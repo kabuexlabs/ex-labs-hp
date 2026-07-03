@@ -1,0 +1,48 @@
+---
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPost, isMicrocmsConfigured } from '../../lib/microcms';
+
+const { slug } = Astro.params;
+const configured = isMicrocmsConfigured();
+const post = configured && slug ? await getPost(slug) : null;
+
+if (!post) {
+  Astro.response.status = 404;
+}
+
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+---
+<BaseLayout title={post ? `${post.title}｜ex Labsブログ` : '記事が見つかりません｜ex Labsブログ'}>
+
+<section class="section" id="article-top"><div class="wrap">
+
+{!post && (
+  <>
+  <p class="eyebrow">BLOG</p>
+  <h2 class="h2 serif">記事が見つかりません</h2>
+  <p class="blog-empty">お探しの記事は存在しないか、削除された可能性があります。</p>
+  </>
+)}
+
+{post && (
+  <>
+  <p class="eyebrow">BLOG</p>
+  <h1 class="h2 serif">{post.title}</h1>
+  <p class="article-date">{formatDate(post.publishedAt)}</p>
+  {post.eyecatch && (
+    <img class="article-hero" src={post.eyecatch.url} alt={post.title} />
+  )}
+  <div class="article-body" set:html={post.body} />
+  </>
+)}
+
+<a class="article-back" href="/blog">← ブログ一覧へ戻る</a>
+
+</div></section>
+
+</BaseLayout>

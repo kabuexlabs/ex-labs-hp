@@ -1,0 +1,78 @@
+---
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPostList, isMicrocmsConfigured } from '../../lib/microcms';
+
+const configured = isMicrocmsConfigured();
+const PAGE_SIZE = 12;
+const page = Math.max(1, Number(Astro.url.searchParams.get('page') ?? '1') || 1);
+const offset = (page - 1) * PAGE_SIZE;
+
+const { contents, totalCount } = configured
+  ? await getPostList(offset, PAGE_SIZE)
+  : { contents: [], totalCount: 0 };
+
+const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function excerpt(html: string, length = 80) {
+  const text = html.replace(/<[^>]+>/g, '');
+  return text.length > length ? text.slice(0, length) + '…' : text;
+}
+---
+<BaseLayout title="ブログ｜株式会社 ex Labs" description="ex Labsのイベント制作・体験型コンテンツに関する最新情報をお届けします。">
+
+<section class="section" id="blog-top"><div class="wrap">
+<p class="eyebrow">BLOG</p><h2 class="h2 serif">ブログ</h2>
+
+{!configured && (
+  <p class="blog-empty">まだブログの準備中です。もうしばらくお待ちください。</p>
+)}
+
+{configured && contents.length === 0 && (
+  <p class="blog-empty">まだ記事がありません。</p>
+)}
+
+{configured && contents.length > 0 && (
+  <>
+  <div class="blog-grid">
+    {contents.map((post) => (
+      <div class="blog-card">
+        <a href={`/blog/${post.id}`}>
+          {post.eyecatch ? (
+            <img class="blog-img" src={post.eyecatch.url} alt={post.title} />
+          ) : (
+            <div class="blog-img"></div>
+          )}
+        </a>
+        <p class="blog-date">{formatDate(post.publishedAt)}</p>
+        <h3 class="blog-title"><a href={`/blog/${post.id}`}>{post.title}</a></h3>
+        <p class="blog-excerpt">{excerpt(post.body)}</p>
+      </div>
+    ))}
+  </div>
+
+  <div class="blog-pagination">
+    {page > 1 ? (
+      <a href={`/blog?page=${page - 1}`}>← 前へ</a>
+    ) : (
+      <span class="disabled">← 前へ</span>
+    )}
+    <span>{page} / {totalPages}</span>
+    {page < totalPages ? (
+      <a href={`/blog?page=${page + 1}`}>次へ →</a>
+    ) : (
+      <span class="disabled">次へ →</span>
+    )}
+  </div>
+  </>
+)}
+
+</div></section>
+
+</BaseLayout>

@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = '株式会社 ex Labs｜体験型エンターテインメントの企画・制作',
+  description = '株式会社ex Labsは、謎解き・マーダーミステリー・イマーシブコンテンツなど体験型エンターテインメントの企画・制作・集客・運営を一貫して手掛けるクリエイティブカンパニーです。',
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="nav"><div class="wrap navrow">
+<a href="/"><img class="logo-header" src="/assets/logo.png" alt="ex Labs"></a>
+<nav class="navlinks"><a href="/#about">ABOUT</a><a href="/#strength">STRENGTH</a><a href="/#works">WORKS</a><a href="/#flow">FLOW</a><a href="/#message">MESSAGE</a><a href="/blog">BLOG</a></nav>
+<a class="btn dark" href="/#contact" style="padding:11px 22px;font-size:12.5px">お問い合わせ</a>
+</div></header>
+
+<slot />
+
+<footer><div class="wrap foot-row">
+<div><p class="foot-name">株式会社 ex Labs</p><p class="foot-addr">東京都新宿区西新宿3-3-13 西新宿水間ビル2F</p></div>
+<p class="foot-copy">© 2026 ex Labs Inc.</p>
+</div></footer>
+
+</body>
+</html>
