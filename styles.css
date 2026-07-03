@@ -108,6 +108,16 @@ header.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(250,24
 .cta-sub{font-size:14.5px;color:rgba(255,255,255,.85);margin:0 0 40px}
 .cta-hint{margin-top:18px;font-size:11.5px;font-family:monospace;color:rgba(255,255,255,.55)}
 
+.contact-form{max-width:560px;margin:0 auto;text-align:left;display:flex;flex-direction:column;gap:20px}
+.contact-form .form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.contact-form label{display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:700;color:rgba(255,255,255,.9)}
+.contact-form .label-cap{display:flex;align-items:center;gap:8px}
+.contact-form .req{font-size:10.5px;font-weight:700;color:#fff;background:rgba(0,0,0,.25);padding:2px 8px;border-radius:10px}
+.contact-form input,.contact-form textarea{font:inherit;font-size:14px;font-weight:400;padding:13px 14px;border:none;border-radius:2px;background:#fff;color:#241f1a}
+.contact-form input:focus,.contact-form textarea:focus{outline:2px solid rgba(255,255,255,.6);outline-offset:2px}
+.contact-form textarea{resize:vertical}
+.contact-form button{align-self:center;margin-top:4px;border:none;cursor:pointer}
+
 footer{padding:56px 0;border-top:1px solid rgba(36,31,26,.1)}
 .foot-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
 .foot-name{font-weight:700;font-size:15px;margin:0 0 4px}
@@ -122,6 +132,7 @@ footer{padding:56px 0;border-top:1px solid rgba(36,31,26,.1)}
   .flow-line{display:none}
   .hero-title{font-size:44px}
   .section{padding:80px 0}
+  .contact-form .form-row{grid-template-columns:1fr}
 }
 @media(max-width:640px){
   .navlinks{display:none}
