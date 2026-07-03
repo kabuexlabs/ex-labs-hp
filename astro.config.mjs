@@ -1,7 +1,9 @@
 import { defineConfig } from 'astro/config';
-import vercel from '@astrojs/vercel/serverless';
+import vercel from '@astrojs/vercel';
 
 export default defineConfig({
-  output: 'hybrid',
+  // Pages are static by default; the blog routes opt out with
+  // `export const prerender = false` so they render on request.
+  output: 'static',
   adapter: vercel(),
 });
