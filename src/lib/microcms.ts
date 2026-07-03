@@ -24,7 +24,11 @@ function getConfig() {
 async function microcmsFetch(path: string): Promise<Response | null> {
   const config = getConfig();
   if (!config) return null;
-  return fetch(`https://${config.serviceDomain}.microcms.io/api/v1/${path}`, {
+  // MICROCMS_API_BASE lets local tests point at a mock server.
+  const base =
+    import.meta.env.MICROCMS_API_BASE ||
+    `https://${config.serviceDomain}.microcms.io`;
+  return fetch(`${base}/api/v1/${path}`, {
     headers: { 'X-MICROCMS-API-KEY': config.apiKey },
   });
 }

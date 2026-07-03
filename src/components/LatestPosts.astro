@@ -1,0 +1,48 @@
+---
+import { getPostList, isMicrocmsConfigured } from '../lib/microcms';
+
+export interface Props {
+  heading?: string;
+  limit?: number;
+}
+
+const { heading = '関連記事', limit = 3 } = Astro.props;
+
+const { contents: fetched } = isMicrocmsConfigured()
+  ? await getPostList(0, limit)
+  : { contents: [] };
+const contents = fetched.slice(0, limit);
+
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function excerpt(html: string, length = 60) {
+  const text = html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  return text.length > length ? text.slice(0, length) + '…' : text;
+}
+---
+{contents.length > 0 && (
+  <section class="section tinted"><div class="wrap">
+    <p class="eyebrow">BLOG</p>
+    <h2 class="h2 serif">{heading}</h2>
+    <div class="blog-grid">
+      {contents.map((post) => (
+        <div class="blog-card">
+          <a href={`/blog/${post.id}`}>
+            {post.eyecatch ? (
+              <img class="blog-img" loading="lazy" decoding="async" src={post.eyecatch.url} alt={post.title} />
+            ) : (
+              <div class="blog-img"></div>
+            )}
+          </a>
+          <p class="blog-date">{formatDate(post.publishedAt)}</p>
+          <h3 class="blog-title"><a href={`/blog/${post.id}`}>{post.title}</a></h3>
+          <p class="blog-excerpt">{excerpt(post.body)}</p>
+        </div>
+      ))}
+    </div>
+    <p class="vc-line" style="margin-top:40px"><a href="/blog" style="color:var(--accent)">ブログ記事一覧を見る →</a></p>
+  </div></section>
+)}

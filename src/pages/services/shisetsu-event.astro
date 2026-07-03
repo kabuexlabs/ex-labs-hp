@@ -1,5 +1,10 @@
 ---
+// Rendered on request so newly published blog posts appear in the
+// related-articles section without a redeploy.
+export const prerender = false;
+
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
 
 const faqs = [
   {
@@ -102,5 +107,7 @@ const breadcrumbLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連サービス：<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作</a></p>
 </div></section>
+
+<LatestPosts />
 
 </BaseLayout>
