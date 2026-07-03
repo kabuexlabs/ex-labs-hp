@@ -57,15 +57,29 @@ async function microcmsFetch(path: string): Promise<Response | null> {
 }
 
 export async function getPostList(offset = 0, limit = 12): Promise<ListResponse> {
-  const res = await microcmsFetch(`${ENDPOINT}?offset=${offset}&limit=${limit}`);
-  if (!res || !res.ok) return { contents: [], totalCount: 0, offset, limit };
-  return res.json();
+  const empty = { contents: [], totalCount: 0, offset, limit };
+  try {
+    const res = await microcmsFetch(`${ENDPOINT}?offset=${offset}&limit=${limit}`);
+    if (!res || !res.ok) {
+      if (res) console.error('[microcms] list request failed:', res.status);
+      return empty;
+    }
+    return await res.json();
+  } catch (e) {
+    console.error('[microcms] getPostList failed:', e);
+    return empty;
+  }
 }
 
 export async function getPost(id: string): Promise<BlogPost | null> {
-  const res = await microcmsFetch(`${ENDPOINT}/${id}`);
-  if (!res || !res.ok) return null;
-  return res.json();
+  try {
+    const res = await microcmsFetch(`${ENDPOINT}/${encodeURIComponent(id)}`);
+    if (!res || !res.ok) return null;
+    return await res.json();
+  } catch (e) {
+    console.error('[microcms] getPost failed:', e);
+    return null;
+  }
 }
 
 export function isMicrocmsConfigured(): boolean {
