@@ -4,6 +4,7 @@ export interface BlogPost {
   body: string;
   eyecatch?: { url: string; width: number; height: number };
   publishedAt: string;
+  revisedAt?: string;
 }
 
 interface ListResponse {

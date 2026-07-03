@@ -4,12 +4,36 @@ import '../styles/global.css';
 export interface Props {
   title?: string;
   description?: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
 }
 
 const {
   title = '株式会社 ex Labs｜体験型エンターテインメントの企画・制作',
-  description = '株式会社ex Labsは、謎解き・マーダーミステリー・イマーシブコンテンツなど体験型エンターテインメントの企画・制作・集客・運営を一貫して手掛けるクリエイティブカンパニーです。',
+  description = '株式会社ex Labsは、謎解き・マーダーミステリー・イマーシブコンテンツなど体験型エンターテインメントの企画・制作・集客・運営を一貫して手掛けるクリエイティブカンパニーです。謎解き研修や施設活用イベントもご相談ください。',
+  ogImage = '/assets/logo.png',
+  ogType = 'website',
 } = Astro.props;
+
+const site = Astro.site ?? new URL('https://ex-labs-hp.vercel.app');
+const canonical = new URL(Astro.url.pathname, site);
+const ogImageAbs = new URL(ogImage, site);
+
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: '株式会社ex Labs',
+  url: site.toString(),
+  logo: new URL('/assets/logo.png', site).toString(),
+  email: 'info@kabuexlabs.com',
+  address: {
+    '@type': 'PostalAddress',
+    addressRegion: '東京都',
+    addressLocality: '新宿区',
+    streetAddress: '西新宿3-3-13 西新宿水間ビル2F',
+    addressCountry: 'JP',
+  },
+};
 ---
 
 <!DOCTYPE html>
@@ -19,22 +43,40 @@ const {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
 <meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content={ogType}>
+<meta property="og:url" content={canonical}>
+<meta property="og:image" content={ogImageAbs}>
+<meta property="og:site_name" content="株式会社 ex Labs">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
 </head>
 <body>
 
 <header class="nav"><div class="wrap navrow">
 <a href="/"><img class="logo-header" src="/assets/logo.png" alt="ex Labs"></a>
-<nav class="navlinks"><a href="/#about">ABOUT</a><a href="/#strength">STRENGTH</a><a href="/#works">WORKS</a><a href="/#flow">FLOW</a><a href="/#message">MESSAGE</a><a href="/blog">BLOG</a></nav>
+<nav class="navlinks"><a href="/#about">ABOUT</a><a href="/#strength">STRENGTH</a><a href="/#works">WORKS</a><a href="/services/">SERVICE</a><a href="/#message">MESSAGE</a><a href="/blog">BLOG</a></nav>
 <a class="btn dark" href="/#contact" style="padding:11px 22px;font-size:12.5px">お問い合わせ</a>
 </div></header>
 
 <slot />
 
-<footer><div class="wrap foot-row">
+<footer><div class="wrap">
+<div class="foot-row">
 <div><p class="foot-name">株式会社 ex Labs</p><p class="foot-addr">東京都新宿区西新宿3-3-13 西新宿水間ビル2F</p></div>
 <p class="foot-copy">© 2026 ex Labs Inc.</p>
+</div>
+<nav class="foot-links">
+<a href="/services/nazotoki-kenshu/">謎解き研修</a>
+<a href="/services/murder-mystery/">マーダーミステリー制作</a>
+<a href="/services/shisetsu-event/">施設活用イベント</a>
+<a href="/blog">ブログ</a>
+</nav>
 </div></footer>
 
 </body>

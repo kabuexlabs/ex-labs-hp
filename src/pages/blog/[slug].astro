@@ -16,8 +16,33 @@ function formatDate(iso: string) {
   const d = new Date(iso);
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 }
+
+function excerpt(html: string, length = 110) {
+  const text = html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  return text.length > length ? text.slice(0, length) + '…' : text;
+}
+
+const articleLd = post
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: post.title,
+      datePublished: post.publishedAt,
+      ...(post.revisedAt ? { dateModified: post.revisedAt } : {}),
+      ...(post.eyecatch ? { image: [post.eyecatch.url] } : {}),
+      author: { '@type': 'Organization', name: '株式会社ex Labs' },
+      publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+      mainEntityOfPage: new URL(Astro.url.pathname, Astro.site).toString(),
+    }
+  : null;
 ---
-<BaseLayout title={post ? `${post.title}｜ex Labsブログ` : '記事が見つかりません｜ex Labsブログ'}>
+<BaseLayout
+  title={post ? `${post.title}｜ex Labsブログ` : '記事が見つかりません｜ex Labsブログ'}
+  description={post ? excerpt(post.body) : undefined}
+  ogImage={post?.eyecatch?.url}
+  ogType="article"
+>
+{articleLd && <script type="application/ld+json" set:html={JSON.stringify(articleLd)} />}
 
 <section class="section" id="article-top"><div class="wrap">
 

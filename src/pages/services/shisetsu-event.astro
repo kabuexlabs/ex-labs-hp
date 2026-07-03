@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const faqs = [
+  {
+    q: 'どのような施設で実施できますか？',
+    a: '水族館（神戸須磨シーワールド様）、書店（博報堂×紀伊國屋書店様）、カラオケ店（カラオケ館様）、宿泊施設、商店街エリア（下北沢）など、幅広い施設・空間での実績があります。施設の特性を活かした企画をご提案します。',
+  },
+  {
+    q: '初期費用はどのくらいかかりますか？',
+    a: '高額な初期制作費をいただくのではなく、イベントの集客・運営を通じて収益を回収するモデルを採用しています。案件によっては初期費用を抑えたご提案やレベニューシェア型での実施にも対応可能です。',
+  },
+  {
+    q: '企画だけでなく集客や運営もお願いできますか？',
+    a: 'はい。企画・制作に加えて、集客・運営・実施後のコンテンツ改善までを一貫してご支援する「伴走型」の体制が当社の特長です。',
+  },
+  {
+    q: '閑散期やオフシーズンの集客施策として使えますか？',
+    a: '体験型イベントは開催期間・時間帯を柔軟に設計できるため、閑散期・オフピーク時間帯の集客施策としても有効です。施設の稼働状況に合わせてご提案します。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'ホーム', item: new URL('/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'サービス', item: new URL('/services/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 3, name: '施設活用イベント' },
+  ],
+};
+---
+<BaseLayout
+  title="施設活用イベントの企画・制作｜商業施設・観光施設の集客なら - 株式会社ex Labs"
+  description="施設を活用した体験型イベントの企画・制作なら株式会社ex Labs。水族館・書店・カラオケ店・宿泊施設・商店街での実績多数。「その場所だからこそ体験できる物語」で新規集客と滞在価値向上を実現。初期費用を抑えたレベニューシェア型にも対応。"
+>
+<script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+
+<section class="section" style="padding-top:160px"><div class="wrap">
+<p class="eyebrow">SERVICE</p>
+<h1 class="h2 serif">施設活用イベントの企画・制作</h1>
+<p class="lede">株式会社ex Labsは、商業施設・文化施設・観光施設・宿泊施設などの空間を活かした体験型イベントを企画・制作しています。「その場所だからこそ体験できる物語」をコンセプトに、施設の魅力を最大限に引き出す集客コンテンツをお届けします。</p>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="eyebrow">ISSUES</p>
+<h2 class="h2 serif">こんな施設様におすすめです</h2>
+<ul class="bullets">
+<li>新しい集客の打ち手を探している商業施設・観光施設</li>
+<li>閑散時間帯・オフシーズンの稼働を高めたい施設</li>
+<li>若年層・ファミリー層との新しい接点を作りたい施設</li>
+<li>施設全体を回遊してもらう仕掛けを作りたい施設</li>
+</ul>
+<div class="rule"></div>
+<p class="lede">周遊型の体験イベントは、来場者が施設内を巡りながら楽しむ構造のため、滞在時間の延長・施設全体の回遊・普段接点のない売場やエリアへの誘導につながります。</p>
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="eyebrow">WORKS</p>
+<h2 class="h2 serif">施設活用イベントの実績</h2>
+<div class="str-grid">
+<div class="str-card"><p class="str-num">01</p><h3 class="str-title">神戸須磨シーワールド様</h3>
+<p class="str-body">館内を巡りながら宝探しを楽しむ周遊型イベント「オルカ海賊団からの挑戦状」の謎解きを制作。水族館という空間の魅力を活かした体験を設計しました。</p></div>
+<div class="str-card"><p class="str-num">02</p><h3 class="str-title">博報堂 × 紀伊國屋書店様</h3>
+<p class="str-body">閉店後の紀伊國屋書店を舞台にした一夜限りの体験型イベント「月明かりの書店と呪われた原稿」の制作を担当。「その場所でしか成立しない物語」を実現しました。</p></div>
+<div class="str-card"><p class="str-num">03</p><h3 class="str-title">下北沢エリア（街全体）</h3>
+<p class="str-body">下北沢連合会様との連携により、街全体を舞台としたアート体験型イベント「ロスト・フレーム」などを制作。商店街・エリア単位での回遊施策にも対応します。</p></div>
+<div class="str-card"><p class="str-num">04</p><h3 class="str-title">カラオケ館様</h3>
+<p class="str-body">参加者が様々な試験へ挑戦する周遊型頭脳戦コンテンツ「恣験」を制作。店舗空間を活かしたエンターテインメントで新しい利用動機を創出しました。</p></div>
+</div>
+<p class="vc-line" style="margin-top:32px">現在も、大手不動産会社様や植物園様をはじめ、様々な企業・団体とのプロジェクトが進行しております。<a href="/#works" style="color:var(--accent)">実績一覧を見る</a></p>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="eyebrow">FAQ</p>
+<h2 class="h2 serif">よくあるご質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">初期費用0円からの施設活用イベント、まずはご相談ください</p>
+<a class="btn" style="background:#241f1a" href="/#contact">お問い合わせ</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連サービス：<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作</a></p>
+</div></section>
+
+</BaseLayout>

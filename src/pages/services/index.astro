@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const services = [
+  {
+    href: '/services/nazotoki-kenshu/',
+    title: '謎解き研修',
+    desc: '謎解きを活用した体験型チームビルディング研修。参加者が自然と協力し合う「体験」で、コミュニケーション活性化と相互理解を促進します。',
+  },
+  {
+    href: '/services/murder-mystery/',
+    title: 'マーダーミステリー制作',
+    desc: '動画企画・店舗集客・イベント向けなど、目的に合わせたオリジナルのマーダーミステリー作品を企画からシナリオ制作・運営まで一貫して制作します。',
+  },
+  {
+    href: '/services/shisetsu-event/',
+    title: '施設活用イベント',
+    desc: '商業施設・文化施設・観光施設の空間を活かした体験型イベントを企画・制作。周遊型の仕掛けで新規集客と滞在価値の向上を実現します。',
+  },
+];
+---
+<BaseLayout
+  title="サービス一覧｜株式会社 ex Labs"
+  description="株式会社ex Labsの法人向けサービス一覧。謎解き研修・マーダーミステリー制作・施設活用イベントなど、体験型エンターテインメントの企画・制作・集客・運営を一貫してご支援します。"
+>
+
+<section class="section" style="padding-top:160px"><div class="wrap">
+<p class="eyebrow">SERVICE</p>
+<h1 class="h2 serif">サービス一覧</h1>
+<p class="h2sub">体験型エンターテインメントの企画・制作・集客・運営を一貫してご支援します。</p>
+<div class="svc-grid">
+{services.map((s) => (
+  <div class="svc-card">
+    <h2 class="svc-title"><a href={s.href}>{s.title}</a></h2>
+    <p class="svc-desc">{s.desc}</p>
+    <a class="svc-link" href={s.href}>詳しく見る →</a>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section" style="padding-top:0"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">サービスに関するご相談はこちら</p>
+<a class="btn" style="background:#241f1a" href="/#contact">お問い合わせ</a>
+</div>
+</div></section>
+
+</BaseLayout>
