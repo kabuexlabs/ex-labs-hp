@@ -13,7 +13,7 @@ const STATIC_PATHS = [
 ];
 
 export const GET: APIRoute = async ({ site }) => {
-  const base = site ?? new URL('https://ex-labs-hp.vercel.app');
+  const base = site ?? new URL('https://kabuexlabs.com');
 
   const urls: { loc: string; lastmod?: string }[] = STATIC_PATHS.map((p) => ({
     loc: new URL(p, base).toString(),
