@@ -8,13 +8,19 @@ import LatestPosts from '../components/LatestPosts.astro';
 
 // 展開団体 — self-run labels/communities shown in the About marquee.
 // Add `logo: '/assets/groups/xxx.png'` to an entry to show an image
-// instead of the text name.
-const groups: { name: string; logo?: string }[] = [
+// instead of the text name; `h` tunes the display height (px) since
+// the logos have very different aspect ratios.
+const groups: { name: string; logo?: string; h?: number }[] = [
+  { name: 'ANAVKEY（アナアキー）', logo: '/assets/groups/anavkey.webp', h: 44 },
+  { name: 'HACKTALE', logo: '/assets/groups/hacktale.png', h: 34 },
+  { name: 'SMystery', logo: '/assets/groups/smystery.webp', h: 64 },
+  { name: 'UNLIMITED MYSTERY', logo: '/assets/groups/unlimited-mystery.webp', h: 48 },
+  { name: '体験する美術館', logo: '/assets/groups/taiken-bijutsukan.png', h: 72 },
   { name: '東大マーダーミステリーサークル' },
 ];
-// Repeat the list so the marquee loop has no visible gap even while
-// the group count is small.
-const marqueeItems = Array(6).fill(groups).flat();
+// Repeat the list so the marquee loop has no visible gap on wide
+// screens.
+const marqueeItems = Array(2).fill(groups).flat();
 ---
 <BaseLayout>
 
@@ -43,12 +49,12 @@ const marqueeItems = Array(6).fill(groups).flat();
 <div class="marquee"><div class="marquee-track">
 {marqueeItems.map((g) => (
   g.logo
-    ? <img class="marquee-logo" src={g.logo} alt={g.name} loading="lazy" decoding="async" />
+    ? <img class="marquee-logo" src={g.logo} alt={g.name} style={g.h ? `height:${g.h}px` : undefined} loading="lazy" decoding="async" />
     : <span class="marquee-name serif">{g.name}</span>
 ))}
 {marqueeItems.map((g) => (
   g.logo
-    ? <img class="marquee-logo" src={g.logo} alt="" loading="lazy" decoding="async" />
+    ? <img class="marquee-logo" src={g.logo} alt="" style={g.h ? `height:${g.h}px` : undefined} loading="lazy" decoding="async" />
     : <span class="marquee-name serif" aria-hidden="true">{g.name}</span>
 ))}
 </div></div>
