@@ -4,9 +4,10 @@ import { getPostList, isMicrocmsConfigured } from '../lib/microcms';
 export interface Props {
   heading?: string;
   limit?: number;
+  tinted?: boolean;
 }
 
-const { heading = '関連記事', limit = 3 } = Astro.props;
+const { heading = '関連記事', limit = 3, tinted = true } = Astro.props;
 
 const { contents: fetched } = isMicrocmsConfigured()
   ? await getPostList(0, limit)
@@ -24,7 +25,7 @@ function excerpt(html: string, length = 60) {
 }
 ---
 {contents.length > 0 && (
-  <section class="section tinted"><div class="wrap">
+  <section class:list={['section', { tinted }]}><div class="wrap">
     <p class="eyebrow">BLOG</p>
     <h2 class="h2 serif">{heading}</h2>
     <div class="blog-grid">

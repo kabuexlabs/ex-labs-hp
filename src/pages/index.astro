@@ -1,5 +1,20 @@
 ---
+// Rendered on request so the latest-posts section stays current
+// without a redeploy.
+export const prerender = false;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
+import LatestPosts from '../components/LatestPosts.astro';
+
+// 展開団体 — self-run labels/communities shown in the About marquee.
+// Add `logo: '/assets/groups/xxx.png'` to an entry to show an image
+// instead of the text name.
+const groups: { name: string; logo?: string }[] = [
+  { name: '東大マーダーミステリーサークル' },
+];
+// Repeat the list so the marquee loop has no visible gap even while
+// the group count is small.
+const marqueeItems = Array(6).fill(groups).flat();
 ---
 <BaseLayout>
 
@@ -23,7 +38,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <p class="lede">「その場所だからこそ体験できる物語」をコンセプトに、商業施設・文化施設・観光施設・IP・ブランドなどの魅力を活かした体験型コンテンツを企画・制作しています。</p>
 <p class="vc-line">設立からの期間はまだ長くありませんが、複数の上場企業様とのお取引実績を有しており、Skyland Ventures様をはじめとするベンチャーキャピタル様からのご支援もいただいております。</p>
 </div>
+<div class="marquee-block">
+<p class="marquee-label">展開団体</p>
+<div class="marquee"><div class="marquee-track">
+{marqueeItems.map((g) => (
+  g.logo
+    ? <img class="marquee-logo" src={g.logo} alt={g.name} loading="lazy" decoding="async" />
+    : <span class="marquee-name serif">{g.name}</span>
+))}
+{marqueeItems.map((g) => (
+  g.logo
+    ? <img class="marquee-logo" src={g.logo} alt="" loading="lazy" decoding="async" />
+    : <span class="marquee-name serif" aria-hidden="true">{g.name}</span>
+))}
+</div></div>
+</div>
 </div></section>
+
+<LatestPosts heading="最新記事" tinted={false} />
 
 <section class="section tinted" id="strength"><div class="wrap">
 <p class="eyebrow">STRENGTH</p><h2 class="h2 serif">ex Labsの強み</h2>

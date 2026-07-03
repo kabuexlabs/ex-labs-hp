@@ -101,6 +101,16 @@ header.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(250,24
 .cta-mini{background:var(--accent);color:#fff;padding:56px 44px;text-align:center;border-radius:2px}
 .cta-mini-title{font-size:24px;font-weight:600;margin:0 0 24px}
 
+.marquee-block{margin-top:56px}
+.marquee-label{font-size:12px;letter-spacing:.18em;font-weight:700;color:rgba(36,31,26,.45);margin:0 0 20px}
+.marquee{overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.marquee-track{display:flex;align-items:center;gap:72px;width:max-content;animation:marquee 30s linear infinite}
+.marquee-track>*{flex:none}
+.marquee-name{font-size:20px;font-weight:600;color:rgba(36,31,26,.55);white-space:nowrap}
+.marquee-logo{height:40px;width:auto;opacity:.75}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 36px))}}
+@media (prefers-reduced-motion: reduce){.marquee-track{animation:none}}
+
 .foot-links{display:flex;gap:20px;flex-wrap:wrap;margin-top:28px;padding-top:20px;border-top:1px solid rgba(36,31,26,.08)}
 .foot-links a{font-size:12.5px;color:rgba(36,31,26,.55)}
 .foot-links a:hover{color:var(--accent)}
