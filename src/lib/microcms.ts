@@ -56,6 +56,17 @@ async function microcmsFetch(path: string): Promise<Response | null> {
   }
 }
 
+// The rich-editor field may be called `body` or `content` depending on
+// how the microCMS API schema was created; accept either and make sure
+// the templates always receive strings.
+function normalizePost(raw: any): BlogPost {
+  return {
+    ...raw,
+    title: raw?.title ?? '(無題)',
+    body: raw?.body ?? raw?.content ?? '',
+  };
+}
+
 export async function getPostList(offset = 0, limit = 12): Promise<ListResponse> {
   const empty = { contents: [], totalCount: 0, offset, limit };
   try {
@@ -64,7 +75,8 @@ export async function getPostList(offset = 0, limit = 12): Promise<ListResponse>
       if (res) console.error('[microcms] list request failed:', res.status);
       return empty;
     }
-    return await res.json();
+    const data = await res.json();
+    return { ...data, contents: (data.contents ?? []).map(normalizePost) };
   } catch (e) {
     console.error('[microcms] getPostList failed:', e);
     return empty;
@@ -75,7 +87,7 @@ export async function getPost(id: string): Promise<BlogPost | null> {
   try {
     const res = await microcmsFetch(`${ENDPOINT}/${encodeURIComponent(id)}`);
     if (!res || !res.ok) return null;
-    return await res.json();
+    return normalizePost(await res.json());
   } catch (e) {
     console.error('[microcms] getPost failed:', e);
     return null;
