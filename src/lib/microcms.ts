@@ -22,9 +22,15 @@ function readEnv(name: string): string | undefined {
 }
 
 function getConfig() {
-  const serviceDomain = readEnv('MICROCMS_SERVICE_DOMAIN');
-  const apiKey = readEnv('MICROCMS_API_KEY');
-  if (!serviceDomain || !apiKey) return null;
+  const rawDomain = readEnv('MICROCMS_SERVICE_DOMAIN')?.trim();
+  const apiKey = readEnv('MICROCMS_API_KEY')?.trim();
+  if (!rawDomain || !apiKey) return null;
+  // Accept a full URL or hostname pasted into the domain variable and
+  // reduce it to the bare service ID microCMS expects.
+  const serviceDomain = rawDomain
+    .replace(/^https?:\/\//, '')
+    .replace(/\.microcms\.io.*$/, '')
+    .replace(/\/.*$/, '');
   return { serviceDomain, apiKey };
 }
 
@@ -38,9 +44,16 @@ async function microcmsFetch(path: string): Promise<Response | null> {
   // MICROCMS_API_BASE lets local tests point at a mock server.
   const base =
     readEnv('MICROCMS_API_BASE') || `https://${config.serviceDomain}.microcms.io`;
-  return fetch(`${base}/api/v1/${path}`, {
-    headers: { 'X-MICROCMS-API-KEY': config.apiKey },
-  });
+  // A CMS outage or a malformed env value must degrade to the empty
+  // state, never crash the page.
+  try {
+    return await fetch(`${base}/api/v1/${path}`, {
+      headers: { 'X-MICROCMS-API-KEY': config.apiKey },
+    });
+  } catch (e) {
+    console.error('[microcms] fetch failed:', e);
+    return null;
+  }
 }
 
 export async function getPostList(offset = 0, limit = 12): Promise<ListResponse> {
