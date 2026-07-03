@@ -3,6 +3,9 @@
 html{scroll-behavior:smooth}
 body{margin:0;background:#faf8f5;color:#241f1a;font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased}
 ::selection{background:var(--accent);color:#fff}
+strong{font-weight:700}
+.lede strong,.str-body strong{color:#241f1a}
+.perf-lede strong,.style-note strong{color:#fff}
 .accent-dark{color:color-mix(in srgb,var(--accent) 60%,#fff 40%)}
 .serif{font-family:'Shippori Mincho',serif}
 a{color:inherit;text-decoration:none;transition:color .2s}
@@ -60,6 +63,10 @@ header.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(250,24
 .style-row{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.7;padding:10px 0;border-top:1px solid rgba(36,31,26,.08)}
 .style-col.us .style-row{border-top:1px solid rgba(255,255,255,.1)}
 .style-note{margin-top:28px;font-size:13px;line-height:1.8;color:rgba(255,255,255,.65)}
+.mark{width:19px;height:19px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:3px}
+.mark.ok{background:color-mix(in srgb,var(--accent) 60%,#fff 40%);color:#241f1a}
+.mark.ok-muted{background:rgba(36,31,26,.1);color:rgba(36,31,26,.6)}
+.mark.no{background:rgba(36,31,26,.08);color:rgba(36,31,26,.35)}
 
 .works-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px}
 .works-grid{display:grid;gap:36px;grid-template-columns:repeat(3,1fr)}
@@ -140,11 +147,12 @@ a:hover>.blog-img{opacity:.88}
 .genre-cell{border:1px solid rgba(36,31,26,.12);padding:26px 20px;font-size:15px;font-weight:600;text-align:center;background:#fff;transition:border-color .25s,color .25s}
 .genre-cell:hover{border-color:color-mix(in srgb,var(--accent) 45%,rgba(36,31,26,.12) 55%);color:var(--accent)}
 
-.flow-row{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
-.flow-step{padding:0 20px;position:relative}
-.flow-num{font-family:'Shippori Mincho',serif;font-size:34px;color:var(--accent);font-weight:600}
-.flow-t{font-size:16px;font-weight:700;margin:14px 0 10px}
-.flow-d{font-size:13px;line-height:1.7;color:rgba(36,31,26,.65)}
+.flow-row{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;position:relative}
+.flow-step{background:#fff;border:1px solid rgba(36,31,26,.08);border-radius:2px;padding:30px 24px;position:relative}
+.flow-step:not(:last-child)::after{content:'';position:absolute;top:50%;right:-19px;width:11px;height:11px;border-top:2px solid var(--accent);border-right:2px solid var(--accent);transform:translateY(-50%) rotate(45deg)}
+.flow-num{font-family:'Shippori Mincho',serif;font-size:30px;line-height:1;color:var(--accent);font-weight:600;margin:0}
+.flow-t{font-size:16px;font-weight:700;margin:16px 0 10px}
+.flow-d{font-size:13px;line-height:1.7;color:rgba(36,31,26,.65);margin:0}
 
 .msg-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:72px;align-items:center}
 .msg-quote{font-size:26px;line-height:1.7;margin:0 0 30px}
@@ -183,8 +191,9 @@ footer{padding:64px 0 40px;background:#241f1a;color:rgba(255,255,255,.8)}
 
 @media(max-width:860px){
   .about-grid,.str-grid,.style-grid,.msg-grid{grid-template-columns:1fr}
-  .flow-row,.genre-grid{grid-template-columns:1fr 1fr}
-  .flow-row{gap:32px 0}
+  .genre-grid{grid-template-columns:1fr 1fr}
+  .flow-row{grid-template-columns:1fr;gap:26px;max-width:480px}
+  .flow-step:not(:last-child)::after{top:auto;right:auto;bottom:-19px;left:50%;transform:translateX(-50%) rotate(135deg)}
   .hero-title{font-size:44px}
   .h2{font-size:34px}
   .section{padding:88px 0}
@@ -228,10 +237,10 @@ footer{padding:64px 0 40px;background:#241f1a;color:rgba(255,255,255,.8)}
   .perf-lede{font-size:13.5px;margin-bottom:40px}
   .cond-item{font-size:13px}
   .genre-cell{padding:18px 10px;font-size:13px}
-  .flow-num{font-size:26px}
+  .flow-num{font-size:24px}
   .flow-t{font-size:14.5px}
-  .flow-d{font-size:12px}
-  .flow-step{padding:0 10px}
+  .flow-d{font-size:12.5px}
+  .flow-step{padding:22px 18px}
   .msg-grid{gap:36px}
   .ceo-photo{max-width:300px;margin:0 auto}
   .msg-quote{font-size:20px}
