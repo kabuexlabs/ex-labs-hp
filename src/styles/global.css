@@ -128,6 +128,14 @@ a:hover>.blog-img{opacity:.88}
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 36px))}}
 @media (prefers-reduced-motion: reduce){.marquee-track{animation:none}}
 
+.voice-marquee{overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.voice-track{display:flex;align-items:flex-start;gap:28px;width:max-content;animation:marquee-voice 42s linear infinite}
+.voice-track:hover{animation-play-state:paused}
+.voice-card{flex:none;height:340px;width:auto;border-radius:10px;border:1px solid rgba(36,31,26,.1);box-shadow:0 20px 40px -28px rgba(36,31,26,.35)}
+@keyframes marquee-voice{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 14px))}}
+@media (prefers-reduced-motion: reduce){.voice-track{animation:none}}
+@media(max-width:640px){.voice-card{height:220px}}
+
 .foot-links{display:flex;gap:24px;flex-wrap:wrap;margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,255,255,.12)}
 .foot-links a{font-size:12.5px;letter-spacing:.04em;color:rgba(255,255,255,.55)}
 .foot-links a:hover{color:color-mix(in srgb,var(--accent) 42%,#fff 58%)}

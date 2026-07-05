@@ -5,6 +5,8 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import VoiceMarquee from '../../components/VoiceMarquee.astro';
+import { zunousenVoices } from '../../data/voices';
 
 const faqs = [
   {
@@ -102,6 +104,8 @@ const breadcrumbLd = {
 </div>
 <p class="vc-line" style="margin-top:32px">自社主催「東京都頭脳王決定戦」の実績はこちら。<a href="/#works" style="color:var(--accent)">実績一覧を見る</a></p>
 </div></section>
+
+<VoiceMarquee voices={zunousenVoices} />
 
 <section class="section"><div class="wrap">
 <p class="eyebrow">FAQ</p>

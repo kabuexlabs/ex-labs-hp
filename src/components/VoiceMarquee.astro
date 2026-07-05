@@ -1,0 +1,25 @@
+---
+import type { Voice } from '../data/voices';
+
+export interface Props {
+  voices: Voice[];
+  heading?: string;
+}
+
+const { voices, heading = 'お客様の声' } = Astro.props;
+// Duplicate the track so the CSS loop has no visible seam.
+const track = [...voices, ...voices];
+---
+{voices.length > 0 && (
+  <section class="section"><div class="wrap">
+  <p class="eyebrow">VOICE</p>
+  <h2 class="h2 serif">{heading}</h2>
+  <div class="voice-marquee">
+    <div class="voice-track">
+      {track.map((v) => (
+        <img class="voice-card" src={v.src} alt={v.alt} loading="lazy" decoding="async" />
+      ))}
+    </div>
+  </div>
+  </div></section>
+)}
