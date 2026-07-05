@@ -1,0 +1,123 @@
+---
+// Rendered on request so newly published blog posts appear in the
+// related-articles section without a redeploy.
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+
+const faqs = [
+  {
+    q: '「頭脳戦」とはどのようなコンテンツですか？',
+    a: '交渉・心理戦・閃きを軸にした対人ゲーム形式のコンテンツです。ライアーゲームのような、正解が一つに定まらない駆け引きを通じて、参加者同士の腹の探り合いや逆転の展開を楽しんでいただけます。',
+  },
+  {
+    q: '謎解きとは何が違うのですか？',
+    a: '謎解きは「参加者全員で協力して謎を解く」形式ですが、頭脳戦は参加者同士が交渉・裏切り・駆け引きを行う対戦形式です。謎解きに特化した制作団体は増えていますが、この対人交渉型ゲームに特化した制作団体は国内でも他に例がなく、ex Labsが唯一の専門集団です。',
+  },
+  {
+    q: '何人から実施できますか？',
+    a: '作品によって異なりますが、少人数の卓上ゲーム形式から、東京都頭脳王決定戦のような都内4会場・大人数同時開催の大型企画まで対応可能です。',
+  },
+  {
+    q: 'オリジナル作品の制作も依頼できますか？',
+    a: 'はい。プレゼント・ポーカー、人狼定理、ダイスボックスなど複数の頭脳戦コンテンツを制作してきた実績をもとに、貴社のご要望に合わせたオリジナルゲームを企画・制作します。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'ホーム', item: new URL('/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'サービス', item: new URL('/services/', Astro.site).toString() },
+    { '@type': 'ListItem', position: 3, name: '頭脳戦制作' },
+  ],
+};
+---
+<BaseLayout
+  title="頭脳戦制作｜交渉・心理戦コンテンツの企画・制作 - 株式会社ex Labs"
+  description="頭脳戦・心理戦コンテンツの制作なら株式会社ex Labs。ライアーゲームのような交渉・閃きのゲームに特化した、日本で唯一の専門制作団体を保有。東京都頭脳王決定戦などの制作実績をもとに、オリジナル頭脳戦コンテンツを企画・制作します。"
+>
+<script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+
+<section class="section" style="padding-top:160px"><div class="wrap">
+<p class="eyebrow">SERVICE</p>
+<h1 class="h2 serif">頭脳戦制作｜交渉・心理戦コンテンツ</h1>
+<p class="lede">株式会社ex Labsは、<strong>ライアーゲームのような交渉・閃きのゲーム</strong>を制作可能な、<strong>日本で唯一の頭脳戦特化制作団体</strong>を保有しています。謎解きに特化した制作団体は複数存在しますが、対人交渉・心理戦を軸にしたこの手のゲームに特化した団体は他に例がありません。</p>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="eyebrow">ISSUES</p>
+<h2 class="h2 serif">こんなご要望はありませんか？</h2>
+<ul class="bullets">
+<li>謎解きとは違う、駆け引きや心理戦を楽しめるコンテンツを探している</li>
+<li>参加者同士が本気で盛り上がる対戦形式の企画を実施したい</li>
+<li>大人数が同時に参加できる大型の頭脳戦イベントを開催したい</li>
+<li>オリジナルの頭脳戦ゲームを一から制作してほしい</li>
+</ul>
+<div class="rule"></div>
+<p class="lede">頭脳戦は「協力すれば解ける」謎解きとは異なり、<strong>読み合い・裏切り・逆転</strong>が生まれる対戦構造が魅力です。正解が一つに定まらないからこそ、プレイするたびに違うドラマが生まれます。</p>
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="eyebrow">FEATURES</p>
+<h2 class="h2 serif">ex Labsの頭脳戦制作が選ばれる理由</h2>
+<div class="str-grid">
+<div class="str-card"><p class="str-num">01</p><h3 class="str-title">日本で唯一の頭脳戦特化団体</h3>
+<p class="str-body">謎解き団体は数多く存在しますが、ライアーゲームのような交渉・心理戦・閃きを軸にした頭脳戦コンテンツに特化した制作団体は、ex Labs以外に例がありません。この分野に特化しているからこそのゲームバランス設計力があります。</p></div>
+<div class="str-card"><p class="str-num">02</p><h3 class="str-title">大型イベントでの実施実績</h3>
+<p class="str-body">自社主催「東京都頭脳王決定戦」では、東京都内4会場を同時に活用し、「東京都で最も頭の良い人を決める」というコンセプトの大型イベントを企画・運営。ご好評をいただきました。</p></div>
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="eyebrow">TITLES</p>
+<h2 class="h2 serif">制作作品例</h2>
+<p class="h2sub">これまでに手がけた頭脳戦コンテンツの一部をご紹介します。</p>
+<div class="svc-grid">
+<div class="svc-card"><h3 class="svc-title">プレゼント・ポーカー</h3>
+<p class="svc-desc">駆け引きと読み合いを軸にした頭脳戦コンテンツ。</p></div>
+<div class="svc-card"><h3 class="svc-title">人狼定理</h3>
+<p class="svc-desc">正体を推理し合う心理戦要素を取り入れた頭脳戦コンテンツ。</p></div>
+<div class="svc-card"><h3 class="svc-title">ダイスボックス</h3>
+<p class="svc-desc">運と交渉を組み合わせた頭脳戦コンテンツ。</p></div>
+</div>
+<p class="vc-line" style="margin-top:32px">自社主催「東京都頭脳王決定戦」の実績はこちら。<a href="/#works" style="color:var(--accent)">実績一覧を見る</a></p>
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="eyebrow">FAQ</p>
+<h2 class="h2 serif">よくあるご質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">頭脳戦制作のご相談はこちら</p>
+<a class="btn" style="background:#241f1a" href="/#contact">お問い合わせ</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連サービス：<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント</a></p>
+</div></section>
+
+<LatestPosts />
+
+</BaseLayout>

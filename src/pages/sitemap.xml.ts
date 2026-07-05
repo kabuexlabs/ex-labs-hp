@@ -10,6 +10,7 @@ const STATIC_PATHS = [
   '/services/nazotoki-kenshu/',
   '/services/murder-mystery/',
   '/services/shisetsu-event/',
+  '/services/zunousen/',
 ];
 
 export const GET: APIRoute = async ({ site }) => {
