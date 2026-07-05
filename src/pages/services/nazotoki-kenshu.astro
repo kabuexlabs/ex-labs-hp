@@ -5,6 +5,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 
 const faqs = [
   {
@@ -35,14 +36,15 @@ const faqLd = {
   })),
 };
 
-const breadcrumbLd = {
+const serviceLd = {
   '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'ホーム', item: new URL('/', Astro.site).toString() },
-    { '@type': 'ListItem', position: 2, name: 'サービス', item: new URL('/services/', Astro.site).toString() },
-    { '@type': 'ListItem', position: 3, name: '謎解き研修' },
-  ],
+  '@type': 'Service',
+  serviceType: '謎解き研修',
+  name: '謎解き研修',
+  description: '謎解きを活用した体験型の社内研修・チームビルディングプログラムの企画・制作',
+  provider: { '@type': 'Organization', name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
+  areaServed: 'JP',
+  url: new URL('/services/nazotoki-kenshu/', Astro.site).toString(),
 };
 ---
 <BaseLayout
@@ -50,9 +52,14 @@ const breadcrumbLd = {
   description="謎解き研修・体験型チームビルディングの企画・制作なら株式会社ex Labs。商業イベントで培ったシナリオ制作力で、貴社の目的に合わせたオリジナル研修プログラムを設計。企画から当日運営まで一貫対応します。"
 >
 <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
-<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(serviceLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'サービス', href: '/services/' },
+  { name: '謎解き研修' },
+]} />
 
-<section class="section" style="padding-top:160px"><div class="wrap">
+<section class="section" style="padding-top:56px"><div class="wrap">
 <p class="eyebrow">SERVICE</p>
 <h1 class="h2 serif">謎解き研修｜体験型チームビルディング</h1>
 <p class="lede">株式会社ex Labsは、謎解きを活用した<strong>体験型の社内研修・チームビルディングプログラム</strong>を企画・制作しています。参加者が自然と協力し合う「体験」を通じて、<strong>コミュニケーションの活性化やチームの相互理解</strong>を促進します。</p>
@@ -100,7 +107,7 @@ const breadcrumbLd = {
 <section class="section"><div class="wrap">
 <div class="cta-mini">
 <p class="cta-mini-title serif">謎解き研修のご相談はこちら</p>
-<a class="btn" style="background:#241f1a" href="/#contact">お問い合わせ</a>
+<a class="btn" style="background:#241f1a" href="/#contact">謎解き研修について相談する</a>
 </div>
 <p class="vc-line" style="margin-top:48px">関連サービス：<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント</a>／<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作</a></p>
 </div></section>

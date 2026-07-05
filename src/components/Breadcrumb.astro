@@ -1,0 +1,28 @@
+---
+export interface Props {
+  items: { name: string; href?: string }[];
+}
+const { items } = Astro.props;
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: items.map((item, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: item.name,
+    ...(item.href ? { item: new URL(item.href, Astro.site).toString() } : {}),
+  })),
+};
+---
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+<nav class="breadcrumb" aria-label="パンくずリスト"><div class="wrap">
+<ol>
+{items.map((item, i) => (
+  <li>
+    {item.href ? <a href={item.href}>{item.name}</a> : <span aria-current="page">{item.name}</span>}
+    {i < items.length - 1 && <span class="breadcrumb-sep" aria-hidden="true">/</span>}
+  </li>
+))}
+</ol>
+</div></nav>

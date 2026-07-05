@@ -2,6 +2,7 @@
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import { getPostList, isMicrocmsConfigured } from '../../lib/microcms';
 
 const configured = isMicrocmsConfigured();
@@ -26,8 +27,12 @@ function excerpt(html: string, length = 80) {
 }
 ---
 <BaseLayout title="ブログ｜株式会社 ex Labs" description="ex Labsのイベント制作・体験型コンテンツに関する最新情報をお届けします。">
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'ブログ' },
+]} />
 
-<section class="section" id="blog-top"><div class="wrap">
+<section class="section" id="blog-top" style="padding-top:56px"><div class="wrap">
 <p class="eyebrow">BLOG</p><h2 class="h2 serif">ブログ</h2>
 
 {!configured && (

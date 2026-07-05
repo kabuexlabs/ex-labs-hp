@@ -2,6 +2,7 @@
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import { getPost, isMicrocmsConfigured } from '../../lib/microcms';
 
 const { slug } = Astro.params;
@@ -43,8 +44,13 @@ const articleLd = post
   ogType="article"
 >
 {articleLd && <script type="application/ld+json" set:html={JSON.stringify(articleLd)} />}
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'ブログ', href: '/blog' },
+  { name: post ? post.title : '記事が見つかりません' },
+]} />
 
-<section class="section" id="article-top"><div class="wrap">
+<section class="section" id="article-top" style="padding-top:56px"><div class="wrap">
 
 {!post && (
   <>
