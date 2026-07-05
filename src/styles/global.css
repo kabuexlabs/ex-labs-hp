@@ -111,14 +111,38 @@ section.section.is-visible .stat-row>*{opacity:1;transform:none}
 
 .str-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}
 .str-card{background:#fff;border:1px solid rgba(36,31,26,.08);border-top:4px solid var(--accent);padding:44px;border-radius:2px;transition:box-shadow .3s,transform .3s}
-.str-card:nth-child(2){border-top-color:var(--tag-nazotoki)}
+/* Homepage strength section alternates 2 fixed colors; LP feature
+   sections instead carry a single theme via .str-grid.tag-* so both
+   cards on a given LP match that page's own accent. */
+#strength .str-card:nth-child(2){border-top-color:var(--tag-nazotoki)}
+#strength .str-card:nth-child(2) .str-num{background:color-mix(in srgb,var(--tag-nazotoki) 14%,#fff 86%);color:var(--tag-nazotoki)}
+#strength .str-card:nth-child(2) .feature-points li::before{background:var(--tag-nazotoki)}
+.str-grid.tag-nazotoki .str-card{border-top-color:var(--tag-nazotoki)}
+.str-grid.tag-nazotoki .str-num{background:color-mix(in srgb,var(--tag-nazotoki) 14%,#fff 86%);color:var(--tag-nazotoki)}
+.str-grid.tag-nazotoki .feature-points li::before{background:var(--tag-nazotoki)}
+.str-grid.tag-murder .str-card{border-top-color:var(--tag-murder)}
+.str-grid.tag-murder .str-num{background:color-mix(in srgb,var(--tag-murder) 14%,#fff 86%);color:var(--tag-murder)}
+.str-grid.tag-murder .feature-points li::before{background:var(--tag-murder)}
+.str-grid.tag-zunou .str-card{border-top-color:var(--tag-zunou)}
+.str-grid.tag-zunou .str-num{background:color-mix(in srgb,var(--tag-zunou) 14%,#fff 86%);color:var(--tag-zunou)}
+.str-grid.tag-zunou .feature-points li::before{background:var(--tag-zunou)}
+.str-grid.tag-shisetsu .str-card{border-top-color:var(--tag-shisetsu)}
+.str-grid.tag-shisetsu .str-num{background:color-mix(in srgb,var(--tag-shisetsu) 14%,#fff 86%);color:var(--tag-shisetsu)}
+.str-grid.tag-shisetsu .feature-points li::before{background:var(--tag-shisetsu)}
 .str-card:hover{box-shadow:0 24px 48px -30px rgba(36,31,26,.3);transform:translateY(-3px)}
 .str-num{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:color-mix(in srgb,var(--accent) 12%,#fff 88%);font-family:'Shippori Mincho',serif;font-size:15px;color:var(--accent);font-weight:700;margin:0 0 20px}
-.str-card:nth-child(2) .str-num{background:color-mix(in srgb,var(--tag-nazotoki) 14%,#fff 86%);color:var(--tag-nazotoki)}
 .str-title{font-size:22px;font-weight:600;margin:0 0 16px}
+.str-lead{font-size:15.5px;font-weight:700;line-height:1.6;color:#241f1a;margin:0 0 14px}
 .str-body{font-size:14.5px;line-height:1.9;color:rgba(36,31,26,.75)}
+.feature-points{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px}
+.feature-points li{display:flex;gap:11px;align-items:flex-start;font-size:13.5px;line-height:1.7;color:rgba(36,31,26,.72)}
+.feature-points li::before{content:'✓';flex:none;width:19px;height:19px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px}
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 .chip{font-size:12.5px;font-weight:600;padding:8px 16px;border:1px solid rgba(36,31,26,.15);border-radius:20px;color:rgba(36,31,26,.7)}
+
+.about-points{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:28px 0 0;padding:0;list-style:none}
+.about-points li{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid rgba(36,31,26,.08);border-radius:2px;padding:18px 20px;font-size:13.5px;line-height:1.6;color:rgba(36,31,26,.78)}
+.about-points li::before{content:'';flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:7px}
 
 .style-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid rgba(36,31,26,.1)}
 .style-col{padding:44px}
@@ -328,6 +352,7 @@ footer{padding:64px 0 40px;background:#241f1a;color:rgba(255,255,255,.8)}
   .h2{font-size:27px}
   .h2sub{font-size:13.5px;margin-bottom:36px}
   .lede{font-size:14.5px}
+  .about-points{grid-template-columns:1fr}
   .bullets li{font-size:14px}
   .vc-line{font-size:12px}
   .str-card,.style-col,.svc-card{padding:26px 22px}
