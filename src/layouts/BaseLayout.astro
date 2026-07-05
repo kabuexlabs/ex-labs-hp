@@ -15,6 +15,10 @@ const {
   ogType = 'website',
 } = Astro.props;
 
+// The intro curtain only plays on the homepage — repeating a ~1.6s
+// animation on every internal nav click would get old fast.
+const showPreloader = Astro.url.pathname === '/';
+
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const canonical = new URL(Astro.url.pathname, site);
 const ogImageAbs = new URL(ogImage, site);
@@ -60,6 +64,12 @@ const orgLd = {
 <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
 </head>
 <body>
+
+{showPreloader && (
+  <div class="preloader" aria-hidden="true">
+    <img class="preloader-logo" src="/assets/logo-white.png" alt="">
+  </div>
+)}
 
 <header class="nav"><div class="wrap navrow">
 <a href="/"><img class="logo-header" src="/assets/logo.png" alt="ex Labs"></a>
