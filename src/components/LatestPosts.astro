@@ -1,16 +1,17 @@
 ---
-import { getPostList, isMicrocmsConfigured } from '../lib/microcms';
+import { getPostList, isMicrocmsConfigured, type PostCategory } from '../lib/microcms';
 
 export interface Props {
   heading?: string;
   limit?: number;
   tinted?: boolean;
+  category?: PostCategory;
 }
 
-const { heading = '関連記事', limit = 3, tinted = true } = Astro.props;
+const { heading = '関連記事', limit = 3, tinted = true, category } = Astro.props;
 
 const { contents: fetched } = isMicrocmsConfigured()
-  ? await getPostList(0, limit)
+  ? await getPostList(0, limit, category)
   : { contents: [] };
 const contents = fetched.slice(0, limit);
 

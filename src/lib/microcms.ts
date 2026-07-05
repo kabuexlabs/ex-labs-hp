@@ -1,7 +1,12 @@
+// Valid values for the optional microCMS "category" field, matching
+// the LP theme keys used elsewhere on the site (tag-nazotoki etc.).
+export type PostCategory = 'nazotoki' | 'murder' | 'zunou' | 'shisetsu';
+
 export interface BlogPost {
   id: string;
   title: string;
   body: string;
+  category?: PostCategory;
   eyecatch?: { url: string; width: number; height: number };
   publishedAt: string;
   revisedAt?: string;
@@ -67,16 +72,34 @@ function normalizePost(raw: any): BlogPost {
   };
 }
 
-export async function getPostList(offset = 0, limit = 12): Promise<ListResponse> {
+async function fetchList(offset: number, limit: number, category?: PostCategory) {
+  const filter = category ? `&filters=category[equals]${encodeURIComponent(category)}` : '';
+  const res = await microcmsFetch(`${ENDPOINT}?offset=${offset}&limit=${limit}${filter}`);
+  if (!res || !res.ok) {
+    if (res) console.error('[microcms] list request failed:', res.status);
+    return null;
+  }
+  const data = await res.json();
+  return { ...data, contents: (data.contents ?? []).map(normalizePost) };
+}
+
+// `category` narrows results to one LP's theme (see PostCategory). If
+// no field named "category" exists yet in microCMS, or no posts are
+// tagged with it yet, this transparently falls back to the latest
+// posts overall so nothing breaks before articles get categorized.
+export async function getPostList(
+  offset = 0,
+  limit = 12,
+  category?: PostCategory,
+): Promise<ListResponse> {
   const empty = { contents: [], totalCount: 0, offset, limit };
   try {
-    const res = await microcmsFetch(`${ENDPOINT}?offset=${offset}&limit=${limit}`);
-    if (!res || !res.ok) {
-      if (res) console.error('[microcms] list request failed:', res.status);
-      return empty;
+    if (category) {
+      const filtered = await fetchList(offset, limit, category);
+      if (filtered && filtered.contents.length > 0) return filtered;
     }
-    const data = await res.json();
-    return { ...data, contents: (data.contents ?? []).map(normalizePost) };
+    const unfiltered = await fetchList(offset, limit);
+    return unfiltered ?? empty;
   } catch (e) {
     console.error('[microcms] getPostList failed:', e);
     return empty;
