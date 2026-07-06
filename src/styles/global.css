@@ -81,7 +81,7 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
 .hero::before{content:'';position:absolute;width:min(46vw,640px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(244,88,28,.16),transparent 68%);top:8%;right:-6%;animation:float-slow 9s ease-in-out infinite}
 .hero::after{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,210,63,.4),transparent 70%);bottom:6%;left:38%;animation:float-slow 7s ease-in-out infinite reverse}
 .hero-overlay{position:absolute;inset:0;background-image:radial-gradient(rgba(244,88,28,.1) 2.5px,transparent 2.5px);background-size:34px 34px;opacity:.5}
-.hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;width:100%;padding-top:130px;padding-bottom:80px}
+.hero-split{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;width:100%;padding-top:130px;padding-bottom:80px}
 .hero-copy{text-align:left}
 .hero-eyebrow{font-size:13px;letter-spacing:.3em;font-weight:800;color:var(--accent);margin:0 0 24px}
 .hero-title{font-size:clamp(30px,3.6vw,50px);line-height:1.55;letter-spacing:.04em;font-weight:800;margin:0 0 24px;color:var(--ink)}
@@ -147,6 +147,10 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
    The springy bezier gives cards a small pop as they settle. */
 section.section{opacity:0;transform:translateY(34px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1)}
 section.section.is-visible{opacity:1;transform:none}
+/* min-width:0 lets grid tracks shrink below a child's min-content —
+   without it, word-break:auto-phrase turns long phrases into a hard
+   minimum width and blows the grid past the viewport on phones. */
+[class$="-grid"]>*{min-width:0}
 [class$="-grid"]>*,.faq-list>*,.stat-row>*,.flow-row>*{opacity:0;transform:translateY(22px) scale(.95);transition:opacity .65s cubic-bezier(.34,1.45,.64,1),transform .65s cubic-bezier(.34,1.45,.64,1)}
 section.section.is-visible [class$="-grid"]>*,
 section.section.is-visible .faq-list>*,
@@ -443,7 +447,7 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .svc-hero{grid-template-columns:1fr;gap:44px}
   .svc-hero-visual{max-width:440px;margin:0 auto;width:100%}
   .about-photos{max-width:440px;margin:0 auto;width:100%}
-  .hero-grid{grid-template-columns:1fr;gap:44px;padding-top:120px;padding-bottom:64px}
+  .hero-split{grid-template-columns:1fr;gap:44px;padding-top:120px;padding-bottom:64px}
   .hero-visual{justify-self:center;max-width:420px}
   .genre-grid{grid-template-columns:1fr 1fr}
   .flow-row{grid-template-columns:1fr;gap:40px;max-width:420px}
@@ -466,7 +470,7 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   #about,#strength,#works,#flow,#message,#contact{scroll-margin-top:64px}
   .hero{min-height:auto}
   .hero-title{font-size:24px}
-  .hero-grid{padding-top:100px;padding-bottom:52px;gap:36px}
+  .hero-split{padding-top:100px;padding-bottom:52px;gap:36px}
   .hero-visual{max-width:320px;aspect-ratio:1/1.02}
   .hero-visual img{border-width:4px;border-radius:10px}
   .hero-actions{gap:10px}
