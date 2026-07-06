@@ -29,7 +29,7 @@ function excerpt(html: string, length = 60) {
   <section class:list={['section', { tinted }]}><div class="wrap">
     <p class="eyebrow">BLOG</p>
     <h2 class="h2 serif">{heading}</h2>
-    <div class="blog-grid">
+    <div class="blog-grid blog-strip">
       {contents.map((post) => (
         <div class="blog-card">
           <a href={`/blog/${post.id}`}>
