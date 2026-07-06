@@ -25,6 +25,14 @@ const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const canonical = new URL(Astro.url.pathname, site);
 const ogImageAbs = new URL(ogImage, site);
 
+const websiteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: '株式会社 ex Labs',
+  url: site.toString(),
+  inLanguage: 'ja',
+};
+
 const orgLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -71,6 +79,7 @@ const orgLd = {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800;900&family=Shippori+Mincho:wght@600;700;800&display=swap" rel="stylesheet">
 <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
 </head>
 <body>
 
@@ -90,7 +99,7 @@ const orgLd = {
 </div>
 </div></header>
 
-<slot />
+<main><slot /></main>
 
 <footer><div class="wrap">
 <div class="foot-row">

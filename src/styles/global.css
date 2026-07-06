@@ -42,6 +42,13 @@ img{max-width:100%;display:block}
 .eyebrow{font-size:13px;letter-spacing:.24em;font-weight:800;color:var(--accent);margin:0 0 14px;text-align:center}
 .h2{font-size:40px;line-height:1.35;font-weight:800;letter-spacing:.02em;margin:0 0 10px;text-align:center;color:var(--accent)}
 .h2sub{font-size:15px;color:rgba(51,48,43,.6);margin:0 auto 56px;font-weight:500;text-align:center;max-width:720px;line-height:1.9}
+/* Uniform gap between a section heading and its first content block
+   when there is no .h2sub in between — some pages (notably the
+   zunousen LP) had cards starting 10px under the heading. */
+.h2+.str-grid,.h2+.bullets,.h2+.faq-list,.h2+.works-grid,.h2+.blog-grid,.h2+.press-list,.h2+.svc-rows,.h2+.event-row,.h2+.genre-grid,.h2+.flow-row,.h2+.style-grid,.h2+.voice-marquee,.h2+.info-grid,.h2+.stat-row,.h2+.about-grid,.h2+.lede,.h2+.ceo-arch{margin-top:48px}
+@media(max-width:640px){
+  .h2+.str-grid,.h2+.bullets,.h2+.faq-list,.h2+.works-grid,.h2+.blog-grid,.h2+.press-list,.h2+.svc-rows,.h2+.event-row,.h2+.genre-grid,.h2+.flow-row,.h2+.style-grid,.h2+.voice-marquee,.h2+.info-grid,.h2+.stat-row,.h2+.about-grid,.h2+.lede,.h2+.ceo-arch{margin-top:34px}
+}
 .lede{font-size:16px;line-height:2;color:rgba(51,48,43,.82);max-width:680px;margin-left:auto;margin-right:auto}
 .rule{width:56px;height:4px;border-radius:2px;background:var(--yellow);margin:28px auto}
 .breadcrumb{padding:104px 0 0}
