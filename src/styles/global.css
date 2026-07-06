@@ -87,7 +87,10 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
 .hero-overlay{position:absolute;inset:0;background-image:radial-gradient(rgba(244,88,28,.08) 2.5px,transparent 2.5px);background-size:34px 34px;opacity:.5}
 .hero-center{position:relative;z-index:2;text-align:center;padding-top:150px;padding-bottom:64px}
 .hero-logo{width:min(400px,64vw);height:auto;margin:0 auto 40px;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) both}
-.hero-title{font-size:clamp(20px,2.5vw,32px);line-height:1.9;letter-spacing:.06em;font-weight:800;margin:0 0 18px;color:var(--accent);animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .18s both}
+.hero-title{font-size:clamp(20px,2.5vw,32px);line-height:1.6;letter-spacing:.06em;font-weight:800;margin:0 0 22px;color:var(--accent);animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .18s both}
+/* Headline lines sit on orange blocks, white type — richer than bare
+   text on the ground. */
+.hero-title .hl{display:inline-block;background:linear-gradient(180deg,#f4581c 0%,#e04a0f 100%);color:#fff;padding:9px 26px;margin:5px 0;border-radius:10px;box-shadow:0 10px 26px rgba(244,88,28,.35)}
 .hero-sub{font-family:'Shippori Mincho',serif;font-size:13px;letter-spacing:.22em;color:rgba(51,48,43,.55);margin:0 0 36px;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .3s both}
 .hero-actions{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .42s both}
 /* Full-width works marquee */
@@ -484,7 +487,8 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .hero{padding-bottom:44px}
   .hero-center{padding-top:112px;padding-bottom:44px}
   .hero-logo{margin-bottom:28px}
-  .hero-title{font-size:16.5px;letter-spacing:.04em}
+  .hero-title{font-size:16px;letter-spacing:.03em}
+  .hero-title .hl{padding:7px 14px;border-radius:8px}
   .hero-sub{font-size:11px;margin-bottom:28px}
   .hero-works-track img{height:170px;border-radius:8px}
   .hero-actions{gap:10px}
