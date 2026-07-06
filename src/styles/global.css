@@ -10,7 +10,7 @@
      replacement. */
   --tag-nazotoki:#f5a300;
   --tag-murder:#e75593;
-  --tag-zunou:#3d8bff;
+  --tag-zunou:#c2410c;
   --tag-shisetsu:#1fb782;
 }
 *{box-sizing:border-box}
@@ -32,6 +32,9 @@ strong{font-weight:700}
 @supports(word-break:auto-phrase){
   .h2,.hero-title,.cta-title,.cta-mini-title,.str-title,.svc-title,.work-name,.blog-title,.flow-t,.msg-quote,.lede,.h2sub,.str-lead{word-break:auto-phrase}
 }
+/* Manual phrase grouping for browsers without auto-phrase (iOS Safari):
+   a .nobr chunk wraps as one unit. */
+.nobr{display:inline-block}
 a{color:inherit;text-decoration:none;transition:color .2s}
 img{max-width:100%;display:block}
 .wrap{max-width:1180px;margin:0 auto;padding:0 40px}
@@ -217,7 +220,9 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 .works-grid{display:grid;gap:32px;grid-template-columns:repeat(3,1fr)}
 .work-card{display:flex;flex-direction:column;background:#fff;border-radius:20px;padding:18px 18px 26px;box-shadow:0 6px 22px rgba(51,48,43,.08);transition:transform .3s,box-shadow .3s}
 .work-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(51,48,43,.14)}
-.work-img{width:100%;aspect-ratio:4/5;border-radius:14px;background:var(--cream);padding:14px;object-fit:contain}
+/* height:auto so width/height HTML attributes (kept for CLS) never win
+   over the responsive layout. */
+.work-img{width:100%;height:auto;aspect-ratio:4/5;border-radius:14px;background:var(--cream);padding:14px;object-fit:contain}
 .work-tag{font-size:11px;font-weight:800;color:#fff;background:var(--accent);letter-spacing:.04em;margin:18px 0 10px;align-self:flex-start;padding:5px 14px;border-radius:999px}
 .work-card.tag-nazotoki .work-tag{background:var(--tag-nazotoki)}
 .work-card.tag-murder .work-tag{background:var(--tag-murder)}
@@ -246,7 +251,7 @@ a:hover>.blog-img{opacity:.88}
 .article-hero{width:100%;aspect-ratio:16/9;border-radius:18px;background:var(--cream);padding:14px;object-fit:contain;margin-bottom:40px}
 .article-date{font-size:13px;color:rgba(51,48,43,.5);margin:0 0 12px}
 .article-body{font-size:15.5px;line-height:2;color:rgba(51,48,43,.82);max-width:760px}
-.article-body img{max-width:100%;border-radius:14px;margin:24px 0}
+.article-body img{max-width:100%;height:auto;border-radius:14px;margin:24px 0}
 .article-body p{margin:0 0 20px}
 .article-body h2{font-size:24px;font-weight:800;margin:40px 0 16px;padding-left:14px;border-left:5px solid var(--accent);border-radius:2px}
 .article-body h3{font-size:19px;font-weight:800;margin:32px 0 12px}
