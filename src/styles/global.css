@@ -110,13 +110,6 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
 .about-photos img:nth-child(1){transform:rotate(-3deg)}
 .about-photos img:nth-child(2){transform:rotate(3deg);margin:-32% 0 0 auto}
 
-/* Service LP hero: copy left, tilted event photo right on a yellow blob */
-.svc-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:center}
-.svc-hero .eyebrow,.svc-hero .h2{text-align:left}
-.svc-hero .lede{margin-left:0}
-.svc-hero-visual{position:relative}
-.svc-hero-visual::before{content:'';position:absolute;inset:-8% -6%;background:radial-gradient(circle,rgba(255,210,63,.55),transparent 68%);border-radius:50%}
-.svc-hero-visual img{position:relative;display:block;width:auto;max-width:100%;max-height:480px;height:auto;margin:0 auto;border-radius:16px;border:7px solid #fff;box-shadow:0 16px 36px rgba(51,48,43,.2);transform:rotate(2deg)}
 
 .preloader{position:fixed;inset:0;z-index:500;background:var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;animation:preloader-out 2.6s cubic-bezier(.76,0,.24,1) forwards}
 .preloader-tagline{margin:0;font-size:17px;letter-spacing:.16em;color:#fff;opacity:0;text-align:center;animation:preloader-fade-in .8s ease .15s forwards}
@@ -462,8 +455,6 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
 }
 @media(max-width:860px){
   .about-grid,.str-grid,.style-grid,.msg-grid{grid-template-columns:1fr}
-  .svc-hero{grid-template-columns:1fr;gap:44px}
-  .svc-hero-visual{max-width:440px;margin:0 auto;width:100%}
   .about-photos{max-width:440px;margin:0 auto;width:100%}
   .genre-grid{grid-template-columns:1fr 1fr}
   .flow-row{grid-template-columns:1fr;gap:40px;max-width:420px}
@@ -495,7 +486,6 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .hero-actions .btn{padding:13px 22px;font-size:13px}
   .perf,.cta{border-radius:28px 28px 0 0}
   .btn{font-size:13.5px;padding:14px 26px}
-  .svc-hero-visual img{max-height:380px}
   .hero-eyebrow{font-size:11px;letter-spacing:.26em;margin-bottom:18px}
   .scrollcue{display:none}
   .h2{font-size:25px}
