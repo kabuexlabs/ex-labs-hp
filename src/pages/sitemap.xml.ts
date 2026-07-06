@@ -6,6 +6,7 @@ import { getPostList, isMicrocmsConfigured } from '../lib/microcms';
 const STATIC_PATHS = [
   '/',
   '/blog',
+  '/press/',
   '/services/',
   '/services/nazotoki-kenshu/',
   '/services/murder-mystery/',

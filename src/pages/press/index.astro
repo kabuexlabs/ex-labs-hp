@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import { pressItems } from '../../data/press';
+
+const items = [...pressItems].sort((a, b) => (a.date < b.date ? 1 : -1));
+
+function formatDate(iso: string) {
+  const [y, m, d] = iso.split('-');
+  return `${y}.${m}.${d}`;
+}
+---
+<BaseLayout
+  title="プレスリリース｜株式会社 ex Labs"
+  description="株式会社ex Labsのプレスリリース一覧。体験型エンターテインメント事業に関する最新の発表をお届けします。"
+>
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'プレスリリース' },
+]} />
+
+<section class="section" style="padding-top:56px"><div class="wrap">
+<p class="eyebrow">PRESS RELEASE</p>
+<h1 class="h2 serif">プレスリリース</h1>
+<p class="h2sub">株式会社ex Labsからの最新の発表をご紹介します。</p>
+
+<div class="press-list">
+{items.map((p) => (
+  <a class="press-item" href={p.url} target="_blank" rel="noopener noreferrer">
+    <span class="press-date">{formatDate(p.date)}</span>
+    <span class="press-title">{p.title}</span>
+    <span class="press-src">{p.source ?? 'PR TIMES'} ↗</span>
+  </a>
+))}
+</div>
+
+{items.length === 0 && (
+  <p class="blog-empty">プレスリリースは準備中です。</p>
+)}
+</div></section>
+
+<section class="section" style="padding-top:0"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">取材・お問い合わせはこちら</p>
+<a class="btn" href="/#contact">お問い合わせ</a>
+</div>
+</div></section>
+
+</BaseLayout>

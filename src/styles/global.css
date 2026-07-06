@@ -21,10 +21,10 @@ strong{font-weight:700}
 .lede strong,.str-body strong{color:var(--ink)}
 .perf-lede strong,.style-note strong{color:#fff}
 .accent-dark{color:var(--yellow)}
-/* Headline face — the whole site leans on this class name. One family
-   sitewide (Noto Sans JP); headings just go to the heaviest weight so
-   pop and formal don't clash. */
-.serif{font-family:'Noto Sans JP',sans-serif;font-weight:900}
+/* Headline face — bold mincho for a premium, theatrical feel; body
+   stays Noto Sans so the pairing reads intentional (classic Japanese
+   editorial combo), not mixed. */
+.serif{font-family:'Shippori Mincho',serif;font-weight:800}
 /* Keep headings from breaking mid-phrase: balance equalizes the lines,
    and auto-phrase (progressive, Chrome) breaks Japanese at natural
    phrase boundaries instead of mid-word. */
@@ -233,6 +233,18 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 .work-name{font-size:19px;font-weight:800;margin:0 0 4px}
 .work-sub{font-size:13.5px;color:rgba(51,48,43,.55);margin:0 0 10px;font-weight:500}
 .work-desc{font-size:14px;line-height:1.75;color:rgba(51,48,43,.72)}
+
+.press-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.press-item{display:flex;align-items:center;gap:20px;background:#fff;border-radius:16px;padding:24px 28px;box-shadow:0 5px 18px rgba(51,48,43,.07);transition:transform .25s,box-shadow .25s}
+.press-item:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(51,48,43,.13)}
+.press-date{flex:none;font-size:12px;font-weight:800;color:#fff;background:var(--accent);padding:5px 14px;border-radius:999px;letter-spacing:.04em}
+.press-title{font-size:15px;font-weight:700;line-height:1.7;color:var(--ink)}
+.press-src{flex:none;margin-left:auto;font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap}
+@media(max-width:640px){
+  .press-item{flex-wrap:wrap;gap:10px 12px;padding:18px 20px}
+  .press-title{width:100%;font-size:14px}
+  .press-src{margin-left:0}
+}
 
 .blog-grid{display:grid;gap:32px;grid-template-columns:repeat(3,1fr)}
 .blog-card{display:flex;flex-direction:column;background:#fff;border-radius:20px;padding:16px 16px 24px;box-shadow:0 6px 22px rgba(51,48,43,.08);transition:transform .3s,box-shadow .3s}
