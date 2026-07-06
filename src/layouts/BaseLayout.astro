@@ -60,6 +60,7 @@ const orgLd = {
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
 </head>
@@ -74,15 +75,18 @@ const orgLd = {
 
 <header class="nav"><div class="wrap navrow">
 <a href="/"><img class="logo-header" src="/assets/logo.png" alt="ex Labs"></a>
-<nav class="navlinks"><a href="/#about">ABOUT</a><a href="/#strength">STRENGTH</a><a href="/#works">WORKS</a><a href="/services/">SERVICE</a><a href="/#message">MESSAGE</a><a href="/blog">BLOG</a></nav>
+<nav class="navlinks"><a href="/#about">会社概要</a><a href="/#strength">強み</a><a href="/#works">実績</a><a href="/services/">サービス</a><a href="/#message">メッセージ</a><a href="/blog">ブログ</a></nav>
+<div class="nav-actions">
 <a class="btn dark" href="/#contact" style="padding:12px 24px;font-size:12.5px">お問い合わせ</a>
+<button class="nav-toggle" type="button" aria-label="メニューを開く" aria-expanded="false"><span></span><span></span><span></span></button>
+</div>
 </div></header>
 
 <slot />
 
 <footer><div class="wrap">
 <div class="foot-row">
-<div><p class="foot-name">株式会社 ex Labs</p><p class="foot-addr">東京都新宿区西新宿3-3-13 西新宿水間ビル2F</p></div>
+<div><p class="foot-name">株式会社 ex Labs</p><p class="foot-tag">AI時代に、人間が作る面白さを追求する — 体験型エンターテインメントの企画・制作</p><p class="foot-addr">東京都新宿区西新宿3-3-13 西新宿水間ビル2F</p></div>
 <p class="foot-copy">© 2026 ex Labs Inc.</p>
 </div>
 <nav class="foot-links">
@@ -95,6 +99,23 @@ const orgLd = {
 </div></footer>
 
 <script is:inline>
+(function () {
+  var header = document.querySelector('header.nav');
+  var toggle = document.querySelector('.nav-toggle');
+  if (header && toggle) {
+    toggle.addEventListener('click', function () {
+      var open = header.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+    });
+    header.querySelectorAll('.navlinks a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        header.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+})();
 (function () {
   var sections = document.querySelectorAll('section.section');
   if (!sections.length) return;
