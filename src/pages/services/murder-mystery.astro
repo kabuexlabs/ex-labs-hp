@@ -6,6 +6,7 @@ export const prerender = false;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import HeroWorksMarquee from '../../components/HeroWorksMarquee.astro';
 
 const faqs = [
   {
@@ -63,27 +64,14 @@ const serviceLd = {
 <div class="hero-overlay"></div>
 <div class="wrap hero-center" style="padding-top:36px;padding-bottom:44px">
 <img class="hero-logo" src="/assets/logo.png" alt="株式会社 ex Labs" width="2048" height="520" loading="eager" decoding="async" style="width:min(220px,46vw);margin-bottom:26px">
-<h1 class="hero-title serif"><span class="hl">マーダーミステリー制作の</span><br><span class="hl">ご依頼を承ります</span></h1>
+<h1 class="hero-title serif"><span class="hl">マーダーミステリーの制作なら</span><br><span class="hl">制作実績のあるex Labsに！</span></h1>
 <p class="hero-sub">Murder Mystery Production — ex Labs Inc.</p>
 <div class="hero-actions">
 <a class="btn" href="/#contact">相談してみる</a>
 <a class="btn ghost" href="#works">実績を見る</a>
 </div>
 </div>
-<div class="hero-works">
-<div class="hero-works-track">
-{[...Array(2)].map(() => (
-  <>
-  <img src="/assets/mm/aru-mm.webp" alt="" width="900" height="1274" loading="eager" decoding="async">
-  <img src="/assets/mm/frankenstein.webp" alt="" width="900" height="1273" loading="eager" decoding="async">
-  <img src="/assets/mm/blue-diamond.webp" alt="" width="900" height="1274" loading="eager" decoding="async">
-  <img src="/assets/work-1.webp" alt="" width="849" height="1200" loading="eager" decoding="async">
-  <img src="/assets/work-6.webp" alt="" width="739" height="415" loading="eager" decoding="async">
-  <img src="/assets/work-7.webp" alt="" width="880" height="974" loading="eager" decoding="async">
-  </>
-))}
-</div>
-</div>
+<HeroWorksMarquee />
 </section>
 
 <section class="section" style="padding-top:56px"><div class="wrap">

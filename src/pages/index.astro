@@ -5,6 +5,7 @@ export const prerender = false;
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LatestPosts from '../components/LatestPosts.astro';
+import HeroWorksMarquee from '../components/HeroWorksMarquee.astro';
 import { pressItems } from '../data/press';
 
 const latestPress = [...pressItems].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 3);
@@ -62,20 +63,7 @@ const marqueeItems = Array(2).fill(groups).flat();
 <a class="btn ghost" href="#works">実績を見る</a>
 </div>
 </div>
-<div class="hero-works">
-<div class="hero-works-track">
-{[...Array(2)].map(() => (
-  <>
-  <img src="/assets/work-0.webp" alt="" width="880" height="1254" loading="eager" decoding="async">
-  <img src="/assets/work-2.webp" alt="" width="880" height="1238" loading="eager" decoding="async">
-  <img src="/assets/work-1.webp" alt="" width="849" height="1200" loading="eager" decoding="async">
-  <img src="/assets/work-8.webp" alt="" width="880" height="1248" loading="eager" decoding="async">
-  <img src="/assets/work-7.webp" alt="" width="880" height="974" loading="eager" decoding="async">
-  <img src="/assets/work-3.webp" alt="" width="880" height="1252" loading="eager" decoding="async">
-  </>
-))}
-</div>
-</div>
+<HeroWorksMarquee />
 </section>
 
 <section class="section" id="about"><div class="wrap">

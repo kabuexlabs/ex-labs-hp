@@ -1,0 +1,12 @@
+---
+import { heroWorks } from '../data/heroWorks';
+---
+<div class="hero-works">
+<div class="hero-works-track">
+{[...Array(2)].map(() => (
+  heroWorks.map((w) => (
+    <img src={w.src} alt="" width={w.w} height={w.h} loading="eager" decoding="async" />
+  ))
+))}
+</div>
+</div>

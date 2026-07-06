@@ -6,6 +6,7 @@ export const prerender = false;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import HeroWorksMarquee from '../../components/HeroWorksMarquee.astro';
 
 const faqs = [
   {
@@ -70,18 +71,7 @@ const serviceLd = {
 <a class="btn ghost" href="#works">実績を見る</a>
 </div>
 </div>
-<div class="hero-works">
-<div class="hero-works-track">
-{[...Array(2)].map(() => (
-  <>
-  <img src="/assets/work-3.webp" alt="" width="880" height="1252" loading="eager" decoding="async">
-  <img src="/assets/work-4.webp" alt="" width="595" height="842" loading="eager" decoding="async">
-  <img src="/assets/work-0.webp" alt="" width="880" height="1254" loading="eager" decoding="async">
-  <img src="/assets/work-5.webp" alt="" width="880" height="486" loading="eager" decoding="async">
-  </>
-))}
-</div>
-</div>
+<HeroWorksMarquee />
 </section>
 
 <section class="section" style="padding-top:56px"><div class="wrap">

@@ -7,6 +7,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import VoiceMarquee from '../../components/VoiceMarquee.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import HeroWorksMarquee from '../../components/HeroWorksMarquee.astro';
 import { zunousenVoices } from '../../data/voices';
 
 const faqs = [
@@ -65,26 +66,14 @@ const serviceLd = {
 <div class="hero-overlay"></div>
 <div class="wrap hero-center" style="padding-top:36px;padding-bottom:44px">
 <img class="hero-logo" src="/assets/logo.png" alt="株式会社 ex Labs" width="2048" height="520" loading="eager" decoding="async" style="width:min(220px,46vw);margin-bottom:26px">
-<h1 class="hero-title serif"><span class="hl">頭脳戦制作・交渉戦制作</span><br><span class="hl">交渉ゲーム・心理戦コンテンツ</span></h1>
+<h1 class="hero-title serif"><span class="hl">日本で唯一の頭脳戦制作団体に</span><br><span class="hl">頭脳戦を制作依頼しませんか？</span></h1>
 <p class="hero-sub">Mind Battle Production — ex Labs Inc.</p>
 <div class="hero-actions">
 <a class="btn" href="/#contact">相談してみる</a>
 <a class="btn ghost" href="#works">実績を見る</a>
 </div>
 </div>
-<div class="hero-works">
-<div class="hero-works-track">
-{[...Array(2)].map(() => (
-  <>
-  <img src="/assets/zunousen/present-poker.webp" alt="" width="900" height="900" loading="eager" decoding="async">
-  <img src="/assets/zunousen/werewolf-theorem.webp" alt="" width="900" height="900" loading="eager" decoding="async">
-  <img src="/assets/zunousen/dice-box.webp" alt="" width="900" height="900" loading="eager" decoding="async">
-  <img src="/assets/work-8.webp" alt="" width="880" height="1248" loading="eager" decoding="async">
-  <img src="/assets/work-5.webp" alt="" width="880" height="486" loading="eager" decoding="async">
-  </>
-))}
-</div>
-</div>
+<HeroWorksMarquee />
 </section>
 
 <section class="section" style="padding-top:56px"><div class="wrap">
