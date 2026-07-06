@@ -11,7 +11,7 @@ export interface Props {
 const {
   title = '株式会社 ex Labs｜体験型エンターテインメントの企画・制作',
   description = '株式会社ex Labsは、謎解き・マーダーミステリー・イマーシブコンテンツなど体験型エンターテインメントの企画・制作・集客・運営を一貫して手掛けるクリエイティブカンパニーです。謎解き研修や施設活用イベントもご相談ください。',
-  ogImage = '/assets/logo.png',
+  ogImage = '/assets/ogp.png',
   ogType = 'website',
 } = Astro.props;
 
@@ -53,6 +53,12 @@ const orgLd = {
 <meta property="og:type" content={ogType}>
 <meta property="og:url" content={canonical}>
 <meta property="og:image" content={ogImageAbs}>
+{ogImage === '/assets/ogp.png' && (
+  <>
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  </>
+)}
 <meta property="og:site_name" content="株式会社 ex Labs">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
