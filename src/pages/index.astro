@@ -53,22 +53,30 @@ const marqueeItems = Array(2).fill(groups).flat();
 
 <section class="hero">
 <div class="hero-overlay"></div>
-<div class="wrap hero-split">
-<div class="hero-copy">
-<p class="hero-eyebrow">EXPERIENCE ENTERTAINMENT</p>
-<h1 class="hero-title serif"><span class="marker">初期費用0円</span>で、<br>謎解きなどの<br>体験型イベントを<br>実施しませんか？</h1>
-<p class="hero-name">株式会社 ex Labs</p>
+<div class="wrap hero-center">
+<img class="hero-logo" src="/assets/logo.png" alt="株式会社 ex Labs" width="2048" height="520" loading="eager" decoding="async">
+<h1 class="hero-title serif">初期費用0円で謎解きなどの<br>体験型イベントを実施しませんか？</h1>
+<p class="hero-sub">Experience Entertainment — ex Labs Inc.</p>
 <div class="hero-actions">
 <a class="btn" href="#contact">相談してみる</a>
 <a class="btn ghost" href="#works">実績を見る</a>
 </div>
 </div>
-<div class="hero-visual">
-<img width="880" height="1254" src="/assets/work-0.webp" alt="神戸須磨シーワールドの謎解きイベントポスター" loading="eager" decoding="async">
-<img width="880" height="1238" src="/assets/work-2.webp" alt="自社主催イベント「ヌル・アーデン展」のポスター" loading="eager" decoding="async">
+<div class="hero-works">
+<div class="hero-works-track">
+{[...Array(2)].map(() => (
+  <>
+  <img src="/assets/work-0.webp" alt="" width="880" height="1254" loading="eager" decoding="async">
+  <img src="/assets/work-2.webp" alt="" width="880" height="1238" loading="eager" decoding="async">
+  <img src="/assets/work-5.webp" alt="" width="880" height="486" loading="eager" decoding="async">
+  <img src="/assets/work-1.webp" alt="" width="849" height="1200" loading="eager" decoding="async">
+  <img src="/assets/work-8.webp" alt="" width="880" height="1248" loading="eager" decoding="async">
+  <img src="/assets/work-7.webp" alt="" width="880" height="974" loading="eager" decoding="async">
+  <img src="/assets/work-3.webp" alt="" width="880" height="1252" loading="eager" decoding="async">
+  </>
+))}
 </div>
 </div>
-<div class="scrollcue">SCROLL</div>
 </section>
 
 <section class="section" id="about"><div class="wrap">
@@ -244,19 +252,31 @@ const marqueeItems = Array(2).fill(groups).flat();
 <section class="section tinted" id="service"><div class="wrap">
 <p class="eyebrow">SERVICE</p><h2 class="h2 serif">法人向けサービス</h2>
 <p class="h2sub">目的別のサービス詳細はこちらをご覧ください。</p>
-<div class="svc-grid">
-<div class="svc-card tag-nazotoki"><h3 class="svc-title"><a href="/services/nazotoki-kenshu/">謎解き研修</a></h3>
-<p class="svc-desc">謎解きを活用した体験型チームビルディング研修。コミュニケーション活性化と相互理解を促進します。</p>
-<a class="svc-link" href="/services/nazotoki-kenshu/">詳しく見る →</a></div>
-<div class="svc-card tag-murder"><h3 class="svc-title"><a href="/services/murder-mystery/">マーダーミステリー制作</a></h3>
-<p class="svc-desc">動画企画・店舗集客・イベント向けなど、目的に合わせたオリジナル作品を企画から制作まで一貫対応。</p>
-<a class="svc-link" href="/services/murder-mystery/">詳しく見る →</a></div>
-<div class="svc-card tag-shisetsu"><h3 class="svc-title"><a href="/services/shisetsu-event/">施設活用イベント</a></h3>
-<p class="svc-desc">商業施設・文化施設・観光施設の空間を活かした周遊型イベントで、新規集客と滞在価値向上を実現。</p>
-<a class="svc-link" href="/services/shisetsu-event/">詳しく見る →</a></div>
-<div class="svc-card tag-zunou"><h3 class="svc-title"><a href="/services/zunousen/">頭脳戦制作</a></h3>
-<p class="svc-desc">交渉・心理戦・閃きのゲームに特化した、日本で唯一の専門制作団体によるオリジナル頭脳戦コンテンツ。</p>
-<a class="svc-link" href="/services/zunousen/">詳しく見る →</a></div>
+<div class="svc-rows">
+<a class="svc-row" href="/services/nazotoki-kenshu/">
+<span class="svc-no">01</span>
+<div class="svc-row-body"><h3 class="svc-row-title">謎解き研修</h3>
+<p class="svc-row-desc">謎解きを活用した体験型チームビルディング研修。コミュニケーション活性化と相互理解を促進します。</p></div>
+<span class="svc-row-arrow">→</span>
+</a>
+<a class="svc-row" href="/services/murder-mystery/">
+<span class="svc-no">02</span>
+<div class="svc-row-body"><h3 class="svc-row-title">マーダーミステリー制作</h3>
+<p class="svc-row-desc">動画企画・店舗集客・イベント向けなど、目的に合わせたオリジナル作品を企画から制作まで一貫対応。</p></div>
+<span class="svc-row-arrow">→</span>
+</a>
+<a class="svc-row" href="/services/shisetsu-event/">
+<span class="svc-no">03</span>
+<div class="svc-row-body"><h3 class="svc-row-title">施設活用イベント</h3>
+<p class="svc-row-desc">商業施設・文化施設・観光施設の空間を活かした周遊型イベントで、新規集客と滞在価値向上を実現。</p></div>
+<span class="svc-row-arrow">→</span>
+</a>
+<a class="svc-row" href="/services/zunousen/">
+<span class="svc-no">04</span>
+<div class="svc-row-body"><h3 class="svc-row-title">頭脳戦制作</h3>
+<p class="svc-row-desc">交渉・心理戦・閃きのゲームに特化した、日本で唯一の専門制作団体によるオリジナル頭脳戦コンテンツ。</p></div>
+<span class="svc-row-arrow">→</span>
+</a>
 </div>
 </div></section>
 
@@ -270,17 +290,14 @@ const marqueeItems = Array(2).fill(groups).flat();
 </div>
 </div></section>
 
-<section class="section" id="message"><div class="wrap">
-<p class="eyebrow">MESSAGE</p><h2 class="h2 serif" style="margin-bottom:56px">代表メッセージ</h2>
-<div class="msg-grid">
-<img width="880" height="880" class="ceo-photo" loading="lazy" decoding="async" src="/assets/ceo.webp" alt="代表 飯田 雄貴 写真">
-<div>
-<p class="msg-quote serif"><span class="nobr">面白いことに、</span><wbr><span class="nobr">フルベットする。</span></p>
-<p class="msg-body">私たちは、「作って終わり」の体験型エンターテインメントではなく、継続的に人を惹きつけ、新たな価値を生み出す体験づくりを目指しています。これからも、企業・自治体・文化施設・クリエイターの皆様とともに、新しいエンターテインメントの可能性を広げてまいります。新しい挑戦をご一緒できることを、心より楽しみにしております。</p>
-<p class="msg-name">株式会社ex Labs</p><p class="msg-role">代表取締役　飯田 雄貴</p>
-<p class="msg-bio">東京大学法学部4年に在籍。大学1年生のときから起業をし、東大生のオンライン家庭教師サービスを売却後、現在は株式会社ex Labsとバックオフィスの会社を経営。</p>
-</div>
-</div>
+<section class="section msg-sec" id="message"><div class="wrap">
+<p class="eyebrow">MESSAGE</p><h2 class="h2 serif">代表メッセージ</h2>
+<img class="ceo-arch" loading="lazy" decoding="async" src="/assets/ceo.webp" alt="代表取締役 飯田 雄貴の写真">
+<p class="msg-role2">株式会社ex Labs 代表取締役</p>
+<p class="msg-name2 serif">飯田 雄貴</p>
+<p class="msg-quote2 serif"><span class="nobr">面白いことに、</span><wbr><span class="nobr">フルベットする。</span></p>
+<p class="msg-body2">私たちは、「作って終わり」の体験型エンターテインメントではなく、継続的に人を惹きつけ、新たな価値を生み出す体験づくりを目指しています。これからも、企業・自治体・文化施設・クリエイターの皆様とともに、新しいエンターテインメントの可能性を広げてまいります。新しい挑戦をご一緒できることを、心より楽しみにしております。</p>
+<p class="msg-bio2">東京大学法学部4年に在籍。大学1年生のときから起業をし、東大生のオンライン家庭教師サービスを売却後、現在は株式会社ex Labsとバックオフィスの会社を経営。</p>
 </div></section>
 
 <section class="section"><div class="wrap">

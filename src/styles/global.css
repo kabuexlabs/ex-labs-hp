@@ -74,33 +74,21 @@ header.nav.open .nav-toggle span:nth-child(1){transform:translateY(7.5px) rotate
 header.nav.open .nav-toggle span:nth-child(2){opacity:0}
 header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
 
-/* Hero: magazine-style split — copy sits in clean whitespace on the
-   left, real posters stack with depth on the right. Keeping type off
-   the imagery is what makes it read designed rather than pasted-on. */
-.hero{position:relative;min-height:88vh;min-height:88svh;display:flex;align-items:center;overflow:hidden;background:linear-gradient(180deg,#fffdf8 0%,#fdf2e2 100%)}
-.hero::before{content:'';position:absolute;width:min(46vw,640px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(244,88,28,.16),transparent 68%);top:8%;right:-6%;animation:float-slow 9s ease-in-out infinite}
-.hero::after{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,210,63,.4),transparent 70%);bottom:6%;left:38%;animation:float-slow 7s ease-in-out infinite reverse}
-.hero-overlay{position:absolute;inset:0;background-image:radial-gradient(rgba(244,88,28,.1) 2.5px,transparent 2.5px);background-size:34px 34px;opacity:.5}
-.hero-split{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;width:100%;padding-top:130px;padding-bottom:80px}
-.hero-copy{text-align:left}
-.hero-eyebrow{font-size:13px;letter-spacing:.3em;font-weight:800;color:var(--accent);margin:0 0 24px}
-.hero-title{font-size:clamp(30px,3.6vw,50px);line-height:1.55;letter-spacing:.04em;font-weight:800;margin:0 0 24px;color:var(--ink)}
-/* Marker line sweeps in from the left after the headline lands */
-.marker{background-image:linear-gradient(transparent 58%,var(--yellow) 58%,var(--yellow) 92%,transparent 92%);background-repeat:no-repeat;background-size:0% 100%;animation:marker-in .7s cubic-bezier(.22,1,.36,1) 1s forwards}
-@keyframes marker-in{to{background-size:100% 100%}}
-.hero-name{font-size:15px;letter-spacing:.12em;font-weight:700;color:rgba(51,48,43,.65);margin:0 0 36px}
-.hero-actions{display:flex;gap:16px;flex-wrap:wrap}
-/* Poster pair: tilted prints with real shadows. Rotation lives on
-   transform; entrance/idle motion uses the separate translate property
-   so the two never fight. After popping in, each print drifts gently
-   forever so the hero doesn't sit still. */
-.hero-visual{position:relative;aspect-ratio:1/1;max-width:500px;width:100%;justify-self:end}
-.hero-visual img{position:absolute;height:auto;border:6px solid #fff;border-radius:14px;box-shadow:0 20px 44px rgba(51,48,43,.2);opacity:0;translate:0 40px}
-.hero-visual img:nth-child(1){width:56%;left:1%;top:5%;transform:rotate(-6deg);z-index:1;animation:hero-pop .9s cubic-bezier(.34,1.4,.64,1) .35s both,poster-drift 5.5s ease-in-out 1.8s infinite}
-.hero-visual img:nth-child(2){width:52%;left:45%;top:22%;transform:rotate(5deg);z-index:2;animation:hero-pop .9s cubic-bezier(.34,1.4,.64,1) .55s both,poster-drift 6.5s ease-in-out 2.4s infinite}
-@keyframes hero-pop{to{opacity:1;translate:0 0}}
-@keyframes poster-drift{0%,100%{opacity:1;translate:0 0}50%{opacity:1;translate:0 -9px}}
-.scrollcue{position:absolute;right:40px;bottom:40px;z-index:2;color:rgba(51,48,43,.5);font-size:11px;letter-spacing:.2em;writing-mode:vertical-rl;animation:fade-in .8s cubic-bezier(.16,1,.3,1) 1s both,scroll-bob 2.2s ease-in-out 2s infinite}
+/* Hero (Pintcle-inspired): big centered logo, message beneath, and a
+   full-bleed auto-scrolling strip of real event visuals below. */
+.hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#fffdf8 0%,#fdf2e2 100%);padding-bottom:64px}
+.hero-overlay{position:absolute;inset:0;background-image:radial-gradient(rgba(244,88,28,.08) 2.5px,transparent 2.5px);background-size:34px 34px;opacity:.5}
+.hero-center{position:relative;z-index:2;text-align:center;padding-top:150px;padding-bottom:64px}
+.hero-logo{width:min(400px,64vw);height:auto;margin:0 auto 40px;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) both}
+.hero-title{font-size:clamp(20px,2.5vw,32px);line-height:1.9;letter-spacing:.06em;font-weight:800;margin:0 0 18px;color:var(--accent);animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .18s both}
+.hero-sub{font-family:'Shippori Mincho',serif;font-size:13px;letter-spacing:.22em;color:rgba(51,48,43,.55);margin:0 0 36px;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .3s both}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .42s both}
+/* Full-width works marquee */
+.hero-works{position:relative;z-index:2;overflow:hidden;animation:fade-in 1.2s ease .5s both}
+.hero-works-track{display:flex;align-items:center;gap:14px;width:max-content;animation:marquee-works 55s linear infinite}
+.hero-works-track img{height:250px;width:auto;border-radius:10px;flex:none}
+@keyframes marquee-works{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 7px))}}
+.scrollcue{display:none}
 @keyframes scroll-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
 @keyframes float-slow{0%,100%{transform:translateY(0)}50%{transform:translateY(-24px)}}
 
@@ -141,8 +129,6 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
 @keyframes hero-in{from{opacity:0;transform:translateY(26px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes fade-in{from{opacity:0}to{opacity:1}}
 .hero-eyebrow{animation:hero-in .8s cubic-bezier(.34,1.4,.64,1) both}
-.hero-title{animation:hero-in .8s cubic-bezier(.34,1.4,.64,1) .12s both}
-.hero-name{animation:hero-in .8s cubic-bezier(.34,1.4,.64,1) .26s both}
 .hero-actions{animation:hero-in .8s cubic-bezier(.34,1.4,.64,1) .4s both}
 
 /* Sitewide scroll-reveal: a tiny inline script in BaseLayout.astro adds
@@ -174,9 +160,8 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 [class$="-grid"]>*:nth-child(11),.faq-list>*:nth-child(11){transition-delay:.85s}
 [class$="-grid"]>*:nth-child(12),.faq-list>*:nth-child(12){transition-delay:.93s}
 @media (prefers-reduced-motion:reduce){
-  .hero-eyebrow,.hero-title,.hero-name,.hero-actions,.scrollcue,.marker{animation:none}
-  .marker{background-size:100% 100%}
-  .hero-visual img{animation:none;opacity:1;translate:none}
+  .hero-logo,.hero-title,.hero-sub,.hero-actions,.hero-works{animation:none}
+  .hero-works-track{animation:none}
   .hero::before,.hero::after{animation:none}
   section.section,[class$="-grid"]>*,.faq-list>*,.stat-row>*,.flow-row>*{opacity:1;transform:none;transition:none}
 }
@@ -380,16 +365,11 @@ a:hover>.blog-img{opacity:.88}
 .cond-check{width:24px;height:24px;border-radius:50%;background:var(--yellow);display:flex;align-items:center;justify-content:center;font-size:0;color:var(--ink);flex:none;font-weight:800;box-shadow:0 2px 0 rgba(0,0,0,.15)}
 .cond-check::before{counter-increment:cd;content:counter(cd);font-size:13px}
 
+/* Two coordinated tones only — the old 7-color set read as noise. */
 .genre-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.genre-cell{border-radius:999px;padding:22px 20px;font-size:14.5px;font-weight:800;text-align:center;color:#fff;transition:transform .25s,box-shadow .25s;box-shadow:0 4px 0 rgba(51,48,43,.1)}
-.genre-cell:hover{transform:translateY(-4px) scale(1.03);box-shadow:0 12px 24px rgba(51,48,43,.18)}
-.genre-cell:nth-child(7n+1){background:var(--accent)}
-.genre-cell:nth-child(7n+2){background:var(--tag-nazotoki)}
-.genre-cell:nth-child(7n+3){background:var(--tag-murder)}
-.genre-cell:nth-child(7n+4){background:var(--tag-zunou)}
-.genre-cell:nth-child(7n+5){background:var(--tag-shisetsu)}
-.genre-cell:nth-child(7n+6){background:#ffb020;color:var(--ink)}
-.genre-cell:nth-child(7n+7){background:var(--ink)}
+.genre-cell{border-radius:999px;padding:20px;font-size:14.5px;font-weight:800;text-align:center;color:var(--ink);background:#fff;border:2px solid rgba(244,88,28,.5);transition:transform .25s,box-shadow .25s,background-color .25s,color .25s}
+.genre-cell:nth-child(even){background:var(--accent);color:#fff;border-color:var(--accent)}
+.genre-cell:hover{transform:translateY(-4px) scale(1.03);box-shadow:0 12px 24px rgba(51,48,43,.16)}
 
 .flow-row{display:grid;grid-template-columns:repeat(4,1fr);gap:48px;position:relative;max-width:980px;margin:0 auto}
 .flow-step{text-align:center;position:relative}
@@ -397,6 +377,29 @@ a:hover>.blog-img{opacity:.88}
 .flow-num{display:flex;align-items:center;justify-content:center;width:104px;height:104px;margin:0 auto;border-radius:50%;background:#fff;border:3px solid var(--accent);font-family:'Noto Sans JP',sans-serif;font-size:30px;line-height:1;color:var(--accent);font-weight:800;box-shadow:0 6px 18px rgba(51,48,43,.1)}
 .flow-t{font-size:16px;font-weight:800;margin:18px 0 10px}
 .flow-d{font-size:13px;line-height:1.7;color:rgba(51,48,43,.65);margin:0}
+
+/* Numbered service rows (Pintcle-style editorial list) */
+.svc-rows{max-width:860px;margin:0 auto;border-bottom:1px solid rgba(51,48,43,.14)}
+.svc-row{display:flex;gap:30px;align-items:flex-start;padding:36px 10px;border-top:1px solid rgba(51,48,43,.14);transition:background-color .25s}
+.svc-row:hover{background:rgba(244,88,28,.05)}
+.svc-no{flex:none;font-family:'Shippori Mincho',serif;font-size:38px;line-height:1;color:var(--accent);font-weight:700;margin-top:2px}
+.svc-row-body{flex:1;min-width:0}
+.svc-row-title{font-size:21px;font-weight:800;margin:0 0 10px;color:var(--ink)}
+.svc-row-desc{font-size:14px;line-height:1.9;color:rgba(51,48,43,.7);margin:0}
+.svc-row-arrow{flex:none;align-self:center;width:44px;height:44px;border-radius:50%;border:2px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;transition:background-color .25s,color .25s,transform .25s}
+.svc-row:hover .svc-row-arrow{background:var(--accent);color:#fff;transform:translateX(4px)}
+
+/* Message section — Pintcle PROFILE-style: warm bronze ground, arched
+   portrait, centered stack */
+.msg-sec{background:linear-gradient(180deg,#b0905e 0%,#a1814c 100%);color:#fff;border-radius:44px 44px 0 0}
+.msg-sec .eyebrow{color:rgba(255,255,255,.85)}
+.msg-sec .h2{color:#fff}
+.ceo-arch{width:280px;aspect-ratio:3/3.6;object-fit:cover;margin:26px auto 30px;border-radius:150px 150px 16px 16px;border:5px solid rgba(255,255,255,.92);box-shadow:0 18px 40px rgba(0,0,0,.18)}
+.msg-role2{text-align:center;font-size:13px;letter-spacing:.08em;color:rgba(255,255,255,.85);margin:0 0 8px}
+.msg-name2{text-align:center;font-size:28px;letter-spacing:.3em;margin:0 0 40px}
+.msg-quote2{text-align:center;font-size:clamp(20px,2.4vw,28px);line-height:1.8;letter-spacing:.06em;margin:0 0 32px}
+.msg-body2{max-width:640px;margin:0 auto;font-size:14.5px;line-height:2.1;color:rgba(255,255,255,.95)}
+.msg-bio2{max-width:640px;margin:28px auto 0;padding-top:22px;border-top:1px dotted rgba(255,255,255,.4);font-size:12.5px;line-height:1.9;color:rgba(255,255,255,.8)}
 
 .msg-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:72px;align-items:center;max-width:980px;margin:0 auto}
 .msg-quote{font-size:42px;line-height:1.5;letter-spacing:.02em;margin:0 0 32px;color:var(--accent)}
@@ -453,12 +456,10 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .svc-hero{grid-template-columns:1fr;gap:44px}
   .svc-hero-visual{max-width:440px;margin:0 auto;width:100%}
   .about-photos{max-width:440px;margin:0 auto;width:100%}
-  .hero-split{grid-template-columns:1fr;gap:44px;padding-top:120px;padding-bottom:64px}
-  .hero-visual{justify-self:center;max-width:420px}
   .genre-grid{grid-template-columns:1fr 1fr}
   .flow-row{grid-template-columns:1fr;gap:40px;max-width:420px}
   .flow-step:not(:last-child)::after{top:auto;right:auto;bottom:-30px;left:50%;transform:translateX(-50%);border-left:11px solid transparent;border-right:11px solid transparent;border-top:16px solid var(--yellow);border-bottom:none}
-  .hero-title{font-size:30px}
+  .hero-title{font-size:20px}
   .h2{font-size:32px}
   .msg-quote{font-size:30px}
   .section{padding:84px 0}
@@ -474,13 +475,12 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .navrow{height:64px}
   .logo-header{width:110px;height:30px}
   #about,#strength,#works,#flow,#message,#contact{scroll-margin-top:64px}
-  .hero{min-height:auto}
-  .hero-copy{text-align:center}
-  .hero-actions{justify-content:center}
-  .hero-title{font-size:24px}
-  .hero-split{padding-top:100px;padding-bottom:52px;gap:36px}
-  .hero-visual{max-width:320px;aspect-ratio:1/1.02}
-  .hero-visual img{border-width:4px;border-radius:10px}
+  .hero{padding-bottom:44px}
+  .hero-center{padding-top:112px;padding-bottom:44px}
+  .hero-logo{margin-bottom:28px}
+  .hero-title{font-size:16.5px;letter-spacing:.04em}
+  .hero-sub{font-size:11px;margin-bottom:28px}
+  .hero-works-track img{height:170px;border-radius:8px}
   .hero-actions{gap:10px}
   .hero-actions .btn{padding:13px 22px;font-size:13px}
   .perf,.cta{border-radius:28px 28px 0 0}
