@@ -62,12 +62,12 @@ const marqueeItems = Array(2).fill(groups).flat();
 <div class="marquee"><div class="marquee-track">
 {marqueeItems.map((g) => (
   g.logo
-    ? <img class="marquee-logo" src={g.logo} alt={g.name} style={g.h ? `height:${g.h}px` : undefined} loading="lazy" decoding="async" />
+    ? <img class="marquee-logo" src={g.logo} alt={g.name} style={g.h ? `height:${g.h}px` : undefined} loading="eager" decoding="async" />
     : <span class="marquee-name serif">{g.name}</span>
 ))}
 {marqueeItems.map((g) => (
   g.logo
-    ? <img class="marquee-logo" src={g.logo} alt="" style={g.h ? `height:${g.h}px` : undefined} loading="lazy" decoding="async" />
+    ? <img class="marquee-logo" src={g.logo} alt="" style={g.h ? `height:${g.h}px` : undefined} loading="eager" decoding="async" />
     : <span class="marquee-name serif" aria-hidden="true">{g.name}</span>
 ))}
 </div></div>
