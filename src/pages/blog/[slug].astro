@@ -3,7 +3,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import { getPost, isMicrocmsConfigured } from '../../lib/microcms';
+import { getPost, isMicrocmsConfigured, jsonLd } from '../../lib/microcms';
 
 const { slug } = Astro.params;
 const configured = isMicrocmsConfigured();
@@ -43,7 +43,7 @@ const articleLd = post
   ogImage={post?.eyecatch?.url}
   ogType="article"
 >
-{articleLd && <script type="application/ld+json" set:html={JSON.stringify(articleLd)} />}
+{articleLd && <script type="application/ld+json" set:html={jsonLd(articleLd)} />}
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
   { name: 'ブログ', href: '/blog' },

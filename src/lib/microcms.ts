@@ -120,3 +120,10 @@ export async function getPost(id: string): Promise<BlogPost | null> {
 export function isMicrocmsConfigured(): boolean {
   return getConfig() !== null;
 }
+
+// Serialize an object for a JSON-LD <script> block. JSON.stringify alone
+// leaves "<" intact, so a CMS-supplied string containing "</script>" could
+// break out of the tag; escaping "<" closes that XSS vector.
+export function jsonLd(obj: unknown): string {
+  return JSON.stringify(obj).replace(/</g, '\\u003c');
+}
