@@ -4,6 +4,7 @@
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { jsonLd } from '../../lib/microcms';
 import LatestPosts from '../../components/LatestPosts.astro';
 import VoiceMarquee from '../../components/VoiceMarquee.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
@@ -54,8 +55,8 @@ const serviceLd = {
   title="頭脳戦制作・交渉戦制作｜交渉ゲーム・心理戦コンテンツ - 株式会社ex Labs"
   description="頭脳戦制作・交渉戦制作なら株式会社ex Labs。ライアーゲームのような交渉ゲーム・心理戦・閃きのゲームに特化した、日本唯一の専門制作団体。東京都頭脳王決定戦の実績をもとに、オリジナルの頭脳戦・交渉戦コンテンツを企画・制作します。"
 >
-<script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
-<script type="application/ld+json" set:html={JSON.stringify(serviceLd)} />
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(serviceLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
   { name: 'サービス', href: '/services/' },

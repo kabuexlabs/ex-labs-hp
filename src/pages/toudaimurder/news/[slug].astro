@@ -2,6 +2,7 @@
 import ToudaimurderLayout from '../../../layouts/ToudaimurderLayout.astro';
 import { tmNews } from '../../../data/toudaimurderNews';
 import { tmWorks } from '../../../data/toudaimurderWorks';
+import { jsonLd } from '../../../lib/microcms';
 
 export function getStaticPaths() {
   return tmNews.map((article) => ({ params: { slug: article.slug }, props: { article } }));
@@ -33,7 +34,7 @@ const articleLd = {
   description={article.summary}
   ogImage={article.image}
 >
-  <script type="application/ld+json" slot="head" set:html={JSON.stringify(articleLd)} />
+  <script type="application/ld+json" slot="head" set:html={jsonLd(articleLd)} />
   <main class="wrap">
     <article class="art fin">
       <p class="crumb mono"><a href={`${base}/`}>TOP</a> / <a href={`${base}/news/`}>NEWS</a> / {article.title}</p>

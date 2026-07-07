@@ -1,3 +1,5 @@
+import sanitizeHtml from 'sanitize-html';
+
 // Valid values for the optional microCMS "category" field, matching
 // the LP theme keys used elsewhere on the site (tag-nazotoki etc.).
 export type PostCategory = 'nazotoki' | 'murder' | 'zunou' | 'shisetsu';
@@ -68,8 +70,26 @@ function normalizePost(raw: any): BlogPost {
   return {
     ...raw,
     title: raw?.title ?? '(無題)',
-    body: raw?.body ?? raw?.content ?? '',
+    body: sanitizeBody(raw?.body ?? raw?.content ?? ''),
   };
+}
+
+// The blog template renders `body` with set:html, so a compromised CMS
+// account (or API key leak) must not be able to inject script into the
+// site. Strip scripts and event handlers while keeping the rich-text
+// markup microCMS produces, plus YouTube/Vimeo embeds.
+function sanitizeBody(html: string): string {
+  return sanitizeHtml(html, {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'figure', 'figcaption', 'iframe', 'h1', 'h2']),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      img: ['src', 'alt', 'width', 'height', 'loading', 'decoding'],
+      iframe: ['src', 'width', 'height', 'allow', 'allowfullscreen', 'frameborder', 'loading'],
+      '*': ['class', 'id'],
+    },
+    allowedIframeHostnames: ['www.youtube.com', 'www.youtube-nocookie.com', 'player.vimeo.com'],
+    allowedSchemes: ['https', 'http', 'mailto'],
+  });
 }
 
 async function fetchList(offset: number, limit: number, category?: PostCategory) {

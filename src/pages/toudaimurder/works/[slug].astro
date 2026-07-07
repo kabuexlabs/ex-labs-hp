@@ -1,6 +1,7 @@
 ---
 import ToudaimurderLayout from '../../../layouts/ToudaimurderLayout.astro';
 import { tmWorks, TM_LINE_URL, TM_X_URL } from '../../../data/toudaimurderWorks';
+import { jsonLd } from '../../../lib/microcms';
 
 export function getStaticPaths() {
   return tmWorks.map((work) => ({ params: { slug: work.slug }, props: { work } }));
@@ -41,8 +42,8 @@ const crumbLd = {
   description={`${work.title}（${work.specs.join('・')}）— 東大マーダーミステリーサークル制作のマーダーミステリー作品。${work.desc}`}
   ogImage={work.image}
 >
-  <script type="application/ld+json" slot="head" set:html={JSON.stringify(workLd)} />
-  <script type="application/ld+json" slot="head" set:html={JSON.stringify(crumbLd)} />
+  <script type="application/ld+json" slot="head" set:html={jsonLd(workLd)} />
+  <script type="application/ld+json" slot="head" set:html={jsonLd(crumbLd)} />
   <main class="wrap">
     <div class="dt fin">
       <div class="ph pv">{work.image ? <img src={work.image} alt={`${work.title} キービジュアル`} /> : <span class="mono">作品キービジュアル 407×570</span>}</div>

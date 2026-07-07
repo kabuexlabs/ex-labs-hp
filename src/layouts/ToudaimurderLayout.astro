@@ -2,6 +2,8 @@
 // 東大マーダーミステリーサークル (/toudaimurder/) 専用レイアウト。
 // 本体サイトとは別ブランドのマイクロサイトなので BaseLayout は使わず、
 // フォント・配色・ヘッダー/フッターをここで完結させる。
+import { jsonLd } from '../lib/microcms';
+
 export interface Props {
   title?: string;
   description?: string;
@@ -73,7 +75,7 @@ const orgLd = {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@600;800&family=JetBrains+Mono:wght@400&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
-<script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
+<script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <slot name="head" />
 </head>
 <body>
@@ -181,6 +183,8 @@ body.noscroll{overflow:hidden}
 
 <script>
 // スクロール連動のフェードイン (.rv → .on)。旧サイトの animate.js 相当。
+// threshold は 0 にする — 縦に長いコンテナ (モバイルの作品グリッド等) だと
+// 「要素の10%が見える」条件を満たせず、永遠に opacity:0 のままになるため。
 const io = new IntersectionObserver(
   (entries) => {
     for (const e of entries) {
@@ -190,7 +194,7 @@ const io = new IntersectionObserver(
       }
     }
   },
-  { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
+  { threshold: 0, rootMargin: '0px 0px -40px 0px' },
 );
 document.querySelectorAll('.rv').forEach((el) => io.observe(el));
 

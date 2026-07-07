@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { jsonLd } from '../lib/microcms';
 
 export interface Props {
   title?: string;
@@ -78,8 +79,8 @@ const orgLd = {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800;900&family=Shippori+Mincho:wght@600;700;800&display=swap" rel="stylesheet">
-<script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
-<script type="application/ld+json" set:html={JSON.stringify(websiteLd)} />
+<script type="application/ld+json" set:html={jsonLd(orgLd)} />
+<script type="application/ld+json" set:html={jsonLd(websiteLd)} />
 </head>
 <body>
 

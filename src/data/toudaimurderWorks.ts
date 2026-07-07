@@ -146,7 +146,6 @@ export const tmWorks: TmWork[] = [
     specs: ['6人', '180分', 'GM必須', '店舗公演', '代表作'],
     synopsis:
       '2012年、東京都某所の密室にて4名の死体が発見された。証拠はあるのに、犯人の特徴は1つも掴めない。この事件は未知を表すXを取り『X事件』と呼ばれることになった。\n以降も同様の犯罪が相次ぎ、犯人は一括りに『殺人鬼X』と呼称されるようになる。性別・年齢・目的、その全てが不明。\n数々の難事件を解決してきた名探偵・法月優とXの相対は、遂に実現の時を迎える。居合わせたのは6名の男女。曇りがかった世界の中、真相に辿り着けるのか。',
-    featured: true,
   },
   {
     slug: 'arumadamisu',
@@ -173,7 +172,6 @@ export const tmWorks: TmWork[] = [
       '🥇 2024年2月 マダミスアンケート1位',
       '🥇 2024年度 マダミスアンケート累計得票数1位',
     ],
-    featured: true,
   },
   {
     slug: 'arumadamisu2',
@@ -298,8 +296,9 @@ export const tmWorks: TmWork[] = [
   },
 ];
 
-/** トップページのマーキーに載せる作品 (掲載順) */
-export const tmFeatured = ['frankenstein', 'sonohi', 'dokuhaku', 'arumadamisu', 'bluedia', 'akuma']
+/** トップページのマーキーに載せる作品 (掲載順)。
+ *  殺人鬼Xの独白・あるマーダーミステリーについて はマーキー非掲載。 */
+export const tmFeatured = ['frankenstein', 'sonohi', 'bluedia', 'akuma']
   .map((slug) => tmWorks.find((w) => w.slug === slug)!)
   .filter(Boolean);
 
