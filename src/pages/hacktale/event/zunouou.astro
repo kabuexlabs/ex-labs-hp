@@ -1,6 +1,7 @@
 ---
 // イベント詳細: 東京都頭脳王決定戦 2026（チケット完売）
 import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
+import { jsonLd } from '../../../lib/microcms';
 import { htBase, htOrgRef, htBreadcrumbLd, HT_ZUNOUSEN_URL } from '../../../data/hacktale';
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
@@ -47,8 +48,8 @@ const prelims = [
   back={{ href: `${htBase}/#event`, label: 'EVENT 一覧へ戻る' }}
 >
 
-<script type="application/ld+json" set:html={JSON.stringify(eventLd)} />
-<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+<script type="application/ld+json" set:html={jsonLd(eventLd)} />
+<script type="application/ld+json" set:html={jsonLd(breadcrumbLd)} />
 
 <section class="sec"><div class="wrap hgrid">
 <img class="kvimg" src="/assets/hacktale/kv-zunouou.webp" alt="東京都頭脳王決定戦 2026 キービジュアル">

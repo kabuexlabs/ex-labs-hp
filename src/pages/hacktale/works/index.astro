@@ -1,6 +1,7 @@
 ---
 // WORKS 作品一覧ページ。人数・時間で並び替えできる。
 import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
+import { jsonLd } from '../../../lib/microcms';
 import { htBase, htWorks, htOrgRef, htBreadcrumbLd } from '../../../data/hacktale';
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
@@ -28,8 +29,8 @@ const breadcrumbLd = htBreadcrumbLd([
   description="HACKTALE（ハックテイル）の頭脳戦ゲーム作品一覧。プレゼント・ポーカー、人狼定理、ダイスボックス。人数や時間から遊びたい作品を探せます。"
 >
 
-<script type="application/ld+json" set:html={JSON.stringify(itemListLd)} />
-<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+<script type="application/ld+json" set:html={jsonLd(itemListLd)} />
+<script type="application/ld+json" set:html={jsonLd(breadcrumbLd)} />
 
 <section class="sec"><div class="wrap">
 <p class="crumb"><a href={`${htBase}/`}>TOP</a><span class="dim"> / WORKS</span></p>

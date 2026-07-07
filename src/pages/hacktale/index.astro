@@ -3,6 +3,7 @@
 // セクション順: ティッカー → ヒーロー → WORKS → EVENT → HACKTALEとは → ABOUT
 // → TICKET → CONTACT → フッターマーキー → フッター
 import HacktaleLayout from '../../layouts/HacktaleLayout.astro';
+import { jsonLd } from '../../lib/microcms';
 import HacktaleContactForm from '../../components/HacktaleContactForm.astro';
 import {
   htBase,
@@ -42,7 +43,7 @@ const orgLd = {
   description="頭脳・交渉を必要とするゲームを展開します。交渉・閃き・論理で勝敗が決まる『頭脳戦』を制作する団体 HACKTALE（ハックテイル）の公式サイト。プレゼント・ポーカー、人狼定理、東京都頭脳王決定戦、JANKEN24などを展開中。"
 >
 
-<script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
+<script type="application/ld+json" set:html={jsonLd(orgLd)} />
 
 <div class="tkr"><div class="tk">{[...tickerItems, ...tickerItems].map((t) => <span>{t}</span>)}</div></div>
 
