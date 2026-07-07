@@ -1,0 +1,136 @@
+---
+import ToudaimurderLayout from '../../layouts/ToudaimurderLayout.astro';
+import { tmFeatured, TM_LINE_URL, TM_X_URL } from '../../data/toudaimurderWorks';
+
+const base = '/toudaimurder';
+const ticker = [
+  '新作『あるマーダーミステリーについて2』リリース。',
+  '新作『フランケンシュタイン城の殺人』リリース。',
+  'ホームページのリニューアルをしました。',
+];
+---
+
+<ToudaimurderLayout wide>
+  <div class="rail" slot="rail"><span class="vtx en">TODAI MURDER MYSTERY CIRCLE — OFFICIAL SITE</span></div>
+
+  <div class="tick" slot="ticker"><div class="tin">
+    {[0, 1].map(() => ticker.map((t) => <span class="ti">{t}</span>))}
+  </div></div>
+
+  <div class="main">
+    <section class="hero wrap">
+      <p class="en dim rv" style="font-size:13px;margin:0 0 22px;letter-spacing:.3em">TODAI MURDER MYSTERY CIRCLE</p>
+      <h1 class="h0 min rv d1">至高の推理体験を<br>あなたに。</h1>
+      <p class="hlead rv d2">現役東大生と有名作家が手を組んだチームが、至高の推理体験を提供します。マーダーミステリーからイマーシブコンテンツまで、幅広く制作・展開を行います。</p>
+      <div class="hbtns rv d3"><a class="btn" href={`${base}/works/`}>作品一覧を見る</a><a class="btnline" href={TM_LINE_URL}>公式LINEで予約</a><a class="btnx" href={TM_X_URL}>Xを見る</a></div>
+    </section>
+
+    <section class="bt" id="works">
+      <div class="shead wrap rv"><h2 class="sh"><span class="sht en">WORKS</span><span class="shj">作品一覧</span></h2><a class="more en" href={`${base}/works/`}>MORE</a></div>
+      <div class="wstrip rv d1">
+        <div class="wsin">
+          {[0, 1].map(() => tmFeatured.map((w) => (
+            <div class="wcard">
+              <a href={`${base}/works/${w.slug}/`}><div class="ph pv"><span class="mono">作品キービジュアル 407×570</span></div></a>
+              <div class="cmeta"><span class="badge en">{w.badge}</span><span class="cdate mono">{w.meta}</span></div>
+              <h3 class="ct"><a href={`${base}/works/${w.slug}/`}>{w.title}</a></h3>
+              <p class="cpl">{w.play}</p>
+              <p class="wd">{w.descTop ?? w.desc}</p>
+            </div>
+          )))}
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap bt" id="whats">
+      <div class="shead rv"><h2 class="sh"><span class="sht en" style="font-size:clamp(40px,4.6vw,72px)">MURDER MYSTERY</span><span class="shj">マーダーミステリーとは？</span></h2></div>
+      <p class="hlead rv d1" style="margin:0;padding-bottom:88px;max-width:820px">マーダーミステリー（通称：マダミス）は、参加者が殺人事件などの物語の登場人物になりきり、会話や推理を通じて事件の犯人を突き止めたり、それぞれの秘密やミッションの達成を目指す体験型の推理ゲームです。</p>
+    </section>
+
+    <section class="wrap bt" id="news">
+      <div class="shead rv"><h2 class="sh"><span class="sht en">NEWS</span><span class="shj">お知らせ</span></h2><a class="more en" href={`${base}/news/`}>MORE</a></div>
+      <div class="rv d1" style="padding-bottom:88px">
+        <div class="nrow"><div class="ph nth"><span class="mono">サムネイル 16:9</span></div><div><span class="ndate mono">0000.00.00</span><h3 class="nt"><a href={`${base}/news/`}>（お知らせの見出しをここに入力）</a></h3><p class="ns" style="margin:0">（本文をここに入力）</p></div></div>
+        <div class="nrow"><div class="ph nth"><span class="mono">サムネイル 16:9</span></div><div><span class="ndate mono">0000.00.00</span><h3 class="nt"><a href={`${base}/news/`}>（お知らせの見出しをここに入力）</a></h3><p class="ns" style="margin:0">（本文をここに入力）</p></div></div>
+      </div>
+    </section>
+
+    <section class="wrap bt">
+      <div class="shead rv"><h2 class="sh"><span class="sht en">ABOUT</span><span class="shj">サークル紹介</span></h2><a class="more en" href={`${base}/about/`}>MORE</a></div>
+      <div class="about rv d1">
+        <p class="acatch min">現役東大生のチームが、<br>体験型コンテンツを展開。</p>
+        <div><p class="dim" style="margin:0 0 16px">マーダーミステリーからイマーシブコンテンツまで、東大生と有名作家がチームで制作・展開を行います。</p><p class="dim" style="margin:0">全国各地への作品展開や、作家様との提携により、最高の推理体験を提供して参ります。</p></div>
+      </div>
+    </section>
+
+    <section class="wrap bt" id="ticket">
+      <div class="shead rv"><h2 class="sh"><span class="sht en">TICKET</span><span class="shj">チケット・参加方法</span></h2></div>
+      <div class="steps rv d1">
+        <div class="st"><span class="sn en">01</span><h3 class="stt">作品を選ぶ</h3><p class="std">WORKSから遊びたい作品をお選びください。</p></div>
+        <div class="st"><span class="sn en">02</span><h3 class="stt">ご連絡</h3><p class="std"><a href={TM_LINE_URL} class="acc">公式LINE</a>、もしくは<a href={TM_X_URL} class="acc">X（@toudaimurder）</a>までご連絡ください。</p></div>
+        <div class="st"><span class="sn en">03</span><h3 class="stt">ご予約</h3><p class="std">貸し切りでのご予約が基本となります。</p></div>
+      </div>
+    </section>
+
+    <div class="ftmq"><div class="fmin"><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span></div></div>
+  </div>
+
+  <footer class="ftr2 wrap" id="contact" slot="footer">
+    <div class="fgrid">
+      <div><p class="logo" style="margin:0 0 12px">東大マーダーミステリー<span class="acc">サークル</span></p><p class="dim" style="font-size:13px;margin:0">至高の推理体験をあなたに。</p></div>
+      <div class="fnav"><span class="flbl en">MENU</span><a href={`${base}/works/`}>WORKS — 作品紹介</a><a href={`${base}/news/`}>NEWS — お知らせ</a><a href={`${base}/about/`}>ABOUT — サークル紹介</a></div>
+      <div class="fnav"><span class="flbl en">CONTACT</span><a href={TM_X_URL}>X — @toudaimurder</a><a href={TM_LINE_URL}>公式LINE</a></div>
+    </div>
+    <p class="copy en">© TODAI MURDER MYSTERY CIRCLE. All Rights Reserved.</p>
+  </footer>
+</ToudaimurderLayout>
+
+<style>
+.tick{overflow:hidden;border-bottom:1px solid var(--ln);background:#0e0c0f}
+.tin{display:flex;gap:0;width:max-content;animation:mq 46s linear infinite;padding:9px 0}
+.ti{display:flex;align-items:center;gap:14px;padding:0 32px;font-size:13px;white-space:nowrap;color:var(--dim)}
+.ti::before{content:"●";color:var(--acc);font-size:8px}
+@keyframes mq{to{transform:translateX(-50%)}}
+.rail{position:fixed;left:0;top:0;bottom:0;width:52px;border-right:1px solid var(--ln);z-index:40;display:flex;align-items:flex-end;justify-content:center;padding:24px 0;box-sizing:border-box;background:#0b0a0c}
+.vtx{writing-mode:vertical-rl;font-size:11px;letter-spacing:.34em;color:var(--dim)}
+.main{margin-left:52px}
+.shead{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:72px 0 44px}
+.hero{padding:110px 0 96px;position:relative;overflow:hidden}
+.h0{font-size:clamp(40px,5.2vw,84px);font-weight:700;letter-spacing:.06em;line-height:1.04;margin:0;color:#eae5e1}
+.hlead{max-width:640px;color:var(--dim);margin:26px 0 0}
+.hbtns{display:flex;gap:18px;margin-top:44px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:14px;background:var(--acc);color:#fff;border:none;border-radius:999px;padding:16px 48px;font-size:14px;letter-spacing:.12em;font-weight:700;transition:background .2s}
+.btn::after{content:"→"}
+.btn:hover{color:#fff;background:#b2132c}
+.btnline{display:inline-flex;align-items:center;gap:14px;background:#06c755;color:#fff;border:none;border-radius:999px;padding:16px 48px;font-size:14px;letter-spacing:.1em;font-weight:700;transition:background .2s}
+.btnline:hover{color:#fff;background:#05a848}
+.btnx{display:inline-flex;align-items:center;gap:12px;background:transparent;color:#fff;border:1.5px solid #eae5e1;border-radius:999px;padding:14px 44px;font-size:14px;letter-spacing:.1em;font-weight:700;transition:all .2s}
+.btnx::before{content:"𝕏";font-size:16px}
+.btnx:hover{background:#eae5e1;color:#0b0a0c}
+.wstrip{overflow:hidden;border-top:1px solid var(--ln);border-bottom:1px solid var(--ln);padding:44px 0}
+.wsin{display:flex;gap:40px;width:max-content;animation:mq 60s linear infinite}
+.wstrip:hover .wsin{animation-play-state:paused}
+.wcard{width:300px;flex-shrink:0}
+.nrow{display:grid;grid-template-columns:190px 1fr;gap:28px;padding:26px 0;border-top:1px solid var(--ln);align-items:center}
+.nth{aspect-ratio:16/9}
+.ndate{font-size:12px;color:var(--acc);letter-spacing:.12em}
+.nt{font-size:16px;font-weight:700;margin:6px 0 2px}
+.ns{font-size:13px;color:var(--dim)}
+.about{display:grid;grid-template-columns:1fr 1.2fr;gap:64px;padding-bottom:88px;align-items:center}
+.acatch{font-size:clamp(26px,2.6vw,40px);font-weight:800;line-height:1.7;margin:0;letter-spacing:.08em}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--ln);border:1px solid var(--ln);margin-bottom:96px}
+.st{background:#0e0c0f;padding:40px 32px}
+.sn{font-size:34px;font-weight:700;color:var(--acc);letter-spacing:.1em}
+.stt{font-size:17px;font-weight:700;margin:14px 0 8px}
+.std{font-size:13px;color:var(--dim);margin:0}
+.ftmq{overflow:hidden;border-top:1px solid var(--ln);padding:34px 0}
+.fmin{display:flex;width:max-content;animation:mq 30s linear infinite}
+.fmt{font-family:'Outfit',sans-serif;font-size:96px;font-weight:700;letter-spacing:.06em;white-space:nowrap;color:transparent;-webkit-text-stroke:1px var(--acc);padding-right:60px;line-height:1}
+.ftr2{border-top:1px solid var(--ln);padding-top:56px;padding-bottom:40px}
+.fgrid{display:flex;justify-content:space-between;gap:48px;flex-wrap:wrap}
+.fnav{display:flex;flex-direction:column;gap:10px;font-size:13px}
+.flbl{font-size:11px;color:var(--acc);letter-spacing:.28em;margin-bottom:6px}
+.ftr2 .copy{margin-top:48px}
+.logo{font-family:'Shippori Mincho',serif;font-weight:800;font-size:18px;letter-spacing:.14em}
+@media (max-width:900px){.rail{display:none}.main{margin-left:0}.about{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.nrow{grid-template-columns:1fr}}
+</style>
