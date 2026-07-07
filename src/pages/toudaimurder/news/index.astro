@@ -1,14 +1,8 @@
 ---
 import ToudaimurderLayout from '../../../layouts/ToudaimurderLayout.astro';
+import { tmNews } from '../../../data/toudaimurderNews';
 
 const base = '/toudaimurder';
-
-// お知らせは追って差し替え予定のプレースホルダー。
-const news = [
-  { date: '0000.00.00', tag: 'カテゴリ', title: '（お知らせの見出しをここに入力）', body: '（本文をここに入力）' },
-  { date: '0000.00.00', tag: 'カテゴリ', title: '（お知らせの見出しをここに入力）', body: '（本文をここに入力）' },
-  { date: '0000.00.00', tag: 'カテゴリ', title: '（お知らせの見出しをここに入力）', body: '（本文をここに入力）' },
-];
 ---
 
 <ToudaimurderLayout
@@ -19,11 +13,11 @@ const news = [
   <main class="wrap">
     <div class="shead rv"><p class="crumb mono"><a href={`${base}/`}>TOP</a> / NEWS</p><h1 class="sh"><span class="sht en">NEWS</span><span class="shj">お知らせ</span></h1></div>
     <div class="list rv d1">
-      {news.map((n) => (
-        <div class="nrow">
-          <div class="ph nth"><span class="mono">サムネイル 16:9</span></div>
-          <div><span class="ndate mono">{n.date}</span><span class="ntag">{n.tag}</span><h2 class="nt">{n.title}</h2><p class="ns">{n.body}</p></div>
-        </div>
+      {tmNews.map((n) => (
+        <a class="nrow" href={`${base}/news/${n.slug}/`}>
+          <div class="ph nth">{n.image ? <img src={n.image} alt={`${n.title} サムネイル`} loading="lazy" decoding="async" /> : <span class="mono">サムネイル 16:9</span>}</div>
+          <div><span class="ndate mono">{n.date}</span><span class="ntag">{n.tag}</span><h2 class="nt">{n.title}</h2><p class="ns">{n.summary}</p></div>
+        </a>
       ))}
     </div>
   </main>
@@ -32,10 +26,12 @@ const news = [
 <style>
 .shead{padding:80px 0 48px}
 .nrow{display:grid;grid-template-columns:220px 1fr;gap:32px;padding:30px 0;border-top:1px solid var(--ln);align-items:center}
-.nth{aspect-ratio:16/9}
+.nrow:hover .nt{color:var(--acc)}
+.nth{aspect-ratio:16/9;overflow:hidden}
+.nth img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block}
 .ndate{font-size:12px;color:var(--acc);letter-spacing:.12em}
 .ntag{display:inline-block;border:1px solid var(--ln);color:var(--dim);font-size:11px;padding:2px 10px;margin-left:12px;letter-spacing:.1em}
-.nt{font-size:17px;font-weight:700;margin:6px 0 2px}
+.nt{font-size:17px;font-weight:700;margin:6px 0 2px;transition:color .2s}
 .ns{font-size:13px;color:var(--dim);margin:0}
 .list{padding-bottom:96px}
 @media (max-width:900px){.nrow{grid-template-columns:1fr}}
