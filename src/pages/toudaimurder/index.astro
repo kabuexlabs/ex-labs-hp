@@ -14,12 +14,36 @@ const ticker = [
 ];
 ---
 
-<ToudaimurderLayout wide>
+<ToudaimurderLayout
+  wide
+  title="東大マーダーミステリーサークル｜マーダーミステリーの制作・公演"
+  description="現役東大生と有名作家のチームがマーダーミステリーを制作・公演。『殺人鬼Xの独白』『フランケンシュタイン城の殺人』などオリジナルのマーダーミステリー作品を店舗公演・オンラインでお楽しみいただけます。貸切公演・オリジナル制作のご相談も受付中。"
+  ogImage="/assets/toudaimurder/frankenstein.webp"
+>
   <div class="rail" slot="rail"><span class="vtx en">TODAI MURDER MYSTERY CIRCLE — OFFICIAL SITE</span></div>
 
   <div class="tick" slot="ticker"><div class="tin">
     {[0, 1].map(() => ticker.map((t) => <span class="ti">{t}</span>))}
   </div></div>
+
+  <script is:inline>
+  // オープニング演出は初回訪問時のみ (同一セッション中の再訪・reduced-motion 環境ではスキップ)。
+  // CSSより先に判定するため intro 要素の直前でルートにクラスを付ける。
+  (function () {
+    try {
+      if (sessionStorage.getItem('tmIntro') || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('no-intro');
+      } else {
+        sessionStorage.setItem('tmIntro', '1');
+      }
+    } catch (e) { /* storage不可でも表示は続行 */ }
+  })();
+  </script>
+  <div class="intro" id="intro" aria-hidden="true">
+    <img class="imark" src="/assets/toudaimurder/um-mark.svg" alt="" width="110" height="98">
+    <p class="ittl min">東大マーダーミステリー<span class="acc">サークル</span></p>
+    <p class="isub en">UNLIMITED MYSTERY</p>
+  </div>
 
   <div class="main">
     <section class="hero wrap">
@@ -96,7 +120,12 @@ const ticker = [
 
   <footer class="ftr2 wrap" slot="footer">
     <div class="fgrid">
-      <div><p class="logo" style="margin:0 0 12px">東大マーダーミステリー<span class="acc">サークル</span></p><p class="dim" style="font-size:13px;margin:0">至高の推理体験をあなたに。</p></div>
+      <div>
+        <p class="logo" style="margin:0 0 12px">東大マーダーミステリー<span class="acc">サークル</span></p>
+        <p class="dim" style="font-size:13px;margin:0 0 20px">至高の推理体験をあなたに。</p>
+        <div class="umlk2"><img src="/assets/toudaimurder/um-mark.svg" alt="UNLIMITED MYSTERY ロゴ" width="46" height="41" loading="lazy"><span class="umtx2">UNLIMITED<br>MYSTERY</span></div>
+        <p class="dim" style="font-size:11px;margin:12px 0 0;max-width:340px">Unlimited Mystery is a label that offers an unparalleled mystery experience with no compromises or corners cut.</p>
+      </div>
       <div class="fnav"><span class="flbl en">MENU</span><a href={`${base}/works/`}>WORKS — 作品紹介</a><a href={`${base}/news/`}>NEWS — お知らせ</a><a href={`${base}/about/`}>ABOUT — サークル紹介</a></div>
       <div class="fnav"><span class="flbl en">CONTACT</span><a href={`${base}/contact/`}>お問い合わせフォーム</a><a href={TM_X_URL}>X — @toudaimurder</a><a href={TM_LINE_URL}>公式LINE</a></div>
       <div class="fnav"><span class="flbl en">COMPANY</span><a href="https://kabuexlabs.com/">運営会社 — 株式会社ex Labs</a></div>
@@ -106,6 +135,17 @@ const ticker = [
 </ToudaimurderLayout>
 
 <style>
+.intro{position:fixed;inset:0;z-index:100;background:#0b0a0c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;animation:introout .6s ease 2s forwards}
+.imark{width:clamp(84px,12vw,120px);height:auto;opacity:0;animation:iin .9s cubic-bezier(.22,.61,.36,1) .15s forwards}
+.ittl{font-size:clamp(19px,3vw,30px);font-weight:800;letter-spacing:.14em;margin:0;opacity:0;animation:iin .9s cubic-bezier(.22,.61,.36,1) .55s forwards;text-align:center;padding:0 20px}
+.isub{font-size:11px;letter-spacing:.42em;color:var(--dim);margin:0;opacity:0;animation:iin .9s ease .85s forwards}
+@keyframes iin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes introout{to{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.intro{display:none}}
+:global(.no-intro) .intro{display:none}
+.umlk2{display:flex;align-items:center;gap:12px}
+.umlk2 img{width:46px;height:auto;display:block}
+.umtx2{font-family:'Playfair Display',serif;font-weight:600;font-size:15px;letter-spacing:.18em;line-height:1.35}
 .tick{overflow:hidden;border-bottom:1px solid var(--ln);background:#0e0c0f}
 .tin{display:flex;gap:0;width:max-content;animation:mq 46s linear infinite;padding:9px 0}
 .ti{display:flex;align-items:center;gap:14px;padding:0 32px;font-size:13px;white-space:nowrap;color:var(--dim)}
@@ -114,8 +154,8 @@ const ticker = [
 .rail{position:fixed;left:0;top:0;bottom:0;width:52px;border-right:1px solid var(--ln);z-index:40;display:flex;align-items:flex-end;justify-content:center;padding:24px 0;box-sizing:border-box;background:#0b0a0c}
 .vtx{writing-mode:vertical-rl;font-size:11px;letter-spacing:.34em;color:var(--dim)}
 .main{margin-left:52px}
-.shead{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:72px 0 44px}
-.hero{padding:110px 0 96px;position:relative;overflow:hidden}
+.shead{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:72px 0 44px;flex-wrap:wrap}
+.hero{padding-top:110px;padding-bottom:96px;position:relative;overflow:hidden}
 .h0{font-size:clamp(40px,5.2vw,84px);font-weight:700;letter-spacing:.06em;line-height:1.04;margin:0;color:#eae5e1}
 .hlead{max-width:640px;color:var(--dim);margin:26px 0 0}
 .hbtns{display:flex;gap:18px;margin-top:44px;flex-wrap:wrap}

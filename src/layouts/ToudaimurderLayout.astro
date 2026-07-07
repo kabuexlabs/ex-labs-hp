@@ -5,21 +5,25 @@
 export interface Props {
   title?: string;
   description?: string;
+  /** OGP 画像 (public/ 配下のパス)。設定すると twitter card も large になる */
+  ogImage?: string;
   active?: 'works' | 'news' | 'about' | 'contact';
   /** トップ・作品一覧はコンテナ幅 1400px、それ以外は 1200px */
   wide?: boolean;
 }
 
 const {
-  title = '東大マーダーミステリーサークル｜至高の推理体験をあなたに',
+  title = '東大マーダーミステリーサークル｜マーダーミステリーの制作・公演',
   description =
-    '現役東大生と有名作家が手を組んだチームが、至高の推理体験を提供します。マーダーミステリーからイマーシブコンテンツまで、幅広く制作・展開を行います。',
+    '現役東大生と有名作家が手を組んだチームが、マーダーミステリーの制作・公演を行うサークルです。オリジナルのマーダーミステリー作品を店舗公演・オンラインでお楽しみいただけます。',
+  ogImage,
   active,
   wide = false,
 } = Astro.props;
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const canonical = new URL(Astro.url.pathname, site);
+const ogImageAbs = ogImage ? new URL(ogImage, site) : undefined;
 
 const base = '/toudaimurder';
 const nav = [
@@ -29,6 +33,24 @@ const nav = [
   { key: 'ticket', href: `${base}/#ticket`, en: 'TICKET', jp: '参加方法' },
   { key: 'contact', href: `${base}/contact/`, en: 'CONTACT', jp: 'お問い合わせ' },
 ];
+
+// マーダーミステリー/マーダーミステリー制作 での検索流入を狙った構造化データ。
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: '東大マーダーミステリーサークル',
+  alternateName: 'UNLIMITED MYSTERY',
+  url: new URL(`${base}/`, site).toString(),
+  logo: new URL('/assets/toudaimurder/um-mark.svg', site).toString(),
+  sameAs: ['https://x.com/toudaimurder'],
+  description:
+    '現役東大生と有名作家によるチームで、マーダーミステリーの制作・公演を行うサークル。オリジナルのマーダーミステリー作品を店舗公演・オンラインで展開しています。',
+  parentOrganization: {
+    '@type': 'Organization',
+    name: '株式会社ex Labs',
+    url: 'https://kabuexlabs.com/',
+  },
+};
 ---
 
 <!DOCTYPE html>
@@ -43,13 +65,15 @@ const nav = [
 <meta property="og:description" content={description}>
 <meta property="og:type" content="website">
 <meta property="og:url" content={canonical}>
+{ogImageAbs && <meta property="og:image" content={ogImageAbs}>}
 <meta property="og:site_name" content="東大マーダーミステリーサークル">
 <meta property="og:locale" content="ja_JP">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content={ogImageAbs ? 'summary_large_image' : 'summary'}>
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@600;800&family=JetBrains+Mono:wght@400&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
 <slot name="head" />
 </head>
 <body>
@@ -64,12 +88,23 @@ const nav = [
     <span class="njp">{item.jp}</span>
   </a>
 ))}
-</nav></div>
+</nav>
+<button class="menub" id="menuBtn" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="mnav"><span></span><span></span><span></span></button>
+</div>
 <slot name="ticker" />
 </header>
+<nav class="mnav" id="mnav" aria-label="メニュー">
+{nav.map((item) => (
+  <a class="mitem" href={item.href}>
+    <span class:list={['men', 'en', { acc: active === item.key }]}>{item.en}</span>
+    <span class="mjp">{item.jp}</span>
+  </a>
+))}
+</nav>
 <slot />
 <slot name="footer">
   <footer class="ftr wrap">
+    <div class="umlk"><img class="ummark" src="/assets/toudaimurder/um-mark.svg" alt="UNLIMITED MYSTERY ロゴ" width="46" height="41" loading="lazy"><span class="umtx">UNLIMITED<br>MYSTERY</span></div>
     <p class="copy">運営会社：<a href="https://kabuexlabs.com/">株式会社ex Labs</a></p>
     <p class="copy en" style="margin-top:6px">© TODAI MURDER MYSTERY CIRCLE. All Rights Reserved.</p>
   </footer>
@@ -101,7 +136,18 @@ a{color:#eae5e1;text-decoration:none}a:hover{color:#e0243f}
 .nit{display:flex;flex-direction:column;align-items:center;gap:1px}
 .nen{font-size:13px;font-weight:600;letter-spacing:.22em}
 .njp{font-size:10px;color:var(--dim)}
-.sh{display:flex;align-items:baseline;gap:18px;margin:0}
+.menub{display:none;flex-direction:column;justify-content:center;gap:6px;width:44px;height:44px;padding:10px;background:transparent;border:1px solid var(--ln);border-radius:4px;cursor:pointer;flex-shrink:0}
+.menub span{display:block;height:2px;background:#eae5e1;border-radius:2px;transition:transform .3s,opacity .3s}
+.menub.x span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+.menub.x span:nth-child(2){opacity:0}
+.menub.x span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+.mnav{position:fixed;inset:0;z-index:49;background:rgba(11,10,12,.98);display:none;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:80px 24px}
+.mnav.open{display:flex}
+body.noscroll{overflow:hidden}
+.mitem{display:flex;flex-direction:column;align-items:center;padding:16px 0}
+.men{font-size:22px;font-weight:600;letter-spacing:.3em}
+.mjp{font-size:11px;color:var(--dim);margin-top:2px}
+.sh{display:flex;align-items:baseline;gap:18px;margin:0;flex-wrap:wrap}
 .sht{font-size:clamp(52px,7vw,104px);font-weight:700;letter-spacing:.05em;line-height:1;color:var(--acc)}
 .shj{font-size:14px;color:var(--dim)}
 .crumb{font-size:12px;color:var(--dim);margin:0 0 10px}
@@ -119,7 +165,18 @@ a{color:#eae5e1;text-decoration:none}a:hover{color:#e0243f}
 .more:hover{background:var(--acc);color:#0b0a0c}
 .ftr{border-top:1px solid var(--ln);padding-top:44px;padding-bottom:36px}
 .copy{font-size:11px;color:var(--dim);margin:0}
-@media (max-width:1100px){.nav{display:none}}
+.umlk{display:flex;align-items:center;gap:12px;margin:0 0 20px}
+.ummark{width:46px;height:auto;display:block}
+.umtx{font-family:'Playfair Display',serif;font-weight:600;font-size:15px;letter-spacing:.18em;line-height:1.35;color:#eae5e1}
+@media (max-width:1100px){.nav{display:none}.menub{display:flex}}
+@media (max-width:700px){
+  .wrap{padding:0 22px}
+  .hbar{padding:12px 18px}
+  .logo{font-size:15px}
+  .sht{font-size:clamp(40px,13vw,64px)}
+  .pg{font-size:14px}
+  .more{padding:10px 26px;letter-spacing:.2em;font-size:12px}
+}
 </style>
 
 <script>
@@ -136,6 +193,27 @@ const io = new IntersectionObserver(
   { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
 );
 document.querySelectorAll('.rv').forEach((el) => io.observe(el));
+
+// モバイルのハンバーガーメニュー
+const menuBtn = document.getElementById('menuBtn');
+const mnav = document.getElementById('mnav');
+if (menuBtn && mnav) {
+  menuBtn.addEventListener('click', () => {
+    const open = mnav.classList.toggle('open');
+    menuBtn.classList.toggle('x', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    menuBtn.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+    document.body.classList.toggle('noscroll', open);
+  });
+  mnav.querySelectorAll('a').forEach((a) =>
+    a.addEventListener('click', () => {
+      mnav.classList.remove('open');
+      menuBtn.classList.remove('x');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('noscroll');
+    }),
+  );
+}
 </script>
 </body>
 </html>

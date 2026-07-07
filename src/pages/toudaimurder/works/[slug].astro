@@ -9,13 +9,40 @@ export function getStaticPaths() {
 const { work } = Astro.props;
 const base = '/toudaimurder';
 const others = tmWorks.filter((w) => w.slug !== work.slug);
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL(`${base}/works/${work.slug}/`, site).toString();
+
+// マーダーミステリー作品としての構造化データ + パンくず
+const workLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Game',
+  name: work.title,
+  genre: 'マーダーミステリー',
+  url: pageUrl,
+  ...(work.image ? { image: new URL(work.image, site).toString() } : {}),
+  description: work.desc,
+  publisher: { '@type': 'Organization', name: '東大マーダーミステリーサークル' },
+};
+const crumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '東大マーダーミステリーサークル', item: new URL(`${base}/`, site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'マーダーミステリー作品一覧', item: new URL(`${base}/works/`, site).toString() },
+    { '@type': 'ListItem', position: 3, name: work.title, item: pageUrl },
+  ],
+};
 ---
 
 <ToudaimurderLayout
   active="works"
-  title={`${work.title}｜東大マーダーミステリーサークル`}
-  description={`${work.title}（${work.specs.join('・')}）— 東大マーダーミステリーサークルのマーダーミステリー作品。${work.desc}`}
+  title={`${work.title}｜マーダーミステリー｜東大マーダーミステリーサークル`}
+  description={`${work.title}（${work.specs.join('・')}）— 東大マーダーミステリーサークル制作のマーダーミステリー作品。${work.desc}`}
+  ogImage={work.image}
 >
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(workLd)} />
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(crumbLd)} />
   <main class="wrap">
     <div class="dt fin">
       <div class="ph pv">{work.image ? <img src={work.image} alt={`${work.title} キービジュアル`} /> : <span class="mono">作品キービジュアル 407×570</span>}</div>
