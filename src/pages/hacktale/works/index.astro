@@ -1,0 +1,117 @@
+---
+// WORKS 作品一覧ページ。人数・時間で並び替えできる。
+import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
+import { htBase, htWorks, htOrgRef, htBreadcrumbLd } from '../../../data/hacktale';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const itemListLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'HACKTALE 作品一覧',
+  description: 'HACKTALE（ハックテイル）が制作・展開する頭脳戦ゲームの作品一覧。',
+  itemListElement: htWorks.map((w, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: w.title,
+    url: new URL(`/hacktale/works/${w.slug}/`, site).toString(),
+  })),
+  publisher: htOrgRef(site),
+};
+const breadcrumbLd = htBreadcrumbLd([
+  { name: 'HACKTALE', url: new URL('/hacktale/', site).toString() },
+  { name: '作品一覧' },
+]);
+---
+
+<HacktaleLayout
+  title="作品一覧 WORKS | ハックテイル"
+  description="HACKTALE（ハックテイル）の頭脳戦ゲーム作品一覧。プレゼント・ポーカー、人狼定理、ダイスボックス。人数や時間から遊びたい作品を探せます。"
+>
+
+<script type="application/ld+json" set:html={JSON.stringify(itemListLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+
+<section class="sec"><div class="wrap">
+<p class="crumb"><a href={`${htBase}/`}>TOP</a><span class="dim"> / WORKS</span></p>
+<div class="shead"><h1 class="m0 fx" style="align-items:baseline;gap:18px"><span class="en st">WORKS</span><span class="sj">作品一覧</span></h1></div>
+
+<div class="tools">
+<label class="sortl">並び替え
+<select class="ssel" id="sortSel">
+<option value="default">おすすめ順</option>
+<option value="players-asc">人数が少ない順</option>
+<option value="players-desc">人数が多い順</option>
+<option value="minutes-asc">時間が短い順</option>
+<option value="minutes-desc">時間が長い順</option>
+</select>
+</label>
+<span class="fcount" id="fcount"></span>
+</div>
+
+<div class="cards" id="cards">
+{htWorks.map((w, i) => (
+  <a class="card" href={`${htBase}/works/${w.slug}/`} data-order={i} data-players={w.players} data-minutes={w.minutes}>
+    <img class="cimg" src={w.image} alt={`${w.title} キービジュアル`} loading={i === 0 ? 'eager' : 'lazy'} decoding="async">
+    <div class="cbody">
+      <div class="chips"><span class="badge en">{w.num}</span><span class="chip">{w.chip}</span></div>
+      <h2 class="ct">{w.title}</h2>
+      <span class="cm">{w.meta}</span>
+      <p class="cd">{w.desc}</p>
+    </div>
+  </a>
+))}
+</div>
+</div></section>
+
+</HacktaleLayout>
+
+<style>
+.sec{padding:72px 0 112px}
+.crumb{font-size:12px;letter-spacing:.14em;margin:0 0 22px;color:#9b978c}
+.crumb a{color:#c9c5ba}
+.shead{margin-bottom:28px}
+.st{font-size:clamp(38px,4.5vw,60px);line-height:1}
+.sj{font-size:13px;letter-spacing:.2em;color:#9b978c}
+.tools{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin:0 0 36px;padding:16px 0;border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1)}
+.sortl{display:flex;align-items:center;gap:12px;font-size:13px;font-weight:700;letter-spacing:.08em;color:#c9c5ba}
+.ssel{background:#141416;border:1px solid rgba(255,255,255,.18);color:#f1efe9;font-size:13px;font-family:inherit;padding:9px 34px 9px 14px;cursor:pointer;appearance:none;background-image:linear-gradient(45deg,transparent 50%,#9b978c 50%),linear-gradient(135deg,#9b978c 50%,transparent 50%);background-position:calc(100% - 19px) 50%,calc(100% - 14px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.ssel:focus{outline:none;border-color:var(--acc)}
+.fcount{font-size:12px;letter-spacing:.1em;color:#9b978c;margin-left:auto}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px}
+.card{border:1px solid rgba(255,255,255,.12);background:#141416;display:flex;flex-direction:column;overflow:hidden;transition:border-color .2s,transform .4s}
+.card:hover{border-color:var(--acc);transform:translateY(-6px)}
+.cimg{width:100%;display:block;aspect-ratio:1/1;object-fit:cover;transition:transform .5s}
+.card:hover .cimg{transform:scale(1.05)}
+.cbody{padding:20px 22px 26px;display:flex;flex-direction:column;gap:10px;flex:1}
+.chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font-size:11px;letter-spacing:.08em;border:1px solid rgba(255,255,255,.25);padding:3px 9px;color:#c9c5ba}
+.badge{font-size:11px;letter-spacing:.14em;background:var(--acc);color:#0d0d0e;padding:3px 9px;font-weight:700}
+.ct{font-size:19px;font-weight:900;line-height:1.5;margin:0}
+.cm{font-size:12px;color:#9b978c;letter-spacing:.04em}
+.cd{font-size:13px;line-height:1.9;color:#c9c5ba;margin:0}
+@media(max-width:900px){.cards{grid-template-columns:1fr}}
+@media(max-width:760px){.sec{padding:48px 0 80px}.tools{margin-bottom:28px}}
+@media(max-width:480px){.st{font-size:clamp(32px,10vw,38px)}}
+</style>
+
+<script>
+const grid = document.getElementById('cards')!;
+const cards = Array.from(grid.children) as HTMLElement[];
+const count = document.getElementById('fcount')!;
+const sortSel = document.getElementById('sortSel') as HTMLSelectElement;
+
+function apply() {
+  const [key, dir] = sortSel.value.split('-');
+  const sorted = [...cards].sort((a, b) => {
+    if (sortSel.value === 'default') return Number(a.dataset.order) - Number(b.dataset.order);
+    const va = Number(a.dataset[key]);
+    const vb = Number(b.dataset[key]);
+    return (dir === 'asc' ? va - vb : vb - va) || Number(a.dataset.order) - Number(b.dataset.order);
+  });
+  for (const card of sorted) grid.appendChild(card);
+  count.textContent = `${cards.length}作品`;
+}
+
+sortSel.addEventListener('change', apply);
+apply();
+</script>
