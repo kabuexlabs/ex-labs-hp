@@ -1,0 +1,86 @@
+---
+import ToudaimurderLayout from '../../../layouts/ToudaimurderLayout.astro';
+import { tmWorks, TM_LINE_URL, TM_X_URL, TM_CONTACT_EMAIL } from '../../../data/toudaimurderWorks';
+
+const base = '/toudaimurder';
+
+// FormSubmit (formsubmit.co) 経由で TM_CONTACT_EMAIL 宛にメール送信される。
+// 初回送信時に宛先メールアドレスへ届く認証メールの承認が必要。
+const formAction = `https://formsubmit.co/${TM_CONTACT_EMAIL}`;
+const thanksUrl = `https://kabuexlabs.com${base}/contact/thanks/`;
+---
+
+<ToudaimurderLayout
+  active="contact"
+  title="お問い合わせ｜東大マーダーミステリーサークル"
+  description="東大マーダーミステリーサークルへのご予約・お問い合わせフォーム。公演のご予約、貸切公演のご相談、その他のお問い合わせを受け付けています。"
+>
+  <main class="wrap">
+    <div class="shead rv"><p class="crumb mono"><a href={`${base}/`}>TOP</a> / CONTACT</p><h1 class="sh"><span class="sht en">CONTACT</span><span class="shj">お問い合わせ</span></h1></div>
+
+    <div class="grid rv d1">
+      <div>
+        <p class="lead">公演のご予約・貸切公演のご相談・その他のお問い合わせは、下記フォームよりご連絡ください。折り返し担当者よりご連絡いたします。</p>
+        <p class="lead dim" style="font-size:13px">お急ぎの場合は <a href={TM_LINE_URL} class="acc">公式LINE</a>、もしくは <a href={TM_X_URL} class="acc">X（@toudaimurder）</a> のDMが便利です。</p>
+      </div>
+
+      <form class="cform" action={formAction} method="POST">
+        <input type="hidden" name="_subject" value="【東大マーダーミステリーサークル】サイトからのお問い合わせ">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value={thanksUrl}>
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+
+        <label class="fl"><span class="flt">お名前 <span class="req">必須</span></span>
+          <input class="fi" type="text" name="お名前" required autocomplete="name" placeholder="山田 太郎">
+        </label>
+
+        <label class="fl"><span class="flt">メールアドレス <span class="req">必須</span></span>
+          <input class="fi" type="email" name="email" required autocomplete="email" placeholder="example@email.com">
+        </label>
+
+        <label class="fl"><span class="flt">お問い合わせ種別</span>
+          <select class="fi" name="お問い合わせ種別">
+            <option>公演の予約</option>
+            <option>貸切公演の相談</option>
+            <option>取材・コラボのご相談</option>
+            <option>その他</option>
+          </select>
+        </label>
+
+        <label class="fl"><span class="flt">ご希望の作品（任意）</span>
+          <select class="fi" name="ご希望の作品">
+            <option value="">選択しない</option>
+            {tmWorks.map((w) => <option>{w.title}</option>)}
+          </select>
+        </label>
+
+        <label class="fl"><span class="flt">お問い合わせ内容 <span class="req">必須</span></span>
+          <textarea class="fi ft" name="お問い合わせ内容" required rows="7" placeholder="ご希望の日時・人数などがあればあわせてご記入ください。"></textarea>
+        </label>
+
+        <button class="send" type="submit">送信する</button>
+        <p class="privacy dim">ご入力いただいた情報は、お問い合わせへの回答のみに使用いたします。</p>
+      </form>
+    </div>
+  </main>
+</ToudaimurderLayout>
+
+<style>
+.shead{padding:80px 0 48px}
+.grid{display:grid;grid-template-columns:1fr 1.4fr;gap:64px;align-items:start;padding-bottom:96px}
+.lead{margin:0 0 18px}
+.cform{border:1px solid var(--ln);background:#0e0c0f;padding:44px 40px;display:flex;flex-direction:column;gap:22px}
+.fl{display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:700;letter-spacing:.06em}
+.flt{display:block}
+.req{display:inline-block;border:1px solid var(--acc);color:var(--acc);font-size:10px;font-weight:600;padding:1px 8px;margin-left:8px;letter-spacing:.14em;vertical-align:middle}
+.fi{background:#0b0a0c;border:1px solid var(--ln);color:#eae5e1;font-size:14px;font-family:'Noto Sans JP',sans-serif;padding:13px 16px;border-radius:2px;transition:border-color .2s}
+.fi:focus{outline:none;border-color:var(--acc)}
+.ft{resize:vertical;min-height:140px}
+select.fi{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--dim) 50%),linear-gradient(135deg,var(--dim) 50%,transparent 50%);background-position:calc(100% - 21px) 50%,calc(100% - 16px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.send{display:inline-flex;align-items:center;justify-content:center;gap:14px;background:var(--acc);color:#fff;border:none;border-radius:999px;padding:16px 48px;font-size:14px;letter-spacing:.18em;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:background .2s;margin-top:6px}
+.send::after{content:"→"}
+.send:hover{background:#b2132c}
+.privacy{font-size:11px;margin:0}
+@media (max-width:900px){.grid{grid-template-columns:1fr}.cform{padding:32px 24px}}
+</style>

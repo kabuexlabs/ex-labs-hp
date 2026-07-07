@@ -1,0 +1,28 @@
+---
+import ToudaimurderLayout from '../../../layouts/ToudaimurderLayout.astro';
+import { TM_LINE_URL, TM_X_URL } from '../../../data/toudaimurderWorks';
+
+const base = '/toudaimurder';
+---
+
+<ToudaimurderLayout
+  active="contact"
+  title="送信完了｜東大マーダーミステリーサークル"
+  description="お問い合わせありがとうございました。担当者より折り返しご連絡いたします。"
+>
+  <!-- フォーム送信後のリダイレクト先。検索結果には出さない -->
+  <meta slot="head" name="robots" content="noindex">
+  <main class="wrap">
+    <div class="box rv on">
+      <p class="en acc" style="font-size:13px;letter-spacing:.3em;margin:0 0 18px">THANK YOU</p>
+      <h1 class="ttl min">送信が完了しました。</h1>
+      <p class="dim" style="margin:22px 0 0">お問い合わせありがとうございます。<br>内容を確認のうえ、担当者より折り返しご連絡いたします。<br>お急ぎの場合は <a href={TM_LINE_URL} class="acc">公式LINE</a> または <a href={TM_X_URL} class="acc">X（@toudaimurder）</a> のDMもご利用ください。</p>
+      <div style="margin-top:44px"><a class="more en" href={`${base}/`}>BACK TO TOP</a></div>
+    </div>
+  </main>
+</ToudaimurderLayout>
+
+<style>
+.box{padding:140px 0 160px;text-align:center}
+.ttl{font-size:clamp(28px,3.4vw,44px);font-weight:800;margin:0;letter-spacing:.08em}
+</style>

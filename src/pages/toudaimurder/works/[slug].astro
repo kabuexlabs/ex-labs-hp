@@ -23,9 +23,52 @@ const others = tmWorks.filter((w) => w.slug !== work.slug);
         <p class="crumb mono"><a href={`${base}/`}>TOP</a> / <a href={`${base}/works/`}>WORKS</a> / {work.title}</p>
         <div class="specs">{work.specs.map((s) => <span class="spec">{s}</span>)}</div>
         <h1 class="wt min">{work.title}</h1>
-        <span class="slbl en">STORY</span>
-        <p class="syn">{work.synopsis}</p>
-        <div class="btns"><a class="btn" href={TM_LINE_URL}>公式LINEで予約</a><a class="morex" href={TM_X_URL}>Xを見る</a></div>
+        {work.catch && <p class="catch min">{work.catch}</p>}
+        {work.synopsis && (
+          <>
+            <span class="slbl en">STORY</span>
+            <p class="syn">{work.synopsis}</p>
+          </>
+        )}
+        {work.details && (
+          <>
+            <span class="slbl en">INFO<span class="sljp">事前情報</span></span>
+            <div class="facts">
+              {work.details.map((d) => (
+                <div class="fact"><span class="fk">{d.label}</span><span>{d.value}</span></div>
+              ))}
+            </div>
+          </>
+        )}
+        {work.notes && (
+          <>
+            <span class="slbl en">NOTES<span class="sljp">注意事項</span></span>
+            <ul class="nlist">
+              {work.notes.map((n) => <li>{n}</li>)}
+            </ul>
+          </>
+        )}
+        {work.sections && (
+          <>
+            <span class="slbl en">SYSTEM<span class="sljp">ゲーム概要</span></span>
+            {work.sectionsIntro && <p class="sintro">{work.sectionsIntro}</p>}
+            {work.sections.map((s) => (
+              <div class="osec">
+                <h2 class="ost"><span class="acc">◉</span> {s.title}</h2>
+                <p class="osb">{s.body}</p>
+              </div>
+            ))}
+          </>
+        )}
+        {work.awards && (
+          <>
+            <span class="slbl en">AWARDS<span class="sljp">受賞</span></span>
+            <ul class="alist">
+              {work.awards.map((a) => <li>{a}</li>)}
+            </ul>
+          </>
+        )}
+        <div class="btns"><a class="btn" href={TM_LINE_URL}>公式LINEで予約</a><a class="morex" href={TM_X_URL}>Xを見る</a><a class="form" href={`${base}/contact/`}>フォームで問い合わせ</a></div>
         <p class="note">※ 貸し切りでのご予約が基本となります。</p>
       </div>
     </div>
@@ -45,19 +88,35 @@ const others = tmWorks.filter((w) => w.slug !== work.slug);
 .specs{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 20px}
 .spec{border:1px solid var(--ln);color:var(--dim);font-size:12px;padding:4px 14px;letter-spacing:.1em}
 .wt{font-size:clamp(30px,3.4vw,48px);font-weight:800;line-height:1.4;margin:0 0 24px}
+.catch{font-size:17px;font-weight:800;line-height:2;letter-spacing:.08em;margin:0 0 36px;white-space:pre-line;border-left:3px solid var(--acc);padding-left:18px}
 .syn{color:var(--dim);margin:0 0 40px;white-space:pre-line}
 .slbl{font-size:11px;color:var(--acc);letter-spacing:.28em;display:block;margin-bottom:12px}
+.sljp{color:var(--dim);letter-spacing:.1em;margin-left:12px;font-family:'Noto Sans JP',sans-serif}
+.facts{margin:0 0 40px;border-bottom:1px solid var(--ln)}
+.fact{display:grid;grid-template-columns:170px 1fr;gap:20px;padding:13px 0;border-top:1px solid var(--ln);font-size:14px}
+.fk{color:var(--dim)}
+.nlist{margin:0 0 40px;padding:0;list-style:none;font-size:14px;color:var(--dim)}
+.nlist li{padding:4px 0 4px 20px;position:relative}
+.nlist li::before{content:"※";color:var(--acc);position:absolute;left:0}
+.sintro{font-size:13px;color:var(--dim);margin:0 0 20px}
+.osec{margin:0 0 28px}
+.ost{font-size:16px;font-weight:800;margin:0 0 8px}
+.osb{color:var(--dim);font-size:14px;margin:0;white-space:pre-line}
+.alist{margin:0 0 40px;padding:0;list-style:none;font-size:14px}
+.alist li{padding:4px 0}
 .btns{display:flex;gap:16px;flex-wrap:wrap}
 .btn{display:inline-flex;align-items:center;gap:14px;background:#06c755;color:#fff;border:none;border-radius:999px;padding:16px 48px;font-size:14px;letter-spacing:.1em;font-weight:700;transition:background .2s}
 .btn:hover{color:#fff;background:#05a848}
 .morex{display:inline-flex;align-items:center;gap:12px;background:transparent;color:#fff;border:1.5px solid #eae5e1;border-radius:999px;padding:14px 44px;font-size:14px;letter-spacing:.14em;font-weight:700;transition:all .2s}
 .morex::before{content:"𝕏";font-size:16px}
 .morex:hover{background:#eae5e1;color:#0b0a0c}
+.form{display:inline-flex;align-items:center;gap:12px;background:transparent;color:var(--acc);border:1.5px solid var(--acc);border-radius:999px;padding:14px 44px;font-size:14px;letter-spacing:.1em;font-weight:700;transition:all .2s}
+.form:hover{background:var(--acc);color:#fff}
 .note{font-size:12px;color:var(--dim);margin-top:20px}
 .others{padding:56px 0 88px}
 .olbl{font-size:20px;font-weight:800;margin:0 0 24px}
 .olist{display:flex;gap:12px;flex-wrap:wrap}
 .oit{border:1px solid var(--ln);padding:8px 20px;font-size:13px;border-radius:999px}
 .oit:hover{border-color:var(--acc);color:var(--acc)}
-@media (max-width:900px){.dt{grid-template-columns:1fr}}
+@media (max-width:900px){.dt{grid-template-columns:1fr}.fact{grid-template-columns:1fr;gap:2px}}
 </style>

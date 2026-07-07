@@ -18,6 +18,7 @@ const STATIC_PATHS = [
   ...tmWorks.map((w) => `/toudaimurder/works/${w.slug}/`),
   '/toudaimurder/news/',
   '/toudaimurder/about/',
+  '/toudaimurder/contact/',
 ];
 
 export const GET: APIRoute = async ({ site }) => {
