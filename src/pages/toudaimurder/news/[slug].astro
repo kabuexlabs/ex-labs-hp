@@ -12,13 +12,28 @@ const base = '/toudaimurder';
 const work = article.workSlug ? tmWorks.find((w) => w.slug === article.workSlug) : undefined;
 const paragraphs = article.body.split('\n\n');
 const others = tmNews.filter((n) => n.slug !== article.slug);
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: article.title,
+  description: article.summary,
+  datePublished: article.date.replaceAll('.', '-'),
+  ...(article.image ? { image: new URL(article.image, site).toString() } : {}),
+  author: { '@type': 'Organization', name: '東大マーダーミステリーサークル' },
+  publisher: { '@type': 'Organization', name: '東大マーダーミステリーサークル' },
+  mainEntityOfPage: new URL(`${base}/news/${article.slug}/`, site).toString(),
+};
 ---
 
 <ToudaimurderLayout
   active="news"
   title={`${article.title}｜東大マーダーミステリーサークル`}
   description={article.summary}
+  ogImage={article.image}
 >
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(articleLd)} />
   <main class="wrap">
     <article class="art fin">
       <p class="crumb mono"><a href={`${base}/`}>TOP</a> / <a href={`${base}/news/`}>NEWS</a> / {article.title}</p>
