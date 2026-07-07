@@ -1,7 +1,7 @@
 ---
 // 作品詳細: 人狼定理（WEREWOLF THEOREM）
 import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
-import { htBase, HT_LINE_URL } from '../../../data/hacktale';
+import { htBase, htOrgRef, htBreadcrumbLd, HT_LINE_URL } from '../../../data/hacktale';
 
 // ステータスバー（5段階）: 交渉2／閃き1／論理5
 const stats = [
@@ -9,6 +9,34 @@ const stats = [
   { label: '閃き', value: 1 },
   { label: '論理', value: 5 },
 ];
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/hacktale/works/werewolf-theorem/', site).toString();
+const gameLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Game',
+  name: '人狼定理',
+  alternateName: 'WEREWOLF THEOREM',
+  description:
+    '論理と交渉で勝利を目指す頭脳戦ゲーム。8人／240分、店舗公演・オンライン。勝利者は2名、途中脱落なし。人狼のルールを知らなくても遊べる。',
+  url: pageUrl,
+  image: new URL('/assets/hacktale/kv-werewolf.webp', site).toString(),
+  genre: ['頭脳戦', '交渉ゲーム'],
+  numberOfPlayers: { '@type': 'QuantitativeValue', value: 8 },
+  publisher: htOrgRef(site),
+  offers: {
+    '@type': 'AggregateOffer',
+    lowPrice: 3500,
+    highPrice: 4500,
+    priceCurrency: 'JPY',
+    availability: 'https://schema.org/InStock',
+    url: pageUrl,
+  },
+};
+const breadcrumbLd = htBreadcrumbLd([
+  { name: 'HACKTALE', url: new URL('/hacktale/', site).toString() },
+  { name: '人狼定理' },
+]);
 ---
 
 <HacktaleLayout
@@ -18,6 +46,9 @@ const stats = [
   twitterCard="summary"
   back={{ href: `${htBase}/#works`, label: 'WORKS 一覧へ戻る' }}
 >
+
+<script type="application/ld+json" set:html={JSON.stringify(gameLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
 
 <section class="sec"><div class="wrap hgrid">
 <img class="kvimg" src="/assets/hacktale/kv-werewolf.webp" alt="人狼定理 WEREWOLF THEOREM キービジュアル">

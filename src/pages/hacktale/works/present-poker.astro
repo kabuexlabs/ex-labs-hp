@@ -1,7 +1,28 @@
 ---
 // 作品詳細: プレゼント・ポーカー
 import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
-import { htBase, HT_LINE_URL } from '../../../data/hacktale';
+import { htBase, htOrgRef, htBreadcrumbLd, HT_LINE_URL } from '../../../data/hacktale';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/hacktale/works/present-poker/', site).toString();
+const gameLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Game',
+  name: 'プレゼント・ポーカー',
+  alternateName: 'PRESENT POKER',
+  description:
+    '裏技と交渉を駆使して勝利を目指す頭脳戦ゲーム。6人／180分の店舗公演。公演終了時、明確に1名の勝利者が出る。',
+  url: pageUrl,
+  image: new URL('/assets/hacktale/kv-poker.webp', site).toString(),
+  genre: ['頭脳戦', '交渉ゲーム'],
+  numberOfPlayers: { '@type': 'QuantitativeValue', value: 6 },
+  publisher: htOrgRef(site),
+  offers: { '@type': 'Offer', price: 4500, priceCurrency: 'JPY', availability: 'https://schema.org/InStock', url: pageUrl },
+};
+const breadcrumbLd = htBreadcrumbLd([
+  { name: 'HACKTALE', url: new URL('/hacktale/', site).toString() },
+  { name: 'プレゼント・ポーカー' },
+]);
 ---
 
 <HacktaleLayout
@@ -11,6 +32,9 @@ import { htBase, HT_LINE_URL } from '../../../data/hacktale';
   twitterCard="summary"
   back={{ href: `${htBase}/#works`, label: 'WORKS 一覧へ戻る' }}
 >
+
+<script type="application/ld+json" set:html={JSON.stringify(gameLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
 
 <section class="sec"><div class="wrap hgrid">
 <img class="kvimg" src="/assets/hacktale/kv-poker.webp" alt="プレゼント・ポーカー キービジュアル">

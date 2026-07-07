@@ -1,7 +1,26 @@
 ---
 // イベント詳細: JANKEN24（チケット完売）
 import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
-import { htBase } from '../../../data/hacktale';
+import { htBase, htOrgRef, htBreadcrumbLd } from '../../../data/hacktale';
+
+// 開催日程が非公開のため Event ではなく Game として記述する
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/hacktale/event/janken24/', site).toString();
+const gameLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Game',
+  name: 'JANKEN24',
+  description:
+    '24時間をかけてじゃんけんを繰り返す頭脳戦ゲーム。心理戦×資産戦×裏切りのチーム対抗マネーゲーム。チケット完売。',
+  url: pageUrl,
+  image: new URL('/assets/hacktale/kv-janken24.webp', site).toString(),
+  genre: ['頭脳戦', '心理戦', 'マネーゲーム'],
+  publisher: htOrgRef(site),
+};
+const breadcrumbLd = htBreadcrumbLd([
+  { name: 'HACKTALE', url: new URL('/hacktale/', site).toString() },
+  { name: 'JANKEN24' },
+]);
 ---
 
 <HacktaleLayout
@@ -10,6 +29,9 @@ import { htBase } from '../../../data/hacktale';
   ogImage="/assets/hacktale/kv-janken24.webp"
   back={{ href: `${htBase}/#event`, label: 'EVENT 一覧へ戻る' }}
 >
+
+<script type="application/ld+json" set:html={JSON.stringify(gameLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
 
 <section class="sec"><div class="wrap">
 <img class="kvimg" src="/assets/hacktale/kv-janken24.webp" alt="JANKEN24 キービジュアル">

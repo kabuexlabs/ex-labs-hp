@@ -1,7 +1,34 @@
 ---
 // イベント詳細: 東京都頭脳王決定戦 2026（チケット完売）
 import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
-import { htBase, HT_ZUNOUSEN_URL } from '../../../data/hacktale';
+import { htBase, htOrgRef, htBreadcrumbLd, HT_ZUNOUSEN_URL } from '../../../data/hacktale';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/hacktale/event/zunouou/', site).toString();
+const eventLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: '東京都頭脳王決定戦 2026',
+  description:
+    '東京で最も頭の良い人間を決める頭脳戦イベント。予選2回戦・本戦・決勝戦で構成され、本戦へ進めるのは予選上位10%のみ。全公演チケット完売。',
+  startDate: '2026-06-27',
+  endDate: '2026-08-01',
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  location: {
+    '@type': 'Place',
+    name: '東京都内4会場',
+    address: { '@type': 'PostalAddress', addressRegion: '東京都', addressCountry: 'JP' },
+  },
+  image: new URL('/assets/hacktale/kv-zunouou.webp', site).toString(),
+  url: pageUrl,
+  organizer: htOrgRef(site),
+  offers: { '@type': 'Offer', availability: 'https://schema.org/SoldOut', url: HT_ZUNOUSEN_URL, priceCurrency: 'JPY' },
+};
+const breadcrumbLd = htBreadcrumbLd([
+  { name: 'HACKTALE', url: new URL('/hacktale/', site).toString() },
+  { name: '東京都頭脳王決定戦 2026' },
+]);
 
 const prelims = [
   { y: '2026 / 06 / SAT', d: '27' },
@@ -19,6 +46,9 @@ const prelims = [
   twitterCard="summary"
   back={{ href: `${htBase}/#event`, label: 'EVENT 一覧へ戻る' }}
 >
+
+<script type="application/ld+json" set:html={JSON.stringify(eventLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
 
 <section class="sec"><div class="wrap hgrid">
 <img class="kvimg" src="/assets/hacktale/kv-zunouou.webp" alt="東京都頭脳王決定戦 2026 キービジュアル">

@@ -1,7 +1,7 @@
 ---
 // 作品詳細: ダイスボックス（THE DICE BOX）— 詳細は近日公開
 import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
-import { htBase, HT_LINE_URL } from '../../../data/hacktale';
+import { htBase, htOrgRef, htBreadcrumbLd, HT_LINE_URL } from '../../../data/hacktale';
 
 // ステータスバー（5段階）: 交渉3／閃き5／論理3
 const stats = [
@@ -9,15 +9,37 @@ const stats = [
   { label: '閃き', value: 5 },
   { label: '論理', value: 3 },
 ];
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/hacktale/works/dice-box/', site).toString();
+const gameLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Game',
+  name: 'ダイスボックス',
+  alternateName: 'THE DICE BOX',
+  description: '閃きが試される頭脳戦ゲーム。9 or 12人／240分。詳細情報は近日公開予定。',
+  url: pageUrl,
+  image: new URL('/assets/hacktale/kv-dicebox.webp', site).toString(),
+  genre: ['頭脳戦', '交渉ゲーム'],
+  numberOfPlayers: { '@type': 'QuantitativeValue', minValue: 9, maxValue: 12 },
+  publisher: htOrgRef(site),
+};
+const breadcrumbLd = htBreadcrumbLd([
+  { name: 'HACKTALE', url: new URL('/hacktale/', site).toString() },
+  { name: 'ダイスボックス' },
+]);
 ---
 
 <HacktaleLayout
   title="ダイスボックス THE DICE BOX | ハックテイル"
-  description="閃きが試される、ダイスの箱。9 or 12人／240分。詳細情報は近日公開予定、続報はNEWS・Xにて。"
+  description="閃きが試される頭脳戦ゲーム『ダイスボックス』。9 or 12人／240分。詳細情報は近日公開予定、続報はNEWS・Xにて。"
   ogImage="/assets/hacktale/kv-dicebox.webp"
   twitterCard="summary"
   back={{ href: `${htBase}/#works`, label: 'WORKS 一覧へ戻る' }}
 >
+
+<script type="application/ld+json" set:html={JSON.stringify(gameLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
 
 <section class="sec"><div class="wrap hgrid">
 <img class="kvimg" src="/assets/hacktale/kv-dicebox.webp" alt="ダイスボックス THE DICE BOX キービジュアル">

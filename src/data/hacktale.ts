@@ -20,6 +20,29 @@ export const htFormWorks = [
   'JANKEN24',
 ];
 
+/** JSON-LD で publisher / organizer に使う HACKTALE の Organization 参照 */
+export function htOrgRef(site: URL) {
+  return {
+    '@type': 'Organization',
+    name: 'HACKTALE（ハックテイル）',
+    url: new URL('/hacktale/', site).toString(),
+  };
+}
+
+/** パンくず JSON-LD。url 省略時は現在ページ（末尾要素）扱い */
+export function htBreadcrumbLd(items: { name: string; url?: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((it, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: it.name,
+      ...(it.url ? { item: it.url } : {}),
+    })),
+  };
+}
+
 /** sitemap.xml に載せる公開ページのパス */
 export const htPaths = [
   '/hacktale/',

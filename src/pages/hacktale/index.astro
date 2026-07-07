@@ -6,6 +6,7 @@ import HacktaleLayout from '../../layouts/HacktaleLayout.astro';
 import HacktaleContactForm from '../../components/HacktaleContactForm.astro';
 import {
   htBase,
+  HT_CONTACT_EMAIL,
   HT_LINE_URL,
   HT_X_URL,
   HT_X_HANDLE,
@@ -17,12 +18,30 @@ const tickerItems = [
   'JANKEN24、完売。',
   '東京都頭脳王決定戦、チケット完売',
 ];
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'HACKTALE（ハックテイル）',
+  alternateName: ['ハックテイル', 'HACKTALE'],
+  description:
+    '交渉・閃き・論理で勝敗が決まる『頭脳戦』を制作・展開するレーベル。プレゼント・ポーカー、人狼定理、ダイスボックス、東京都頭脳王決定戦、JANKEN24などを手がける。',
+  url: new URL('/hacktale/', site).toString(),
+  logo: new URL('/assets/hacktale/ogp.png', site).toString(),
+  email: HT_CONTACT_EMAIL,
+  sameAs: [HT_X_URL, HT_LINE_URL],
+  parentOrganization: { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' },
+  knowsAbout: ['頭脳戦', '頭脳戦制作', '交渉ゲーム', '心理戦'],
+};
 ---
 
 <HacktaleLayout
-  title="ハックテイル | 公式サイト"
-  description="頭脳・交渉を必要とするゲームを展開します。"
+  title="ハックテイル公式サイト｜日本で唯一無二の『頭脳戦』制作団体 HACKTALE"
+  description="頭脳・交渉を必要とするゲームを展開します。交渉・閃き・論理で勝敗が決まる『頭脳戦』を制作する団体 HACKTALE（ハックテイル）の公式サイト。プレゼント・ポーカー、人狼定理、東京都頭脳王決定戦、JANKEN24などを展開中。"
 >
+
+<script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
 
 <div class="tkr"><div class="tk">{[...tickerItems, ...tickerItems].map((t) => <span>{t}</span>)}</div></div>
 
