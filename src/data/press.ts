@@ -10,7 +10,7 @@ export interface PressItem {
 export const pressItems: PressItem[] = [
   {
     date: '2026-07-07',
-    title: 'プレスリリース第1弾を配信しました',
+    title: '下北沢の街を実際に歩き、手描きの絵画の謎を見抜き、登場人物との対話で物語を紡ぐ「あなた自身が体験する美術館」『ロスト・フレーム』をリリース。',
     url: 'https://prtimes.jp/main/html/rd/p/000000001.000185770.html',
     source: 'PR TIMES',
   },
