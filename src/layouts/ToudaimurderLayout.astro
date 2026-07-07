@@ -1,0 +1,137 @@
+---
+// 東大マーダーミステリーサークル (/toudaimurder/) 専用レイアウト。
+// 本体サイトとは別ブランドのマイクロサイトなので BaseLayout は使わず、
+// フォント・配色・ヘッダー/フッターをここで完結させる。
+export interface Props {
+  title?: string;
+  description?: string;
+  active?: 'works' | 'news' | 'about';
+  /** トップ・作品一覧はコンテナ幅 1400px、それ以外は 1200px */
+  wide?: boolean;
+}
+
+const {
+  title = '東大マーダーミステリーサークル｜至高の推理体験をあなたに',
+  description =
+    '現役東大生と有名作家が手を組んだチームが、至高の推理体験を提供します。マーダーミステリーからイマーシブコンテンツまで、幅広く制作・展開を行います。',
+  active,
+  wide = false,
+} = Astro.props;
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const canonical = new URL(Astro.url.pathname, site);
+
+const base = '/toudaimurder';
+const nav = [
+  { key: 'works', href: `${base}/works/`, en: 'WORKS', jp: '作品紹介' },
+  { key: 'news', href: `${base}/news/`, en: 'NEWS', jp: 'お知らせ' },
+  { key: 'about', href: `${base}/about/`, en: 'ABOUT', jp: 'サークル紹介' },
+  { key: 'ticket', href: `${base}/#ticket`, en: 'TICKET', jp: '参加方法' },
+  { key: 'contact', href: `${base}/#contact`, en: 'CONTACT', jp: 'お問い合わせ' },
+];
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:url" content={canonical}>
+<meta property="og:site_name" content="東大マーダーミステリーサークル">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class:list={['pg', { pgwide: wide }]}>
+<slot name="rail" />
+<header class="hdr">
+<div class="hbar"><a href={`${base}/`} class="logo">東大マーダーミステリー<span class="acc">サークル</span></a>
+<nav class="nav">
+{nav.map((item) => (
+  <a class="nit" href={item.href}>
+    <span class:list={['nen', 'en', { acc: active === item.key }]}>{item.en}</span>
+    <span class="njp">{item.jp}</span>
+  </a>
+))}
+</nav></div>
+<slot name="ticker" />
+</header>
+<slot />
+<slot name="footer">
+  <footer class="ftr wrap"><p class="copy en">© TODAI MURDER MYSTERY CIRCLE. All Rights Reserved.</p></footer>
+</slot>
+</div>
+
+<style is:global>
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0;background:#0b0a0c}
+.rv{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s cubic-bezier(.22,.61,.36,1)}
+.rv.on{opacity:1;transform:none}
+.d1{transition-delay:.12s}.d2{transition-delay:.24s}.d3{transition-delay:.36s}
+a:hover .ph{border-color:var(--acc);filter:brightness(1.18)}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.tin,.fmin,.wsin{animation:none}.fin,.fin2{animation:none}}
+a{color:#eae5e1;text-decoration:none}a:hover{color:#e0243f}
+.pg{--acc:#e0243f;--ln:color-mix(in srgb,var(--acc) 22%,transparent);--dim:#8d8590;--wrapw:1200px;background:#0b0a0c;color:#eae5e1;font-family:'Noto Sans JP',sans-serif;font-size:15px;line-height:1.8;min-height:100vh}
+.pgwide{--wrapw:1400px}
+.en{font-family:'Outfit',sans-serif;letter-spacing:.14em}
+.min{font-family:'Shippori Mincho',serif}
+.mono{font-family:'JetBrains Mono',monospace;letter-spacing:.08em}
+.acc{color:var(--acc)}
+.dim{color:var(--dim)}
+.wrap{max-width:var(--wrapw);margin:0 auto;padding:0 56px}
+.bt{border-top:1px solid var(--ln)}
+.hdr{position:sticky;top:0;z-index:50;background:rgba(11,10,12,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--ln)}
+.hbar{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:14px 32px}
+.logo{font-family:'Shippori Mincho',serif;font-weight:800;font-size:18px;letter-spacing:.14em;white-space:nowrap}
+.nav{display:flex;gap:34px}
+.nit{display:flex;flex-direction:column;align-items:center;gap:1px}
+.nen{font-size:13px;font-weight:600;letter-spacing:.22em}
+.njp{font-size:10px;color:var(--dim)}
+.sh{display:flex;align-items:baseline;gap:18px;margin:0}
+.sht{font-size:clamp(52px,7vw,104px);font-weight:700;letter-spacing:.05em;line-height:1;color:var(--acc)}
+.shj{font-size:14px;color:var(--dim)}
+.crumb{font-size:12px;color:var(--dim);margin:0 0 10px}
+.ph{background:repeating-linear-gradient(45deg,#151217 0 14px,#1a151b 14px 28px);border:1px solid var(--ln);display:flex;align-items:center;justify-content:center;color:#4c454f;font-size:11px;transition:border-color .3s,filter .3s}
+.pv{aspect-ratio:407/570}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.badge{display:inline-block;border:1px solid var(--acc);color:var(--acc);font-size:11px;letter-spacing:.14em;padding:3px 12px}
+.cmeta{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap}
+.cdate{font-size:12px;color:var(--dim)}
+.ct{font-size:18px;font-weight:700;margin:10px 0 4px;line-height:1.5}
+.cpl{font-size:12px;color:var(--dim);margin:0}
+.wd{font-size:13px;color:var(--dim);margin:8px 0 0}
+.more{display:inline-flex;align-items:center;gap:14px;border:1px solid var(--acc);color:var(--acc);border-radius:999px;padding:12px 40px;font-size:13px;letter-spacing:.32em;font-weight:600}
+.more::after{content:"→"}
+.more:hover{background:var(--acc);color:#0b0a0c}
+.ftr{border-top:1px solid var(--ln);padding-top:44px;padding-bottom:36px}
+.copy{font-size:11px;color:var(--dim);margin:0}
+@media (max-width:1100px){.nav{display:none}}
+</style>
+
+<script>
+// スクロール連動のフェードイン (.rv → .on)。旧サイトの animate.js 相当。
+const io = new IntersectionObserver(
+  (entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        e.target.classList.add('on');
+        io.unobserve(e.target);
+      }
+    }
+  },
+  { threshold: 0.1, rootMargin: '0px 0px -40px 0px' },
+);
+document.querySelectorAll('.rv').forEach((el) => io.observe(el));
+</script>
+</body>
+</html>

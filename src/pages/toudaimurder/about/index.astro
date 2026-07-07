@@ -1,0 +1,44 @@
+---
+import ToudaimurderLayout from '../../../layouts/ToudaimurderLayout.astro';
+import { TM_LINE_URL, TM_X_URL } from '../../../data/toudaimurderWorks';
+
+const base = '/toudaimurder';
+---
+
+<ToudaimurderLayout
+  active="about"
+  title="サークル紹介｜東大マーダーミステリーサークル"
+  description="東大マーダーミステリーサークルの紹介。現役東大生と有名作家によるチームが、マーダーミステリーからイマーシブコンテンツまで体験型コンテンツを制作・展開しています。"
+>
+  <main class="wrap">
+    <div class="shead rv"><p class="crumb mono"><a href={`${base}/`}>TOP</a> / ABOUT</p><h1 class="sh"><span class="sht en">ABOUT</span><span class="shj">サークル紹介</span></h1></div>
+    <div class="lead rv d1">
+      <p class="acatch min">現役東大生のチームが、<br>体験型コンテンツを展開。</p>
+      <div><p class="dim" style="margin:0 0 16px">マーダーミステリーからイマーシブコンテンツまで、東大生と有名作家がチームで制作・展開を行います。</p><p class="dim" style="margin:0">全国各地への作品展開や、作家様との提携により、最高の推理体験を提供して参ります。</p></div>
+    </div>
+    <section class="bt blk rv">
+      <h2 class="h2j" style="margin-bottom:28px"><span class="h2e en">PROFILE</span>団体概要</h2>
+      <div class="fact"><span class="fk">名称</span><span>東大マーダーミステリーサークル</span></div>
+      <div class="fact"><span class="fk">構成</span><span>現役東大生＋有名作家によるチーム</span></div>
+      <div class="fact"><span class="fk">活動</span><span>マーダーミステリー／イマーシブコンテンツの制作・展開</span></div>
+      <div class="fact"><span class="fk">連絡先</span><span><a href={TM_LINE_URL} class="acc">公式LINE</a>／<a href={TM_X_URL} class="acc">X（@toudaimurder）</a></span></div>
+    </section>
+    <div class="cta rv">
+      <div><p style="font-size:20px;font-weight:800;margin:0 0 6px">ご予約・お問い合わせ</p><p class="dim" style="font-size:13px;margin:0"><a href={TM_LINE_URL} class="acc">公式LINE</a>、もしくは<a href={TM_X_URL} class="acc">X</a>までご連絡ください。貸し切りでのご予約が基本となります。</p></div>
+      <a class="more en" href={TM_LINE_URL}>公式LINEで予約</a>
+    </div>
+  </main>
+</ToudaimurderLayout>
+
+<style>
+.shead{padding:80px 0 48px}
+.lead{display:grid;grid-template-columns:1fr 1.2fr;gap:64px;align-items:center;padding-bottom:80px}
+.acatch{font-size:clamp(28px,3vw,46px);font-weight:800;line-height:1.7;margin:0;letter-spacing:.08em}
+.h2j{font-size:22px;font-weight:800;margin:0}
+.h2e{font-size:12px;color:var(--acc);letter-spacing:.28em;display:block;margin-bottom:10px}
+.blk{padding:56px 0}
+.fact{display:grid;grid-template-columns:180px 1fr;gap:24px;padding:18px 0;border-top:1px solid var(--ln);font-size:14px}
+.fk{color:var(--dim)}
+.cta{border:1px solid var(--ln);background:#0e0c0f;padding:52px 48px;margin:24px 0 96px;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap}
+@media (max-width:900px){.lead{grid-template-columns:1fr}}
+</style>

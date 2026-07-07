@@ -1,0 +1,63 @@
+---
+import ToudaimurderLayout from '../../../layouts/ToudaimurderLayout.astro';
+import { tmWorks, TM_LINE_URL, TM_X_URL } from '../../../data/toudaimurderWorks';
+
+export function getStaticPaths() {
+  return tmWorks.map((work) => ({ params: { slug: work.slug }, props: { work } }));
+}
+
+const { work } = Astro.props;
+const base = '/toudaimurder';
+const others = tmWorks.filter((w) => w.slug !== work.slug);
+---
+
+<ToudaimurderLayout
+  active="works"
+  title={`${work.title}｜東大マーダーミステリーサークル`}
+  description={`${work.title}（${work.specs.join('・')}）— 東大マーダーミステリーサークルのマーダーミステリー作品。${work.desc}`}
+>
+  <main class="wrap">
+    <div class="dt fin">
+      <div class="ph pv">{work.image ? <img src={work.image} alt={`${work.title} キービジュアル`} /> : <span class="mono">作品キービジュアル 407×570</span>}</div>
+      <div>
+        <p class="crumb mono"><a href={`${base}/`}>TOP</a> / <a href={`${base}/works/`}>WORKS</a> / {work.title}</p>
+        <div class="specs">{work.specs.map((s) => <span class="spec">{s}</span>)}</div>
+        <h1 class="wt min">{work.title}</h1>
+        <span class="slbl en">STORY</span>
+        <p class="syn">{work.synopsis}</p>
+        <div class="btns"><a class="btn" href={TM_LINE_URL}>公式LINEで予約</a><a class="morex" href={TM_X_URL}>Xを見る</a></div>
+        <p class="note">※ 貸し切りでのご予約が基本となります。</p>
+      </div>
+    </div>
+    <div class="others fin2">
+      <h2 class="olbl">他の作品</h2>
+      <div class="olist">{others.map((o) => <a class="oit" href={`${base}/works/${o.slug}/`}>{o.title}</a>)}</div>
+    </div>
+  </main>
+</ToudaimurderLayout>
+
+<style>
+@keyframes fadeup{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.fin{animation:fadeup .8s cubic-bezier(.22,.61,.36,1) both}
+.fin2{animation:fadeup .8s cubic-bezier(.22,.61,.36,1) .15s both}
+.dt{display:grid;grid-template-columns:400px 1fr;gap:64px;padding:72px 0 88px;align-items:start;border-bottom:1px solid var(--ln)}
+.dt .crumb{margin:0 0 28px}
+.specs{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 20px}
+.spec{border:1px solid var(--ln);color:var(--dim);font-size:12px;padding:4px 14px;letter-spacing:.1em}
+.wt{font-size:clamp(30px,3.4vw,48px);font-weight:800;line-height:1.4;margin:0 0 24px}
+.syn{color:var(--dim);margin:0 0 40px;white-space:pre-line}
+.slbl{font-size:11px;color:var(--acc);letter-spacing:.28em;display:block;margin-bottom:12px}
+.btns{display:flex;gap:16px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:14px;background:#06c755;color:#fff;border:none;border-radius:999px;padding:16px 48px;font-size:14px;letter-spacing:.1em;font-weight:700;transition:background .2s}
+.btn:hover{color:#fff;background:#05a848}
+.morex{display:inline-flex;align-items:center;gap:12px;background:transparent;color:#fff;border:1.5px solid #eae5e1;border-radius:999px;padding:14px 44px;font-size:14px;letter-spacing:.14em;font-weight:700;transition:all .2s}
+.morex::before{content:"𝕏";font-size:16px}
+.morex:hover{background:#eae5e1;color:#0b0a0c}
+.note{font-size:12px;color:var(--dim);margin-top:20px}
+.others{padding:56px 0 88px}
+.olbl{font-size:20px;font-weight:800;margin:0 0 24px}
+.olist{display:flex;gap:12px;flex-wrap:wrap}
+.oit{border:1px solid var(--ln);padding:8px 20px;font-size:13px;border-radius:999px}
+.oit:hover{border-color:var(--acc);color:var(--acc)}
+@media (max-width:900px){.dt{grid-template-columns:1fr}}
+</style>
