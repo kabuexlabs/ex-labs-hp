@@ -1,0 +1,77 @@
+---
+// HACKTALE のお問い合わせフォーム（トップページ CONTACT セクション用）。
+// FormSubmit (formsubmit.co) 経由で HT_CONTACT_EMAIL 宛にメール送信される。
+// JS 有効時は AJAX 送信してその場に成功/失敗のフィードバックを表示し、
+// JS 無効時は通常 POST → /hacktale/contact/thanks/ にリダイレクトされる。
+import { HT_CONTACT_EMAIL, htFormWorks } from '../data/hacktale';
+
+const formAction = `https://formsubmit.co/${HT_CONTACT_EMAIL}`;
+const ajaxAction = `https://formsubmit.co/ajax/${HT_CONTACT_EMAIL}`;
+const thanksUrl = 'https://kabuexlabs.com/hacktale/contact/thanks/';
+---
+
+<form class="form" id="ht-contact-form" action={formAction} method="POST" data-ajax-action={ajaxAction}>
+<input type="hidden" name="_subject" value="【HACKTALE】サイトからのお問い合わせ">
+<input type="hidden" name="_template" value="table">
+<input type="hidden" name="_captcha" value="false">
+<input type="hidden" name="_next" value={thanksUrl}>
+<input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+<div><div class="fl">お名前<span class="req">必須</span></div><input class="in" type="text" name="お名前" required autocomplete="name"></div>
+<div><div class="fl">メールアドレス<span class="req">必須</span></div><input class="in" type="email" name="email" required autocomplete="email"></div>
+<div><div class="fl">お問い合わせ種別</div><select class="in" name="お問い合わせ種別"><option>公演の予約</option><option>貸切公演の相談</option><option>制作の依頼</option><option>取材・コラボのご相談</option><option>その他</option></select></div>
+<div><div class="fl">ご希望の作品（任意）</div><select class="in" name="ご希望の作品"><option>選択しない</option>{htFormWorks.map((w) => <option>{w}</option>)}</select></div>
+<div><div class="fl">お問い合わせ内容<span class="req">必須</span></div><textarea class="in" rows="6" name="お問い合わせ内容" required></textarea></div>
+<div><button class="btn btn-acc send" type="submit">送信する</button></div>
+<p class="fstatus" id="ht-form-status" role="status" aria-live="polite"></p>
+<p class="fnote">ご入力いただいた情報は、お問い合わせへの回答のみに使用いたします。</p>
+</form>
+
+<style>
+.form{display:flex;flex-direction:column;gap:22px;max-width:640px}
+.fl{font-size:13px;font-weight:700;letter-spacing:.08em;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.req{font-size:10px;background:#3a2020;color:#e08a8a;padding:2px 7px;letter-spacing:.1em}
+.in{width:100%;box-sizing:border-box;background:#141416;border:1px solid rgba(255,255,255,.18);color:#f1efe9;padding:13px 14px;font-size:14px;font-family:inherit}
+.in:focus{outline:none;border-color:var(--acc)}
+textarea.in{resize:vertical}
+.send{cursor:pointer;font-family:inherit}
+.send:disabled{opacity:.6;cursor:wait}
+.fstatus{display:none;margin:0;padding:14px 18px;border:1px solid transparent;font-size:14px;line-height:1.9}
+.fstatus.ok{display:block;border-color:rgba(217,230,59,.5);color:#f1efe9}
+.fstatus.ng{display:block;border-color:#e5484d;color:#e08a8a}
+.fstatus.ng :global(a){color:#e08a8a;text-decoration:underline}
+.fnote{font-size:13px;line-height:1.9;color:#c9c5ba;margin:0}
+</style>
+
+<script>
+const form = document.getElementById('ht-contact-form') as HTMLFormElement | null;
+const status = document.getElementById('ht-form-status');
+
+form?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+  if (!btn || !status) return;
+  btn.disabled = true;
+  btn.textContent = '送信中…';
+  status.className = 'fstatus';
+  status.textContent = '';
+  try {
+    const res = await fetch(form.dataset.ajaxAction!, {
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+      body: new URLSearchParams(new FormData(form) as unknown as Record<string, string>),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data || String(data.success) !== 'true') throw new Error('send failed');
+    form.reset();
+    status.classList.add('ok');
+    status.textContent = '送信が完了しました。折り返し担当者よりご連絡いたします。';
+  } catch {
+    status.classList.add('ng');
+    status.innerHTML =
+      '送信に失敗しました。時間をおいて再度お試しいただくか、<a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> まで直接ご連絡ください。';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '送信する';
+  }
+});
+</script>

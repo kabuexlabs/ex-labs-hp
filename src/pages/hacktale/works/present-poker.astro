@@ -1,0 +1,96 @@
+---
+// 作品詳細: プレゼント・ポーカー
+import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
+import { htBase, htOrgRef, htBreadcrumbLd, HT_LINE_URL } from '../../../data/hacktale';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/hacktale/works/present-poker/', site).toString();
+const gameLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Game',
+  name: 'プレゼント・ポーカー',
+  alternateName: 'PRESENT POKER',
+  description:
+    '裏技と交渉を駆使して勝利を目指す頭脳戦ゲーム。6人／180分の店舗公演。公演終了時、明確に1名の勝利者が出る。',
+  url: pageUrl,
+  image: new URL('/assets/hacktale/kv-poker.webp', site).toString(),
+  genre: ['頭脳戦', '交渉ゲーム'],
+  numberOfPlayers: { '@type': 'QuantitativeValue', value: 6 },
+  publisher: htOrgRef(site),
+  offers: { '@type': 'Offer', price: 4500, priceCurrency: 'JPY', availability: 'https://schema.org/InStock', url: pageUrl },
+};
+const breadcrumbLd = htBreadcrumbLd([
+  { name: 'HACKTALE', url: new URL('/hacktale/', site).toString() },
+  { name: 'プレゼント・ポーカー' },
+]);
+---
+
+<HacktaleLayout
+  title="プレゼント・ポーカー | ハックテイル"
+  description="裏技と交渉を駆使し、勝利を目指せ。6人／180分の店舗公演。公演終了時、明確に1名の勝利者が出る頭脳戦ゲーム。"
+  ogImage="/assets/hacktale/kv-poker.webp"
+  twitterCard="summary"
+  back={{ href: `${htBase}/#works`, label: 'WORKS 一覧へ戻る' }}
+>
+
+<script type="application/ld+json" set:html={JSON.stringify(gameLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+
+<section class="sec"><div class="wrap hgrid">
+<img class="kvimg" src="/assets/hacktale/kv-poker.webp" alt="プレゼント・ポーカー キービジュアル">
+<div>
+<div class="chips"><span class="badge en">01</span><span class="chip">6人／180分</span><span class="chip">店舗公演</span><span class="chip">GAME LEVEL ★★★★☆</span></div>
+<h1 class="t1">プレゼント・ポーカー</h1>
+<p class="tsub m0 en">PRESENT POKER — HACK THE GAME</p>
+<div class="win">公演終了時、明確に<span class="acc fw7">1名の勝利者</span>が出ます。<br>裏技と交渉を駆使し、勝利を目指してください。</div>
+</div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+<div class="sh"><span class="en sht">INFO</span><span class="shj">事前情報</span></div>
+<table class="spec">
+<tr class="sr"><th class="sk">人数</th><td class="sv">6名</td></tr>
+<tr class="sr"><th class="sk">男女比</th><td class="sv">なし</td></tr>
+<tr class="sr"><th class="sk">時間</th><td class="sv">180分（感想戦含む）</td></tr>
+<tr class="sr"><th class="sk">形式</th><td class="sv">店舗公演</td></tr>
+<tr class="sr"><th class="sk">料金</th><td class="sv">4,500円（1名様あたり）</td></tr>
+</table>
+</div></section>
+
+<section class="sec"><div class="wrap">
+<div class="sh"><span class="en sht">NOTES</span><span class="shj">注意点</span></div>
+<p class="note">・ポーカーのルールを知らなくても問題ありません。</p>
+<p class="note">・お客様同士での交渉が鍵になります。</p>
+<p class="note">・私物の持ち込み等は不可能です。</p>
+<p class="note">・リピート参加は不可能です。</p>
+</div></section>
+
+<div class="cta"><div class="wrap">
+<p class="ctat">公演のご予約・貸切のご相談</p>
+<div class="fx ac jc gap16 fwrap"><a class="btn btn-acc" href={`${htBase}/#contact`}>お問い合わせフォームへ</a><a class="btn" href={HT_LINE_URL} target="_blank" rel="noopener">公式LINEで予約</a></div>
+</div></div>
+
+</HacktaleLayout>
+
+<style>
+.sec{padding:72px 0 0}
+.hgrid{display:grid;grid-template-columns:440px 1fr;gap:52px;align-items:start}
+.kvimg{width:100%;display:block;border:1px solid rgba(255,255,255,.12)}
+.chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font-size:12px;letter-spacing:.08em;border:1px solid rgba(255,255,255,.25);padding:4px 11px;color:#c9c5ba}
+.badge{font-size:12px;letter-spacing:.14em;background:var(--acc);color:#0d0d0e;padding:4px 11px;font-weight:700}
+.t1{font-size:clamp(32px,4.5vw,52px);font-weight:900;line-height:1.35;margin:18px 0 10px}
+.tsub{font-size:14px;color:#9b978c;letter-spacing:.14em}
+.win{margin-top:28px;border:1px solid rgba(217,230,59,.4);padding:20px 24px;font-size:15px;line-height:2;color:#f1efe9}
+.sh{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+.sht{font-size:30px}
+.shj{font-size:12px;letter-spacing:.2em;color:#9b978c}
+.spec{width:100%;border-collapse:collapse}
+.sr{border-bottom:1px solid rgba(255,255,255,.1)}
+.sk{text-align:left;font-size:13px;letter-spacing:.1em;color:#9b978c;padding:16px 24px 16px 0;width:180px;font-weight:500;vertical-align:top}
+.sv{font-size:14px;padding:16px 0;color:#f1efe9}
+.note{font-size:14px;line-height:2.1;color:#c9c5ba;margin:0 0 10px;padding-left:1.2em;text-indent:-1.2em}
+.cta{margin:88px 0 0;border-top:1px solid rgba(255,255,255,.1);padding:56px 0 96px;text-align:center}
+.ctat{font-size:22px;font-weight:900;margin:0 0 24px}
+@media(max-width:820px){.hgrid{grid-template-columns:1fr}}
+</style>
