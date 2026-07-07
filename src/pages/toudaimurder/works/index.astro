@@ -17,7 +17,7 @@ const base = '/toudaimurder';
       {tmWorks.map((w) => (
         <div>
           <a href={`${base}/works/${w.slug}/`}><div class="ph pv">{w.image ? <img src={w.image} alt={`${w.title} キービジュアル`} loading="lazy" decoding="async" /> : <span class="mono">作品キービジュアル 407×570</span>}</div></a>
-          <div class="cmeta"><span class="badge">{w.badge}</span><span class="cdate mono">{w.meta}</span></div>
+          <div class="cmeta"><span class="badge">{w.badge}</span>{w.meta && <span class="cdate mono">{w.meta}</span>}</div>
           <h2 class="ct"><a href={`${base}/works/${w.slug}/`}>{w.title}</a></h2>
           <p class="cpl">{w.play}</p>
           <p class="wd">{w.desc}</p>
