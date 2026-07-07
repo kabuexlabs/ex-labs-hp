@@ -4,6 +4,7 @@
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { jsonLd } from '../../lib/microcms';
 import LatestPosts from '../../components/LatestPosts.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import HeroWorksMarquee from '../../components/HeroWorksMarquee.astro';
@@ -52,8 +53,8 @@ const serviceLd = {
   title="謎解き研修｜体験型チームビルディング研修の企画・制作 - 株式会社ex Labs"
   description="謎解き研修・体験型チームビルディングの企画・制作なら株式会社ex Labs。商業イベントで培ったシナリオ制作力で、貴社の目的に合わせたオリジナル研修プログラムを設計。企画から当日運営まで一貫対応します。"
 >
-<script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
-<script type="application/ld+json" set:html={JSON.stringify(serviceLd)} />
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(serviceLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
   { name: 'サービス', href: '/services/' },
