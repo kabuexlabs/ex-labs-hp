@@ -1,5 +1,6 @@
 ---
 import ToudaimurderLayout from '../../layouts/ToudaimurderLayout.astro';
+import ToudaimurderContactForm from '../../components/ToudaimurderContactForm.astro';
 import { tmFeatured, TM_LINE_URL, TM_X_URL } from '../../data/toudaimurderWorks';
 
 const base = '/toudaimurder';
@@ -72,10 +73,21 @@ const ticker = [
       </div>
     </section>
 
+    <section class="wrap bt" id="contact">
+      <div class="shead rv"><h2 class="sh"><span class="sht en">CONTACT</span><span class="shj">お問い合わせ</span></h2></div>
+      <div class="cgrid rv d1">
+        <div>
+          <p style="margin:0 0 18px">公演のご予約・貸切公演のご相談・その他のお問い合わせは、フォームよりご連絡ください。折り返し担当者よりご連絡いたします。</p>
+          <p class="dim" style="font-size:13px;margin:0">お急ぎの場合は <a href={TM_LINE_URL} class="acc">公式LINE</a>、もしくは <a href={TM_X_URL} class="acc">X（@toudaimurder）</a> のDMが便利です。</p>
+        </div>
+        <ToudaimurderContactForm />
+      </div>
+    </section>
+
     <div class="ftmq"><div class="fmin"><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span></div></div>
   </div>
 
-  <footer class="ftr2 wrap" id="contact" slot="footer">
+  <footer class="ftr2 wrap" slot="footer">
     <div class="fgrid">
       <div><p class="logo" style="margin:0 0 12px">東大マーダーミステリー<span class="acc">サークル</span></p><p class="dim" style="font-size:13px;margin:0">至高の推理体験をあなたに。</p></div>
       <div class="fnav"><span class="flbl en">MENU</span><a href={`${base}/works/`}>WORKS — 作品紹介</a><a href={`${base}/news/`}>NEWS — お知らせ</a><a href={`${base}/about/`}>ABOUT — サークル紹介</a></div>
@@ -124,6 +136,8 @@ const ticker = [
 .sn{font-size:34px;font-weight:700;color:var(--acc);letter-spacing:.1em}
 .stt{font-size:17px;font-weight:700;margin:14px 0 8px}
 .std{font-size:13px;color:var(--dim);margin:0}
+.cgrid{display:grid;grid-template-columns:1fr 1.4fr;gap:64px;align-items:start;padding-bottom:96px}
+@media (max-width:900px){.cgrid{grid-template-columns:1fr}}
 .ftmq{overflow:hidden;border-top:1px solid var(--ln);padding:34px 0}
 .fmin{display:flex;width:max-content;animation:mq 30s linear infinite}
 .fmt{font-family:'Outfit',sans-serif;font-size:96px;font-weight:700;letter-spacing:.06em;white-space:nowrap;color:transparent;-webkit-text-stroke:1px var(--acc);padding-right:60px;line-height:1}

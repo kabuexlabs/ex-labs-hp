@@ -3,6 +3,17 @@ import ToudaimurderLayout from '../../../layouts/ToudaimurderLayout.astro';
 import { tmWorks } from '../../../data/toudaimurderWorks';
 
 const base = '/toudaimurder';
+
+// メタ表記 ('6人／240分' 等) から絞り込み・並び替え用の数値を取り出す。
+// 「4〜8人」は最小人数、時間未記載は末尾送りにする。
+const cardData = tmWorks.map((w, i) => ({
+  work: w,
+  order: i,
+  players: parseInt(w.meta, 10) || 999,
+  minutes: parseInt(w.meta.match(/(\d+)分/)?.[1] ?? '999', 10),
+  store: w.play.includes('店舗') || w.play.includes('パンドラ人狼'),
+  online: w.play.includes('オンライン'),
+}));
 ---
 
 <ToudaimurderLayout
@@ -13,9 +24,28 @@ const base = '/toudaimurder';
 >
   <main class="wrap">
     <div class="shead rv"><p class="crumb mono"><a href={`${base}/`}>TOP</a> / WORKS</p><h1 class="sh"><span class="sht en">WORKS</span><span class="shj">作品一覧</span></h1></div>
-    <div class="cards rv d1">
-      {tmWorks.map((w) => (
-        <div>
+
+    <div class="tools rv">
+      <div class="fset" role="group" aria-label="公演形式で絞り込み">
+        <button class="fbtn on" type="button" data-filter="all">すべて</button>
+        <button class="fbtn" type="button" data-filter="store">店舗公演</button>
+        <button class="fbtn" type="button" data-filter="online">オンライン</button>
+      </div>
+      <label class="sortl">並び替え
+        <select class="ssel" id="sortSel">
+          <option value="default">おすすめ順</option>
+          <option value="players-asc">人数が少ない順</option>
+          <option value="players-desc">人数が多い順</option>
+          <option value="minutes-asc">時間が短い順</option>
+          <option value="minutes-desc">時間が長い順</option>
+        </select>
+      </label>
+      <span class="fcount mono" id="fcount"></span>
+    </div>
+
+    <div class="cards rv d1" id="cards">
+      {cardData.map(({ work: w, order, players, minutes, store, online }) => (
+        <div class="wk" data-order={order} data-players={players} data-minutes={minutes} data-store={store ? '1' : '0'} data-online={online ? '1' : '0'}>
           <a href={`${base}/works/${w.slug}/`}><div class="ph pv">{w.image ? <img src={w.image} alt={`${w.title} キービジュアル`} loading="lazy" decoding="async" /> : <span class="mono">作品キービジュアル 407×570</span>}</div></a>
           <div class="cmeta"><span class="badge">{w.badge}</span>{w.meta && <span class="cdate mono">{w.meta}</span>}</div>
           <h2 class="ct"><a href={`${base}/works/${w.slug}/`}>{w.title}</a></h2>
@@ -27,7 +57,53 @@ const base = '/toudaimurder';
   </main>
 </ToudaimurderLayout>
 
+<script>
+const grid = document.getElementById('cards')!;
+const cards = Array.from(grid.children) as HTMLElement[];
+const count = document.getElementById('fcount')!;
+const sortSel = document.getElementById('sortSel') as HTMLSelectElement;
+const fbtns = Array.from(document.querySelectorAll<HTMLButtonElement>('.fbtn'));
+let filter = 'all';
+
+function apply() {
+  const [key, dir] = sortSel.value.split('-');
+  const sorted = [...cards].sort((a, b) => {
+    if (sortSel.value === 'default') return Number(a.dataset.order) - Number(b.dataset.order);
+    const va = Number(a.dataset[key]);
+    const vb = Number(b.dataset[key]);
+    return (dir === 'asc' ? va - vb : vb - va) || Number(a.dataset.order) - Number(b.dataset.order);
+  });
+  let shown = 0;
+  for (const card of sorted) {
+    const visible = filter === 'all' || card.dataset[filter] === '1';
+    card.style.display = visible ? '' : 'none';
+    if (visible) shown++;
+    grid.appendChild(card);
+  }
+  count.textContent = `${shown}作品`;
+}
+
+for (const btn of fbtns) {
+  btn.addEventListener('click', () => {
+    filter = btn.dataset.filter!;
+    fbtns.forEach((b) => b.classList.toggle('on', b === btn));
+    apply();
+  });
+}
+sortSel.addEventListener('change', apply);
+apply();
+</script>
+
 <style>
 .shead{padding:80px 0 44px}
+.tools{display:flex;align-items:center;gap:28px;flex-wrap:wrap;margin:0 0 40px;padding:18px 0;border-top:1px solid var(--ln);border-bottom:1px solid var(--ln)}
+.fset{display:flex;gap:10px}
+.fbtn{background:transparent;border:1px solid var(--ln);color:var(--dim);font-size:13px;font-family:'Noto Sans JP',sans-serif;padding:8px 22px;border-radius:999px;cursor:pointer;letter-spacing:.08em;transition:all .2s}
+.fbtn:hover{border-color:var(--acc);color:var(--acc)}
+.fbtn.on{border-color:var(--acc);color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,transparent)}
+.sortl{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--dim)}
+.ssel{background:#0e0c0f;border:1px solid var(--ln);color:#eae5e1;font-size:13px;font-family:'Noto Sans JP',sans-serif;padding:8px 36px 8px 16px;border-radius:2px;cursor:pointer;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--dim) 50%),linear-gradient(135deg,var(--dim) 50%,transparent 50%);background-position:calc(100% - 19px) 50%,calc(100% - 14px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.ssel:focus{outline:none;border-color:var(--acc)}
+.fcount{font-size:12px;color:var(--dim);margin-left:auto}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:40px;padding-bottom:96px}
 </style>
