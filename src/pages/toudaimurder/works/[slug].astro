@@ -18,7 +18,7 @@ const others = tmWorks.filter((w) => w.slug !== work.slug);
 >
   <main class="wrap">
     <div class="dt fin">
-      <div class="ph pv"><span class="mono">作品キービジュアル 407×570</span></div>
+      <div class="ph pv">{work.image ? <img src={work.image} alt={`${work.title} キービジュアル`} /> : <span class="mono">作品キービジュアル 407×570</span>}</div>
       <div>
         <p class="crumb mono"><a href={`${base}/`}>TOP</a> / <a href={`${base}/works/`}>WORKS</a> / {work.title}</p>
         <div class="specs">{work.specs.map((s) => <span class="spec">{s}</span>)}</div>

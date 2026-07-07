@@ -31,7 +31,7 @@ const ticker = [
         <div class="wsin">
           {[0, 1].map(() => tmFeatured.map((w) => (
             <div class="wcard">
-              <a href={`${base}/works/${w.slug}/`}><div class="ph pv"><span class="mono">作品キービジュアル 407×570</span></div></a>
+              <a href={`${base}/works/${w.slug}/`}><div class="ph pv">{w.image ? <img src={w.image} alt={`${w.title} キービジュアル`} loading="lazy" decoding="async" /> : <span class="mono">作品キービジュアル 407×570</span>}</div></a>
               <div class="cmeta"><span class="badge en">{w.badge}</span><span class="cdate mono">{w.meta}</span></div>
               <h3 class="ct"><a href={`${base}/works/${w.slug}/`}>{w.title}</a></h3>
               <p class="cpl">{w.play}</p>

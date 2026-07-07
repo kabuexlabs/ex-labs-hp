@@ -5,6 +5,8 @@ export interface TmWork {
   slug: string;
   title: string;
   badge: string;
+  /** キービジュアル画像 (public/ 配下のパス)。未設定ならプレースホルダー表示 */
+  image?: string;
   /** 人数／時間 のカード表記 (例: '6人／240分') */
   meta: string;
   /** 公演形態のカード表記 (例: 'GM必須｜店舗公演') */
