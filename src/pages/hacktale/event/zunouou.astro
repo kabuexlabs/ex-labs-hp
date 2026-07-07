@@ -1,0 +1,123 @@
+---
+// イベント詳細: 東京都頭脳王決定戦 2026（チケット完売）
+import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
+import { htBase, HT_ZUNOUSEN_URL } from '../../../data/hacktale';
+
+const prelims = [
+  { y: '2026 / 06 / SAT', d: '27' },
+  { y: '2026 / 06 / SUN', d: '28' },
+  { y: '2026 / 07 / SAT', d: '04' },
+  { y: '2026 / 07 / SUN', d: '05' },
+  { y: '2026 / 07 / SAT', d: '11' },
+];
+---
+
+<HacktaleLayout
+  title="東京都頭脳王決定戦 2026 | ハックテイル"
+  description="決めよう。東京で最も頭の良い人間を。予選2回戦・本戦・決勝戦で構成され、本戦へ進めるのは予選上位10%のみ。全公演チケット完売。"
+  ogImage="/assets/hacktale/kv-zunouou.webp"
+  twitterCard="summary"
+  back={{ href: `${htBase}/#event`, label: 'EVENT 一覧へ戻る' }}
+>
+
+<section class="sec"><div class="wrap hgrid">
+<img class="kvimg" src="/assets/hacktale/kv-zunouou.webp" alt="東京都頭脳王決定戦 2026 キービジュアル">
+<div>
+<div class="chips"><span class="sbadge">チケット完売</span><span class="chip en">TOKYO 2026</span><span class="chip en">ONLY THE TOP 10% PROCEED</span></div>
+<h1 class="t1">東京都頭脳王決定戦 2026</h1>
+<p class="tsub m0 en">A GAME OF MINDS</p>
+<p class="catch">決めよう。<br>東京で最も頭の良い人間を。</p>
+<p class="body">必要なのは、閃きと論理と交渉、そして僅かな運だ。</p>
+<span class="btn soldbtn" style="margin-top:12px">SOLD OUT — チケット完売</span>
+<p class="soldnote m0">全公演のチケットは完売いたしました。多数のお申し込みありがとうございました。</p>
+</div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+<div class="sh"><span class="en sht">OUTLINE</span><span class="shj">概要</span></div>
+<p class="body">本イベントは、<span class="fw7">予選2回戦 ／ 本戦 ／ 決勝戦</span> で構成されるイベントです。</p>
+<div class="win">本戦に参加できるのは、予選で<span class="acc fw7">上位10％</span>の成績を獲得した方のみ。<br>限られた者だけが、次の舞台へ進むことができます。</div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+<div class="sh"><span class="en sht">DETAILS</span><span class="shj">体験詳細</span></div>
+<div class="dgrid">
+<div class="dcell"><div class="dlab en">DURATION</div><h3 class="dh">体験時間</h3><p class="dp">予選 — 4時間<br>本戦 — 4時間<br>決勝 — 4時間</p></div>
+<div class="dcell"><div class="dlab en">CAPACITY</div><h3 class="dh">予選参加人数</h3><p class="dp">8名 × 4会場<br>全10公演</p></div>
+<div class="dcell"><div class="dlab en">TICKET</div><h3 class="dh">チケット料金</h3><p class="dp">予選・本戦・決勝戦<br>それぞれ発生</p></div>
+</div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+<div class="sh"><span class="en sht">SCHEDULE</span><span class="shj">開催日程</span></div>
+<div class="dsub en" style="margin-top:0">PRELIMINARY ROUND ／ 予選</div>
+<div class="dates">
+{prelims.map((p) => (
+  <div class="dbox"><div class="dboxy en">{p.y}</div><div class="dboxd en">{p.d}</div></div>
+))}
+</div>
+<div class="dsub en">MAIN ROUND ／ 本戦</div>
+<div class="dates"><div class="dbox fin"><div class="dboxy en">2026 / 08 / SAT</div><div class="dboxd en">01</div></div></div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+<div class="sh"><span class="en sht">HOW TO JOIN</span><span class="shj">参加方法</span></div>
+<div class="steps">
+<div class="step"><div class="en snum">01</div><h3 class="sh3">チケット購入</h3><p class="sp">チケットサイトにてチケットをご購入ください。</p></div>
+<div class="step"><div class="en snum">02</div><h3 class="sh3">会場へ来場</h3><p class="sp">チケットサイト記載の住所へお越しいただき、体験にご参加ください。</p></div>
+</div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+<div class="sh"><span class="en sht">NOTES</span><span class="shj">注意事項</span></div>
+<p class="note">・本ゲームはリピート参加禁止、ネタバレ禁止です。</p>
+<p class="note">・予選はすべて同一内容で実施いたします。</p>
+<p class="note">・会場住所はチケットサイトをご確認ください。</p>
+<p class="note">・その他の注意事項はチケットサイトをご確認ください。</p>
+</div></section>
+
+<div class="cta"><div class="wrap">
+<p class="ctat">A GAME OF MINDS — 東京都頭脳王決定戦</p>
+<div class="fx ac jc gap16 fwrap"><span class="btn soldbtn">SOLD OUT — チケット完売</span><a class="btn" href={HT_ZUNOUSEN_URL} target="_blank" rel="noopener">特設サイトを見る</a></div>
+</div></div>
+
+</HacktaleLayout>
+
+<style>
+.sec{padding:72px 0 0}
+.hgrid{display:grid;grid-template-columns:400px 1fr;gap:52px;align-items:start}
+.kvimg{width:100%;display:block;border:1px solid rgba(255,255,255,.12)}
+.chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font-size:12px;letter-spacing:.08em;border:1px solid rgba(255,255,255,.25);padding:4px 11px;color:#c9c5ba}
+.sbadge{font-size:12px;letter-spacing:.14em;background:#e5484d;color:#fff;padding:4px 11px;font-weight:700}
+.soldbtn{border-color:#e5484d;color:#e5484d;cursor:default;letter-spacing:.2em}
+.soldnote{font-size:13px;color:#9b978c;margin:12px 0 0}
+.t1{font-size:clamp(30px,4.2vw,48px);font-weight:900;line-height:1.4;margin:18px 0 10px}
+.tsub{font-size:14px;color:#9b978c;letter-spacing:.14em}
+.catch{font-size:clamp(20px,2.6vw,28px);font-weight:900;line-height:1.8;margin:26px 0 14px}
+.body{font-size:15px;line-height:2.1;color:#c9c5ba;margin:0 0 14px}
+.win{margin-top:24px;border:1px solid rgba(217,230,59,.4);padding:20px 24px;font-size:15px;line-height:2;color:#f1efe9}
+.sh{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+.sht{font-size:30px}
+.shj{font-size:12px;letter-spacing:.2em;color:#9b978c}
+.dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.dcell{border:1px solid rgba(255,255,255,.12);padding:26px}
+.dlab{font-size:11px;letter-spacing:.25em;color:#9b978c;margin-bottom:14px}
+.dh{font-size:18px;font-weight:900;margin:0 0 12px}
+.dp{font-size:14px;line-height:2;color:#c9c5ba;margin:0}
+.dates{display:flex;gap:14px;flex-wrap:wrap}
+.dbox{border:1px solid rgba(255,255,255,.18);padding:16px 20px;text-align:center;min-width:96px}
+.dboxy{font-size:11px;color:#9b978c;letter-spacing:.12em}
+.dboxd{font-size:30px;font-weight:900;margin-top:4px}
+.dbox.fin{border-color:var(--acc)}
+.dsub{font-size:13px;letter-spacing:.18em;color:#9b978c;margin:34px 0 14px}
+.note{font-size:14px;line-height:2.1;color:#c9c5ba;margin:0 0 10px;padding-left:1.2em;text-indent:-1.2em}
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.step{border-top:2px solid var(--acc);padding-top:20px}
+.snum{font-size:38px;color:var(--acc)}
+.sh3{font-size:18px;font-weight:900;margin:8px 0 10px}
+.sp{font-size:13px;line-height:2;color:#c9c5ba;margin:0}
+.cta{margin:88px 0 0;border-top:1px solid rgba(255,255,255,.1);padding:56px 0 96px;text-align:center}
+.ctat{font-size:22px;font-weight:900;margin:0 0 24px}
+@media(max-width:820px){.hgrid,.dgrid,.steps{grid-template-columns:1fr}}
+</style>

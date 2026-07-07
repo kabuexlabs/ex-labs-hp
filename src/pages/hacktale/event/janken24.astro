@@ -1,0 +1,60 @@
+---
+// イベント詳細: JANKEN24（チケット完売）
+import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
+import { htBase } from '../../../data/hacktale';
+---
+
+<HacktaleLayout
+  title="JANKEN24 | ハックテイル"
+  description="24時間をかけてじゃんけんを繰り返す頭脳戦ゲーム — 3つの手に、10人の思惑。心理戦×資産戦×裏切り、チーム対抗マネーゲーム。"
+  ogImage="/assets/hacktale/kv-janken24.webp"
+  back={{ href: `${htBase}/#event`, label: 'EVENT 一覧へ戻る' }}
+>
+
+<section class="sec"><div class="wrap">
+<img class="kvimg" src="/assets/hacktale/kv-janken24.webp" alt="JANKEN24 キービジュアル">
+<div style="margin-top:36px">
+<div class="chips"><span class="sbadge">チケット完売</span><span class="chip">心理戦×資産戦×裏切り</span><span class="chip">チーム対抗マネーゲーム</span></div>
+<h1 class="t1 en">JANKEN24</h1>
+<p class="tsub m0">24時間をかけてじゃんけんを繰り返す頭脳戦ゲーム — 3つの手に、10人の思惑</p>
+<div class="win">情報収集、駆け引き、心理戦、そして資金運用。<br>すべてを制したチームだけが、このゲームの<span class="acc fw7">頂点</span>へ辿り着きます。</div>
+</div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+<div class="sh"><span class="en sht">GAME</span><span class="shj">ゲーム紹介</span></div>
+<p class="body">プレイヤーはゲーム内通貨を使い、ショップで「グー」「チョキ」「パー」のカードやさまざまなアイテムを購入します。</p>
+<p class="body">そして定められたタイミングで闘技場へ向かい、カードを使ったじゃんけんバトルに挑戦します。</p>
+<p class="body">バトルに勝利すると個人やチームに大きな利益がもたらされますが、使用するカードやアイテムには限りがあり、単純な運だけでは勝ち残れません。</p>
+<p class="q">どのカードを買うのか。<br>誰を闘技場へ送り出すのか。<br>相手は何を狙っているのか。</p>
+<p class="body">しかし、あなたはチームを出し抜くこともできます。<br>誰かに出し抜かれているかもしれません。</p>
+<p class="body">果たしてあなたは、最後まで勝ち残ることができるでしょうか。</p>
+</div></section>
+
+<div class="cta"><div class="wrap">
+<p class="ctat">チケットは完売いたしました</p>
+<p class="soldnote" style="margin:0 0 24px">多数のお申し込みありがとうございました。今後の開催情報はNEWS・Xにてお知らせします。</p>
+<div class="fx ac jc gap16 fwrap"><span class="btn soldbtn">SOLD OUT — チケット完売</span><a class="btn" href={`${htBase}/#contact`}>お問い合わせフォームへ</a></div>
+</div></div>
+
+</HacktaleLayout>
+
+<style>
+.sec{padding:72px 0 0}
+.kvimg{width:100%;display:block;border:1px solid rgba(255,255,255,.12)}
+.chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font-size:12px;letter-spacing:.08em;border:1px solid rgba(255,255,255,.25);padding:4px 11px;color:#c9c5ba}
+.sbadge{font-size:12px;letter-spacing:.14em;background:#e5484d;color:#fff;padding:4px 11px;font-weight:700}
+.soldbtn{border-color:#e5484d;color:#e5484d;cursor:default;letter-spacing:.2em}
+.soldnote{font-size:13px;color:#9b978c;margin:12px 0 0}
+.t1{font-size:clamp(34px,5vw,58px);font-weight:900;line-height:1.3;margin:18px 0 10px}
+.tsub{font-size:14px;color:#9b978c;letter-spacing:.14em}
+.body{font-size:15px;line-height:2.2;color:#c9c5ba;margin:0 0 16px}
+.q{font-size:clamp(18px,2.2vw,24px);font-weight:900;line-height:2;margin:0 0 16px}
+.win{margin-top:24px;border:1px solid rgba(217,230,59,.4);padding:20px 24px;font-size:15px;line-height:2;color:#f1efe9}
+.sh{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+.sht{font-size:30px}
+.shj{font-size:12px;letter-spacing:.2em;color:#9b978c}
+.cta{margin:88px 0 0;border-top:1px solid rgba(255,255,255,.1);padding:56px 0 96px;text-align:center}
+.ctat{font-size:22px;font-weight:900;margin:0 0 24px}
+</style>

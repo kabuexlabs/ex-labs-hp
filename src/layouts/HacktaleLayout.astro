@@ -1,0 +1,120 @@
+---
+// HACKTALE (/hacktale/) 専用レイアウト。本体サイトとは別ブランドのマイクロサイトなので
+// BaseLayout は使わず、フォント・配色・ヘッダーをここで完結させる。
+// ページ固有のスタイルは各ページの scoped <style> に置き、ここには全ページ共通の
+// トークン・ヘッダー・ボタン・ユーティリティだけを定義する。
+import { htBase } from '../data/hacktale';
+
+export interface Props {
+  title: string;
+  description: string;
+  /** OGP画像（サイトルート相対）。省略時はロゴ入りの汎用画像 */
+  ogImage?: string;
+  twitterCard?: 'summary' | 'summary_large_image';
+  /** 詳細ページ用: コンテナ幅1060px＋「← 一覧へ戻る」ヘッダーに切り替える */
+  back?: { href: string; label: string };
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  ogImage = '/assets/hacktale/ogp.png',
+  twitterCard = 'summary_large_image',
+  back,
+  noindex = false,
+} = Astro.props;
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const canonical = new URL(Astro.url.pathname, site);
+const ogImageAbs = new URL(ogImage, site);
+
+const nav = [
+  { href: `${htBase}/#works`, en: 'WORKS', jp: '作品紹介' },
+  { href: `${htBase}/#event`, en: 'EVENT', jp: 'イベント' },
+  { href: `${htBase}/#about`, en: 'ABOUT', jp: 'レーベル紹介' },
+  { href: `${htBase}/#ticket`, en: 'TICKET', jp: '参加方法' },
+  { href: `${htBase}/#contact`, en: 'CONTACT', jp: 'お問い合わせ' },
+];
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+{noindex && <meta name="robots" content="noindex">}
+<link rel="canonical" href={canonical}>
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:url" content={canonical}>
+<meta property="og:site_name" content="HACKTALE（ハックテイル）">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content={ogImageAbs}>
+<meta name="twitter:card" content={twitterCard}>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body class:list={[{ 'ht-detail': !!back }]}>
+<header class="hdr">
+<div class="wrap hbar fx ac jb">
+<a href={back ? `${htBase}/` : '#top'}><img class="logo" src="/assets/hacktale/logo.png" alt="HACKTALE"></a>
+{back ? (
+  <a class="back" href={back.href}>← {back.label}</a>
+) : (
+  <nav class="fx ac gap24">
+    {nav.map((n) => (
+      <a class="nl" href={n.href}><span class="en fs14">{n.en}</span><span class="nj">{n.jp}</span></a>
+    ))}
+  </nav>
+)}
+</div>
+</header>
+<slot />
+</body>
+</html>
+
+<style is:global>
+:root{--acc:#d9e63b}
+html{scroll-behavior:smooth}
+body{margin:0;background:#0d0d0e;color:#f1efe9;font-family:'Zen Kaku Gothic New',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#f1efe9;text-decoration:none}
+a:hover{color:var(--acc)}
+.en{font-family:Anton,sans-serif;letter-spacing:.05em;font-weight:400}
+.acc{color:var(--acc)}
+.dim{color:#9b978c}
+.fx{display:flex}
+.ac{align-items:center}
+.jc{justify-content:center}
+.jb{justify-content:space-between}
+.fwrap{flex-wrap:wrap}
+.gap16{gap:16px}
+.gap24{gap:24px}
+.m0{margin:0}
+.fw7{font-weight:700}
+.fs14{font-size:14px}
+.posrel{position:relative}
+.wrap{max-width:1160px;margin:0 auto;padding:0 32px}
+.ht-detail .wrap{max-width:1060px}
+.hdr{position:sticky;top:0;z-index:50;background:rgba(13,13,14,.88);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1)}
+.hbar{height:72px}
+.logo{height:22px;filter:invert(1);display:block}
+.nl{display:flex;flex-direction:column;align-items:center;gap:2px}
+.nj{font-size:10px;color:#9b978c;letter-spacing:.1em}
+.back{font-size:13px;letter-spacing:.12em;color:#9b978c}
+.btn{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.3);padding:15px 30px;font-weight:700;font-size:14px;letter-spacing:.08em;transition:all .2s}
+.btn:hover{border-color:var(--acc)}
+.btn-acc{background:var(--acc);color:#0d0d0e;border-color:var(--acc)}
+.btn-acc:hover{color:#0d0d0e;filter:brightness(1.08)}
+/* 狭幅ではロゴ行＋ナビ行の2段に折り返す（ナビ5項目は1行に収まらないため） */
+@media(max-width:760px){
+.hbar{height:auto;flex-wrap:wrap;row-gap:4px;padding:14px 0}
+.hdr nav{width:100%;justify-content:space-between;gap:8px;flex-wrap:wrap}
+}
+@media(max-width:480px){.wrap{padding:0 24px}}
+</style>

@@ -3,6 +3,7 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import { getPostList, isMicrocmsConfigured } from '../lib/microcms';
 import { tmWorks } from '../data/toudaimurderWorks';
+import { htPaths } from '../data/hacktale';
 
 const STATIC_PATHS = [
   '/',
@@ -19,6 +20,7 @@ const STATIC_PATHS = [
   '/toudaimurder/news/',
   '/toudaimurder/about/',
   '/toudaimurder/contact/',
+  ...htPaths,
 ];
 
 export const GET: APIRoute = async ({ site }) => {
