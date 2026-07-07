@@ -5,7 +5,7 @@
 export interface Props {
   title?: string;
   description?: string;
-  active?: 'works' | 'news' | 'about';
+  active?: 'works' | 'news' | 'about' | 'contact';
   /** トップ・作品一覧はコンテナ幅 1400px、それ以外は 1200px */
   wide?: boolean;
 }
@@ -27,7 +27,7 @@ const nav = [
   { key: 'news', href: `${base}/news/`, en: 'NEWS', jp: 'お知らせ' },
   { key: 'about', href: `${base}/about/`, en: 'ABOUT', jp: 'サークル紹介' },
   { key: 'ticket', href: `${base}/#ticket`, en: 'TICKET', jp: '参加方法' },
-  { key: 'contact', href: `${base}/#contact`, en: 'CONTACT', jp: 'お問い合わせ' },
+  { key: 'contact', href: `${base}/contact/`, en: 'CONTACT', jp: 'お問い合わせ' },
 ];
 ---
 
@@ -50,6 +50,7 @@ const nav = [
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<slot name="head" />
 </head>
 <body>
 <div class:list={['pg', { pgwide: wide }]}>
@@ -68,7 +69,10 @@ const nav = [
 </header>
 <slot />
 <slot name="footer">
-  <footer class="ftr wrap"><p class="copy en">© TODAI MURDER MYSTERY CIRCLE. All Rights Reserved.</p></footer>
+  <footer class="ftr wrap">
+    <p class="copy">運営会社：<a href="https://kabuexlabs.com/">株式会社ex Labs</a></p>
+    <p class="copy en" style="margin-top:6px">© TODAI MURDER MYSTERY CIRCLE. All Rights Reserved.</p>
+  </footer>
 </slot>
 </div>
 
