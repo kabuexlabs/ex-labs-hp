@@ -3,6 +3,7 @@ export const prerender = false;
 import type { APIRoute } from 'astro';
 import { getPostList, isMicrocmsConfigured } from '../lib/microcms';
 import { tmWorks } from '../data/toudaimurderWorks';
+import { tmNews } from '../data/toudaimurderNews';
 
 const STATIC_PATHS = [
   '/',
@@ -17,6 +18,7 @@ const STATIC_PATHS = [
   '/toudaimurder/works/',
   ...tmWorks.map((w) => `/toudaimurder/works/${w.slug}/`),
   '/toudaimurder/news/',
+  ...tmNews.map((n) => `/toudaimurder/news/${n.slug}/`),
   '/toudaimurder/about/',
   '/toudaimurder/contact/',
 ];
