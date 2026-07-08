@@ -30,7 +30,7 @@ strong{font-weight:700}
    phrase boundaries instead of mid-word. */
 .h2,.hero-title,.cta-title,.cta-mini-title,.str-title,.svc-title,.work-name,.blog-title,.flow-t,.msg-quote,.style-h{text-wrap:balance}
 @supports(word-break:auto-phrase){
-  .h2,.hero-title,.cta-title,.cta-mini-title,.str-title,.svc-title,.work-name,.blog-title,.flow-t,.msg-quote,.lede,.h2sub,.str-lead,.bullets li,.feature-points li,.about-points li,.flow-d,.genre-d,.event-desc,.flow-note{word-break:auto-phrase}
+  .h2,.hero-title,.cta-title,.cta-mini-title,.str-title,.svc-title,.svc-row-title,.svc-row-desc,.work-name,.blog-title,.flow-t,.msg-quote,.lede,.h2sub,.str-lead,.bullets li,.feature-points li,.about-points li,.flow-d,.genre-d,.event-desc,.flow-note{word-break:auto-phrase}
 }
 /* Manual phrase grouping for browsers without auto-phrase (iOS Safari):
    a .nobr chunk wraps as one unit. */
@@ -327,6 +327,23 @@ a:hover>.blog-img{opacity:.88}
 
 .marquee-block{margin-top:56px}
 .marquee-label{font-size:12px;letter-spacing:.18em;font-weight:800;color:rgba(51,48,43,.5);margin:0 0 20px;text-align:center}
+/* Official label-site links shown under the partner marquee */
+.label-links{margin-top:44px}
+.label-links .marquee-label{margin-bottom:16px}
+.label-links-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:720px;margin:0 auto}
+.label-link{display:flex;align-items:center;gap:14px;background:#fff;border:2px solid rgba(244,88,28,.4);border-radius:16px;padding:18px 22px;box-shadow:0 5px 16px rgba(51,48,43,.06);transition:transform .25s,box-shadow .25s}
+.label-link:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(51,48,43,.12)}
+.label-link-body{flex:1;min-width:0}
+.label-link-cat{display:block;font-size:11px;font-weight:800;color:var(--accent);letter-spacing:.06em;margin-bottom:5px}
+.label-link-name{display:block;font-size:15px;font-weight:800;color:var(--ink);line-height:1.5}
+.label-link-arrow{flex:none;width:34px;height:34px;border-radius:50%;border:2px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;transition:background-color .25s,color .25s}
+.label-link:hover .label-link-arrow{background:var(--accent);color:#fff}
+@media(max-width:640px){
+  .label-links{margin-top:36px}
+  .label-links-row{grid-template-columns:1fr;gap:12px}
+  .label-link{padding:16px 18px}
+  .label-link-name{font-size:14px}
+}
 /* Edge fade uses gradient overlays instead of mask-image: iOS Safari
    can fail to paint masked content that is also being animated. */
 .marquee{overflow:hidden;position:relative}
@@ -558,6 +575,13 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .faq-a{font-size:13px}
   .marquee-track{gap:44px}
   .marquee-name{font-size:16px}
+  /* Tighter numbered service rows so long titles (マーダーミステリー制作)
+     keep to one line on phones. */
+  .svc-row{gap:16px;padding:28px 4px}
+  .svc-no{font-size:26px}
+  .svc-row-title{font-size:16.5px;margin-bottom:8px}
+  .svc-row-desc{font-size:12.5px;line-height:1.8}
+  .svc-row-arrow{width:36px;height:36px;font-size:13px}
   .article-body{font-size:14.5px}
   .foot-row{flex-direction:column;align-items:flex-start;gap:12px}
 }
