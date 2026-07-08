@@ -6,6 +6,9 @@
 // 本体フォームと同一の「通常 POST」で送信し、Formspree の _next で当サイトの
 // サンクスページへ戻す。AJAX(fetch)は「200 を返すが実際は未配信」の状態を
 // success として隠してしまうため使わず、本体の実績ある送信経路に揃える。
+// ハニーポット (_gotcha) は意図的に付けない — 本体フォームは付けておらず、
+// このフィールドが自動入力等で埋まると Formspree は "success" 表示のまま
+// メールを配信しない。本体との唯一の構造差だったため、実害を避けて撤去した。
 import { tmWorks } from '../data/toudaimurderWorks';
 
 const FORM_ENDPOINT = 'https://formspree.io/f/xykqblal';
@@ -16,7 +19,6 @@ const NEXT_URL = 'https://kabuexlabs.com/toudaimurder/contact/thanks/';
 <form class="cform" action={FORM_ENDPOINT} method="POST">
   <input type="hidden" name="_subject" value="【東大マーダーミステリーサークル】サイトからのお問い合わせ">
   <input type="hidden" name="_next" value={NEXT_URL}>
-  <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
 
   <label class="fl"><span class="flt">お名前 <span class="req">必須</span></span>
     <input class="fi" type="text" name="お名前" required autocomplete="name" placeholder="山田 太郎">
