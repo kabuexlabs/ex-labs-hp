@@ -1,0 +1,91 @@
+---
+// 体験する美術館のお問い合わせフォーム (/taikenbizyutu/ の CONTACT セクション用)。
+//
+// 送信先は本体サイト (kabuexlabs.com) のお問い合わせと同じ Formspree フォーム。
+// このエンドポイントは認証済みで、確実に info@kabuexlabs.com へ届く
+// (toudaimurder のフォームと同じ経緯で Formspree に統一している)。
+// 送信は fetch (AJAX) で行い、完了後は当サイトのサンクスページへ遷移する。
+// JS が無効な環境では通常 POST にフォールバックする (Formspree の完了画面経由)。
+const FORM_ENDPOINT = 'https://formspree.io/f/xykqblal';
+const thanksPath = '/taikenbizyutu/contact/thanks/';
+---
+
+<form class="frm" action={FORM_ENDPOINT} method="POST" data-thanks={thanksPath}>
+  <input type="hidden" name="_subject" value="【体験する美術館】サイトからのお問い合わせ">
+  <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+
+  <div class="fldgrid">
+    <div>
+      <label class="lbl" for="cf-name">お名前 *</label>
+      <input class="inp" id="cf-name" name="お名前" type="text" required autocomplete="name" placeholder="山田 太郎">
+    </div>
+    <div>
+      <label class="lbl" for="cf-mail">メールアドレス *</label>
+      <input class="inp" id="cf-mail" name="email" type="email" required autocomplete="email" placeholder="mail@example.com">
+    </div>
+  </div>
+  <div class="fld">
+    <label class="lbl" for="cf-type">お問い合わせ種別 *</label>
+    <select class="inp" id="cf-type" name="お問い合わせ種別" required>
+      <option value="">選択してください</option>
+      <option value="取材・メディア">取材・メディア</option>
+      <option value="店舗・施設連携">店舗・施設連携</option>
+      <option value="クリエイター参画">クリエイター参画</option>
+      <option value="チケット・公演について">チケット・公演について</option>
+      <option value="その他">その他</option>
+    </select>
+  </div>
+  <div class="fld">
+    <label class="lbl" for="cf-body">お問い合わせ内容 *</label>
+    <textarea class="inp ta" id="cf-body" name="お問い合わせ内容" required placeholder="ご相談内容をご記入ください"></textarea>
+  </div>
+  <div class="tc" style="margin-top:36px">
+    <button class="bigx sendbtn" type="submit">送信する</button>
+  </div>
+  <p class="ferr note tc" hidden>送信に失敗しました。お手数ですが時間をおいて再度お試しいただくか、<a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> まで直接ご連絡ください。</p>
+  <p class="note tc" style="margin:20px 0 0">お急ぎの場合は<a href="https://x.com/taikenbizyutu" target="_blank" rel="noopener">公式X（@taikenbizyutu）</a>のDMもご利用いただけます。<br>ご入力いただいた情報は、お問い合わせへの回答のみに使用いたします。</p>
+</form>
+
+<script>
+// AJAX送信 → 自サイトのサンクスページへ。失敗時はエラー表示して再送可能にする。
+for (const form of document.querySelectorAll<HTMLFormElement>('.frm')) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector<HTMLButtonElement>('.sendbtn')!;
+    const err = form.querySelector<HTMLElement>('.ferr')!;
+    err.hidden = true;
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = '送信中…';
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' },
+      });
+      if (!res.ok) throw new Error(`formspree ${res.status}`);
+      window.location.href = form.dataset.thanks!;
+    } catch {
+      err.hidden = false;
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+}
+</script>
+
+<style>
+.frm{max-width:680px;margin:52px auto 0;text-align:left}
+.lbl{display:block;font-size:12.5px;letter-spacing:.22em;color:#9c9488;margin-bottom:8px}
+.inp{width:100%;background:#100e0d;border:1px solid rgba(235,229,218,.18);color:#ebe5da;font-family:'Shippori Mincho',serif;font-size:14px;letter-spacing:.05em;padding:13px 14px;box-sizing:border-box;border-radius:0}
+.inp:focus{outline:none;border-color:#b39a63}
+select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#9c9488 50%),linear-gradient(135deg,#9c9488 50%,transparent 50%);background-position:calc(100% - 21px) 50%,calc(100% - 16px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.ta{min-height:160px;resize:vertical}
+.fldgrid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.fld{margin-top:22px}
+.sendbtn{background:transparent;font-family:'Shippori Mincho',serif;cursor:pointer}
+.sendbtn:disabled{opacity:.5;cursor:wait}
+.ferr{color:#c9756b;border:1px solid rgba(165,82,74,.5);padding:12px 16px;margin:20px 0 0}
+.ferr a{color:#c9756b;text-decoration:underline}
+@media (max-width:700px){.fldgrid{grid-template-columns:1fr}}
+</style>

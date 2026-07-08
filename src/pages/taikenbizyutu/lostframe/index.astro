@@ -1,0 +1,64 @@
+---
+// 『ロスト・フレーム』公演LP。
+// 支給されたLP画像 (3枚・縦つなぎでシームレスなグラデーションになっている) を
+// 全幅で積み、チケット購入CTAと追従ボタンを重ねる構成。
+// トップページの WORKS ナビ・Lost Frame カードからここに遷移する。
+import TaikenbizyutuLayout from '../../../layouts/TaikenbizyutuLayout.astro';
+
+const TICKET_URL = 'https://escape.id/kyoukaiart-org/e-lost/';
+const assets = '/assets/taikenbizyutu';
+
+const title = 'ロスト・フレーム Lost Frame｜体験する美術館';
+const description =
+  '下北沢の街に散らばった絵画を探し、隠された物語を辿る——絵画と街が交差する周遊型アートイマーシブ『ロスト・フレーム』。体験時間75分・1〜4名。チケット販売中。';
+---
+
+<TaikenbizyutuLayout title={title} description={description} bare>
+
+<header class="lphdr fx ac jb">
+  <a class="lpback" href="/taikenbizyutu/">← 体験する美術館</a>
+  <a class="lpticket-s" href={TICKET_URL} target="_blank" rel="noopener">チケット購入</a>
+</header>
+
+<div class="lp">
+  <img class="lpimg" src={`${assets}/lp-1.webp`} alt="ロスト・フレーム Lost Frame ─ 絵画×イマーシブ『体験する美術館』。その日、絵画は街にこぼれた。下北沢の街に散らばった絵画を探し、隠された物語を辿る……絵画と街が交差する周遊型アートイマーシブ" width="1600" height="2900">
+  <img class="lpimg" src={`${assets}/lp-2.webp`} alt="STORY：古着と音楽、演劇とアート。多様な文化が調和する街、下北沢。しかし最近、奇妙な出来事が目撃されている。絵画のモチーフが街にこぼれるように現れはじめたのだ——。ABOUT：絵画×イマーシブ。実際に下北沢の街を歩きながら、この体験のためだけに描かれた絵画と、絵画を巡る物語を体験するアートイマーシブコンテンツ。PAINTING：荒巻まりの、小島有貴、中堀慎治、山科ティナ" width="1600" height="3700" loading="lazy">
+  <img class="lpimg" src={`${assets}/lp-3.webp`} alt="体験時間75分、定員1〜4名。チケット料金（1人あたり）：4,000円［4名参加］、4,500円［3名参加］、5,000円［2名参加］、8,000円［1名参加］。STEP：01 チケットサイトでチケットを購入、02 チケットサイト記載の住所で体験に参加。CREATER：企画 株式会社ex Labs／ディレクター・デザイン・ストーリー制作 荒巻まりの／プロデューサー・謎制作 かるら／監修 御湯波ライト" width="1600" height="4000" loading="lazy">
+
+  <div class="lpcta tc">
+    <a class="lpbtn" href={TICKET_URL} target="_blank" rel="noopener">チケット購入 <span class="arr">▶▶</span></a>
+    <p class="lpnote">チケットサイト（escape.id）へ移動します</p>
+    <a class="lphome" href="/taikenbizyutu/">← 体験する美術館 トップへ戻る</a>
+  </div>
+
+  <footer class="lpftr tc">
+    <p class="m0">企画・運営：<a href="https://kabuexlabs.com/">株式会社 ex Labs</a></p>
+    <p class="m0">© 2026 ex Labs Inc. All Rights Reserved.</p>
+  </footer>
+</div>
+
+<a class="fab" href={TICKET_URL} target="_blank" rel="noopener">チケット<br>購入 ▶▶</a>
+
+<style>
+.lp{background:#4e3f49}
+.lpimg{display:block;width:100%;height:auto}
+.lphdr{position:sticky;top:0;z-index:50;background:rgba(19,25,38,.72);backdrop-filter:blur(8px);padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
+.lpback{color:#fff;font-size:13px;letter-spacing:.14em}
+.lpback:hover{color:#efe14a}
+.lpticket-s{color:#131926;background:#efe14a;font-size:12px;font-weight:600;letter-spacing:.14em;padding:8px 16px}
+.lpticket-s:hover{color:#131926;background:#fff}
+.lpcta{padding:64px 24px 72px;background:linear-gradient(180deg,#4e3f49 0%,#3a2f37 100%)}
+.lpbtn{display:inline-block;background:#efe14a;color:#1c1a12;font-size:20px;font-weight:600;letter-spacing:.16em;padding:22px 56px;clip-path:polygon(6% 12%,55% 0,100% 18%,96% 88%,10% 100%,0 78%);transition:transform .2s}
+.lpbtn:hover{color:#1c1a12;transform:scale(1.05)}
+.arr{font-size:15px}
+.lpnote{font-size:12px;color:rgba(255,255,255,.65);letter-spacing:.1em;margin:18px 0 0}
+.lphome{display:inline-block;color:#fff;font-size:13px;letter-spacing:.14em;margin-top:34px;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:2px}
+.lphome:hover{color:#efe14a;border-color:#efe14a}
+.lpftr{background:#2c242b;color:rgba(255,255,255,.55);font-size:11px;letter-spacing:.1em;padding:28px 24px 90px}
+.lpftr a{color:rgba(255,255,255,.75)}
+.lpftr a:hover{color:#efe14a}
+.fab{position:fixed;right:16px;bottom:16px;z-index:60;background:#efe14a;color:#1c1a12;font-size:13px;font-weight:600;letter-spacing:.08em;line-height:1.5;text-align:center;padding:14px 18px;clip-path:polygon(8% 10%,60% 0,100% 16%,95% 90%,8% 100%,0 74%);box-shadow:0 6px 24px rgba(0,0,0,.4)}
+.fab:hover{color:#1c1a12;background:#fff}
+@media (min-width:1100px){.lp{max-width:none}.lpbtn{font-size:22px}}
+</style>
+</TaikenbizyutuLayout>

@@ -1,0 +1,313 @@
+---
+// 体験する美術館 トップページ。
+// Claude Design のハンドオフ (Taiken Bijutsukan Site.dc.html) を Astro に移植したもの。
+// WORKS / ART は横スクロール列、Lost Frame のカードと WORKS ナビは LP ページへ遷移する。
+import TaikenbizyutuLayout from '../../layouts/TaikenbizyutuLayout.astro';
+import TaikenbizyutuContactForm from '../../components/TaikenbizyutuContactForm.astro';
+
+const TICKET_URL = 'https://escape.id/kyoukaiart-org/e-lost/';
+const assets = '/assets/taikenbizyutu';
+
+const creators = [
+  { name: '荒巻まりの', role: '絵画' },
+  { name: '小島有貴', role: '絵画' },
+  { name: '中堀慎治', role: '絵画' },
+  { name: '山科ティナ', role: '絵画' },
+];
+
+const arts = [
+  { src: `${assets}/art-hoshi-no-sakusha.webp`, alt: '星の作者', cap: '《星の作者》 ─ ヌル・アーデン' },
+  { src: `${assets}/art-ao-no-uragawa.webp`, alt: '青の裏側', cap: '《青の裏側》 ─ ヌル・アーデン' },
+  { src: `${assets}/art-shita-kara-ai.webp`, alt: '下から藍', cap: '《下から藍》 ─ ヌル・アーデン' },
+  { src: `${assets}/art-sayuu.webp`, alt: '左右', cap: '《左右》 ─ ヌル・アーデン' },
+];
+
+const faqs = [
+  {
+    q: '体験型のイベントは初めてですが、楽しめますか？',
+    a: 'はい。特別な知識や準備は必要ありません。会場や街を巡りながら、絵画と物語、謎解きをご自身のペースでお楽しみいただけます。',
+  },
+  {
+    q: 'どのような体験ですか？',
+    a: '公演ごとに舞台は変わります。閉館後の美術館、使用されていない展示会場、そして街そのもの——。手描きの絵画と物語、謎解きを軸にした没入型体験の中で、登場人物と実際に会話をしながら物語を辿ります。',
+  },
+  {
+    q: '物語の結末は変わりますか？',
+    a: 'はい。来場者の方の選択によって、物語のエンディングは大きく変化します。',
+  },
+  {
+    q: '作品のオークションはありますか？',
+    a: '過去公演では、公演内で使用された作品のオークションを終了後に開催しています。『ロスト・フレーム』における実施は未定です。',
+  },
+  {
+    q: 'チケットはいつから購入できますか？',
+    a: '『ロスト・フレーム』のチケットは公式チケットサイトにて販売中です。最新情報は公式X（@taikenbizyutu）でもお知らせします。',
+  },
+];
+---
+
+<TaikenbizyutuLayout>
+
+<section id="top" class="hero fx col ac jc">
+  <div class="fx col ac gap24" style="padding:120px 24px 140px">
+    <div class="herox fx ac gap12"><span>絵&nbsp;画</span><span class="xmark">×</span><span>イマーシブ</span><span class="xmark">×</span><span>謎&nbsp;解&nbsp;き</span></div>
+    <img class="heromark" src={`${assets}/logo-white.webp`} alt="体験する美術館" width="1000" height="487">
+    <p class="herolead m0">鑑賞するアートから、<wbr>体験するアートへ。</p>
+    <p class="note tc m0" style="letter-spacing:.14em">絵画と物語、謎解きを融合した<wbr>体験型エンターテインメントレーベル</p>
+    <div style="margin-top:28px"><a class="bigx" href="/taikenbizyutu/lostframe/">最新のイベントを見る</a></div>
+  </div>
+  <div class="scrolly"></div>
+</section>
+
+<section id="works" class="sec hairtop">
+  <div class="wrapc">
+    <div class="kicker">Works</div>
+    <h2 class="h2">公演一覧</h2>
+    <p class="lead muted" style="margin:28px 0 0;max-width:720px">閉館後の美術館、使用されていない展示会場、そして街そのもの——。公演ごとに舞台を変えながら、絵画と物語、謎解きの体験をお届けしています。</p>
+    <div class="hscroll ewrow" style="margin-top:56px">
+      <a class="ewcard" href="/taikenbizyutu/lostframe/">
+        <img class="poster" src={`${assets}/lost-frame.webp`} alt="ロスト・フレーム キービジュアル" width="900" height="1281" loading="lazy">
+        <div class="ewbody">
+          <span class="badge">第二弾 ─ チケット販売中</span>
+          <p class="ewtitle">ロスト・フレーム</p>
+          <p class="ewsub en m0">Lost Frame</p>
+          <p class="cdesc" style="margin:14px 0 0">絵画と街が交差する、周遊型アートイマーシブ。舞台は東京・下北沢の街そのもの。</p>
+          <p class="arw" style="margin:16px 0 0;font-size:15px">→ 公演詳細を見る</p>
+        </div>
+      </a>
+      <div class="ewcard">
+        <img class="poster" src={`${assets}/null-arden.webp`} alt="ヌル・アーデン展 キービジュアル" width="900" height="1267" loading="lazy">
+        <div class="ewbody">
+          <span class="sold">第一弾 ─ SOLD OUT</span>
+          <p class="ewtitle">ヌル・アーデン展</p>
+          <p class="ewsub en m0">Null Arden Exhibition</p>
+          <p class="cdesc" style="margin:14px 0 0">名以外を持たぬ画家「ヌル・アーデン」の個展を舞台にした、絵画×イマーシブ×謎解き。全公演、完売にて終了しました。</p>
+          <div style="margin-top:10px">
+            <a class="artlink" href="https://note.com/kabuexlabs/n/n9aa3cb9cc3a0" target="_blank" rel="noopener"><span class="arw">→</span><span>ネタバレ解説記事を読む（note）</span></a>
+            <a class="artlink" href="https://note.com/kabuexlabs/n/nb3be468d0a6c" target="_blank" rel="noopener"><span class="arw">→</span><span>作品オークションの記録を読む（note）</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="hshint">← 横にスクロールできます →</p>
+  </div>
+</section>
+
+<section id="news" class="sec hairtop">
+  <div class="wrapc">
+    <div class="kicker">News</div>
+    <h2 class="h2">お知らせ</h2>
+    <div style="margin-top:40px">
+      <div class="newsrow fx gap24"><span class="ndate">2026.07</span><span>『ロスト・フレーム』のチケット販売を開始しました（<a href={TICKET_URL} target="_blank" rel="noopener">チケットサイトはこちら</a>）</span></div>
+      <div class="newsrow fx gap24"><span class="ndate">2026.07</span><span>体験する美術館 第二弾『ロスト・フレーム』の開催が決定しました（東京・下北沢エリア）</span></div>
+      <div class="newsrow fx gap24"><span class="ndate">2026.07</span><span>『ロスト・フレーム』ティザービジュアルを公開しました</span></div>
+    </div>
+    <p class="note" style="margin-top:18px">最新情報は<a href="https://x.com/taikenbizyutu" target="_blank" rel="noopener">公式X（@taikenbizyutu）</a>にて随時お知らせします。</p>
+  </div>
+</section>
+
+<section id="lostframe" class="sec hairtop">
+  <div class="wrapc">
+    <div class="evgrid">
+      <div class="posrel"><img class="poster pshadow" src={`${assets}/lost-frame.webp`} alt="ロスト・フレーム キービジュアル" width="900" height="1281" loading="lazy"></div>
+      <div>
+        <span class="badge">最新公演 ─ 第二弾</span>
+        <h2 class="evtitle">ロスト・フレーム</h2>
+        <p class="evsub en">Lost Frame</p>
+        <p class="lead" style="margin:28px 0 0">下北沢の街に散らばった絵画を探し、<wbr>隠された物語を辿る……<br>絵画と街が交差する、<wbr>周遊型アートイマーシブ。</p>
+        <div class="story" style="margin-top:28px">
+          <p class="m0">『ロスト・フレーム』は、街を巡りながらアートと物語、謎解きを体験する、新たな街歩きエンターテインメントです。</p>
+          <p style="margin:16px 0 0">下北沢エリアの店舗様との連携により、街に点在する店舗を巡り、手描きの絵画と物語、謎解きを軸にした没入型体験の中で、登場人物と実際に会話をする——そんな新しい街歩きを体験していただきます。</p>
+          <p style="margin:16px 0 0">あなたの選択によって、物語のエンディングは大きく変化します。</p>
+        </div>
+        <div class="dl" style="margin-top:36px">
+          <div class="dlrow"><span class="dt">エリア</span><span>東京・下北沢エリア各所（小田急線／京王井の頭線「下北沢駅」周辺）</span></div>
+          <div class="dlrow"><span class="dt">形式</span><span>周遊型アートイマーシブ（絵画 × 物語 × 謎解き）</span></div>
+          <div class="dlrow"><span class="dt">体験時間</span><span>75分</span></div>
+          <div class="dlrow"><span class="dt">定員</span><span>1〜4名</span></div>
+          <div class="dlrow"><span class="dt">チケット</span><span><a href={TICKET_URL} target="_blank" rel="noopener">チケットを購入する →</a></span></div>
+        </div>
+        <div class="fx gap16 wrap" style="margin-top:32px">
+          <a class="bigx" href={TICKET_URL} target="_blank" rel="noopener">チケットを購入する</a>
+          <a class="bigx" href="/taikenbizyutu/lostframe/">公演詳細を見る</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="sec hairtop dark2">
+  <div class="wrapc">
+    <div class="kicker">About</div>
+    <h2 class="h2">『体験する美術館』とは</h2>
+    <p class="lead" style="margin:32px 0 0;max-width:720px">「体験する美術館」は、“鑑賞するアート”を“体験するアート”へと再定義することを目的とした、体験型エンターテインメントレーベルです。</p>
+    <div class="grid3" style="margin-top:64px">
+      <div class="card3">
+        <div class="num">01</div>
+        <h3 class="h3">物語の中で、絵画と出会う。</h3>
+        <p class="body14 m0">プロの画家やイラストレーターが、その体験のためだけに描き下ろした特別な絵画。作品という物語に隠された謎を読み解きながら、アートを「体験」していただきます。</p>
+      </div>
+      <div class="card3">
+        <div class="num">02</div>
+        <h3 class="h3">クリエイターの新たな機会を。</h3>
+        <p class="body14 m0">アート作品は高い価値を持ちながらも、作品単体での継続的な収益化や認知拡大には課題があります。株式会社ex Labsは、アート作品と物語体験を融合したコンテンツを制作し、クリエイターの新たな発表・販売機会を創出します。</p>
+      </div>
+      <div class="card3">
+        <div class="num">03</div>
+        <h3 class="h3">作品の価値を高める、オークション。</h3>
+        <p class="body14 m0">イベント終了後には、公演内で使用された作品のオークションを開催。作品そのものの価値を高める販売機会も提供しています。</p>
+        <p class="note" style="margin:12px 0 0">※『ロスト・フレーム』におけるオークションの実施は未定です。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="model" class="sec hairtop">
+  <div class="wrapc">
+    <div class="kicker">Model</div>
+    <h2 class="h2">地域とクリエイターをつなぐ、<wbr>新たなモデル</h2>
+    <div class="grid3" style="margin-top:64px">
+      <div class="card3">
+        <div class="num">舞台</div>
+        <h3 class="h3">街や施設が、美術館になる。</h3>
+        <p class="body14 m0">閉館後の美術館、使用されていない展示会場、店舗の一部スペース、そして街そのもの——公演ごとに、その場所ならではの舞台を立ち上げます。会場となる店舗様・施設様には、新たな来店・認知獲得の機会となります。</p>
+      </div>
+      <div class="card3">
+        <div class="num">回遊</div>
+        <h3 class="h3">地域全体への送客に。</h3>
+        <p class="body14 m0">イベント参加者が絵画を探して会場や街を巡ることで、地域全体への送客にもつながります。</p>
+      </div>
+      <div class="card3">
+        <div class="num">運営</div>
+        <h3 class="h3">初期費用のご負担なく。</h3>
+        <p class="body14 m0">株式会社ex Labsが集客から企画・運営までを一括して担うため、施設・店舗側は初期費用をご負担いただくことなく認知を獲得できるスキームを採用しています。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="creators" class="sec hairtop dark2">
+  <div class="wrapc">
+    <div class="kicker">Creators</div>
+    <h2 class="h2">絵画クリエイター</h2>
+    <p class="lead muted" style="margin:28px 0 0;max-width:720px">本企画には、東京藝術大学出身者や漫画家など、多様なジャンルで活躍するクリエイターが絵画制作に参画しています。</p>
+    <div class="grid4" style="margin-top:56px">
+      {creators.map((c) => (
+        <div>
+          <div class="slotwrap fx ac jc"><span class="slotph en">Coming Soon</span></div>
+          <p class="cname m0">{c.name}</p>
+          <p class="crole m0">{c.role}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section id="art" class="sec hairtop">
+  <div class="wrapc">
+    <div class="kicker">Art</div>
+    <h2 class="h2">作品群</h2>
+    <p class="lead muted" style="margin:28px 0 0;max-width:720px">各公演のために描き下ろされた、手描きの絵画作品。物語の鍵として会場に展示され、公演終了後にはオークションを通じて新たな持ち主のもとへ。</p>
+    <div class="hscroll artrow" style="margin-top:56px">
+      {arts.map((a) => (
+        <div>
+          <div class="artframe fx ac jc"><img class="poster pshadow artimg" src={a.src} alt={a.alt} loading="lazy"></div>
+          <p class="wcap">{a.cap}</p>
+        </div>
+      ))}
+    </div>
+    <p class="hshint">← 横にスクロールできます →</p>
+    <p class="note tc" style="margin:40px 0 0">ここに掲載しているのは一部です。ほかにも多数の作品がございます。</p>
+  </div>
+</section>
+
+<section id="faq" class="sec hairtop dark2">
+  <div class="wrapc" style="max-width:860px">
+    <div class="kicker">FAQ</div>
+    <h2 class="h2">よくある質問</h2>
+    <div style="margin-top:44px">
+      {faqs.map((f) => (
+        <details class="faqit">
+          <summary class="faqq"><span class="qmark">Q</span>{f.q}</summary>
+          <p class="faqa">{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="sec hairtop">
+  <div class="wrapc tc">
+    <div class="kicker">Contact</div>
+    <h2 class="h2">お問い合わせ</h2>
+    <div class="fx jc gap24 wrap" style="margin-top:48px">
+      <div class="card3 ccard"><p class="ctitle m0">取材・メディアの方</p><p class="cdesc" style="margin:10px 0 0">本レーベル・各公演に関する取材のご相談を承ります。</p></div>
+      <div class="card3 ccard"><p class="ctitle m0">店舗・施設の方</p><p class="cdesc" style="margin:10px 0 0">イベント連携・スペース活用のご相談を承ります。</p></div>
+      <div class="card3 ccard"><p class="ctitle m0">クリエイターの方</p><p class="cdesc" style="margin:10px 0 0">絵画制作への参画のご相談を承ります。</p></div>
+    </div>
+    <TaikenbizyutuContactForm />
+  </div>
+</section>
+
+</TaikenbizyutuLayout>
+
+<style>
+.hero{min-height:100vh;background:linear-gradient(180deg,#2b2620 0%,#1b1815 42%,#131110 78%);position:relative}
+.heromark{width:min(480px,72vw);height:auto}
+.herox{font-size:15px;letter-spacing:.3em;color:#cfc8bc}
+.xmark{color:#b39a63;font-size:12px}
+.herolead{font-size:17px;letter-spacing:.24em;color:#ebe5da;text-align:center}
+.scrolly{position:absolute;bottom:0;left:50%;width:1px;height:88px;background:linear-gradient(180deg,rgba(179,154,99,0),#b39a63)}
+.newsrow{padding:20px 0;border-bottom:1px solid rgba(235,229,218,.1);font-size:14px;letter-spacing:.06em}
+.ndate{font-family:'Cormorant Garamond',serif;font-style:italic;color:#b39a63;font-size:15px;min-width:96px}
+.evtitle{font-size:52px;font-weight:500;letter-spacing:.12em;margin:18px 0 0;line-height:1.3}
+.evsub{font-size:24px;color:#b39a63;letter-spacing:.06em;margin:2px 0 0}
+.story{font-size:15.5px;letter-spacing:.06em;color:#d8d2c6}
+.dl{border-top:1px solid rgba(235,229,218,.1)}
+.dlrow{display:grid;grid-template-columns:130px 1fr;gap:16px;padding:14px 2px;border-bottom:1px solid rgba(235,229,218,.1);font-size:14px;letter-spacing:.06em}
+.dt{color:#9c9488}
+.num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:38px;color:#b39a63;line-height:1}
+.cname{font-size:17px;letter-spacing:.16em;margin:14px 0 2px}
+.crole{font-size:12px;color:#9c9488;letter-spacing:.24em}
+.slotwrap{aspect-ratio:3/4;position:relative;border:1px solid rgba(235,229,218,.14);background:linear-gradient(160deg,#1f1b17 0%,#171411 100%)}
+.slotph{color:#8a8377;font-size:15px;letter-spacing:.12em}
+.faqit{border-bottom:1px solid rgba(235,229,218,.1)}
+.faqq{cursor:pointer;list-style:none;padding:22px 2px;font-size:16px;letter-spacing:.08em;display:flex;gap:18px;align-items:baseline}
+.faqq::-webkit-details-marker{display:none}
+.qmark{font-family:'Cormorant Garamond',serif;font-style:italic;color:#b39a63;font-size:20px}
+.faqa{padding:0 2px 24px 38px;font-size:14.5px;color:#b5aea2;letter-spacing:.05em;margin:0}
+.ccard{width:260px;text-align:left}
+.wcap{font-size:13px;color:#9c9488;letter-spacing:.14em;margin:14px 0 0;text-align:center}
+.ewrow{grid-auto-columns:min(440px,82vw)}
+.ewcard{display:block;color:inherit;border:1px solid rgba(235,229,218,.12);background:#1a1714;padding:28px}
+a.ewcard:hover{color:inherit;border-color:rgba(179,154,99,.5)}
+.ewbody{padding:26px 4px 4px}
+.ewtitle{font-size:28px;font-weight:500;letter-spacing:.14em;margin:16px 0 0;line-height:1.4}
+.ewsub{font-size:17px;color:#b39a63;letter-spacing:.08em}
+.artlink{display:flex;gap:14px;align-items:baseline;padding:16px 2px;border-bottom:1px solid rgba(235,229,218,.1);font-size:14.5px;letter-spacing:.06em}
+.arw{font-family:'Cormorant Garamond',serif;font-style:italic;color:#b39a63}
+.artrow{grid-auto-columns:min(460px,82vw);align-items:end}
+.artframe{height:min(560px,110vw)}
+.artimg{max-width:100%;max-height:100%;width:auto;height:auto}
+.evgrid{display:grid;grid-template-columns:380px 1fr;gap:72px;align-items:start}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:44px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:32px}
+@media (max-width:900px){
+  .evgrid{grid-template-columns:1fr;gap:44px}
+  .evgrid>.posrel{max-width:380px;margin:0 auto}
+  .grid3{grid-template-columns:1fr}
+  .grid4{grid-template-columns:repeat(2,1fr)}
+  .evtitle{font-size:36px}
+  .evsub{font-size:19px}
+  .herolead{font-size:15px;letter-spacing:.18em}
+  .herox{font-size:13px;letter-spacing:.22em}
+  .dlrow{grid-template-columns:92px 1fr;gap:12px;font-size:13px}
+  .newsrow{flex-direction:column;gap:2px}
+  .ndate{min-width:0}
+  .ccard{width:100%;max-width:420px}
+  .ewcard{padding:18px}
+  .ewtitle{font-size:23px}
+  .faqq{font-size:14.5px;gap:12px}
+  .faqa{padding-left:30px}
+}
+</style>

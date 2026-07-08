@@ -22,6 +22,8 @@ const STATIC_PATHS = [
   ...tmNews.map((n) => `/toudaimurder/news/${n.slug}/`),
   '/toudaimurder/about/',
   '/toudaimurder/contact/',
+  '/taikenbizyutu/',
+  '/taikenbizyutu/lostframe/',
   ...htPaths,
 ];
 
