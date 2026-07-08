@@ -1,0 +1,219 @@
+---
+// 体験する美術館 (/taikenbizyutu/) 専用レイアウト。
+// 本体サイトとは別ブランドのマイクロサイトなので BaseLayout は使わず、
+// フォント・配色・ヘッダー/フッターをここで完結させる。
+// サブドメイン taikenbizyutu.kabuexlabs.com は vercel.json のリダイレクトで
+// /taikenbizyutu/ 配下へ転送される (toudaimurder と同じ方式)。
+import { jsonLd } from '../lib/microcms';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  /** OGP 画像 (public/ 配下のパス)。設定すると twitter card も large になる */
+  ogImage?: string;
+  /** ヘッダー/フッターを持たない全幅ページ (ロスト・フレームLP) 用 */
+  bare?: boolean;
+}
+
+const {
+  title = '体験する美術館｜絵画×イマーシブ×謎解きの体験型エンターテインメント',
+  description =
+    '「体験する美術館」は、鑑賞するアートから体験するアートへ。絵画と物語、謎解きを融合した体験型エンターテインメントレーベルです。最新公演『ロスト・フレーム』開催決定。',
+  ogImage = '/assets/taikenbizyutu/ogp.jpg',
+  bare = false,
+} = Astro.props;
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const canonical = new URL(Astro.url.pathname, site);
+const ogImageAbs = new URL(ogImage, site);
+
+const base = '/taikenbizyutu';
+const nav = [
+  { href: `${base}/lostframe/`, label: 'WORKS' },
+  { href: `${base}/#news`, label: 'NEWS' },
+  { href: `${base}/#about`, label: 'ABOUT' },
+  { href: `${base}/#model`, label: 'MODEL' },
+  { href: `${base}/#creators`, label: 'CREATORS' },
+  { href: `${base}/#art`, label: 'ART' },
+  { href: `${base}/#faq`, label: 'FAQ' },
+  { href: `${base}/#contact`, label: 'CONTACT' },
+];
+
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: '体験する美術館',
+  url: new URL(`${base}/`, site).toString(),
+  logo: new URL('/assets/taikenbizyutu/logo-white.webp', site).toString(),
+  sameAs: ['https://x.com/taikenbizyutu'],
+  description:
+    '絵画と物語、謎解きを融合した体験型エンターテインメントレーベル。閉館後の美術館や街そのものを舞台に、没入型のアート体験をお届けします。',
+  parentOrganization: {
+    '@type': 'Organization',
+    name: '株式会社ex Labs',
+    url: 'https://kabuexlabs.com/',
+  },
+};
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:url" content={canonical}>
+<meta property="og:image" content={ogImageAbs}>
+<meta property="og:site_name" content="体験する美術館">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
+<script type="application/ld+json" set:html={jsonLd(orgLd)} />
+<slot name="head" />
+</head>
+<body>
+<div class="page">
+{!bare && (
+<header class="hdr">
+  <div class="hdrin fx ac jb">
+    <a href={`${base}/`} aria-label="体験する美術館 トップページ"><img class="hlogo" src="/assets/taikenbizyutu/logo-white.webp" alt="体験する美術館" width="99" height="48"></a>
+    <nav class="hnav fx ac gap24" aria-label="メニュー">
+      {nav.map((item) => <a class="nlink" href={item.href}>{item.label}</a>)}
+    </nav>
+    <div class="fx ac gap12">
+      <a class="xbtn nowrap" href="https://x.com/taikenbizyutu" target="_blank" rel="noopener">公式 X</a>
+      <button class="menub" id="menuBtn" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="mnav"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+<nav class="mnav" id="mnav" aria-label="メニュー">
+  {nav.map((item) => <a class="mitem" href={item.href}>{item.label}</a>)}
+  <a class="mitem gold" href="https://x.com/taikenbizyutu" target="_blank" rel="noopener">公式 X →</a>
+</nav>
+)}
+<slot />
+{!bare && (
+<footer class="ftr">
+  <div class="wrapc fx col ac gap16">
+    <img class="flogo" src="/assets/taikenbizyutu/logo-white.webp" alt="体験する美術館" width="62" height="30" loading="lazy">
+    <p class="fsmall m0">企画・運営：<a href="https://kabuexlabs.com/">株式会社 ex Labs</a></p>
+    <p class="fsmall m0">© 2026 ex Labs Inc. All Rights Reserved.</p>
+  </div>
+</footer>
+)}
+</div>
+
+<style is:global>
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:#131110}
+a{color:#b39a63;text-decoration:none}
+a:hover{color:#d8c28c}
+.page{background:#131110;color:#ebe5da;font-family:'Shippori Mincho',serif;-webkit-font-smoothing:antialiased;line-height:1.9;min-height:100vh}
+.en{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400}
+.gold{color:#b39a63}
+.muted{color:#9c9488}
+.fx{display:flex}
+.col{display:flex;flex-direction:column}
+.ac{align-items:center}
+.jc{justify-content:center}
+.jb{justify-content:space-between}
+.wrap{flex-wrap:wrap}
+.tc{text-align:center}
+.nowrap{white-space:nowrap}
+.gap12{gap:12px}
+.gap16{gap:16px}
+.gap24{gap:24px}
+.m0{margin:0}
+.posrel{position:relative}
+.wrapc{max-width:1060px;margin:0 auto;padding:0 36px}
+.sec{padding:128px 0}
+.hairtop{border-top:1px solid rgba(235,229,218,.1)}
+.kicker{font-size:15px;letter-spacing:.42em;color:#b39a63;text-transform:uppercase;font-family:'Cormorant Garamond',serif;font-style:italic}
+.h2{font-size:32px;font-weight:500;letter-spacing:.18em;margin:14px 0 0;line-height:1.5}
+.lead{font-size:16px;letter-spacing:.08em}
+.hdr{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(19,17,16,.78);backdrop-filter:blur(10px);border-bottom:1px solid rgba(235,229,218,.08)}
+.hdrin{max-width:1200px;margin:0 auto;padding:0 32px;height:64px}
+.hlogo{height:26px;width:auto;display:block}
+.nlink{color:#cfc8bc;font-size:13px;letter-spacing:.18em;padding:6px 2px}
+.nlink:hover{color:#fff}
+.xbtn{border:1px solid rgba(179,154,99,.6);color:#b39a63;font-size:12px;letter-spacing:.22em;padding:8px 18px}
+.xbtn:hover{background:rgba(179,154,99,.12);color:#d8c28c}
+.menub{display:none;flex-direction:column;justify-content:center;gap:6px;width:42px;height:42px;padding:10px;background:transparent;border:1px solid rgba(235,229,218,.25);cursor:pointer;flex-shrink:0}
+.menub span{display:block;height:1px;background:#ebe5da;transition:transform .3s,opacity .3s}
+.menub.x span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.menub.x span:nth-child(2){opacity:0}
+.menub.x span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mnav{position:fixed;inset:0;z-index:49;background:rgba(19,17,16,.97);display:none;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:80px 24px}
+.mnav.open{display:flex}
+body.noscroll{overflow:hidden}
+.mitem{display:block;color:#ebe5da;font-size:17px;letter-spacing:.3em;padding:13px 0;font-family:'Cormorant Garamond',serif;font-style:italic}
+.mitem.gold{color:#b39a63}
+.badge{border:1px solid rgba(179,154,99,.6);color:#b39a63;font-size:12px;letter-spacing:.3em;padding:5px 14px}
+.sold{border:1px solid #a5524a;color:#c9756b;font-size:12px;letter-spacing:.3em;padding:5px 14px}
+.poster{width:100%;height:auto;display:block;border:1px solid rgba(235,229,218,.14)}
+.pshadow{box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.note{font-size:12.5px;color:#8a8377;letter-spacing:.04em}
+.bigx{display:inline-block;border:1px solid #b39a63;color:#b39a63;font-size:14px;letter-spacing:.3em;padding:16px 46px}
+.bigx:hover{background:rgba(179,154,99,.14);color:#d8c28c}
+.card3{border-top:1px solid rgba(179,154,99,.4);padding-top:26px}
+.h3{font-size:19px;font-weight:500;letter-spacing:.1em;margin:16px 0 10px;line-height:1.7}
+.body14{font-size:14px;color:#b5aea2;letter-spacing:.04em}
+.ctitle{font-size:15px;letter-spacing:.2em;color:#ebe5da}
+.cdesc{font-size:13px;color:#9c9488;letter-spacing:.05em}
+.dark2{background:#1a1714}
+.ftr{border-top:1px solid rgba(235,229,218,.08);padding:56px 0 48px}
+.flogo{height:30px;width:auto;opacity:.9}
+.fsmall{font-size:12px;color:#8a8377;letter-spacing:.1em}
+/* 横スクロール列 (WORKS / ART)。スマホでもカードが切れて「続きがある」ことが分かる幅にする */
+.hscroll{display:grid;grid-auto-flow:column;gap:36px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 4px 22px;-webkit-overflow-scrolling:touch;scrollbar-color:rgba(179,154,99,.5) rgba(235,229,218,.08)}
+.hscroll>*{scroll-snap-align:start}
+.hscroll::-webkit-scrollbar{height:4px}
+.hscroll::-webkit-scrollbar-track{background:rgba(235,229,218,.08)}
+.hscroll::-webkit-scrollbar-thumb{background:rgba(179,154,99,.5)}
+.hshint{font-size:11px;color:#8a8377;letter-spacing:.2em;text-align:right;margin:10px 0 0}
+@media (max-width:900px){
+  .hnav{display:none}
+  .menub{display:flex}
+  .sec{padding:88px 0}
+  .wrapc{padding:0 24px}
+  .hdrin{padding:0 18px}
+  .h2{font-size:25px;letter-spacing:.14em}
+  .kicker{font-size:13px}
+  .lead{font-size:15px}
+  .bigx{padding:14px 32px;letter-spacing:.22em;font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+
+<script>
+// モバイルのハンバーガーメニュー
+const menuBtn = document.getElementById('menuBtn');
+const mnav = document.getElementById('mnav');
+if (menuBtn && mnav) {
+  menuBtn.addEventListener('click', () => {
+    const open = mnav.classList.toggle('open');
+    menuBtn.classList.toggle('x', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    menuBtn.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+    document.body.classList.toggle('noscroll', open);
+  });
+  mnav.querySelectorAll('a').forEach((a) =>
+    a.addEventListener('click', () => {
+      mnav.classList.remove('open');
+      menuBtn.classList.remove('x');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('noscroll');
+    }),
+  );
+}
+</script>
+</body>
+</html>

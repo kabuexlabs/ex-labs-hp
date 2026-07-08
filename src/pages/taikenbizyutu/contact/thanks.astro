@@ -1,0 +1,27 @@
+---
+// お問い合わせ送信完了ページ。フォーム (AJAX) 成功後にここへ遷移する。
+// 戻り先は必ず /taikenbizyutu/ (体験する美術館トップ) にする。
+import TaikenbizyutuLayout from '../../../layouts/TaikenbizyutuLayout.astro';
+---
+
+<TaikenbizyutuLayout
+  title="送信完了｜体験する美術館"
+  description="お問い合わせありがとうございます。内容を確認のうえ、担当者よりご連絡いたします。"
+>
+  <meta name="robots" content="noindex" slot="head" />
+  <section class="sec" style="padding-top:190px;min-height:60vh">
+    <div class="wrapc tc">
+      <div class="kicker">Contact</div>
+      <h2 class="h2">送信完了</h2>
+      <div class="thanks">
+        <p class="ctitle m0">お問い合わせありがとうございます。</p>
+        <p class="cdesc" style="margin:14px 0 0">内容を確認のうえ、担当者よりご連絡いたします。お急ぎの場合は<a href="https://x.com/taikenbizyutu" target="_blank" rel="noopener">公式X（@taikenbizyutu）</a>のDMをご利用ください。</p>
+      </div>
+      <div style="margin-top:48px"><a class="bigx" href="/taikenbizyutu/">トップページへ戻る</a></div>
+    </div>
+  </section>
+
+  <style>
+    .thanks{max-width:560px;margin:56px auto 0;border:1px solid rgba(179,154,99,.4);padding:40px 32px}
+  </style>
+</TaikenbizyutuLayout>
