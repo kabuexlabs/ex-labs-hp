@@ -1,6 +1,7 @@
 ---
 // イベント詳細: JANKEN24（チケット完売）
 import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
+import { jsonLd } from '../../../lib/microcms';
 import { htBase, htOrgRef, htBreadcrumbLd } from '../../../data/hacktale';
 
 // 開催日程が非公開のため Event ではなく Game として記述する
@@ -30,8 +31,8 @@ const breadcrumbLd = htBreadcrumbLd([
   back={{ href: `${htBase}/#event`, label: 'EVENT 一覧へ戻る' }}
 >
 
-<script type="application/ld+json" set:html={JSON.stringify(gameLd)} />
-<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+<script type="application/ld+json" set:html={jsonLd(gameLd)} />
+<script type="application/ld+json" set:html={jsonLd(breadcrumbLd)} />
 
 <section class="sec"><div class="wrap">
 <img class="kvimg" src="/assets/hacktale/kv-janken24.webp" alt="JANKEN24 キービジュアル">

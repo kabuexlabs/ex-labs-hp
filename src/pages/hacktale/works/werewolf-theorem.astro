@@ -1,6 +1,7 @@
 ---
 // 作品詳細: 人狼定理（WEREWOLF THEOREM）
 import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
+import { jsonLd } from '../../../lib/microcms';
 import { htBase, htOrgRef, htBreadcrumbLd, HT_LINE_URL } from '../../../data/hacktale';
 
 // ステータスバー（5段階）: 交渉2／閃き1／論理5
@@ -47,8 +48,8 @@ const breadcrumbLd = htBreadcrumbLd([
   back={{ href: `${htBase}/#works`, label: 'WORKS 一覧へ戻る' }}
 >
 
-<script type="application/ld+json" set:html={JSON.stringify(gameLd)} />
-<script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+<script type="application/ld+json" set:html={jsonLd(gameLd)} />
+<script type="application/ld+json" set:html={jsonLd(breadcrumbLd)} />
 
 <section class="sec"><div class="wrap hgrid">
 <img class="kvimg" src="/assets/hacktale/kv-werewolf.webp" alt="人狼定理 WEREWOLF THEOREM キービジュアル">

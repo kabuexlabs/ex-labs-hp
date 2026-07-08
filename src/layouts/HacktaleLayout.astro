@@ -99,7 +99,7 @@ a:hover{color:var(--acc)}
 .fw7{font-weight:700}
 .fs14{font-size:14px}
 .posrel{position:relative}
-.wrap{max-width:1160px;margin:0 auto;padding:0 32px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 var(--pagepad,32px)}
 .ht-detail .wrap{max-width:1060px}
 .hdr{position:sticky;top:0;z-index:50;background:rgba(13,13,14,.88);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1)}
 .hbar{height:72px}
@@ -115,6 +115,11 @@ a:hover{color:var(--acc)}
 @media(max-width:760px){
 .hbar{height:auto;flex-wrap:wrap;row-gap:4px;padding:14px 0}
 .hdr nav{width:100%;justify-content:space-between;gap:8px;flex-wrap:wrap}
+/* 詳細ページ: モバイルの余白と見出しサイズ */
+.ht-detail .sec{padding:52px 0 0}
+.ht-detail .hgrid{gap:28px}
+.ht-detail .cta{margin:56px 0 0;padding:44px 0 72px}
+.ht-detail .t1{font-size:clamp(24px,7.6vw,44px)}
 }
-@media(max-width:480px){.wrap{padding:0 24px}}
+@media(max-width:480px){:root{--pagepad:24px}}
 </style>

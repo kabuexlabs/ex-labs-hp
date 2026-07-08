@@ -3,9 +3,11 @@
 // セクション順: ティッカー → ヒーロー → WORKS → EVENT → HACKTALEとは → ABOUT
 // → TICKET → CONTACT → フッターマーキー → フッター
 import HacktaleLayout from '../../layouts/HacktaleLayout.astro';
+import { jsonLd } from '../../lib/microcms';
 import HacktaleContactForm from '../../components/HacktaleContactForm.astro';
 import {
   htBase,
+  htWorks,
   HT_CONTACT_EMAIL,
   HT_LINE_URL,
   HT_X_URL,
@@ -41,7 +43,7 @@ const orgLd = {
   description="頭脳・交渉を必要とするゲームを展開します。交渉・閃き・論理で勝敗が決まる『頭脳戦』を制作する団体 HACKTALE（ハックテイル）の公式サイト。プレゼント・ポーカー、人狼定理、東京都頭脳王決定戦、JANKEN24などを展開中。"
 >
 
-<script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
+<script type="application/ld+json" set:html={jsonLd(orgLd)} />
 
 <div class="tkr"><div class="tk">{[...tickerItems, ...tickerItems].map((t) => <span>{t}</span>)}</div></div>
 
@@ -57,23 +59,16 @@ const orgLd = {
 </div></section>
 
 <section class="sec" id="works"><div class="wrap">
-<div class="shead"><span class="en st">WORKS</span><span class="sj">作品一覧</span><a class="more en" href="#works">MORE</a></div>
+<div class="shead"><span class="en st">WORKS</span><span class="sj">作品一覧</span><a class="more en" href={`${htBase}/works/`}>MORE</a></div>
 <div class="cards">
-<a class="card" href={`${htBase}/works/present-poker/`}>
-<img class="cimg" src="/assets/hacktale/kv-poker.webp" alt="プレゼント・ポーカー キービジュアル" loading="lazy">
-<div class="cbody"><div class="chips"><span class="badge en">01</span><span class="chip">6人／180分</span></div>
-<h3 class="ct">プレゼント・ポーカー</h3><span class="cm">店舗公演｜4,500円</span>
-<p class="cd">裏技と交渉を駆使し、勝利を目指せ。公演終了時、明確に1名の勝利者が出る。</p></div></a>
-<a class="card" href={`${htBase}/works/werewolf-theorem/`}>
-<img class="cimg" src="/assets/hacktale/kv-werewolf.webp" alt="人狼定理 キービジュアル" loading="lazy">
-<div class="cbody"><div class="chips"><span class="badge en">02</span><span class="chip">8人／240分</span></div>
-<h3 class="ct">人狼定理</h3><span class="cm">店舗公演・オンライン｜4,500円（オンライン3,500円）</span>
-<p class="cd">論理と交渉の頭脳戦。勝利者は2名、途中脱落なし。人狼のルールを知らなくても遊べる。</p></div></a>
-<a class="card" href={`${htBase}/works/dice-box/`}>
-<img class="cimg" src="/assets/hacktale/kv-dicebox.webp" alt="ダイスボックス キービジュアル" loading="lazy">
-<div class="cbody"><div class="chips"><span class="badge en">04</span><span class="chip">9 or 12人／240分</span></div>
-<h3 class="ct">ダイスボックス</h3><span class="cm">詳細は近日公開</span>
-<p class="cd">閃きが試される、ダイスの箱。続報はNEWS・Xにて。</p></div></a>
+{htWorks.map((w) => (
+  <a class="card" href={`${htBase}/works/${w.slug}/`}>
+    <img class="cimg" src={w.image} alt={`${w.title} キービジュアル`} loading="lazy">
+    <div class="cbody"><div class="chips"><span class="badge en">{w.num}</span><span class="chip">{w.chip}</span></div>
+    <h3 class="ct">{w.title}</h3><span class="cm">{w.meta}</span>
+    <p class="cd">{w.desc}</p></div>
+  </a>
+))}
 </div>
 </div></section>
 
@@ -101,7 +96,7 @@ const orgLd = {
 <section class="sec dark2" id="about"><div class="wrap">
 <div class="shead"><span class="en st">ABOUT</span><span class="sj">レーベル紹介</span></div>
 <div class="kwrow"><span class="kw">閃き</span><span class="kwsl en">/</span><span class="kw kw2">論理</span><span class="kwsl en">/</span><span class="kw kw3">交渉</span></div>
-<h3 class="abh">をベースとする<br>ライアーゲームのような体験をあなたに。</h3>
+<h3 class="abh">をベースとする<br><span class="nb">ライアーゲームのような体験を</span><span class="nb">あなたに。</span></h3>
 </div></section>
 
 <section class="sec" id="ticket"><div class="wrap">
@@ -115,14 +110,14 @@ const orgLd = {
 
 <section class="sec dark2" id="contact"><div class="wrap">
 <div class="shead"><span class="en st">CONTACT</span><span class="sj">お問い合わせ</span></div>
-<p class="whatp" style="margin-bottom:40px">公演のご予約・貸切公演のご相談・その他のお問い合わせは、フォームよりご連絡ください。折り返し担当者よりご連絡いたします。</p>
+<p class="whatp cintro">公演のご予約・貸切公演のご相談・その他のお問い合わせは、フォームよりご連絡ください。折り返し担当者よりご連絡いたします。</p>
 <HacktaleContactForm />
 </div></section>
 
 <div class="fmq"><div class="fmt en"><span>HACKTALE — BRAIN &amp; NEGOTIATION GAMES —</span><span>HACKTALE — BRAIN &amp; NEGOTIATION GAMES —</span></div></div>
 
 <footer class="ftr"><div class="wrap"><div class="fcols">
-<div><img class="logo" src="/assets/hacktale/logo.png" alt="HACKTALE"><p class="ftag">裏技に早く気付ければ、絶対に勝てる。</p></div>
+<div><img class="logo" src="/assets/hacktale/logo.png" alt="HACKTALE"><p class="ftag">明確に勝敗のつく頭脳戦を展開します。</p></div>
 <div><div class="fh en">MENU</div><a class="flink" href="#works">WORKS — 作品紹介</a><a class="flink" href="#event">EVENT — イベント</a><a class="flink" href="#about">ABOUT — レーベル紹介</a><a class="flink" href="#ticket">TICKET — 参加方法</a></div>
 <div><div class="fh en">CONTACT</div><a class="flink" href="#contact">お問い合わせフォーム</a><a class="flink" href={HT_X_URL} target="_blank" rel="noopener">X — {HT_X_HANDLE}</a><a class="flink" href={HT_LINE_URL} target="_blank" rel="noopener">公式LINE</a></div>
 <div><div class="fh en">COMPANY</div><a class="flink" href={HT_COMPANY_URL}>運営会社 — 株式会社ex Labs</a></div>
@@ -167,6 +162,7 @@ const orgLd = {
 .cm{font-size:12px;color:#9b978c;letter-spacing:.04em}
 .cd{font-size:13px;line-height:1.9;color:#c9c5ba;margin:0}
 .whatp{font-size:15px;line-height:2.2;color:#c9c5ba;max-width:720px;margin:0}
+.cintro{margin-bottom:40px}
 .kwrow{display:flex;align-items:baseline;gap:22px;flex-wrap:wrap;margin:0 0 32px}
 .kw{font-size:clamp(44px,6vw,76px);font-weight:900;color:var(--acc);animation:kwp 3.6s ease-in-out infinite;display:inline-block}
 .kw2{animation-delay:1.2s}
@@ -174,6 +170,7 @@ const orgLd = {
 .kwsl{font-size:clamp(30px,4vw,52px);color:#3f3f44}
 @keyframes kwp{0%,100%{opacity:.5;transform:translateY(0);text-shadow:none}12%{opacity:1;transform:translateY(-8px);text-shadow:0 0 30px rgba(217,230,59,.55)}32%{opacity:.5;transform:translateY(0);text-shadow:none}}
 .abh{font-size:clamp(22px,3vw,34px);font-weight:900;line-height:1.9;margin:0}
+.nb{display:inline-block}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
 .step{border-top:2px solid var(--acc);padding-top:22px}
 .snum{font-size:44px;color:var(--acc)}
@@ -191,7 +188,38 @@ const orgLd = {
 /* スクロールリビール: 初期状態は可視。JS が .pre を付けてから IntersectionObserver で発火 */
 .pre{opacity:0;transform:translateY(26px)}
 .pre.rev{opacity:1;transform:translateY(0);transition:opacity .8s ease,transform .8s ease}
-@media(max-width:900px){.cards,.steps{grid-template-columns:1fr}.fcols{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){
+.steps{grid-template-columns:1fr}
+.fcols{grid-template-columns:1fr 1fr}
+/* WORKS / EVENT カードは縦積みではなく横スクロールで見せる */
+.cards{display:flex;overflow-x:auto;gap:16px;margin:0 calc(-1 * var(--pagepad,32px));padding:4px var(--pagepad,32px) 16px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent}
+.card{flex:0 0 min(78vw,340px);scroll-snap-align:start}
+.cards::-webkit-scrollbar{height:6px}
+.cards::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18)}
+}
+/* モバイルの余白調整 */
+@media(max-width:760px){
+.hero{padding:76px 0 64px}
+.sec{padding:64px 0}
+.shead{margin-bottom:32px;gap:12px}
+.kwrow{margin-bottom:24px;gap:14px}
+.steps{gap:22px}
+.cintro{margin-bottom:28px}
+.fmq{padding:24px 0}
+.fmt{font-size:48px}
+.ftr{padding:56px 0 32px}
+.fcols{gap:28px}
+.cr{margin-top:40px}
+}
+/* モバイルの改行位置調整（見出しが中途半端な位置で折り返さないように） */
+@media(max-width:480px){
+.kick{font-size:12px;letter-spacing:.24em}
+.h1{font-size:clamp(30px,9vw,40px)}
+.st{font-size:clamp(32px,10vw,38px)}
+.kw{font-size:clamp(30px,10vw,40px)}
+.kwsl{font-size:clamp(20px,6vw,26px)}
+.abh{font-size:clamp(17px,5vw,20px)}
+}
 @media (prefers-reduced-motion:reduce){.tk,.fmt{animation:none}.kw{animation:none;opacity:1}.pre{opacity:1;transform:none}}
 </style>
 
