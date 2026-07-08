@@ -77,6 +77,7 @@ const orgLd = {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
+<noscript><style>.rv{opacity:1 !important;transform:none !important}.hero-el{opacity:1 !important;transform:none !important;animation:none !important}</style></noscript>
 <slot name="head" />
 </head>
 <body>
@@ -172,13 +173,33 @@ body.noscroll{overflow:hidden}
 .ftr{border-top:1px solid rgba(235,229,218,.08);padding:56px 0 48px}
 .flogo{height:30px;width:auto;opacity:.9}
 .fsmall{font-size:12px;color:#8a8377;letter-spacing:.1em}
-/* 横スクロール列 (WORKS / ART)。スマホでもカードが切れて「続きがある」ことが分かる幅にする */
-.hscroll{display:grid;grid-auto-flow:column;gap:36px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 4px 22px;-webkit-overflow-scrolling:touch;scrollbar-color:rgba(179,154,99,.5) rgba(235,229,218,.08)}
+/* 横スクロール列 (WORKS / ART / スマホの ABOUT・MODEL)。
+   .scroller が枠、.hscroll が実際にスクロールする行。
+   右端のフェードと下のスワイプヒントで「まだ続きがある」ことを強調する。
+   ヒント/フェードは JS が overflow を検知したときだけ (.can-scroll) 表示する。 */
+.scroller{position:relative}
+.hscroll{display:grid;grid-auto-flow:column;gap:36px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 4px 22px;-webkit-overflow-scrolling:touch;scrollbar-color:rgba(179,154,99,.6) rgba(235,229,218,.08)}
 .hscroll>*{scroll-snap-align:start}
-.hscroll::-webkit-scrollbar{height:4px}
-.hscroll::-webkit-scrollbar-track{background:rgba(235,229,218,.08)}
-.hscroll::-webkit-scrollbar-thumb{background:rgba(179,154,99,.5)}
-.hshint{font-size:11px;color:#8a8377;letter-spacing:.2em;text-align:right;margin:10px 0 0}
+.hscroll::-webkit-scrollbar{height:6px}
+.hscroll::-webkit-scrollbar-track{background:rgba(235,229,218,.08);border-radius:3px}
+.hscroll::-webkit-scrollbar-thumb{background:rgba(179,154,99,.55);border-radius:3px}
+/* 右端フェード — スクロール可能かつ末尾でないときだけ濃く出す */
+.scroller::after{content:"";position:absolute;top:0;right:0;bottom:22px;width:64px;pointer-events:none;opacity:0;transition:opacity .35s ease;background:linear-gradient(90deg,rgba(19,17,16,0),var(--fadecol,#131110))}
+.scroller.can-scroll::after{opacity:1}
+.scroller.can-scroll.at-end::after{opacity:0}
+/* スワイプ／ドラッグ誘導のヒント */
+.swipe{display:none;align-items:center;justify-content:center;gap:12px;margin:14px auto 0;width:max-content;max-width:100%;border:1px solid rgba(179,154,99,.5);border-radius:999px;padding:9px 22px;color:#d8c28c;background:rgba(179,154,99,.08);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;letter-spacing:.16em}
+.scroller.can-scroll .swipe{display:flex}
+.scroller.can-scroll.at-end .swipe{opacity:.45}
+.swipe .ar{font-size:15px;color:#b39a63;animation:swipeNudge 1.5s ease-in-out infinite}
+.swipe .ar.r{animation-delay:.2s}
+@keyframes swipeNudge{0%,100%{transform:translateX(0);opacity:.6}50%{transform:translateX(4px);opacity:1}}
+.swipe .ar.l{animation-name:swipeNudgeL}
+@keyframes swipeNudgeL{0%,100%{transform:translateX(0);opacity:.6}50%{transform:translateX(-4px);opacity:1}}
+/* スクロール連動フェードイン (全体アニメーション) */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s cubic-bezier(.22,.61,.36,1)}
+.rv.on{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
 @media (max-width:900px){
   .hnav{display:none}
   .menub{display:flex}
@@ -190,10 +211,48 @@ body.noscroll{overflow:hidden}
   .lead{font-size:15px}
   .bigx{padding:14px 32px;letter-spacing:.22em;font-size:13px}
 }
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .swipe .ar{animation:none}
+  .hero-el{opacity:1 !important;transform:none !important;animation:none !important}
+}
 </style>
 
 <script>
+// スクロール連動フェードイン (.rv → .on)。
+// threshold は 0 — 縦に長い要素でも「10%見える」条件で永遠に隠れるのを防ぐ。
+const io = new IntersectionObserver(
+  (entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        e.target.classList.add('on');
+        io.unobserve(e.target);
+      }
+    }
+  },
+  { threshold: 0, rootMargin: '0px 0px -8% 0px' },
+);
+document.querySelectorAll('.rv').forEach((el) => io.observe(el));
+
+// 横スクロール枠: overflow を検知したときだけヒント/フェードを出し、
+// 末尾まで来たら消す。リサイズ・画像読み込みでも再判定する。
+document.querySelectorAll('.scroller').forEach((sc) => {
+  const row = sc.querySelector('.hscroll');
+  if (!row) return;
+  const update = () => {
+    const can = row.scrollWidth - row.clientWidth > 8;
+    sc.classList.toggle('can-scroll', can);
+    sc.classList.toggle('at-end', can && row.scrollLeft >= row.scrollWidth - row.clientWidth - 8);
+  };
+  row.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  row.querySelectorAll('img').forEach((img) => {
+    if (!img.complete) img.addEventListener('load', update, { once: true });
+  });
+  update();
+});
+
 // モバイルのハンバーガーメニュー
 const menuBtn = document.getElementById('menuBtn');
 const mnav = document.getElementById('mnav');

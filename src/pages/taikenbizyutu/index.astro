@@ -49,22 +49,24 @@ const faqs = [
 <TaikenbizyutuLayout>
 
 <section id="top" class="hero fx col ac jc">
-  <div class="fx col ac gap24" style="padding:120px 24px 140px">
-    <div class="herox fx ac gap12"><span>絵&nbsp;画</span><span class="xmark">×</span><span>イマーシブ</span><span class="xmark">×</span><span>謎&nbsp;解&nbsp;き</span></div>
-    <img class="heromark" src={`${assets}/logo-white.webp`} alt="体験する美術館" width="1000" height="487">
-    <p class="herolead m0">鑑賞するアートから、<wbr>体験するアートへ。</p>
-    <p class="note tc m0" style="letter-spacing:.14em">絵画と物語、謎解きを融合した<wbr>体験型エンターテインメントレーベル</p>
-    <div style="margin-top:28px"><a class="bigx" href="/taikenbizyutu/lostframe/">最新のイベントを見る</a></div>
+  <div class="dust" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="fx col ac gap24" style="padding:120px 24px 140px;position:relative;z-index:1">
+    <div class="herox fx ac gap12 hero-el e0"><span>絵&nbsp;画</span><span class="xmark">×</span><span>イマーシブ</span><span class="xmark">×</span><span>謎&nbsp;解&nbsp;き</span></div>
+    <img class="heromark hero-el e1" src={`${assets}/logo-white.webp`} alt="体験する美術館" width="1000" height="487">
+    <p class="herolead m0 hero-el e2">鑑賞するアートから、<wbr>体験するアートへ。</p>
+    <p class="note tc m0 hero-el e3" style="letter-spacing:.14em">絵画と物語、謎解きを融合した<wbr>体験型エンターテインメントレーベル</p>
+    <div class="hero-el e4" style="margin-top:28px"><a class="bigx" href="/taikenbizyutu/lostframe/">最新のイベントを見る</a></div>
   </div>
   <div class="scrolly"></div>
 </section>
 
 <section id="works" class="sec hairtop">
   <div class="wrapc">
-    <div class="kicker">Works</div>
-    <h2 class="h2">公演一覧</h2>
-    <p class="lead muted" style="margin:28px 0 0;max-width:720px">閉館後の美術館、使用されていない展示会場、そして街そのもの——。公演ごとに舞台を変えながら、絵画と物語、謎解きの体験をお届けしています。</p>
-    <div class="hscroll ewrow" style="margin-top:56px">
+    <div class="kicker rv">Works</div>
+    <h2 class="h2 rv d1">公演一覧</h2>
+    <p class="lead muted rv d2" style="margin:28px 0 0;max-width:720px">閉館後の美術館、使用されていない展示会場、そして街そのもの——。公演ごとに舞台を変えながら、絵画と物語、謎解きの体験をお届けしています。</p>
+    <div class="scroller rv d2" style="margin-top:56px">
+    <div class="hscroll ewrow">
       <a class="ewcard" href="/taikenbizyutu/lostframe/">
         <img class="poster" src={`${assets}/lost-frame.webp`} alt="ロスト・フレーム キービジュアル" width="900" height="1281" loading="lazy">
         <div class="ewbody">
@@ -89,28 +91,29 @@ const faqs = [
         </div>
       </div>
     </div>
-    <p class="hshint">← 横にスクロールできます →</p>
+    <div class="swipe"><span class="ar l">◀</span>スワイプで他の公演を見る<span class="ar r">▶</span></div>
+    </div>
   </div>
 </section>
 
 <section id="news" class="sec hairtop">
   <div class="wrapc">
-    <div class="kicker">News</div>
-    <h2 class="h2">お知らせ</h2>
+    <div class="kicker rv">News</div>
+    <h2 class="h2 rv d1">お知らせ</h2>
     <div style="margin-top:40px">
-      <div class="newsrow fx gap24"><span class="ndate">2026.07</span><span>『ロスト・フレーム』のチケット販売を開始しました（<a href={TICKET_URL} target="_blank" rel="noopener">チケットサイトはこちら</a>）</span></div>
-      <div class="newsrow fx gap24"><span class="ndate">2026.07</span><span>体験する美術館 第二弾『ロスト・フレーム』の開催が決定しました（東京・下北沢エリア）</span></div>
-      <div class="newsrow fx gap24"><span class="ndate">2026.07</span><span>『ロスト・フレーム』ティザービジュアルを公開しました</span></div>
+      <div class="newsrow fx gap24 rv"><span class="ndate">2026.07</span><span>『ロスト・フレーム』のチケット販売を開始しました（<a href={TICKET_URL} target="_blank" rel="noopener">チケットサイトはこちら</a>）</span></div>
+      <div class="newsrow fx gap24 rv d1"><span class="ndate">2026.07</span><span>体験する美術館 第二弾『ロスト・フレーム』の開催が決定しました（東京・下北沢エリア）</span></div>
+      <div class="newsrow fx gap24 rv d2"><span class="ndate">2026.07</span><span>『ロスト・フレーム』ティザービジュアルを公開しました</span></div>
     </div>
-    <p class="note" style="margin-top:18px">最新情報は<a href="https://x.com/taikenbizyutu" target="_blank" rel="noopener">公式X（@taikenbizyutu）</a>にて随時お知らせします。</p>
+    <p class="note rv" style="margin-top:18px">最新情報は<a href="https://x.com/taikenbizyutu" target="_blank" rel="noopener">公式X（@taikenbizyutu）</a>にて随時お知らせします。</p>
   </div>
 </section>
 
 <section id="lostframe" class="sec hairtop">
   <div class="wrapc">
     <div class="evgrid">
-      <div class="posrel"><img class="poster pshadow" src={`${assets}/lost-frame.webp`} alt="ロスト・フレーム キービジュアル" width="900" height="1281" loading="lazy"></div>
-      <div>
+      <div class="posrel rv"><img class="poster pshadow" src={`${assets}/lost-frame.webp`} alt="ロスト・フレーム キービジュアル" width="900" height="1281" loading="lazy"></div>
+      <div class="rv d1">
         <span class="badge">最新公演 ─ 第二弾</span>
         <h2 class="evtitle">ロスト・フレーム</h2>
         <p class="evsub en">Lost Frame</p>
@@ -138,10 +141,11 @@ const faqs = [
 
 <section id="about" class="sec hairtop dark2">
   <div class="wrapc">
-    <div class="kicker">About</div>
-    <h2 class="h2">『体験する美術館』とは</h2>
-    <p class="lead" style="margin:32px 0 0;max-width:720px">「体験する美術館」は、“鑑賞するアート”を“体験するアート”へと再定義することを目的とした、体験型エンターテインメントレーベルです。</p>
-    <div class="grid3" style="margin-top:64px">
+    <div class="kicker rv">About</div>
+    <h2 class="h2 rv d1">『体験する美術館』とは</h2>
+    <p class="lead rv d2" style="margin:32px 0 0;max-width:720px">「体験する美術館」は、“鑑賞するアート”を“体験するアート”へと再定義することを目的とした、体験型エンターテインメントレーベルです。</p>
+    <div class="scroller mobscroll rv d2" style="margin-top:64px;--fadecol:#1a1714">
+    <div class="hscroll grid3">
       <div class="card3">
         <div class="num">01</div>
         <h3 class="h3">物語の中で、絵画と出会う。</h3>
@@ -159,14 +163,17 @@ const faqs = [
         <p class="note" style="margin:12px 0 0">※『ロスト・フレーム』におけるオークションの実施は未定です。</p>
       </div>
     </div>
+    <div class="swipe"><span class="ar l">◀</span>スワイプで見る<span class="ar r">▶</span></div>
+    </div>
   </div>
 </section>
 
 <section id="model" class="sec hairtop">
   <div class="wrapc">
-    <div class="kicker">Model</div>
-    <h2 class="h2">地域とクリエイターをつなぐ、<wbr>新たなモデル</h2>
-    <div class="grid3" style="margin-top:64px">
+    <div class="kicker rv">Model</div>
+    <h2 class="h2 rv d1">地域とクリエイターをつなぐ、<wbr>新たなモデル</h2>
+    <div class="scroller mobscroll rv d2" style="margin-top:64px">
+    <div class="hscroll grid3">
       <div class="card3">
         <div class="num">舞台</div>
         <h3 class="h3">街や施設が、美術館になる。</h3>
@@ -183,32 +190,34 @@ const faqs = [
         <p class="body14 m0">株式会社ex Labsが集客から企画・運営までを一括して担うため、施設・店舗側は初期費用をご負担いただくことなく認知を獲得できるスキームを採用しています。</p>
       </div>
     </div>
+    <div class="swipe"><span class="ar l">◀</span>スワイプで見る<span class="ar r">▶</span></div>
+    </div>
   </div>
 </section>
 
 <section id="creators" class="sec hairtop dark2">
   <div class="wrapc">
-    <div class="kicker">Creators</div>
-    <h2 class="h2">絵画クリエイター</h2>
-    <p class="lead muted" style="margin:28px 0 0;max-width:720px">本企画には、東京藝術大学出身者や漫画家など、多様なジャンルで活躍するクリエイターが絵画制作に参画しています。</p>
-    <div class="grid4" style="margin-top:56px">
+    <div class="kicker rv">Creators</div>
+    <h2 class="h2 rv d1">絵画クリエイター</h2>
+    <p class="lead muted rv d2" style="margin:28px 0 0;max-width:720px">本企画には、東京藝術大学出身者や漫画家など、多様なジャンルで活躍するクリエイターが絵画制作に参画しています。</p>
+    <div class="cnames rv d2" style="margin-top:56px">
       {creators.map((c) => (
-        <div>
-          <div class="slotwrap fx ac jc"><span class="slotph en">Coming Soon</span></div>
-          <p class="cname m0">{c.name}</p>
-          <p class="crole m0">{c.role}</p>
+        <div class="cnameplate">
+          <span class="cnn">{c.name}</span>
         </div>
       ))}
     </div>
+    <p class="note rv" style="margin-top:34px">※敬称略・順不同。</p>
   </div>
 </section>
 
 <section id="art" class="sec hairtop">
   <div class="wrapc">
-    <div class="kicker">Art</div>
-    <h2 class="h2">作品群</h2>
-    <p class="lead muted" style="margin:28px 0 0;max-width:720px">各公演のために描き下ろされた、手描きの絵画作品。物語の鍵として会場に展示され、公演終了後にはオークションを通じて新たな持ち主のもとへ。</p>
-    <div class="hscroll artrow" style="margin-top:56px">
+    <div class="kicker rv">Art</div>
+    <h2 class="h2 rv d1">作品群</h2>
+    <p class="lead muted rv d2" style="margin:28px 0 0;max-width:720px">各公演のために描き下ろされた、手描きの絵画作品。物語の鍵として会場に展示され、公演終了後にはオークションを通じて新たな持ち主のもとへ。</p>
+    <div class="scroller rv d2" style="margin-top:56px">
+    <div class="hscroll artrow">
       {arts.map((a) => (
         <div>
           <div class="artframe fx ac jc"><img class="poster pshadow artimg" src={a.src} alt={a.alt} loading="lazy"></div>
@@ -216,18 +225,19 @@ const faqs = [
         </div>
       ))}
     </div>
-    <p class="hshint">← 横にスクロールできます →</p>
-    <p class="note tc" style="margin:40px 0 0">ここに掲載しているのは一部です。ほかにも多数の作品がございます。</p>
+    <div class="swipe"><span class="ar l">◀</span>スワイプで作品を見る<span class="ar r">▶</span></div>
+    </div>
+    <p class="note tc rv" style="margin:40px 0 0">ここに掲載しているのは一部です。ほかにも多数の作品がございます。</p>
   </div>
 </section>
 
 <section id="faq" class="sec hairtop dark2">
   <div class="wrapc" style="max-width:860px">
-    <div class="kicker">FAQ</div>
-    <h2 class="h2">よくある質問</h2>
+    <div class="kicker rv">FAQ</div>
+    <h2 class="h2 rv d1">よくある質問</h2>
     <div style="margin-top:44px">
       {faqs.map((f) => (
-        <details class="faqit">
+        <details class="faqit rv">
           <summary class="faqq"><span class="qmark">Q</span>{f.q}</summary>
           <p class="faqa">{f.a}</p>
         </details>
@@ -238,12 +248,12 @@ const faqs = [
 
 <section id="contact" class="sec hairtop">
   <div class="wrapc tc">
-    <div class="kicker">Contact</div>
-    <h2 class="h2">お問い合わせ</h2>
+    <div class="kicker rv">Contact</div>
+    <h2 class="h2 rv d1">お問い合わせ</h2>
     <div class="fx jc gap24 wrap" style="margin-top:48px">
-      <div class="card3 ccard"><p class="ctitle m0">取材・メディアの方</p><p class="cdesc" style="margin:10px 0 0">本レーベル・各公演に関する取材のご相談を承ります。</p></div>
-      <div class="card3 ccard"><p class="ctitle m0">店舗・施設の方</p><p class="cdesc" style="margin:10px 0 0">イベント連携・スペース活用のご相談を承ります。</p></div>
-      <div class="card3 ccard"><p class="ctitle m0">クリエイターの方</p><p class="cdesc" style="margin:10px 0 0">絵画制作への参画のご相談を承ります。</p></div>
+      <div class="card3 ccard rv"><p class="ctitle m0">取材・メディアの方</p><p class="cdesc" style="margin:10px 0 0">本レーベル・各公演に関する取材のご相談を承ります。</p></div>
+      <div class="card3 ccard rv d1"><p class="ctitle m0">店舗・施設の方</p><p class="cdesc" style="margin:10px 0 0">イベント連携・スペース活用のご相談を承ります。</p></div>
+      <div class="card3 ccard rv d2"><p class="ctitle m0">クリエイターの方</p><p class="cdesc" style="margin:10px 0 0">絵画制作への参画のご相談を承ります。</p></div>
     </div>
     <TaikenbizyutuContactForm />
   </div>
@@ -267,10 +277,11 @@ const faqs = [
 .dlrow{display:grid;grid-template-columns:130px 1fr;gap:16px;padding:14px 2px;border-bottom:1px solid rgba(235,229,218,.1);font-size:14px;letter-spacing:.06em}
 .dt{color:#9c9488}
 .num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:38px;color:#b39a63;line-height:1}
-.cname{font-size:17px;letter-spacing:.16em;margin:14px 0 2px}
-.crole{font-size:12px;color:#9c9488;letter-spacing:.24em}
-.slotwrap{aspect-ratio:3/4;position:relative;border:1px solid rgba(235,229,218,.14);background:linear-gradient(160deg,#1f1b17 0%,#171411 100%)}
-.slotph{color:#8a8377;font-size:15px;letter-spacing:.12em}
+/* 絵画クリエイター — 名前のみ表示 */
+.cnames{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.cnameplate{border-top:1px solid rgba(179,154,99,.42);padding:26px 8px;text-align:center;transition:background .3s,border-color .3s}
+.cnameplate:hover{background:rgba(179,154,99,.06);border-color:rgba(179,154,99,.75)}
+.cnn{font-size:20px;letter-spacing:.2em;color:#ebe5da}
 .faqit{border-bottom:1px solid rgba(235,229,218,.1)}
 .faqq{cursor:pointer;list-style:none;padding:22px 2px;font-size:16px;letter-spacing:.08em;display:flex;gap:18px;align-items:baseline}
 .faqq::-webkit-details-marker{display:none}
@@ -290,13 +301,41 @@ a.ewcard:hover{color:inherit;border-color:rgba(179,154,99,.5)}
 .artframe{height:min(560px,110vw)}
 .artimg{max-width:100%;max-height:100%;width:auto;height:auto}
 .evgrid{display:grid;grid-template-columns:380px 1fr;gap:72px;align-items:start}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:44px}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:32px}
+/* ABOUT / MODEL: 通常は3カラムグリッド、スマホでは横スクロールに切り替える。
+   .hscroll (2クラス指定) でベースの横スクロール定義を上書きしている。 */
+.hscroll.grid3{grid-auto-flow:row;grid-template-columns:repeat(3,1fr);grid-auto-columns:auto;gap:44px;overflow:visible;padding:0;scroll-snap-type:none}
+
+/* ヒーローの登場アニメーション */
+.hero-el{opacity:0;transform:translateY(24px);animation:heroUp 1s cubic-bezier(.22,.61,.36,1) both}
+.e0{animation-delay:.1s}.e1{animation-delay:.3s}.e2{animation-delay:.65s}.e3{animation-delay:.85s}.e4{animation-delay:1.05s}
+@keyframes heroUp{to{opacity:1;transform:none}}
+/* ヒーローに漂う金色の粒子 (寂しさ解消のための微アニメーション) */
+.dust{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.dust span{position:absolute;bottom:-12px;width:3px;height:3px;border-radius:50%;background:rgba(179,154,99,.55);opacity:0;animation:floatUp linear infinite}
+.dust span:nth-child(1){left:7%;animation-duration:15s;animation-delay:0s}
+.dust span:nth-child(2){left:19%;animation-duration:19s;animation-delay:2s;width:2px;height:2px}
+.dust span:nth-child(3){left:32%;animation-duration:13s;animation-delay:5s}
+.dust span:nth-child(4){left:44%;animation-duration:21s;animation-delay:1s;width:2px;height:2px}
+.dust span:nth-child(5){left:56%;animation-duration:17s;animation-delay:3.5s}
+.dust span:nth-child(6){left:66%;animation-duration:14s;animation-delay:6s;width:2px;height:2px}
+.dust span:nth-child(7){left:78%;animation-duration:20s;animation-delay:2.5s}
+.dust span:nth-child(8){left:88%;animation-duration:16s;animation-delay:4.5s;width:2px;height:2px}
+.dust span:nth-child(9){left:95%;animation-duration:18s;animation-delay:7s}
+@keyframes floatUp{0%{transform:translateY(0);opacity:0}12%{opacity:.75}85%{opacity:.45}100%{transform:translateY(-92vh);opacity:0}}
+/* スクロール誘導ラインに流れる光 */
+.scrolly{overflow:hidden}
+.scrolly::after{content:"";position:absolute;top:0;left:0;width:1px;height:34px;background:linear-gradient(180deg,rgba(216,194,140,0),#f0e4b6);animation:scrollrun 2.6s ease-in-out infinite}
+@keyframes scrollrun{0%{transform:translateY(-40px)}70%,100%{transform:translateY(92px)}}
+@media (prefers-reduced-motion:reduce){
+  .hero-el{opacity:1;transform:none;animation:none}
+  .dust,.scrolly::after{display:none}
+}
 @media (max-width:900px){
   .evgrid{grid-template-columns:1fr;gap:44px}
   .evgrid>.posrel{max-width:380px;margin:0 auto}
-  .grid3{grid-template-columns:1fr}
-  .grid4{grid-template-columns:repeat(2,1fr)}
+  /* ABOUT/MODEL をスマホで横スクロールに */
+  .hscroll.grid3{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:78vw;gap:18px;overflow-x:auto;padding:4px 2px 22px;scroll-snap-type:x proximity}
+  .hscroll.grid3>.card3{scroll-snap-align:start}
   .evtitle{font-size:36px}
   .evsub{font-size:19px}
   .herolead{font-size:15px;letter-spacing:.18em}
@@ -309,5 +348,10 @@ a.ewcard:hover{color:inherit;border-color:rgba(179,154,99,.5)}
   .ewtitle{font-size:23px}
   .faqq{font-size:14.5px;gap:12px}
   .faqa{padding-left:30px}
+  .cnames{grid-template-columns:repeat(2,1fr);gap:12px}
+  .cnn{font-size:18px}
+}
+@media (max-width:440px){
+  .cnames{grid-template-columns:1fr}
 }
 </style>
