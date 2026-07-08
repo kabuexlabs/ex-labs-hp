@@ -1,16 +1,17 @@
 ---
 // HACKTALE のお問い合わせフォーム（トップページ CONTACT セクション用）。
-// FormSubmit (formsubmit.co) 経由で HT_CONTACT_EMAIL 宛にメール送信される。
-// JS 有効時は AJAX 送信してその場に成功/失敗のフィードバックを表示し、
-// JS 無効時は通常 POST → /hacktale/contact/thanks/ にリダイレクトされる。
+// FormSubmit (formsubmit.co) へブラウザ標準の POST で送信し、HT_CONTACT_EMAIL 宛に届く。
+// 送信後は _next により /hacktale/contact/thanks/ へリダイレクトされる。
+// toudaimurder のフォームと同じ実証済みフローに合わせている（AJAX 送信は
+// FormSubmit 側の制約で失敗することがあるため使わない）。
+// 注意: 宛先メールアドレスは FormSubmit の初回認証（届いた確認メールの承認）が必要。
 import { HT_CONTACT_EMAIL, htFormWorks } from '../data/hacktale';
 
 const formAction = `https://formsubmit.co/${HT_CONTACT_EMAIL}`;
-const ajaxAction = `https://formsubmit.co/ajax/${HT_CONTACT_EMAIL}`;
 const thanksUrl = 'https://kabuexlabs.com/hacktale/contact/thanks/';
 ---
 
-<form class="form" id="ht-contact-form" action={formAction} method="POST" data-ajax-action={ajaxAction}>
+<form class="form" id="ht-contact-form" action={formAction} method="POST">
 <input type="hidden" name="_subject" value="【HACKTALE】サイトからのお問い合わせ">
 <input type="hidden" name="_template" value="table">
 <input type="hidden" name="_captcha" value="false">
@@ -22,7 +23,6 @@ const thanksUrl = 'https://kabuexlabs.com/hacktale/contact/thanks/';
 <div><div class="fl">ご希望の作品（任意）</div><select class="in" name="ご希望の作品"><option>選択しない</option>{htFormWorks.map((w) => <option>{w}</option>)}</select></div>
 <div><div class="fl">お問い合わせ内容<span class="req">必須</span></div><textarea class="in" rows="6" name="お問い合わせ内容" required></textarea></div>
 <div><button class="btn btn-acc send" type="submit">送信する</button></div>
-<p class="fstatus" id="ht-form-status" role="status" aria-live="polite"></p>
 <p class="fnote">ご入力いただいた情報は、お問い合わせへの回答のみに使用いたします。</p>
 </form>
 
@@ -35,43 +35,17 @@ const thanksUrl = 'https://kabuexlabs.com/hacktale/contact/thanks/';
 textarea.in{resize:vertical}
 .send{cursor:pointer;font-family:inherit}
 .send:disabled{opacity:.6;cursor:wait}
-.fstatus{display:none;margin:0;padding:14px 18px;border:1px solid transparent;font-size:14px;line-height:1.9}
-.fstatus.ok{display:block;border-color:rgba(217,230,59,.5);color:#f1efe9}
-.fstatus.ng{display:block;border-color:#e5484d;color:#e08a8a}
-.fstatus.ng :global(a){color:#e08a8a;text-decoration:underline}
 .fnote{font-size:13px;line-height:1.9;color:#c9c5ba;margin:0}
 </style>
 
 <script>
-const form = document.getElementById('ht-contact-form') as HTMLFormElement | null;
-const status = document.getElementById('ht-form-status');
-
-form?.addEventListener('submit', async (e) => {
-  e.preventDefault();
+// 二重送信の防止のみ。送信そのものはブラウザ標準の POST に任せる。
+const form = document.getElementById('ht-contact-form');
+form?.addEventListener('submit', () => {
   const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-  if (!btn || !status) return;
-  btn.disabled = true;
-  btn.textContent = '送信中…';
-  status.className = 'fstatus';
-  status.textContent = '';
-  try {
-    const res = await fetch(form.dataset.ajaxAction!, {
-      method: 'POST',
-      headers: { Accept: 'application/json' },
-      body: new URLSearchParams(new FormData(form) as unknown as Record<string, string>),
-    });
-    const data = await res.json().catch(() => null);
-    if (!res.ok || !data || String(data.success) !== 'true') throw new Error('send failed');
-    form.reset();
-    status.classList.add('ok');
-    status.textContent = '送信が完了しました。折り返し担当者よりご連絡いたします。';
-  } catch {
-    status.classList.add('ng');
-    status.innerHTML =
-      '送信に失敗しました。時間をおいて再度お試しいただくか、<a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> まで直接ご連絡ください。';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = '送信する';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '送信中…';
   }
 });
 </script>

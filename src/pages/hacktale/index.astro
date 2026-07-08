@@ -45,7 +45,14 @@ const orgLd = {
 
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 
-<div class="tkr"><div class="tk">{[...tickerItems, ...tickerItems].map((t) => <span>{t}</span>)}</div></div>
+{/* ループ系は「前半＋複製の後半」を並べ、-50% 移動でちょうど前半の幅ぶん戻る構造。
+    コンテナ側の gap だと継ぎ目がずれるため、間隔は各半分の padding-right で持つ */}
+<div class="tkr"><div class="tk">
+<div class="tkhalf">{tickerItems.map((t) => <span>{t}</span>)}</div>
+<div class="tkhalf" aria-hidden="true">{tickerItems.map((t) => <span>{t}</span>)}</div>
+</div></div>
+
+<div class="fmq fmq-top" aria-hidden="true"><div class="fmt en"><span class="fmhalf">HACKTALE — BRAIN &amp; NEGOTIATION GAMES —</span><span class="fmhalf">HACKTALE — BRAIN &amp; NEGOTIATION GAMES —</span></div></div>
 
 <section class="hero" id="top"><div class="hbg"></div><div class="wrap posrel">
 <p class="kick en m0">HACKTALE — BRAIN &amp; NEGOTIATION GAMES</p>
@@ -114,7 +121,7 @@ const orgLd = {
 <HacktaleContactForm />
 </div></section>
 
-<div class="fmq"><div class="fmt en"><span>HACKTALE — BRAIN &amp; NEGOTIATION GAMES —</span><span>HACKTALE — BRAIN &amp; NEGOTIATION GAMES —</span></div></div>
+<div class="fmq"><div class="fmt en"><span class="fmhalf">HACKTALE — BRAIN &amp; NEGOTIATION GAMES —</span><span class="fmhalf" aria-hidden="true">HACKTALE — BRAIN &amp; NEGOTIATION GAMES —</span></div></div>
 
 <footer class="ftr"><div class="wrap"><div class="fcols">
 <div><img class="logo" src="/assets/hacktale/logo.png" alt="HACKTALE"><p class="ftag">明確に勝敗のつく頭脳戦を展開します。</p></div>
@@ -127,7 +134,8 @@ const orgLd = {
 
 <style>
 .tkr{overflow:hidden;background:var(--acc);color:#0d0d0e}
-.tk{display:flex;gap:56px;white-space:nowrap;width:max-content;padding:9px 0;animation:mq 28s linear infinite;font-size:13px;font-weight:700}
+.tk{display:flex;white-space:nowrap;width:max-content;padding:9px 0;animation:mq 28s linear infinite;font-size:13px;font-weight:700;will-change:transform}
+.tkhalf{display:flex;gap:56px;padding-right:56px}
 @keyframes mq{to{transform:translateX(-50%)}}
 .hero{padding:128px 0 96px;position:relative;overflow:hidden}
 .hbg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 70% 20%,rgba(217,230,59,.08),transparent 70%);pointer-events:none}
@@ -178,7 +186,9 @@ const orgLd = {
 .sp{font-size:13px;line-height:2;color:#c9c5ba;margin:0}
 .sp a{border-bottom:1px solid rgba(255,255,255,.3)}
 .fmq{overflow:hidden;border-top:1px solid rgba(255,255,255,.08);padding:36px 0}
-.fmt{display:flex;gap:64px;white-space:nowrap;width:max-content;animation:mq 40s linear infinite;font-size:72px;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.22)}
+.fmq-top{border-top:0;padding:28px 0}
+.fmt{display:flex;white-space:nowrap;width:max-content;animation:mq 40s linear infinite;font-size:72px;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.22);will-change:transform;transform:translateZ(0)}
+.fmhalf{padding-right:64px}
 .ftr{border-top:1px solid rgba(255,255,255,.08);padding:72px 0 40px}
 .fcols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px}
 .fh{font-size:12px;letter-spacing:.25em;color:#9b978c;margin-bottom:18px}
@@ -206,6 +216,7 @@ const orgLd = {
 .steps{gap:22px}
 .cintro{margin-bottom:28px}
 .fmq{padding:24px 0}
+.fmq-top{padding:16px 0}
 .fmt{font-size:48px}
 .ftr{padding:56px 0 32px}
 .fcols{gap:28px}
@@ -225,7 +236,10 @@ const orgLd = {
 
 <script>
 // スクロールリビール。JS 無効時も見えるよう、初期表示外の要素だけを JS で隠してから発火する。
-const els = document.querySelectorAll<HTMLElement>('.card, .shead');
+// モバイルではカード列が横スクロールになるため、カード個別ではなく列全体を対象にする
+// （個別に監視すると横方向に画面外のカードが隠れたままになり「消えた」ように見える）。
+const perCard = window.matchMedia('(min-width: 901px)').matches;
+const els = document.querySelectorAll<HTMLElement>(perCard ? '.card, .shead' : '.cards, .shead');
 const io = new IntersectionObserver(
   (entries) => {
     entries.forEach((en) => {
