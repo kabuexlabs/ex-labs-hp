@@ -46,14 +46,14 @@ const ticker = [
   </div>
 
   <div class="main">
+    <div class="ftmq ftmq-top"><div class="fmin"><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span></div></div>
+
     <section class="hero wrap">
       <p class="en dim rv" style="font-size:13px;margin:0 0 22px;letter-spacing:.3em">TODAI MURDER MYSTERY CIRCLE</p>
       <h1 class="h0 min rv d1">至高の推理体験を<br>あなたに。</h1>
       <p class="hlead rv d2">現役東大生と有名作家が手を組んだチームが、至高の推理体験を提供します。マーダーミステリーからイマーシブコンテンツまで、幅広く制作・展開を行います。</p>
       <div class="hbtns rv d3"><a class="btn" href={`${base}/works/`}>作品一覧を見る</a><a class="btnline" href={TM_LINE_URL}>公式LINEで予約</a><a class="btnx" href={TM_X_URL}>Xを見る</a></div>
     </section>
-
-    <div class="ftmq ftmq-top"><div class="fmin"><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span></div></div>
 
     <section class="bt" id="works">
       <div class="shead wrap rv"><h2 class="sh"><span class="sht en">WORKS</span><span class="shj">作品一覧</span></h2><a class="more en" href={`${base}/works/`}>MORE</a></div>
@@ -192,7 +192,8 @@ const ticker = [
 .cgrid{display:grid;grid-template-columns:1fr 1.4fr;gap:64px;align-items:start;padding-bottom:96px}
 @media (max-width:900px){.cgrid{grid-template-columns:1fr}}
 .ftmq{overflow:hidden;border-top:1px solid var(--ln);padding:34px 0}
-.ftmq-top{border-top:none}
+.ftmq-top{border-top:none;border-bottom:1px solid var(--ln);padding:26px 0}
+@media (max-width:700px){.fmt{font-size:64px}.ftmq-top{padding:18px 0}}
 .fmin{display:flex;width:max-content;animation:mq 30s linear infinite}
 .fmt{font-family:'Outfit',sans-serif;font-size:96px;font-weight:700;letter-spacing:.06em;white-space:nowrap;color:transparent;-webkit-text-stroke:1px var(--acc);padding-right:60px;line-height:1}
 .ftr2{border-top:1px solid var(--ln);padding-top:56px;padding-bottom:40px}
@@ -202,4 +203,6 @@ const ticker = [
 .ftr2 .copy{margin-top:48px}
 .logo{font-family:'Shippori Mincho',serif;font-weight:800;font-size:18px;letter-spacing:.14em}
 @media (max-width:900px){.rail{display:none}.main{margin-left:0}.about{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.nrow{grid-template-columns:1fr}}
+/* 375px幅で「至高の推理体験を」が1行に収まるサイズにし、「を」だけの孤立改行を防ぐ */
+@media (max-width:700px){.h0{font-size:clamp(30px,9.4vw,40px)}.hero{padding-top:72px;padding-bottom:64px}}
 </style>
