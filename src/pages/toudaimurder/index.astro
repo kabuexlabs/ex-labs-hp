@@ -53,6 +53,8 @@ const ticker = [
       <div class="hbtns rv d3"><a class="btn" href={`${base}/works/`}>作品一覧を見る</a><a class="btnline" href={TM_LINE_URL}>公式LINEで予約</a><a class="btnx" href={TM_X_URL}>Xを見る</a></div>
     </section>
 
+    <div class="ftmq ftmq-top"><div class="fmin"><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span></div></div>
+
     <section class="bt" id="works">
       <div class="shead wrap rv"><h2 class="sh"><span class="sht en">WORKS</span><span class="shj">作品一覧</span></h2><a class="more en" href={`${base}/works/`}>MORE</a></div>
       <div class="wstrip rv d1">
@@ -150,7 +152,10 @@ const ticker = [
 .tin{display:flex;gap:0;width:max-content;animation:mq 46s linear infinite;padding:9px 0}
 .ti{display:flex;align-items:center;gap:14px;padding:0 32px;font-size:13px;white-space:nowrap;color:var(--dim)}
 .ti::before{content:"●";color:var(--acc);font-size:8px}
-@keyframes mq{to{transform:translateX(-50%)}}
+/* translate3d + will-change でGPU合成を強制する。translateX だと iOS Safari 等で
+   画面外→復帰時にアニメーションが止まる・描画が消えることがある。 */
+@keyframes mq{to{transform:translate3d(-50%,0,0)}}
+.tin,.wsin,.fmin{will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0)}
 .rail{position:fixed;left:0;top:0;bottom:0;width:52px;border-right:1px solid var(--ln);z-index:40;display:flex;align-items:flex-end;justify-content:center;padding:24px 0;box-sizing:border-box;background:#0b0a0c}
 .vtx{writing-mode:vertical-rl;font-size:11px;letter-spacing:.34em;color:var(--dim)}
 .main{margin-left:52px}
@@ -187,6 +192,7 @@ const ticker = [
 .cgrid{display:grid;grid-template-columns:1fr 1.4fr;gap:64px;align-items:start;padding-bottom:96px}
 @media (max-width:900px){.cgrid{grid-template-columns:1fr}}
 .ftmq{overflow:hidden;border-top:1px solid var(--ln);padding:34px 0}
+.ftmq-top{border-top:none}
 .fmin{display:flex;width:max-content;animation:mq 30s linear infinite}
 .fmt{font-family:'Outfit',sans-serif;font-size:96px;font-weight:700;letter-spacing:.06em;white-space:nowrap;color:transparent;-webkit-text-stroke:1px var(--acc);padding-right:60px;line-height:1}
 .ftr2{border-top:1px solid var(--ln);padding-top:56px;padding-bottom:40px}
