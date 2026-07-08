@@ -24,6 +24,9 @@ const STATIC_PATHS = [
   '/toudaimurder/contact/',
   '/taikenbizyutu/',
   '/taikenbizyutu/lostframe/',
+  '/smystery/',
+  '/smystery/events/',
+  '/smystery/company/',
   ...htPaths,
 ];
 

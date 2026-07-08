@@ -1,0 +1,89 @@
+---
+// Smystery 会社概要ページ。
+import SmysteryLayout from '../../../layouts/SmysteryLayout.astro';
+
+const rows = [
+  { k: 'Company', jp: '会社名', v: '株式会社ex Labs' },
+  { k: 'Label', jp: '運営レーベル', v: 'Smystery（スミステリー）' },
+  { k: 'Business', jp: '事業内容', v: 'イマーシブ体験の企画・制作・運営／香りとエンターテインメントの融合事業／ブランドコラボレーション' },
+  { k: 'Concept', jp: 'コンセプト', v: 'Smell（匂い）× Mystery（謎）— 五感で味わう、もうひとつの物語。' },
+  { k: 'Website', jp: '公式サイト', v: 'https://kabuexlabs.com/', link: true },
+];
+
+const pillars = [
+  { n: '01', t: '企画・制作', d: 'イマーシブ体験、街歩き型ミステリー、没入型イベントの企画・制作・運営。' },
+  { n: '02', t: 'ブランド協働', d: '香水・フレグランスをはじめとするブランドとのコラボレーション体験の開発。' },
+  { n: '03', t: '体験設計', d: '香り・空間・物語・テクノロジーを統合した、五感の体験デザイン。' },
+];
+---
+
+<SmysteryLayout
+  title="COMPANY｜株式会社ex Labs / Smystery"
+  description="Smystery（スミステリー）は、株式会社ex Labsが運営する、匂いとミステリーを掛け合わせたイマーシブ体験レーベル。会社概要・事業内容をご紹介します。"
+  current="company"
+>
+
+<section class="phero">
+  <div class="wrap"><span class="eyebrow">Company</span><h1>会社概要</h1><p class="crumb"><a href="/smystery/">HOME</a>　/　COMPANY</p></div>
+</section>
+
+<section class="sec" style="padding-top:56px">
+  <div class="wrap narrow msg rv">
+    <p class="lead mincho">香りは、記憶をひらく鍵。<br><span class="nobr">物語は、世界を変える扉。</span></p>
+    <p><span class="rose">Smystery（スミステリー）</span>は、株式会社ex Labsが運営する、匂い（Smell）とミステリー（Mystery）を掛け合わせたイマーシブ体験レーベルです。実在する香水ブランドや街と協働し、参加者自身が物語の当事者となる、五感で味わう新しいエンターテインメントを企画・制作しています。</p>
+    <p>観るでも、演じるでもない。香りを纏い、街を歩き、選択を重ねながら真実へ近づく——私たちは、記憶に残る「体験」そのものを創り続けます。</p>
+  </div>
+</section>
+
+<section class="sec" style="padding-top:0">
+  <div class="wrap"><div class="pillars">
+    {pillars.map((p) => (
+      <div class="pillar rv"><div class="pn">{p.n}</div><h4 class="mincho">{p.t}</h4><p>{p.d}</p></div>
+    ))}
+  </div></div>
+</section>
+
+<section class="sec" style="padding-top:0">
+  <div class="wrap narrow">
+    <div class="sec-head rv"><span class="eyebrow">Corporate Profile</span><h2 class="sec-title">会社情報</h2></div>
+    <div class="table rv">
+      {rows.map((r) => (
+        <div class="trow"><div class="tk latin">{r.k}<small>{r.jp}</small></div><div class="tv">{r.link ? <a href={r.v} target="_blank" rel="noopener">{r.v}</a> : r.v}</div></div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <p class="clead mincho">物語は、まだ続いていく。</p>
+    <p class="dim cnote"><span class="nobr">公演・コラボレーション・取材に関する</span><wbr><span class="nobr">お問い合わせはお気軽にどうぞ。</span></p>
+    <a class="btn" href="/smystery/#contact">お問い合わせ<span class="ar">→</span></a>
+  </div>
+</section>
+
+<style>
+.msg{text-align:center}
+.msg .lead{font-weight:500;font-size:clamp(22px,3vw,32px);line-height:2;letter-spacing:.1em;color:#f2e9e5;margin:0 auto 28px;max-width:760px}
+.msg p{font-size:15px;line-height:2.35;letter-spacing:.07em;color:#c3b6b1;max-width:680px;margin:0 auto 20px}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.pillar{border:1px solid rgba(201,162,75,.18);padding:36px 28px;text-align:center;background:rgba(16,9,11,.5)}
+.pillar .pn{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:34px;color:#7a1226}
+.pillar h4{font-weight:600;font-size:18px;color:#f2e9e5;margin:14px 0 12px;letter-spacing:.06em}
+.pillar p{font-size:13px;line-height:1.95;color:#b3a6a1;margin:0}
+.table{border-top:1px solid rgba(201,162,75,.18)}
+.trow{display:grid;grid-template-columns:220px 1fr;border-bottom:1px solid rgba(201,162,75,.14)}
+.tk{padding:24px 24px 24px 4px;font-family:'Cormorant Garamond',serif;letter-spacing:.16em;color:#c9a24b;font-size:16px}
+.tk small{display:block;font-family:'Zen Kaku Gothic New',sans-serif;font-size:11px;letter-spacing:.2em;color:#9c8f8a;margin-top:4px}
+.tv{padding:24px 4px;font-size:14.5px;letter-spacing:.05em;color:#d6cac5;line-height:1.9}
+.cta{text-align:center;background:radial-gradient(100% 120% at 50% 0%,rgba(74,15,24,.45),transparent 60%);padding:90px 0}
+.clead{font-size:clamp(22px,3vw,32px);letter-spacing:.1em;color:#f2e9e5;margin:0 0 14px}
+.cnote{font-size:14px;letter-spacing:.08em;line-height:2;max-width:520px;margin:0 auto 26px}
+@media(max-width:900px){
+  .pillars{grid-template-columns:1fr}
+  .trow{grid-template-columns:1fr;gap:0}
+  .tk{padding-bottom:6px}.tv{padding-top:6px;padding-bottom:20px}
+}
+</style>
+
+</SmysteryLayout>

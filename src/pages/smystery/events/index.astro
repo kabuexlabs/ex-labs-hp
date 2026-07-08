@@ -1,0 +1,79 @@
+---
+// Smystery イベント一覧ページ。
+import SmysteryLayout from '../../../layouts/SmysteryLayout.astro';
+
+const TICKET_URL = 'https://escape.id/smystery-org/e-shimokita/';
+const assets = '/assets/smystery';
+---
+
+<SmysteryLayout
+  title="EVENTS｜Smystery イベント一覧"
+  description="Smystery のイベント一覧。開催中の街歩き型イマーシブミステリー『紅漂う街角で 〜ある香水ブランドの秘密〜』をはじめ、香りとミステリーが交わる体験をご紹介します。"
+  current="event"
+>
+
+<section class="phero">
+  <div class="wrap"><span class="eyebrow">Events</span><h1>イベント一覧</h1><p class="crumb"><a href="/smystery/">HOME</a>　/　EVENTS</p></div>
+</section>
+
+<section class="sec" style="padding-top:60px">
+  <div class="wrap">
+    <div class="now rv">
+      <div class="now-vis"><span class="badge">NOW</span><img src={`${assets}/event-waka.webp`} alt="紅漂う街角で ─ ある香水ブランドの秘密" width="595" height="842"></div>
+      <div>
+        <span class="tag">Smystery × WAKA ／ イマーシブミステリー</span>
+        <h2 class="mincho">紅漂う街角で<span class="sm">— ある香水ブランドの秘密 —</span></h2>
+        <div class="meta"><span><b>VENUE</b>下北沢の街</span><span><b>SCENT</b>WAKA FRAGRANCE OF JAPAN</span><span><b>STYLE</b>街歩き型イマーシブ</span></div>
+        <p class="d">香水ブランド「WAKA」の新シリーズ発売にあわせ、下北沢の街で募集された期間限定の訪問販売スタッフ。そのアルバイトに応募したあなたは、ただ香水を届けるだけではない、ある事件へと巻き込まれていく——。実在する香水を実際に体感しながら、街そのものを舞台に物語を進める、街歩き型のイマーシブミステリー。複数のエンディングを備え、何度でも楽しめます。</p>
+        <a class="btn" href={TICKET_URL} target="_blank" rel="noopener">チケット・詳細を見る<span class="ar">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" style="padding-top:0">
+  <div class="wrap">
+    <div class="arch-head rv"><span class="eyebrow">Archive</span><h3 class="mincho">これまでの、そしてこれからの物語</h3></div>
+    <div class="grid">
+      <div class="card rv"><div class="ci"><img src={`${assets}/event-waka.webp`} alt="紅漂う街角で" width="595" height="842"></div><div class="cb"><span class="ct">Immersive Mystery ／ 開催中</span><h4 class="mincho">紅漂う街角で</h4><p>Smystery × WAKA。香水ブランドの秘密をめぐる、下北沢を舞台にした街歩き型イマーシブミステリー。</p><div class="cm">VENUE ｜ 下北沢　·　SCENT ｜ WAKA</div></div></div>
+      <div class="soon rv d1"><div class="s1">Coming Soon</div><div class="s2 mincho">次なる物語を準備中</div><div class="s3"><span class="nobr">香りとミステリーが交わる新たな体験を</span><wbr><span class="nobr">企画しています。続報をお待ちください。</span></div></div>
+    </div>
+  </div>
+</section>
+
+<style>
+.now{display:grid;grid-template-columns:0.95fr 1.05fr;gap:52px;align-items:center;border:1px solid rgba(201,162,75,.2);padding:40px;background:rgba(16,9,11,.5)}
+.now-vis{position:relative}
+.now-vis img{width:100%;border:1px solid rgba(201,162,75,.25);box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.badge{position:absolute;top:-13px;left:-13px;background:#7a1226;color:#f2e9e5;font-family:'Cormorant Garamond',serif;font-size:14px;letter-spacing:.2em;padding:7px 17px;border:1px solid #c9a24b}
+.tag{font-family:'Cormorant Garamond',serif;font-style:italic;letter-spacing:.2em;color:#c9a24b;font-size:16px}
+.now h2{font-weight:700;font-size:clamp(26px,3.4vw,40px);line-height:1.4;letter-spacing:.06em;color:#f2e9e5;margin:12px 0 6px}
+.now h2 .sm{display:block;font-size:.52em;font-weight:500;color:#d98cae;letter-spacing:.12em;margin-top:12px}
+.meta{display:flex;flex-wrap:wrap;gap:10px 24px;margin:22px 0;font-size:13px;color:#c3b6b1;letter-spacing:.06em}
+.meta b{color:#c9a24b;font-weight:500;margin-right:9px;font-family:'Cormorant Garamond',serif;letter-spacing:.16em}
+.now p.d{font-size:14px;line-height:2.2;letter-spacing:.05em;color:#c9bdb8;margin:0 0 26px}
+.arch-head{text-align:center;margin:0 0 50px}
+.arch-head .eyebrow{display:block;margin-bottom:12px}
+.arch-head h3{font-weight:600;font-size:clamp(24px,3vw,34px);letter-spacing:.1em;color:#f2e9e5;margin:0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:28px}
+.card{border:1px solid rgba(201,162,75,.18);background:rgba(16,9,11,.55);overflow:hidden;transition:border-color .4s,transform .4s}
+.card:hover{border-color:rgba(201,162,75,.5);transform:translateY(-6px)}
+.card .ci{position:relative;aspect-ratio:16/10;overflow:hidden}
+.card .ci img{width:100%;height:100%;object-fit:cover}
+.card .cb{padding:26px 28px}
+.card .ct{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;letter-spacing:.16em;color:#c9a24b}
+.card h4{font-weight:600;font-size:22px;letter-spacing:.05em;color:#f2e9e5;margin:8px 0 12px}
+.card p{font-size:13px;line-height:1.9;color:#b3a6a1;margin:0}
+.card .cm{margin-top:16px;font-size:12px;letter-spacing:.08em;color:#9c8f8a}
+.soon{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1px dashed rgba(201,162,75,.3);background:rgba(16,9,11,.3);min-height:340px;padding:40px}
+.soon .s1{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:26px;color:#7a1226;letter-spacing:.16em}
+.soon .s2{font-size:19px;color:#c3b6b1;margin-top:16px;letter-spacing:.1em}
+.soon .s3{font-size:12.5px;color:#9c8f8a;margin-top:14px;line-height:1.9;letter-spacing:.05em}
+@media(max-width:900px){
+  .now,.grid{grid-template-columns:1fr;gap:30px}
+  .now{padding:26px}
+  .now-vis{max-width:320px;margin:0 auto}
+}
+</style>
+
+</SmysteryLayout>

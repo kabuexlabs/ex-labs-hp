@@ -1,0 +1,91 @@
+---
+// Smystery のお問い合わせフォーム (/smystery/ の CONTACT セクション用)。
+//
+// 送信先は本体サイト (kabuexlabs.com) のお問い合わせと同じ Formspree フォーム。
+// このエンドポイントは認証済みで、確実に info@kabuexlabs.com へ届く
+// (toudaimurder / taikenbizyutu のフォームと同じ経緯で Formspree に統一)。
+// 送信は fetch (AJAX) で行い、完了後は当サイトのサンクスページへ遷移する。
+// JS 無効時は通常 POST にフォールバックする (Formspree の完了画面経由)。
+const FORM_ENDPOINT = 'https://formspree.io/f/xykqblal';
+const thanksPath = '/smystery/contact/thanks/';
+---
+
+<form class="form" action={FORM_ENDPOINT} method="POST" data-thanks={thanksPath}>
+  <input type="hidden" name="_subject" value="【Smystery】サイトからのお問い合わせ">
+  <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+
+  <div class="frow">
+    <div class="field">
+      <label for="sm-name">お名前<span class="req">必須</span></label>
+      <input id="sm-name" name="お名前" type="text" required autocomplete="name" placeholder="山田 花子">
+    </div>
+    <div class="field">
+      <label for="sm-mail">メールアドレス<span class="req">必須</span></label>
+      <input id="sm-mail" name="email" type="email" required autocomplete="email" placeholder="you@example.com">
+    </div>
+  </div>
+  <div class="field">
+    <label for="sm-type">お問い合わせ種別</label>
+    <select id="sm-type" name="お問い合わせ種別">
+      <option>公演について</option>
+      <option>コラボレーション</option>
+      <option>取材・メディア</option>
+      <option>その他</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="sm-body">メッセージ<span class="req">必須</span></label>
+    <textarea id="sm-body" name="お問い合わせ内容" required placeholder="お問い合わせ内容をご記入ください"></textarea>
+  </div>
+  <p class="form-err" hidden>送信に失敗しました。お手数ですが時間をおいて再度お試しいただくか、<a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> まで直接ご連絡ください。</p>
+  <div class="form-submit"><button class="btn sendbtn" type="submit">送信する<span class="ar">→</span></button></div>
+  <p class="fnote">ご入力いただいた情報は、お問い合わせへの回答のみに使用いたします。</p>
+</form>
+
+<script>
+// AJAX送信 → 自サイトのサンクスページへ。失敗時はエラー表示して再送可能にする。
+for (const form of document.querySelectorAll<HTMLFormElement>('.form')) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector<HTMLButtonElement>('.sendbtn')!;
+    const err = form.querySelector<HTMLElement>('.form-err')!;
+    err.hidden = true;
+    btn.disabled = true;
+    const original = btn.innerHTML;
+    btn.textContent = '送信中…';
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' },
+      });
+      if (!res.ok) throw new Error(`formspree ${res.status}`);
+      window.location.href = form.dataset.thanks!;
+    } catch {
+      err.hidden = false;
+      btn.disabled = false;
+      btn.innerHTML = original;
+    }
+  });
+}
+</script>
+
+<style>
+.form{max-width:680px;margin:0 auto;text-align:left}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.field{margin-bottom:20px}
+.field label{display:block;font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:.16em;color:#c9a24b;margin-bottom:9px}
+.field label .req{color:#d98cae;margin-left:8px;font-size:10px;letter-spacing:.14em;font-family:'Zen Kaku Gothic New',sans-serif}
+.field input,.field select,.field textarea{width:100%;box-sizing:border-box;background:rgba(16,9,11,.7);border:1px solid rgba(201,162,75,.25);color:#e7ddd9;padding:14px 16px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px;letter-spacing:.04em;transition:border-color .3s;border-radius:0}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#c9a24b}
+.field input::placeholder,.field textarea::placeholder{color:#6f6560}
+.field textarea{min-height:150px;resize:vertical}
+.field select{appearance:none;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,#9c8f8a 50%),linear-gradient(135deg,#9c8f8a 50%,transparent 50%);background-position:calc(100% - 21px) 50%,calc(100% - 16px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.form-err{color:#e79bbb;border:1px solid rgba(217,140,174,.5);padding:12px 16px;margin:0 0 20px;font-size:13px;letter-spacing:.04em;text-align:center}
+.form-err a{color:#e79bbb;text-decoration:underline}
+.form-submit{text-align:center;margin-top:6px}
+.sendbtn{cursor:pointer;font-family:'Shippori Mincho',serif}
+.sendbtn:disabled{opacity:.5;cursor:wait}
+.fnote{font-size:12.5px;line-height:1.9;color:#9c8f8a;letter-spacing:.05em;text-align:center;margin:22px 0 0}
+@media(max-width:700px){.frow{grid-template-columns:1fr;gap:0}}
+</style>

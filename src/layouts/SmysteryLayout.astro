@@ -1,0 +1,208 @@
+---
+// Smystery (/smystery/) 専用レイアウト。
+// 本体サイトとは別ブランドのマイクロサイトなので BaseLayout は使わず、
+// フォント・配色・ヘッダー/フッターをここで完結させる
+// (toudaimurder / taikenbizyutu と同じ方式)。
+// Claude Design のハンドオフ (Smystery.dc.html ほか) を Astro に移植したもの。
+import { jsonLd } from '../lib/microcms';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  /** OGP 画像 (public/ 配下のパス) */
+  ogImage?: string;
+  /** 現在ページのナビ強調キー (concept/event/news/company など) */
+  current?: string;
+}
+
+const {
+  title = 'Smystery｜匂いとミステリーが融合するイマーシブ体験レーベル',
+  description =
+    'Smystery（スミステリー）は、匂い（Smell）とミステリー（Mystery）を掛け合わせたイマーシブ体験レーベル。実在する香水と街を舞台に、あなた自身が物語の当事者になる没入体験を企画・制作します。最新公演『紅漂う街角で』開催中。',
+  ogImage = '/assets/smystery/ogp.jpg',
+  current = '',
+} = Astro.props;
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const canonical = new URL(Astro.url.pathname, site);
+const ogImageAbs = new URL(ogImage, site);
+
+const base = '/smystery';
+const nav = [
+  { href: `${base}/#concept`, label: 'CONCEPT', jp: 'コンセプト', key: 'concept' },
+  { href: `${base}/events/`, label: 'EVENTS', jp: '公演情報', key: 'event' },
+  { href: `${base}/#news`, label: 'NEWS', jp: 'お知らせ', key: 'news' },
+  { href: `${base}/company/`, label: 'COMPANY', jp: '会社概要', key: 'company' },
+];
+
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Smystery',
+  alternateName: 'スミステリー',
+  url: new URL(`${base}/`, site).toString(),
+  logo: new URL('/assets/smystery/smystery-logo.webp', site).toString(),
+  description:
+    '匂い（Smell）とミステリー（Mystery）を掛け合わせたイマーシブ体験レーベル。実在する香水と街を舞台に、参加者自身が物語の当事者となる没入体験を企画・制作します。',
+  parentOrganization: {
+    '@type': 'Organization',
+    name: '株式会社ex Labs',
+    url: 'https://kabuexlabs.com/',
+  },
+};
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:url" content={canonical}>
+<meta property="og:image" content={ogImageAbs}>
+<meta property="og:site_name" content="Smystery">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet">
+<script type="application/ld+json" set:html={jsonLd(orgLd)} />
+<noscript><style>.rv{opacity:1 !important;transform:none !important}</style></noscript>
+<slot name="head" />
+</head>
+<body>
+<div class="page">
+<header class="hdr" id="hdr"><div class="wrap hdr-in"><a href={`${base}/`} aria-label="Smystery トップページ"><img class="hlogo" src="/assets/smystery/smystery-logo.webp" alt="Smystery" width="140" height="82"></a><button class="burger" id="burger" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="snav"><span></span><span></span><span></span></button><nav class="nav" id="snav" aria-label="メニュー">{nav.map((item) => <a class={`navlink${current === item.key ? ' cur' : ''}`} href={item.href}>{item.label}<small>{item.jp}</small></a>)}<a class="navcta" href={`${base}/#contact`}>CONTACT</a></nav></div></header>
+
+<slot />
+
+<footer class="footer"><div class="wrap"><a href={`${base}/`}><img src="/assets/smystery/smystery-logo.webp" alt="Smystery" width="120" height="70" loading="lazy"></a><nav><a href={`${base}/#concept`}>CONCEPT</a><a href={`${base}/events/`}>EVENTS</a><a href={`${base}/#news`}>NEWS</a><a href={`${base}/company/`}>COMPANY</a><a href={`${base}/#contact`}>CONTACT</a></nav><div class="hair" style="max-width:200px;margin:0 auto 24px"></div><p class="fcredit">企画・運営：<a href="https://kabuexlabs.com/">株式会社 ex Labs</a></p><p class="copy">© 2026 Smystery / ex Labs Inc. All Rights Reserved.</p></div></footer>
+</div>
+
+<style is:global>
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:#0a0708;color:#e7ddd9;font-family:'Zen Kaku Gothic New',sans-serif;font-weight:300;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:#d98cae;text-decoration:none;transition:color .3s}
+a:hover{color:#f0b6ce}
+img{max-width:100%;display:block}
+::selection{background:#7a1226;color:#f4e9e6}
+.page{min-height:100vh}
+.mincho{font-family:'Shippori Mincho',serif}
+.latin{font-family:'Cormorant Garamond',serif}
+.wrap{max-width:1180px;margin:0 auto;padding:0 40px;box-sizing:border-box}
+.narrow{max-width:840px}
+.eyebrow{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:19px;letter-spacing:.24em;color:#c9a24b;text-transform:uppercase}
+.hair{height:1px;background:linear-gradient(90deg,transparent,#6b1220 30%,#c9a24b 50%,#6b1220 70%,transparent)}
+.gold{color:#c9a24b}
+.rose{color:#d98cae}
+.dim{color:#9c8f8a}
+.nobr{display:inline-block}
+/* header */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:50;transition:background .5s,backdrop-filter .5s,border-color .5s,padding .4s;border-bottom:1px solid transparent;padding:20px 0}
+.hdr.on{background:rgba(10,7,8,.84);backdrop-filter:blur(14px);border-bottom:1px solid rgba(201,162,75,.18);padding:13px 0}
+.hdr-in{display:flex;align-items:center;justify-content:space-between}
+.hlogo{height:38px;width:auto;transition:height .4s}
+.hdr.on .hlogo{height:30px}
+.nav{display:flex;align-items:center;gap:34px}
+.navlink{display:flex;flex-direction:column;gap:3px;font-family:'Cormorant Garamond',serif;font-size:16px;letter-spacing:.1em;color:#e7ddd9;position:relative}
+.navlink small{font-family:'Zen Kaku Gothic New',sans-serif;font-size:9.5px;letter-spacing:.24em;color:#9c8f8a}
+.navlink:hover,.navlink.cur{color:#c9a24b}
+.navlink:hover small,.navlink.cur small{color:#c9a24b}
+.navcta{display:inline-block;border:1px solid #c9a24b;color:#c9a24b;padding:11px 22px;font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:.2em;transition:all .35s;max-width:100%;box-sizing:border-box}
+.navcta:hover{background:#c9a24b;color:#0a0708}
+.burger{display:none;flex-direction:column;gap:6px;background:none;border:none;cursor:pointer;padding:6px;z-index:70}
+.burger span{width:26px;height:1.5px;background:#e7ddd9;transition:.3s}
+.burger.open span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0}
+.burger.open span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+/* sections */
+.sec{position:relative;padding:120px 0}
+.sec-head{text-align:center;margin-bottom:60px}
+.sec-head .eyebrow{display:block;margin-bottom:14px}
+.sec-title{font-family:'Shippori Mincho',serif;font-weight:600;font-size:clamp(28px,4vw,44px);letter-spacing:.1em;color:#f2e9e5;margin:0;line-height:1.45}
+.btn{display:inline-flex;align-items:center;gap:14px;background:linear-gradient(135deg,#9b1a5c,#7a1226);color:#f4e9e6;padding:16px 32px;font-family:'Shippori Mincho',serif;font-size:15px;letter-spacing:.14em;border:1px solid rgba(201,162,75,.4);transition:all .4s;cursor:pointer}
+.btn:hover{color:#fff;box-shadow:0 12px 40px rgba(155,26,92,.5);transform:translateY(-3px)}
+.btn .ar{font-family:'Cormorant Garamond',serif;font-size:18px}
+.btn-ghost{display:inline-flex;align-items:center;gap:12px;border:1px solid #c9a24b;color:#c9a24b;padding:15px 30px;font-family:'Shippori Mincho',serif;font-size:14px;letter-spacing:.14em;transition:all .35s;background:none;cursor:pointer}
+.btn-ghost:hover{background:#c9a24b;color:#0a0708}
+/* page hero (sub pages) */
+.phero{position:relative;padding:180px 0 84px;text-align:center;background:radial-gradient(120% 90% at 50% 0%,rgba(90,15,24,.4),transparent 60%)}
+.phero .eyebrow{display:block;margin-bottom:16px}
+.phero h1{font-family:'Shippori Mincho',serif;font-weight:600;font-size:clamp(30px,5vw,52px);letter-spacing:.12em;color:#f2e9e5;margin:0}
+.crumb{margin-top:22px;font-family:'Cormorant Garamond',serif;font-size:14px;letter-spacing:.14em;color:#9c8f8a}
+/* footer */
+.footer{border-top:1px solid rgba(201,162,75,.16);padding:56px 0 40px;text-align:center}
+.footer img{height:32px;width:auto;opacity:.85;margin:0 auto 22px}
+.footer nav{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin-bottom:24px;font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:.12em}
+.fcredit{font-size:12px;letter-spacing:.08em;color:#9c8f8a;margin:0 0 8px}
+.copy{font-size:11px;letter-spacing:.18em;color:#6f6560;margin:0}
+/* reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s cubic-bezier(.22,.61,.36,1)}
+.rv.on{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
+/* mobile */
+@media(max-width:900px){
+.nav{position:fixed;inset:0;background:rgba(10,7,8,.97);backdrop-filter:blur(20px);flex-direction:column;justify-content:center;gap:30px;transform:translateX(100%);transition:transform .45s;z-index:60}
+.nav.open{transform:translateX(0)}
+.burger{display:flex}
+.navlink{font-size:22px;align-items:center}
+.navlink small{font-size:11px}
+.wrap{padding:0 24px}
+.sec{padding:84px 0}
+.sec-head{margin-bottom:44px}
+.phero{padding:150px 0 66px}
+body.noscroll{overflow:hidden}
+}
+@media (prefers-reduced-motion:reduce){
+html{scroll-behavior:auto}
+.rv{opacity:1;transform:none;transition:none}
+}
+</style>
+
+<script>
+// ヘッダーのスクロール切り替え
+const hdr = document.getElementById('hdr');
+const onScroll = () => hdr?.classList.toggle('on', window.scrollY > 40);
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+
+// スクロール連動フェードイン (.rv → .on)
+const io = new IntersectionObserver(
+  (entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); }
+    }
+  },
+  { threshold: 0, rootMargin: '0px 0px -8% 0px' },
+);
+document.querySelectorAll('.rv').forEach((el) => io.observe(el));
+
+// モバイルのハンバーガーメニュー
+const burger = document.getElementById('burger');
+const snav = document.getElementById('snav');
+if (burger && snav) {
+  const close = () => {
+    snav.classList.remove('open');
+    burger.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
+    burger.setAttribute('aria-label', 'メニューを開く');
+    document.body.classList.remove('noscroll');
+  };
+  burger.addEventListener('click', () => {
+    const open = snav.classList.toggle('open');
+    burger.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+    document.body.classList.toggle('noscroll', open);
+  });
+  snav.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+}
+</script>
+</body>
+</html>
