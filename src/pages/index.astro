@@ -39,11 +39,11 @@ const liveEvents = [
 // 取引先企業様 — client/partner company logos shown above the 展開団体
 // marquee. Same duplicate-and-loop pattern as `groups` below.
 const partners: { name: string; logo: string; h?: number }[] = [
-  { name: '株式会社サイバーエージェント', logo: '/assets/partners/cyberagent.webp', h: 32 },
+  { name: '株式会社サイバーエージェント', logo: '/assets/partners/cyberagent.webp', h: 48 },
+  { name: 'Skyland Ventures', logo: '/assets/partners/skylandventures.webp', h: 64 },
   { name: 'apri la porta', logo: '/assets/partners/aprilaporta.webp', h: 50 },
   { name: 'Light and Geek', logo: '/assets/partners/lightandgeek.webp', h: 76 },
   { name: 'XANATIVE（物語体験ライブラリ）', logo: '/assets/partners/xanative.webp', h: 56 },
-  { name: 'Skyland Ventures', logo: '/assets/partners/skylandventures.webp', h: 64 },
 ];
 const partnerItems = Array(2).fill(partners).flat();
 
@@ -95,7 +95,7 @@ const marqueeItems = Array(2).fill(groups).flat();
 </div>
 <div class="marquee-block">
 <p class="marquee-label">取引先企業様</p>
-<div class="marquee"><div class="marquee-track">
+<div class="marquee"><div class="marquee-track partners-track">
 {partnerItems.map((p) => (
   <img class="marquee-logo" src={p.logo} alt={p.name} style={p.h ? `height:${p.h}px` : undefined} loading="eager" decoding="async" />
 ))}
