@@ -14,6 +14,7 @@ const STATIC_PATHS = [
   '/services/nazotoki-kenshu/',
   '/services/murder-mystery/',
   '/services/shisetsu-event/',
+  '/services/immersive/',
   '/services/zunousen/',
   '/toudaimurder/',
   '/toudaimurder/works/',
