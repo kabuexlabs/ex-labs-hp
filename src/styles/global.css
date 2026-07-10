@@ -373,7 +373,12 @@ a:hover>.blog-img{opacity:.88}
    instead of crawling slower over less distance. */
 .marquee-track.partners-track{animation-duration:30.43s}
 .marquee-name{font-size:20px;font-weight:700;color:rgba(51,48,43,.55);white-space:nowrap}
-.marquee-logo{height:44px;width:auto;mix-blend-mode:multiply;opacity:.85}
+/* No mix-blend-mode: blending an element that lives inside a
+   transform-animated track makes the browser intermittently fail to
+   composite it, so logos would vanish at random (esp. iOS Safari). All
+   logos are transparent PNG/WebP, so they sit cleanly on the ground
+   without any blend trick. */
+.marquee-logo{height:44px;width:auto;opacity:.9}
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 36px))}}
 @media (prefers-reduced-motion: reduce){.marquee-track{animation:none}}
 
