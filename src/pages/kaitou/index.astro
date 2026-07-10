@@ -216,15 +216,18 @@ const faqs = [
 <div class="sechead rv"><span class="label">Contact</span><h2 class="h2">お問い合わせ</h2><span class="rule"></span></div>
 <div class="narrow contact-box rv">
 <p class="contact-lead">公演に関するお問い合わせは、下記フォームよりご連絡ください。</p>
-<form class="cform" id="cform">
+<form class="cform" id="cform" action="https://formspree.io/f/xykqblal" method="POST" data-thanks="sentbox">
+<input type="hidden" name="_subject" value="【怪盗と秘密の試験】サイトからのお問い合わせ">
+<input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
 <div class="frow2">
-<label class="flab">お名前<input class="fin" name="name" required placeholder="山田 太郎"></label>
-<label class="flab">メールアドレス<input class="fin" type="email" name="email" required placeholder="mail@example.com"></label>
+<label class="flab" for="cf-name">お名前<input id="cf-name" class="fin" name="お名前" required autocomplete="name" placeholder="山田 太郎"></label>
+<label class="flab" for="cf-mail">メールアドレス<input id="cf-mail" class="fin" type="email" name="email" required autocomplete="email" placeholder="mail@example.com"></label>
 </div>
-<label class="flab">件名<select class="fin" name="subject"><option>チケットについて</option><option>団体・貸切について</option><option>取材・掲載について</option><option>その他</option></select></label>
-<label class="flab">お問い合わせ内容<textarea class="fin" name="message" rows="6" required></textarea></label>
-<button class="buy fsubmit" type="submit">送信する</button>
-<div class="tnote tnote-center">※フォームの送信先は現在未接続です（デモ）。接続先決定後に設定してください。</div>
+<label class="flab" for="cf-subject">件名<select id="cf-subject" class="fin" name="件名"><option>チケットについて</option><option>団体・貸切について</option><option>取材・掲載について</option><option>その他</option></select></label>
+<label class="flab" for="cf-message">お問い合わせ内容<textarea id="cf-message" class="fin" name="お問い合わせ内容" rows="6" required></textarea></label>
+<p class="form-err" hidden>送信に失敗しました。お手数ですが時間をおいて再度お試しいただくか、<a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> まで直接ご連絡ください。</p>
+<button class="buy fsubmit sendbtn" type="submit">送信する</button>
+<div class="tnote tnote-center">ご入力いただいた情報は、お問い合わせへの回答のみに使用いたします。</div>
 </form>
 <div class="sent-box" id="sentbox" hidden>
 <div class="sent-h">送信ありがとうございました</div>
@@ -249,6 +252,7 @@ const faqs = [
 
 <style is:global>
 :root{--accent:#C9314B;--kvdim:0.55}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth}
 body{margin:0;background:#0E0716;color:#ECE4DA;font-family:'Zen Old Mincho',serif;line-height:1.9}
 a{color:#D8B4C0;text-decoration:none}
@@ -288,7 +292,7 @@ a:hover{color:#E85C74}
 .kv-org{font-size:12px;letter-spacing:.42em;color:#A79DB3}
 .kv-title{font-size:clamp(40px,7vw,84px);font-weight:900;letter-spacing:.08em;line-height:1.3;margin:0;text-shadow:0 4px 40px rgba(0,0,0,.6)}
 .kv-sub{font-size:clamp(11px,1.3vw,15px);letter-spacing:.5em;color:#D8B4C0}
-.badge{border:1px solid rgba(236,228,218,.35);padding:6px 18px;font-size:12px;letter-spacing:.3em}
+.badge{border:1px solid rgba(236,228,218,.35);padding:6px 18px;font-size:12px;letter-spacing:.3em;word-break:keep-all;line-height:1.9}
 .kv-date{font-size:clamp(20px,2.6vw,30px);font-weight:700;letter-spacing:.24em;color:#FDF6EC}
 .kv-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 28px;font-size:15px;letter-spacing:.2em;margin-top:14px}
 @keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
@@ -370,13 +374,16 @@ a:hover{color:#E85C74}
 /* CONTACT */
 .contact-box{text-align:center;display:flex;flex-direction:column;align-items:center;gap:24px}
 .contact-lead{margin:0;font-size:15px;letter-spacing:.1em}
-.cform{display:flex;flex-direction:column;gap:22px;width:100%;max-width:640px;text-align:left}
+.cform{display:flex;flex-direction:column;gap:22px;width:100%;max-width:640px;text-align:left;box-sizing:border-box}
+.form-err{color:#E79BBB;border:1px solid rgba(201,49,75,.5);background:rgba(201,49,75,.06);padding:12px 16px;margin:0;font-size:13px;letter-spacing:.04em;text-align:center}
+.form-err a{color:#E79BBB;text-decoration:underline}
+.sendbtn:disabled{opacity:.5;cursor:wait}
 .frow2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
 .flab{display:flex;flex-direction:column;gap:8px;font-size:13px;letter-spacing:.16em;color:#C9BFD4}
 .fin{background:#0E0716;border:1px solid rgba(236,228,218,.2);color:#ECE4DA;font-family:'Zen Old Mincho',serif;font-size:15px;padding:12px 14px;letter-spacing:.06em}
 .fin:focus{outline:none;border-color:var(--accent)}
 .fsubmit{cursor:pointer;font-family:'Zen Old Mincho',serif;align-self:center;border:1px solid rgba(253,246,236,.25)}
-.sent-box{border:1px solid rgba(201,49,75,.5);background:rgba(201,49,75,.06);padding:44px 32px;display:flex;flex-direction:column;gap:18px;align-items:center;width:100%;max-width:640px}
+.sent-box{border:1px solid rgba(201,49,75,.5);background:rgba(201,49,75,.06);padding:44px 32px;display:flex;flex-direction:column;gap:18px;align-items:center;width:100%;max-width:640px;box-sizing:border-box}
 .sent-h{font-size:20px;font-weight:700;letter-spacing:.16em}
 .sent-p{margin:0;font-size:14px;color:#C9BFD4}
 
@@ -404,6 +411,11 @@ a:hover{color:#E85C74}
 .sec{padding:80px 20px}
 .frow2{grid-template-columns:1fr}
 .fab{right:14px;bottom:14px;padding:14px 22px;font-size:13px}
+}
+/* スマホでは KV タイトルを1行に収め、末尾の1文字が孤立しないようにする */
+@media(max-width:560px){
+.kv-title{font-size:clamp(32px,9vw,40px);letter-spacing:.04em;word-break:keep-all}
+.badge{letter-spacing:.22em}
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -442,15 +454,33 @@ html{scroll-behavior:auto}
     });
   }
 
-  // お問い合わせフォーム（送信先未接続のデモ）
+  // お問い合わせフォーム。Formspree 経由で info@kabuexlabs.com へ届く
+  // （本体サイト・他LPと同じ認証済みエンドポイント）。AJAX送信し、
+  // 成功時はデザイン通りのサンクス表示、失敗時はエラー表示して再送可能にする。
+  // JS無効時はブラウザ標準POSTにフォールバック（Formspreeの完了画面経由）。
   var form = document.getElementById('cform');
   var sent = document.getElementById('sentbox');
   var reset = document.getElementById('cformreset');
   if (form && sent) {
+    var err = form.querySelector('.form-err');
+    var btn = form.querySelector('.sendbtn');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      form.hidden = true;
-      sent.hidden = false;
+      if (err) err.hidden = true;
+      var label = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = '送信中…'; }
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' }
+      }).then(function (res) {
+        if (!res.ok) throw new Error('formspree ' + res.status);
+        form.hidden = true;
+        sent.hidden = false;
+      }).catch(function () {
+        if (err) err.hidden = false;
+        if (btn) { btn.disabled = false; btn.textContent = label; }
+      });
     });
   }
   if (reset && form && sent) {
@@ -458,6 +488,8 @@ html{scroll-behavior:auto}
       sent.hidden = true;
       form.hidden = false;
       form.reset();
+      var b = form.querySelector('.sendbtn');
+      if (b) { b.disabled = false; b.textContent = '送信する'; }
     });
   }
 })();
