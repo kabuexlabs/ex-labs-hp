@@ -96,9 +96,16 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
 .hero-actions{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .42s both}
 /* Full-width works marquee */
 .hero-works{position:relative;z-index:2;overflow:hidden;animation:fade-in 1.2s ease .5s both}
-.hero-works-track{display:flex;align-items:center;gap:14px;width:max-content;animation:marquee-works 55s linear infinite}
-.hero-works-track img{height:250px;width:auto;border-radius:10px;flex:none}
-@keyframes marquee-works{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 7px))}}
+/* Seamless marquee: spacing lives on each image as margin-right (not a
+   track gap) so the total width divides evenly across the duplicated
+   copies — this makes translateX(-50%) land exactly on a copy boundary
+   with no half-gap seam. The image list is duplicated enough times
+   (see HeroWorksMarquee.astro) that one -50% copy is always wider than
+   the viewport, so the strip never runs out and "cuts off" mid-loop on
+   wide screens. */
+.hero-works-track{display:flex;align-items:center;width:max-content;animation:marquee-works 55s linear infinite}
+.hero-works-track img{height:250px;width:auto;border-radius:10px;flex:none;margin-right:14px}
+@keyframes marquee-works{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .scrollcue{display:none}
 @keyframes scroll-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
 @keyframes float-slow{0%,100%{transform:translateY(0)}50%{transform:translateY(-24px)}}
