@@ -1,0 +1,467 @@
+---
+// 公演「怪盗と秘密の試験」（IMMERSIVE ILLUSION）公式ティザーLP。
+// まだ一般公開しないサブページ — noindex を付け、サイトマップ
+// (src/pages/sitemap.xml.ts の STATIC_PATHS) にも載せていない。
+// コーポレートサイトとはデザイン系統が別物なので BaseLayout は
+// 使わず、このファイルだけで完結させている。
+// デザインハンドオフ（Claude Design）を Astro に移植したもの。
+
+// キャスト追加発表後は COMING SOON カードを実キャストに差し替える。
+const castComingSoon = true;
+
+const title = '【公式】怪盗と秘密の試験 | イマーシブイリュージョン';
+const description =
+  '会員制バー周遊型 イマーシブ×マジック公演「怪盗と秘密の試験」公式サイト。2026年9月、東京・六本木にて開催。出演マジシャン：才藤大芽。その扉が、昼の光の中で、静かにひらく。';
+
+const newsItems = [
+  { date: '2026.07.11', text: 'ティザーサイトを公開しました' },
+  { date: '2026.07.11', text: '出演マジシャンに才藤大芽の出演が決定しました' },
+];
+
+const abouts = [
+  {
+    num: '01',
+    h: '昼のバーが、<br>試験会場になる。',
+    p: '普段は夜にしか扉を開かない、六本木の会員制バー。本公演では、その複数店舗を昼間だけ特別に周遊します。ふだん足を踏み入れることのできない空間そのものが、物語の舞台です。',
+  },
+  {
+    num: '02',
+    h: '目の前で起こる、<br>本物のマジック。',
+    p: '世界大会日本代表マジシャン・才藤大芽によるイリュージョンが、手の届く距離で物語を動かします。演出ではない、本物の「あり得ない」を体験してください。',
+  },
+  {
+    num: '03',
+    h: '観客ではなく、<br>“受験者”として。',
+    p: 'あなたは客席から観るのではなく、怪盗の仕掛けた試験に挑む登場人物のひとり。選び、迷い、確かめる。あなたの選択が、物語の行方を左右します。',
+  },
+];
+
+const faqs = [
+  { q: '昼間の開催ですか？', a: 'はい。普段は夜にしか営業していない会員制バーを、昼間だけ特別にお借りして開催します。明るい時間の六本木を、バーからバーへ巡っていただきます。' },
+  { q: 'マジックショーとの違いは何ですか？', a: '客席から観るショーではなく、あなた自身が「試験の受験者」として物語に参加するイマーシブ（没入型）体験です。マジックは物語を動かす手がかりとして、目の前で起こります。' },
+  { q: 'イマーシブ体験が初めてでも楽しめますか？', a: 'はい、初めての方もお楽しみいただけます。特別な知識や準備は必要ありません。' },
+  { q: '謎解きが苦手なのですが大丈夫ですか？', a: 'ひらめき力は必要ありません。手がかりを見つけ、あなた自身の選択を楽しんでいただく体験です。' },
+  { q: '1人でも参加できますか？', a: 'はい、お1人でのご参加も歓迎です。複数名でのご参加ももちろんお楽しみいただけます。' },
+  { q: 'お酒は飲めますか？', a: 'ドリンク提供の有無・内容は現在調整中です。決定次第、本ページにてご案内いたします。（仮）' },
+  { q: '服装の指定はありますか？', a: '指定はありませんが、店舗間を徒歩で移動しますので、歩きやすい服装・靴でのご来場をおすすめします。' },
+];
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="怪盗と秘密の試験">
+<meta property="og:locale" content="ja_JP">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;700;900&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header class="hdr">
+<div><div class="hdr-title">怪盗と秘密の試験</div><div class="hdr-org latin">IMMERSIVE ILLUSION</div></div>
+<nav class="nav">
+<a href="#news">NEWS</a><a href="#story">STORY</a><a href="#about">ABOUT</a><a href="#cast">CAST</a><a href="#ticket">TICKET</a><a href="#access">ACCESS</a><a href="#faq">FAQ</a><a href="#contact">CONTACT</a>
+</nav>
+<a class="cta" href="#ticket">チケット</a>
+</header>
+
+<main>
+
+<section class="kv" id="kv">
+<div class="kv-scrim"></div>
+<div class="kv-body">
+<div class="kv-logo imgslot" role="img" aria-label="ロゴ画像（準備中）"><span>LOGO</span></div>
+<div class="kv-org latin">IMMERSIVE ILLUSION PRESENTS</div>
+<h1 class="kv-title">怪盗と秘密の試験</h1>
+<div class="kv-sub latin">THE PHANTOM THIEF AND THE SECRET EXAMINATION</div>
+<div class="badge">会員制バー周遊型　イマーシブ×マジック公演</div>
+<div class="kv-date">2026年9月　開催</div>
+<div class="kv-meta"><span>東京・六本木</span><span>出演マジシャン：才藤大芽</span></div>
+</div>
+</section>
+
+<section class="news" id="news">
+<div class="inner">
+<div class="label label-center">News</div>
+{newsItems.map(({ date, text }) => (
+  <div class="news-row"><span class="news-date latin">{date}</span><span>{text}</span></div>
+))}
+</div>
+</section>
+
+<section class="sec" id="story">
+<div class="sechead rv"><span class="label">Story</span><h2 class="h2">ストーリー</h2><span class="rule"></span></div>
+<div class="narrow">
+<p class="story-p rv">夜にしか開かないはずの、六本木の会員制バー。<br>その扉が、昼の光の中で、静かにひらく。</p>
+<div class="yokoku rv">「貴店に眠る<span class="acc">“秘宝”</span>を、頂戴しに参ります。<br>ただし、その前に──<br>資格ある者を選ぶ<span class="acc">“試験”</span>を執り行います。」<span class="yokoku-sign">── 怪盗より</span></div>
+<p class="story-p rv" style="margin-top:48px">一通の予告状とともに、試験に招かれたのは、あなた。<br><br>バーからバーへ。グラスの底に、コースターの裏に、<br>怪盗が残した手がかりが眠っている。<br><br>目の前で起こる、あり得ないはずの出来事──<br>そのマジックだけが、真実へつながる鍵。</p>
+<div class="story-imgs rv">
+<div class="story-img imgslot" role="img" aria-label="バーの内観写真（準備中）"><span>バーの内観写真</span></div>
+<div class="story-img imgslot" role="img" aria-label="雰囲気写真（準備中）"><span>雰囲気写真</span></div>
+</div>
+<p class="story-p rv" style="margin-bottom:0">試験の果てに、あなたは怪盗の正体へたどり着くのか。<br>それとも──あなた自身が、<span class="acc">“共犯者”</span>に選ばれるのか。</p>
+</div>
+</section>
+
+<section class="sec sec-alt" id="about">
+<div class="sechead rv"><span class="label">About</span><h2 class="h2">本公演の楽しみ方</h2><span class="rule"></span></div>
+<div class="inner about-grid">
+{abouts.map(({ num, h, p }) => (
+  <div class="about-card rv"><span class="about-num latin">{num}</span><h3 class="about-h" set:html={h}></h3><p class="about-p">{p}</p></div>
+))}
+</div>
+</section>
+
+<section class="sec" id="cast">
+<div class="sechead rv"><span class="label">Cast</span><h2 class="h2">キャスト</h2><span class="rule"></span></div>
+<div class="inner">
+<div class="cast-main rv">
+<div class="cast-photo imgslot" role="img" aria-label="才藤大芽 宣材写真（準備中）"><span>才藤大芽 宣材写真</span></div>
+<div>
+<div class="cast-role latin">MAGICIAN</div>
+<h3 class="cast-name">才藤大芽</h3>
+<div class="dim cast-latin">SAITO TAIGA</div>
+<p class="cast-bio">京都大学卒という異色の経歴を持つマジシャン・イリュージョニスト。マジック界の最高権威である世界大会「FISM」に日本代表として2度選出され、2021年の全日本マジックチャンピオンシップでは優勝。ハリウッドのマジック界の殿堂「マジックキャッスル」にも出演した。華やかなステージマジックと、観客との対話で進めるテーブルマジックの両輪を得意とし、上品で高級感のあるパフォーマンスに定評がある。</p>
+<div class="cast-links"><a href="https://www.saitotaiga.com/" target="_blank" rel="noopener">Official Site</a><a href="https://twitter.com/taiga365ib" target="_blank" rel="noopener">X (Twitter)</a></div>
+</div>
+</div>
+{castComingSoon && (
+  <div class="soon-grid rv">
+  <div class="soon-card"><div class="soon-circle latin">COMING<br>SOON</div><div class="soon-t">キャスト発表をお待ちください</div></div>
+  <div class="soon-card"><div class="soon-circle latin">COMING<br>SOON</div><div class="soon-t">キャスト発表をお待ちください</div></div>
+  <div class="soon-card"><div class="soon-circle latin">COMING<br>SOON</div><div class="soon-t">キャスト発表をお待ちください</div></div>
+  </div>
+)}
+</div>
+</section>
+
+<section class="sec sec-alt" id="ticket">
+<div class="sechead rv"><span class="label">Ticket</span><h2 class="h2">チケット情報</h2><span class="rule"></span></div>
+<div class="narrow ticket-box rv">
+<div class="price">¥4,900 <small>（税込）/ 1名</small></div>
+<div class="ticket-type">日時指定チケット制</div>
+<a class="buy" href="#ticket" data-ticket>チケットを購入する</a>
+<div class="tnote">※外部チケットサイトが開きます（販売ページ準備中）<br>※表示価格のほか、別途手数料がかかる場合があります</div>
+</div>
+</section>
+
+<section class="sec" id="notes">
+<div class="sechead rv"><span class="label">Notice</span><h2 class="h2">注意事項</h2><span class="rule"></span></div>
+<div class="narrow rv">
+<div class="prep">※以下は準備中の仮の内容を含みます。確定次第、正式な注意事項に差し替えてください。</div>
+<h3 class="notes-h">チケット・ご予約について</h3>
+<ul class="notes-ul">
+<li>日時指定制です。ご希望の回をご予約ください。</li>
+<li>チケット1枚につき、1名様のみご参加いただけます。</li>
+<li>決済完了後の日時変更・キャンセル・返金は承っておりません。</li>
+<li>複数名でご参加の場合は、代表者様がまとめてご購入いただくことをお勧めします。</li>
+</ul>
+<h3 class="notes-h">ご来場・受付について</h3>
+<ul class="notes-ul">
+<li>集合場所は、チケットご購入者にのみ個別にご案内いたします。</li>
+<li>開始時刻を過ぎますとご入場いただけません。10分前を目安にお越しください。</li>
+<li>受付にて有効なチケットをご提示いただけない場合、ご参加をお断りすることがあります。</li>
+</ul>
+<h3 class="notes-h">会場・移動について</h3>
+<ul class="notes-ul">
+<li>本公演は複数の店舗を徒歩で周遊する形式です。屋外の移動を含みますので、歩きやすい服装・靴でお越しください。</li>
+<li>会場は会員制バーのため、店舗名は当日までお伝えできません。</li>
+<li>雨天決行・荒天中止を予定しています。中止の際はご案内いたします。</li>
+</ul>
+<h3 class="notes-h">演出・場内でのお願い</h3>
+<ul class="notes-ul">
+<li>体験中は、出演者・スタッフの案内に必ずお従いください。</li>
+<li>店舗内での許可のない撮影・録音はお断りいたします。</li>
+<li>未体験の方の楽しみを損なわないよう、SNS投稿の際はネタバレへのご配慮をお願いいたします。</li>
+</ul>
+</div>
+</section>
+
+<section class="sec sec-alt" id="access">
+<div class="sechead rv"><span class="label">Access</span><h2 class="h2">アクセス</h2><span class="rule"></span></div>
+<div class="inner acc-grid">
+<div class="acc-dl rv">
+<div class="acc-dt latin" style="margin-top:0">AREA</div><div class="acc-dd">東京・六本木エリア（複数店舗を周遊）</div>
+<div class="acc-dt latin">MEETING POINT</div><div class="acc-dd">集合場所は、チケットご購入者にのみご案内いたします。</div>
+<div class="acc-dt latin">NEAREST STATION</div><div class="acc-dd">東京メトロ日比谷線・都営大江戸線「六本木駅」周辺</div>
+<div class="acc-dt latin">MAP</div><div class="acc-dd"><a href="https://www.google.com/maps/search/?api=1&query=六本木駅" target="_blank" rel="noopener">Google Mapはこちら</a></div>
+</div>
+<iframe class="map rv" src="https://maps.google.com/maps?q=%E5%85%AD%E6%9C%AC%E6%9C%A8%E9%A7%85&t=&z=15&ie=UTF8&iwloc=B&output=embed" loading="lazy" title="六本木エリアの地図"></iframe>
+</div>
+</section>
+
+<section class="sec" id="faq">
+<div class="sechead rv"><span class="label">FAQ</span><h2 class="h2">よくある質問</h2><span class="rule"></span></div>
+<div class="narrow faqlist rv">
+{faqs.map(({ q, a }) => (
+  <details class="faq-item">
+    <summary class="faq-q"><span class="qmark latin">Q</span><span class="faq-qt">{q}</span></summary>
+    <div class="faq-a">{a}</div>
+  </details>
+))}
+</div>
+</section>
+
+<section class="sec sec-alt" id="contact">
+<div class="sechead rv"><span class="label">Contact</span><h2 class="h2">お問い合わせ</h2><span class="rule"></span></div>
+<div class="narrow contact-box rv">
+<p class="contact-lead">公演に関するお問い合わせは、下記フォームよりご連絡ください。</p>
+<form class="cform" id="cform">
+<div class="frow2">
+<label class="flab">お名前<input class="fin" name="name" required placeholder="山田 太郎"></label>
+<label class="flab">メールアドレス<input class="fin" type="email" name="email" required placeholder="mail@example.com"></label>
+</div>
+<label class="flab">件名<select class="fin" name="subject"><option>チケットについて</option><option>団体・貸切について</option><option>取材・掲載について</option><option>その他</option></select></label>
+<label class="flab">お問い合わせ内容<textarea class="fin" name="message" rows="6" required></textarea></label>
+<button class="buy fsubmit" type="submit">送信する</button>
+<div class="tnote tnote-center">※フォームの送信先は現在未接続です（デモ）。接続先決定後に設定してください。</div>
+</form>
+<div class="sent-box" id="sentbox" hidden>
+<div class="sent-h">送信ありがとうございました</div>
+<p class="sent-p">内容を確認のうえ、担当者よりご連絡いたします。<br>数日経っても返信がない場合は、お手数ですが再度お問い合わせください。</p>
+<button class="cta fsubmit" id="cformreset" type="button">フォームに戻る</button>
+</div>
+</div>
+</section>
+
+</main>
+
+<a class="fab" href="#ticket">チケットを購入する</a>
+
+<footer class="ftr">
+<div class="rv">
+<div class="ftr-org latin">IMMERSIVE ILLUSION</div>
+<div class="ftr-jp">イマーシブイリュージョン</div>
+<div class="ftr-staff">主催・企画：イマーシブイリュージョン<br>出演：才藤大芽<br>会場：東京・六本木 会員制バー（複数店舗周遊）<br>運営：<a href="https://kabuexlabs.com/" target="_blank" rel="noopener">株式会社ex Labs</a></div>
+<div class="copy latin">© 2026 IMMERSIVE ILLUSION All Rights Reserved.</div>
+</div>
+</footer>
+
+<style is:global>
+:root{--accent:#C9314B;--kvdim:0.55}
+html{scroll-behavior:smooth}
+body{margin:0;background:#0E0716;color:#ECE4DA;font-family:'Zen Old Mincho',serif;line-height:1.9}
+a{color:#D8B4C0;text-decoration:none}
+a:hover{color:#E85C74}
+.latin{font-family:'Cinzel',serif}
+.acc{color:var(--accent)}
+.dim{color:#A79DB3}
+.sec{padding:110px 24px}
+.sec-alt{background:#120A1E}
+.inner{max-width:1040px;margin:0 auto}
+.narrow{max-width:720px;margin:0 auto}
+.label{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.45em;color:var(--accent);text-transform:uppercase}
+.label-center{text-align:center;display:block;margin-bottom:24px}
+.h2{font-size:34px;font-weight:700;letter-spacing:.12em;margin:10px 0 0;line-height:1.4}
+.sechead{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;margin-bottom:56px}
+.rule{width:56px;height:1px;background:var(--accent);margin-top:22px}
+
+/* 写真プレースホルダー（実素材差し替え時は <img> object-fit:cover に置換） */
+.imgslot{display:flex;align-items:center;justify-content:center;background:rgba(236,228,218,.03);border:1px dashed rgba(236,228,218,.2);box-sizing:border-box}
+.imgslot span{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.24em;color:#6E6180}
+
+/* 固定ヘッダー */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 28px;background:rgba(14,7,22,.82);backdrop-filter:blur(10px);border-bottom:1px solid rgba(236,228,218,.08)}
+.hdr-title{font-size:16px;font-weight:700;letter-spacing:.14em;white-space:nowrap}
+.hdr-org{font-size:10px;letter-spacing:.3em;color:#A79DB3}
+.nav{display:flex;flex-wrap:wrap;gap:22px;font-size:13px;letter-spacing:.18em}
+.nav a{color:#ECE4DA}
+.nav a:hover{color:#E85C74}
+.cta{display:inline-block;background:var(--accent);color:#FDF6EC;padding:10px 26px;font-size:13px;letter-spacing:.22em;border:1px solid rgba(253,246,236,.25);white-space:nowrap;transition:background .3s,transform .3s,color .3s}
+.cta:hover{background:#A82238;color:#FDF6EC}
+
+/* KV */
+.kv{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 30%,#2A1440 0%,#0E0716 70%)}
+.kv-scrim{position:absolute;inset:0;background:rgba(10,4,18,var(--kvdim));pointer-events:none}
+.kv-body{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;padding:120px 24px 80px}
+.kv-logo{width:150px;height:150px;border-radius:16px}
+.kv-org{font-size:12px;letter-spacing:.42em;color:#A79DB3}
+.kv-title{font-size:clamp(40px,7vw,84px);font-weight:900;letter-spacing:.08em;line-height:1.3;margin:0;text-shadow:0 4px 40px rgba(0,0,0,.6)}
+.kv-sub{font-size:clamp(11px,1.3vw,15px);letter-spacing:.5em;color:#D8B4C0}
+.badge{border:1px solid rgba(236,228,218,.35);padding:6px 18px;font-size:12px;letter-spacing:.3em}
+.kv-date{font-size:clamp(20px,2.6vw,30px);font-weight:700;letter-spacing:.24em;color:#FDF6EC}
+.kv-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 28px;font-size:15px;letter-spacing:.2em;margin-top:14px}
+@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+.kv-body>*{animation:rise 1s ease-out both}
+.kv-body>*:nth-child(2){animation-delay:.15s}.kv-body>*:nth-child(3){animation-delay:.3s}.kv-body>*:nth-child(4){animation-delay:.45s}.kv-body>*:nth-child(5){animation-delay:.6s}.kv-body>*:nth-child(6){animation-delay:.75s}.kv-body>*:nth-child(7){animation-delay:.9s}
+
+/* NEWS */
+.news{background:#160C24;border-top:1px solid rgba(236,228,218,.07);border-bottom:1px solid rgba(236,228,218,.07);padding:56px 24px}
+.news .inner{max-width:1040px}
+.news-row{display:flex;gap:24px;padding:16px 0;border-bottom:1px solid rgba(236,228,218,.1);font-size:14px;letter-spacing:.06em}
+.news-date{color:var(--accent);letter-spacing:.12em;white-space:nowrap}
+
+/* STORY */
+.story-p{font-size:17px;letter-spacing:.1em;line-height:2.4;text-align:center;margin:0 0 48px}
+.yokoku{border:1px solid rgba(201,49,75,.5);background:rgba(201,49,75,.06);padding:44px 32px;text-align:center;font-size:18px;letter-spacing:.14em;line-height:2.4;position:relative}
+.yokoku-sign{display:block;margin-top:18px;font-size:15px;letter-spacing:.4em;color:var(--accent)}
+.story-imgs{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:64px 0}
+.story-img{height:260px;border-radius:4px}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.about-card{background:#160C24;border:1px solid rgba(236,228,218,.1);padding:40px 30px;display:flex;flex-direction:column;gap:16px;transition:transform .35s ease,border-color .35s ease}
+.about-card:hover{transform:translateY(-6px);border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
+.about-num{font-size:30px;color:var(--accent);letter-spacing:.1em}
+.about-h{font-size:20px;font-weight:700;letter-spacing:.1em;line-height:1.7;margin:0}
+.about-p{font-size:14px;color:#C9BFD4;margin:0}
+
+/* CAST */
+.cast-main{display:grid;grid-template-columns:340px 1fr;gap:48px;align-items:start}
+.cast-photo{height:440px;border-radius:4px}
+.cast-role{font-size:12px;letter-spacing:.34em;color:#A79DB3}
+.cast-name{font-size:32px;font-weight:700;letter-spacing:.16em;margin:6px 0 2px}
+.cast-latin{font-size:13px;letter-spacing:.18em}
+.cast-bio{font-size:14.5px;color:#D6CCE0;margin:20px 0 0}
+.cast-links{display:flex;gap:20px;margin-top:20px;font-size:13px;letter-spacing:.1em}
+.cast-links a{border-bottom:1px solid rgba(216,180,192,.4);padding-bottom:2px}
+.soon-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:64px}
+.soon-card{border:1px dashed rgba(236,228,218,.22);padding:36px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;transition:transform .35s ease,border-color .35s ease}
+.soon-card:hover{transform:translateY(-6px);border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
+.soon-circle{width:110px;height:110px;border-radius:50%;background:#1D1130;display:flex;align-items:center;justify-content:center;font-size:11px;letter-spacing:.2em;color:#6E6180;line-height:1.6}
+.soon-t{font-size:13px;letter-spacing:.24em;color:#A79DB3}
+
+/* TICKET */
+.ticket-box{background:#160C24;border:1px solid rgba(201,49,75,.4);padding:64px 32px;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
+.price{font-size:44px;font-weight:700;letter-spacing:.08em}
+.price small{font-size:16px;color:#A79DB3;letter-spacing:.14em}
+.ticket-type{font-size:14px;letter-spacing:.14em}
+.buy{display:inline-block;background:var(--accent);color:#FDF6EC;padding:18px 64px;font-size:16px;letter-spacing:.3em;border:1px solid rgba(253,246,236,.25);transition:background .3s,transform .3s,color .3s}
+.buy:hover{background:#A82238;color:#FDF6EC;transform:translateY(-2px)}
+.tnote{font-size:12px;color:#A79DB3;letter-spacing:.08em}
+.tnote-center{text-align:center}
+
+/* 注意事項 */
+.prep{border:1px solid rgba(236,228,218,.2);background:rgba(236,228,218,.04);padding:14px 20px;font-size:12.5px;color:#A79DB3;letter-spacing:.06em;text-align:center}
+.notes-h{font-size:17px;font-weight:700;letter-spacing:.14em;border-left:2px solid var(--accent);padding-left:14px;margin:44px 0 14px}
+.notes-ul{margin:0;padding-left:22px;font-size:13.5px;color:#C9BFD4}
+.notes-ul li{margin:8px 0}
+
+/* ACCESS */
+.acc-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.acc-dl{font-size:15px}
+.acc-dt{font-size:11px;letter-spacing:.3em;color:var(--accent);margin-top:26px}
+.acc-dd{margin:6px 0 0}
+.map{width:100%;height:340px;border:1px solid rgba(236,228,218,.14);filter:grayscale(1) invert(.92) hue-rotate(200deg)}
+
+/* FAQ */
+.faqlist{}
+.faq-item{border-bottom:1px solid rgba(236,228,218,.12)}
+.faq-q{display:flex;align-items:center;gap:18px;width:100%;color:#ECE4DA;font-family:'Zen Old Mincho',serif;font-size:16px;letter-spacing:.08em;text-align:left;padding:22px 4px;cursor:pointer;list-style:none}
+.faq-q::-webkit-details-marker{display:none}
+.faq-q:hover{color:#E85C74}
+.qmark{color:var(--accent);font-size:18px;flex-shrink:0}
+.faq-qt{flex:1}
+.faq-q::after{content:"+";font-size:20px;color:#A79DB3;flex-shrink:0}
+.faq-item[open] .faq-q::after{content:"−"}
+@keyframes faqin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.faq-a{padding:0 4px 26px 42px;font-size:14.5px;color:#C9BFD4;letter-spacing:.06em;animation:faqin .3s ease-out}
+
+/* CONTACT */
+.contact-box{text-align:center;display:flex;flex-direction:column;align-items:center;gap:24px}
+.contact-lead{margin:0;font-size:15px;letter-spacing:.1em}
+.cform{display:flex;flex-direction:column;gap:22px;width:100%;max-width:640px;text-align:left}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.flab{display:flex;flex-direction:column;gap:8px;font-size:13px;letter-spacing:.16em;color:#C9BFD4}
+.fin{background:#0E0716;border:1px solid rgba(236,228,218,.2);color:#ECE4DA;font-family:'Zen Old Mincho',serif;font-size:15px;padding:12px 14px;letter-spacing:.06em}
+.fin:focus{outline:none;border-color:var(--accent)}
+.fsubmit{cursor:pointer;font-family:'Zen Old Mincho',serif;align-self:center;border:1px solid rgba(253,246,236,.25)}
+.sent-box{border:1px solid rgba(201,49,75,.5);background:rgba(201,49,75,.06);padding:44px 32px;display:flex;flex-direction:column;gap:18px;align-items:center;width:100%;max-width:640px}
+.sent-h{font-size:20px;font-weight:700;letter-spacing:.16em}
+.sent-p{margin:0;font-size:14px;color:#C9BFD4}
+
+/* 固定CTA */
+@keyframes glowpulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent),0 8px 30px rgba(0,0,0,.45)}50%{box-shadow:0 0 0 18px color-mix(in srgb,var(--accent) 0%,transparent),0 8px 30px rgba(0,0,0,.45)}}
+.fab{position:fixed;right:22px;bottom:22px;z-index:60;background:var(--accent);color:#FDF6EC;padding:16px 32px;font-size:14px;letter-spacing:.24em;white-space:nowrap;border:1px solid rgba(253,246,236,.3);animation:glowpulse 2.6s ease-out infinite;transition:transform .3s,background .3s}
+.fab:hover{transform:translateY(-3px) scale(1.03);background:#A82238;color:#FDF6EC}
+
+/* フッター */
+.ftr{border-top:1px solid rgba(236,228,218,.08);padding:64px 24px 40px;text-align:center;background:#0A0511}
+.ftr-org{font-size:18px;letter-spacing:.4em}
+.ftr-jp{font-size:13px;letter-spacing:.3em;margin-top:8px}
+.ftr-staff{font-size:12.5px;color:#A79DB3;letter-spacing:.12em;margin-top:22px;line-height:2.2}
+.copy{font-size:11px;color:#6E6180;letter-spacing:.1em;margin-top:36px}
+
+/* スクロールリビール */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s ease}
+.rv.vis{opacity:1;transform:none}
+
+@media(max-width:1180px){.nav{display:none}}
+@media(max-width:860px){
+.about-grid,.soon-grid,.acc-grid,.story-imgs{grid-template-columns:1fr}
+.cast-main{grid-template-columns:1fr}
+.cast-photo{height:320px}
+.sec{padding:80px 20px}
+.frow2{grid-template-columns:1fr}
+.fab{right:14px;bottom:14px;padding:14px 22px;font-size:13px}
+}
+
+@media (prefers-reduced-motion: reduce){
+html{scroll-behavior:auto}
+.kv-body>*,.fab,.faq-a{animation:none}
+.rv{opacity:1;transform:none;transition:none}
+}
+</style>
+
+<script is:inline>
+(function () {
+  // スクロールリビール
+  var els = document.querySelectorAll('.rv');
+  if (els.length) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+      els.forEach(function (el) { el.classList.add('vis'); });
+    } else {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('vis');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      els.forEach(function (el) { io.observe(el); });
+    }
+  }
+
+  // チケット購入（販売ページ準備中のためダミー）
+  var ticket = document.querySelector('[data-ticket]');
+  if (ticket) {
+    ticket.addEventListener('click', function (e) {
+      e.preventDefault();
+      alert('チケット販売ページは準備中です');
+    });
+  }
+
+  // お問い合わせフォーム（送信先未接続のデモ）
+  var form = document.getElementById('cform');
+  var sent = document.getElementById('sentbox');
+  var reset = document.getElementById('cformreset');
+  if (form && sent) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      form.hidden = true;
+      sent.hidden = false;
+    });
+  }
+  if (reset && form && sent) {
+    reset.addEventListener('click', function () {
+      sent.hidden = true;
+      form.hidden = false;
+      form.reset();
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
