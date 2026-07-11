@@ -1,0 +1,50 @@
+---
+// ネタバレ公開特設サイト トップ：公開済みイベント一覧。
+import NetabareLayout from '../../layouts/NetabareLayout.astro';
+
+const events = [
+  {
+    href: '/netabare/null-arden/',
+    img: '/assets/netabare/null-arden.jpg',
+    title: 'ヌル・アーデン展',
+    meta: '2026.4.15 – 5.17　絵画 × イマーシブ × 謎解き',
+    desc: '“名以外を持たぬ画家” ヌル・アーデンの個展を訪れたあなたたちは、絵画に隠された謎と、閉ざされた空間からの脱出に挑むことになる。「体験する美術館」第1回公演。',
+  },
+  {
+    href: '/netabare/auction/',
+    img: '/assets/netabare/auction.jpg',
+    title: 'ヌル・アーデン展 オークション',
+    meta: '2026.5　マーダーミステリー × オークション',
+    desc: '展示で使用された絵画の複製画を競り落とす特別公演。しかし会場には、怪盗［カラス］の影が――。30分の推理劇の顛末を記録する。',
+  },
+];
+---
+
+<NetabareLayout>
+<div data-screen-label="トップ：ネタバレ公開済みイベント一覧">
+<header class="hero">
+  <img class="herologo" src="/assets/netabare/logo-white.png" alt="株式会社ex Labs" width="2048" height="520">
+  <p class="tagline dim">体験を作る会社 ── 株式会社ex Labs</p>
+  <div class="rule"></div>
+</header>
+<main class="wrap">
+  <h1 class="h2">ネタバレ公開済みイベント一覧</h1>
+  <p class="note">謎解きやマーダーミステリーコンテンツは、<br>ネタバレが致命的な欠陥になる可能性があるため<br>再演が実施されないコンテンツに限ります。</p>
+  <div class="cards">
+    {events.map((ev) => (
+      <article class="card">
+        <a class="posterbox frame" href={ev.href}>
+          <img class="poster" src={ev.img} alt={ev.title} width="1080" height="1546" loading="lazy">
+        </a>
+        <div class="cardbody">
+          <h2 class="ctitle">{ev.title}</h2>
+          <div class="cmeta">{ev.meta}</div>
+          <p class="cdesc">{ev.desc}</p>
+          <a class="btn" href={ev.href}>このイベントのネタバレを見る</a>
+        </div>
+      </article>
+    ))}
+  </div>
+</main>
+</div>
+</NetabareLayout>
