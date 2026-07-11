@@ -418,7 +418,7 @@ a:hover>.blog-img{opacity:.88}
 /* Official label-site links shown under the partner marquee */
 .label-links{margin-top:44px}
 .label-links .marquee-label{margin-bottom:16px}
-.label-links-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:840px;margin:0 auto}
+.label-links-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1080px;margin:0 auto}
 @media(max-width:900px){.label-links-row{grid-template-columns:1fr 1fr}}
 .label-link{display:flex;align-items:center;gap:14px;background:#fff;border:2px solid rgba(244,88,28,.4);border-radius:16px;padding:18px 22px;box-shadow:0 5px 16px rgba(51,48,43,.06);transition:transform .25s,box-shadow .25s}
 .label-link:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(51,48,43,.12)}
@@ -708,3 +708,14 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;back
   /* 縦積み用の下向き矢印を、横並び用の右向き矢印に戻す */
   .flow-step:not(:last-child)::after{top:34px;bottom:auto;left:auto;right:-27px;transform:none;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:15px solid var(--yellow);border-right:none}
 }
+
+/* カルーセル直下の「横にスワイプ」ヒント（BaseLayout の JS が、
+   実際に横へはみ出しているストリップにだけ挿入する）。
+   矢印が左右にゆれて操作を誘導し、一度スクロールすると消える。 */
+.swipe-hint{display:flex;align-items:center;justify-content:center;gap:10px;margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;color:rgba(51,48,43,.5);transition:opacity .45s,visibility .45s}
+.swipe-hint::before{content:'←';color:var(--accent);animation:swipe-nudge-l 1.6s ease-in-out infinite}
+.swipe-hint::after{content:'→';color:var(--accent);animation:swipe-nudge-r 1.6s ease-in-out infinite}
+@keyframes swipe-nudge-l{0%,100%{transform:translateX(0)}50%{transform:translateX(-4px)}}
+@keyframes swipe-nudge-r{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+.swipe-hint.is-fading{opacity:0;visibility:hidden}
+@media (prefers-reduced-motion:reduce){.swipe-hint::before,.swipe-hint::after{animation:none}}
