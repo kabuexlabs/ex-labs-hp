@@ -71,7 +71,10 @@ const orgLd = {
 <style is:global>
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:#0c0b08;color:#e9e4d4;font-family:'Shippori Mincho',serif;-webkit-font-smoothing:antialiased;overflow-wrap:break-word;word-break:normal;line-break:strict}
-img{max-width:100%}
+/* height:auto にしておくことで、CLS 対策で付与した width/height 属性
+   (presentational hint) が実寸として効いてしまうのを防ぎ、幅と
+   aspect-ratio から高さが算出されるようにする。 */
+img{max-width:100%;height:auto}
 a{color:#c9b458;text-decoration:none}a:hover{color:#e5d47f}
 .gold{color:#c9b458}
 .dim{color:#9b957f}
