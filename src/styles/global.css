@@ -16,7 +16,10 @@
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:#fffdf8;color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased}
+/* "palt" tightens Japanese punctuation/kana spacing for an editorial,
+   typeset look; the slight tracking keeps body text from feeling
+   cramped after the squeeze. */
+body{margin:0;background:#fffdf8;color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1;letter-spacing:.015em}
 ::selection{background:var(--yellow);color:var(--ink)}
 strong{font-weight:700}
 .lede strong,.str-body strong{color:var(--ink)}
@@ -41,7 +44,16 @@ img{max-width:100%;display:block}
 .wrap{max-width:1180px;margin:0 auto;padding:0 40px}
 .section{padding:110px 0}
 .eyebrow{font-size:13px;letter-spacing:.24em;font-weight:800;color:var(--accent);margin:0 0 14px;text-align:center}
-.h2{font-size:40px;line-height:1.35;font-weight:800;letter-spacing:.02em;margin:0 0 10px;text-align:center;color:var(--accent)}
+/* Short flanking dashes give the section label a stamped, editorial
+   feel. inline-block (not flex) so pages that override .eyebrow's
+   display or alignment are unaffected. */
+.eyebrow::before,.eyebrow::after{content:'';display:inline-block;width:22px;height:2px;border-radius:1px;background:currentColor;opacity:.45;vertical-align:middle;margin:0 14px 3px}
+.h2{font-size:40px;line-height:1.35;font-weight:800;letter-spacing:.04em;margin:0 0 10px;text-align:center;color:var(--accent)}
+/* Signature underline beneath every section heading — yellow→orange
+   echoes the standalone .rule bar. Dark sections swap to solid yellow
+   since the orange half would sink into their orange ground. */
+.h2::after{content:'';display:block;width:46px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--yellow),var(--accent));margin:18px auto 0}
+.perf .h2::after,.msg-sec .h2::after{background:var(--yellow)}
 .h2sub{font-size:15px;color:rgba(51,48,43,.6);margin:0 auto 56px;font-weight:500;text-align:center;max-width:720px;line-height:1.9}
 /* Uniform gap between a section heading and its first content block
    when there is no .h2sub in between — some pages (notably the
@@ -182,6 +194,11 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 }
 
 .tinted{background-color:var(--cream);background-image:radial-gradient(rgba(244,88,28,.06) 2px,transparent 2px);background-size:28px 28px}
+/* Hairline edge on white cards: shadow-only edges read slightly soft
+   on the cream grounds — the 1px line keeps each block crisp without
+   moving the layout. Kept early in the file so per-card border-top
+   accents declared later (e.g. .svc-card) still win on their side. */
+.str-card,.work-card,.press-item,.event-card,.blog-card,.faq-item,.info-grid,.bullets li,.about-points li,.style-col.them,.svc-card{border:1px solid rgba(51,48,43,.06)}
 .bullets{list-style:none;margin:24px auto 0;padding:0;display:flex;flex-direction:column;gap:12px;max-width:680px;counter-reset:bl}
 .bullets li{display:flex;gap:14px;font-size:15px;line-height:1.7;color:rgba(51,48,43,.85);background:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 3px 12px rgba(51,48,43,.06)}
 .bullets li::before{counter-increment:bl;content:counter(bl);flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:0;box-shadow:0 2px 0 rgba(51,48,43,.15)}
@@ -532,9 +549,12 @@ a.genre-cell:hover{transform:translateY(-5px);box-shadow:0 16px 34px rgba(244,88
 .contact-form button{align-self:center;margin-top:4px;border:none;cursor:pointer;background:#fff;color:var(--accent);box-shadow:0 5px 0 rgba(0,0,0,.15)}
 .contact-form button:hover{background:var(--yellow);color:var(--ink)}
 
-footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
+/* Footer: subtle vertical gradient + brand gradient hairline on top so
+   the page closes on a considered note instead of a flat slab. */
+footer{padding:76px 0 44px;background:linear-gradient(180deg,#3a362f 0%,#2b2823 100%);color:rgba(255,255,255,.85);position:relative}
+footer::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--yellow))}
 .foot-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
-.foot-name{font-weight:800;font-size:15px;margin:0 0 4px;color:#fff}
+.foot-name{font-family:'Shippori Mincho',serif;font-weight:800;font-size:17px;letter-spacing:.05em;margin:0 0 6px;color:#fff}
 .foot-tag{font-size:12px;color:rgba(255,255,255,.55);margin:0 0 6px}
 .foot-addr{font-size:12.5px;color:rgba(255,255,255,.5);margin:0}
 .foot-copy{font-size:12px;color:rgba(255,255,255,.4)}
