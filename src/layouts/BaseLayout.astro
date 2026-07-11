@@ -121,6 +121,20 @@ const orgLd = {
 </div></footer>
 
 <script is:inline>
+/* Safety net: hero logo/headline/marquee use entrance animations that
+   start at opacity:0. On iOS Safari a bfcache "back" restore or a
+   throttled load can leave those animations un-run, freezing the hero
+   invisible. Force any still-hidden hero element visible after the
+   animations would normally have finished, and again on bfcache show. */
+(function () {
+  function ensureHeroVisible() {
+    document.querySelectorAll('.hero-logo,.hero-title,.hero-sub,.hero-actions,.hero-works').forEach(function (el) {
+      if (parseFloat(getComputedStyle(el).opacity) < 0.99) el.style.opacity = '1';
+    });
+  }
+  window.addEventListener('pageshow', function (e) { if (e.persisted) ensureHeroVisible(); });
+  window.addEventListener('load', function () { setTimeout(ensureHeroVisible, 1800); });
+})();
 (function () {
   var header = document.querySelector('header.nav');
   var toggle = document.querySelector('.nav-toggle');

@@ -94,8 +94,13 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
 .hero-title .hl{display:inline-block;background:linear-gradient(180deg,#f4581c 0%,#e04a0f 100%);color:#fff;padding:9px 26px;margin:5px 0;border-radius:10px;box-shadow:0 10px 26px rgba(244,88,28,.35)}
 .hero-sub{font-family:'Shippori Mincho',serif;font-size:13px;letter-spacing:.22em;color:rgba(51,48,43,.55);margin:0 0 36px;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .3s both}
 .hero-actions{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .42s both}
-/* Full-width works marquee */
-.hero-works{position:relative;z-index:2;overflow:hidden;animation:fade-in 1.2s ease .5s both}
+/* Full-width works marquee.
+   NOTE: no entrance fade here on purpose. An `animation:fade-in …both`
+   starts the strip at opacity:0 and, if the animation never advances
+   (iOS Safari bfcache "back" restores, throttled/again-loaded tabs),
+   the key visual gets stuck invisible. The strip's own horizontal
+   scroll is enough motion, and this way it is always painted. */
+.hero-works{position:relative;z-index:2;overflow:hidden}
 /* Seamless marquee: spacing lives on each image as margin-right (not a
    track gap) so the total width divides evenly across the duplicated
    copies — this makes translateX(-50%) land exactly on a copy boundary
@@ -209,6 +214,35 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 .feature-points li::before{counter-increment:fp;content:counter(fp);flex:none;width:21px;height:21px;border-radius:50%;background:var(--accent);color:#fff;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px}
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 .chip{font-size:12.5px;font-weight:700;padding:8px 18px;background:var(--cream);border-radius:999px;color:rgba(51,48,43,.75)}
+
+/* 成果報酬型ビジネスモデルのフロー図（会社資料 p3 を踏襲） */
+.bizmodel-label{margin:64px 0 30px;font-size:14px;font-weight:800;letter-spacing:.04em;color:var(--accent);text-align:center;position:relative;padding-bottom:14px}
+.bizmodel-label::after{content:'';position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:44px;height:3px;border-radius:2px;background:var(--accent)}
+.biz-flow{display:flex;justify-content:center;align-items:flex-start;flex-wrap:nowrap;gap:6px;max-width:1000px;margin:0 auto}
+.biz-node{display:flex;flex-direction:column;align-items:center;gap:14px;flex:1 1 0;min-width:0}
+.biz-circle{width:104px;height:104px;border-radius:50%;border:2px solid var(--accent);color:var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:22px;font-weight:800;box-shadow:0 6px 18px rgba(51,48,43,.08);background:#fff}
+.biz-circle.dark{background:var(--ink);color:#fff;border-color:var(--ink);font-size:19px;letter-spacing:.02em}
+.biz-circle.punch{background:var(--ink);color:#fff;border-color:var(--ink);font-size:11.5px;font-weight:700;line-height:1.55;padding:10px}
+.biz-circle.punch b{color:var(--yellow);font-weight:800;display:block;font-size:13px;margin:2px 0}
+.biz-cap{font-size:13px;line-height:1.6;color:rgba(51,48,43,.72);text-align:center;font-weight:500}
+.biz-cap b{display:block;margin-top:4px;color:var(--accent);font-weight:800;font-size:13.5px}
+.biz-arrow{align-self:flex-start;margin-top:40px;color:var(--accent);font-size:22px;font-weight:800;flex:none}
+.biz-note{max-width:640px;margin:34px auto 0;text-align:center;font-size:14px;line-height:1.9;color:rgba(51,48,43,.75)}
+.biz-note strong{color:var(--accent)}
+@media(max-width:760px){
+  .bizmodel-label{margin-top:48px}
+  .biz-flow{flex-direction:column;align-items:center;gap:2px}
+  .biz-node{flex-direction:row;justify-content:flex-start;gap:18px;width:100%;max-width:340px;text-align:left}
+  .biz-circle{width:84px;height:84px;font-size:19px;flex:none}
+  .biz-circle.dark{font-size:16px}
+  .biz-cap{text-align:left}
+  .biz-arrow{align-self:center;margin:2px 0;transform:rotate(90deg)}
+  /* The punchline node has no side caption, so on phones let it be a
+     full-width rounded banner instead of a fixed circle — text then
+     fits cleanly on one line rather than overflowing a small circle. */
+  .biz-circle.punch{width:100%;height:auto;min-height:64px;border-radius:16px;padding:14px 18px;font-size:13px;line-height:1.5}
+  .biz-circle.punch b{display:inline;font-size:13px;margin:0}
+}
 
 .about-points{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:28px 0 0;padding:0;list-style:none;counter-reset:ap}
 .about-points li{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:16px;box-shadow:0 4px 16px rgba(51,48,43,.07);padding:20px 22px;font-size:13.5px;line-height:1.6;color:rgba(51,48,43,.8);font-weight:500}
