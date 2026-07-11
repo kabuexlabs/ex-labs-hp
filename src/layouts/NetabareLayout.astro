@@ -1,0 +1,133 @@
+---
+// ネタバレ公開特設サイト (/netabare/) 専用レイアウト。
+// Claude Design のハンドオフ (ネタバレ公開特設サイト.dc.html) を Astro に移植したもの。
+// 再演のないコンテンツ (謎解き・マーダーミステリー) のネタバレ記録を公開する特設サイト。
+// 本体サイトとは別トーンのマイクロサイトなので BaseLayout は使わず、
+// フォント・配色・フッターをここで完結させる。
+import { jsonLd } from '../lib/microcms';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  /** OGP 画像 (public/ 配下のパス)。 */
+  ogImage?: string;
+}
+
+const {
+  title = 'ネタバレ公開特設サイト｜株式会社ex Labs',
+  description =
+    '再演を予定していない謎解き・マーダーミステリー公演のネタバレ記録を公開する、株式会社ex Labs の特設サイトです。「ヌル・アーデン展」および「ヌル・アーデン展 オークション」の記録を掲載しています。',
+  ogImage = '/assets/netabare/null-arden.jpg',
+} = Astro.props;
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const canonical = new URL(Astro.url.pathname, site);
+const ogImageAbs = new URL(ogImage, site);
+
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'ネタバレ公開特設サイト',
+  url: canonical.toString(),
+  description:
+    '再演を予定していない謎解き・マーダーミステリー公演のネタバレ記録を公開する特設サイト。',
+  isPartOf: {
+    '@type': 'Organization',
+    name: '株式会社ex Labs',
+    url: 'https://kabuexlabs.com/',
+  },
+};
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:url" content={canonical}>
+<meta property="og:image" content={ogImageAbs}>
+<meta property="og:site_name" content="株式会社ex Labs">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Zen+Old+Mincho:wght@400;700;900&display=swap" rel="stylesheet">
+<script type="application/ld+json" set:html={jsonLd(orgLd)} />
+<slot name="head" />
+</head>
+<body>
+<div class="page">
+<slot />
+<footer class="footer">株式会社ex Labs<br>© ex Labs Inc. All Rights Reserved.</footer>
+</div>
+
+<style is:global>
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#0c0b08;color:#e9e4d4;font-family:'Shippori Mincho',serif;-webkit-font-smoothing:antialiased;overflow-wrap:break-word;word-break:normal;line-break:strict}
+img{max-width:100%}
+a{color:#c9b458;text-decoration:none}a:hover{color:#e5d47f}
+.gold{color:#c9b458}
+.dim{color:#9b957f}
+.page{min-height:100vh}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px;box-sizing:border-box}
+.frame{border:1px solid #6b5f22;outline:1px solid #2a250f;outline-offset:4px}
+.hero{padding:96px 24px 64px;text-align:center;background:radial-gradient(ellipse 80% 60% at 50% 0%,#1a1708 0%,#0c0b08 70%)}
+.herologo{width:min(560px,80vw);display:block;margin:0 auto}
+.tagline{letter-spacing:.42em;font-size:13px;margin-top:28px}
+.rule{width:64px;height:1px;background:#c9b458;margin:40px auto 0;opacity:.7}
+.h2{font-family:'Zen Old Mincho',serif;font-weight:900;font-size:clamp(26px,4vw,40px);letter-spacing:.12em;margin:0;text-align:center}
+.note{max-width:620px;margin:28px auto 0;line-height:2.2;font-size:14px;text-align:center;color:#b8b19a}
+.cards{display:flex;flex-wrap:wrap;justify-content:center;gap:48px;padding:64px 0 96px}
+.card{width:340px;display:flex;flex-direction:column}
+.poster{width:100%;display:block;aspect-ratio:1080/1546;object-fit:cover;filter:saturate(.92)}
+.posterbox{position:relative;overflow:hidden;transition:transform .35s ease}
+.posterbox:hover{transform:translateY(-4px)}
+.cardbody{padding:22px 4px 0;display:flex;flex-direction:column;gap:12px}
+.ctitle{font-family:'Zen Old Mincho',serif;font-weight:700;font-size:21px;letter-spacing:.08em;margin:0}
+.cmeta{font-size:12px;letter-spacing:.14em;color:#9b957f}
+.cdesc{font-size:13px;line-height:1.9;color:#b8b19a;margin:0}
+.btn{display:block;text-align:center;margin-top:8px;padding:14px 10px;border:1px solid #6b5f22;color:#c9b458;font-size:13px;letter-spacing:.22em;transition:background .25s,color .25s;cursor:pointer;background:transparent;font-family:'Shippori Mincho',serif}
+.btn:hover{background:#c9b458;color:#0c0b08}
+.footer{border-top:1px solid #2a250f;padding:40px 24px 48px;text-align:center;font-size:12px;color:#6f6a58;letter-spacing:.18em;line-height:2}
+.dhero{padding:72px 24px 48px;text-align:center;background:radial-gradient(ellipse 80% 60% at 50% 0%,#1a1708 0%,#0c0b08 70%)}
+.back{display:inline-block;font-size:12px;letter-spacing:.24em;margin-bottom:40px}
+.dtitle{font-family:'Zen Old Mincho',serif;font-weight:900;font-size:clamp(28px,5vw,46px);letter-spacing:.1em;margin:0}
+.dsub{margin-top:14px;font-size:13px;letter-spacing:.3em;color:#9b957f}
+.dposter{width:min(360px,70vw);display:block;margin:48px auto 0}
+.meta{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:32px}
+.chip{border:1px solid #4a431f;padding:6px 14px;font-size:11px;letter-spacing:.2em;color:#b8b19a}
+.gate{max-width:640px;margin:64px auto;padding:48px 32px;text-align:center;border:1px solid #6b5f22;outline:1px solid #2a250f;outline-offset:5px;box-sizing:border-box}
+.gtitle{font-family:'Zen Old Mincho',serif;font-weight:700;font-size:22px;letter-spacing:.2em;margin:0;color:#c9b458}
+.gtext{font-size:13px;line-height:2.2;color:#b8b19a;margin:22px 0 0}
+.gbtn{margin:36px auto 0;max-width:340px}
+.article{max-width:680px;margin:0 auto;padding:16px 24px 96px;box-sizing:border-box}
+.sec{font-family:'Zen Old Mincho',serif;font-weight:700;font-size:22px;letter-spacing:.14em;margin:72px 0 0;padding-bottom:14px;border-bottom:1px solid #4a431f;color:#e5d47f}
+.sec3{font-family:'Zen Old Mincho',serif;font-weight:700;font-size:17px;letter-spacing:.1em;margin:48px 0 0;color:#e5d47f}
+.p{font-size:14.5px;line-height:2.15;margin:22px 0 0;color:#d6d0bd;text-wrap:pretty}
+.qt{margin:26px 0 0;padding:18px 24px;border-left:2px solid #6b5f22;background:#12100a;font-size:14px;line-height:2.2;color:#c4bda6}
+.li{font-size:14.5px;line-height:2.2;color:#d6d0bd;margin:10px 0 0;padding-left:1.2em;text-indent:-1.2em}
+.cr{font-size:13px;line-height:2.3;color:#9b957f;margin:26px 0 0}
+.fig{margin:36px 0 0}
+.figimg{width:100%;display:block;border:1px solid #2a250f}
+.cap{font-size:12px;color:#8a8470;text-align:center;margin-top:10px}
+.m0{margin:0}
+.bottomnav{max-width:680px;margin:0 auto;padding:0 24px 96px;display:flex;flex-direction:column;gap:16px;box-sizing:border-box}
+@media(max-width:600px){
+  .hero{padding:64px 20px 44px}.dhero{padding:44px 20px 36px}.herologo{width:82vw}
+  .cards{gap:32px;padding:44px 0 68px}.card{width:100%;max-width:360px}
+  .sec{margin-top:52px;font-size:19px}.sec3{font-size:15px}
+  .p{font-size:14px;line-height:2.05}.li{font-size:14px}
+  .gate{margin:44px auto;padding:34px 20px}.article{padding:12px 20px 72px}
+  .qt{padding:16px 18px}.meta{gap:8px}.chip{font-size:10px;padding:5px 11px}
+  .footer{letter-spacing:.12em}
+}
+</style>
+</body>
+</html>
