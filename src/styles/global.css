@@ -16,7 +16,10 @@
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:#fffdf8;color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased}
+/* "palt" tightens Japanese punctuation/kana spacing for an editorial,
+   typeset look; the slight tracking keeps body text from feeling
+   cramped after the squeeze. */
+body{margin:0;background:#fffdf8;color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1;letter-spacing:.015em}
 ::selection{background:var(--yellow);color:var(--ink)}
 strong{font-weight:700}
 .lede strong,.str-body strong{color:var(--ink)}
@@ -41,7 +44,23 @@ img{max-width:100%;display:block}
 .wrap{max-width:1180px;margin:0 auto;padding:0 40px}
 .section{padding:110px 0}
 .eyebrow{font-size:13px;letter-spacing:.24em;font-weight:800;color:var(--accent);margin:0 0 14px;text-align:center}
-.h2{font-size:40px;line-height:1.35;font-weight:800;letter-spacing:.02em;margin:0 0 10px;text-align:center;color:var(--accent)}
+/* Short flanking dashes give the section label a stamped, editorial
+   feel. inline-block (not flex) so pages that override .eyebrow's
+   display or alignment are unaffected. */
+.eyebrow::before,.eyebrow::after{content:'';display:inline-block;width:22px;height:2px;border-radius:1px;background:currentColor;opacity:.45;vertical-align:middle;margin:0 14px 3px}
+.h2{font-size:40px;line-height:1.35;font-weight:800;letter-spacing:.04em;margin:0 0 10px;text-align:center;color:var(--accent)}
+/* Signature underline beneath every section heading — yellow→orange
+   echoes the standalone .rule bar. Dark sections swap to solid yellow
+   since the orange half would sink into their orange ground. */
+.h2::after{content:'';display:block;width:46px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--yellow),var(--accent));margin:18px auto 0}
+.perf .h2::after,.msg-sec .h2::after{background:var(--yellow)}
+/* Gradient-inked headings — a subtle vertical shade reads as printed
+   metal type rather than flat digital color. Dark sections get a
+   white→warm-white shade instead so they stay readable on orange. */
+@supports((-webkit-background-clip:text)){
+  .h2,.cta-title,.stat-num{background-image:linear-gradient(180deg,#f87638 0%,#d63f06 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .perf .h2,.msg-sec .h2,.cta-title{background-image:linear-gradient(180deg,#fff 30%,#ffdfc2 100%)}
+}
 .h2sub{font-size:15px;color:rgba(51,48,43,.6);margin:0 auto 56px;font-weight:500;text-align:center;max-width:720px;line-height:1.9}
 /* Uniform gap between a section heading and its first content block
    when there is no .h2sub in between — some pages (notably the
@@ -182,6 +201,11 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 }
 
 .tinted{background-color:var(--cream);background-image:radial-gradient(rgba(244,88,28,.06) 2px,transparent 2px);background-size:28px 28px}
+/* Hairline edge on white cards: shadow-only edges read slightly soft
+   on the cream grounds — the 1px line keeps each block crisp without
+   moving the layout. Kept early in the file so per-card border-top
+   accents declared later (e.g. .svc-card) still win on their side. */
+.str-card,.work-card,.press-item,.event-card,.blog-card,.faq-item,.info-grid,.bullets li,.about-points li,.style-col.them,.svc-card{border:1px solid rgba(51,48,43,.06)}
 .bullets{list-style:none;margin:24px auto 0;padding:0;display:flex;flex-direction:column;gap:12px;max-width:680px;counter-reset:bl}
 .bullets li{display:flex;gap:14px;font-size:15px;line-height:1.7;color:rgba(51,48,43,.85);background:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 3px 12px rgba(51,48,43,.06)}
 .bullets li::before{counter-increment:bl;content:counter(bl);flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:0;box-shadow:0 2px 0 rgba(51,48,43,.15)}
@@ -215,33 +239,38 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
 .chip{font-size:12.5px;font-weight:700;padding:8px 18px;background:var(--cream);border-radius:999px;color:rgba(51,48,43,.75)}
 
-/* 成果報酬型ビジネスモデルのフロー図（会社資料 p3 を踏襲） */
-.bizmodel-label{margin:64px 0 30px;font-size:14px;font-weight:800;letter-spacing:.04em;color:var(--accent);text-align:center;position:relative;padding-bottom:14px}
+/* 成果報酬型ビジネスモデルの図。番号付きステップカード＋結論バナー
+   の構成 — 誰が・何を・どう回収するかを1カード1メッセージで示す。 */
+.bizmodel-label{margin:72px 0 34px;font-size:14px;font-weight:800;letter-spacing:.04em;color:var(--accent);text-align:center;position:relative;padding-bottom:14px}
 .bizmodel-label::after{content:'';position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:44px;height:3px;border-radius:2px;background:var(--accent)}
-.biz-flow{display:flex;justify-content:center;align-items:flex-start;flex-wrap:nowrap;gap:6px;max-width:1000px;margin:0 auto}
-.biz-node{display:flex;flex-direction:column;align-items:center;gap:14px;flex:1 1 0;min-width:0}
-.biz-circle{width:104px;height:104px;border-radius:50%;border:2px solid var(--accent);color:var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:22px;font-weight:800;box-shadow:0 6px 18px rgba(51,48,43,.08);background:#fff}
-.biz-circle.dark{background:var(--ink);color:#fff;border-color:var(--ink);font-size:19px;letter-spacing:.02em}
-.biz-circle.punch{background:var(--ink);color:#fff;border-color:var(--ink);font-size:11.5px;font-weight:700;line-height:1.55;padding:10px}
-.biz-circle.punch b{color:var(--yellow);font-weight:800;display:block;font-size:13px;margin:2px 0}
-.biz-cap{font-size:13px;line-height:1.6;color:rgba(51,48,43,.72);text-align:center;font-weight:500}
-.biz-cap b{display:block;margin-top:4px;color:var(--accent);font-weight:800;font-size:13.5px}
-.biz-arrow{align-self:flex-start;margin-top:40px;color:var(--accent);font-size:22px;font-weight:800;flex:none}
-.biz-note{max-width:640px;margin:34px auto 0;text-align:center;font-size:14px;line-height:1.9;color:rgba(51,48,43,.75)}
-.biz-note strong{color:var(--accent)}
-@media(max-width:760px){
-  .bizmodel-label{margin-top:48px}
-  .biz-flow{flex-direction:column;align-items:center;gap:2px}
-  .biz-node{flex-direction:row;justify-content:flex-start;gap:18px;width:100%;max-width:340px;text-align:left}
-  .biz-circle{width:84px;height:84px;font-size:19px;flex:none}
-  .biz-circle.dark{font-size:16px}
-  .biz-cap{text-align:left}
-  .biz-arrow{align-self:center;margin:2px 0;transform:rotate(90deg)}
-  /* The punchline node has no side caption, so on phones let it be a
-     full-width rounded banner instead of a fixed circle — text then
-     fits cleanly on one line rather than overflowing a small circle. */
-  .biz-circle.punch{width:100%;height:auto;min-height:64px;border-radius:16px;padding:14px 18px;font-size:13px;line-height:1.5}
-  .biz-circle.punch b{display:inline;font-size:13px;margin:0}
+.biz-flow{display:flex;align-items:stretch;justify-content:center;gap:10px;max-width:1040px;margin:0 auto}
+.biz-step{flex:1 1 0;min-width:0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 18px 24px;text-align:center;box-shadow:0 8px 22px rgba(51,48,43,.07)}
+.biz-no{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;font-weight:800;font-size:13.5px;box-shadow:0 3px 10px rgba(244,88,28,.35);margin-bottom:14px}
+.biz-t{margin:0 0 8px;font-size:15.5px;font-weight:800;color:var(--ink);line-height:1.5}
+.biz-d{margin:0;font-size:12px;line-height:1.75;color:rgba(51,48,43,.65);font-weight:500}
+.biz-d b{color:var(--accent);font-weight:800}
+/* ex Labs のカードだけ塗りにして「弊社が担う範囲」を主役化 */
+.biz-step.is-ex{background:linear-gradient(160deg,var(--accent),var(--accent-dark));border-color:var(--accent-dark);box-shadow:0 12px 30px rgba(244,88,28,.32)}
+.biz-step.is-ex .biz-no{background:#fff;color:var(--accent);box-shadow:0 3px 10px rgba(0,0,0,.18)}
+.biz-step.is-ex .biz-t{color:#fff;font-size:18px;letter-spacing:.03em}
+.biz-step.is-ex .biz-d{color:rgba(255,255,255,.92)}
+.biz-arrow{align-self:center;color:var(--accent);font-size:20px;font-weight:800;flex:none}
+.biz-punch{max-width:620px;margin:40px auto 0;background:var(--ink);color:#fff;border-radius:20px;padding:30px 32px;text-align:center;box-shadow:0 14px 34px rgba(51,48,43,.22);position:relative;overflow:hidden}
+.biz-punch::before{content:'';position:absolute;width:170px;height:170px;border-radius:50%;background:rgba(255,210,63,.12);top:-80px;right:-55px}
+.biz-punch::after{content:'';position:absolute;width:120px;height:120px;border-radius:50%;background:rgba(244,88,28,.16);bottom:-60px;left:-40px}
+.biz-punch-t{margin:0 0 10px;font-size:21px;letter-spacing:.05em;position:relative;z-index:1}
+.biz-punch-t b{color:var(--yellow)}
+.biz-punch-d{margin:0;font-size:13.5px;line-height:1.9;color:rgba(255,255,255,.85);position:relative;z-index:1}
+.biz-punch-d strong{color:var(--yellow)}
+/* スマホでは縦積みせず、横スワイプのステップカルーセルに */
+@media(max-width:860px){
+  .bizmodel-label{margin-top:56px}
+  .biz-flow{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;gap:8px;margin:0 -22px;padding:4px 22px 16px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .biz-flow::-webkit-scrollbar{display:none}
+  .biz-step{flex:0 0 62%;scroll-snap-align:center}
+  .biz-punch{margin-top:26px;padding:24px 22px}
+  .biz-punch-t{font-size:17.5px}
+  .biz-punch-d{font-size:12.5px}
 }
 
 .about-points{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:28px 0 0;padding:0;list-style:none;counter-reset:ap}
@@ -268,7 +297,8 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 .work-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(51,48,43,.14)}
 /* height:auto so width/height HTML attributes (kept for CLS) never win
    over the responsive layout. */
-.work-img{width:100%;height:auto;aspect-ratio:4/5;border-radius:14px;background:var(--cream);padding:14px;object-fit:contain}
+.work-img{width:100%;height:auto;aspect-ratio:4/5;border-radius:14px;background:var(--cream);padding:14px;object-fit:contain;transition:transform .4s cubic-bezier(.22,1,.36,1)}
+.work-card:hover .work-img{transform:scale(1.035)}
 .work-tag{font-size:11px;font-weight:800;color:#fff;background:var(--accent);letter-spacing:.04em;margin:18px 0 10px;align-self:flex-start;padding:5px 14px;border-radius:999px}
 .work-card.tag-nazotoki .work-tag{background:var(--tag-nazotoki)}
 .work-card.tag-murder .work-tag{background:var(--tag-murder)}
@@ -498,6 +528,10 @@ a.genre-cell:hover{transform:translateY(-5px);box-shadow:0 16px 34px rgba(244,88
 .msg-role2{text-align:center;font-size:13px;letter-spacing:.08em;color:rgba(255,255,255,.85);margin:0 0 8px}
 .msg-name2{text-align:center;font-size:28px;letter-spacing:.3em;margin:0 0 40px}
 .msg-quote2{text-align:center;font-size:clamp(20px,2.4vw,28px);line-height:1.8;letter-spacing:.06em;margin:0 0 32px}
+/* 鉤括弧を黄色で添えて「言葉」としての存在感を出す。行末で
+   括弧だけが孤立しないよう、擬似要素ではなく .nobr 内の実要素
+   （index.astro 側の .q-mark）として組み込む。 */
+.msg-quote2 .q-mark{color:var(--yellow)}
 .msg-body2{max-width:640px;margin:0 auto;font-size:14.5px;line-height:2.1;color:rgba(255,255,255,.95)}
 .msg-bio2{max-width:640px;margin:28px auto 0;padding-top:22px;border-top:1px dotted rgba(255,255,255,.4);font-size:12.5px;line-height:1.9;color:rgba(255,255,255,.8)}
 
@@ -532,9 +566,12 @@ a.genre-cell:hover{transform:translateY(-5px);box-shadow:0 16px 34px rgba(244,88
 .contact-form button{align-self:center;margin-top:4px;border:none;cursor:pointer;background:#fff;color:var(--accent);box-shadow:0 5px 0 rgba(0,0,0,.15)}
 .contact-form button:hover{background:var(--yellow);color:var(--ink)}
 
-footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
+/* Footer: subtle vertical gradient + brand gradient hairline on top so
+   the page closes on a considered note instead of a flat slab. */
+footer{padding:76px 0 44px;background:linear-gradient(180deg,#3a362f 0%,#2b2823 100%);color:rgba(255,255,255,.85);position:relative}
+footer::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--yellow))}
 .foot-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
-.foot-name{font-weight:800;font-size:15px;margin:0 0 4px;color:#fff}
+.foot-name{font-family:'Shippori Mincho',serif;font-weight:800;font-size:17px;letter-spacing:.05em;margin:0 0 6px;color:#fff}
 .foot-tag{font-size:12px;color:rgba(255,255,255,.55);margin:0 0 6px}
 .foot-addr{font-size:12.5px;color:rgba(255,255,255,.5);margin:0}
 .foot-copy{font-size:12px;color:rgba(255,255,255,.4)}
@@ -653,3 +690,32 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .article-body{font-size:14.5px}
   .foot-row{flex-direction:column;align-items:flex-start;gap:12px}
 }
+
+/* ── スマホの横スワイプ・カルーセル ─────────────────────────
+   強み・他社様との違い・提供コンテンツ・制作フローは縦積みだと
+   1画面に1カードで延々スクロールが続くため、.event-row と同じ
+   「はみ出しスワイプ」パターンに変換する。次のカードが端に
+   のぞくことでスワイプできることが伝わる。
+   （このブロックは既存の 640px ルールを上書きするため必ず末尾に置く） */
+@media(max-width:640px){
+  .str-grid,.style-grid,.genre-grid,.flow-row{display:flex;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin:0 -22px;padding:4px 22px 18px;max-width:none;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .str-grid::-webkit-scrollbar,.style-grid::-webkit-scrollbar,.genre-grid::-webkit-scrollbar,.flow-row::-webkit-scrollbar{display:none}
+  .str-card{flex:0 0 84%;scroll-snap-align:center}
+  .style-col{flex:0 0 84%;scroll-snap-align:center}
+  .genre-cell{flex:0 0 72%;scroll-snap-align:center}
+  .flow-row{gap:36px;padding-right:36px}
+  .flow-step{flex:0 0 56%;scroll-snap-align:center}
+  /* 縦積み用の下向き矢印を、横並び用の右向き矢印に戻す */
+  .flow-step:not(:last-child)::after{top:34px;bottom:auto;left:auto;right:-27px;transform:none;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:15px solid var(--yellow);border-right:none}
+}
+
+/* カルーセル直下の「横にスワイプ」ヒント（BaseLayout の JS が、
+   実際に横へはみ出しているストリップにだけ挿入する）。
+   矢印が左右にゆれて操作を誘導し、一度スクロールすると消える。 */
+.swipe-hint{display:flex;align-items:center;justify-content:center;gap:10px;margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;color:rgba(51,48,43,.5);transition:opacity .45s,visibility .45s}
+.swipe-hint::before{content:'←';color:var(--accent);animation:swipe-nudge-l 1.6s ease-in-out infinite}
+.swipe-hint::after{content:'→';color:var(--accent);animation:swipe-nudge-r 1.6s ease-in-out infinite}
+@keyframes swipe-nudge-l{0%,100%{transform:translateX(0)}50%{transform:translateX(-4px)}}
+@keyframes swipe-nudge-r{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+.swipe-hint.is-fading{opacity:0;visibility:hidden}
+@media (prefers-reduced-motion:reduce){.swipe-hint::before,.swipe-hint::after{animation:none}}

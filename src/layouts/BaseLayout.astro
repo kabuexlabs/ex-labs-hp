@@ -74,7 +74,8 @@ const orgLd = {
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="google-site-verification" content="70Rfozvga_yw5B2FeapOdwuZiC8fwS_oCnVyWKijlRE">
-<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -113,7 +114,6 @@ const orgLd = {
 <a href="/services/shisetsu-event/">施設活用イベント</a>
 <a href="/services/immersive/">イマーシブ制作</a>
 <a href="/services/zunousen/">頭脳戦制作</a>
-<a href="/hacktale/">HACKTALE（頭脳戦公演）</a>
 <a href="/game/">過去コンテンツのネタバレ</a>
 <a href="/press/">プレスリリース</a>
 <a href="/blog">ブログ</a>
@@ -151,6 +151,26 @@ const orgLd = {
       });
     });
   }
+})();
+/* 横スワイプできるカルーセルの直下に「スワイプ」ヒントを自動で
+   付ける。実際にはみ出しているときだけ表示し、一度スクロール
+   したらフェードアウトする。対象クラスはCSSの横スクロール
+   ストリップ群と揃えること。 */
+(function () {
+  var strips = document.querySelectorAll('.str-grid,.style-grid,.genre-grid,.flow-row,.biz-flow,.event-row,.blog-strip');
+  function attach() {
+    strips.forEach(function (el) {
+      if (el.dataset.swipeHint || el.scrollWidth <= el.clientWidth + 8) return;
+      el.dataset.swipeHint = '1';
+      var hint = document.createElement('p');
+      hint.className = 'swipe-hint';
+      hint.textContent = '横にスワイプ';
+      el.insertAdjacentElement('afterend', hint);
+      el.addEventListener('scroll', function () { hint.classList.add('is-fading'); }, { once: true, passive: true });
+    });
+  }
+  window.addEventListener('load', attach);
+  attach();
 })();
 (function () {
   var sections = document.querySelectorAll('section.section');
