@@ -80,11 +80,13 @@ img{max-width:100%;display:block}
 .breadcrumb-sep{color:rgba(51,48,43,.25)}
 @media(max-width:640px){.breadcrumb{padding-top:86px}.breadcrumb ol{font-size:11.5px}}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:16px 38px;background:var(--accent);color:#fff;font-weight:800;font-size:14.5px;letter-spacing:.04em;white-space:nowrap;border-radius:999px;box-shadow:0 5px 0 var(--accent-dark);transition:transform .18s,box-shadow .18s,background-color .25s,color .25s,border-color .25s}
-.btn:hover{transform:translateY(3px);box-shadow:0 2px 0 var(--accent-dark)}
-.btn.ghost{background:#fff;color:var(--accent);border:2px solid var(--accent);box-shadow:0 5px 0 rgba(212,63,7,.35)}
+/* ボタンは「押し込み式の硬い落ち影」ではなく、柔らかい拡散影＋
+   浮き上がるホバーで上質に見せる。 */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:16px 38px;background:linear-gradient(180deg,#f66427 0%,#e04a0f 100%);color:#fff;font-weight:800;font-size:14.5px;letter-spacing:.08em;white-space:nowrap;border-radius:999px;box-shadow:0 10px 24px rgba(212,63,7,.3);transition:transform .2s,box-shadow .2s,background-color .25s,color .25s,border-color .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(212,63,7,.38)}
+.btn.ghost{background:#fff;color:var(--accent);border:2px solid var(--accent);box-shadow:0 8px 20px rgba(212,63,7,.14)}
 .btn.ghost:hover{background:var(--accent);color:#fff}
-.btn.dark{background:var(--accent);color:#fff;border:none}
+.btn.dark{color:#fff;border:none}
 .btn.pill{border-radius:999px;padding:10px 22px;font-size:12.5px;background:#fff;color:var(--accent);border:2px solid var(--accent);box-shadow:none}
 .btn.pill:hover{background:var(--accent);color:#fff;transform:translateY(-2px)}
 
@@ -104,13 +106,13 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
 /* Hero (Pintcle-inspired): big centered logo, message beneath, and a
    full-bleed auto-scrolling strip of real event visuals below. */
 .hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#fffdf8 0%,#fdf2e2 100%);padding-bottom:64px}
-.hero-overlay{position:absolute;inset:0;background-image:radial-gradient(rgba(244,88,28,.08) 2.5px,transparent 2.5px);background-size:34px 34px;opacity:.5}
+.hero-overlay{position:absolute;inset:0;background-image:radial-gradient(rgba(244,88,28,.07) 2px,transparent 2px);background-size:34px 34px;opacity:.35}
 .hero-center{position:relative;z-index:2;text-align:center;padding-top:150px;padding-bottom:64px}
 .hero-logo{width:min(400px,64vw);height:auto;margin:0 auto 40px;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) both}
 .hero-title{font-size:clamp(20px,2.5vw,32px);line-height:1.6;letter-spacing:.06em;font-weight:800;margin:0 0 22px;color:var(--accent);animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .18s both}
 /* Headline lines sit on orange blocks, white type — richer than bare
    text on the ground. */
-.hero-title .hl{display:inline-block;background:linear-gradient(180deg,#f4581c 0%,#e04a0f 100%);color:#fff;padding:9px 26px;margin:5px 0;border-radius:10px;box-shadow:0 10px 26px rgba(244,88,28,.35)}
+.hero-title .hl{display:inline-block;background:linear-gradient(180deg,#f4581c 0%,#e04a0f 100%);color:#fff;padding:9px 26px;margin:5px 0;border-radius:8px;box-shadow:0 14px 32px rgba(244,88,28,.22)}
 .hero-sub{font-family:'Shippori Mincho',serif;font-size:13px;letter-spacing:.22em;color:rgba(51,48,43,.55);margin:0 0 36px;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .3s both}
 .hero-actions{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .42s both}
 /* Full-width works marquee.
@@ -200,7 +202,7 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
   section.section,[class$="-grid"]>*,.faq-list>*,.stat-row>*,.flow-row>*{opacity:1;transform:none;transition:none}
 }
 
-.tinted{background-color:var(--cream);background-image:radial-gradient(rgba(244,88,28,.06) 2px,transparent 2px);background-size:28px 28px}
+.tinted{background-color:var(--cream);background-image:radial-gradient(rgba(244,88,28,.035) 1.5px,transparent 1.5px);background-size:28px 28px}
 /* Hairline edge on white cards: shadow-only edges read slightly soft
    on the cream grounds — the 1px line keeps each block crisp without
    moving the layout. Kept early in the file so per-card border-top
@@ -410,7 +412,7 @@ a:hover>.blog-img{opacity:.88}
 .cta-mini-title{font-size:24px;font-weight:800;margin:0 0 26px}
 .cta-mini-title::before{content:'＼';color:var(--yellow);margin-right:14px;font-weight:800}
 .cta-mini-title::after{content:'／';color:var(--yellow);margin-left:14px;font-weight:800}
-.cta-mini .btn{background:#fff;color:var(--accent);box-shadow:0 5px 0 rgba(0,0,0,.15)}
+.cta-mini .btn{background:#fff;color:var(--accent);box-shadow:0 10px 24px rgba(0,0,0,.16)}
 .cta-mini .btn:hover{background:var(--yellow);color:var(--ink)}
 
 .marquee-block{margin-top:56px}
@@ -489,11 +491,11 @@ a:hover>.blog-img{opacity:.88}
    the rest. */
 .genre-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1040px;margin-left:auto;margin-right:auto}
 .genre-cell{position:relative;display:flex;flex-direction:column;gap:10px;text-align:left;border-radius:18px;padding:24px 22px;color:var(--ink);background:#fff;border:2px solid rgba(244,88,28,.45);box-shadow:0 6px 18px rgba(51,48,43,.07);transition:transform .25s,box-shadow .25s;overflow:hidden}
-.genre-cell::before{content:'';position:absolute;inset:6px;border:1.5px dashed rgba(244,88,28,.35);border-radius:12px;pointer-events:none}
+.genre-cell::before{content:'';position:absolute;inset:6px;border:1px solid rgba(244,88,28,.18);border-radius:12px;pointer-events:none}
 .genre-t{font-size:16.5px;font-weight:800;letter-spacing:.02em;padding-bottom:8px;border-bottom:2px solid var(--accent);align-self:flex-start;position:relative;z-index:1}
 .genre-d{font-size:12.5px;line-height:1.8;font-weight:500;color:rgba(51,48,43,.72);position:relative;z-index:1}
 a.genre-cell{background:linear-gradient(150deg,var(--accent),var(--accent-dark));border-color:var(--accent-dark);color:#fff;box-shadow:0 10px 26px rgba(244,88,28,.3);padding-bottom:54px}
-a.genre-cell::before{border-color:rgba(255,255,255,.45)}
+a.genre-cell::before{border-color:rgba(255,255,255,.3)}
 a.genre-cell .genre-t{border-bottom-color:var(--yellow)}
 a.genre-cell .genre-d{color:rgba(255,255,255,.92)}
 .genre-arrow{position:absolute;right:16px;bottom:14px;width:30px;height:30px;border-radius:50%;background:#fff;color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;box-shadow:0 2px 8px rgba(51,48,43,.22);z-index:1}
@@ -506,8 +508,9 @@ a.genre-cell:hover{transform:translateY(-5px);box-shadow:0 16px 34px rgba(244,88
 .flow-t{font-size:16px;font-weight:800;margin:18px 0 10px}
 .flow-d{font-size:13px;line-height:1.7;color:rgba(51,48,43,.65);margin:0}
 /* Prominent supplement under the flow — e.g. "shorter schedules are
-   possible depending on the project". */
-.flow-note{margin:52px auto 0;max-width:620px;text-align:center;background:linear-gradient(150deg,var(--accent),var(--accent-dark));color:#fff;font-size:15.5px;font-weight:800;line-height:1.9;padding:20px 28px;border-radius:16px;box-shadow:0 10px 26px rgba(244,88,28,.3)}
+   possible depending on the project". White card + accent keyline
+   reads calmer/premium vs. the old loud orange banner. */
+.flow-note{margin:52px auto 0;max-width:640px;text-align:center;background:#fff;border:1.5px solid rgba(244,88,28,.4);color:var(--ink);font-size:15px;font-weight:700;line-height:1.9;padding:22px 30px;border-radius:16px;box-shadow:0 10px 26px rgba(51,48,43,.08)}
 
 /* Numbered service rows (Pintcle-style editorial list) */
 .svc-rows{max-width:860px;margin:0 auto;border-bottom:1px solid rgba(51,48,43,.14)}
@@ -563,7 +566,7 @@ a.genre-cell:hover{transform:translateY(-5px);box-shadow:0 16px 34px rgba(244,88
 .contact-form input,.contact-form textarea{font:inherit;font-size:14px;font-weight:400;padding:14px 16px;border:none;border-radius:12px;background:#fff;color:var(--ink)}
 .contact-form input:focus,.contact-form textarea:focus{outline:3px solid var(--yellow);outline-offset:2px}
 .contact-form textarea{resize:vertical}
-.contact-form button{align-self:center;margin-top:4px;border:none;cursor:pointer;background:#fff;color:var(--accent);box-shadow:0 5px 0 rgba(0,0,0,.15)}
+.contact-form button{align-self:center;margin-top:4px;border:none;cursor:pointer;background:#fff;color:var(--accent);box-shadow:0 10px 24px rgba(0,0,0,.18)}
 .contact-form button:hover{background:var(--yellow);color:var(--ink)}
 
 /* Footer: subtle vertical gradient + brand gradient hairline on top so
@@ -698,15 +701,42 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;back
    のぞくことでスワイプできることが伝わる。
    （このブロックは既存の 640px ルールを上書きするため必ず末尾に置く） */
 @media(max-width:640px){
-  .str-grid,.style-grid,.genre-grid,.flow-row{display:flex;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin:0 -22px;padding:4px 22px 18px;max-width:none;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-  .str-grid::-webkit-scrollbar,.style-grid::-webkit-scrollbar,.genre-grid::-webkit-scrollbar,.flow-row::-webkit-scrollbar{display:none}
+  .str-grid,.style-grid,.genre-grid,.flow-row,.works-grid{display:flex;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin:0 -22px;padding:4px 22px 18px;max-width:none;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .str-grid::-webkit-scrollbar,.style-grid::-webkit-scrollbar,.genre-grid::-webkit-scrollbar,.flow-row::-webkit-scrollbar,.works-grid::-webkit-scrollbar{display:none}
   .str-card{flex:0 0 84%;scroll-snap-align:center}
   .style-col{flex:0 0 84%;scroll-snap-align:center}
-  .genre-cell{flex:0 0 72%;scroll-snap-align:center}
+  .genre-cell{flex:0 0 74%;scroll-snap-align:center}
   .flow-row{gap:36px;padding-right:36px}
   .flow-step{flex:0 0 56%;scroll-snap-align:center}
   /* 縦積み用の下向き矢印を、横並び用の右向き矢印に戻す */
   .flow-step:not(:last-child)::after{top:34px;bottom:auto;left:auto;right:-27px;transform:none;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:15px solid var(--yellow);border-right:none}
+  /* 主な実績：2列グリッドだと文字が極小になるため、1枚を大きく
+     見せる横スワイプに。文字サイズも読める大きさへ戻す。 */
+  .work-card{flex:0 0 72%;scroll-snap-align:center;padding:14px 14px 20px;border-radius:18px}
+  .work-img{padding:12px;border-radius:12px}
+  .work-tag{font-size:10.5px;margin:14px 0 8px;padding:4px 12px}
+  .work-name{font-size:16.5px}
+  .work-sub{font-size:12.5px;margin-bottom:8px}
+  .work-desc{font-size:13px;line-height:1.8}
+  /* カルーセル内テキストの可読性を一段引き上げ */
+  .genre-d{font-size:13px;line-height:1.85}
+  .flow-d{font-size:13px}
+  .event-desc{font-size:12.5px}
+  .svc-row-desc{font-size:13px}
+  .biz-d{font-size:12.5px}
+  .biz-punch-d{font-size:13px}
+  .h2sub{font-size:14px;line-height:2}
+  .lede{font-size:15px}
+  .vc-line{font-size:12.5px;line-height:1.9}
+}
+
+/* 320〜375px級の狭い端末では、カルーセルのカード幅を広げて
+   .nobr の文節チャンクが確実に収まるようにする。 */
+@media(max-width:374px){
+  .work-card{flex-basis:84%}
+  .genre-cell{flex-basis:84%}
+  .str-card,.style-col{flex-basis:92%}
+  .event-card{flex-basis:76%}
 }
 
 /* カルーセル直下の「横にスワイプ」ヒント（BaseLayout の JS が、
