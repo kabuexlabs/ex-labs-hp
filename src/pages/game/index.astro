@@ -23,12 +23,14 @@ const events = [
 <GameLayout>
 <div data-screen-label="トップ：ネタバレ公開済みイベント一覧">
 <header class="hero">
-  <img class="herologo" src="/assets/game/logo-white.png" alt="株式会社ex Labs" width="2048" height="520">
+  <a class="herologo-link" href="/" aria-label="株式会社ex Labs 公式サイト">
+    <img class="herologo" src="/assets/game/logo-white.png" alt="株式会社ex Labs" width="2048" height="520">
+  </a>
   <p class="tagline dim">体験を作る会社 ── 株式会社ex Labs</p>
   <div class="rule"></div>
 </header>
 <main class="wrap">
-  <h1 class="h2">ネタバレ公開済みイベント一覧</h1>
+  <h1 class="h2"><span class="nobr">ネタバレ公開済み</span><span class="nobr">イベント一覧</span></h1>
   <p class="note">謎解きやマーダーミステリーコンテンツは、<br>ネタバレが致命的な欠陥になる可能性があるため<br>再演が実施されないコンテンツに限ります。</p>
   <div class="cards">
     {events.map((ev) => (
