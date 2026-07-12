@@ -39,7 +39,7 @@ const events = [
           <img class="poster" src={ev.img} alt={ev.title} width="1080" height="1546" loading="lazy">
         </a>
         <div class="cardbody">
-          <h2 class="ctitle">{ev.title}</h2>
+          <h2 class="ctitle">{ev.title.split(/\s+/).map((w, i) => <span class="nobr">{i > 0 ? '　' : ''}{w}</span>)}</h2>
           <div class="cmeta">{ev.meta}</div>
           <p class="cdesc">{ev.desc}</p>
           <a class="btn" href={ev.href}>このイベントのネタバレを見る</a>
