@@ -117,6 +117,13 @@ const orgLd = {
 <style is:global>
 html{scroll-behavior:smooth}
 html,body{margin:0;padding:0;background:#0b0a0c}
+/* 見出し・本文の改行を自然に。auto-phrase 対応ブラウザ（Chrome等）は
+   文節で折り返し、非対応（iOS Safari）でも strict 禁則で長音「ー」や
+   小書き文字が行頭に来ないようにする。 */
+.pg :is(h1,h2,h3,p,li,.ct,.nt,.shj,.acatch,.stt,.hlead,.wd,.cpl,.cdesc){line-break:strict}
+@supports(word-break:auto-phrase){
+  .pg :is(h1,h2,h3,.ct,.nt,.shj,.acatch,.stt,.hlead,.wd,.cpl,.cdesc){word-break:auto-phrase}
+}
 .rv{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s cubic-bezier(.22,.61,.36,1)}
 .rv.on{opacity:1;transform:none}
 .d1{transition-delay:.12s}.d2{transition-delay:.24s}.d3{transition-delay:.36s}
