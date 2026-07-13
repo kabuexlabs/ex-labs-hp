@@ -14,16 +14,44 @@ const others = tmWorks.filter((w) => w.slug !== work.slug);
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const pageUrl = new URL(`${base}/works/${work.slug}/`, site).toString();
 
+// プレースホルダー（？？？ など）を避けつつ、最も内容のある紹介文を選ぶ。
+// meta description と構造化データの description に使う。
+const cleanDesc =
+  [work.desc, work.catch, work.synopsis]
+    .map((s) => (s ?? '').replace(/\s+/g, ' ').trim())
+    .find((s) => s.length >= 8 && !/^[？?]+$/.test(s)) ?? '';
+
+// カード表記 (例 '5人／180分'、'4〜8人／120分') から人数・時間を数値化。
+const playerNums = (work.meta.match(/(\d+)\s*[〜~]\s*(\d+)人|(\d+)\s*人/) ?? []);
+const minPlayers = Number(playerNums[1] ?? playerNums[3]) || undefined;
+const maxPlayers = Number(playerNums[2] ?? playerNums[3]) || undefined;
+const minutes = Number(work.meta.match(/(\d+)\s*分/)?.[1]) || undefined;
+// 事前情報の「料金」から代表価格を1つ取り出す（'4,500円（オフライン）' → 4500）。
+const priceStr = work.details?.find((d) => d.label.includes('料金'))?.value ?? '';
+const priceYen = Number(priceStr.match(/([\d,]+)\s*円/)?.[1]?.replace(/,/g, '')) || undefined;
+const platforms = [
+  work.play.includes('オンライン') ? 'オンライン公演' : null,
+  work.play.includes('店舗') ? '店舗公演' : null,
+].filter(Boolean);
+
 // マーダーミステリー作品としての構造化データ + パンくず
 const workLd = {
   '@context': 'https://schema.org',
   '@type': 'Game',
   name: work.title,
-  genre: 'マーダーミステリー',
+  alternateName: `${work.title}（マダミス）`,
+  genre: ['マーダーミステリー', 'マダミス', '推理ゲーム'],
   url: pageUrl,
   ...(work.image ? { image: new URL(work.image, site).toString() } : {}),
-  description: work.desc,
+  description: cleanDesc || `${work.title} — 東大マーダーミステリーサークル制作のマーダーミステリー作品。`,
+  inLanguage: 'ja',
+  ...(platforms.length ? { gamePlatform: platforms } : {}),
+  ...(minPlayers ? { numberOfPlayers: { '@type': 'QuantitativeValue', minValue: minPlayers, ...(maxPlayers ? { maxValue: maxPlayers } : {}) } } : {}),
+  ...(minutes ? { timeRequired: `PT${minutes}M` } : {}),
+  ...(work.awards?.length ? { award: work.awards.map((a) => a.replace(/[^\p{L}\p{N}\s％%位年月]/gu, '').trim()).filter(Boolean) } : {}),
+  author: { '@type': 'Organization', name: '東大マーダーミステリーサークル', url: new URL(`${base}/`, site).toString() },
   publisher: { '@type': 'Organization', name: '東大マーダーミステリーサークル' },
+  ...(priceYen ? { offers: { '@type': 'Offer', price: priceYen, priceCurrency: 'JPY', availability: 'https://schema.org/InStock', url: pageUrl } } : {}),
 };
 const crumbLd = {
   '@context': 'https://schema.org',
@@ -38,8 +66,8 @@ const crumbLd = {
 
 <ToudaimurderLayout
   active="works"
-  title={`${work.title}｜マーダーミステリー｜東大マーダーミステリーサークル`}
-  description={`${work.title}（${work.specs.join('・')}）— 東大マーダーミステリーサークル制作のマーダーミステリー作品。${work.desc}`}
+  title={`${work.title}｜マーダーミステリー（マダミス）｜東大マーダーミステリーサークル`}
+  description={`${work.title}は、東大マーダーミステリーサークルが制作したマーダーミステリー（マダミス）作品。${work.specs.join('・')}。${cleanDesc ? cleanDesc.replace(/[。．.]+$/, '') + '。' : ''}貸切公演・オンライン公演のご予約を受付中です。`}
   ogImage={work.image}
 >
   <script type="application/ld+json" slot="head" set:html={jsonLd(workLd)} />
@@ -49,7 +77,7 @@ const crumbLd = {
       <div class="ph pv">{work.image ? <img src={work.image} alt={`${work.title} キービジュアル`} /> : <span class="mono">作品キービジュアル 407×570</span>}</div>
       <div>
         <p class="crumb mono"><a href={`${base}/`}>TOP</a> / <a href={`${base}/works/`}>WORKS</a> / {work.title}</p>
-        <div class="specs">{work.specs.map((s) => <span class="spec">{s}</span>)}</div>
+        <div class="specs"><span class="spec spec-genre">マーダーミステリー（マダミス）</span>{work.specs.map((s) => <span class="spec">{s}</span>)}</div>
         <h1 class="wt min">{work.title}</h1>
         {work.catch && <p class="catch min">{work.catch}</p>}
         {work.synopsis && (
@@ -115,6 +143,7 @@ const crumbLd = {
 .dt .crumb{margin:0 0 28px}
 .specs{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 20px}
 .spec{border:1px solid var(--ln);color:var(--dim);font-size:12px;padding:4px 14px;letter-spacing:.1em}
+.spec-genre{border-color:var(--acc);color:var(--acc)}
 .wt{font-size:clamp(30px,3.4vw,48px);font-weight:800;line-height:1.4;margin:0 0 24px}
 .catch{font-size:17px;font-weight:800;line-height:2;letter-spacing:.08em;margin:0 0 36px;white-space:pre-line;border-left:3px solid var(--acc);padding-left:18px}
 .syn{color:var(--dim);margin:0 0 40px;white-space:pre-line}
