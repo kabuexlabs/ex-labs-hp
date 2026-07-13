@@ -10,6 +10,8 @@ const STATIC_PATHS = [
   '/',
   '/blog',
   '/press/',
+  '/guide/madamis/',
+  '/guide/immersive/',
   '/services/',
   '/services/nazotoki-kenshu/',
   '/services/murder-mystery/',
