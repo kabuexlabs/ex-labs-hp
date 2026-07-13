@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import { jsonLd } from '../../lib/microcms';
 
 const services = [
   {
@@ -34,11 +35,26 @@ const services = [
     tag: 'zunou',
   },
 ];
+
+// サービス一覧の ItemList 構造化データ（検索エンジンの一覧理解を補助）
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const itemListLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: '株式会社ex Labs 法人向けサービス一覧',
+  itemListElement: services.map((s, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: s.title,
+    url: new URL(s.href, site).toString(),
+  })),
+};
 ---
 <BaseLayout
   title="サービス一覧｜株式会社 ex Labs"
   description="株式会社ex Labsの法人向けサービス一覧。謎解き研修・マーダーミステリー制作・施設活用イベントなど、体験型エンターテインメントの企画・制作・集客・運営を一貫してご支援します。"
 >
+<script type="application/ld+json" set:html={jsonLd(itemListLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
   { name: 'サービス' },

@@ -33,6 +33,8 @@ const STATIC_PATHS = [
   '/smystery/',
   '/smystery/events/',
   '/smystery/company/',
+  '/kaitou/',
+  '/uwasabanashi/',
   ...htPaths,
 ];
 
@@ -42,6 +44,12 @@ export const GET: APIRoute = async ({ site }) => {
   const urls: { loc: string; lastmod?: string }[] = STATIC_PATHS.map((p) => ({
     loc: new URL(p, base).toString(),
   }));
+
+  // 日付を持つニュース記事は lastmod を付与（Google が再クロール判断に使う）。
+  for (const n of tmNews) {
+    const u = urls.find((x) => x.loc.endsWith(`/toudaimurder/news/${n.slug}/`));
+    if (u && n.date) u.lastmod = n.date.replace(/\./g, '-');
+  }
 
   if (isMicrocmsConfigured()) {
     // microCMS caps limit at 100 per request; page through everything.
