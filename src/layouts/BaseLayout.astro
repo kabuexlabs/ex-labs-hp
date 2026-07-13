@@ -38,15 +38,29 @@ const orgLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: '株式会社ex Labs',
+  alternateName: 'ex Labs（イーエックスラボ）',
   url: site.toString(),
   logo: new URL('/assets/logo.png', site).toString(),
+  image: new URL('/assets/share-card.png', site).toString(),
   email: 'info@kabuexlabs.com',
+  description:
+    '謎解き・マーダーミステリー（マダミス）・頭脳戦・イマーシブなど、体験型エンターテインメントの企画・制作・集客・運営を一貫して手掛けるクリエイティブカンパニー。',
+  knowsLanguage: 'ja',
+  areaServed: { '@type': 'Country', name: '日本' },
   address: {
     '@type': 'PostalAddress',
+    postalCode: '160-0023',
     addressRegion: '東京都',
     addressLocality: '新宿区',
     streetAddress: '西新宿3-3-13 西新宿水間ビル2F',
     addressCountry: 'JP',
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    email: 'info@kabuexlabs.com',
+    contactType: 'customer support',
+    areaServed: 'JP',
+    availableLanguage: 'Japanese',
   },
 };
 ---
@@ -114,6 +128,8 @@ const orgLd = {
 <a href="/services/shisetsu-event/">施設活用イベント</a>
 <a href="/services/immersive/">イマーシブ制作</a>
 <a href="/services/zunousen/">頭脳戦制作</a>
+<a href="/guide/madamis/">マダミスとは</a>
+<a href="/guide/immersive/">イマーシブとは</a>
 <a href="/game/">過去コンテンツのネタバレ</a>
 <a href="/press/">プレスリリース</a>
 <a href="/blog">ブログ</a>
