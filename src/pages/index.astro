@@ -73,7 +73,7 @@ const marqueeItems = Array(2).fill(groups).flat();
 <section class="hero">
 <div class="hero-overlay"></div>
 <div class="wrap hero-center">
-<img class="hero-logo" src="/assets/logo.png" alt="株式会社 ex Labs" width="2048" height="520" loading="eager" decoding="async">
+<img class="hero-logo" src="/assets/logo.png" alt="株式会社 ex Labs" width="2048" height="520" loading="eager" fetchpriority="high" decoding="async">
 <h1 class="hero-title serif"><span class="hl">初期費用0円で謎解きなどの</span><br><span class="hl">体験型イベントを実施しませんか？</span></h1>
 <p class="hero-sub">Experience Entertainment — ex Labs Inc.</p>
 <div class="hero-actions">
@@ -100,10 +100,10 @@ const marqueeItems = Array(2).fill(groups).flat();
 <p class="marquee-label">取引先企業様</p>
 <div class="marquee"><div class="marquee-track partners-track">
 {partnerItems.map((p) => (
-  <img class="marquee-logo" src={p.logo} alt={p.name} style={p.h ? `height:${p.h}px` : undefined} loading="eager" decoding="async" />
+  <img class="marquee-logo" src={p.logo} alt={p.name} style={p.h ? `height:${p.h}px` : undefined} loading="lazy" decoding="async" />
 ))}
 {partnerItems.map((p) => (
-  <img class="marquee-logo" src={p.logo} alt="" style={p.h ? `height:${p.h}px` : undefined} loading="eager" decoding="async" />
+  <img class="marquee-logo" src={p.logo} alt="" style={p.h ? `height:${p.h}px` : undefined} loading="lazy" decoding="async" />
 ))}
 </div></div>
 </div>
@@ -112,12 +112,12 @@ const marqueeItems = Array(2).fill(groups).flat();
 <div class="marquee"><div class="marquee-track">
 {marqueeItems.map((g) => (
   g.logo
-    ? <img class="marquee-logo" src={g.logo} alt={g.name} style={g.h ? `height:${g.h}px` : undefined} loading="eager" decoding="async" />
+    ? <img class="marquee-logo" src={g.logo} alt={g.name} style={g.h ? `height:${g.h}px` : undefined} loading="lazy" decoding="async" />
     : <span class="marquee-name serif">{g.name}</span>
 ))}
 {marqueeItems.map((g) => (
   g.logo
-    ? <img class="marquee-logo" src={g.logo} alt="" style={g.h ? `height:${g.h}px` : undefined} loading="eager" decoding="async" />
+    ? <img class="marquee-logo" src={g.logo} alt="" style={g.h ? `height:${g.h}px` : undefined} loading="lazy" decoding="async" />
     : <span class="marquee-name serif" aria-hidden="true">{g.name}</span>
 ))}
 </div></div>
