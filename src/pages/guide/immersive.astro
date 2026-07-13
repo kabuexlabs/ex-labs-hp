@@ -1,0 +1,170 @@
+---
+// 「イマーシブ」単体ワードの受け皿となるピラーページ（完全ガイド）。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'about', label: 'イマーシブとは' },
+  { id: 'origin', label: '言葉の意味・語源' },
+  { id: 'types', label: 'イマーシブ体験の種類' },
+  { id: 'examples', label: 'イマーシブ体験の例' },
+  { id: 'biz', label: '企業・施設での活用' },
+  { id: 'make', label: 'イマーシブを制作・依頼するには' },
+  { id: 'cost', label: '費用の目安' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'イマーシブとはどういう意味ですか？',
+    a: 'イマーシブ（immersive）は英語で「没入型の」という意味です。観客が客席から鑑賞するのではなく、物語や空間の中に入り込んで体験する形式を指します。',
+  },
+  {
+    q: 'イマーシブシアターとは何ですか？',
+    a: '建物や空間の中を観客が自由に歩き回り、同時多発的に進行する物語を追う没入型の演劇です。俳優との距離が近く、濃密な没入感が得られます。',
+  },
+  {
+    q: 'イマーシブと体験型イベントは何が違いますか？',
+    a: '体験型イベントの中でも、特に「物語世界への没入」を核に据えたものがイマーシブです。参加者自身が物語の当事者になる点が特徴です。',
+  },
+  {
+    q: 'イマーシブ体験は企業のプロモーションに使えますか？',
+    a: '使えます。ブランドの世界観を「説明」ではなく「体験」として伝えられるため、商業施設の集客やブランドプロモーションで導入が広がっています。',
+  },
+  {
+    q: 'オリジナルのイマーシブ体験を制作してもらえますか？',
+    a: '可能です。株式会社ex Labsでは、実在する街・空間・香り・アートを物語に組み込んだイマーシブコンテンツを、企画から体験設計・運営まで一貫して制作しています。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'イマーシブとは？意味・種類・体験例まで完全ガイド',
+  about: 'イマーシブ（没入型体験）',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  mainEntityOfPage: new URL('/guide/immersive/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="イマーシブとは？意味・種類・体験例まで完全ガイド - 株式会社ex Labs"
+  description="イマーシブとは「没入型」の意味。観客が物語や空間に入り込んで体験する形式です。言葉の意味・種類（シアター型/周遊型/五感型）・体験例・企業活用・費用・制作依頼まで、制作会社がまとめて解説します。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'イマーシブ完全ガイド' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">IMMERSIVE GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">イマーシブとは？</span><span class="nobr">意味・種類・体験例まで</span><span class="nobr">完全ガイド</span></h1>
+<p class="lede"><strong>イマーシブ</strong>とは「<strong>没入型</strong>」を意味する言葉。観客が客席から観るのではなく、物語や空間の中に入り込んで体験する形式を指します。このページでは、イマーシブの意味・種類・体験例から、企業活用・費用・制作依頼の方法までをまとめて解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">イマーシブとは</h2>
+<p class="lede"><strong>イマーシブ</strong>とは、参加者が物語を「観る」のではなく、<strong>自分自身が物語の当事者として体験する</strong>エンターテインメント形式です。劇場型の演劇から、街全体を舞台にした周遊型まで、<strong>空間そのものを物語に変える</strong>のが特徴です。</p>
+<p class="lede">大型施設や都市型コンテンツの登場で注目が高まり、いまや商業施設・観光地・ブランドのマーケティング施策としても導入が広がっています。</p>
+</div></section>
+
+<section class="section" id="origin"><div class="wrap narrow">
+<p class="eyebrow">MEANING</p><h2 class="h2 serif">言葉の意味・語源</h2>
+<p class="lede">イマーシブ（immersive）は、英語の動詞 <strong>immerse（浸す・没頭させる）</strong> を語源とする形容詞で、「<strong>没入型の</strong>」という意味です。水に浸かるように、その世界へ深く入り込む状態を表します。転じて、映像・ゲーム・演劇・空間演出など、<strong>強い没入感を生む体験</strong>を「イマーシブ」と呼びます。</p>
+</div></section>
+
+<section class="section tinted" id="types"><div class="wrap">
+<p class="eyebrow">TYPES</p><h2 class="h2 serif">イマーシブ体験の種類</h2>
+<p class="h2sub">ひとくちにイマーシブといっても、舞台や手法によっていくつかのタイプがあります。</p>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">劇場・施設型</span><span class="genre-d">建物内を歩き回り、同時進行する物語を追う形式（イマーシブシアター）。</span></div>
+<div class="genre-cell"><span class="genre-t serif">街なか周遊型</span><span class="genre-d">実在する街や商店街を舞台に、スポットを巡りながら物語を体験する形式。</span></div>
+<div class="genre-cell"><span class="genre-t serif">五感・テーマ型</span><span class="genre-d">香り・音・アートなど五感やテーマを軸に世界観を体験する形式。</span></div>
+<div class="genre-cell"><span class="genre-t serif">ミステリー融合型</span><span class="genre-d">謎解きやマダミスと融合し、推理しながら没入する形式。</span></div>
+</div>
+</div></section>
+
+<section class="section" id="examples"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLES</p><h2 class="h2 serif">イマーシブ体験の例</h2>
+<p class="lede">株式会社ex Labsが制作したイマーシブ体験には、次のようなものがあります。</p>
+<ul class="bullets">
+<li><strong>ロスト・フレーム（下北沢）</strong>：街に散らばった絵画を探し、物語を辿る周遊型アートイマーシブ。</li>
+<li><strong>紅漂う街角で（Smystery × WAKA）</strong>：香水ブランドと組み、香りを手がかりに謎を追うイマーシブミステリー。</li>
+<li><strong>ヌル・アーデン展</strong>：アートと謎解きを融合した没入型の展覧会イベント。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="biz"><div class="wrap narrow">
+<p class="eyebrow">FOR BUSINESS</p><h2 class="h2 serif">企業・施設での活用</h2>
+<p class="lede">イマーシブは「そこでしかできない体験」を生むため、<strong>商業施設・観光施設の集客</strong>や、<strong>ブランドの世界観を体験として伝えるプロモーション</strong>に活用が広がっています。来場者が物語を追う構造は、滞在時間の延長・館内回遊・SNSでの話題化にもつながります。</p>
+</div></section>
+
+<section class="section" id="make"><div class="wrap narrow">
+<p class="eyebrow">PRODUCTION</p><h2 class="h2 serif">イマーシブを制作・依頼するには</h2>
+<p class="lede">実在する街・空間・ブランドを舞台にした<strong>オリジナルのイマーシブ体験</strong>を制作できます。株式会社ex Labsは、アート×体験レーベル「体験する美術館」、香り×体験レーベル「Smystery」など複数の自社レーベルを運営し、企画・体験設計・集客・運営まで一貫して対応します。</p>
+<p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービスの詳細を見る →</a></p>
+</div></section>
+
+<section class="section tinted" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif">費用の目安</h2>
+<p class="lede">イマーシブ制作の費用は、<strong>体験の規模（会場数・公演回数・出演者数）・制作物の量・運営範囲</strong>によって決まります。チケット収益から回収する成果報酬型・レベニューシェア型に対応しており、初期費用を抑えた導入も可能です。</p>
+</div></section>
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">イマーシブ制作のご相談はこちら</p>
+<a class="btn" href="/#contact">イマーシブ体験について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作</a>／<a href="/taikenbizyutu/" style="color:var(--accent)">体験する美術館</a>／<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは</a></p>
+</div></section>
+
+<LatestPosts />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#origin,#types,#examples,#biz,#make,#cost,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
