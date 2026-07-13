@@ -93,7 +93,14 @@ const orgLd = {
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800;900&family=Shippori+Mincho:wght@600;700;800&display=swap" rel="stylesheet">
+{/* ヘッダーロゴ＆ヒーローロゴ（LCP候補）を最優先で先読み。 */}
+<link rel="preload" as="image" href="/assets/logo.png" fetchpriority="high">
+{/* Webフォントはレンダリングをブロックしないよう非同期読み込み
+    （media=print→onloadでall）。未使用の Noto 900 は除外して軽量化。
+    display=swap でフォント取得前もフォールバックで即表示される。 */}
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&family=Shippori+Mincho:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&family=Shippori+Mincho:wght@600;700;800&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&family=Shippori+Mincho:wght@600;700;800&display=swap"></noscript>
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <script type="application/ld+json" set:html={jsonLd(websiteLd)} />
 </head>
