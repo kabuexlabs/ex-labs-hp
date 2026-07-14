@@ -47,13 +47,13 @@ const partnersRow1: { name: string; logo: string; h?: number }[] = [
 ];
 const partnersRow2: { name: string; logo: string; h?: number }[] = [
   { name: '東急不動産', logo: '/assets/partners/tokyuland.webp', h: 58 },
-  { name: 'ウズプロダクション', logo: '/assets/partners/uzuproduction.webp', h: 54 },
   { name: 'Thermal Climb Studio Fuji', logo: '/assets/partners/thermalclimb.webp', h: 60 },
   { name: 'SHINKUKAN', logo: '/assets/partners/shinkukan.webp', h: 70 },
 ];
-// 少ない枚数でも -50% ループが常に画面幅を超えるよう十分に複製する。
-const partnerRow1Items = Array(3).fill(partnersRow1).flat();
-const partnerRow2Items = Array(3).fill(partnersRow2).flat();
+// 少ない枚数でも -50% ループが常に画面幅（4Kワイド含む）を超えるよう
+// 十分に複製する。2段目は3社しかないため多めに繰り返す。
+const partnerRow1Items = Array(4).fill(partnersRow1).flat();
+const partnerRow2Items = Array(8).fill(partnersRow2).flat();
 
 // 展開団体 — self-run labels/communities shown in the About marquee.
 // Add `logo: '/assets/groups/xxx.png'` to an entry to show an image

@@ -175,6 +175,28 @@ const orgLd = {
     });
   }
 })();
+/* マーキーのスクロール速度を全トラックで統一する。CSSの固定
+   duration だとトラック幅（ロゴ枚数）によって px/秒 が変わるため、
+   幅に比例した duration を計算して速度を一定にする。遅延読み込みの
+   画像で幅が変わっても ResizeObserver で追従する。 */
+(function () {
+  var SPEED = 86; // px/秒（従来の展開団体マーキー実測値に合わせ体感を維持）
+  function set(t) {
+    var dist = t.scrollWidth / 2;
+    if (dist > 0) t.style.animationDuration = Math.round((dist / SPEED) * 10) / 10 + 's';
+  }
+  var tracks = document.querySelectorAll('.marquee-track');
+  if (!tracks.length) return;
+  tracks.forEach(set);
+  if ('ResizeObserver' in window) {
+    var ro = new ResizeObserver(function (entries) {
+      entries.forEach(function (e) { set(e.target); });
+    });
+    tracks.forEach(function (t) { ro.observe(t); });
+  } else {
+    window.addEventListener('load', function () { tracks.forEach(set); });
+  }
+})();
 /* 横スワイプできるカルーセルの直下に「スワイプ」ヒントを自動で
    付ける。実際にはみ出しているときだけ表示し、一度スクロール
    したらフェードアウトする。対象クラスはCSSの横スクロール
