@@ -37,18 +37,23 @@ const liveEvents = [
 ];
 
 // 取引先企業様 — client/partner company logos shown above the 展開団体
-// marquee. Same duplicate-and-loop pattern as `groups` below.
-const partners: { name: string; logo: string; h?: number }[] = [
+// marquee. 数が増えたので2段構成にし、2段目は逆方向に流す。
+const partnersRow1: { name: string; logo: string; h?: number }[] = [
   { name: 'Skyland Ventures', logo: '/assets/partners/skylandventures.webp', h: 64 },
   { name: 'COEN', logo: '/assets/partners/coen.webp', h: 40 },
   { name: 'MAISON MARC', logo: '/assets/partners/maisonmarc.webp', h: 46 },
   { name: 'Party', logo: '/assets/partners/party.webp', h: 50 },
   { name: 'Sally', logo: '/assets/partners/sally.webp', h: 44 },
+];
+const partnersRow2: { name: string; logo: string; h?: number }[] = [
+  { name: '東急不動産', logo: '/assets/partners/tokyuland.webp', h: 58 },
   { name: 'ウズプロダクション', logo: '/assets/partners/uzuproduction.webp', h: 54 },
   { name: 'Thermal Climb Studio Fuji', logo: '/assets/partners/thermalclimb.webp', h: 60 },
   { name: 'SHINKUKAN', logo: '/assets/partners/shinkukan.webp', h: 70 },
 ];
-const partnerItems = Array(2).fill(partners).flat();
+// 少ない枚数でも -50% ループが常に画面幅を超えるよう十分に複製する。
+const partnerRow1Items = Array(3).fill(partnersRow1).flat();
+const partnerRow2Items = Array(3).fill(partnersRow2).flat();
 
 // 展開団体 — self-run labels/communities shown in the About marquee.
 // Add `logo: '/assets/groups/xxx.png'` to an entry to show an image
@@ -99,10 +104,18 @@ const marqueeItems = Array(2).fill(groups).flat();
 <div class="marquee-block">
 <p class="marquee-label">取引先企業様</p>
 <div class="marquee"><div class="marquee-track partners-track">
-{partnerItems.map((p) => (
+{partnerRow1Items.map((p) => (
   <img class="marquee-logo" src={p.logo} alt={p.name} style={p.h ? `height:${p.h}px` : undefined} loading="lazy" decoding="async" />
 ))}
-{partnerItems.map((p) => (
+{partnerRow1Items.map((p) => (
+  <img class="marquee-logo" src={p.logo} alt="" style={p.h ? `height:${p.h}px` : undefined} loading="lazy" decoding="async" />
+))}
+</div></div>
+<div class="marquee marquee-row2"><div class="marquee-track partners-track rev">
+{partnerRow2Items.map((p) => (
+  <img class="marquee-logo" src={p.logo} alt={p.name} style={p.h ? `height:${p.h}px` : undefined} loading="lazy" decoding="async" />
+))}
+{partnerRow2Items.map((p) => (
   <img class="marquee-logo" src={p.logo} alt="" style={p.h ? `height:${p.h}px` : undefined} loading="lazy" decoding="async" />
 ))}
 </div></div>

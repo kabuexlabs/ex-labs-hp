@@ -447,6 +447,11 @@ a:hover>.blog-img{opacity:.88}
    duration keeps the px/s speed the same as the 展開団体 marquee
    instead of crawling slower over less distance. */
 .marquee-track.partners-track{animation-duration:33.66s}
+/* 取引先マーキー2段目：同じキーフレームを逆再生して右方向に流す。
+   コンテンツを複製しているので逆再生でも継ぎ目なくループする。 */
+.marquee-track.rev{animation-direction:reverse}
+.marquee-row2{margin-top:22px}
+@media(max-width:640px){.marquee-row2{margin-top:16px}}
 .marquee-name{font-size:20px;font-weight:700;color:rgba(51,48,43,.55);white-space:nowrap}
 /* No mix-blend-mode: blending an element that lives inside a
    transform-animated track makes the browser intermittently fail to
