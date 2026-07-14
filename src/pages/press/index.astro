@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import { pressItems } from '../../data/press';
+import { jsonLd } from '../../lib/microcms';
 
 const items = [...pressItems].sort((a, b) => (a.date < b.date ? 1 : -1));
 
@@ -9,11 +10,25 @@ function formatDate(iso: string) {
   const [y, m, d] = iso.split('-');
   return `${y}.${m}.${d}`;
 }
+
+// プレスリリース一覧の ItemList 構造化データ
+const pressListLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: '株式会社ex Labs プレスリリース一覧',
+  itemListElement: items.map((p, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: p.title,
+    url: p.url,
+  })),
+};
 ---
 <BaseLayout
   title="プレスリリース｜株式会社 ex Labs"
   description="株式会社ex Labsのプレスリリース一覧。体験型エンターテインメント事業に関する最新の発表をお届けします。"
 >
+<script type="application/ld+json" set:html={jsonLd(pressListLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
   { name: 'プレスリリース' },

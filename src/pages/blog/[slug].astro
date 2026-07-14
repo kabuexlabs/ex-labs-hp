@@ -28,6 +28,8 @@ const articleLd = post
       '@context': 'https://schema.org',
       '@type': 'Article',
       headline: post.title,
+      description: excerpt(post.body),
+      inLanguage: 'ja',
       datePublished: post.publishedAt,
       ...(post.revisedAt ? { dateModified: post.revisedAt } : {}),
       ...(post.eyecatch ? { image: [post.eyecatch.url] } : {}),
