@@ -14,6 +14,9 @@ export interface Slot {
   date: string; // 'YYYY-MM-DD'
   time: string; // 自由記述（例: '14:00〜16:00'）
   createdAt: string;
+  // 管理者が手動で受付を止めた枠。予約済みとは別概念で、削除せずに
+  // 一時的に締め切りたい／再開したいときに使う。
+  closed?: boolean;
 }
 
 export interface Booking {
@@ -101,6 +104,24 @@ export async function addSlot(date: string, time: string): Promise<Slot> {
 
 export async function deleteSlot(id: string): Promise<void> {
   await redis('HDEL', SLOTS_KEY, id);
+}
+
+export async function saveSlot(slot: Slot): Promise<void> {
+  await redis('HSET', SLOTS_KEY, slot.id, JSON.stringify(slot));
+}
+
+// --- ページ設定（タイトルなど） ------------------------------------------------
+
+const TITLE_KEY = 'yoyaku:title';
+export const DEFAULT_TITLE = '日程調整のご案内';
+
+export async function getPageTitle(): Promise<string> {
+  const raw = await redis('GET', TITLE_KEY);
+  return typeof raw === 'string' && raw.trim() ? raw : DEFAULT_TITLE;
+}
+
+export async function setPageTitle(title: string): Promise<void> {
+  await redis('SET', TITLE_KEY, title.trim().slice(0, 80));
 }
 
 export async function getSlot(id: string): Promise<Slot | null> {
@@ -209,8 +230,11 @@ export async function sendMail(to: string, subject: string, text: string): Promi
     return false;
   }
   const from = readEnv('MAIL_FROM') ?? 'ex Labs 予約窓口 <no-reply@kabuexlabs.com>';
+  // RESEND_API_BASE はローカルテストでモックサーバーに向けるための逃げ道
+  // （microcms.ts の MICROCMS_API_BASE と同じ流儀）。本番では未設定でよい。
+  const base = readEnv('RESEND_API_BASE') ?? 'https://api.resend.com';
   try {
-    const res = await fetch('https://api.resend.com/emails', {
+    const res = await fetch(`${base}/emails`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ from, to: [to], subject, text, reply_to: adminEmail() }),

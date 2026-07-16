@@ -11,6 +11,7 @@ import {
   getSlots,
   getBookings,
   getSlot,
+  getPageTitle,
   reserve,
   sendMail,
   adminEmail,
@@ -47,7 +48,7 @@ if (configured && Astro.request.method === 'POST') {
   else if (!slotId) error = 'ご希望の日程を選択してください。';
   else {
     const slot = await getSlot(slotId);
-    if (!slot || slot.date < jstToday()) {
+    if (!slot || slot.closed || slot.date < jstToday()) {
       error = '選択された日程は現在ご予約いただけません。別の日程をお選びください。';
     } else if (!(await reserve(slot, { name, phone, email }))) {
       // HSETNX が負けた = 直前に他の方が同じ枠を確保した
@@ -79,14 +80,17 @@ if (configured && Astro.request.method === 'POST') {
 const doneId = Astro.url.searchParams.get('done');
 const today = jstToday();
 
-const [slots, bookings] = configured ? await Promise.all([getSlots(), getBookings()]) : [[], new Map()];
-// 過去の日付は出さない。予約済みの枠は「満」表示で残す（埋まり具合が伝わる）。
+const [slots, bookings, pageTitle] = configured
+  ? await Promise.all([getSlots(), getBookings(), getPageTitle()])
+  : [[], new Map(), '日程調整のご案内'];
+// 過去の日付は出さない。予約済み・受付停止の枠は「予約済み」表示で残す
+// （埋まり具合が伝わる）。
 const visible = slots.filter((s) => s.date >= today);
 const doneSlot = doneId ? slots.find((s) => s.id === doneId) : undefined;
-const hasOpen = visible.some((s) => !bookings.has(s.id));
+const hasOpen = visible.some((s) => !bookings.has(s.id) && !s.closed);
 ---
-<YoyakuLayout title="日程調整｜株式会社 ex Labs">
-<h1>日程調整のご案内</h1>
+<YoyakuLayout title={`${pageTitle}｜株式会社 ex Labs`}>
+<h1>{pageTitle}</h1>
 <p class="yk-lede">下記の候補からご希望の日程をお選びのうえ、必要事項をご入力ください。ご予約いただいた日程は他の方は選べなくなります。前日にリマインドメールをお送りします。</p>
 
 {doneSlot ? (
@@ -108,7 +112,7 @@ const hasOpen = visible.some((s) => !bookings.has(s.id));
       <h2>1. ご希望の日程</h2>
       <div class="yk-card">
         {visible.map((s) => {
-          const full = bookings.has(s.id);
+          const full = bookings.has(s.id) || s.closed;
           return full ? (
             <p class="yk-slot is-full">{formatSlotJa(s.date, s.time)}<span class="yk-full-tag">予約済み</span></p>
           ) : (
