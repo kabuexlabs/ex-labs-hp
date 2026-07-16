@@ -1,7 +1,9 @@
 ---
 // 日程調整の管理ページ（社内用）。
 // YOYAKU_ADMIN_KEY を知っている人だけが候補日の追加・削除、予約の確認・
-// キャンセルをできる。URL は /yoyaku/admin/?key=<合言葉> — ブックマーク推奨。
+// キャンセルをできる。合言葉は POST でのみ受け取り、以降は HttpOnly な
+// セッション Cookie で認証する — URL に載せるとブラウザ履歴・ブックマーク・
+// ホスティングのアクセスログに残ってしまうため、クエリでは絶対に受けない。
 // 静的セグメントは動的な [token] より優先されるので、/yoyaku/admin/ が
 // 予約ページとして解決されることはない。
 export const prerender = false;
@@ -24,15 +26,31 @@ import {
 Astro.response.headers.set('Cache-Control', 'no-store');
 Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
 
-let key = Astro.url.searchParams.get('key') ?? '';
+const COOKIE = 'yoyaku_admin';
 let error = '';
+let loginFailed = false;
 let message = Astro.url.searchParams.get('msg') ?? '';
+
+// 認証はセッション Cookie（ブラウザを閉じると消える）。値は合言葉そのもの
+// ではなくても良いが、サーバ側に状態を持たない構成なので毎回照合する。
+let key = Astro.cookies.get(COOKIE)?.value ?? '';
 
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
-  key = String(form.get('key') ?? key);
-  if (checkAdminKey(key)) {
-    const action = String(form.get('action') ?? '');
+  const action = String(form.get('action') ?? '');
+  if (action === 'login') {
+    const entered = String(form.get('key') ?? '');
+    if (checkAdminKey(entered)) {
+      Astro.cookies.set(COOKIE, entered, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/yoyaku/admin',
+      });
+      return Astro.redirect(Astro.url.pathname, 303);
+    }
+    loginFailed = true;
+  } else if (checkAdminKey(key)) {
     const bookings = await getBookings();
     let msg = '';
     if (action === 'add') {
@@ -58,10 +76,7 @@ if (Astro.request.method === 'POST') {
     }
     if (!error) {
       // PRG: リロードで同じ操作が再実行されないようリダイレクト
-      return Astro.redirect(
-        `${Astro.url.pathname}?key=${encodeURIComponent(key)}&msg=${encodeURIComponent(msg)}`,
-        303,
-      );
+      return Astro.redirect(`${Astro.url.pathname}?msg=${encodeURIComponent(msg)}`, 303);
     }
   }
 }
@@ -80,8 +95,9 @@ const bookingList = [...bookings.values()].sort((a, b) => (a.date + a.time).loca
 
 {!authed ? (
   <>
-  {(key || Astro.request.method === 'POST') && <p class="yk-error">合言葉が違います。</p>}
-  <form method="GET" action={Astro.url.pathname}>
+  {loginFailed && <p class="yk-error">合言葉が違います。</p>}
+  <form method="POST" action={Astro.url.pathname}>
+    <input type="hidden" name="action" value="login">
     <div class="yk-card">
       <label class="yk-field">管理用の合言葉
         <input type="password" name="key" required autocomplete="current-password">
@@ -106,7 +122,6 @@ const bookingList = [...bookings.values()].sort((a, b) => (a.date + a.time).loca
 
   <h2>候補日を追加</h2>
   <form method="POST" action={Astro.url.pathname}>
-    <input type="hidden" name="key" value={key}>
     <input type="hidden" name="action" value="add">
     <div class="yk-card" style="padding-top:6px">
       <div class="yk-row">
@@ -138,7 +153,6 @@ const bookingList = [...bookings.values()].sort((a, b) => (a.date + a.time).loca
               <td>
                 {!b && (
                   <form class="yk-inline-form" method="POST" action={Astro.url.pathname}>
-                    <input type="hidden" name="key" value={key}>
                     <input type="hidden" name="action" value="delslot">
                     <input type="hidden" name="id" value={s.id}>
                     <button class="yk-del" type="submit">削除</button>
@@ -169,7 +183,6 @@ const bookingList = [...bookings.values()].sort((a, b) => (a.date + a.time).loca
             <td>{b.remindedAt ? '送信済み' : '未送信'}</td>
             <td>
               <form class="yk-inline-form" method="POST" action={Astro.url.pathname}>
-                <input type="hidden" name="key" value={key}>
                 <input type="hidden" name="action" value="cancel">
                 <input type="hidden" name="id" value={b.slotId}>
                 <button class="yk-del" type="submit">キャンセル</button>
