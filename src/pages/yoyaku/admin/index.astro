@@ -1,0 +1,186 @@
+---
+// 日程調整の管理ページ（社内用）。
+// YOYAKU_ADMIN_KEY を知っている人だけが候補日の追加・削除、予約の確認・
+// キャンセルをできる。URL は /yoyaku/admin/?key=<合言葉> — ブックマーク推奨。
+// 静的セグメントは動的な [token] より優先されるので、/yoyaku/admin/ が
+// 予約ページとして解決されることはない。
+export const prerender = false;
+
+import YoyakuLayout from '../../../layouts/YoyakuLayout.astro';
+import {
+  checkAdminKey,
+  isKvConfigured,
+  bookingPageToken,
+  getSlots,
+  getBookings,
+  addSlot,
+  deleteSlot,
+  cancelBooking,
+  formatSlotJa,
+  jstToday,
+  type Booking,
+} from '../../../lib/yoyaku';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+
+let key = Astro.url.searchParams.get('key') ?? '';
+let error = '';
+let message = Astro.url.searchParams.get('msg') ?? '';
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  key = String(form.get('key') ?? key);
+  if (checkAdminKey(key)) {
+    const action = String(form.get('action') ?? '');
+    const bookings = await getBookings();
+    let msg = '';
+    if (action === 'add') {
+      const date = String(form.get('date') ?? '');
+      const time = String(form.get('time') ?? '').trim().slice(0, 40);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) error = '日付を選択してください。';
+      else if (!time) error = '時間帯を入力してください（例：14:00〜16:00）。';
+      else {
+        await addSlot(date, time);
+        msg = '候補日を追加しました。';
+      }
+    } else if (action === 'delslot') {
+      const id = String(form.get('id') ?? '');
+      if (bookings.has(id)) error = 'この枠には予約が入っています。先に予約をキャンセルしてください。';
+      else {
+        await deleteSlot(id);
+        msg = '候補日を削除しました。';
+      }
+    } else if (action === 'cancel') {
+      const id = String(form.get('id') ?? '');
+      await cancelBooking(id);
+      msg = '予約をキャンセルしました。枠は再び予約可能になります。';
+    }
+    if (!error) {
+      // PRG: リロードで同じ操作が再実行されないようリダイレクト
+      return Astro.redirect(
+        `${Astro.url.pathname}?key=${encodeURIComponent(key)}&msg=${encodeURIComponent(msg)}`,
+        303,
+      );
+    }
+  }
+}
+
+const authed = checkAdminKey(key);
+const configured = isKvConfigured();
+const token = bookingPageToken();
+const shareUrl = token ? new URL(`/yoyaku/${token}/`, Astro.site ?? Astro.url).toString() : '';
+
+const [slots, bookings] = authed && configured ? await Promise.all([getSlots(), getBookings()]) : [[], new Map<string, Booking>()];
+const today = jstToday();
+const bookingList = [...bookings.values()].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+---
+<YoyakuLayout title="日程調整 管理｜株式会社 ex Labs">
+<h1>日程調整 管理ページ</h1>
+
+{!authed ? (
+  <>
+  {(key || Astro.request.method === 'POST') && <p class="yk-error">合言葉が違います。</p>}
+  <form method="GET" action={Astro.url.pathname}>
+    <div class="yk-card">
+      <label class="yk-field">管理用の合言葉
+        <input type="password" name="key" required autocomplete="current-password">
+      </label>
+      <button class="yk-btn" type="submit">ログイン</button>
+    </div>
+  </form>
+  </>
+) : !configured ? (
+  <p class="yk-error">データベース（Upstash Redis）が未接続です。Vercel の Storage 設定を確認してください（docs/yoyaku-setup.md 参照）。</p>
+) : (
+  <>
+  {message && <p class="yk-done">{message}</p>}
+  {error && <p class="yk-error">{error}</p>}
+
+  <h2>お客様に共有するURL</h2>
+  {shareUrl ? (
+    <p class="yk-copy">{shareUrl}</p>
+  ) : (
+    <p class="yk-notice">BOOKING_PAGE_TOKEN が未設定のため、予約ページはまだ公開されていません。</p>
+  )}
+
+  <h2>候補日を追加</h2>
+  <form method="POST" action={Astro.url.pathname}>
+    <input type="hidden" name="key" value={key}>
+    <input type="hidden" name="action" value="add">
+    <div class="yk-card" style="padding-top:6px">
+      <div class="yk-row">
+        <label class="yk-field">日付
+          <input type="date" name="date" required min={today}>
+        </label>
+        <label class="yk-field">時間帯<small>例：14:00〜16:00</small>
+          <input type="text" name="time" required maxlength="40" placeholder="14:00〜16:00">
+        </label>
+      </div>
+      <button class="yk-btn" type="submit">追加する</button>
+    </div>
+  </form>
+
+  <h2>候補日と空き状況</h2>
+  <div class="yk-card">
+    {slots.length === 0 ? (
+      <p style="font-size:14px;color:#8a8378;margin:6px 0">候補日はまだありません。上のフォームから追加してください。</p>
+    ) : (
+      <table class="yk-table">
+        <thead><tr><th>日程</th><th>状態</th><th></th></tr></thead>
+        <tbody>
+        {slots.map((s) => {
+          const b = bookings.get(s.id);
+          return (
+            <tr style={s.date < today ? 'opacity:.5' : ''}>
+              <td>{formatSlotJa(s.date, s.time)}{s.date < today && '（過去）'}</td>
+              <td>{b ? <span class="yk-status-booked">予約済み</span> : <span class="yk-status-open">空き</span>}</td>
+              <td>
+                {!b && (
+                  <form class="yk-inline-form" method="POST" action={Astro.url.pathname}>
+                    <input type="hidden" name="key" value={key}>
+                    <input type="hidden" name="action" value="delslot">
+                    <input type="hidden" name="id" value={s.id}>
+                    <button class="yk-del" type="submit">削除</button>
+                  </form>
+                )}
+              </td>
+            </tr>
+          );
+        })}
+        </tbody>
+      </table>
+    )}
+  </div>
+
+  <h2>予約一覧</h2>
+  <div class="yk-card">
+    {bookingList.length === 0 ? (
+      <p style="font-size:14px;color:#8a8378;margin:6px 0">予約はまだありません。</p>
+    ) : (
+      <table class="yk-table">
+        <thead><tr><th>日程</th><th>お客様</th><th>連絡先</th><th>リマインド</th><th></th></tr></thead>
+        <tbody>
+        {bookingList.map((b) => (
+          <tr>
+            <td>{formatSlotJa(b.date, b.time)}</td>
+            <td>{b.name}</td>
+            <td>{b.phone}<br>{b.email}</td>
+            <td>{b.remindedAt ? '送信済み' : '未送信'}</td>
+            <td>
+              <form class="yk-inline-form" method="POST" action={Astro.url.pathname}>
+                <input type="hidden" name="key" value={key}>
+                <input type="hidden" name="action" value="cancel">
+                <input type="hidden" name="id" value={b.slotId}>
+                <button class="yk-del" type="submit">キャンセル</button>
+              </form>
+            </td>
+          </tr>
+        ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+  </>
+)}
+</YoyakuLayout>

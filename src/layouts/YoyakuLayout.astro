@@ -1,0 +1,74 @@
+---
+// 日程調整（/yoyaku）専用の最小レイアウト。
+// リンクを知っている人だけに見せる非公開ページなので、サイト共通の
+// ナビ・フッター・JSON-LD・OGP は載せず、noindex を必ず付ける。
+export interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>{title}</title>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&family=Shippori+Mincho:wght@700;800&display=swap">
+{/* slot 経由で入るページ側の要素にも当てるため is:global にする */}
+<style is:global>
+:root{--accent:#f4581c;--accent-dark:#d43f07;--yellow:#ffd23f;--ink:#33302b;--cream:#f7f2e9}
+*{box-sizing:border-box}
+body{margin:0;background:#fffdf8;color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1;letter-spacing:.015em;line-height:1.8}
+.yk-wrap{max-width:640px;margin:0 auto;padding:48px 20px 80px}
+.yk-brand{display:flex;align-items:center;gap:12px;margin-bottom:36px}
+.yk-brand img{height:34px;width:auto}
+.yk-brand span{font-size:13px;color:#8a8378;letter-spacing:.08em}
+h1{font-family:'Shippori Mincho',serif;font-weight:800;font-size:26px;line-height:1.4;letter-spacing:.04em;color:var(--accent);margin:0 0 8px}
+h1::after{content:'';display:block;width:46px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--yellow),var(--accent));margin-top:14px}
+h2{font-size:16px;font-weight:800;letter-spacing:.06em;margin:36px 0 12px}
+.yk-lede{font-size:14.5px;color:#5f594f;margin:14px 0 0}
+.yk-card{background:#fff;border:1px solid #ece5d8;border-radius:16px;padding:22px 22px 24px;margin-top:16px;box-shadow:0 6px 18px rgba(51,48,43,.05)}
+.yk-slot{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #f1ece2;font-size:15px}
+.yk-slot:last-child{border-bottom:none}
+.yk-slot input[type=radio]{width:19px;height:19px;accent-color:var(--accent);flex:none;margin:0}
+.yk-slot.is-full{color:#b6ae9f}
+.yk-slot .yk-full-tag{margin-left:auto;flex:none;font-size:11.5px;font-weight:800;letter-spacing:.1em;color:#b6ae9f;border:1.5px solid #ddd5c6;border-radius:999px;padding:3px 12px}
+label.yk-field{display:block;margin-top:18px;font-size:13.5px;font-weight:700}
+label.yk-field small{font-weight:400;color:#8a8378;margin-left:6px}
+input[type=text],input[type=tel],input[type=email],input[type=date],input[type=password]{width:100%;margin-top:7px;padding:13px 14px;font:inherit;font-size:15px;border:1.5px solid #ddd5c6;border-radius:10px;background:#fffdf8;color:var(--ink)}
+input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.yk-btn{display:inline-flex;align-items:center;justify-content:center;width:100%;margin-top:26px;padding:16px 38px;background:linear-gradient(180deg,#f66427 0%,#e04a0f 100%);color:#fff;font:inherit;font-weight:800;font-size:15px;letter-spacing:.08em;border:none;border-radius:999px;box-shadow:0 10px 24px rgba(212,63,7,.3);cursor:pointer;transition:transform .2s,box-shadow .2s}
+.yk-btn:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(212,63,7,.38)}
+.yk-btn.small{width:auto;padding:9px 20px;font-size:12.5px;margin-top:0;box-shadow:none}
+.yk-btn.ghost{background:#fff;color:var(--accent-dark);border:1.5px solid var(--accent)}
+.yk-error{background:#fdecec;border:1.5px solid #e8b4b4;color:#a13030;border-radius:12px;padding:13px 16px;font-size:14px;margin-top:16px}
+.yk-notice{background:#fff8e0;border:1.5px solid #eedb9a;color:#7a5d00;border-radius:12px;padding:13px 16px;font-size:14px;margin-top:16px}
+.yk-done{background:#effaf1;border:1.5px solid #b5e0bf;color:#1d6b32;border-radius:12px;padding:16px 18px;font-size:14.5px;margin-top:16px}
+.yk-done strong{display:block;font-size:16px;margin-bottom:4px}
+.yk-table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:10px}
+.yk-table th,.yk-table td{text-align:left;padding:9px 10px;border-bottom:1px solid #f1ece2;vertical-align:top}
+.yk-table th{font-size:12px;letter-spacing:.06em;color:#8a8378;white-space:nowrap}
+.yk-status-open{color:#1d6b32;font-weight:700;white-space:nowrap}
+.yk-status-booked{color:var(--accent-dark);font-weight:700;white-space:nowrap}
+.yk-inline-form{display:inline}
+.yk-del{background:none;border:none;color:#a13030;font:inherit;font-size:12.5px;cursor:pointer;text-decoration:underline;padding:0}
+.yk-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.yk-row>label{flex:1;min-width:160px;margin-top:12px}
+.yk-foot{margin-top:56px;font-size:12px;color:#a79f90;text-align:center}
+.yk-copy{font-size:12.5px;word-break:break-all;background:#f7f2e9;border-radius:8px;padding:10px 12px;margin-top:8px}
+@media(max-width:520px){.yk-wrap{padding-top:32px}h1{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="yk-wrap">
+<p class="yk-brand"><img src="/assets/logo.png" alt="ex Labs"><span>株式会社 ex Labs</span></p>
+<slot />
+<p class="yk-foot">© 2026 ex Labs Inc.</p>
+</div>
+</body>
+</html>
