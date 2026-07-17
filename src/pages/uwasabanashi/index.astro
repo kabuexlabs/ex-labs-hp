@@ -95,18 +95,10 @@ const faqs = [
 <div class="sechead"><h2 class="sechead-en">STORY</h2><p class="sechead-ja">ストーリー</p><div class="rule"></div></div>
 <p class="storyp">2026年9月。<br>Shibuya Sakura Stageで、4人の従業員が<br>相次いで心臓発作により死亡した。</p>
 <p class="storyp">現場から発見されたのは、<br>未来を書き換えるという「現実改変ノート」。<br>「4人は、このノートによって殺された」</p>
-<div class="simg errslot" role="img" aria-label="削除された目撃談の画面演出">
-<p class="err-code mincho">404</p>
-<p class="err-sub">NOT FOUND</p>
-<p class="err-note">この目撃談は、すでに削除されています。</p>
-</div>
+<img class="simg" src="/assets/uwasabanashi/story-night.webp" alt="夜の渋谷サクラステージ" loading="lazy" width="1200" height="900">
 <p class="storyp">囁かれるウワサバナシの真相を調査するため、<br>あなたは「ウワサバナシ調査委員会」の新人調査員として、<br>現地へ派遣された。</p>
 <p class="storyp">施設内を巡り、関係者への聞き込みを重ねながら、<br>現実改変ノートに隠されたルールを解き明かしていく。</p>
-<div class="simg errslot" role="img" aria-label="閲覧制限された調査記録の画面演出">
-<p class="err-code mincho">403</p>
-<p class="err-sub">FORBIDDEN</p>
-<p class="err-note">この調査記録の閲覧には、権限が必要です。</p>
-</div>
+<img class="simg" src="/assets/uwasabanashi/story-shop.webp" alt="調査の舞台となる店舗フロア" loading="lazy" width="1200" height="900">
 <p class="storyp storylead">現実を改変した犯人は、一体誰なのか。<br>ウワサバナシの真相を暴け。</p>
 </div>
 </section>
@@ -146,7 +138,7 @@ const faqs = [
 
 <section class="sec" id="team">
 <div class="wrap rv">
-<div class="sechead"><h2 class="sechead-en">TEAM</h2><p class="sechead-ja">企画・プロデュース</p><div class="rule"></div></div>
+<div class="sechead"><h2 class="sechead-en">TEAM</h2><div class="rule"></div></div>
 <div class="teamgrid">
 <img class="teamimg" src="/assets/uwasabanashi/tonton.jpg" alt="とんとんのプロフィールアイコン" loading="lazy" width="400" height="400">
 <div>
@@ -155,7 +147,6 @@ const faqs = [
 <p class="teamp">体験型コンテンツクリエイター。公演型マーダーミステリーやストーリープレイングを中心に、数多くの物語体験を提供している。</p>
 <p class="teamp">近年はイマーシブコンテンツの脚本制作など、没入型エンターテインメントの分野へも活動の幅を広げている。</p>
 <p class="teamp">代表作『天使は花明かりの下で』『白いウサギは歌わない』『BOOROOM』など</p>
-<p class="teamlink"><a href="#contact">最新情報を発信中 →</a></p>
 </div>
 </div>
 </div>
@@ -301,15 +292,7 @@ a:hover{color:#fff}
 /* STORY */
 .storyp{font-family:'Shippori Mincho',serif;font-size:clamp(15px,1.7vw,18px);letter-spacing:.1em;line-height:2.6;margin:0 0 44px;text-align:center}
 .storylead{font-size:clamp(19px,2.4vw,26px);color:#fff;letter-spacing:.16em}
-.simg{width:min(720px,100%);height:340px;margin:56px auto;display:block}
-
-/* STORYの「消された記録」演出パネル。
-   実写真（掲載許可のある素材）が届いたら <img> object-fit:cover に差し替え可 */
-.errslot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:#0c1114 repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.014) 3px 4px);border:1px solid rgba(255,255,255,.08);box-sizing:border-box;animation:errflick 6s step-end infinite}
-.err-code{font-size:clamp(42px,6vw,64px);letter-spacing:.18em;color:var(--accent);opacity:.8;margin:0;text-indent:.18em}
-.err-sub{font-size:12px;letter-spacing:.5em;color:#fff;opacity:.6;margin:0;text-indent:.5em}
-.err-note{font-size:12px;letter-spacing:.14em;color:var(--dim);margin:12px 0 0;padding:0 16px;text-align:center}
-@keyframes errflick{0%,93%,96%,100%{opacity:1}94%{opacity:.55}95%{opacity:.85}}
+.simg{width:min(720px,100%);height:340px;margin:56px auto;display:block;object-fit:cover}
 
 /* ABOUT */
 .aboutgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px}
@@ -338,7 +321,6 @@ a:hover{color:#fff}
 .teamp{font-size:14px;color:var(--dim);margin:0 0 14px}
 .teamrole{font-size:13px;letter-spacing:.2em;color:var(--accent);margin:0 0 8px}
 .teamname{font-size:24px;font-weight:600;letter-spacing:.08em;color:#fff;margin:0 0 18px}
-.teamlink{margin:20px 0 0}
 
 /* 注意事項 */
 .notes{max-width:820px;margin:0 auto}
@@ -400,7 +382,7 @@ a:hover{color:#fff}
 
 @media (prefers-reduced-motion: reduce){
 html{scroll-behavior:auto}
-.kvlogo,.kvcatch,.kvmeta,.cta,.errslot{animation:none}
+.kvlogo,.kvcatch,.kvmeta,.cta{animation:none}
 .newsin{animation:none}
 .rv{opacity:1;transform:none;transition:none}
 }
