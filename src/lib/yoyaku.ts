@@ -1,13 +1,26 @@
-import { timingSafeEqual } from 'node:crypto';
+import { timingSafeEqual, randomBytes } from 'node:crypto';
 
 // ---------------------------------------------------------------------------
 // 日程調整（/yoyaku）のデータ層とメール送信。
+//
+// 「イベント」単位で複数の予約ページを同時運用できる。イベントごとに
+//   ・タイトル
+//   ・共有URLトークン（イベント作成時に自動発行。1つ漏れても他に影響なし）
+//   ・候補日（枠）と予約
+// を持ち、1つの管理ページ（/yoyaku/admin/）からまとめて管理する。
 //
 // ストレージ: Upstash Redis の REST API（Vercel Marketplace の無料プラン）。
 //   SDK を入れず fetch だけで叩くので依存が増えない。
 // メール:     Resend の REST API（無料枠 月3,000通）。未設定でも予約自体は
 //   成立し、メールだけスキップされる（運用開始前でも壊れない）。
 // ---------------------------------------------------------------------------
+
+export interface EventInfo {
+  id: string;
+  token: string; // 共有URLの秘密トークン（/yoyaku/<token>/）
+  title: string;
+  createdAt: string;
+}
 
 export interface Slot {
   id: string;
@@ -29,6 +42,8 @@ export interface Booking {
   createdAt: string;
   remindedAt?: string;
 }
+
+export const DEFAULT_TITLE = '日程調整のご案内';
 
 // Vercel injects dashboard variables into process.env at runtime;
 // import.meta.env covers .env files and build-time injection.
@@ -66,8 +81,9 @@ async function redis(...command: string[]): Promise<unknown> {
   return data.result;
 }
 
-const SLOTS_KEY = 'yoyaku:slots';
-const BOOKINGS_KEY = 'yoyaku:bookings';
+const EVENTS_KEY = 'yoyaku:events';
+const evSlotsKey = (eventId: string) => `yoyaku:ev:${eventId}:slots`;
+const evBookingsKey = (eventId: string) => `yoyaku:ev:${eventId}:bookings`;
 
 // HGETALL は [field, value, field, value, ...] のフラット配列で返る。
 function parseHash<T>(flat: unknown): Map<string, T> {
@@ -83,49 +99,118 @@ function parseHash<T>(flat: unknown): Map<string, T> {
   return map;
 }
 
-export async function getSlots(): Promise<Slot[]> {
-  const map = parseHash<Slot>(await redis('HGETALL', SLOTS_KEY));
-  return [...map.values()].sort((a, b) =>
-    (a.date + a.time).localeCompare(b.date + b.time),
-  );
+const randHex = (bytes: number) => randomBytes(bytes).toString('hex');
+
+// --- イベント -----------------------------------------------------------------
+
+export async function getEvents(): Promise<EventInfo[]> {
+  const map = parseHash<EventInfo>(await redis('HGETALL', EVENTS_KEY));
+  return [...map.values()].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 
-export async function getBookings(): Promise<Map<string, Booking>> {
-  return parseHash<Booking>(await redis('HGETALL', BOOKINGS_KEY));
+export async function getEvent(id: string): Promise<EventInfo | null> {
+  const raw = await redis('HGET', EVENTS_KEY, id);
+  if (typeof raw !== 'string') return null;
+  try {
+    return JSON.parse(raw) as EventInfo;
+  } catch {
+    return null;
+  }
 }
 
-export async function addSlot(date: string, time: string): Promise<Slot> {
+export async function saveEvent(ev: EventInfo): Promise<void> {
+  await redis('HSET', EVENTS_KEY, ev.id, JSON.stringify(ev));
+}
+
+export async function createEvent(title: string): Promise<EventInfo> {
+  const ev: EventInfo = {
+    id: randHex(4),
+    token: randHex(12), // 24文字の推測不可能なトークン
+    title: title.trim().slice(0, 80) || DEFAULT_TITLE,
+    createdAt: new Date().toISOString(),
+  };
+  await saveEvent(ev);
+  return ev;
+}
+
+/** イベント削除。枠・予約データも一緒に消す。 */
+export async function deleteEvent(id: string): Promise<void> {
+  await redis('HDEL', EVENTS_KEY, id);
+  await redis('DEL', evSlotsKey(id), evBookingsKey(id));
+}
+
+/** 共有URLのトークンから該当イベントを引く（予約ページの認証）。 */
+export async function findEventByToken(token: string): Promise<EventInfo | null> {
+  if (!token) return null;
+  const events = await getEvents();
+  // 一致判定はタイミングセーフ比較。イベント数は高々数十なので全走査で十分。
+  return events.find((ev) => safeEqual(ev.token, token)) ?? null;
+}
+
+/** イベント一覧に出す枠数・予約数（HLEN なので軽い）。 */
+export async function getEventStats(id: string): Promise<{ slots: number; bookings: number }> {
+  const [slots, bookings] = await Promise.all([
+    redis('HLEN', evSlotsKey(id)),
+    redis('HLEN', evBookingsKey(id)),
+  ]);
+  return { slots: Number(slots) || 0, bookings: Number(bookings) || 0 };
+}
+
+/**
+ * 旧・単一イベント構成（yoyaku:slots / yoyaku:bookings / yoyaku:title）からの
+ * 自動引き継ぎ。イベントが1つもなく旧データがあるときだけ、旧データを
+ * 「イベント1」として取り込む。共有URLは旧 BOOKING_PAGE_TOKEN を引き継ぐので
+ * すでに配ったリンクもそのまま使える。
+ */
+export async function migrateLegacy(): Promise<void> {
+  const count = Number(await redis('HLEN', EVENTS_KEY)) || 0;
+  if (count > 0) return;
+  const legacySlots = Number(await redis('HLEN', 'yoyaku:slots')) || 0;
+  const legacyTitle = await redis('GET', 'yoyaku:title');
+  if (legacySlots === 0 && typeof legacyTitle !== 'string') return;
+
+  const ev: EventInfo = {
+    id: randHex(4),
+    token: readEnv('BOOKING_PAGE_TOKEN') ?? randHex(12),
+    title: typeof legacyTitle === 'string' && legacyTitle.trim() ? legacyTitle : DEFAULT_TITLE,
+    createdAt: new Date().toISOString(),
+  };
+  await saveEvent(ev);
+  if (legacySlots > 0) await redis('RENAME', 'yoyaku:slots', evSlotsKey(ev.id));
+  const legacyBookings = Number(await redis('HLEN', 'yoyaku:bookings')) || 0;
+  if (legacyBookings > 0) await redis('RENAME', 'yoyaku:bookings', evBookingsKey(ev.id));
+  await redis('DEL', 'yoyaku:title');
+}
+
+// --- 枠と予約 -----------------------------------------------------------------
+
+export async function getSlots(eventId: string): Promise<Slot[]> {
+  const map = parseHash<Slot>(await redis('HGETALL', evSlotsKey(eventId)));
+  return [...map.values()].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+}
+
+export async function getBookings(eventId: string): Promise<Map<string, Booking>> {
+  return parseHash<Booking>(await redis('HGETALL', evBookingsKey(eventId)));
+}
+
+export async function addSlot(eventId: string, date: string, time: string): Promise<Slot> {
   // 同一日に複数枠（時間帯違い）を作れるよう、ID には乱数を混ぜる。
   const id = `${date}_${Math.random().toString(36).slice(2, 8)}`;
   const slot: Slot = { id, date, time, createdAt: new Date().toISOString() };
-  await redis('HSET', SLOTS_KEY, id, JSON.stringify(slot));
+  await redis('HSET', evSlotsKey(eventId), id, JSON.stringify(slot));
   return slot;
 }
 
-export async function deleteSlot(id: string): Promise<void> {
-  await redis('HDEL', SLOTS_KEY, id);
+export async function saveSlot(eventId: string, slot: Slot): Promise<void> {
+  await redis('HSET', evSlotsKey(eventId), slot.id, JSON.stringify(slot));
 }
 
-export async function saveSlot(slot: Slot): Promise<void> {
-  await redis('HSET', SLOTS_KEY, slot.id, JSON.stringify(slot));
+export async function deleteSlot(eventId: string, id: string): Promise<void> {
+  await redis('HDEL', evSlotsKey(eventId), id);
 }
 
-// --- ページ設定（タイトルなど） ------------------------------------------------
-
-const TITLE_KEY = 'yoyaku:title';
-export const DEFAULT_TITLE = '日程調整のご案内';
-
-export async function getPageTitle(): Promise<string> {
-  const raw = await redis('GET', TITLE_KEY);
-  return typeof raw === 'string' && raw.trim() ? raw : DEFAULT_TITLE;
-}
-
-export async function setPageTitle(title: string): Promise<void> {
-  await redis('SET', TITLE_KEY, title.trim().slice(0, 80));
-}
-
-export async function getSlot(id: string): Promise<Slot | null> {
-  const raw = await redis('HGET', SLOTS_KEY, id);
+export async function getSlot(eventId: string, id: string): Promise<Slot | null> {
+  const raw = await redis('HGET', evSlotsKey(eventId), id);
   if (typeof raw !== 'string') return null;
   try {
     return JSON.parse(raw) as Slot;
@@ -138,7 +223,11 @@ export async function getSlot(id: string): Promise<Slot | null> {
  * 予約の本体。HSETNX が原子的なので、同じ枠に二人が同時に申し込んでも
  * 先に書けた一人だけが成功する（ダブルブッキング防止）。
  */
-export async function reserve(slot: Slot, data: { name: string; phone: string; email: string }): Promise<boolean> {
+export async function reserve(
+  eventId: string,
+  slot: Slot,
+  data: { name: string; phone: string; email: string },
+): Promise<boolean> {
   const booking: Booking = {
     slotId: slot.id,
     name: data.name,
@@ -148,16 +237,16 @@ export async function reserve(slot: Slot, data: { name: string; phone: string; e
     time: slot.time,
     createdAt: new Date().toISOString(),
   };
-  const result = await redis('HSETNX', BOOKINGS_KEY, slot.id, JSON.stringify(booking));
+  const result = await redis('HSETNX', evBookingsKey(eventId), slot.id, JSON.stringify(booking));
   return result === 1;
 }
 
-export async function cancelBooking(slotId: string): Promise<void> {
-  await redis('HDEL', BOOKINGS_KEY, slotId);
+export async function cancelBooking(eventId: string, slotId: string): Promise<void> {
+  await redis('HDEL', evBookingsKey(eventId), slotId);
 }
 
-export async function saveBooking(booking: Booking): Promise<void> {
-  await redis('HSET', BOOKINGS_KEY, booking.slotId, JSON.stringify(booking));
+export async function saveBooking(eventId: string, booking: Booking): Promise<void> {
+  await redis('HSET', evBookingsKey(eventId), booking.slotId, JSON.stringify(booking));
 }
 
 // --- 認証 -------------------------------------------------------------------
@@ -167,17 +256,6 @@ function safeEqual(a: string, b: string): boolean {
   const bb = Buffer.from(b);
   // timingSafeEqual は長さ違いで例外になるため先に弾く（長さは秘密ではない）。
   return ab.length === bb.length && timingSafeEqual(ab, bb);
-}
-
-/** 予約ページの URL トークン（= リンクを知っている人だけ見られる）。 */
-export function checkPageToken(token: string | undefined): boolean {
-  const expected = readEnv('BOOKING_PAGE_TOKEN');
-  return !!expected && !!token && safeEqual(token, expected);
-}
-
-/** 管理ページに「お客様に共有するURL」を表示するために使う。 */
-export function bookingPageToken(): string | undefined {
-  return readEnv('BOOKING_PAGE_TOKEN');
 }
 
 /** 管理ページの合言葉。 */
