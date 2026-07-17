@@ -42,6 +42,7 @@ export const GET: APIRoute = async ({ request }) => {
     const due = [...bookings.values()].filter((b) => b.date === tomorrow && !b.remindedAt);
     dueCount += due.length;
 
+    const notesBlock = ev.notes ? `■ ご案内\n${ev.notes}\n\n` : '';
     for (const b of due) {
       const when = formatSlotJa(b.date, b.time);
       const ok = await sendMail(
@@ -49,6 +50,7 @@ export const GET: APIRoute = async ({ request }) => {
         '【ex Labs】明日のご予約のリマインド',
         `${b.name} 様\n\n明日のご予約のリマインドです。\n\n` +
           `■ イベント\n${ev.title}\n\n■ 日程\n${when}\n\n` +
+          notesBlock +
           `ご不明な点や変更のご希望がありましたら、このメールへの返信、または ${adminEmail()} までご連絡ください。\n\n` +
           `当日はどうぞよろしくお願いいたします。\n\n株式会社 ex Labs`,
       );

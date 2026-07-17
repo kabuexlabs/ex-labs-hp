@@ -65,6 +65,7 @@ if (Astro.request.method === 'POST') {
       error = '申し訳ありません、この日程はたった今埋まってしまいました。別の日程をお選びください。';
     } else {
       const when = formatSlotJa(slot.date, slot.time);
+      const notesBlock = ev.notes ? `■ ご案内\n${ev.notes}\n\n` : '';
       await Promise.all([
         sendMail(
           email,
@@ -72,6 +73,7 @@ if (Astro.request.method === 'POST') {
           `${name} 様\n\nご予約ありがとうございます。以下の内容で承りました。\n\n` +
             `■ イベント\n${ev.title}\n\n■ 日程\n${when}\n\n` +
             `■ ご入力内容\nハンドルネーム：${name}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +
+            notesBlock +
             `前日にリマインドメールをお送りします。\n変更・キャンセルはこのメールへの返信、または ${adminEmail()} までご連絡ください。\n\n株式会社 ex Labs`,
         ),
         sendMail(
@@ -103,12 +105,20 @@ const hasOpen = visible.some((s) => !bookings.has(s.id) && !s.closed);
 <p class="yk-lede">下記の候補からご希望の日程をお選びのうえ、必要事項をご入力ください。ご予約いただいた日程は他の方は選べなくなります。前日にリマインドメールをお送りします。</p>
 
 {doneSlot ? (
+  <>
   <div class="yk-done">
     <strong>ご予約を承りました</strong>
     日程：{formatSlotJa(doneSlot.date, doneSlot.time)}<br>
     確認メールをお送りしました。前日にもリマインドメールが届きます。<br>
     変更・キャンセルは {adminEmail()} までご連絡ください。
   </div>
+  {ev.notes && (
+    <>
+    <h2>ご案内</h2>
+    <div class="yk-card yk-notes">{ev.notes}</div>
+    </>
+  )}
+  </>
 ) : (
   <>
   {error && <p class="yk-error">{error}</p>}

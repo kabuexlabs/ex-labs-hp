@@ -20,6 +20,10 @@ export interface EventInfo {
   token: string; // 共有URLの秘密トークン（/yoyaku/<token>/）
   title: string;
   createdAt: string;
+  // ご案内文（集合場所・注意事項など）。予約完了画面と確認・リマインド
+  // メールにだけ出す — 予約前の画面には出さないので、場所の情報は
+  // 実際に予約した人にしか伝わらない。
+  notes?: string;
 }
 
 export interface Slot {
