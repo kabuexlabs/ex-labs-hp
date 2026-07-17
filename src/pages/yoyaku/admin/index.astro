@@ -102,6 +102,12 @@ if (Astro.request.method === 'POST') {
           await saveEvent({ ...ev, title: title.slice(0, 80) });
           msg = '予約ページのタイトルを変更しました。';
         }
+      } else if (action === 'notes') {
+        const notes = String(form.get('notes') ?? '').trim().slice(0, 2000);
+        await saveEvent({ ...ev, notes: notes || undefined });
+        msg = notes
+          ? 'ご案内文を保存しました。予約完了画面と確認・リマインドメールに表示されます。'
+          : 'ご案内文を削除しました。';
       } else if (action === 'add') {
         const date = String(form.get('date') ?? '');
         const time = String(form.get('time') ?? '').trim().slice(0, 40);
@@ -267,6 +273,18 @@ const shareUrl = ev ? new URL(`/yoyaku/${ev.token}/`, Astro.site ?? Astro.url).t
         <input type="text" name="title" required maxlength="80" value={ev.title}>
       </label>
       <button class="yk-btn small ghost" type="submit" style="margin-top:16px">変更する</button>
+    </div>
+  </form>
+
+  <h2>ご案内文（集合場所・注意事項など）</h2>
+  <form method="POST" action={Astro.url.pathname}>
+    <input type="hidden" name="action" value="notes">
+    <input type="hidden" name="event" value={ev.id}>
+    <div class="yk-card" style="padding-top:6px">
+      <label class="yk-field">予約完了画面と確認・リマインドメールに表示されます<small>予約前の画面には出ません。空にして保存すると非表示になります</small>
+        <textarea name="notes" rows="6" maxlength="2000" placeholder={`【集合場所】\n〇〇ビル 2F 受付前（西新宿駅 徒歩3分）\n\n【注意事項】\n・開始10分前までにお越しください\n・キャンセルは前日までにご連絡ください`}>{ev.notes ?? ''}</textarea>
+      </label>
+      <button class="yk-btn small ghost" type="submit" style="margin-top:16px">保存する</button>
     </div>
   </form>
 
