@@ -74,8 +74,8 @@ const faqs = [
 <img class="kvlogo" src="/assets/uwasabanashi/logo-white.png" alt="ウワサバナシ調査委員会">
 <p class="kvcatch mincho">「あの4人さ、ノートで殺されたらしいよ」</p>
 <div class="kvmeta">
-<span class="kvdate">2026.{dates.map((d, i) => (
-  <>{i > 0 && <span class="kvsep">／</span>}{d}</>
+<span class="kvdate">{dates.map((d, i) => (
+  <span class="kvd">{i === 0 ? `2026.${d}` : d}{i < dates.length - 1 && <span class="kvsep">／</span>}</span>
 ))}</span>
 <span class="kvvenue">渋谷サクラステージ</span>
 </div>
@@ -277,6 +277,8 @@ a:hover{color:#fff}
 .kvcatch{font-size:clamp(15px,2vw,19px);letter-spacing:.22em;color:var(--ink);margin:0;animation:rise 1.3s ease .5s both}
 .kvmeta{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 40px;font-family:'Shippori Mincho',serif;animation:rise 1.3s ease .9s both}
 .kvdate{font-size:clamp(18px,2.6vw,28px);letter-spacing:.12em;color:#fff}
+/* 日付と後続の区切りをひと塊にして、行の折返しは日付の切れ目だけで起こす */
+.kvd{white-space:nowrap}
 .kvsep{color:var(--accent);font-size:.75em;padding:0 .35em}
 .kvvenue{font-size:14px;letter-spacing:.24em;color:var(--dim);align-self:center}
 
@@ -364,6 +366,15 @@ a:hover{color:#fff}
 .teamimg{width:100%;height:240px}
 .sec{padding:76px 0}
 .kv{padding:130px 20px 70px}
+/* キャッチは字間を詰めて1行に収める（折返すと「よ」だけが孤立する） */
+.kvcatch{letter-spacing:.1em}
+.kvdate{text-wrap:balance}
+/* PC向けの詩的な改行位置は画面幅に合わないので解除し、
+   文節折返し（auto-phrase）＋行長の均等化で語中の孤立改行を防ぐ。
+   auto-phrase 未対応ブラウザでは通常の禁則折返しにフォールバック */
+.storyp br{display:none}
+.storyp{text-wrap:balance;word-break:auto-phrase}
+.faq summary{word-break:auto-phrase}
 .simg{height:220px}
 .price{gap:14px}
 .pricebox{flex:1 1 140px;padding:24px 20px;min-width:0}
