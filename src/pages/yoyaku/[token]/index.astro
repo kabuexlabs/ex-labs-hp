@@ -1,17 +1,18 @@
 ---
-// リンク共有したときだけ見える非公開の日程調整ページ。
-// URL の [token] が BOOKING_PAGE_TOKEN と一致しなければ 404 を返すので、
-// リンクを知らない人・クローラーからは存在ごと見えない。
+// リンク共有したときだけ見える非公開の日程調整ページ（イベント単位）。
+// URL の [token] に一致するイベントがなければ 404 を返すので、リンクを
+// 知らない人・クローラーからは存在ごと見えない。トークンはイベントごとに
+// 別なので、1つのURLが漏れても他のイベントには影響しない。
 export const prerender = false;
 
 import YoyakuLayout from '../../../layouts/YoyakuLayout.astro';
 import {
-  checkPageToken,
   isKvConfigured,
+  migrateLegacy,
+  findEventByToken,
   getSlots,
   getBookings,
   getSlot,
-  getPageTitle,
   reserve,
   sendMail,
   adminEmail,
@@ -22,19 +23,28 @@ import {
   validEmail,
 } from '../../../lib/yoyaku';
 
-if (!checkPageToken(Astro.params.token)) {
-  return new Response('Not Found', { status: 404, headers: { 'Content-Type': 'text/plain' } });
-}
-
 Astro.response.headers.set('Cache-Control', 'no-store');
 Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
 
 const configured = isKvConfigured();
+if (!configured) {
+  // DB未接続の間はトークンを検証できないので、404ではなく準備中を出す
+  return new Response('準備中です。しばらくお待ちください。', {
+    status: 503,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
+}
+
+await migrateLegacy();
+const ev = await findEventByToken(Astro.params.token ?? '');
+if (!ev) {
+  return new Response('Not Found', { status: 404, headers: { 'Content-Type': 'text/plain' } });
+}
 
 let error = '';
 let prev = { name: '', phone: '', email: '', slotId: '' };
 
-if (configured && Astro.request.method === 'POST') {
+if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   const name = String(form.get('name') ?? '').trim().slice(0, 50);
   const phone = normalizePhone(String(form.get('phone') ?? ''));
@@ -47,10 +57,10 @@ if (configured && Astro.request.method === 'POST') {
   else if (!validEmail(email)) error = 'メールアドレスの形式をご確認ください。';
   else if (!slotId) error = 'ご希望の日程を選択してください。';
   else {
-    const slot = await getSlot(slotId);
+    const slot = await getSlot(ev.id, slotId);
     if (!slot || slot.closed || slot.date < jstToday()) {
       error = '選択された日程は現在ご予約いただけません。別の日程をお選びください。';
-    } else if (!(await reserve(slot, { name, phone, email }))) {
+    } else if (!(await reserve(ev.id, slot, { name, phone, email }))) {
       // HSETNX が負けた = 直前に他の方が同じ枠を確保した
       error = '申し訳ありません、この日程はたった今埋まってしまいました。別の日程をお選びください。';
     } else {
@@ -60,13 +70,14 @@ if (configured && Astro.request.method === 'POST') {
           email,
           '【ex Labs】ご予約を承りました',
           `${name} 様\n\nご予約ありがとうございます。以下の内容で承りました。\n\n` +
-            `■ 日程\n${when}\n\n■ ご入力内容\nハンドルネーム：${name}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +
+            `■ イベント\n${ev.title}\n\n■ 日程\n${when}\n\n` +
+            `■ ご入力内容\nハンドルネーム：${name}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +
             `前日にリマインドメールをお送りします。\n変更・キャンセルはこのメールへの返信、または ${adminEmail()} までご連絡ください。\n\n株式会社 ex Labs`,
         ),
         sendMail(
           adminEmail(),
-          `【予約】新規予約が入りました：${when}`,
-          `予約ページから新しい予約が入りました。\n\n■ 日程\n${when}\n\n` +
+          `【予約】${ev.title}：${when}`,
+          `予約ページから新しい予約が入りました。\n\n■ イベント\n${ev.title}\n\n■ 日程\n${when}\n\n` +
             `■ お客様情報\nハンドルネーム：${name}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +
             `管理ページ：${new URL('/yoyaku/admin/', Astro.site ?? Astro.url).toString()}`,
         ),
@@ -80,17 +91,15 @@ if (configured && Astro.request.method === 'POST') {
 const doneId = Astro.url.searchParams.get('done');
 const today = jstToday();
 
-const [slots, bookings, pageTitle] = configured
-  ? await Promise.all([getSlots(), getBookings(), getPageTitle()])
-  : [[], new Map(), '日程調整のご案内'];
+const [slots, bookings] = await Promise.all([getSlots(ev.id), getBookings(ev.id)]);
 // 過去の日付は出さない。予約済み・受付停止の枠は「予約済み」表示で残す
 // （埋まり具合が伝わる）。
 const visible = slots.filter((s) => s.date >= today);
 const doneSlot = doneId ? slots.find((s) => s.id === doneId) : undefined;
 const hasOpen = visible.some((s) => !bookings.has(s.id) && !s.closed);
 ---
-<YoyakuLayout title={`${pageTitle}｜株式会社 ex Labs`}>
-<h1>{pageTitle}</h1>
+<YoyakuLayout title={`${ev.title}｜株式会社 ex Labs`}>
+<h1>{ev.title}</h1>
 <p class="yk-lede">下記の候補からご希望の日程をお選びのうえ、必要事項をご入力ください。ご予約いただいた日程は他の方は選べなくなります。前日にリマインドメールをお送りします。</p>
 
 {doneSlot ? (
@@ -100,8 +109,6 @@ const hasOpen = visible.some((s) => !bookings.has(s.id) && !s.closed);
     確認メールをお送りしました。前日にもリマインドメールが届きます。<br>
     変更・キャンセルは {adminEmail()} までご連絡ください。
   </div>
-) : !configured ? (
-  <p class="yk-notice">現在このページは準備中です。恐れ入りますが、しばらく経ってから再度アクセスしてください。</p>
 ) : (
   <>
   {error && <p class="yk-error">{error}</p>}
