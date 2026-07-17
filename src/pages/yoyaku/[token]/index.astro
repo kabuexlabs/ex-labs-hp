@@ -121,6 +121,12 @@ const hasOpen = visible.some((s) => !bookings.has(s.id) && !s.closed);
   </>
 ) : (
   <>
+  {ev.notes && (
+    <>
+    <h2>ご案内</h2>
+    <div class="yk-card yk-notes">{ev.notes}</div>
+    </>
+  )}
   {error && <p class="yk-error">{error}</p>}
   {!hasOpen ? (
     <p class="yk-notice">現在ご予約いただける日程がありません。恐れ入りますが、担当者までお問い合わせください（{adminEmail()}）。</p>
