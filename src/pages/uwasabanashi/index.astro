@@ -10,7 +10,10 @@ const castComingSoon = true;
 
 const title = '【公式】ウワサバナシ調査委員会 | イマーシブ公演';
 const description =
-  'イマーシブ公演「ウワサバナシ調査委員会」公式サイト。2026.10.9—11.3、渋谷サクラステージにて開催。そのウワサ、確かめに行きませんか。';
+  'イマーシブ公演「ウワサバナシ調査委員会」公式サイト。2026年9月19日・20日・26日・27日・10月3日・4日、渋谷サクラステージにて開催。あの4人さ、ノートで殺されたらしいよ。';
+
+// 公演日程（2026年）。KVに一覧表示する。
+const dates = ['9.19', '9.20', '9.26', '9.27', '10.3', '10.4'];
 
 const newsItems = [
   'NEWS ／ 2026.07.07 公式サイトを公開しました',
@@ -24,7 +27,7 @@ const faqs = [
   { q: '謎解きはありますか？', a: 'いわゆる謎解き要素は基本的にございません。証言を聞き、あなた自身の選択をお楽しみください。' },
   { q: '一度体験したらもう楽しめませんか？', a: '選択によって展開が変わるため、何度でもお楽しみいただけます。' },
   { q: '友達やグループでの参加はできますか？', a: '複数人でのご参加も歓迎です。体験の途中で一時的に離れ離れになる場合があります。' },
-  { q: '遅れた場合、入場できますか？', a: '他のお客様の体験の関係上、途中入場は一律お断りしております。開演10分前には必ずお越しください。' },
+  { q: '遅れた場合、入場できますか？', a: '他のお客様の体験の関係上、途中入場は一律お断りしております。開演5分前には必ずお越しください。' },
   { q: '年齢制限はありますか？', a: '本公演は15歳以上の方のみご参加いただけます。未就学児・乳幼児のご入場は保護者同伴の場合でもご遠慮いただいております。' },
 ];
 ---
@@ -69,9 +72,11 @@ const faqs = [
 <div class="kvnoise"></div>
 <div class="kvin">
 <img class="kvlogo" src="/assets/uwasabanashi/logo-white.png" alt="ウワサバナシ調査委員会">
-<p class="kvcatch mincho">そのウワサ、確かめに行きませんか。</p>
+<p class="kvcatch mincho">「あの4人さ、ノートで殺されたらしいよ」</p>
 <div class="kvmeta">
-<span class="kvdate">2026.10.9 <span class="accent">—</span> 11.3</span>
+<span class="kvdate">2026.{dates.map((d, i) => (
+  <>{i > 0 && <span class="kvsep">／</span>}{d}</>
+))}</span>
 <span class="kvvenue">渋谷サクラステージ</span>
 </div>
 </div>
@@ -88,12 +93,13 @@ const faqs = [
 <section class="sec" id="story">
 <div class="wrap rv">
 <div class="sechead"><h2 class="sechead-en">STORY</h2><p class="sechead-ja">ストーリー</p><div class="rule"></div></div>
-<p class="storyp">渋谷には、いくつかのウワサがある。<br>夜のサクラステージに現れる、誰もいないはずのフロア。<br>終電のあとにだけ流れる、聞き覚えのない館内放送。<br>SNSに書き込まれては、なぜか消えていく目撃談。</p>
+<p class="storyp">2026年9月。<br>Shibuya Sakura Stageで、4人の従業員が<br>相次いで心臓発作により死亡した。</p>
+<p class="storyp">現場から発見されたのは、<br>未来を書き換えるという「現実改変ノート」。<br>「4人は、このノートによって殺された」</p>
 <div class="simg imgslot" role="img" aria-label="渋谷の夜景・現場写真（準備中）"><span>渋谷の夜景・現場写真</span></div>
-<p class="storyp">誰が言い出したのかは、わからない。<br>ほんとうかどうかも、わからない。<br>ただ——調べた者から、順に黙っていく。</p>
-<p class="storyp">あなたは今夜、「ウワサバナシ調査委員会」の<br>調査員として招集された。<br>証言を集め、出どころを辿り、噂の核心へ。</p>
+<p class="storyp">囁かれるウワサバナシの真相を調査するため、<br>あなたは「ウワサバナシ調査委員会」の新人調査員として、<br>現地へ派遣された。</p>
+<p class="storyp">施設内を巡り、関係者への聞き込みを重ねながら、<br>現実改変ノートに隠されたルールを解き明かしていく。</p>
 <div class="simg imgslot" role="img" aria-label="調査資料・小道具の写真（準備中）"><span>調査資料・小道具の写真</span></div>
-<p class="storyp storylead">噂は、調べる者を選ぶ。<br>あなたの選択が、結末を変える。</p>
+<p class="storyp storylead">現実を改変した犯人は、一体誰なのか。<br>ウワサバナシの真相を暴け。</p>
 </div>
 </section>
 
@@ -103,7 +109,7 @@ const faqs = [
 <div class="aboutgrid">
 <div class="abcard"><p class="abnum">01</p><h3 class="abh">舞台は、<br>渋谷サクラステージ。</h3><p class="abp">物語の現場は、実在する渋谷の複合施設。見慣れた街の風景が、調査を進めるほどに違って見えてきます。</p></div>
 <div class="abcard"><p class="abnum">02</p><h3 class="abh">あなた自身が<br>“調査員”になる。</h3><p class="abp">本公演は、あなたが物語の登場人物として噂の調査に巻き込まれていくイマーシブ（没入型）体験。集めた証言や、あなたの「選択」そのものが物語を動かします。</p></div>
-<div class="abcard"><p class="abnum">03</p><h3 class="abh">観るでも、解くでもない。<br>“確かめに行く”物語。</h3><p class="abp">これは映画でも、演劇でも、いわゆる謎解きでもありません。疑い、迷い、選ぶ——噂と向き合う行為そのものを楽しむ体験です。</p></div>
+<div class="abcard"><p class="abnum">03</p><h3 class="abh">あなた自身が<br>都市伝説の謎に挑む</h3><p class="abp">これは映画でも、演劇でも、いわゆる謎解きでもありません。それら全ての要素を複合させた、疑い、迷い、選ぶ——噂と向き合う行為そのものを楽しむ体験です。</p></div>
 </div>
 </div>
 </section>
@@ -121,8 +127,7 @@ const faqs = [
 <div class="wrap rv">
 <div class="sechead"><h2 class="sechead-en">TICKET</h2><p class="sechead-ja">チケット情報</p><div class="rule"></div></div>
 <div class="price">
-<div class="pricebox"><p class="pricelabel">平日</p><p class="priceval">¥4,500<span class="dim priceunit">（税込）</span></p></div>
-<div class="pricebox"><p class="pricelabel">土日祝</p><p class="priceval">¥5,000<span class="dim priceunit">（税込）</span></p></div>
+<div class="pricebox"><p class="pricelabel">全日程共通</p><p class="priceval">¥4,000<span class="dim priceunit">（税込）</span></p></div>
 </div>
 <div class="center">
 <a class="buy" href="#ticket">チケットを購入する</a>
@@ -137,8 +142,9 @@ const faqs = [
 <div class="teamgrid">
 <div class="teamimg imgslot" role="img" aria-label="チーム写真（準備中）"><span>チーム写真</span></div>
 <div>
-<p class="teamp">「ウワサバナシ調査委員会」は、街に流れる噂や記憶を題材に物語体験をつくる企画チームです。没入型公演、体験型展示、街歩き型のイベントなど、場所に宿る声を拾い上げ、ひとつの体験へと立ち上げます。</p>
-<p class="teamp">本公演では、渋谷サクラステージを舞台に、“噂”というもっとも身近な物語装置と向き合います。</p>
+<p class="teamrole">脚本／制作</p>
+<p class="teamname mincho">とんとん</p>
+{/* プロフィール説明文は後日支給され次第ここに追加する */}
 <p class="teamlink"><a href="#contact">最新情報を発信中 →</a></p>
 </div>
 </div>
@@ -159,7 +165,7 @@ const faqs = [
 </ul>
 <h3 class="noteh">ご来場・受付について</h3>
 <ul>
-<li>開演時刻を過ぎますとご入場いただけません。10分前を目安にご来場ください。</li>
+<li>開演時刻を過ぎますとご入場いただけません。5分前を目安にご来場ください。</li>
 <li>受付にて有効なチケットをご提示いただけない場合、ご参加をお断りすることがございます。</li>
 </ul>
 <h3 class="noteh">ご参加いただけない方</h3>
@@ -172,7 +178,6 @@ const faqs = [
 </ul>
 <h3 class="noteh">演出・場内でのお願い</h3>
 <ul>
-<li>本公演には、暗闇・大音量・ストロボ・出演者による接触などの演出が含まれます。</li>
 <li>出演者・スタッフの指示には必ずお従いください。</li>
 <li>館内での飲食・喫煙、許可のない撮影・録音は固くお断りいたします。</li>
 <li>SNS投稿の際は、ネタバレへのご配慮をお願いいたします。</li>
@@ -223,7 +228,7 @@ const faqs = [
 <div class="rv">
 <img class="ftrlogo" src="/assets/uwasabanashi/logo-white.png" alt="ウワサバナシ調査委員会">
 <div class="snsrow"><a class="sns" href="https://x.com/" target="_blank" rel="noopener">X（旧Twitter）</a></div>
-<p class="staff">主催・企画：株式会社ex Labs<br>脚本：とんとん<br>会場：渋谷サクラステージ<br>運営会社：<a href="https://kabuexlabs.com/" target="_blank" rel="noopener">株式会社ex Labs</a></p>
+<p class="staff">主催・企画：株式会社ex Labs<br>脚本／制作：とんとん<br>会場：渋谷サクラステージ<br>運営会社：<a href="https://kabuexlabs.com/" target="_blank" rel="noopener">株式会社ex Labs</a></p>
 <p class="copy">© 株式会社ex Labs All Rights Reserved.</p>
 </div>
 </footer>
@@ -271,7 +276,8 @@ a:hover{color:#fff}
 .kvlogo{width:min(560px,82vw);animation:rise 1.3s ease .1s both}
 .kvcatch{font-size:clamp(15px,2vw,19px);letter-spacing:.22em;color:var(--ink);margin:0;animation:rise 1.3s ease .5s both}
 .kvmeta{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 40px;font-family:'Shippori Mincho',serif;animation:rise 1.3s ease .9s both}
-.kvdate{font-size:clamp(22px,3.4vw,34px);letter-spacing:.12em;color:#fff}
+.kvdate{font-size:clamp(18px,2.6vw,28px);letter-spacing:.12em;color:#fff}
+.kvsep{color:var(--accent);font-size:.75em;padding:0 .35em}
 .kvvenue{font-size:14px;letter-spacing:.24em;color:var(--dim);align-self:center}
 
 /* NEWSティッカー */
@@ -314,6 +320,8 @@ a:hover{color:#fff}
 .teamgrid{display:grid;grid-template-columns:280px 1fr;gap:44px;align-items:start}
 .teamimg{width:280px;height:280px}
 .teamp{font-size:14px;color:var(--dim);margin:0 0 14px}
+.teamrole{font-size:13px;letter-spacing:.2em;color:var(--accent);margin:0 0 8px}
+.teamname{font-size:24px;font-weight:600;letter-spacing:.08em;color:#fff;margin:0}
 .teamlink{margin:20px 0 0}
 
 /* 注意事項 */
