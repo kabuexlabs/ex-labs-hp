@@ -102,7 +102,11 @@ const hasOpen = visible.some((s) => !bookings.has(s.id) && !s.closed);
 ---
 <YoyakuLayout title={`${ev.title}｜株式会社 ex Labs`}>
 <h1>{ev.title}</h1>
-<p class="yk-lede">下記の候補からご希望の日程をお選びのうえ、必要事項をご入力ください。ご予約いただいた日程は他の方は選べなくなります。前日にリマインドメールをお送りします。</p>
+<p class="yk-lede">下記の候補からご希望の日程をお選びのうえ、<span class="nobr">必要事項をご入力ください。</span></p>
+<ul class="yk-lede-points">
+  <li>ご予約いただいた日程は、他の方は選べなくなります</li>
+  <li>予約の前日にリマインドメールをお送りします</li>
+</ul>
 
 {doneSlot ? (
   <>

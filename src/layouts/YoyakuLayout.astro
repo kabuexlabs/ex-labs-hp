@@ -32,6 +32,11 @@ h1{font-family:'Shippori Mincho',serif;font-weight:800;font-size:26px;line-heigh
 h1::after{content:'';display:block;width:46px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--yellow),var(--accent));margin-top:14px}
 h2{font-size:16px;font-weight:800;letter-spacing:.06em;margin:36px 0 12px}
 .yk-lede{font-size:14.5px;color:#5f594f;margin:14px 0 0}
+.nobr{display:inline-block}
+/* 補足事項の箇条書き。マーカーをブランド色にして本文より一段軽く */
+.yk-lede-points{margin:10px 0 0;padding:0 0 0 2px;list-style:none;font-size:13.5px;color:#5f594f}
+.yk-lede-points li{position:relative;padding-left:16px;margin-top:6px;line-height:1.7}
+.yk-lede-points li::before{content:'';position:absolute;left:0;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--yellow);outline:1.5px solid var(--accent);outline-offset:1px;transform:scale(.72)}
 .yk-card{background:#fff;border:1px solid #ece5d8;border-radius:16px;padding:22px 22px 24px;margin-top:16px;box-shadow:0 6px 18px rgba(51,48,43,.05)}
 .yk-slot{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid #f1ece2;font-size:15px}
 .yk-slot:last-child{border-bottom:none}
