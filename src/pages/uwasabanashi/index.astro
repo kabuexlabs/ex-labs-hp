@@ -6,18 +6,20 @@
 // 使わず、このファイルだけで完結させている。
 
 // キャスト一覧。写真は /public/assets/uwasabanashi/cast-<id>.webp に配置。
+// 並び順は50音順（おおの→かなで→すぎた→まゆり→みずしろ→わため）。
+// キャストを追加・変更するときも必ず50音順を維持すること。
 const cast = [
-  { id: 'sugita', name: '杉田真帆', x: 'Maho__0407', bio: '舞台役者、フリーランスで都内で活動中' },
+  { id: 'ohno', name: '大野愛', x: 'madoka145', bio: '舞台やイマーシブシアターを中心に、俳優・ダンサーとして活動中。マーダーミステリーのGMとしての経験も重ね、エンターテイメントの現場で幅広く活躍している。' },
   { id: 'hanakanade', name: '花奏和音', x: 'waonnu', bio: '山形県出身。東北芸術工科大学デザイン工学部卒。18歳から地元劇団で演技を学ぶ。退団後も小劇場を中心に活動を続け、2020年から東京での演劇活動を開始。2025年2月には、女優・千歳まち氏との演劇ユニット『花千本produce』を旗揚げし、初回公演ではプロデュースや出演のほか宣伝美術も務めた。現在イマーシブシアターや体験型コンテンツに多く出演するほか、『ストーリープレイングシアター』にてGMを務めるなど、活動の幅を広げる。' },
+  { id: 'sugita', name: '杉田真帆', x: 'Maho__0407', bio: '舞台役者、フリーランスで都内で活動中' },
   { id: 'mayuri', name: 'まゆり（楯真由子）', x: 'MayuliG_G6', bio: '出てくる度、物騒な事件を起こしがちなお姉さんです。今日はどんな風に君たちを可愛がろうかな。なんてね。' },
   { id: 'mizushiro', name: '水城けい', x: 'mizushiro_kei', bio: '舞台やイマーシブ作品を中心に活動しています。体を使った表現やアクションが大好きです。一つ一つの出会いを大切に作品作りに向き合っております。' },
-  { id: 'ohno', name: '大野愛', x: 'madoka145', bio: '舞台やイマーシブシアターを中心に、俳優・ダンサーとして活動中。マーダーミステリーのGMとしての経験も重ね、エンターテイメントの現場で幅広く活躍している。' },
   { id: 'watame', name: '綿目霞', x: 'Watamekasumi', bio: '女優。主な出演作として「IdentityⅤ STAGE」心眼ヘレナ・アダムス役など。ストレートプレイから2.5次元舞台まで幅広くこなす。' },
 ];
 
 const title = '【公式】ウワサバナシ調査委員会 | イマーシブ公演';
 const description =
-  'イマーシブ公演「ウワサバナシ調査委員会」公式サイト。2026年9月19日・20日・26日・27日・10月3日・4日、渋谷サクラステージにて開催。あの4人さ、ノートで殺されたらしいよ。';
+  'イマーシブ公演「ウワサバナシ調査委員会」公式サイト。2026年9月19日・20日・26日・27日・10月3日・4日、渋谷サクラステージにて開催。ねえ知ってる？現実を変えることができるノートがあるって。';
 
 // 公演日程（2026年）。KVに一覧表示する。
 const dates = ['9.19', '9.20', '9.26', '9.27', '10.3', '10.4'];
@@ -79,11 +81,11 @@ const faqs = [
 <div class="kvnoise"></div>
 <div class="kvin">
 <img class="kvlogo" src="/assets/uwasabanashi/logo-white.png" alt="ウワサバナシ調査委員会">
-<p class="kvcatch mincho">「あの4人さ、ノートで殺されたらしいよ」</p>
+<p class="kvcatch mincho">ねえ知ってる？<br>現実を変えることができるノートがあるって</p>
 <div class="kvmeta">
-<span class="kvdate">{dates.map((d, i) => (
-  <span class="kvd">{i === 0 ? `2026.${d}` : d}{i < dates.length - 1 && <span class="kvsep">／</span>}</span>
-))}</span>
+<span class="kvdate">
+<span class="kvd">2026.{dates[0]}<span class="kvsep">／</span>{dates[1]}<span class="kvsep">／</span>{dates[2]}</span><br class="sponly"><span class="kvsep pconly">／</span><span class="kvd">{dates[3]}<span class="kvsep">／</span>{dates[4]}<span class="kvsep">／</span>{dates[5]}</span>
+</span>
 <span class="kvvenue">渋谷サクラステージ</span>
 </div>
 </div>
@@ -100,14 +102,14 @@ const faqs = [
 <section class="sec" id="story">
 <div class="wrap rv">
 <div class="sechead"><h2 class="sechead-en">STORY</h2><p class="sechead-ja">ストーリー</p><div class="rule"></div></div>
-<p class="storyp">2026年9月。<br>Shibuya Sakura Stageで、4人の従業員が<br>相次いで心臓発作により死亡した。</p>
-<p class="storyp">現場から発見されたのは、<br>未来を書き換えるという「現実改変ノート」。<br>「4人は、このノートによって殺された」</p>
+<p class="storyp">2026年9月。<br>Shibuya Sakura Stageで、<br>複数件の不審な出来事が発生した。</p>
+<p class="storyp">現場から発見されたのは、<br>未来を書き換えるという「現実改変ノート」。</p>
 <img class="simg" src="/assets/uwasabanashi/story-night.webp" alt="夜の渋谷サクラステージ" loading="lazy" width="1200" height="900">
-<p class="storyp">囁かれるウワサバナシの真相を調査するため、<br>あなたは「ウワサバナシ調査委員会」の新人調査員として、<br>現地へ派遣された。</p>
-<p class="storyp">施設内を巡り、関係者への聞き込みを重ねながら、<br>現実改変ノートに隠されたルールを解き明かしていく。</p>
+<p class="storyp">囁かれるウワサバナシの真相を調査するため、<br>あなたは「ウワサバナシ調査委員会」の<br>新人調査員として、現地へ派遣された。</p>
+<p class="storyp">施設内を巡り、<br>関係者への聞き込みを重ねながら、<br>現実改変ノートに隠されたルールと<br>不審な出来事の真相を解き明かしていく。</p>
 <img class="simg" src="/assets/uwasabanashi/story-shop.webp" alt="調査の舞台となる店舗フロア" loading="lazy" width="1200" height="900">
 <p class="storyp storylead">現実を改変した犯人は、一体誰なのか。<br>ウワサバナシの真相を暴け。</p>
-<p class="fiction-note">※本公演の内容はフィクションです。実在の事件・人物とは一切関係ありません。</p>
+<p class="fiction-note">※本公演の内容はフィクションです。<br>実在の事件・人物とは一切関係ありません。</p>
 </div>
 </section>
 
@@ -115,7 +117,7 @@ const faqs = [
 <div class="wrap rv">
 <div class="sechead"><h2 class="sechead-en">ABOUT</h2><p class="sechead-ja">本公演の楽しみ方</p><div class="rule"></div></div>
 <div class="aboutgrid">
-<div class="abcard"><p class="abnum">01</p><h3 class="abh">舞台は、<br>渋谷サクラステージ。</h3><p class="abp">物語の現場は、実在する渋谷の複合施設。普段は入れない場所や、実在する店舗を巡り、物語を進めていきます。</p></div>
+<div class="abcard"><p class="abnum">01</p><h3 class="abh">舞台は、<br>渋谷サクラステージ。</h3><p class="abp">物語の現場は、実在する渋谷の複合施設。<br>普段は入れない場所や、実在する店舗を巡り、<br>物語を進めていきます。</p></div>
 <div class="abcard"><p class="abnum">02</p><h3 class="abh">あなた自身が<br>“調査員”になる。</h3><p class="abp">本公演は、あなたが物語の登場人物として噂の調査に巻き込まれていくイマーシブ（没入型）体験。集めた証言や、あなたの「選択」そのものが物語を動かします。</p></div>
 <div class="abcard"><p class="abnum">03</p><h3 class="abh">あなた自身が<br>都市伝説の謎に挑む</h3><p class="abp">これは映画でも、演劇でも、いわゆる謎解きでもありません。それら全ての要素を複合させた、疑い、迷い、選ぶ——噂と向き合う行為そのものを楽しむ体験です。</p></div>
 </div>
@@ -171,9 +173,9 @@ const faqs = [
 <div>
 <p class="teamrole">脚本／制作</p>
 <p class="teamname mincho">とんとん</p>
-<p class="teamp">体験型コンテンツクリエイター。公演型マーダーミステリーやストーリープレイングを中心に、数多くの物語体験を提供している。</p>
-<p class="teamp">近年はイマーシブコンテンツの脚本制作など、没入型エンターテインメントの分野へも活動の幅を広げている。</p>
-<p class="teamp">代表作『天使は花明かりの下で』『白いウサギは歌わない』『BOOROOM』など</p>
+<p class="teamp">体験型コンテンツクリエイター。<br>公演型マーダーミステリーや<br>ストーリープレイングを中心に、<br>数多くの物語体験を提供している。</p>
+<p class="teamp">近年はイマーシブコンテンツの脚本制作など、<br>没入型エンターテインメントの分野へも<br>活動の幅を広げている。</p>
+<p class="teamp">代表作<br>『天使は花明かりの下で』<br>『白いウサギは歌わない』『BOOROOM』など</p>
 </div>
 </div>
 </div>
@@ -257,7 +259,7 @@ const faqs = [
 <img class="ftrlogo" src="/assets/uwasabanashi/logo-white.png" alt="ウワサバナシ調査委員会">
 <div class="snsrow"><a class="sns" href="https://x.com/" target="_blank" rel="noopener">X（旧Twitter）</a></div>
 <p class="staff">主催・企画：株式会社ex Labs<br>脚本／制作：とんとん<br>会場：渋谷サクラステージ<br>運営会社：<a href="https://kabuexlabs.com/" target="_blank" rel="noopener">株式会社ex Labs</a></p>
-<p class="fiction-note ftr-note">※本公演の内容はフィクションです。実在の事件・人物とは一切関係ありません。</p>
+<p class="fiction-note ftr-note">※本公演の内容はフィクションです。<br>実在の事件・人物とは一切関係ありません。</p>
 <p class="copy">© 株式会社ex Labs All Rights Reserved.</p>
 </div>
 </footer>
@@ -306,9 +308,11 @@ a:hover{color:#fff}
 .kvcatch{font-size:clamp(15px,2vw,19px);letter-spacing:.22em;color:var(--ink);margin:0;animation:rise 1.3s ease .5s both}
 .kvmeta{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 40px;font-family:'Shippori Mincho',serif;animation:rise 1.3s ease .9s both}
 .kvdate{font-size:clamp(18px,2.6vw,28px);letter-spacing:.12em;color:#fff}
-/* 日付と後続の区切りをひと塊にして、行の折返しは日付の切れ目だけで起こす */
+/* 日付は9月分・10月分の2グループ。PCは1行（pconlyの区切りで連結）、
+   スマホはグループ間で改行（sponly）し、行末に区切りが残らないようにする */
 .kvd{white-space:nowrap}
 .kvsep{color:var(--accent);font-size:.75em;padding:0 .35em}
+.sponly{display:none}
 .kvvenue{font-size:14px;letter-spacing:.24em;color:var(--dim);align-self:center}
 
 /* NEWSティッカー */
@@ -326,10 +330,10 @@ a:hover{color:#fff}
 
 /* ABOUT */
 .aboutgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px}
-.abcard{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);padding:38px 30px;box-sizing:border-box}
+.abcard{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);padding:38px 24px;box-sizing:border-box}
 .abnum{font-family:'Shippori Mincho',serif;font-size:15px;letter-spacing:.3em;color:var(--accent);margin:0 0 16px}
 .abh{font-family:'Shippori Mincho',serif;font-size:20px;font-weight:600;line-height:1.8;letter-spacing:.06em;color:#fff;margin:0 0 16px}
-.abp{font-size:14px;color:var(--dim);margin:0}
+.abp{font-size:13px;color:var(--dim);margin:0}
 
 /* CAST — 全員が常に見える均等グリッド。タップで詳細ダイアログ。
    動き: 表示順は読み込みごとにシャッフル（公平性の担保）、
@@ -420,14 +424,12 @@ a:hover{color:#fff}
 .teamimg{width:min(240px,100%);height:auto;aspect-ratio:1;margin:0 auto}
 .sec{padding:76px 0}
 .kv{padding:130px 20px 70px}
-/* キャッチは字間を詰めて1行に収める（折返すと「よ」だけが孤立する） */
 .kvcatch{letter-spacing:.1em}
-.kvdate{text-wrap:balance}
-/* PC向けの詩的な改行位置は画面幅に合わないので解除し、
-   文節折返し（auto-phrase）＋行長の均等化で語中の孤立改行を防ぐ。
-   auto-phrase 未対応ブラウザでは通常の禁則折返しにフォールバック */
-.storyp br{display:none}
-.storyp{text-wrap:balance;word-break:auto-phrase}
+.sponly{display:inline}
+.pconly{display:none}
+/* 指定の改行位置がそのまま収まるよう、字間とサイズを詰める */
+.storyp{font-size:14px;letter-spacing:.06em}
+.storyp.storylead{font-size:16px;letter-spacing:.1em}
 .faq summary{word-break:auto-phrase}
 .simg{height:220px}
 .castgrid{grid-template-columns:repeat(3,1fr);gap:16px 10px}
@@ -473,18 +475,6 @@ html{scroll-behavior:auto}
 </script>
 
 <script is:inline define:vars={{ cast }}>
-(function () {
-  // 露出の公平性のため、キャストの表示順を読み込みごとにシャッフルする
-  var grid = document.querySelector('.castgrid');
-  if (grid) {
-    var cards = Array.prototype.slice.call(grid.children);
-    for (var i = cards.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var t = cards[i]; cards[i] = cards[j]; cards[j] = t;
-    }
-    cards.forEach(function (el) { grid.appendChild(el); });
-  }
-})();
 (function () {
   var dlg = document.getElementById('castdlg');
   if (!dlg || typeof dlg.showModal !== 'function') return;
