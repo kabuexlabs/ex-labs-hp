@@ -23,7 +23,10 @@ const {
 const showPreloader = Astro.url.pathname === '/';
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
-const canonical = new URL(Astro.url.pathname, site);
+// Canonical always uses the trailing-slash form: SSR routes answer
+// both /path and /path/, and a request-echoing canonical would split
+// the page into two competing URLs in Google's eyes.
+const canonical = new URL(Astro.url.pathname.replace(/([^/])$/, '$1/'), site);
 const ogImageAbs = new URL(ogImage, site);
 
 const websiteLd = {
@@ -115,7 +118,7 @@ const orgLd = {
 
 <header class="nav"><div class="wrap navrow">
 <a href="/"><img class="logo-header" src="/assets/logo.png" alt="ex Labs"></a>
-<nav class="navlinks"><a href="/#about">会社概要</a><a href="/#strength">強み</a><a href="/#works">実績</a><a href="/services/">サービス</a><a href="/#message">メッセージ</a><a href="/press/">プレスリリース</a><a href="/blog">ブログ</a><a href="/game/">過去コンテンツのネタバレ</a></nav>
+<nav class="navlinks"><a href="/#about">会社概要</a><a href="/#strength">強み</a><a href="/#works">実績</a><a href="/services/">サービス</a><a href="/#message">メッセージ</a><a href="/press/">プレスリリース</a><a href="/blog/">ブログ</a><a href="/game/">過去コンテンツのネタバレ</a></nav>
 <div class="nav-actions">
 <a class="btn dark" href="/#contact" style="padding:12px 24px;font-size:12.5px">お問い合わせ</a>
 <button class="nav-toggle" type="button" aria-label="メニューを開く" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -139,7 +142,7 @@ const orgLd = {
 <a href="/guide/immersive/">イマーシブとは</a>
 <a href="/game/">過去コンテンツのネタバレ</a>
 <a href="/press/">プレスリリース</a>
-<a href="/blog">ブログ</a>
+<a href="/blog/">ブログ</a>
 </nav>
 </div></footer>
 

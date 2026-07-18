@@ -24,7 +24,10 @@ const {
 } = Astro.props;
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
-const canonical = new URL(Astro.url.pathname, site);
+// Canonical always uses the trailing-slash form: SSR routes answer
+// both /path and /path/, and a request-echoing canonical would split
+// the page into two competing URLs in Google's eyes.
+const canonical = new URL(Astro.url.pathname.replace(/([^/])$/, '$1/'), site);
 const ogImageAbs = ogImage ? new URL(ogImage, site) : undefined;
 
 const base = '/toudaimurder';

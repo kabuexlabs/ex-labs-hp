@@ -6,9 +6,13 @@ import { tmWorks } from '../data/toudaimurderWorks';
 import { tmNews } from '../data/toudaimurderNews';
 import { htPaths } from '../data/hacktale';
 
+// NOTE: keep every URL here in its canonical trailing-slash form, and
+// never list pages that carry noindex (unlisted LPs, private tools) —
+// a sitemap entry that resolves to a noindex page shows up in Search
+// Console as "excluded / not indexed" noise.
 const STATIC_PATHS = [
   '/',
-  '/blog',
+  '/blog/',
   '/press/',
   '/guide/madamis/',
   '/guide/immersive/',
@@ -33,8 +37,6 @@ const STATIC_PATHS = [
   '/smystery/',
   '/smystery/events/',
   '/smystery/company/',
-  '/kaitou/',
-  '/uwasabanashi/',
   ...htPaths,
 ];
 
