@@ -331,10 +331,21 @@ a:hover{color:#fff}
 .abh{font-family:'Shippori Mincho',serif;font-size:20px;font-weight:600;line-height:1.8;letter-spacing:.06em;color:#fff;margin:0 0 16px}
 .abp{font-size:14px;color:var(--dim);margin:0}
 
-/* CAST — 全員が常に見える均等グリッド。タップで詳細ダイアログ */
+/* CAST — 全員が常に見える均等グリッド。タップで詳細ダイアログ。
+   動き: 表示順は読み込みごとにシャッフル（公平性の担保）、
+   出現は1人ずつのステップフェード、待機中は位相をずらした浮遊 */
 .castgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:22px 20px}
 .castdlg{max-height:calc(100vh - 48px);overflow:auto}
-.castcard{display:flex;flex-direction:column;gap:8px;background:none;border:0;padding:0;cursor:pointer;text-align:left;font-family:inherit}
+.castcard{display:flex;flex-direction:column;gap:8px;background:none;border:0;padding:0;cursor:pointer;text-align:left;font-family:inherit;opacity:0;transition:opacity .8s ease;animation:castfloat 6s ease-in-out infinite}
+.rv.vis .castcard{opacity:1}
+.castcard:hover{animation-play-state:paused}
+@keyframes castfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.castcard:nth-child(1){transition-delay:.05s;animation-delay:-0s}
+.castcard:nth-child(2){transition-delay:.15s;animation-delay:-1s}
+.castcard:nth-child(3){transition-delay:.25s;animation-delay:-2s}
+.castcard:nth-child(4){transition-delay:.35s;animation-delay:-3s}
+.castcard:nth-child(5){transition-delay:.45s;animation-delay:-4s}
+.castcard:nth-child(6){transition-delay:.55s;animation-delay:-5s}
 .castimg{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;display:block;border:1px solid rgba(255,255,255,.08);filter:saturate(.9);transition:filter .3s ease}
 .castcard:hover .castimg{filter:saturate(1.05) brightness(1.06)}
 .castname{font-size:14px;letter-spacing:.06em;color:#fff;line-height:1.5}
@@ -436,6 +447,7 @@ a:hover{color:#fff}
 html{scroll-behavior:auto}
 .kvlogo,.kvcatch,.kvmeta,.cta{animation:none}
 .newsin{animation:none}
+.castcard{animation:none;opacity:1;transition:none}
 .rv{opacity:1;transform:none;transition:none}
 }
 </style>
@@ -461,6 +473,18 @@ html{scroll-behavior:auto}
 </script>
 
 <script is:inline define:vars={{ cast }}>
+(function () {
+  // 露出の公平性のため、キャストの表示順を読み込みごとにシャッフルする
+  var grid = document.querySelector('.castgrid');
+  if (grid) {
+    var cards = Array.prototype.slice.call(grid.children);
+    for (var i = cards.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = cards[i]; cards[i] = cards[j]; cards[j] = t;
+    }
+    cards.forEach(function (el) { grid.appendChild(el); });
+  }
+})();
 (function () {
   var dlg = document.getElementById('castdlg');
   if (!dlg || typeof dlg.showModal !== 'function') return;
