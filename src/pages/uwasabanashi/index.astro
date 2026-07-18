@@ -125,21 +125,17 @@ const faqs = [
 <section class="sec" id="cast">
 <div class="wrap rv">
 <div class="sechead"><h2 class="sechead-en">CAST</h2><p class="sechead-ja">キャスト</p><div class="rule"></div></div>
-</div>
-<div class="castrow rv" aria-label="キャスト一覧（自動スクロール）">
-<div class="casttrack">
-{[0, 1].map((copy) => (
-  cast.map((c, i) => (
-    <button class="castcard" type="button" data-cast={i} aria-hidden={copy === 1 ? 'true' : undefined} tabindex={copy === 1 ? -1 : undefined}>
-      <img class="castimg" src={`/assets/uwasabanashi/cast-${c.id}.webp`} alt={c.name} loading="lazy" width="480" height="640">
-      <span class="castname mincho">{c.name}</span>
-      <span class="castx">@{c.x}</span>
-    </button>
-  ))
+<div class="castgrid">
+{cast.map((c, i) => (
+  <button class="castcard" type="button" data-cast={i}>
+    <img class="castimg" src={`/assets/uwasabanashi/cast-${c.id}.webp`} alt={c.name} loading="lazy" width="480" height="640">
+    <span class="castname mincho">{c.name}</span>
+    <span class="castx">@{c.x}</span>
+  </button>
 ))}
 </div>
-</div>
 <p class="casthint dim">※ 写真をタップするとプロフィールをご覧いただけます</p>
+</div>
 </section>
 
 <dialog class="castdlg" id="castdlg">
@@ -335,18 +331,15 @@ a:hover{color:#fff}
 .abh{font-family:'Shippori Mincho',serif;font-size:20px;font-weight:600;line-height:1.8;letter-spacing:.06em;color:#fff;margin:0 0 16px}
 .abp{font-size:14px;color:var(--dim);margin:0}
 
-/* CAST — 自動スクロールのカード列。ホバーで一時停止、タップで詳細ダイアログ */
-.castrow{overflow:hidden;margin-top:-8px}
-.casttrack{display:flex;width:max-content;animation:castscroll 40s linear infinite}
-.castrow:hover .casttrack{animation-play-state:paused}
+/* CAST — 全員が常に見える均等グリッド。タップで詳細ダイアログ */
+.castgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:22px 20px}
 .castdlg{max-height:calc(100vh - 48px);overflow:auto}
-@keyframes castscroll{to{transform:translateX(-50%)}}
-.castcard{display:flex;flex-direction:column;gap:10px;width:220px;margin-right:26px;background:none;border:0;padding:0;cursor:pointer;text-align:left;font-family:inherit}
-.castimg{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;border:1px solid rgba(255,255,255,.08);filter:saturate(.9);transition:filter .3s ease}
+.castcard{display:flex;flex-direction:column;gap:8px;background:none;border:0;padding:0;cursor:pointer;text-align:left;font-family:inherit}
+.castimg{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;display:block;border:1px solid rgba(255,255,255,.08);filter:saturate(.9);transition:filter .3s ease}
 .castcard:hover .castimg{filter:saturate(1.05) brightness(1.06)}
-.castname{font-size:16px;letter-spacing:.08em;color:#fff}
-.castx{font-size:12px;letter-spacing:.08em;color:var(--accent)}
-.casthint{font-size:11px;letter-spacing:.14em;text-align:center;margin:26px 24px 0}
+.castname{font-size:14px;letter-spacing:.06em;color:#fff;line-height:1.5}
+.castx{font-size:11px;letter-spacing:.06em;color:var(--accent);word-break:break-all}
+.casthint{font-size:11px;letter-spacing:.14em;text-align:center;margin:30px 0 0}
 .castdlg{background:var(--bg2);color:var(--ink);border:1px solid rgba(255,255,255,.12);padding:0;max-width:min(760px,calc(100vw - 40px));width:100%}
 .castdlg::backdrop{background:rgba(5,8,10,.82);backdrop-filter:blur(3px)}
 .dlgbody{display:grid;grid-template-columns:280px 1fr;gap:0}
@@ -426,7 +419,9 @@ a:hover{color:#fff}
 .storyp{text-wrap:balance;word-break:auto-phrase}
 .faq summary{word-break:auto-phrase}
 .simg{height:220px}
-.castcard{width:170px;margin-right:18px}
+.castgrid{grid-template-columns:repeat(3,1fr);gap:16px 10px}
+.castname{font-size:11.5px}
+.castx{font-size:10px}
 .dlgbody{grid-template-columns:1fr}
 .dlgimg{min-height:0;height:320px}
 .dlginfo{padding:24px 22px 30px}
@@ -441,9 +436,6 @@ a:hover{color:#fff}
 html{scroll-behavior:auto}
 .kvlogo,.kvcatch,.kvmeta,.cta{animation:none}
 .newsin{animation:none}
-/* 自動スクロールを止め、手動の横スクロールに切り替える */
-.casttrack{animation:none}
-.castrow{overflow-x:auto}
 .rv{opacity:1;transform:none;transition:none}
 }
 </style>
