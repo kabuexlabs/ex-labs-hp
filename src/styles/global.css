@@ -198,8 +198,14 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
    accents declared later (e.g. .svc-card) still win on their side. */
 .str-card,.work-card,.press-item,.event-card,.blog-card,.faq-item,.info-grid,.bullets li,.about-points li,.style-col.them,.svc-card{border:1px solid rgba(51,48,43,.06)}
 .bullets{list-style:none;margin:24px auto 0;padding:0;display:flex;flex-direction:column;gap:12px;max-width:680px;counter-reset:bl}
-.bullets li{display:flex;gap:14px;font-size:15px;line-height:1.7;color:rgba(51,48,43,.85);background:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 3px 12px rgba(51,48,43,.06)}
-.bullets li::before{counter-increment:bl;content:counter(bl);flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:0;box-shadow:0 2px 0 rgba(51,48,43,.15)}
+/* The number badge is absolutely positioned, NOT a flex sibling: with
+   display:flex, any inline <strong> in the li became its own flex item
+   and split the sentence into skinny side-by-side columns. Block flow
+   keeps mixed inline markup on one line. overflow-wrap:anywhere is a
+   last-resort break for auto-phrase misjudging latin＋ダッシュ runs as
+   one unbreakable segment. */
+.bullets li{position:relative;font-size:15px;line-height:1.7;color:rgba(51,48,43,.85);background:#fff;border-radius:14px;padding:16px 20px 16px 60px;box-shadow:0 3px 12px rgba(51,48,43,.06);overflow-wrap:anywhere}
+.bullets li::before{counter-increment:bl;content:counter(bl);position:absolute;left:20px;top:16px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(51,48,43,.15)}
 .vc-line{margin:36px auto 0;font-size:13px;color:rgba(51,48,43,.55);border-top:2px dotted rgba(51,48,43,.18);padding-top:20px;max-width:680px;text-align:center}
 
 .str-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}
@@ -623,7 +629,8 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;back
   .h2sub{font-size:13.5px;margin-bottom:36px}
   .lede{font-size:14.5px}
   .about-points{grid-template-columns:1fr}
-  .bullets li{font-size:14px;padding:14px 16px}
+  .bullets li{font-size:14px;padding:14px 16px 14px 54px}
+  .bullets li::before{left:16px;top:14px}
   .vc-line{font-size:12px}
   .str-card,.style-col{padding:26px 22px}
   .svc-grid{grid-template-columns:1fr}
