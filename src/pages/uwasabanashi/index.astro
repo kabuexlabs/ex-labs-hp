@@ -6,12 +6,15 @@
 // 使わず、このファイルだけで完結させている。
 
 // キャスト一覧。写真は /public/assets/uwasabanashi/cast-<id>.webp に配置。
-// 並び順は50音順（おおの→かなで→すぎた→まゆり→みずしろ→わため）。
+// 並び順は50音順（おおの→かなで→しえら→すぎた→べっとう→ほしの→まゆり→みずしろ→わため）。
 // キャストを追加・変更するときも必ず50音順を維持すること。
 const cast = [
   { id: 'ohno', name: '大野愛', x: 'madoka145', bio: '舞台やイマーシブシアターを中心に、俳優・ダンサーとして活動中。マーダーミステリーのGMとしての経験も重ね、エンターテイメントの現場で幅広く活躍している。' },
   { id: 'hanakanade', name: '花奏和音', x: 'waonnu', bio: '山形県出身。東北芸術工科大学デザイン工学部卒。18歳から地元劇団で演技を学ぶ。退団後も小劇場を中心に活動を続け、2020年から東京での演劇活動を開始。2025年2月には、女優・千歳まち氏との演劇ユニット『花千本produce』を旗揚げし、初回公演ではプロデュースや出演のほか宣伝美術も務めた。現在イマーシブシアターや体験型コンテンツに多く出演するほか、『ストーリープレイングシアター』にてGMを務めるなど、活動の幅を広げる。' },
+  { id: 'shiera', name: 'しえら', x: 'shierrrrrrra', bio: 'ダンサー、アクターなどをメインに活動しています。たまに歌って踊ったりもします。' },
   { id: 'sugita', name: '杉田真帆', x: 'Maho__0407', bio: '舞台役者、フリーランスで都内で活動中' },
+  { id: 'betto', name: 'べっとうかつき', x: 'katuki_betto', bio: 'ホラーやイマーシブ作品を中心に活動。出演に加え、企画や制作も行う。体験型エンターテインメントならではの没入感に魅力を感じ、観客の記憶に残る体験を目指して日々取り組んでいます。' },
+  { id: 'hoshino', name: '星乃圭吾', x: 'KeigoHoshino', bio: '俳優・声優・アイドル・司会・エンタメクリエイターなど様々な分野で活動中です！座右の銘は『期待に応えて 予想を裏切る』' },
   { id: 'mayuri', name: 'まゆり（楯真由子）', x: 'MayuliG_G6', bio: '出てくる度、物騒な事件を起こしがちなお姉さんです。今日はどんな風に君たちを可愛がろうかな。なんてね。' },
   { id: 'mizushiro', name: '水城けい', x: 'mizushiro_kei', bio: '舞台やイマーシブ作品を中心に活動しています。体を使った表現やアクションが大好きです。一つ一つの出会いを大切に作品作りに向き合っております。' },
   { id: 'watame', name: '綿目霞', x: 'Watamekasumi', bio: '女優。主な出演作として「IdentityⅤ STAGE」心眼ヘレナ・アダムス役など。ストレートプレイから2.5次元舞台まで幅広くこなす。' },
@@ -338,7 +341,9 @@ a:hover{color:#fff}
 /* CAST — 全員が常に見える均等グリッド。タップで詳細ダイアログ。
    動き: 表示順は読み込みごとにシャッフル（公平性の担保）、
    出現は1人ずつのステップフェード、待機中は位相をずらした浮遊 */
-.castgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:22px 20px}
+/* flex+中央寄せ: 人数が6の倍数でなくても最終行が中央に揃う */
+.castgrid{display:flex;flex-wrap:wrap;justify-content:center;gap:22px 20px}
+.castcard{width:calc((100% - 100px)/6)}
 .castdlg{max-height:calc(100vh - 48px);overflow:auto}
 .castcard{display:flex;flex-direction:column;gap:8px;background:none;border:0;padding:0;cursor:pointer;text-align:left;font-family:inherit;opacity:0;transition:opacity .8s ease;animation:castfloat 6s ease-in-out infinite}
 .rv.vis .castcard{opacity:1}
@@ -350,6 +355,9 @@ a:hover{color:#fff}
 .castcard:nth-child(4){transition-delay:.35s;animation-delay:-3s}
 .castcard:nth-child(5){transition-delay:.45s;animation-delay:-4s}
 .castcard:nth-child(6){transition-delay:.55s;animation-delay:-5s}
+.castcard:nth-child(7){transition-delay:.65s;animation-delay:-.5s}
+.castcard:nth-child(8){transition-delay:.75s;animation-delay:-2.5s}
+.castcard:nth-child(9){transition-delay:.85s;animation-delay:-4.5s}
 .castimg{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;display:block;border:1px solid rgba(255,255,255,.08);filter:saturate(.9);transition:filter .3s ease}
 .castcard:hover .castimg{filter:saturate(1.05) brightness(1.06)}
 .castname{font-size:14px;letter-spacing:.06em;color:#fff;line-height:1.5}
@@ -432,7 +440,8 @@ a:hover{color:#fff}
 .storyp.storylead{font-size:16px;letter-spacing:.1em}
 .faq summary{word-break:auto-phrase}
 .simg{height:220px}
-.castgrid{grid-template-columns:repeat(3,1fr);gap:16px 10px}
+.castgrid{gap:16px 10px}
+.castcard{width:calc((100% - 20px)/3)}
 .castname{font-size:11.5px}
 .castx{font-size:10px}
 .dlgbody{grid-template-columns:1fr}
