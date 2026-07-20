@@ -27,6 +27,9 @@ const description =
 // 公演日程（2026年）。KVに一覧表示する。
 const dates = ['9.19', '9.20', '9.26', '9.27', '10.3', '10.4'];
 
+// チケット販売ページ（escape.id）
+const ticketUrl = 'https://escape.id/uwasabanashi-org/e-case1/';
+
 const newsItems = [
   'NEWS ／ 2026.07.07 公式サイトを公開しました',
   'NEWS ／ 2026.07.07 チケット情報を公開しました',
@@ -162,7 +165,7 @@ const faqs = [
 <div class="pricebox"><p class="pricelabel">全日程共通</p><p class="priceval">¥4,000<span class="dim priceunit">（税込）</span></p></div>
 </div>
 <div class="center">
-<a class="buy" href="#ticket">チケットを購入する</a>
+<a class="buy" href={ticketUrl} target="_blank" rel="noopener">チケットを購入する</a>
 <p class="pricenote">日時指定チケット制／表示価格のほか別途手数料がかかります</p>
 </div>
 </div>
