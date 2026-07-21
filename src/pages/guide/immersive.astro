@@ -59,6 +59,23 @@ const faqLd = {
   })),
 };
 
+// 用語定義の構造化データ：AI検索・辞書的クエリ（〜とは/意味）への
+// 引用元として、このページが「イマーシブ」の定義を持つことを明示する。
+const definedTermLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: 'イマーシブ',
+  alternateName: ['immersive', '没入型'],
+  description:
+    'イマーシブ（immersive）は「没入型の」を意味する英語の形容詞。動詞 immerse（浸す）から派生した語で、観客が物語や空間の中に入り込んで体験するエンターテインメント形式を指して使われる。',
+  inDefinedTermSet: {
+    '@type': 'DefinedTermSet',
+    name: '体験型エンターテインメント用語集',
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  },
+  url: new URL('/guide/immersive/', Astro.site).toString(),
+};
+
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
@@ -76,6 +93,7 @@ const articleLd = {
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<script type="application/ld+json" set:html={jsonLd(definedTermLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
   { name: 'イマーシブ完全ガイド' },
