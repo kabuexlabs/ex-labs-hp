@@ -90,7 +90,7 @@ const faqs = [
 <header class="hdr">
 <div><div class="hdr-title">怪盗と秘密の試験</div><div class="hdr-org latin">IMMERSIVE ILLUSION</div></div>
 <nav class="nav">
-<a href="#story">STORY</a><a href="#about">ABOUT</a><a href="#cast">CAST</a><a href="#team">TEAM</a><a href="#ticket">TICKET</a><a href="#flow">FLOW</a><a href="#access">ACCESS</a><a href="#faq">FAQ</a><a href="#contact">CONTACT</a>
+<a href="#story">STORY</a><a href="#about">ABOUT</a><a href="#team">TEAM</a><a href="#cast">CAST</a><a href="#ticket">TICKET</a><a href="#flow">FLOW</a><a href="#access">ACCESS</a><a href="#faq">FAQ</a><a href="#contact">CONTACT</a>
 </nav>
 <a class="cta" href="#ticket">チケット</a>
 </header>
@@ -142,23 +142,7 @@ const faqs = [
 </div>
 </section>
 
-<section class="sec" id="cast">
-<div class="sechead rv"><span class="label">Cast</span><h2 class="h2">キャスト</h2><span class="rule"></span></div>
-<div class="inner cast-grid">
-{cast.map((c) => (
-  <div class="castc rv">
-  <img class="castc-photo" src={`/assets/kaitou/cast/${c.slug}.jpg`} width="720" height="960" loading="lazy" alt={`${c.name} 宣材写真`}>
-  <div class="castc-body">
-  <h3 class="castc-name">{c.name}</h3>
-  <a class="castc-x latin" href={`https://x.com/${c.x}`} target="_blank" rel="noopener">@{c.x}</a>
-  <p class="castc-bio">{c.bio}</p>
-  </div>
-  </div>
-))}
-</div>
-</section>
-
-<section class="sec sec-alt" id="team">
+<section class="sec" id="team">
 <div class="sechead rv"><span class="label">Team</span><h2 class="h2">イリュージョン監修・出演</h2><span class="rule"></span></div>
 <div class="inner">
 <div class="cast-main rv">
@@ -171,6 +155,22 @@ const faqs = [
 <div class="cast-links"><a href="https://www.saitotaiga.com/" target="_blank" rel="noopener">Official Site</a><a href="https://x.com/taiga365ib" target="_blank" rel="noopener">X (Twitter)</a></div>
 </div>
 </div>
+</div>
+</section>
+
+<section class="sec sec-alt" id="cast">
+<div class="sechead rv"><span class="label">Cast</span><h2 class="h2">キャスト</h2><span class="rule"></span></div>
+<div class="inner cast-grid">
+{cast.map((c) => (
+  <div class="castc rv">
+  <img class="castc-photo" src={`/assets/kaitou/cast/${c.slug}.jpg`} width="720" height="960" loading="lazy" alt={`${c.name} 宣材写真`}>
+  <div class="castc-body">
+  <h3 class="castc-name">{c.name}</h3>
+  <a class="castc-x latin" href={`https://x.com/${c.x}`} target="_blank" rel="noopener">@{c.x}</a>
+  <p class="castc-bio">{c.bio}</p>
+  </div>
+  </div>
+))}
 </div>
 </section>
 
