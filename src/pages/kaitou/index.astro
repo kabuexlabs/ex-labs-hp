@@ -8,7 +8,7 @@
 
 const title = '【公式】怪盗と秘密の試験 | イマーシブイリュージョン';
 const description =
-  'イマーシブ×マジック公演「怪盗と秘密の試験」公式サイト。義賊組織「レイヴン怪盗団」からの招待状を手に、団員候補として"秘密の試験"へ挑むイマーシブ体験。イリュージョンはプロマジシャン・才藤大芽が監修・出演。2026年9月、東京・六本木にて開催。';
+  'イマーシブ×マジック公演「怪盗と秘密の試験」公式サイト。義賊組織「レイヴン怪盗団」からの招待状を手に、会員制バーで団員候補として"秘密の試験"へ挑むイマーシブ体験。日本一・世界7位のプロマジシャン・才藤大芽が監修・出演。2026年9月、東京・六本木にて開催。';
 
 const newsItems = [
   { date: '2026.07.22', text: '出演者情報を公開しました' },
@@ -16,23 +16,32 @@ const newsItems = [
   { date: '2026.07.11', text: 'ティザーサイトを公開しました' },
 ];
 
-// 本公演の楽しみ方（公式イベント内容より）。
+// 本イベントの特徴（公式チケットサイトの記載に準拠）。
 const abouts = [
   {
     num: '01',
-    h: '「レイヴン怪盗団」の<br>団員候補として。',
-    p: 'あなたは都市伝説として語られる義賊組織「レイヴン怪盗団」の団員候補となり、秘密の試験へ挑みます。客席から観るのではなく、あなた自身が物語の登場人物のひとりです。',
+    h: '「会員制バー」が<br>物語の舞台。',
+    p: '舞台は、通常は会員しか足を踏み入れることのできない会員制バー。限られた人だけが扉を開くことを許される、非日常的で秘密めいた空間そのものが、レイヴン怪盗団の物語を構成する一部となります。',
   },
   {
     num: '02',
-    h: '才藤大芽 監修・出演の<br>本格イリュージョン。',
-    p: '本イベントで体験するイリュージョンは、プロマジシャン・才藤大芽が監修。イベント内では実際に出演し、プロならではの本格的なイリュージョンを間近で体感できます。',
+    h: 'あなた自身が<br>“怪盗候補”に。',
+    p: '物語を外から観るだけではありません。あなたはレイヴン怪盗団の団員候補となり、登場人物と実際に会話しながら秘密の試験へ挑戦します。仲間との協力、駆け引き、そして自らの選択が、あなただけの体験を形づくります。',
   },
   {
     num: '03',
-    h: '仲間と協力し、<br>ときに駆け引きを。',
-    p: '試験の舞台となるバーでは、個性豊かな人物たちとの出会いや、様々な試練があなたを待ち受けています。仲間と協力し、怪盗としての資質を試されるイマーシブ体験をお楽しみください。',
+    h: '日本一・世界7位の<br>本格イリュージョン。',
+    p: 'イリュージョンを監修・実演するのは、プロマジシャン・才藤大芽。世界大会で評価された技術と、至近距離だからこそ味わえる驚きを、イマーシブストーリーの中で目の前で体感していただきます。',
   },
+];
+
+// イベント当日の流れ（公式チケットサイトより）。
+const flowSteps = [
+  { n: '1', t: '受付', d: '指定された受付場所へ、チケットに記載された受付時間までにお越しください。受付時にチケットを確認いたします。会員制バーという会場の性質上、受付時間より前に店内へ入ることはできません。スタッフの案内があるまで、指定された場所でお待ちください。' },
+  { n: '2', t: '事前説明', d: 'イベントへの参加方法や注意事項について、スタッフからご案内します。' },
+  { n: '3', t: '会員制バーへの入場', d: 'スタッフの案内に従い、秘密の試験会場となる会員制バーへ入場していただきます。扉を開けた瞬間から、皆様は「レイヴン怪盗団」の団員候補です。' },
+  { n: '4', t: '秘密の試験開始', d: '登場人物との会話や仲間との協力、さまざまな試練を通して、怪盗としての資質を示してください。試験の中では、才藤大芽氏による本格的なイリュージョンも目の前で繰り広げられます。' },
+  { n: '5', t: '物語の終了', d: '試験の結果を見届けたところで、イベント終了となります。終了後はスタッフの案内に従ってご退出ください。' },
 ];
 
 // 出演者（才藤大芽は TEAM セクションで別掲）。X ハンドルは @ を除いた値。
@@ -48,13 +57,12 @@ const cast = [
 ];
 
 const faqs = [
-  { q: '昼間の開催ですか？', a: 'はい。普段は夜にしか営業していない会員制バーを、昼間だけ特別にお借りして開催します。明るい時間の六本木を、バーからバーへ巡っていただきます。' },
-  { q: 'マジックショーとの違いは何ですか？', a: '客席から観るショーではなく、あなた自身が「試験の受験者」として物語に参加するイマーシブ（没入型）体験です。マジックは物語を動かす手がかりとして、目の前で起こります。' },
-  { q: 'イマーシブ体験が初めてでも楽しめますか？', a: 'はい、初めての方もお楽しみいただけます。特別な知識や準備は必要ありません。' },
-  { q: '謎解きが苦手なのですが大丈夫ですか？', a: 'ひらめき力は必要ありません。手がかりを見つけ、あなた自身の選択を楽しんでいただく体験です。' },
+  { q: '会場はどんな場所ですか？', a: '通常は会員しか入ることのできない会員制バーが舞台です。閉ざされた秘密めいた空間そのものが、物語を構成する一部となります。' },
+  { q: 'マジックショーとの違いは何ですか？', a: '客席から観るショーではなく、あなた自身が団員候補として物語に参加するイマーシブ（没入型）体験です。マジックは物語の中で、目の前で繰り広げられます。' },
+  { q: 'イマーシブ体験や謎解きが初めてでも楽しめますか？', a: 'はい。特別な知識や経験は必要ありません。体験中は登場人物やスタッフが必要に応じて進行をサポートしますので、はじめての方もお楽しみいただけます。' },
   { q: '1人でも参加できますか？', a: 'はい、お1人でのご参加も歓迎です。複数名でのご参加ももちろんお楽しみいただけます。' },
-  { q: 'お酒は飲めますか？', a: 'ドリンク提供の有無・内容は現在調整中です。決定次第、本ページにてご案内いたします。（仮）' },
-  { q: '服装の指定はありますか？', a: '指定はありませんが、店舗間を徒歩で移動しますので、歩きやすい服装・靴でのご来場をおすすめします。' },
+  { q: 'お酒は飲めますか？', a: '会場は会員制バーです。お飲み物については当日会場にてご案内いたします。なお、飲酒により正常な判断・行動が難しいとスタッフが判断した場合は、ご参加をお断りすることがあります。' },
+  { q: '服装の指定はありますか？', a: '特に指定はございません。会員制バーの雰囲気に合わせた服装で、物語の世界をお楽しみください。' },
 ];
 ---
 
@@ -82,7 +90,7 @@ const faqs = [
 <header class="hdr">
 <div><div class="hdr-title">怪盗と秘密の試験</div><div class="hdr-org latin">IMMERSIVE ILLUSION</div></div>
 <nav class="nav">
-<a href="#news">NEWS</a><a href="#story">STORY</a><a href="#about">ABOUT</a><a href="#cast">CAST</a><a href="#team">TEAM</a><a href="#ticket">TICKET</a><a href="#access">ACCESS</a><a href="#faq">FAQ</a><a href="#contact">CONTACT</a>
+<a href="#story">STORY</a><a href="#about">ABOUT</a><a href="#cast">CAST</a><a href="#team">TEAM</a><a href="#ticket">TICKET</a><a href="#flow">FLOW</a><a href="#access">ACCESS</a><a href="#faq">FAQ</a><a href="#contact">CONTACT</a>
 </nav>
 <a class="cta" href="#ticket">チケット</a>
 </header>
@@ -96,7 +104,7 @@ const faqs = [
 <div class="kv-org latin">IMMERSIVE ILLUSION PRESENTS</div>
 <h1 class="kv-title">怪盗と秘密の試験</h1>
 <div class="kv-sub latin">THE PHANTOM THIEF AND THE SECRET EXAMINATION</div>
-<div class="badge">会員制バー周遊型　イマーシブ×マジック公演</div>
+<div class="badge">会員制バー × イマーシブ × イリュージョン</div>
 <div class="kv-date">2026年9月　開催</div>
 <div class="kv-meta"><span>東京・六本木</span><span>出演マジシャン：才藤大芽</span></div>
 </div>
@@ -116,12 +124,12 @@ const faqs = [
 <div class="narrow">
 <p class="story-p rv">ある日、あなたのもとへ一通の招待状が届く。<br>差出人は、都市伝説として語られる義賊組織<br><span class="acc">「レイヴン怪盗団」</span>。</p>
 <div class="yokoku rv">「秘密の試験に招待する」<span class="yokoku-sign">── レイヴン怪盗団 より</span></div>
-<p class="story-p rv" style="margin-top:48px">招待状に記されていたのは、ただ一文。<br>それが何を意味するのかは誰も知らない。<br><br>しかし、興味をひかれたあなたは<br>指定された場所に向かう。<br>そこは、ごく普通のバーだった。</p>
+<p class="story-p rv" style="margin-top:48px">招待状に記されていたのは、ただ一文。<br>それが何を意味するのかは、誰も知らない。<br><br>興味をひかれたあなたが指定された場所へ向かうと、<br>そこにあったのは、普段は会員しか<br>入ることのできない<span class="acc">秘密のバー。</span></p>
 <div class="story-imgs rv">
-<div class="story-img imgslot" role="img" aria-label="バーの内観写真（準備中）"><span>バーの内観写真</span></div>
+<div class="story-img imgslot" role="img" aria-label="会員制バーの内観写真（準備中）"><span>会員制バーの内観写真</span></div>
 <div class="story-img imgslot" role="img" aria-label="雰囲気写真（準備中）"><span>雰囲気写真</span></div>
 </div>
-<p class="story-p rv" style="margin-bottom:0">だが、その扉を開けた瞬間から、<br>あなたの日常は<span class="acc">終わりを告げる。</span></p>
+<p class="story-p rv" style="margin-bottom:0">重い扉の向こうで、<br>あなたを待ち受けていたものとは──。<br><br>その扉を開けた瞬間から、<br>あなたの日常は<span class="acc">終わりを告げる。</span></p>
 </div>
 </section>
 
@@ -159,51 +167,77 @@ const faqs = [
 <div class="cast-role latin">MAGICIAN / SUPERVISOR</div>
 <h3 class="cast-name">才藤大芽</h3>
 <div class="dim cast-latin">SAITO TAIGA</div>
-<p class="cast-bio">京都大学卒という異色の経歴を持つマジシャン・イリュージョニスト。マジック界の最高権威である世界大会「FISM」に日本代表として2度選出され、2021年の全日本マジックチャンピオンシップでは優勝を飾り、日本マジック界の王者となった。ハリウッドのマジック界の殿堂「マジックキャッスル」にも出演。華やかなステージマジックと、観客との対話で進めるテーブルマジックの両輪を得意とし、上品で高級感のあるパフォーマンスに定評がある。本公演ではイリュージョンを監修し、イベント内では実際に出演します。</p>
+<p class="cast-bio">京都大学卒業後、プロマジシャンとして活動を開始。マジック界最高峰の世界大会「FISM」に日本代表として2度選出され、2018年大会では世界7位を記録。2021年には「Japan National Championship of Magic」で優勝を果たした、日本一・世界7位の実績を持つマジシャンです。ハリウッドにあるマジック界の殿堂「マジックキャッスル」への出演歴も持ち、『ヒルナンデス！』『チコちゃんに叱られる！』『開運！なんでも鑑定団』など数々のテレビ番組にも出演。本イベントではイリュージョンを監修するだけでなく、才藤氏本人が物語の登場人物として出演し、至近距離ならではの驚きを体感していただきます。</p>
 <div class="cast-links"><a href="https://www.saitotaiga.com/" target="_blank" rel="noopener">Official Site</a><a href="https://x.com/taiga365ib" target="_blank" rel="noopener">X (Twitter)</a></div>
 </div>
 </div>
 </div>
 </section>
 
-<section class="sec sec-alt" id="ticket">
+<section class="sec" id="ticket">
 <div class="sechead rv"><span class="label">Ticket</span><h2 class="h2">チケット情報</h2><span class="rule"></span></div>
 <div class="narrow ticket-box rv">
 <div class="price">¥4,900 <small>（税込）/ 1名</small></div>
 <div class="ticket-type">日時指定チケット制</div>
 <a class="buy" href="#ticket" data-ticket>チケットを購入する</a>
-<div class="tnote">※外部チケットサイトが開きます（販売ページ準備中）<br>※表示価格のほか、別途手数料がかかる場合があります</div>
+<div class="tnote">※外部チケットサイトが開きます（販売ページ準備中）<br>※購入後のお客様都合によるキャンセル・払い戻し・日時変更はお受けできません<br>※表示価格のほか、別途手数料がかかる場合があります</div>
+</div>
+</section>
+
+<section class="sec sec-alt" id="flow">
+<div class="sechead rv"><span class="label">Flow</span><h2 class="h2">当日の流れ</h2><span class="rule"></span></div>
+<div class="narrow flow">
+{flowSteps.map((s) => (
+  <div class="flow-row rv">
+  <div class="flow-n latin">{s.n}</div>
+  <div class="flow-body"><h3 class="flow-t">{s.t}</h3><p class="flow-d">{s.d}</p></div>
+  </div>
+))}
 </div>
 </section>
 
 <section class="sec" id="notes">
 <div class="sechead rv"><span class="label">Notice</span><h2 class="h2">注意事項</h2><span class="rule"></span></div>
 <div class="narrow rv">
-<div class="prep">※以下は準備中の仮の内容を含みます。確定次第、正式な注意事項に差し替えてください。</div>
-<h3 class="notes-h">チケット・ご予約について</h3>
+<h3 class="notes-h">キャンセル・日時変更について</h3>
 <ul class="notes-ul">
-<li>日時指定制です。ご希望の回をご予約ください。</li>
-<li>チケット1枚につき、1名様のみご参加いただけます。</li>
-<li>決済完了後の日時変更・キャンセル・返金は承っておりません。</li>
-<li>複数名でご参加の場合は、代表者様がまとめてご購入いただくことをお勧めします。</li>
+<li>チケット購入後のお客様都合によるキャンセル、払い戻しおよび日時変更は、システムの都合上お受けできません。</li>
+<li>ご購入前に、参加日時や枚数を十分にご確認ください。</li>
 </ul>
-<h3 class="notes-h">ご来場・受付について</h3>
+<h3 class="notes-h">イベント参加について</h3>
 <ul class="notes-ul">
-<li>集合場所は、チケットご購入者にのみ個別にご案内いたします。</li>
-<li>開始時刻を過ぎますとご入場いただけません。10分前を目安にお越しください。</li>
-<li>受付にて有効なチケットをご提示いただけない場合、ご参加をお断りすることがあります。</li>
+<li>本イベントは、参加者自身が物語の登場人物となって楽しむ体験型イベントです。</li>
+<li>イベント中、キャストとの会話や参加者同士で協力する場面があります。</li>
+<li>受付時間に遅れた場合、演出および進行の都合上、ご参加いただけません。</li>
+<li>日本語で進行するイベントです。</li>
+<li>飲酒により正常な判断や行動が難しいとスタッフが判断した場合、参加をお断りします。</li>
+<li>スタッフおよびキャストの指示に従っていただけない場合、イベントの途中でも退場をお願いすることがあります。その場合の返金はいたしかねます。</li>
+<li>本イベントはフィクションです。実在する人物、団体、事件等とは関係ありません。</li>
 </ul>
-<h3 class="notes-h">会場・移動について</h3>
+<h3 class="notes-h">写真撮影・動画撮影・録音について</h3>
 <ul class="notes-ul">
-<li>本公演は複数の店舗を徒歩で周遊する形式です。屋外の移動を含みますので、歩きやすい服装・靴でお越しください。</li>
-<li>会場は会員制バーのため、店舗名は当日までお伝えできません。</li>
-<li>雨天決行・荒天中止を予定しています。中止の際はご案内いたします。</li>
+<li>主催者またはスタッフから明確な許可がある場合を除き、会場内での写真撮影、動画撮影および録音はすべて禁止です。</li>
+<li>撮影許可が出た場合も、指定された時間・場所・内容の範囲内でのみ撮影可能です。</li>
+<li>ネタバレとなる内容や、ほかの参加者が映り込んだ写真・動画を無断で公開することは禁止です。</li>
 </ul>
-<h3 class="notes-h">演出・場内でのお願い</h3>
+<h3 class="notes-h">体験中の行為について</h3>
 <ul class="notes-ul">
-<li>体験中は、出演者・スタッフの案内に必ずお従いください。</li>
-<li>店舗内での許可のない撮影・録音はお断りいたします。</li>
-<li>未体験の方の楽しみを損なわないよう、SNS投稿の際はネタバレへのご配慮をお願いいたします。</li>
+<li>キャストやほかの参加者に触れる行為は禁止です。</li>
+<li>会場内の備品や装飾品には、スタッフまたはキャストから案内があった場合を除き、触れないでください。</li>
+<li>キャストやほかの参加者に対する暴言、威圧的な行為、過度な接触は禁止です。</li>
+<li>イベントの進行を妨げる行為や、ほかの参加者の体験を損なう行為はお控えください。</li>
+</ul>
+<h3 class="notes-h">ネタバレについて</h3>
+<ul class="notes-ul">
+<li>イベントの内容、仕掛け、試験の詳細、物語の結末など、ネタバレとなる情報をインターネットやSNS上で公開することはお控えください。</li>
+<li>これから参加される方の体験を損なわないよう、ご配慮をお願いいたします。</li>
+</ul>
+<h3 class="notes-h">持ち物・手荷物について</h3>
+<ul class="notes-ul">
+<li>会場にクロークはございません。</li>
+<li>大きな荷物を保管するスペースもございませんので、駅周辺のコインロッカーなどへお預けのうえ、できる限り身軽な状態でお越しください。</li>
+<li>貴重品は必ずご自身で管理してください。紛失、盗難または破損について、主催者および会場は責任を負いかねます。</li>
+<li>イベント開始前に、お手洗いなどをお済ませください。</li>
 </ul>
 </div>
 </section>
@@ -212,8 +246,8 @@ const faqs = [
 <div class="sechead rv"><span class="label">Access</span><h2 class="h2">アクセス</h2><span class="rule"></span></div>
 <div class="inner acc-grid">
 <div class="acc-dl rv">
-<div class="acc-dt latin" style="margin-top:0">AREA</div><div class="acc-dd">東京・六本木エリア（複数店舗を周遊）</div>
-<div class="acc-dt latin">MEETING POINT</div><div class="acc-dd">集合場所は、チケットご購入者にのみご案内いたします。</div>
+<div class="acc-dt latin" style="margin-top:0">AREA</div><div class="acc-dd">東京・六本木エリアの会員制バー</div>
+<div class="acc-dt latin">RECEPTION</div><div class="acc-dd">受付場所は、チケットご購入者にのみご案内いたします。受付時間より前の入場はできません。</div>
 <div class="acc-dt latin">NEAREST STATION</div><div class="acc-dd">東京メトロ日比谷線・都営大江戸線「六本木駅」周辺</div>
 <div class="acc-dt latin">MAP</div><div class="acc-dd"><a href="https://www.google.com/maps/search/?api=1&query=六本木駅" target="_blank" rel="noopener">Google Mapはこちら</a></div>
 </div>
@@ -266,7 +300,7 @@ const faqs = [
 <div class="rv">
 <div class="ftr-org latin">IMMERSIVE ILLUSION</div>
 <div class="ftr-jp">イマーシブイリュージョン</div>
-<div class="ftr-staff">主催・企画：イマーシブイリュージョン<br>出演：才藤大芽<br>会場：東京・六本木 会員制バー（複数店舗周遊）<br>運営：<a href="https://kabuexlabs.com/" target="_blank" rel="noopener">株式会社ex Labs</a></div>
+<div class="ftr-staff">主催・企画：イマーシブイリュージョン<br>イリュージョン監修・出演：才藤大芽<br>会場：東京・六本木 会員制バー<br>運営：<a href="https://kabuexlabs.com/" target="_blank" rel="noopener">株式会社ex Labs</a></div>
 <div class="copy latin">© 2026 IMMERSIVE ILLUSION All Rights Reserved.</div>
 </div>
 </footer>
@@ -372,9 +406,18 @@ a:hover{color:#E85C74}
 .tnote{font-size:12px;color:#A79DB3;letter-spacing:.08em}
 .tnote-center{text-align:center}
 
+/* FLOW（当日の流れ） */
+.flow{display:flex;flex-direction:column}
+.flow-row{display:grid;grid-template-columns:64px 1fr;gap:24px;padding:28px 0;border-bottom:1px solid rgba(236,228,218,.12)}
+.flow-row:last-child{border-bottom:none;padding-bottom:0}
+.flow-row:first-child{padding-top:0}
+.flow-n{font-size:32px;color:var(--accent);letter-spacing:.05em;line-height:1.1}
+.flow-t{font-size:18px;font-weight:700;letter-spacing:.1em;margin:0 0 10px}
+.flow-d{font-size:13.5px;color:#C9BFD4;margin:0;line-height:1.95}
+
 /* 注意事項 */
-.prep{border:1px solid rgba(236,228,218,.2);background:rgba(236,228,218,.04);padding:14px 20px;font-size:12.5px;color:#A79DB3;letter-spacing:.06em;text-align:center}
 .notes-h{font-size:17px;font-weight:700;letter-spacing:.14em;border-left:2px solid var(--accent);padding-left:14px;margin:44px 0 14px}
+.notes-h:first-child{margin-top:0}
 .notes-ul{margin:0;padding-left:22px;font-size:13.5px;color:#C9BFD4}
 .notes-ul li{margin:8px 0}
 
@@ -436,6 +479,8 @@ a:hover{color:#E85C74}
 .cast-grid{grid-template-columns:repeat(2,1fr);gap:14px}
 .cast-main{grid-template-columns:1fr}
 .cast-photo{max-width:280px;margin:0 auto}
+.flow-row{grid-template-columns:40px 1fr;gap:16px}
+.flow-n{font-size:26px}
 .sec{padding:80px 20px}
 .frow2{grid-template-columns:1fr}
 .fab{right:14px;bottom:14px;padding:14px 22px;font-size:13px}
