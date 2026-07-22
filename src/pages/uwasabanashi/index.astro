@@ -123,7 +123,7 @@ const faqs = [
 <a href="#faq">FAQ</a>
 </header>
 
-<a class="cta" href={ticketUrl} target="_blank" rel="noopener">チケットを予約</a>
+<a class="cta" href={ticketUrl} target="_blank" rel="noopener"><span class="ctal1">チケット</span><span class="ctal2">購入はコチラ!!<span class="ctaarw">▶</span></span></a>
 
 <main>
 
@@ -153,14 +153,16 @@ const faqs = [
 <section class="sec" id="story">
 <div class="wrap rv">
 <div class="sechead"><h2 class="sechead-en">STORY</h2><p class="sechead-ja">ストーリー</p><div class="rule"></div></div>
-<p class="storyp">2026年9月。<br>渋谷サクラステージで、<br>複数件の不審な出来事が発生した。</p>
-<p class="storyp">現場から発見されたのは、<br>未来を書き換えるという「現実改変ノート」。</p>
+<div class="storycol">
+<p class="storyp slead">2026年9月。<br>渋谷サクラステージで、<br>複数件の不審な出来事が発生した。</p>
+<p class="storyp sbody">現場から発見されたのは、<br>未来を書き換えるという「現実改変ノート」。</p>
 <img class="simg" src="/assets/uwasabanashi/story-night.webp" alt="夜の渋谷サクラステージ" loading="lazy" width="1200" height="900">
-<p class="storyp">囁かれるウワサバナシの真相を調査するため、<br>あなたは「ウワサバナシ調査委員会」の<br>新人調査員として、現地へ派遣された。</p>
-<p class="storyp">施設内を巡り、<br>関係者への聞き込みを重ねながら、<br>現実改変ノートに隠されたルールと<br>不審な出来事の真相を解き明かしていく。</p>
+<p class="storyp sbody">囁かれるウワサバナシの真相を調査するため、<br>あなたは「ウワサバナシ調査委員会」の<br>新人調査員として、現地へ派遣された。</p>
+<p class="storyp sbody">施設内を巡り、<br>関係者への聞き込みを重ねながら、<br>現実改変ノートに隠されたルールと<br>不審な出来事の真相を解き明かしていく。</p>
 <img class="simg" src="/assets/uwasabanashi/story-shop.webp" alt="調査の舞台となる店舗フロア" loading="lazy" width="1200" height="900">
 <p class="storyp storylead">現実を改変した犯人は、一体誰なのか。<br>ウワサバナシの真相を暴け。</p>
 <p class="fiction-note">※本公演の内容はフィクションです。<br>実在の事件・人物とは一切関係ありません。</p>
+</div>
 </div>
 </section>
 
@@ -227,6 +229,15 @@ const faqs = [
 <p class="teamp">体験型コンテンツクリエイター。<br>公演型マーダーミステリーや<br>ストーリープレイングを中心に、<br>数多くの物語体験を提供している。</p>
 <p class="teamp">近年はイマーシブコンテンツの脚本制作など、<br>没入型エンターテインメントの分野へも<br>活動の幅を広げている。</p>
 <p class="teamp">代表作<br>『天使は花明かりの下で』<br>『白いウサギは歌わない』『BOOROOM』など</p>
+</div>
+</div>
+<div class="teamgrid teamgrid2">
+<img class="teamimg teamlogo" src="/assets/logo-white.png" alt="株式会社ex Labs" loading="lazy">
+<div>
+<p class="teamrole">主催・企画・運営</p>
+<p class="teamname mincho">株式会社ex Labs</p>
+<p class="teamp">謎解き・マーダーミステリー・イマーシブコンテンツなど、<br>体験型エンターテインメントの企画・制作・集客・運営を<br>一貫して手掛けるクリエイティブカンパニー。</p>
+<p class="teamp"><a href="https://kabuexlabs.com/" target="_blank" rel="noopener">公式サイト →</a></p>
 </div>
 </div>
 </div>
@@ -320,6 +331,8 @@ const faqs = [
 :root{--accent:#5fc9dc;--bg:#0a0d10;--bg2:#10151a;--ink:#d9e2e6;--dim:#8a979e}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:'Zen Kaku Gothic New',sans-serif;line-height:1.9}
+/* ページ全体にフィルムグレイン（SVGノイズ）を薄く重ねる */
+body::before{content:"";position:fixed;inset:0;z-index:90;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.045 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")}
 a{color:var(--accent);text-decoration:none}
 a:hover{color:#fff}
 .mincho{font-family:'Shippori Mincho',serif}
@@ -341,10 +354,12 @@ a:hover{color:#fff}
 /* ロゴは支給JPG（白地×黒文字）から生成した白抜き透過PNGを使用 */
 .hlogo{height:44px;display:block}
 
-/* 固定CTA */
-.cta{position:fixed;right:22px;bottom:22px;z-index:60;background:var(--accent);color:#06141a;font-weight:700;letter-spacing:.14em;padding:19px 34px;border-radius:999px;box-shadow:0 8px 28px rgba(0,0,0,.55);font-size:15px;animation:ctapulse 2.4s ease-out infinite}
-.cta:hover{color:#000;filter:brightness(1.12);animation-play-state:paused}
-@keyframes ctapulse{0%{box-shadow:0 8px 28px rgba(0,0,0,.55),0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}75%{box-shadow:0 8px 28px rgba(0,0,0,.55),0 0 0 20px color-mix(in srgb,var(--accent) 0%,transparent)}100%{box-shadow:0 8px 28px rgba(0,0,0,.55),0 0 0 0 color-mix(in srgb,var(--accent) 0%,transparent)}}
+/* 固定CTA — スタンプ／ラベル風。少し傾け、ベタ影を重ねる */
+.cta{position:fixed;right:22px;bottom:26px;z-index:60;display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--accent);color:#06141a;padding:12px 22px 13px;border-radius:4px;transform:rotate(-4deg);box-shadow:5px 6px 0 color-mix(in srgb,var(--accent) 35%,#000),0 10px 26px rgba(0,0,0,.5);transition:transform .2s ease,filter .2s ease}
+.cta:hover{color:#06141a;filter:brightness(1.1);transform:rotate(-4deg) scale(1.05)}
+.ctal1{font-size:11px;font-weight:700;letter-spacing:.42em;text-indent:.42em;line-height:1}
+.ctal2{font-size:17px;font-weight:800;letter-spacing:.06em;line-height:1.3}
+.ctaarw{font-size:12px;margin-left:6px;vertical-align:2px}
 
 /* スクロールリビール */
 .rv{opacity:0;transform:translateY(28px);transition:opacity .9s ease,transform .9s ease}
@@ -373,18 +388,21 @@ a:hover{color:#fff}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .newsitem{display:inline-block;padding:0 34px}
 
-/* STORY */
-.storyp{font-family:'Shippori Mincho',serif;font-size:clamp(15px,1.7vw,18px);letter-spacing:.1em;line-height:2.6;margin:0 0 44px;text-align:center}
+/* STORY — 左揃えの編集的な文字組み。リード（色文字）→ 字下げ本文 のリズム */
+.storycol{max-width:760px;margin:0 auto}
+.storyp{font-family:'Shippori Mincho',serif;font-size:clamp(15px,1.7vw,18px);letter-spacing:.1em;line-height:2.6;margin:0 0 44px;text-align:left}
+.slead{font-size:clamp(18px,2.2vw,24px);font-weight:600;color:var(--accent);letter-spacing:.14em;line-height:2.2}
+.sbody{padding-left:clamp(20px,7vw,88px)}
 .fiction-note{font-size:12px;letter-spacing:.1em;color:var(--dim);text-align:center;margin:56px 0 0}
 .ftr-note{margin:0 0 18px}
-.storylead{font-size:clamp(19px,2.4vw,26px);color:#fff;letter-spacing:.16em}
-.simg{width:min(720px,100%);height:340px;margin:56px auto;display:block;object-fit:cover}
+.storylead{font-size:clamp(19px,2.4vw,26px);color:#fff;letter-spacing:.16em;margin-top:56px}
+.simg{width:100%;height:clamp(220px,32vw,380px);margin:56px 0;display:block;object-fit:cover}
 
-/* ABOUT */
-.aboutgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px}
-.abcard{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);padding:38px 24px;box-sizing:border-box}
-.abnum{font-family:'Shippori Mincho',serif;font-size:15px;letter-spacing:.3em;color:var(--accent);margin:0 0 16px}
-.abh{font-family:'Shippori Mincho',serif;font-size:20px;font-weight:600;line-height:1.8;letter-spacing:.06em;color:#fff;margin:0 0 16px}
+/* ABOUT — 大きな番号がカード上辺からはみ出すレイアウト */
+.aboutgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:44px 28px;margin-top:30px}
+.abcard{position:relative;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);padding:44px 24px 38px;box-sizing:border-box}
+.abnum{position:absolute;top:-30px;left:16px;font-family:'Shippori Mincho',serif;font-size:56px;line-height:1;letter-spacing:.04em;color:var(--accent);margin:0;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.abh{font-family:'Shippori Mincho',serif;font-size:20px;font-weight:600;line-height:1.8;letter-spacing:.06em;color:#fff;margin:0 0 18px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.14)}
 .abp{font-size:13px;color:var(--dim);margin:0}
 
 /* CAST — 全員が常に見える均等グリッド。タップで詳細ダイアログ。
@@ -436,7 +454,9 @@ a:hover{color:#fff}
 
 /* TEAM */
 .teamgrid{display:grid;grid-template-columns:280px 1fr;gap:44px;align-items:start}
+.teamgrid2{margin-top:72px}
 .teamimg{width:280px;height:280px;object-fit:cover;display:block}
+.teamlogo{object-fit:contain;padding:48px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);box-sizing:border-box}
 .teamp{font-size:14px;color:var(--dim);margin:0 0 14px}
 .teamrole{font-size:13px;letter-spacing:.2em;color:var(--accent);margin:0 0 8px}
 .teamname{font-size:24px;font-weight:600;letter-spacing:.08em;color:#fff;margin:0 0 18px}
@@ -489,6 +509,8 @@ a:hover{color:#fff}
 .pconly{display:none}
 /* 指定の改行位置がそのまま収まるよう、字間とサイズを詰める */
 .storyp{font-size:14px;letter-spacing:.06em}
+.storyp.slead{font-size:17px;letter-spacing:.1em}
+.sbody{padding-left:18px}
 .storyp.storylead{font-size:16px;letter-spacing:.1em}
 .faq summary{word-break:auto-phrase}
 .simg{height:220px}
@@ -502,7 +524,8 @@ a:hover{color:#fff}
 .price{gap:14px}
 .pricebox{flex:1 1 140px;padding:24px 20px;min-width:0}
 .buy{display:block;padding:17px 20px}
-.cta{right:14px;bottom:14px;padding:16px 24px;font-size:14px}
+.cta{right:12px;bottom:18px;padding:10px 16px 11px}
+.ctal2{font-size:15px}
 .map{height:260px}
 }
 
