@@ -166,19 +166,28 @@ const faqs = [
 
 <section class="sec sec-alt" id="cast">
 <div class="sechead rv"><span class="label">Cast</span><h2 class="h2">キャスト</h2><span class="rule"></span></div>
-<div class="inner cast-grid">
-{cast.map((c) => (
-  <div class="castc rv">
+<div class="inner cast-grid rv">
+{cast.map((c, i) => (
+  <button class="castc" type="button" data-cast={i}>
   <img class="castc-photo" src={`/assets/kaitou/cast/${c.slug}.jpg`} width="720" height="960" loading="lazy" alt={`${c.name} 宣材写真`}>
-  <div class="castc-body">
-  <h3 class="castc-name">{c.name}</h3>
-  <a class="castc-x latin" href={`https://x.com/${c.x}`} target="_blank" rel="noopener">@{c.x}</a>
-  <p class="castc-bio">{c.bio}</p>
-  </div>
-  </div>
+  <span class="castc-name">{c.name}</span>
+  </button>
 ))}
 </div>
+<p class="casthint dim">※ 写真をタップするとプロフィールをご覧いただけます</p>
 </section>
+
+<dialog class="castdlg" id="castdlg">
+<button class="dlgclose" type="button" aria-label="閉じる">×</button>
+<div class="dlgbody">
+<img class="dlgimg" id="dlgimg" src="" alt="">
+<div class="dlginfo">
+<p class="dlgname" id="dlgname"></p>
+<a class="dlgx latin" id="dlgx" href="#" target="_blank" rel="noopener"></a>
+<p class="dlgbio" id="dlgbio"></p>
+</div>
+</div>
+</dialog>
 
 <section class="sec" id="ticket">
 <div class="sechead rv"><span class="label">Ticket</span><h2 class="h2">チケット情報</h2><span class="rule"></span></div>
@@ -388,14 +397,25 @@ a:hover{color:#E85C74}
 
 /* CAST グリッド */
 .cast-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
-.castc{background:#160C24;border:1px solid rgba(236,228,218,.1);display:flex;flex-direction:column;overflow:hidden;transition:transform .35s ease,border-color .35s ease}
+.castc{background:#160C24;border:1px solid rgba(236,228,218,.1);display:flex;flex-direction:column;overflow:hidden;padding:0;cursor:pointer;text-align:left;font-family:inherit;color:inherit;transition:transform .35s ease,border-color .35s ease}
 .castc:hover{transform:translateY(-6px);border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
-.castc-photo{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;object-position:top center;display:block;background:#1D1130}
-.castc-body{padding:22px 20px;display:flex;flex-direction:column;gap:8px}
-.castc-name{font-size:19px;font-weight:700;letter-spacing:.08em;margin:0}
-.castc-x{font-size:12px;letter-spacing:.1em;color:#A79DB3;align-self:flex-start}
-.castc-x:hover{color:#E85C74}
-.castc-bio{font-size:12.5px;color:#C9BFD4;line-height:1.95;margin:4px 0 0}
+.castc-photo{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;object-position:top center;display:block;background:#1D1130;filter:saturate(.95);transition:filter .3s ease}
+.castc:hover .castc-photo{filter:saturate(1.05) brightness(1.05)}
+.castc-name{display:block;font-size:18px;font-weight:700;letter-spacing:.08em;margin:0;padding:18px 18px 20px}
+.casthint{font-size:12px;letter-spacing:.14em;text-align:center;margin:34px 0 0}
+
+/* キャスト詳細モーダル */
+.castdlg{background:#160C24;color:#ECE4DA;border:1px solid rgba(236,228,218,.14);padding:0;max-width:min(760px,calc(100vw - 40px));width:100%;max-height:calc(100vh - 48px);overflow:auto}
+.castdlg::backdrop{background:rgba(8,3,16,.82);backdrop-filter:blur(3px)}
+.dlgbody{display:grid;grid-template-columns:280px 1fr;gap:0}
+.dlgimg{width:100%;height:100%;min-height:280px;object-fit:cover;object-position:top center;display:block;background:#1D1130}
+.dlginfo{padding:34px 32px;display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.dlgname{font-size:24px;font-weight:700;letter-spacing:.1em;color:#FDF6EC;margin:0}
+.dlgx{font-size:12px;letter-spacing:.1em;color:#A79DB3;word-break:break-all}
+.dlgx:hover{color:#E85C74}
+.dlgbio{font-size:14px;line-height:2.05;color:#C9BFD4;margin:6px 0 0}
+.dlgclose{position:absolute;top:8px;right:12px;background:none;border:0;color:#A79DB3;font-size:28px;line-height:1;cursor:pointer;z-index:1}
+.dlgclose:hover{color:#FDF6EC}
 
 /* TEAM（才藤大芽 目玉） */
 .cast-main{display:grid;grid-template-columns:340px 1fr;gap:48px;align-items:start}
@@ -488,6 +508,10 @@ a:hover{color:#E85C74}
 @media(max-width:860px){
 .about-grid,.acc-grid,.story-imgs{grid-template-columns:1fr}
 .cast-grid{grid-template-columns:repeat(2,1fr);gap:14px}
+.castc-name{font-size:15px;padding:14px 14px 16px}
+.dlgbody{grid-template-columns:1fr}
+.dlgimg{min-height:0;height:300px}
+.dlginfo{padding:24px 22px 30px}
 .cast-main{grid-template-columns:1fr}
 .cast-photo{max-width:280px;margin:0 auto}
 .flow-row{grid-template-columns:40px 1fr;gap:16px}
@@ -576,6 +600,33 @@ html{scroll-behavior:auto}
       if (b) { b.disabled = false; b.textContent = '送信する'; }
     });
   }
+})();
+</script>
+
+<script is:inline define:vars={{ cast }}>
+(function () {
+  // キャストカードのクリックで、プロフィールをモーダル表示する。
+  var dlg = document.getElementById('castdlg');
+  if (!dlg || typeof dlg.showModal !== 'function') return;
+  var img = document.getElementById('dlgimg');
+  var name = document.getElementById('dlgname');
+  var bio = document.getElementById('dlgbio');
+  var x = document.getElementById('dlgx');
+  document.querySelectorAll('.castc').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var c = cast[Number(btn.dataset.cast)];
+      if (!c) return;
+      img.src = '/assets/kaitou/cast/' + c.slug + '.jpg';
+      img.alt = c.name + ' 宣材写真';
+      name.textContent = c.name;
+      bio.textContent = c.bio;
+      x.textContent = '@' + c.x;
+      x.href = 'https://x.com/' + c.x;
+      dlg.showModal();
+    });
+  });
+  dlg.querySelector('.dlgclose').addEventListener('click', function () { dlg.close(); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
 })();
 </script>
 
