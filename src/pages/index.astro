@@ -36,7 +36,7 @@ const liveEvents = [
   },
 ];
 
-// 取引先企業様 — client/partner company logos shown above the 展開団体
+// お取引先、ご協力企業様 — client/partner company logos shown above the 展開団体
 // marquee. 数が増えたので2段構成にし、2段目は逆方向に流す。
 const partnersRow1: { name: string; logo: string; h?: number }[] = [
   { name: 'Skyland Ventures', logo: '/assets/partners/skylandventures.webp', h: 64 },
@@ -104,7 +104,7 @@ const marqueeItems = Array(2).fill(groups).flat();
 </div>
 </div>
 <div class="marquee-block">
-<p class="marquee-label">取引先企業様</p>
+<p class="marquee-label">お取引先、ご協力企業様</p>
 <div class="marquee"><div class="marquee-track partners-track">
 {partnerRow1Items.map((p) => (
   <img class="marquee-logo" src={p.logo} alt={p.name} style={p.h ? `height:${p.h}px` : undefined} loading="lazy" decoding="async" />
