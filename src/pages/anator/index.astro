@@ -1,0 +1,216 @@
+---
+// ANATOR トップページ。
+// Claude Design のハンドオフ (ANATOR.dc.html) を Astro に移植したもの。
+import AnatorLayout from '../../layouts/AnatorLayout.astro';
+import AnatorContactForm from '../../components/AnatorContactForm.astro';
+
+const assets = '/assets/anator';
+
+const works = [
+  {
+    vol: 'VOL. 1',
+    title: 'ヌル・アーデン',
+    img: '/assets/work-2.webp',
+    alt: 'ヌル・アーデン メインビジュアル',
+    body: '東京藝術大学出身アーティストとのコラボレーションによる、アートと物語が融合した没入型の展覧会公演。作品世界に入り込む「体験としての美術展」として上演され、公演終了後には作品オークションも開催。',
+  },
+  {
+    vol: 'VOL. 2',
+    title: 'アトリエコペル',
+    img: '/assets/events/atelier-copel.webp',
+    alt: 'アトリエコペル メインビジュアル',
+    body: '閉ざされたアトリエを舞台に、キャストとの対話を通して物語を紡ぐ少人数密室型イマーシブ公演。参加者一人ひとりの選択が、その日の物語を形づくる。',
+  },
+];
+
+const rentalTags = ['イマーシブ公演', '謎解き公演', '頭脳戦公演', 'マーダーミステリー公演'];
+
+const mapSrc =
+  'https://maps.google.com/maps?q=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E5%8F%B8%E7%94%BA2%E4%B8%81%E7%9B%AE15-11&z=17&output=embed';
+---
+
+<AnatorLayout>
+
+<header id="top" class="hero">
+  <div class="hero-beam" aria-hidden="true"></div>
+  <div class="hero-pool" aria-hidden="true"></div>
+  <p class="hero-eyebrow">少人数密室型イマーシブ空間</p>
+  <div class="hero-logo">
+    <img src={`${assets}/logo-w.png`} alt="ANATOR — THEATER, ACTOR AND YOU." width="760" height="220">
+  </div>
+  <p class="hero-reading">アナター</p>
+  <p class="hero-tag">ここは、あなたと物語が<br>向き合う空間。</p>
+  <div class="scrollcue" aria-hidden="true">
+    <span>SCROLL</span>
+    <span class="line"></span>
+  </div>
+</header>
+
+<section id="concept" class="concept">
+  <div class="concept-drop" aria-hidden="true"></div>
+  <div class="rv concept-in">
+    <p class="eyebrow">CONCEPT</p>
+    <div class="concept-frame">
+      <div class="concept-beam" aria-hidden="true"></div>
+      <div class="concept-pool" aria-hidden="true"></div>
+      <h2 class="sec-h2 concept-h">物語の内側へ。</h2>
+      <p class="concept-body">閉ざされた小さな空間で、<br>キャストと言葉を交わし、<br>目の前で繰り広げられる生き様に触れる。<br>ANATORは、<br>少人数だからこそ成立する<br>濃密な物語体験のための劇場です。</p>
+    </div>
+  </div>
+</section>
+
+<section id="works" class="works">
+  <div class="works-wrap">
+    <div class="rv sec-head">
+      <p class="eyebrow">WORKS</p>
+      <h2 class="sec-h2">公演実績</h2>
+    </div>
+    <div class="works-grid">
+      {works.map((w) => (
+        <article class="rv work">
+          <div class="work-visual">
+            <img src={w.img} alt={w.alt} loading="lazy">
+          </div>
+          <div class="work-rule">
+            <span class="work-vol">{w.vol}</span>
+            <span class="work-line"></span>
+          </div>
+          <h3 class="work-title">{w.title}</h3>
+          <p class="work-body">{w.body}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section id="rental" class="rental">
+  <div class="rental-wrap">
+    <div class="rv">
+      <p class="eyebrow">RENTAL</p>
+      <h2 class="sec-h2 rental-h">スペースレンタル</h2>
+      <p class="rental-lead">ANATORでは、スペースのレンタルを行っています。</p>
+    </div>
+    <div class="rv rental-tags">
+      {rentalTags.map((t) => <span class="tag">{t}</span>)}
+    </div>
+    <p class="rv rental-note">などでご活用いただけます。<br>ご利用のご相談は<a class="link" href="#contact">お問い合わせ</a>より。</p>
+  </div>
+</section>
+
+<section id="access" class="access">
+  <div class="access-wrap">
+    <div class="rv sec-head">
+      <p class="eyebrow">ACCESS</p>
+      <h2 class="sec-h2">アクセス</h2>
+    </div>
+    <div class="rv access-grid">
+      <div class="access-col">
+        <div>
+          <p class="access-k">所在地</p>
+          <p class="access-addr">〒101-0048<br>東京都千代田区神田司町2丁目15−11<br>HARVEY神田司町 4F</p>
+        </div>
+        <div>
+          <p class="access-k">外観</p>
+          <div class="access-photo">
+            <img src={`${assets}/exterior.jpg`} alt="HARVEY神田司町 外観" loading="lazy">
+          </div>
+        </div>
+      </div>
+      <div class="access-col">
+        <div class="access-map-img">
+          <img src={`${assets}/access-map.jpg`} alt="HARVEY神田司町 周辺地図（小川町・淡路町方面からの案内）" loading="lazy">
+        </div>
+        <div class="access-map-embed">
+          <iframe title="ANATOR 地図（Googleマップ）" src={mapSrc} loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contact">
+  <div class="contact-wrap">
+    <div class="rv sec-head">
+      <p class="eyebrow">CONTACT US</p>
+      <h2 class="sec-h2">お問い合わせ</h2>
+      <p class="contact-note">公演・取材・会場利用に関するお問い合わせは、<br>下記フォームよりご連絡ください。</p>
+    </div>
+    <div class="rv"><AnatorContactForm /></div>
+  </div>
+</section>
+
+<style>
+/* hero */
+.hero{position:relative;min-height:100vh;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;padding:90px 16px 130px;background:radial-gradient(ellipse 70% 55% at 50% 42%,#17171a 0%,#0a0a0b 70%)}
+.hero-beam{position:absolute;left:50%;top:0;transform:translateX(-50%);width:min(900px,90vw);height:68%;background:linear-gradient(180deg,rgba(232,229,223,.20) 0%,rgba(232,229,223,.06) 55%,transparent 100%);clip-path:polygon(47% 0,53% 0,100% 100%,0 100%);animation:slowGlow 7s ease-in-out infinite;pointer-events:none}
+.hero-pool{position:absolute;left:50%;top:64%;transform:translateX(-50%);width:min(760px,80vw);height:90px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(232,229,223,.10),transparent 70%);pointer-events:none}
+.hero-eyebrow{position:relative;margin:0 0 26px;font-size:13px;letter-spacing:.55em;color:#8d897f;text-indent:.55em;animation:fadeUp 1.4s .2s both}
+.hero-logo{position:relative;padding:10px 36px;animation:fadeUp 1.4s .45s both}
+.hero-logo img{width:clamp(320px,56vw,760px);height:auto}
+.hero-reading{position:relative;margin:30px 0 0;font-size:15px;letter-spacing:.4em;text-indent:.4em;color:#b3afa5;animation:fadeUp 1.4s .7s both}
+.hero-tag{position:relative;margin:58px 0 0;font-size:clamp(16px,2vw,21px);letter-spacing:.3em;line-height:2.4;animation:fadeUp 1.4s .95s both}
+.scrollcue{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px}
+.scrollcue span:first-child{font-size:10px;letter-spacing:.35em;color:#6b675e}
+.scrollcue .line{width:1px;height:48px;background:linear-gradient(#6b675e,transparent)}
+/* concept */
+.concept{position:relative;padding:160px 24px 170px;overflow:hidden}
+.concept-drop{position:absolute;top:0;left:50%;transform:translateX(-50%);width:1px;height:90px;background:linear-gradient(rgba(232,229,223,.2),transparent)}
+.concept-in{max-width:860px;margin:0 auto;text-align:center}
+.concept-frame{position:relative;margin:60px auto 0;width:min(640px,92vw);padding:96px 24px 72px}
+.concept-beam{position:absolute;left:50%;top:0;transform:translateX(-50%);width:460px;max-width:80vw;height:100%;background:linear-gradient(180deg,rgba(232,229,223,.16) 0%,rgba(232,229,223,.05) 55%,transparent 100%);clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);pointer-events:none;animation:slowGlow 6s ease-in-out infinite}
+.concept-pool{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);width:380px;max-width:70vw;height:46px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(232,229,223,.10),transparent 70%);pointer-events:none}
+.concept-h{position:relative;margin:0;line-height:2}
+.concept-body{position:relative;margin:40px auto 0;font-size:15px;line-height:2.6;letter-spacing:.12em;color:#b3afa5}
+/* works */
+.works{padding:140px 24px 160px;background:#0e0e10;border-top:1px solid #1c1c1f;border-bottom:1px solid #1c1c1f}
+.works-wrap{max-width:1080px;margin:0 auto}
+.sec-head{text-align:center}
+.sec-head .sec-h2{margin:26px 0 0}
+.works-grid{margin-top:90px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:56px}
+.work{display:flex;flex-direction:column}
+.work-visual{position:relative;aspect-ratio:4 / 5;border:1px solid #26262a;overflow:hidden}
+.work-visual img{width:100%;height:100%;object-fit:cover}
+.work-rule{display:flex;align-items:baseline;gap:16px;margin-top:34px}
+.work-vol{font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.2em;color:var(--accent)}
+.work-line{flex:1;height:1px;background:#26262a;align-self:center}
+.work-title{margin:18px 0 0;font-size:24px;font-weight:600;letter-spacing:.18em}
+.work-body{margin:20px 0 0;font-size:14px;line-height:2.3;letter-spacing:.08em;color:#b3afa5;text-wrap:pretty}
+/* rental */
+.rental{padding:140px 24px 150px}
+.rental-wrap{max-width:720px;margin:0 auto;text-align:center}
+.rental-h{margin:26px 0 0}
+.rental-lead{margin:40px auto 0;font-size:15px;line-height:2.6;letter-spacing:.12em;color:#b3afa5}
+.rental-tags{margin:56px auto 0;display:flex;justify-content:center;flex-wrap:wrap;gap:14px}
+.rental-tags .tag{border:1px solid #2c2c30;padding:12px 26px;font-size:14px;letter-spacing:.18em}
+.rental-note{margin:40px 0 0;font-size:14px;line-height:2.4;letter-spacing:.12em;color:#b3afa5}
+.rental-note .link{color:var(--accent);border-bottom:1px solid var(--accent);padding-bottom:2px}
+/* access */
+.access{padding:140px 24px 160px}
+.access-wrap{max-width:1080px;margin:0 auto}
+.access-grid{margin-top:80px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:56px;align-items:start}
+.access-col{display:flex;flex-direction:column;gap:40px}
+.access-col:last-child{gap:24px}
+.access-k{margin:0;font-size:12px;letter-spacing:.35em;color:#6b675e}
+.access-addr{margin:18px 0 0;font-size:16px;line-height:2.2;letter-spacing:.1em}
+.access-photo{margin-top:18px;aspect-ratio:16 / 10;border:1px solid #26262a;overflow:hidden}
+.access-photo img{width:100%;height:100%;object-fit:cover}
+.access-map-img{border:1px solid #26262a;background:#fff}
+.access-map-img img{width:100%;height:auto}
+.access-map-embed{border:1px solid #26262a;aspect-ratio:16 / 10;filter:grayscale(1) invert(.92) contrast(.9);overflow:hidden}
+.access-map-embed iframe{width:100%;height:100%;border:0;display:block}
+/* contact */
+.contact{padding:140px 24px 150px;background:#0e0e10;border-top:1px solid #1c1c1f}
+.contact-wrap{max-width:620px;margin:0 auto}
+.contact .sec-head .sec-h2{margin:26px 0 0}
+.contact-note{margin:36px 0 0;font-size:14px;line-height:2.3;letter-spacing:.1em;color:#b3afa5}
+@media (max-width:640px){
+  .hero{padding:96px 16px 120px}
+  .concept{padding:110px 20px 120px}
+  .works,.access,.contact{padding:90px 20px 100px}
+  .rental{padding:90px 20px}
+  .works-grid{margin-top:60px;gap:48px}
+  .access-grid{margin-top:56px;gap:44px}
+}
+</style>
+
+</AnatorLayout>
