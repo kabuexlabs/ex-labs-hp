@@ -26,7 +26,7 @@ function excerpt(html: string, length = 80) {
   return text.length > length ? text.slice(0, length) + '…' : text;
 }
 ---
-<BaseLayout title="ブログ｜株式会社 ex Labs" description="ex Labsのイベント制作・体験型コンテンツに関する最新情報をお届けします。">
+<BaseLayout title="ブログ｜謎解き研修・マダミス・イマーシブの解説記事 - 株式会社ex Labs" description="謎解き研修の効果と進め方、マーダーミステリー（マダミス）制作の流れ、イマーシブイベントの企画方法、施設集客の事例など、体験型エンターテインメントの実務ノウハウを制作会社の視点で解説します。">
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
   { name: 'ブログ' },
@@ -56,7 +56,7 @@ function excerpt(html: string, length = 80) {
           )}
         </a>
         <p class="blog-date">{formatDate(post.publishedAt)}</p>
-        <h3 class="blog-title"><a href={`/blog/${post.id}`}>{post.title}</a></h3>
+        <h2 class="blog-title"><a href={`/blog/${post.id}`}>{post.title}</a></h2>
         <p class="blog-excerpt">{excerpt(post.body)}</p>
       </div>
     ))}

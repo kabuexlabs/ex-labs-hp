@@ -52,7 +52,7 @@ const faqs = [
   <div class="dust" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="fx col ac gap24" style="padding:120px 24px 140px;position:relative;z-index:1">
     <div class="herox fx ac gap12 hero-el e0"><span>絵&nbsp;画</span><span class="xmark">×</span><span>イマーシブ</span><span class="xmark">×</span><span>謎&nbsp;解&nbsp;き</span></div>
-    <img class="heromark hero-el e1" src={`${assets}/logo-white.webp`} alt="体験する美術館" width="1000" height="487">
+    <h1 class="heromark-h1"><img class="heromark hero-el e1" src={`${assets}/logo-white.webp`} alt="体験する美術館" width="1000" height="487"></h1>
     <p class="herolead m0 hero-el e2">鑑賞するアートから、<wbr>体験するアートへ。</p>
     <p class="note tc m0 hero-el e3" style="letter-spacing:.14em">絵画と物語、謎解きを融合した<wbr>体験型エンターテインメントレーベル</p>
     <div class="hero-el e4" style="margin-top:28px"><a class="bigx" href="/taikenbizyutu/lostframe/">最新のイベントを見る</a></div>
@@ -263,6 +263,9 @@ const faqs = [
 
 <style>
 .hero{min-height:100vh;background:linear-gradient(180deg,#2b2620 0%,#1b1815 42%,#131110 78%);position:relative}
+/* ロゴ画像がこのページの見出しそのものなので h1 で包む（alt が見出しテキスト
+   になる）。見た目は変えないよう既定のマージン・行間をリセットする。 */
+.heromark-h1{margin:0;line-height:0;font-size:inherit;font-weight:inherit}
 .heromark{width:min(480px,72vw);height:auto}
 .herox{font-size:15px;letter-spacing:.3em;color:#cfc8bc}
 .xmark{color:#b39a63;font-size:12px}

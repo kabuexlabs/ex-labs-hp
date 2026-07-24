@@ -7,7 +7,7 @@ import { jsonLd } from '../lib/microcms';
 export interface Props {
   title?: string;
   description?: string;
-  /** OGP 画像 (public/ 配下のパス)。設定すると twitter card も large になる */
+  /** OGP 画像 (public/ 配下のパス)。作品ページ等は個別画像で上書きする */
   ogImage?: string;
   active?: 'works' | 'news' | 'about' | 'contact';
   /** トップ・作品一覧はコンテナ幅 1400px、それ以外は 1200px */
@@ -18,7 +18,9 @@ const {
   title = '東大マーダーミステリーサークル｜マーダーミステリーの制作・公演',
   description =
     '現役東大生と有名作家が手を組んだチームが、マーダーミステリーの制作・公演を行うサークルです。オリジナルのマーダーミステリー作品を店舗公演・オンラインでお楽しみいただけます。',
-  ogImage,
+  // 既定のシェア画像。指定がないと SNS・AI検索のカードが無地になるので、
+  // サークルの代表作ビジュアルをフォールバックとして必ず出す。
+  ogImage = '/assets/toudaimurder/frankenstein.webp',
   active,
   wide = false,
 } = Astro.props;

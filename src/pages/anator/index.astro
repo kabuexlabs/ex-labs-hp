@@ -35,9 +35,9 @@ const mapSrc =
   <div class="hero-beam" aria-hidden="true"></div>
   <div class="hero-pool" aria-hidden="true"></div>
   <p class="hero-eyebrow">少人数密室型イマーシブ空間</p>
-  <div class="hero-logo">
+  <h1 class="hero-logo">
     <img src={`${assets}/logo-w.png`} alt="ANATOR — THEATER, ACTOR AND YOU." width="760" height="220">
-  </div>
+  </h1>
   <p class="hero-reading">アナター</p>
   <p class="hero-tag">ここは、あなたと物語が<br>向き合う空間。</p>
   <div class="scrollcue" aria-hidden="true">
@@ -145,7 +145,9 @@ const mapSrc =
 .hero-beam{position:absolute;left:50%;top:0;transform:translateX(-50%);width:min(900px,90vw);height:68%;background:linear-gradient(180deg,rgba(232,229,223,.20) 0%,rgba(232,229,223,.06) 55%,transparent 100%);clip-path:polygon(47% 0,53% 0,100% 100%,0 100%);animation:slowGlow 7s ease-in-out infinite;pointer-events:none}
 .hero-pool{position:absolute;left:50%;top:64%;transform:translateX(-50%);width:min(760px,80vw);height:90px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(232,229,223,.10),transparent 70%);pointer-events:none}
 .hero-eyebrow{position:relative;margin:0 0 26px;font-size:13px;letter-spacing:.55em;color:#8d897f;text-indent:.55em;animation:fadeUp 1.4s .2s both}
-.hero-logo{position:relative;padding:10px 36px;animation:fadeUp 1.4s .45s both}
+/* ロゴがこのページの見出しそのものなので h1 にしている（alt が見出しテキスト
+   になる）。見た目を変えないよう既定のマージン・行間をリセットする。 */
+.hero-logo{position:relative;margin:0;line-height:0;padding:10px 36px;animation:fadeUp 1.4s .45s both}
 .hero-logo img{width:clamp(320px,56vw,760px);height:auto}
 .hero-reading{position:relative;margin:30px 0 0;font-size:15px;letter-spacing:.4em;text-indent:.4em;color:#b3afa5;animation:fadeUp 1.4s .7s both}
 .hero-tag{position:relative;margin:58px 0 0;font-size:clamp(16px,2vw,21px);letter-spacing:.3em;line-height:2.4;animation:fadeUp 1.4s .95s both}

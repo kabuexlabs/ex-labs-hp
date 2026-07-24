@@ -131,7 +131,7 @@ const faqs = [
 <div class="kvbg"></div>
 <div class="kvnoise"></div>
 <div class="kvin">
-<img class="kvlogo" src="/assets/uwasabanashi/logo-white.png" alt="ウワサバナシ調査委員会">
+<h1 class="kvlogo-h1"><img class="kvlogo" src="/assets/uwasabanashi/logo-white.png" alt="ウワサバナシ調査委員会"></h1>
 <p class="kvcatch mincho">ねぇ、知ってる？<br>現実を変えることができるノートがあるって</p>
 <div class="kvmeta">
 <span class="kvdate">
@@ -369,6 +369,9 @@ a:hover{color:#fff}
 .kvbg{position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 50% 30%,#15222b 0%,var(--bg) 70%);z-index:0}
 .kvnoise{position:absolute;inset:0;opacity:.5;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.012) 3px 4px);z-index:0}
 .kvin{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:30px}
+/* KVロゴがこのページの見出しそのものなので h1 で包む（alt が見出しテキスト
+   になる）。見た目を変えないよう既定のマージン・行間をリセットする。 */
+.kvlogo-h1{margin:0;line-height:0;font-size:inherit;font-weight:inherit}
 .kvlogo{width:min(560px,82vw);animation:rise 1.3s ease .1s both}
 .kvcatch{font-size:clamp(15px,2vw,19px);letter-spacing:.22em;color:var(--ink);margin:0;animation:rise 1.3s ease .5s both}
 .kvmeta{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 40px;font-family:'Shippori Mincho',serif;animation:rise 1.3s ease .9s both}

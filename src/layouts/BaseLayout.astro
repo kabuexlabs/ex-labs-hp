@@ -48,7 +48,36 @@ const orgLd = {
   email: 'info@kabuexlabs.com',
   description:
     '謎解き・マーダーミステリー（マダミス）・頭脳戦・イマーシブなど、体験型エンターテインメントの企画・制作・集客・運営を一貫して手掛けるクリエイティブカンパニー。',
+  slogan: 'AI時代に、人間が作る面白さを追求する',
   founder: { '@type': 'Person', name: '飯田 雄貴', jobTitle: '代表取締役' },
+  // AI検索（AIO）向けの専門領域宣言。「マーダーミステリーの制作会社は？」
+  // のような質問に対し、この会社が該当領域の事業者だと判定させるための情報。
+  knowsAbout: [
+    '謎解きイベントの企画・制作',
+    'マーダーミステリー（マダミス）の制作',
+    'イマーシブ（没入型）体験・イマーシブシアターの企画・制作',
+    '頭脳戦・交渉ゲームコンテンツの制作',
+    '商業施設・観光施設・文化施設の集客イベント',
+    '謎解きを活用した企業研修・チームビルディング',
+  ],
+  // 提供サービスを実体として列挙し、各サービスページに紐づける。
+  makesOffer: [
+    { n: '謎解き研修', p: '/services/nazotoki-kenshu/' },
+    { n: 'マーダーミステリー（マダミス）制作', p: '/services/murder-mystery/' },
+    { n: '施設活用イベントの企画・制作', p: '/services/shisetsu-event/' },
+    { n: 'イマーシブコンテンツ制作', p: '/services/immersive/' },
+    { n: '頭脳戦制作', p: '/services/zunousen/' },
+  ].map((s) => ({
+    '@type': 'Offer',
+    itemOffered: {
+      '@type': 'Service',
+      name: s.n,
+      serviceType: s.n,
+      url: new URL(s.p, site).toString(),
+      provider: { '@type': 'Organization', name: '株式会社ex Labs' },
+      areaServed: { '@type': 'Country', name: '日本' },
+    },
+  })),
   // Entity consolidation for AI/LLM search: link the official X account
   // and the PR TIMES company page so answer engines can verify this is
   // the same organization across sources.

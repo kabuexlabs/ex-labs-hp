@@ -333,7 +333,9 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 .press-item{display:flex;align-items:center;gap:20px;background:#fff;border-radius:16px;padding:24px 28px;box-shadow:0 5px 18px rgba(51,48,43,.07);transition:transform .25s,box-shadow .25s}
 .press-item:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(51,48,43,.13)}
 .press-date{flex:none;font-size:12px;font-weight:800;color:#fff;background:var(--accent);padding:5px 14px;border-radius:999px;letter-spacing:.04em}
-.press-title{font-size:15px;font-weight:700;line-height:1.7;color:var(--ink)}
+/* 各リリースのタイトルは h2（見出し階層を h1→h2 で通すため）。既定の
+   マージンが出ないようリセットして従来の行レイアウトを保つ。 */
+.press-title{margin:0;font-size:15px;font-weight:700;line-height:1.7;color:var(--ink)}
 .press-src{flex:none;margin-left:auto;font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap}
 @media(max-width:640px){
   .press-item{flex-wrap:wrap;gap:10px 12px;padding:18px 20px}
@@ -416,7 +418,8 @@ a:hover>.blog-img{opacity:.88}
 /* Official label-site links shown under the partner marquee */
 .label-links{margin-top:44px}
 .label-links .marquee-label{margin-bottom:16px}
-.label-links-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1080px;margin:0 auto}
+/* 6レーベルあるので3列×2段。4列にすると最終行が2枚だけ残って崩れる。 */
+.label-links-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1080px;margin:0 auto}
 @media(max-width:900px){.label-links-row{grid-template-columns:1fr 1fr}}
 .label-link{display:flex;align-items:center;gap:14px;background:#fff;border:2px solid rgba(244,88,28,.4);border-radius:16px;padding:18px 22px;box-shadow:0 5px 16px rgba(51,48,43,.06);transition:transform .25s,box-shadow .25s}
 .label-link:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(51,48,43,.12)}

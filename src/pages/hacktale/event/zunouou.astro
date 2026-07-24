@@ -65,13 +65,13 @@ const prelims = [
 </div></section>
 
 <section class="sec"><div class="wrap">
-<div class="sh"><span class="en sht">OUTLINE</span><span class="shj">概要</span></div>
+<div class="sh"><h2 class="shh"><span class="en sht">OUTLINE</span><span class="shj">概要</span></h2></div>
 <p class="body">本イベントは、<span class="fw7">予選2回戦 ／ 本戦 ／ 決勝戦</span> で構成されるイベントです。</p>
 <div class="win">本戦に参加できるのは、予選で<span class="acc fw7">上位10％</span>の成績を獲得した方のみ。<br>限られた者だけが、次の舞台へ進むことができます。</div>
 </div></section>
 
 <section class="sec"><div class="wrap">
-<div class="sh"><span class="en sht">DETAILS</span><span class="shj">体験詳細</span></div>
+<div class="sh"><h2 class="shh"><span class="en sht">DETAILS</span><span class="shj">体験詳細</span></h2></div>
 <div class="dgrid">
 <div class="dcell"><div class="dlab en">DURATION</div><h3 class="dh">体験時間</h3><p class="dp">予選 — 4時間<br>本戦 — 4時間<br>決勝 — 4時間</p></div>
 <div class="dcell"><div class="dlab en">CAPACITY</div><h3 class="dh">予選参加人数</h3><p class="dp">8名 × 4会場<br>全10公演</p></div>
@@ -80,7 +80,7 @@ const prelims = [
 </div></section>
 
 <section class="sec"><div class="wrap">
-<div class="sh"><span class="en sht">SCHEDULE</span><span class="shj">開催日程</span></div>
+<div class="sh"><h2 class="shh"><span class="en sht">SCHEDULE</span><span class="shj">開催日程</span></h2></div>
 <div class="dsub en" style="margin-top:0">PRELIMINARY ROUND ／ 予選</div>
 <div class="dates">
 {prelims.map((p) => (
@@ -92,7 +92,7 @@ const prelims = [
 </div></section>
 
 <section class="sec"><div class="wrap">
-<div class="sh"><span class="en sht">HOW TO JOIN</span><span class="shj">参加方法</span></div>
+<div class="sh"><h2 class="shh"><span class="en sht">HOW TO JOIN</span><span class="shj">参加方法</span></h2></div>
 <div class="steps">
 <div class="step"><div class="en snum">01</div><h3 class="sh3">チケット購入</h3><p class="sp">チケットサイトにてチケットをご購入ください。</p></div>
 <div class="step"><div class="en snum">02</div><h3 class="sh3">会場へ来場</h3><p class="sp">チケットサイト記載の住所へお越しいただき、体験にご参加ください。</p></div>
@@ -100,7 +100,7 @@ const prelims = [
 </div></section>
 
 <section class="sec"><div class="wrap">
-<div class="sh"><span class="en sht">NOTES</span><span class="shj">注意事項</span></div>
+<div class="sh"><h2 class="shh"><span class="en sht">NOTES</span><span class="shj">注意事項</span></h2></div>
 <p class="note">・本ゲームはリピート参加禁止、ネタバレ禁止です。</p>
 <p class="note">・予選はすべて同一内容で実施いたします。</p>
 <p class="note">・会場住所はチケットサイトをご確認ください。</p>
@@ -129,6 +129,9 @@ const prelims = [
 .body{font-size:15px;line-height:2.1;color:#c9c5ba;margin:0 0 14px}
 .win{margin-top:24px;border:1px solid rgba(217,230,59,.4);padding:20px 24px;font-size:15px;line-height:2;color:#f1efe9}
 .sh{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+/* セクション見出しを h2 に。見出し階層が h1→h3 と飛ぶのを防ぐためで、
+   見た目は従来の .sh の並びのまま。 */
+.shh{display:flex;align-items:baseline;gap:14px;margin:0;font-size:inherit;font-weight:inherit}
 .sht{font-size:30px}
 .shj{font-size:12px;letter-spacing:.2em;color:#9b978c}
 .dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}

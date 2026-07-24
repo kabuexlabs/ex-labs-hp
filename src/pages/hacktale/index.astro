@@ -66,7 +66,7 @@ const orgLd = {
 </div></section>
 
 <section class="sec" id="works"><div class="wrap">
-<div class="shead"><span class="en st">WORKS</span><span class="sj">作品一覧</span><a class="more en" href={`${htBase}/works/`}>MORE</a></div>
+<div class="shead"><h2 class="sheadh"><span class="en st">WORKS</span><span class="sj">作品一覧</span></h2><a class="more en" href={`${htBase}/works/`}>MORE</a></div>
 <div class="cards">
 {htWorks.map((w) => (
   <a class="card" href={`${htBase}/works/${w.slug}/`}>
@@ -80,7 +80,7 @@ const orgLd = {
 </div></section>
 
 <section class="sec" id="event"><div class="wrap">
-<div class="shead"><span class="en st">EVENT</span><span class="sj">イベント</span><a class="more en" href="#event">MORE</a></div>
+<div class="shead"><h2 class="sheadh"><span class="en st">EVENT</span><span class="sj">イベント</span></h2><a class="more en" href="#event">MORE</a></div>
 <div class="cards">
 <a class="card" href={`${htBase}/event/zunouou/`}>
 <div class="ekv"><img class="ebg" src="/assets/hacktale/kv-zunouou.webp" alt="" loading="lazy"><img class="efit" src="/assets/hacktale/kv-zunouou.webp" alt="東京都頭脳王決定戦 キービジュアル" loading="lazy"><span class="sold"><span class="soldbox"><span class="solden en">SOLD OUT</span><span class="soldjp">チケット完売</span></span></span></div>
@@ -96,18 +96,18 @@ const orgLd = {
 </div></section>
 
 <section class="sec dark2"><div class="wrap">
-<div class="shead"><span class="en st">HACKTALE</span><span class="sj">ハックテイルとは？</span></div>
+<div class="shead"><h2 class="sheadh"><span class="en st">HACKTALE</span><span class="sj">ハックテイルとは？</span></h2></div>
 <p class="whatp">HACKTALE（ハックテイル）は、頭脳・交渉を必要とするゲームを制作・展開するレーベルです。すべての作品に共通するコンセプトは<span class="acc fw7">「裏技に早く気付ければ、絶対に勝てる」</span>。ルールを深く読み、隠された抜け道を見つけ、交渉で他プレイヤーを出し抜く——運ではなく、洞察と思考で勝敗が決まる体験を追求しています。</p>
 </div></section>
 
 <section class="sec dark2" id="about"><div class="wrap">
-<div class="shead"><span class="en st">ABOUT</span><span class="sj">レーベル紹介</span></div>
+<div class="shead"><h2 class="sheadh"><span class="en st">ABOUT</span><span class="sj">レーベル紹介</span></h2></div>
 <div class="kwrow"><span class="kw">閃き</span><span class="kwsl en">/</span><span class="kw kw2">論理</span><span class="kwsl en">/</span><span class="kw kw3">交渉</span></div>
 <h3 class="abh">をベースとする<br><span class="nb">ライアーゲームのような体験を</span><span class="nb">あなたに。</span></h3>
 </div></section>
 
 <section class="sec" id="ticket"><div class="wrap">
-<div class="shead"><span class="en st">TICKET</span><span class="sj">チケット・参加方法</span></div>
+<div class="shead"><h2 class="sheadh"><span class="en st">TICKET</span><span class="sj">チケット・参加方法</span></h2></div>
 <div class="steps">
 <div class="step"><div class="en snum">01</div><h3 class="sh3">作品を選ぶ</h3><p class="sp">WORKSから遊びたい作品をお選びください。</p></div>
 <div class="step"><div class="en snum">02</div><h3 class="sh3">ご連絡</h3><p class="sp"><a href="#contact">お問い合わせフォーム</a>、<a href={HT_LINE_URL} target="_blank" rel="noopener">公式LINE</a>、もしくは<a href={HT_X_URL} target="_blank" rel="noopener">X（{HT_X_HANDLE}）</a>のDMまでご連絡ください。</p></div>
@@ -116,7 +116,7 @@ const orgLd = {
 </div></section>
 
 <section class="sec dark2" id="contact"><div class="wrap">
-<div class="shead"><span class="en st">CONTACT</span><span class="sj">お問い合わせ</span></div>
+<div class="shead"><h2 class="sheadh"><span class="en st">CONTACT</span><span class="sj">お問い合わせ</span></h2></div>
 <p class="whatp cintro">公演のご予約・貸切公演のご相談・その他のお問い合わせは、フォームよりご連絡ください。折り返し担当者よりご連絡いたします。</p>
 <HacktaleContactForm />
 </div></section>
@@ -145,6 +145,9 @@ const orgLd = {
 .sec{padding:104px 0;border-top:1px solid rgba(255,255,255,.08)}
 .dark2{background:#111113}
 .shead{display:flex;align-items:baseline;gap:18px;margin-bottom:48px}
+/* セクション見出し（英語＋日本語の組）は h2。見出し階層が h1→h3 と飛ぶのを
+   防ぐためのもので、見た目は従来の .shead の並びのまま。 */
+.sheadh{display:flex;align-items:baseline;gap:18px;margin:0;font-size:inherit;font-weight:inherit}
 .st{font-size:clamp(38px,4.5vw,60px);line-height:1}
 .sj{font-size:13px;letter-spacing:.2em;color:#9b978c}
 .more{margin-left:auto;font-size:13px;letter-spacing:.2em;border-bottom:1px solid rgba(255,255,255,.3);padding-bottom:4px}
@@ -212,6 +215,7 @@ const orgLd = {
 .hero{padding:76px 0 64px}
 .sec{padding:64px 0}
 .shead{margin-bottom:32px;gap:12px}
+.sheadh{gap:12px}
 .kwrow{margin-bottom:24px;gap:14px}
 .steps{gap:22px}
 .cintro{margin-bottom:28px}
