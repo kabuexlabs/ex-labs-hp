@@ -38,6 +38,7 @@ const STATIC_PATHS = [
   '/smystery/events/',
   '/smystery/company/',
   '/uwasabanashi/',
+  '/anator/',
   ...htPaths,
 ];
 

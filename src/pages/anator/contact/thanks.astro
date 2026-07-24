@@ -1,0 +1,33 @@
+---
+// お問い合わせ送信完了ページ。フォーム (AJAX) 成功後にここへ遷移する。
+import AnatorLayout from '../../../layouts/AnatorLayout.astro';
+---
+
+<AnatorLayout
+  title="送信完了｜ANATOR"
+  description="お問い合わせありがとうございます。内容を確認のうえ、担当者よりご連絡いたします。"
+>
+  <meta name="robots" content="noindex" slot="head" />
+  <section class="thanks-sec">
+    <div class="thanks-wrap">
+      <p class="eyebrow">THANK YOU</p>
+      <h1 class="sec-h2 thanks-h">送信完了</h1>
+      <div class="thanks-card">
+        <p class="tk">お問い合わせありがとうございます。</p>
+        <p class="tkd">内容を確認のうえ、担当者より折り返しご連絡いたします。<br>今しばらくお待ちくださいませ。</p>
+      </div>
+      <div class="thanks-back"><a class="link" href="/anator/">トップページへ戻る</a></div>
+    </div>
+  </section>
+
+  <style>
+    .thanks-sec{padding:200px 24px 140px;min-height:64vh;text-align:center}
+    .thanks-wrap{max-width:560px;margin:0 auto}
+    .thanks-h{margin:26px 0 0}
+    .thanks-card{margin:52px auto 0;border:1px solid #26262a;padding:52px 36px;background:#0e0e10}
+    .thanks-card .tk{font-size:19px;letter-spacing:.1em;margin:0 0 16px}
+    .thanks-card .tkd{font-size:14px;line-height:2.1;color:#b3afa5;letter-spacing:.05em;margin:0}
+    .thanks-back{margin-top:48px}
+    .thanks-back .link{color:var(--accent);border-bottom:1px solid var(--accent);padding-bottom:2px;letter-spacing:.1em}
+  </style>
+</AnatorLayout>
