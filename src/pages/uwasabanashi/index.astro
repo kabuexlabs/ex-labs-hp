@@ -75,6 +75,17 @@ const newsItems = [
   'NEWS ／ 2026.07.07 チケット情報を公開しました',
 ];
 
+// FAQリッチリザルト用。ページ内のFAQと同一内容を機械可読で宣言する。
+const faqLd = (faqList: { q: string; a: string }[]) => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqList.map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+});
+
 const faqs = [
   { q: '体験時間はどれくらいですか？', a: '約70分を予定しています。' },
   { q: 'イマーシブ体験が初めてでも楽しめますか？', a: 'はい、初めての方もお楽しみいただけます。知識や事前準備は必要ありません。' },
@@ -106,6 +117,7 @@ const faqs = [
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json" set:html={JSON.stringify(eventLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(faqLd(faqs))} />
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" href="/favicon-ex.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
