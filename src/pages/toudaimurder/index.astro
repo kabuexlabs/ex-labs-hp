@@ -16,11 +16,11 @@ const ticker = [
 
 <ToudaimurderLayout
   wide
-  title="東大マーダーミステリーサークル｜推理系マダミス（マーダーミステリー）の制作・公演"
+  title="UNLIMITED MYSTERY（東大マーダーミステリーサークル）｜推理系マダミス（マーダーミステリー）の制作・公演"
   description="現役東大生と有名作家のチームが、推理系マダミス（マーダーミステリー）を制作・公演。『殺人鬼Xの独白』『フランケンシュタイン城の殺人』など、推理を重視した本格派マダミス作品を店舗公演・オンラインでお楽しみいただけます。貸切公演・オリジナル制作のご相談も受付中。"
   ogImage="/assets/toudaimurder/frankenstein.webp"
 >
-  <div class="rail" slot="rail"><span class="vtx en">TODAI MURDER MYSTERY CIRCLE — OFFICIAL SITE</span></div>
+  <div class="rail" slot="rail"><span class="vtx en">UNLIMITED MYSTERY — OFFICIAL SITE</span></div>
 
   <div class="tick" slot="ticker"><div class="tin">
     {[0, 1].map(() => ticker.map((t) => <span class="ti">{t}</span>))}
@@ -41,15 +41,17 @@ const ticker = [
   </script>
   <div class="intro" id="intro" aria-hidden="true">
     <img class="imark" src="/assets/toudaimurder/um-mark.svg" alt="" width="110" height="98">
-    <p class="ittl min">東大マーダーミステリー<span class="acc">サークル</span></p>
-    <p class="isub en">UNLIMITED MYSTERY</p>
+    <p class="ittl en">UNLIMITED <span class="acc">MYSTERY</span></p>
+    <p class="isub min">東大マーダーミステリーサークル</p>
   </div>
 
   <div class="main">
-    <div class="ftmq ftmq-top"><div class="fmin"><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span></div></div>
+    <div class="ftmq ftmq-top"><div class="fmin"><span class="fmt">UNLIMITED MYSTERY — UNLIMITED MYSTERY — UNLIMITED MYSTERY — </span><span class="fmt">UNLIMITED MYSTERY — UNLIMITED MYSTERY — UNLIMITED MYSTERY — </span></div></div>
 
     <section class="hero wrap">
-      <p class="en dim rv" style="font-size:13px;margin:0 0 22px;letter-spacing:.3em">TODAI MURDER MYSTERY CIRCLE</p>
+      {/* ファーストビューの主ブランドは UNLIMITED MYSTERY。旧称は
+          検索用にメタ・本文中盤・フッターへ残している。 */}
+      <p class="hbrand en rv"><img class="hbrand-mark" src="/assets/toudaimurder/um-mark.svg" alt="" width="46" height="41">UNLIMITED <span class="acc">MYSTERY</span></p>
       <h1 class="h0 min rv d1">至高の推理体験を<br>あなたに。</h1>
       <p class="hlead rv d2">現役東大生と有名作家が手を組んだチームが、至高の推理体験を提供します。推理系マダミス（マーダーミステリー）からイマーシブコンテンツまで、幅広く制作・展開を行います。</p>
       <div class="hbtns rv d3"><a class="btn" href={`${base}/works/`}>作品一覧を見る</a><a class="btnline" href={TM_LINE_URL}>公式LINEで予約</a><a class="btnx" href={TM_X_URL}>Xを見る</a></div>
@@ -118,22 +120,22 @@ const ticker = [
       </div>
     </section>
 
-    <div class="ftmq"><div class="fmin"><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span><span class="fmt">TODAI MURDER MYSTERY CIRCLE — TODAI MURDER MYSTERY CIRCLE — </span></div></div>
+    <div class="ftmq"><div class="fmin"><span class="fmt">UNLIMITED MYSTERY — UNLIMITED MYSTERY — UNLIMITED MYSTERY — </span><span class="fmt">UNLIMITED MYSTERY — UNLIMITED MYSTERY — UNLIMITED MYSTERY — </span></div></div>
   </div>
 
   <footer class="ftr2 wrap" slot="footer">
     <div class="fgrid">
       <div>
-        <p class="logo" style="margin:0 0 12px">東大マーダーミステリー<span class="acc">サークル</span></p>
-        <p class="dim" style="font-size:13px;margin:0 0 20px">至高の推理体験をあなたに。</p>
-        <div class="umlk2"><img src="/assets/toudaimurder/um-mark.svg" alt="UNLIMITED MYSTERY ロゴ" width="46" height="41" loading="lazy"><span class="umtx2">UNLIMITED<br>MYSTERY</span></div>
+        <div class="umlk2" style="margin-bottom:14px"><img src="/assets/toudaimurder/um-mark.svg" alt="UNLIMITED MYSTERY ロゴ" width="46" height="41" loading="lazy"><span class="umtx2">UNLIMITED<br>MYSTERY</span></div>
+        <p class="dim" style="font-size:13px;margin:0 0 6px">至高の推理体験をあなたに。</p>
+        <p class="dim" style="font-size:12px;margin:0 0 16px">東大マーダーミステリーサークル</p>
         <p class="dim" style="font-size:11px;margin:12px 0 0;max-width:340px">Unlimited Mystery is a label that offers an unparalleled mystery experience with no compromises or corners cut.</p>
       </div>
       <div class="fnav"><span class="flbl en">MENU</span><a href={`${base}/works/`}>WORKS — 作品紹介</a><a href={`${base}/news/`}>NEWS — お知らせ</a><a href={`${base}/about/`}>ABOUT — サークル紹介</a></div>
       <div class="fnav"><span class="flbl en">CONTACT</span><a href={`${base}/contact/`}>お問い合わせフォーム</a><a href={TM_X_URL}>X — @toudaimurder</a><a href={TM_LINE_URL}>公式LINE</a></div>
       <div class="fnav"><span class="flbl en">COMPANY</span><a href="https://kabuexlabs.com/">運営会社 — 株式会社ex Labs</a></div>
     </div>
-    <p class="copy en">© TODAI MURDER MYSTERY CIRCLE. All Rights Reserved.</p>
+    <p class="copy en">© UNLIMITED MYSTERY. All Rights Reserved.</p>
   </footer>
 </ToudaimurderLayout>
 
@@ -162,6 +164,9 @@ const ticker = [
 .main{margin-left:52px}
 .shead{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:72px 0 44px;flex-wrap:wrap}
 .hero{padding-top:110px;padding-bottom:96px;position:relative;overflow:hidden}
+/* ファーストビューの主ブランド行（UMマーク＋UNLIMITED MYSTERY）。 */
+.hbrand{display:flex;align-items:center;gap:16px;font-size:clamp(19px,2.3vw,30px);font-weight:600;letter-spacing:.22em;margin:0 0 26px;color:#eae5e1}
+.hbrand-mark{width:clamp(34px,3.4vw,46px);height:auto;flex:none}
 .h0{font-size:clamp(40px,5.2vw,84px);font-weight:700;letter-spacing:.06em;line-height:1.04;margin:0;color:#eae5e1}
 .hlead{max-width:640px;color:var(--dim);margin:26px 0 0}
 .hbtns{display:flex;gap:18px;margin-top:44px;flex-wrap:wrap}

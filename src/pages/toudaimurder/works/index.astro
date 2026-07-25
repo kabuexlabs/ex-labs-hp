@@ -10,7 +10,7 @@ const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const worksListLd = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
-  name: '東大マーダーミステリーサークル マダミス（マーダーミステリー）作品一覧',
+  name: 'UNLIMITED MYSTERY（東大マーダーミステリーサークル） マダミス（マーダーミステリー）作品一覧',
   itemListElement: tmWorks.map((w, i) => ({
     '@type': 'ListItem',
     position: i + 1,
@@ -34,8 +34,8 @@ const cardData = tmWorks.map((w, i) => ({
 <ToudaimurderLayout
   wide
   active="works"
-  title="マダミス（マーダーミステリー）作品一覧｜東大マーダーミステリーサークル"
-  description="東大マーダーミステリーサークルが制作した推理系マダミス（マーダーミステリー）作品の一覧。店舗公演・オンライン公演の絞り込みや人数・時間での並び替えができます。推理を重視した本格派作品を中心に、全作品、貸切でのご予約が可能です。"
+  title="マダミス（マーダーミステリー）作品一覧｜UNLIMITED MYSTERY（東大マーダーミステリーサークル）"
+  description="UNLIMITED MYSTERY（東大マーダーミステリーサークル）が制作した推理系マダミス（マーダーミステリー）作品の一覧。店舗公演・オンライン公演の絞り込みや人数・時間での並び替えができます。推理を重視した本格派作品を中心に、全作品、貸切でのご予約が可能です。"
 >
   <script type="application/ld+json" slot="head" set:html={jsonLd(worksListLd)} />
   <main class="wrap">

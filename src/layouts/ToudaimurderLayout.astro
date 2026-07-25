@@ -15,7 +15,7 @@ export interface Props {
 }
 
 const {
-  title = '東大マーダーミステリーサークル｜マーダーミステリーの制作・公演',
+  title = 'UNLIMITED MYSTERY（東大マーダーミステリーサークル）｜マーダーミステリーの制作・公演',
   description =
     '現役東大生と有名作家が手を組んだチームが、マーダーミステリーの制作・公演を行うサークルです。オリジナルのマーダーミステリー作品を店舗公演・オンラインでお楽しみいただけます。',
   // 既定のシェア画像。指定がないと SNS・AI検索のカードが無地になるので、
@@ -45,8 +45,10 @@ const nav = [
 const orgLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: '東大マーダーミステリーサークル',
-  alternateName: 'UNLIMITED MYSTERY',
+  // 表ブランドは UNLIMITED MYSTERY。検索流入用に旧称（東大マーダー
+  // ミステリーサークル）は alternateName とメタ文言に残す。
+  name: 'UNLIMITED MYSTERY',
+  alternateName: ['東大マーダーミステリーサークル', 'アンリミテッドミステリー'],
   url: new URL(`${base}/`, site).toString(),
   logo: new URL('/assets/toudaimurder/um-mark.svg', site).toString(),
   sameAs: ['https://x.com/toudaimurder'],
@@ -73,7 +75,7 @@ const orgLd = {
 <meta property="og:type" content="website">
 <meta property="og:url" content={canonical}>
 {ogImageAbs && <meta property="og:image" content={ogImageAbs}>}
-<meta property="og:site_name" content="東大マーダーミステリーサークル">
+<meta property="og:site_name" content="UNLIMITED MYSTERY">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content={ogImageAbs ? 'summary_large_image' : 'summary'}>
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -88,7 +90,7 @@ const orgLd = {
 <div class:list={['pg', { pgwide: wide }]}>
 <slot name="rail" />
 <header class="hdr">
-<div class="hbar"><a href={`${base}/`} class="logo">東大マーダーミステリー<span class="acc">サークル</span></a>
+<div class="hbar"><a href={`${base}/`} class="logo"><img class="logomark" src="/assets/toudaimurder/um-mark.svg" alt="" width="46" height="41">UNLIMITED&nbsp;<span class="acc">MYSTERY</span></a>
 <nav class="nav">
 {nav.map((item) => (
   <a class="nit" href={item.href}>
@@ -114,7 +116,7 @@ const orgLd = {
   <footer class="ftr wrap">
     <div class="umlk"><img class="ummark" src="/assets/toudaimurder/um-mark.svg" alt="UNLIMITED MYSTERY ロゴ" width="46" height="41" loading="lazy"><span class="umtx">UNLIMITED<br>MYSTERY</span></div>
     <p class="copy">運営会社：<a href="https://kabuexlabs.com/">株式会社ex Labs</a></p>
-    <p class="copy en" style="margin-top:6px">© TODAI MURDER MYSTERY CIRCLE. All Rights Reserved.</p>
+    <p class="copy en" style="margin-top:6px">© UNLIMITED MYSTERY. All Rights Reserved.</p>
   </footer>
 </slot>
 </div>
@@ -148,7 +150,8 @@ a{color:#eae5e1;text-decoration:none}a:hover{color:#e0243f}
 .bt{border-top:1px solid var(--ln)}
 .hdr{position:sticky;top:0;z-index:50;background:rgba(11,10,12,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--ln)}
 .hbar{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:14px 32px}
-.logo{font-family:'Shippori Mincho',serif;font-weight:800;font-size:18px;letter-spacing:.14em;white-space:nowrap}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Outfit',sans-serif;font-weight:600;font-size:16px;letter-spacing:.22em;white-space:nowrap}
+.logomark{width:26px;height:auto;flex:none}
 .nav{display:flex;gap:34px}
 .nit{display:flex;flex-direction:column;align-items:center;gap:1px}
 .nen{font-size:13px;font-weight:600;letter-spacing:.22em}
@@ -189,7 +192,8 @@ body.noscroll{overflow:hidden}
 @media (max-width:700px){
   .wrap{padding:0 22px}
   .hbar{padding:12px 18px}
-  .logo{font-size:15px}
+  .logo{font-size:13.5px;letter-spacing:.16em}
+  .logomark{width:22px}
   .sht{font-size:clamp(40px,13vw,64px)}
   .pg{font-size:14px}
   .more{padding:10px 26px;letter-spacing:.2em;font-size:12px}

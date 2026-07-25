@@ -22,15 +22,15 @@ const articleLd = {
   description: article.summary,
   datePublished: article.date.replaceAll('.', '-'),
   ...(article.image ? { image: new URL(article.image, site).toString() } : {}),
-  author: { '@type': 'Organization', name: '東大マーダーミステリーサークル' },
-  publisher: { '@type': 'Organization', name: '東大マーダーミステリーサークル' },
+  author: { '@type': 'Organization', name: 'UNLIMITED MYSTERY' },
+  publisher: { '@type': 'Organization', name: 'UNLIMITED MYSTERY' },
   mainEntityOfPage: new URL(`${base}/news/${article.slug}/`, site).toString(),
 };
 ---
 
 <ToudaimurderLayout
   active="news"
-  title={`${article.title}｜東大マーダーミステリーサークル`}
+  title={`${article.title}｜UNLIMITED MYSTERY（東大マーダーミステリーサークル）`}
   description={article.summary}
   ogImage={article.image}
 >
