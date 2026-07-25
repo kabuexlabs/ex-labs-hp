@@ -6,9 +6,12 @@ export interface Props {
   limit?: number;
   tinted?: boolean;
   category?: PostCategory;
+  /** 記事が取得できない時もセクション自体は出す（トップページ用）。
+      CMS側の障害や設定切れでブログへの導線ごと消えるのを防ぐ。 */
+  alwaysShow?: boolean;
 }
 
-const { heading = '関連記事', limit = 3, tinted = true, category } = Astro.props;
+const { heading = '関連記事', limit = 3, tinted = true, category, alwaysShow = false } = Astro.props;
 
 const { contents: fetched } = isMicrocmsConfigured()
   ? await getPostList(0, limit, category)
@@ -25,10 +28,13 @@ function excerpt(html: string, length = 60) {
   return text.length > length ? text.slice(0, length) + '…' : text;
 }
 ---
-{contents.length > 0 && (
+{(contents.length > 0 || alwaysShow) && (
   <section class:list={['section', { tinted }]}><div class="wrap">
     <p class="eyebrow">BLOG</p>
     <h2 class="h2 serif">{heading}</h2>
+    {contents.length === 0 && (
+      <div style="text-align:center;margin-top:8px"><a class="btn ghost" href="/blog/">ブログ記事一覧を見る　→</a></div>
+    )}
     <div class="blog-grid blog-strip">
       {contents.map((post) => (
         <div class="blog-card">
@@ -45,6 +51,8 @@ function excerpt(html: string, length = 60) {
         </div>
       ))}
     </div>
-    <p class="vc-line" style="margin-top:40px"><a href="/blog/" style="color:var(--accent)">ブログ記事一覧を見る →</a></p>
+    {contents.length > 0 && (
+      <p class="vc-line" style="margin-top:40px"><a href="/blog/" style="color:var(--accent)">ブログ記事一覧を見る →</a></p>
+    )}
   </div></section>
 )}
