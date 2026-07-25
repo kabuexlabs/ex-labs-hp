@@ -535,16 +535,17 @@ a.genre-cell:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-2)}
    reads calmer/premium vs. the old loud orange banner. */
 .flow-note{margin:52px auto 0;max-width:640px;text-align:center;background:#fff;border:1.5px solid rgba(244,88,28,.5);color:var(--ink);font-size:15px;font-weight:700;line-height:1.9;padding:22px 30px;border-radius:var(--r-m);box-shadow:var(--shadow-1)}
 
-/* Numbered service rows (Pintcle-style editorial list) */
-.svc-rows{max-width:860px;margin:0 auto;border-bottom:1px solid rgba(51,48,43,.14)}
-.svc-row{display:flex;gap:30px;align-items:flex-start;padding:36px 10px;border-top:1px solid rgba(51,48,43,.14);transition:background-color .25s}
-.svc-row:hover{background:rgba(244,88,28,.05)}
+/* 法人向けサービス：番号付きの太枠カード。トップの主要導線なので
+   ヘアライン行ではなく、白地＋墨フチ＋紙の重なり影でしっかり立たせる。 */
+.svc-rows{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.svc-row{display:flex;gap:26px;align-items:flex-start;padding:26px 28px;background:#fff;border:var(--bd);box-shadow:var(--shadow-1);transition:transform .2s,box-shadow .2s}
+.svc-row:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-2)}
 .svc-no{flex:none;font-family:'Archivo Black','Noto Sans JP',sans-serif;font-size:40px;line-height:1;color:var(--accent);font-weight:400;margin-top:2px}
 .svc-row-body{flex:1;min-width:0}
-.svc-row-title{font-size:21px;font-weight:800;margin:0 0 10px;color:var(--ink)}
+.svc-row-title{font-size:22px;font-weight:800;margin:0 0 10px;color:var(--ink)}
 .svc-row-desc{font-size:14px;line-height:1.9;color:rgba(51,48,43,.7);margin:0}
-.svc-row-arrow{flex:none;align-self:center;width:44px;height:44px;border-radius:0;border:2px solid var(--ink);color:var(--ink);display:flex;align-items:center;justify-content:center;font-weight:800;transition:background-color .25s,color .25s,transform .25s}
-.svc-row:hover .svc-row-arrow{background:var(--accent);color:#fff;transform:translateX(4px)}
+.svc-row-arrow{flex:none;align-self:center;width:44px;height:44px;border-radius:0;border:2px solid var(--ink);background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;transition:background-color .25s,color .25s,transform .25s}
+.svc-row:hover .svc-row-arrow{background:var(--ink);color:#fff;transform:translateX(4px)}
 
 /* Message section — arched portrait, centered stack on brand orange */
 .msg-sec{background-color:var(--accent);background-image:linear-gradient(rgba(255,255,255,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.14) 1px,transparent 1px);background-size:34px 34px;color:#fff}
@@ -709,7 +710,7 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;back
   .marquee-name{font-size:16px}
   /* Tighter numbered service rows so long titles (マーダーミステリー制作)
      keep to one line on phones. */
-  .svc-row{gap:16px;padding:28px 4px}
+  .svc-row{gap:14px;padding:20px 18px}
   .svc-no{font-size:26px}
   .svc-row-title{font-size:16.5px;margin-bottom:8px}
   .svc-row-desc{font-size:12.5px;line-height:1.8}

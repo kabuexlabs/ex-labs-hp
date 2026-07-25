@@ -1,0 +1,106 @@
+---
+// お問い合わせの受信箱＋診断ページ（社内用）。
+//   - KVに保存された問い合わせを新しい順に一覧表示（メールを見落としても
+//     ここに必ず残る — 取りこぼし防止の最後の砦）
+//   - メール(Resend)/KVの設定状態と、実際のテスト送信による疎通確認
+// 認証は予約管理と同じ YOYAKU_ADMIN_KEY（合言葉はPOSTのみ、以降は
+// HttpOnly セッションCookie）。
+export const prerender = false;
+
+import YoyakuLayout from '../../../layouts/YoyakuLayout.astro';
+import { checkAdminKey, adminEmail } from '../../../lib/yoyaku';
+import {
+  listInquiries,
+  contactConfigStatus,
+  testResendSend,
+  type ContactRecord,
+} from '../../../lib/contact';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+
+const COOKIE = 'contact_admin';
+let loginFailed = false;
+let testResult: { ok: boolean; detail: string } | null = null;
+
+let key = Astro.cookies.get(COOKIE)?.value ?? '';
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const action = String(form.get('action') ?? '');
+  if (action === 'login') {
+    const entered = String(form.get('key') ?? '').trim();
+    if (checkAdminKey(entered)) {
+      Astro.cookies.set(COOKIE, entered, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/contact/admin',
+      });
+      return Astro.redirect(Astro.url.pathname, 303);
+    }
+    loginFailed = true;
+  } else if (action === 'testmail' && checkAdminKey(key)) {
+    testResult = await testResendSend(adminEmail());
+  }
+}
+
+const authed = checkAdminKey(key);
+const status = contactConfigStatus();
+const inquiries: ContactRecord[] = authed ? await listInquiries(50) : [];
+
+function fmtDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+---
+<YoyakuLayout title="お問い合わせ受信箱｜ex Labs">
+<div class="yk-wrap">
+<h1 style="font-size:22px;margin:0 0 8px">お問い合わせ受信箱</h1>
+<p style="font-size:13px;color:#8a8378;margin:0 0 28px">フォームからの送信はメール通知とは別にここへ必ず記録されます（直近500件）。</p>
+
+{!authed ? (
+  <form method="POST" style="display:flex;flex-direction:column;gap:14px;max-width:360px">
+    <input type="hidden" name="action" value="login">
+    <label style="font-size:13px;font-weight:700">合言葉（予約管理と共通）
+      <input type="password" name="key" required style="display:block;width:100%;margin-top:8px;padding:12px 14px;border:2px solid var(--ink);font:inherit">
+    </label>
+    {loginFailed && <p style="color:#c00;font-size:13px;margin:0">合言葉が違います。</p>}
+    <button type="submit" style="padding:12px;border:2px solid var(--ink);background:var(--accent);color:#fff;font-weight:800;cursor:pointer">ログイン</button>
+  </form>
+) : (
+  <>
+  <section style="border:2px solid var(--ink);background:#fff;padding:20px 22px;margin-bottom:28px">
+    <h2 style="font-size:15px;margin:0 0 12px">システム状態</h2>
+    <ul style="margin:0;padding-left:1.2em;font-size:13.5px;line-height:2">
+      <li>メール通知（Resend）: {status.resend ? '✅ APIキー設定あり' : '❌ RESEND_API_KEY 未設定 — Vercelの環境変数に追加してください'}</li>
+      <li>記録（KV）: {status.kv ? '✅ 設定あり' : '❌ 未設定 — 問い合わせの保存ができません'}</li>
+      <li>送信元アドレス: {status.mailFrom}</li>
+    </ul>
+    <form method="POST" style="margin:16px 0 0">
+      <input type="hidden" name="action" value="testmail">
+      <button type="submit" style="padding:10px 20px;border:2px solid var(--ink);background:#fff;font-weight:800;cursor:pointer">テストメールを {adminEmail()} に送信</button>
+    </form>
+    {testResult && (
+      <p style={`margin:14px 0 0;font-size:13.5px;padding:12px 14px;border:2px solid ${testResult.ok ? '#1a7f37' : '#c00'};background:${testResult.ok ? '#f0fff4' : '#fff5f5'};overflow-wrap:anywhere`}>{testResult.detail}</p>
+    )}
+  </section>
+
+  <h2 style="font-size:15px;margin:0 0 14px">受信一覧（{inquiries.length}件）</h2>
+  {inquiries.length === 0 ? (
+    <p style="font-size:13.5px;color:#8a8378">記録はまだありません。{!status.kv && 'KVが未設定のため保存自体が行われていません。'}</p>
+  ) : (
+    <div style="display:flex;flex-direction:column;gap:14px">
+      {inquiries.map((q) => (
+        <details style="border:2px solid var(--ink);background:#fff;padding:14px 18px">
+          <summary style="cursor:pointer;font-size:13.5px;font-weight:700">{fmtDate(q.createdAt)}　{q.subject}　<span style="font-weight:500;color:#8a8378">{q.email}</span></summary>
+          <pre style="white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:13.5px;margin:12px 0 0;line-height:1.9">{q.fields}</pre>
+          <p style="font-size:11.5px;color:#8a8378;margin:10px 0 0">返信先: <a href={`mailto:${q.email}`} style="color:var(--accent)">{q.email}</a>｜IP: {q.ip}</p>
+        </details>
+      ))}
+    </div>
+  )}
+  </>
+)}
+</div>
+</YoyakuLayout>

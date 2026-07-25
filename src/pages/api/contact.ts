@@ -9,36 +9,7 @@ export const prerender = false;
 // 各サイトのフォームは action を差し替えるだけで移行できる。
 import type { APIRoute } from 'astro';
 import { sendMail, adminEmail } from '../../lib/yoyaku';
-
-function readEnv(name: string): string | undefined {
-  const v = (import.meta.env as Record<string, string | undefined>)[name] ?? process.env[name];
-  return v?.trim() || undefined;
-}
-
-// yoyaku.ts と同じ二系統対応の Upstash REST クライアント（あちらは
-// モジュール非公開なので最小限をここに持つ）。未設定なら null を返し、
-// 記録・レート制限はスキップされる。
-async function redis(...command: string[]): Promise<unknown | null> {
-  const url = readEnv('KV_REST_API_URL') ?? readEnv('UPSTASH_REDIS_REST_URL');
-  const token = readEnv('KV_REST_API_TOKEN') ?? readEnv('UPSTASH_REDIS_REST_TOKEN');
-  if (!url || !token) return null;
-  try {
-    const res = await fetch(url.replace(/\/+$/, ''), {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(command),
-    });
-    if (!res.ok) {
-      console.error('[contact] KV request failed:', res.status);
-      return null;
-    }
-    const data = (await res.json()) as { result?: unknown };
-    return data.result ?? null;
-  } catch (e) {
-    console.error('[contact] KV request failed:', e);
-    return null;
-  }
-}
+import { contactRedis as redis, CONTACT_LOG_KEY } from '../../lib/contact';
 
 // リダイレクト先はサイト内パスか kabuexlabs.com のみ許可
 // （open redirect 防止）。
@@ -114,10 +85,10 @@ export const POST: APIRoute = async ({ request }) => {
   // --- 記録（KV）＋ 通知メール（Resend） -------------------------------------
   // どちらか片方でも成功すれば問い合わせは「受け付けた」ことにする。
   let stored = false;
-  const pushed = await redis('LPUSH', 'contact:log', JSON.stringify(record));
+  const pushed = await redis('LPUSH', CONTACT_LOG_KEY, JSON.stringify(record));
   if (pushed !== null) {
     stored = true;
-    await redis('LTRIM', 'contact:log', '0', '499');
+    await redis('LTRIM', CONTACT_LOG_KEY, '0', '499');
   }
 
   const body =
