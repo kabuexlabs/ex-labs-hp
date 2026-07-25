@@ -126,6 +126,18 @@ export const POST: APIRoute = async ({ request }) => {
     `このメールに返信すると送信者宛に届きます。`;
   const mailed = await sendMail(adminEmail(), subject, body, email);
 
+  // 送信者への自動控えメール。受付が成立した場合のみ送る。
+  // 返信先は info@ なので、送信者がこのメールに返信すればそのまま届く。
+  if (stored || mailed) {
+    const receipt =
+      `お問い合わせありがとうございます。\n以下の内容で受け付けました。\n\n` +
+      `${record.fields}\n\n——\n` +
+      `担当者より2営業日以内に折り返しご連絡いたします。\n` +
+      `お急ぎの場合は info@kabuexlabs.com までご連絡ください。\n\n` +
+      `株式会社ex Labs\nhttps://kabuexlabs.com/`;
+    await sendMail(email, 'お問い合わせを受け付けました｜株式会社ex Labs', receipt);
+  }
+
   if (!stored && !mailed) {
     // 保存もメールも失敗（KV/Resend両方の設定切れ等）。無言で捨てず、
     // 直接メールしてもらうための案内を返す。
