@@ -81,21 +81,31 @@ export async function testResendSend(to: string): Promise<{ ok: boolean; detail:
   if (!apiKey) return { ok: false, detail: 'RESEND_API_KEY が設定されていません（Vercelの環境変数を確認）' };
   const from = readEnv('MAIL_FROM') ?? 'ex Labs 予約窓口 <no-reply@kabuexlabs.com>';
   const base = readEnv('RESEND_API_BASE') ?? 'https://api.resend.com';
-  try {
-    const res = await fetch(`${base}/emails`, {
+  const post = (fromAddr: string) =>
+    fetch(`${base}/emails`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from,
+        from: fromAddr,
         to: [to],
         subject: '【テスト】お問い合わせシステムの送信テスト',
         text: `このメールが届いていれば、お問い合わせフォームのメール通知は正常に動作しています。\n送信日時: ${new Date().toISOString()}`,
       }),
     });
+  try {
+    let res = await post(from);
+    if (res.ok) return { ok: true, detail: `送信成功（HTTP ${res.status}）。${to} の受信箱（迷惑メールフォルダも）を確認してください。` };
     const text = (await res.text()).slice(0, 400);
-    return res.ok
-      ? { ok: true, detail: `送信成功（HTTP ${res.status}）。${to} の受信箱を確認してください。` }
-      : { ok: false, detail: `Resend がエラーを返しました（HTTP ${res.status}）: ${text}` };
+    // 本番の sendMail と同じフォールバック：ドメイン未認証でも
+    // アカウント所有者宛てなら共有差出人で届く。
+    if (res.status === 403 && !from.includes('resend.dev')) {
+      const res2 = await post('ex Labs <onboarding@resend.dev>');
+      if (res2.ok) {
+        return { ok: true, detail: `共有差出人（onboarding@resend.dev）で送信成功。ドメイン認証が完了するまでは通知メールはこの差出人から届きます。本来の差出人エラー: ${text}` };
+      }
+      return { ok: false, detail: `Resend がエラーを返しました（HTTP ${res.status}）: ${text}／共有差出人でも失敗（HTTP ${res2.status}）: ${(await res2.text()).slice(0, 200)}` };
+    }
+    return { ok: false, detail: `Resend がエラーを返しました（HTTP ${res.status}）: ${text}` };
   } catch (e) {
     return { ok: false, detail: `送信リクエスト自体が失敗: ${String(e).slice(0, 300)}` };
   }

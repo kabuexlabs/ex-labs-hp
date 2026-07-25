@@ -319,14 +319,26 @@ export async function sendMail(
   // RESEND_API_BASE はローカルテストでモックサーバーに向けるための逃げ道
   // （microcms.ts の MICROCMS_API_BASE と同じ流儀）。本番では未設定でよい。
   const base = readEnv('RESEND_API_BASE') ?? 'https://api.resend.com';
-  try {
-    const res = await fetch(`${base}/emails`, {
+  const post = async (fromAddr: string) =>
+    fetch(`${base}/emails`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to: [to], subject, text, reply_to: replyTo ?? adminEmail() }),
+      body: JSON.stringify({ from: fromAddr, to: [to], subject, text, reply_to: replyTo ?? adminEmail() }),
     });
+  try {
+    let res = await post(from);
     if (!res.ok) {
-      console.error('[yoyaku] mail send failed:', res.status, await res.text());
+      const detail = await res.text();
+      // ドメイン未認証（403）の場合、Resend共有の onboarding@resend.dev から
+      // 再送を試みる。この差出人は「アカウント所有者宛て」だけは認証なしで
+      // 届くため、kabuexlabs.com のDNS認証が済むまでの間も info@ への通知が
+      // 止まらない。認証完了後は自動的に本来の差出人が使われる。
+      console.error('[yoyaku] mail send failed:', res.status, detail);
+      if (res.status === 403 && !from.includes('resend.dev')) {
+        res = await post('ex Labs <onboarding@resend.dev>');
+        if (res.ok) return true;
+        console.error('[yoyaku] fallback send failed:', res.status, await res.text());
+      }
       return false;
     }
     return true;
