@@ -12,7 +12,7 @@ import { checkAdminKey, adminEmail } from '../../../lib/yoyaku';
 import {
   listInquiries,
   contactConfigStatus,
-  testResendSend,
+  testMailSend,
   type ContactRecord,
 } from '../../../lib/contact';
 
@@ -41,7 +41,7 @@ if (Astro.request.method === 'POST') {
     }
     loginFailed = true;
   } else if (action === 'testmail' && checkAdminKey(key)) {
-    testResult = await testResendSend(adminEmail());
+    testResult = await testMailSend(adminEmail());
   }
 }
 
@@ -73,7 +73,7 @@ function fmtDate(iso: string) {
   <section style="border:2px solid var(--ink);background:#fff;padding:20px 22px;margin-bottom:28px">
     <h2 style="font-size:15px;margin:0 0 12px">システム状態</h2>
     <ul style="margin:0;padding-left:1.2em;font-size:13.5px;line-height:2">
-      <li>メール通知（Resend）: {status.resend ? '✅ APIキー設定あり' : '❌ RESEND_API_KEY 未設定'}</li>
+      <li>メール通知: {status.smtp ? '✅ 自社メール（SMTP直送）— 外部サービス不使用' : status.resend ? '✅ Resend APIキーあり' : '❌ 未設定'}</li>
       <li>記録（KV）: {status.kv ? '✅ 設定あり' : '❌ 未設定 — 問い合わせの保存ができません'}</li>
       <li>送信元アドレス: {status.mailFrom}</li>
     </ul>
@@ -84,16 +84,17 @@ function fmtDate(iso: string) {
     {testResult && (
       <p style={`margin:14px 0 0;font-size:13.5px;padding:12px 14px;border:2px solid ${testResult.ok ? '#1a7f37' : '#c00'};background:${testResult.ok ? '#f0fff4' : '#fff5f5'};overflow-wrap:anywhere`}>{testResult.detail}</p>
     )}
-    {!status.resend && (
+    {!status.smtp && (
       <div style="margin:18px 0 0;padding:14px 16px;border:2px solid var(--accent);background:#fff8f0;font-size:13px;line-height:2">
-        <p style="margin:0 0 6px;font-weight:800">メール通知を有効にする手順（約5分）</p>
+        <p style="margin:0 0 6px;font-weight:800">メール通知を有効にする手順（外部サービス不要・約5分）</p>
+        <p style="margin:0 0 8px">info@kabuexlabs.com（Google）自身の送信機能をそのまま使います。新しいサービスの契約は不要です。</p>
         <ol style="margin:0;padding-left:1.4em">
-          <li><a href="https://resend.com/signup" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">resend.com</a> に <strong>info@kabuexlabs.com</strong> でアカウント登録（無料・月3,000通）</li>
-          <li>ダッシュボードの「API Keys」→「Create API Key」でキー（re_...）を作成しコピー</li>
-          <li>Vercelの Settings → Environment Variables に <code>RESEND_API_KEY</code> として貼り付け（全環境）→ Redeploy</li>
+          <li>info@kabuexlabs.com のGoogleアカウントで2段階認証を有効にする（設定済みなら次へ）</li>
+          <li><a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline">myaccount.google.com/apppasswords</a> を開き（info@でログイン）、アプリ名「HP問い合わせ」等で<strong>アプリパスワード（16桁）</strong>を作成してコピー</li>
+          <li>Vercelの Settings → Environment Variables に2つ追加（全環境）→ Redeploy：<br><code>SMTP_USER</code> = info@kabuexlabs.com<br><code>SMTP_PASS</code> = 作成した16桁（スペースはあってもOK）</li>
           <li>このページの「テストメール送信」で届くことを確認</li>
         </ol>
-        <p style="margin:8px 0 0;color:#8a8378">※お客様への控えメール送信と no-reply@kabuexlabs.com 差出人には、追加で Resend の「Domains」から kabuexlabs.com のDNS認証が必要です（それまでは info@ への通知のみ届きます）。</p>
+        <p style="margin:8px 0 0;color:#8a8378">※アプリパスワードは「このシステム専用の合鍵」です。Googleのログインパスワード本体ではなく、いつでも単独で無効化できます。</p>
       </div>
     )}
   </section>

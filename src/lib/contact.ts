@@ -60,25 +60,51 @@ export async function listInquiries(limit = 50): Promise<ContactRecord[]> {
 }
 
 /** 設定の有無（値そのものは絶対に返さない）。診断表示用。 */
-export function contactConfigStatus(): { kv: boolean; resend: boolean; mailFrom: string } {
+export function contactConfigStatus(): { kv: boolean; smtp: boolean; resend: boolean; mailFrom: string } {
   const kv =
     !!(readEnv('KV_REST_API_URL') ?? readEnv('UPSTASH_REDIS_REST_URL')) &&
     !!(readEnv('KV_REST_API_TOKEN') ?? readEnv('UPSTASH_REDIS_REST_TOKEN'));
+  const smtp = !!readEnv('SMTP_USER') && !!readEnv('SMTP_PASS');
   return {
     kv,
+    smtp,
     resend: !!readEnv('RESEND_API_KEY'),
-    mailFrom: readEnv('MAIL_FROM') ?? 'ex Labs 予約窓口 <no-reply@kabuexlabs.com>（既定値）',
+    mailFrom: smtp
+      ? `株式会社ex Labs <${readEnv('SMTP_USER')}>（自社メールアカウントから直送）`
+      : readEnv('MAIL_FROM') ?? 'ex Labs 予約窓口 <no-reply@kabuexlabs.com>（既定値）',
   };
 }
 
 /**
- * Resend へ実際にテスト送信し、生のステータスとエラー本文を返す。
- * 「キー切れ」「ドメイン未認証」等、失敗理由をそのまま可視化する。
+ * 実際にテスト送信し、経路（自社SMTP / Resend）と生の失敗理由を返す。
  * 管理ページ（合言葉認証済み）からのみ呼ぶこと。
  */
-export async function testResendSend(to: string): Promise<{ ok: boolean; detail: string }> {
+export async function testMailSend(to: string): Promise<{ ok: boolean; detail: string }> {
+  // 1) 自社SMTP（外部サービス不要の本命経路）
+  if (readEnv('SMTP_USER') && readEnv('SMTP_PASS')) {
+    try {
+      const nodemailer = (await import('nodemailer')).default;
+      const port = Number(readEnv('SMTP_PORT') ?? 465);
+      const transporter = nodemailer.createTransport({
+        host: readEnv('SMTP_HOST') ?? 'smtp.gmail.com',
+        port,
+        secure: readEnv('SMTP_SECURE') === 'false' ? false : port === 465,
+        auth: { user: readEnv('SMTP_USER')!, pass: readEnv('SMTP_PASS')!.replace(/\s+/g, '') },
+      });
+      await transporter.sendMail({
+        from: `株式会社ex Labs <${readEnv('SMTP_USER')}>`,
+        to,
+        subject: '【テスト】お問い合わせシステムの送信テスト',
+        text: `このメールが届いていれば、お問い合わせフォームのメール通知は正常に動作しています。\n経路: 自社メール（SMTP直送）\n送信日時: ${new Date().toISOString()}`,
+      });
+      return { ok: true, detail: `自社メール（SMTP）で送信成功。${to} の受信箱を確認してください。` };
+    } catch (e) {
+      return { ok: false, detail: `SMTP送信に失敗: ${String(e).slice(0, 350)}（アプリパスワードの誤り・2段階認証未設定の可能性）` };
+    }
+  }
+  // 2) Resend（設定されている場合のみ）
   const apiKey = readEnv('RESEND_API_KEY');
-  if (!apiKey) return { ok: false, detail: 'RESEND_API_KEY が設定されていません（Vercelの環境変数を確認）' };
+  if (!apiKey) return { ok: false, detail: 'メール送信が未設定です（下の手順で SMTP_USER / SMTP_PASS を設定してください）' };
   const from = readEnv('MAIL_FROM') ?? 'ex Labs 予約窓口 <no-reply@kabuexlabs.com>';
   const base = readEnv('RESEND_API_BASE') ?? 'https://api.resend.com';
   const post = (fromAddr: string) =>

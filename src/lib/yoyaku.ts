@@ -300,9 +300,60 @@ export function adminEmail(): string {
   return readEnv('YOYAKU_ADMIN_EMAIL') ?? 'info@kabuexlabs.com';
 }
 
+// --- 自社メールアカウント直送（SMTP） ------------------------------------------
+// 外部の送信サービスを一切使わず、既存の info@kabuexlabs.com アカウント
+// （Google Workspace）の SMTP でそのまま送る。必要な環境変数：
+//   SMTP_USER = info@kabuexlabs.com
+//   SMTP_PASS = Googleの「アプリパスワード」（16桁）
+// 任意: SMTP_HOST（既定 smtp.gmail.com）/ SMTP_PORT（既定 465）
+// 自分のアカウントから自分宛てに送るため、認証・到達性の問題が起きない。
+
+export function smtpConfigured(): boolean {
+  return !!readEnv('SMTP_USER') && !!readEnv('SMTP_PASS');
+}
+
+export function smtpFrom(): string {
+  return `株式会社ex Labs <${readEnv('SMTP_USER') ?? ''}>`;
+}
+
+async function sendViaSmtp(
+  to: string,
+  subject: string,
+  text: string,
+  replyTo?: string,
+): Promise<boolean> {
+  const user = readEnv('SMTP_USER');
+  const pass = readEnv('SMTP_PASS');
+  if (!user || !pass) return false;
+  try {
+    const nodemailer = (await import('nodemailer')).default;
+    const port = Number(readEnv('SMTP_PORT') ?? 465);
+    const transporter = nodemailer.createTransport({
+      host: readEnv('SMTP_HOST') ?? 'smtp.gmail.com',
+      port,
+      // ローカルテスト（平文モックSMTP）用に SMTP_SECURE=false で無効化できる
+      secure: readEnv('SMTP_SECURE') === 'false' ? false : port === 465,
+      auth: { user, pass: pass.replace(/\s+/g, '') },
+    });
+    await transporter.sendMail({
+      from: smtpFrom(),
+      to,
+      subject,
+      text,
+      replyTo: replyTo ?? adminEmail(),
+    });
+    return true;
+  } catch (e) {
+    console.error('[mail] smtp send failed:', e);
+    return false;
+  }
+}
+
 /**
- * Resend でプレーンテキストメールを送る。API キー未設定・送信失敗は
- * false を返すだけで例外にしない — メールが落ちても予約は成立させる。
+ * プレーンテキストメールを送る。優先順位：
+ *   1) 自社SMTP（SMTP_USER/SMTP_PASS 設定時 — 外部サービス不要）
+ *   2) Resend（RESEND_API_KEY 設定時のみのフォールバック）
+ * どちらも未設定・失敗時は false を返すだけで例外にしない。
  */
 export async function sendMail(
   to: string,
@@ -310,9 +361,14 @@ export async function sendMail(
   text: string,
   replyTo?: string,
 ): Promise<boolean> {
+  // 1) 自社SMTP（最優先）
+  if (smtpConfigured()) {
+    if (await sendViaSmtp(to, subject, text, replyTo)) return true;
+    // SMTP失敗時は下のResendがあればそちらを試す
+  }
   const apiKey = readEnv('RESEND_API_KEY');
   if (!apiKey) {
-    console.warn('[yoyaku] RESEND_API_KEY not set; skipping mail:', subject);
+    if (!smtpConfigured()) console.warn('[mail] SMTP/RESEND とも未設定; skipping mail:', subject);
     return false;
   }
   const from = readEnv('MAIL_FROM') ?? 'ex Labs 予約窓口 <no-reply@kabuexlabs.com>';
