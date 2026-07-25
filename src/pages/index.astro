@@ -440,7 +440,10 @@ const marqueeItems = Array(2).fill(groups).flat();
 <section class="cta section" id="contact"><div class="wrap">
 <h2 class="cta-title serif">まずは、お気軽にご相談ください</h2>
 <p class="cta-sub"><span class="nobr">お問い合わせ内容をご入力のうえ</span><wbr><span class="nobr">送信してください。</span><wbr><span class="nobr">2〜3営業日以内に</span><span class="nobr">ご連絡を差し上げます。</span></p>
-<form class="contact-form" action="https://formspree.io/f/xykqblal" method="POST">
+<form class="contact-form" action="/api/contact" method="POST">
+<input type="hidden" name="_next" value="/contact/thanks/">
+{/* ハニーポット：botだけが埋める不可視フィールド */}
+<input type="text" name="_gotcha" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">
 <div class="form-row">
 <label><span class="label-cap">お名前<span class="req">必須</span></span><input type="text" name="name" required></label>
 <label><span class="label-cap">会社名</span><input type="text" name="company"></label>

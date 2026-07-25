@@ -304,7 +304,12 @@ export function adminEmail(): string {
  * Resend でプレーンテキストメールを送る。API キー未設定・送信失敗は
  * false を返すだけで例外にしない — メールが落ちても予約は成立させる。
  */
-export async function sendMail(to: string, subject: string, text: string): Promise<boolean> {
+export async function sendMail(
+  to: string,
+  subject: string,
+  text: string,
+  replyTo?: string,
+): Promise<boolean> {
   const apiKey = readEnv('RESEND_API_KEY');
   if (!apiKey) {
     console.warn('[yoyaku] RESEND_API_KEY not set; skipping mail:', subject);
@@ -318,7 +323,7 @@ export async function sendMail(to: string, subject: string, text: string): Promi
     const res = await fetch(`${base}/emails`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to: [to], subject, text, reply_to: adminEmail() }),
+      body: JSON.stringify({ from, to: [to], subject, text, reply_to: replyTo ?? adminEmail() }),
     });
     if (!res.ok) {
       console.error('[yoyaku] mail send failed:', res.status, await res.text());
