@@ -85,7 +85,9 @@ const nav = [
 
 <style is:global>
 :root{--acc:#d9e63b}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:clip}
+/* キーボード操作のフォーカスリング（マウスでは出ない）。 */
+:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid var(--acc);outline-offset:3px}
 body{margin:0;background:#0d0d0e;color:#f1efe9;font-family:'Zen Kaku Gothic New',sans-serif;-webkit-font-smoothing:antialiased}
 a{color:#f1efe9;text-decoration:none}
 a:hover{color:var(--acc)}

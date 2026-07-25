@@ -112,7 +112,9 @@ const orgLd = {
 </footer>
 
 <style is:global>
-html{scroll-behavior:smooth;scroll-padding-top:80px}
+html{scroll-behavior:smooth;scroll-padding-top:80px;overflow-x:clip}
+/* キーボード操作のフォーカスリング（マウスでは出ない）。 */
+:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid #b5a67f;outline-offset:3px}
 body{margin:0;background:#0a0a0b;color:#e8e5df;font-family:'Shippori Mincho',serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:#e8e5df;text-decoration:none;transition:color .3s}
 a:hover{color:var(--accent)}

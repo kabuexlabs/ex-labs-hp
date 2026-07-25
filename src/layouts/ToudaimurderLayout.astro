@@ -120,7 +120,9 @@ const orgLd = {
 </div>
 
 <style is:global>
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:clip}
+/* キーボード操作のフォーカスリング（マウスでは出ない）。 */
+:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid #c9a24b;outline-offset:3px}
 html,body{margin:0;padding:0;background:#0b0a0c}
 /* 見出し・本文の改行を自然に。auto-phrase 対応ブラウザ（Chrome等）は
    文節で折り返し、非対応（iOS Safari）でも strict 禁則で長音「ー」や

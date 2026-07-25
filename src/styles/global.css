@@ -633,6 +633,9 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;back
   .h2sub{font-size:13.5px;margin-bottom:36px}
   .lede{font-size:14.5px}
   .about-points{grid-template-columns:1fr}
+  /* スマホは見出しが中央揃えなので、ラベルも中央に合わせて
+     左右の揃えを統一する。 */
+  .about-label{justify-content:center}
   .bullets li{font-size:14px;padding:14px 16px 14px 54px}
   .bullets li::before{left:16px;top:14px}
   .vc-line{font-size:12px}
@@ -664,10 +667,11 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;back
   .cond-item{font-size:13px}
   .genre-grid{grid-template-columns:1fr;gap:14px}
   .genre-cell{padding:20px 18px}
-  a.genre-cell{padding-bottom:20px;padding-right:64px}
+  /* 矢印は右下の定位置のまま、本文の幅を削らない（右パディングを
+     空ける方式だと説明文の折り返しが不自然になるため）。 */
+  a.genre-cell{padding-bottom:52px}
   .genre-t{font-size:15.5px}
   .genre-d{font-size:12px}
-  .genre-arrow{bottom:50%;transform:translateY(50%)}
   .flow-note{font-size:13.5px;padding:16px 20px;margin-top:40px}
   .flow-num{width:84px;height:84px;font-size:24px}
   .flow-step:not(:last-child)::after{top:auto;bottom:-28px}

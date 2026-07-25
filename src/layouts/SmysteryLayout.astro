@@ -90,7 +90,9 @@ const orgLd = {
 </div>
 
 <style is:global>
-html{scroll-behavior:smooth;scroll-padding-top:80px}
+html{scroll-behavior:smooth;scroll-padding-top:80px;overflow-x:clip}
+/* キーボード操作のフォーカスリング（マウスでは出ない）。 */
+:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid #c9a24b;outline-offset:3px}
 body{margin:0;background:#0a0708;color:#e7ddd9;font-family:'Zen Kaku Gothic New',sans-serif;font-weight:300;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:#d98cae;text-decoration:none;transition:color .3s}
 a:hover{color:#f0b6ce}
@@ -130,8 +132,8 @@ img{max-width:100%;display:block}
 .sec-head{text-align:center;margin-bottom:60px}
 .sec-head .eyebrow{display:block;margin-bottom:14px}
 .sec-title{font-family:'Shippori Mincho',serif;font-weight:600;font-size:clamp(28px,4vw,44px);letter-spacing:.1em;color:#f2e9e5;margin:0;line-height:1.45}
-.btn{display:inline-flex;align-items:center;gap:14px;background:linear-gradient(135deg,#9b1a5c,#7a1226);color:#f4e9e6;padding:16px 32px;font-family:'Shippori Mincho',serif;font-size:15px;letter-spacing:.14em;border:1px solid rgba(201,162,75,.4);transition:all .4s;cursor:pointer}
-.btn:hover{color:#fff;box-shadow:0 12px 40px rgba(155,26,92,.5);transform:translateY(-3px)}
+.btn{display:inline-flex;align-items:center;gap:14px;background:#8a1745;color:#f4e9e6;padding:16px 32px;font-family:'Shippori Mincho',serif;font-size:15px;letter-spacing:.14em;border:1px solid rgba(201,162,75,.4);transition:background-color .4s,color .4s,border-color .4s;cursor:pointer}
+.btn:hover{color:#fff;background:#9b1a5c;border-color:rgba(201,162,75,.7)}
 .btn .ar{font-family:'Cormorant Garamond',serif;font-size:18px}
 .btn-ghost{display:inline-flex;align-items:center;gap:12px;border:1px solid #c9a24b;color:#c9a24b;padding:15px 30px;font-family:'Shippori Mincho',serif;font-size:14px;letter-spacing:.14em;transition:all .35s;background:none;cursor:pointer}
 .btn-ghost:hover{background:#c9a24b;color:#0a0708}

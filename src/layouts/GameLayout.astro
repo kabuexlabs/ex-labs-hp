@@ -73,7 +73,9 @@ const orgLd = {
 </div>
 
 <style is:global>
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;overflow-x:clip}
+/* キーボード操作のフォーカスリング（マウスでは出ない）。 */
+:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid #c8a45c;outline-offset:3px}
 body{margin:0;background:#0c0b08;color:#e9e4d4;font-family:'Shippori Mincho',serif;-webkit-font-smoothing:antialiased;overflow-wrap:break-word;word-break:normal;line-break:strict}
 /* height:auto にしておくことで、CLS 対策で付与した width/height 属性
    (presentational hint) が実寸として効いてしまうのを防ぎ、幅と
@@ -99,7 +101,7 @@ a{color:#c9b458;text-decoration:none}a:hover{color:#e5d47f}
 .card{width:340px;display:flex;flex-direction:column}
 .poster{width:100%;display:block;aspect-ratio:1080/1546;object-fit:cover;filter:saturate(.92)}
 .posterbox{position:relative;overflow:hidden;transition:transform .35s ease}
-.posterbox:hover{transform:translateY(-4px)}
+.posterbox:hover{transform:translateY(-2px)}
 .cardbody{padding:22px 4px 0;display:flex;flex-direction:column;gap:12px}
 .ctitle{font-family:'Zen Old Mincho',serif;font-weight:700;font-size:21px;letter-spacing:.08em;margin:0;text-wrap:balance}
 .cmeta{font-size:12px;letter-spacing:.14em;color:#9b957f;text-wrap:pretty}
