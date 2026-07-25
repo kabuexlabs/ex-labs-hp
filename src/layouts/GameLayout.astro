@@ -2,7 +2,7 @@
 // ネタバレ公開特設サイト (/game/) 専用レイアウト。
 // Claude Design のハンドオフ (ネタバレ公開特設サイト.dc.html) を Astro に移植したもの。
 // 再演のないコンテンツ (謎解き・マーダーミステリー) のネタバレ記録を公開する特設サイト。
-// 本体サイトとは別トーンのマイクロサイトなので BaseLayout は使わず、
+// 見た目は本体サイトの印刷物テイストに統一（トークンも同値）。BaseLayout は使わず、
 // フォント・配色・フッターをここで完結させる。
 import { jsonLd } from '../lib/microcms';
 
@@ -62,7 +62,7 @@ const orgLd = {
 <link rel="icon" type="image/png" href="/favicon-ex.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=Zen+Old+Mincho:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <slot name="head" />
 </head>
@@ -73,70 +73,74 @@ const orgLd = {
 </div>
 
 <style is:global>
+/* 本体サイトと同じ印刷物ライクな設計言語（方眼紙・墨フチ・ハードな
+   オフセット影・Archivo見出し）。トークン値も本体 global.css と揃える。 */
+:root{--accent:#f4581c;--accent-dark:#d43f07;--yellow:#ffd23f;--ink:#33302b;--paper:#f4f2ec;--bd:2px solid var(--ink);--shadow-1:6px 6px 0 -1px #fff,6px 6px 0 1px var(--ink);--shadow-2:9px 9px 0 -1px #fff,9px 9px 0 1px var(--ink)}
 html{-webkit-text-size-adjust:100%;overflow-x:clip}
 /* キーボード操作のフォーカスリング（マウスでは出ない）。 */
-:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid #c8a45c;outline-offset:3px}
-body{margin:0;background:#0c0b08;color:#e9e4d4;font-family:'Shippori Mincho',serif;-webkit-font-smoothing:antialiased;overflow-wrap:break-word;word-break:normal;line-break:strict}
+:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(rgba(51,48,43,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(51,48,43,.05) 1px,transparent 1px);background-size:28px 28px;color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1;letter-spacing:.015em;overflow-wrap:break-word;word-break:normal;line-break:strict}
+::selection{background:var(--yellow);color:var(--ink)}
 /* height:auto にしておくことで、CLS 対策で付与した width/height 属性
    (presentational hint) が実寸として効いてしまうのを防ぎ、幅と
    aspect-ratio から高さが算出されるようにする。 */
 img{max-width:100%;height:auto}
-a{color:#c9b458;text-decoration:none}a:hover{color:#e5d47f}
-.gold{color:#c9b458}
-.dim{color:#9b957f}
+a{color:var(--ink);text-decoration:none;transition:color .2s}a:hover{color:var(--accent)}
+.gold{color:var(--accent-dark)}
+.dim{color:rgba(51,48,43,.55)}
 .page{min-height:100vh}
 .wrap{max-width:1080px;margin:0 auto;padding:0 24px;box-sizing:border-box}
-.frame{border:1px solid #6b5f22;outline:1px solid #2a250f;outline-offset:4px}
-.hero{padding:96px 24px 64px;text-align:center;background:radial-gradient(ellipse 80% 60% at 50% 0%,#1a1708 0%,#0c0b08 70%)}
+.frame{border:var(--bd);outline:2px solid var(--ink);outline-offset:5px}
+.hero{padding:96px 24px 64px;text-align:center}
 .herologo-link{display:block;width:fit-content;margin:0 auto}
-.herologo{width:min(560px,80vw);display:block;margin:0 auto}
-.tagline{letter-spacing:.42em;font-size:13px;margin-top:28px}
-.rule{width:64px;height:1px;background:#c9b458;margin:40px auto 0;opacity:.7}
-.h2{font-family:'Zen Old Mincho',serif;font-weight:900;font-size:clamp(26px,4vw,40px);letter-spacing:.12em;margin:0;text-align:center;text-wrap:balance}
+.herologo{width:min(440px,72vw);display:block;margin:0 auto}
+.tagline{letter-spacing:.42em;font-size:13px;margin-top:28px;font-weight:700}
+.rule{width:64px;height:4px;background:var(--ink);margin:40px auto 0}
+.h2{font-weight:800;font-size:clamp(24px,3.4vw,34px);letter-spacing:.1em;margin:0;text-align:center;text-wrap:balance}
 /* 手動グループ化: この単位の途中では改行させない (スマホでの語中改行対策)。 */
 .nobr{display:inline-block}
-.foot-home{letter-spacing:.14em}
-.note{max-width:620px;margin:28px auto 0;line-height:2.2;font-size:14px;text-align:center;color:#b8b19a;text-wrap:pretty}
+.foot-home{letter-spacing:.14em;font-weight:700}
+.note{max-width:620px;margin:28px auto 0;line-height:2.2;font-size:14px;text-align:center;color:rgba(51,48,43,.7);text-wrap:pretty}
 .cards{display:flex;flex-wrap:wrap;justify-content:center;gap:48px;padding:64px 0 96px}
 .card{width:340px;display:flex;flex-direction:column}
-.poster{width:100%;display:block;aspect-ratio:1080/1546;object-fit:cover;filter:saturate(.92)}
-.posterbox{position:relative;overflow:hidden;transition:transform .35s ease}
-.posterbox:hover{transform:translateY(-2px)}
+.poster{width:100%;display:block;aspect-ratio:1080/1546;object-fit:cover}
+.posterbox{position:relative;overflow:hidden;border:var(--bd);box-shadow:var(--shadow-1);transition:transform .25s,box-shadow .25s;background:#fff}
+.posterbox:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-2)}
 .cardbody{padding:22px 4px 0;display:flex;flex-direction:column;gap:12px}
-.ctitle{font-family:'Zen Old Mincho',serif;font-weight:700;font-size:21px;letter-spacing:.08em;margin:0;text-wrap:balance}
-.cmeta{font-size:12px;letter-spacing:.14em;color:#9b957f;text-wrap:pretty}
-.cdesc{font-size:13px;line-height:1.9;color:#b8b19a;margin:0;text-wrap:pretty}
-.btn{display:block;text-align:center;margin-top:8px;padding:14px 10px;border:1px solid #6b5f22;color:#c9b458;font-size:13px;letter-spacing:.22em;transition:background .25s,color .25s;cursor:pointer;background:transparent;font-family:'Shippori Mincho',serif}
-.btn:hover{background:#c9b458;color:#0c0b08}
-.footer{border-top:1px solid #2a250f;padding:40px 24px 48px;text-align:center;font-size:12px;color:#6f6a58;letter-spacing:.18em;line-height:2}
-.dhero{padding:72px 24px 48px;text-align:center;background:radial-gradient(ellipse 80% 60% at 50% 0%,#1a1708 0%,#0c0b08 70%)}
-.back{display:inline-block;font-size:12px;letter-spacing:.24em;margin-bottom:40px}
-.dtitle{font-family:'Zen Old Mincho',serif;font-weight:900;font-size:clamp(28px,5vw,46px);letter-spacing:.1em;margin:0;text-wrap:balance}
-.dsub{margin-top:14px;font-size:13px;letter-spacing:.3em;color:#9b957f}
-.dposter{width:min(360px,70vw);display:block;margin:48px auto 0}
+.ctitle{font-weight:800;font-size:20px;letter-spacing:.06em;margin:0;text-wrap:balance}
+.cmeta{font-size:12px;letter-spacing:.14em;color:rgba(51,48,43,.55);font-weight:700;text-wrap:pretty}
+.cdesc{font-size:13px;line-height:1.9;color:rgba(51,48,43,.72);margin:0;text-wrap:pretty}
+.btn{display:block;text-align:center;margin-top:8px;padding:14px 10px;border:var(--bd);color:var(--ink);font-size:13px;letter-spacing:.22em;font-weight:800;background:#fff;box-shadow:4px 4px 0 var(--ink);transition:transform .15s,box-shadow .15s,background-color .2s,color .2s;cursor:pointer;font-family:'Noto Sans JP',sans-serif}
+.btn:hover{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink);background:var(--yellow);color:var(--ink)}
+.footer{border-top:var(--bd);padding:40px 24px 48px;text-align:center;font-size:12px;color:rgba(51,48,43,.55);letter-spacing:.18em;line-height:2}
+.dhero{padding:72px 24px 48px;text-align:center}
+.back{display:inline-block;font-size:12px;letter-spacing:.24em;margin-bottom:40px;font-weight:700}
+.dtitle{font-weight:800;font-size:clamp(26px,4.6vw,42px);letter-spacing:.08em;margin:0;text-wrap:balance}
+.dsub{margin-top:14px;font-size:13px;letter-spacing:.3em;color:rgba(51,48,43,.55);font-weight:700}
+.dposter{width:min(360px,70vw);display:block;margin:48px auto 0;border:var(--bd);box-shadow:var(--shadow-1)}
 .meta{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:32px}
-.chip{border:1px solid #4a431f;padding:6px 14px;font-size:11px;letter-spacing:.2em;color:#b8b19a}
-.gate{max-width:640px;margin:64px auto;padding:48px 32px;text-align:center;border:1px solid #6b5f22;outline:1px solid #2a250f;outline-offset:5px;box-sizing:border-box}
-.gtitle{font-family:'Zen Old Mincho',serif;font-weight:700;font-size:22px;letter-spacing:.2em;margin:0;color:#c9b458;text-wrap:balance}
-.gtext{font-size:13px;line-height:2.2;color:#b8b19a;margin:22px 0 0;text-wrap:pretty}
+.chip{border:1.5px solid var(--ink);background:#fff;padding:6px 14px;font-size:11px;letter-spacing:.2em;font-weight:700;color:var(--ink)}
+.gate{max-width:640px;margin:64px auto;padding:48px 32px;text-align:center;background:#fff;border:var(--bd);box-shadow:var(--shadow-1);box-sizing:border-box}
+.gtitle{font-weight:800;font-size:22px;letter-spacing:.2em;margin:0;color:var(--accent-dark);text-wrap:balance}
+.gtext{font-size:13px;line-height:2.2;color:rgba(51,48,43,.75);margin:22px 0 0;text-wrap:pretty}
 .gbtn{margin:36px auto 0;max-width:340px}
 .article{max-width:680px;margin:0 auto;padding:16px 24px 96px;box-sizing:border-box}
-.sec{font-family:'Zen Old Mincho',serif;font-weight:700;font-size:22px;letter-spacing:.14em;margin:72px 0 0;padding-bottom:14px;border-bottom:1px solid #4a431f;color:#e5d47f}
-.sec3{font-family:'Zen Old Mincho',serif;font-weight:700;font-size:17px;letter-spacing:.1em;margin:48px 0 0;color:#e5d47f}
-.p{font-size:14.5px;line-height:2.15;margin:22px 0 0;color:#d6d0bd;text-wrap:pretty}
-.qt{margin:26px 0 0;padding:18px 24px;border-left:2px solid #6b5f22;background:#12100a;font-size:14px;line-height:2.2;color:#c4bda6}
-.li{font-size:14.5px;line-height:2.2;color:#d6d0bd;margin:10px 0 0;padding-left:1.2em;text-indent:-1.2em}
-.cr{font-size:13px;line-height:2.3;color:#9b957f;margin:26px 0 0}
+.sec{font-weight:800;font-size:22px;letter-spacing:.1em;margin:72px 0 0;padding-bottom:14px;border-bottom:var(--bd);color:var(--ink)}
+.sec3{font-weight:800;font-size:17px;letter-spacing:.08em;margin:48px 0 0;color:var(--accent-dark)}
+.p{font-size:14.5px;line-height:2.15;margin:22px 0 0;color:rgba(51,48,43,.85);text-wrap:pretty}
+.qt{margin:26px 0 0;padding:18px 24px;border:var(--bd);border-left:5px solid var(--accent);background:#fff;font-size:14px;line-height:2.2;color:rgba(51,48,43,.8)}
+.li{font-size:14.5px;line-height:2.2;color:rgba(51,48,43,.85);margin:10px 0 0;padding-left:1.2em;text-indent:-1.2em}
+.cr{font-size:13px;line-height:2.3;color:rgba(51,48,43,.6);margin:26px 0 0}
 .fig{margin:36px 0 0}
-.figimg{width:100%;display:block;border:1px solid #2a250f}
-.cap{font-size:12px;color:#8a8470;text-align:center;margin-top:10px;text-wrap:pretty}
+.figimg{width:100%;display:block;border:var(--bd)}
+.cap{font-size:12px;color:rgba(51,48,43,.55);text-align:center;margin-top:10px;text-wrap:pretty}
 .m0{margin:0}
 .bottomnav{max-width:680px;margin:0 auto;padding:0 24px 96px;display:flex;flex-direction:column;gap:16px;box-sizing:border-box}
 @media(max-width:600px){
   /* 長い一文に付いた手動 <br> がスマホでは二重改行 (孤立行) になるため無効化し、
      text-wrap の自然な折り返しに任せる。note は各節が1行に収まるので <br> を残す。 */
   .gtext br,.cap br{display:none}
-  .hero{padding:64px 20px 44px}.dhero{padding:44px 20px 36px}.herologo{width:82vw}
+  .hero{padding:64px 20px 44px}.dhero{padding:44px 20px 36px}.herologo{width:72vw}
   .cards{gap:32px;padding:44px 0 68px}.card{width:100%;max-width:360px}
   /* スマホでは各節が1行に収まるよう少し詰める (孤立行防止)。 */
   .note{font-size:13px;letter-spacing:0}

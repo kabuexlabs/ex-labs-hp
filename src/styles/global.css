@@ -122,6 +122,12 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
 .hero-title .hl{display:inline-block;background:var(--accent);color:#fff;padding:9px 26px;margin:6px 0;border:2px solid var(--ink);box-shadow:5px 5px 0 var(--ink)}
 .hero-sub{font-family:'Shippori Mincho',serif;font-size:13px;letter-spacing:.22em;color:rgba(51,48,43,.55);margin:0 0 36px;animation:hero-in .9s cubic-bezier(.22,1,.36,1) .3s both}
 .hero-actions{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;animation:hero-in .9s cubic-bezier(.22,1,.36,1) .42s both}
+/* 実績の看板数字（累計体験者数）。白箱＋墨フチ＋ハード影の
+   印刷物スタイル。エントランスアニメは付けない。 */
+.hero-stat{display:inline-flex;align-items:center;gap:18px;margin-top:30px;background:#fff;border:var(--bd);box-shadow:5px 5px 0 var(--ink);padding:12px 28px}
+.hero-stat-label{font-size:12.5px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;line-height:1.6}
+.hero-stat-num{font-family:'Archivo Black','Noto Sans JP',sans-serif;font-size:34px;line-height:1;color:var(--accent);letter-spacing:.01em}
+.hero-stat-unit{font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:800;color:var(--ink);margin-left:4px}
 /* Full-width works marquee.
    NOTE: no entrance fade here on purpose. An `animation:fade-in …both`
    starts the strip at opacity:0 and, if the animation never advances
@@ -146,8 +152,11 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
 
 /* About */
 .about-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:64px;align-items:center}
-.about-label{margin:36px 0 0;font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:10px;letter-spacing:.04em}
-.about-label::before{content:'';width:20px;height:4px;border-radius:2px;background:var(--accent)}
+/* 会社紹介のリード：地の文ではなく「宣言」。キーワードには黄色の
+   マーカー線（蛍光ペン風、文字の下側だけ塗る）を敷く。 */
+.about-lead{font-size:clamp(19px,2.2vw,25px);font-weight:800;line-height:2;letter-spacing:.04em;color:var(--ink);margin:0;text-wrap:balance}
+.about-lead mark{background:linear-gradient(transparent 62%,var(--yellow) 62%);color:inherit}
+.about-label{margin:36px 0 0;font-size:15px;font-weight:800;color:var(--ink);letter-spacing:.04em}
 .about-label+.about-points{margin-top:16px}
 
 
@@ -639,7 +648,10 @@ footer::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;back
   .about-points{grid-template-columns:1fr}
   /* スマホは見出しが中央揃えなので、ラベルも中央に合わせて
      左右の揃えを統一する。 */
-  .about-label{justify-content:center}
+  .about-label{text-align:center}
+  .about-lead{font-size:17.5px;line-height:1.95}
+  .hero-stat{gap:12px;padding:10px 18px;margin-top:22px}
+  .hero-stat-num{font-size:26px}
   .bullets li{font-size:14px;padding:14px 16px 14px 54px}
   .bullets li::before{left:16px;top:14px}
   .vc-line{font-size:12px}
