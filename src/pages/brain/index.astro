@@ -1,0 +1,195 @@
+---
+// 「第二の脳」ホーム：名刺・議事録の横断検索と、直近の記録・操作ログ。
+// 認証は BRAIN_ADMIN_KEY（合言葉はPOSTのみ→以降はKV保存のセッション
+// トークンを HttpOnly Cookie で持ち回る）。詳細は src/lib/brain.ts 参照。
+export const prerender = false;
+
+import BrainLayout from '../../layouts/BrainLayout.astro';
+import BrainLogin from '../../components/BrainLogin.astro';
+import {
+  handleAuth,
+  isKvConfigured,
+  isAdminKeyConfigured,
+  searchAll,
+  getContacts,
+  getNotes,
+  getLogs,
+  snippet,
+  formatDateJa,
+  formatDateTimeJa,
+  SOURCE_LABEL,
+  type SearchResult,
+  type Contact,
+  type Note,
+  type LogEntry,
+} from '../../lib/brain';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+
+const auth = await handleAuth(Astro);
+if (auth.response) return auth.response;
+
+const q = (Astro.url.searchParams.get('q') ?? '').slice(0, 200);
+
+let results: SearchResult | null = null;
+let recentContacts: Contact[] = [];
+let recentNotes: Note[] = [];
+let logs: LogEntry[] = [];
+let totals = { contacts: 0, notes: 0 };
+
+if (auth.authed) {
+  if (q.trim()) {
+    results = await searchAll(q);
+  }
+  const [contacts, notes] = await Promise.all([getContacts(), getNotes()]);
+  totals = { contacts: contacts.length, notes: notes.length };
+  recentContacts = contacts.slice(0, 5);
+  recentNotes = notes.slice(0, 5);
+  logs = await getLogs(20);
+}
+---
+<BrainLayout title="第二の脳｜ex Labs" active="home" authed={auth.authed}>
+  <h1>第二の脳</h1>
+  <p class="bn-lede">名刺・議事録・メモを1か所に貯めて、あとから全部検索で引っ張り出す社内アーカイブ。</p>
+
+  {!auth.authed ? (
+    <BrainLogin
+      loginFailed={auth.loginFailed}
+      locked={auth.locked}
+      kvConfigured={isKvConfigured()}
+      keyConfigured={isAdminKeyConfigured()}
+    />
+  ) : (
+    <>
+      <div class="bn-card">
+        <form method="get" action="/brain/">
+          <label class="bn-field" style="margin-top:0">横断検索
+            <small>名刺・議事録の全項目から探します。スペース区切りで絞り込み（例：田中 見積）</small>
+            <input type="search" name="q" value={q} placeholder="名前・会社名・会議の内容・タグ…" autofocus={!!q} />
+          </label>
+          <button class="bn-btn small" type="submit" style="margin-top:12px">検索</button>
+          {q && <a class="bn-link" href="/brain/" style="margin-left:14px;font-size:13px">クリア</a>}
+        </form>
+      </div>
+
+      {results && (
+        <>
+          <h2>検索結果：「{q}」</h2>
+          {results.contacts.length === 0 && results.notes.length === 0 && (
+            <p class="bn-notice">見つかりませんでした。キーワードを短くする・減らすと当たりやすくなります。</p>
+          )}
+          {results.contacts.length > 0 && (
+            <div class="bn-card">
+              <h2 style="margin-top:0">名刺（{results.contacts.length}件）</h2>
+              <table class="bn-table">
+                <thead><tr><th>氏名</th><th>会社・役職</th><th>連絡先</th></tr></thead>
+                <tbody>
+                  {results.contacts.map((c) => (
+                    <tr>
+                      <td><a class="bn-link" href={`/brain/contacts/?id=${c.id}`}>{c.name}</a></td>
+                      <td>{[c.company, c.role].filter(Boolean).join('／') || '—'}</td>
+                      <td>{[c.email, c.phone].filter(Boolean).join(' / ') || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {results.notes.length > 0 && (
+            <div class="bn-card">
+              <h2 style="margin-top:0">議事録・メモ（{results.notes.length}件）</h2>
+              <table class="bn-table">
+                <thead><tr><th>日付</th><th>タイトル・ヒット箇所</th><th>種別</th></tr></thead>
+                <tbody>
+                  {results.notes.map((n) => (
+                    <tr>
+                      <td style="white-space:nowrap">{formatDateJa(n.date)}</td>
+                      <td>
+                        <a class="bn-link" href={`/brain/notes/?id=${n.id}`}>{n.title}</a>
+                        <div class="bn-muted">{snippet(n.body, q)}</div>
+                      </td>
+                      <td><span class="bn-src">{SOURCE_LABEL[n.source]}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
+
+      {!results && (
+        <>
+          <div class="bn-card">
+            <h2 style="margin-top:0">いま入っているもの</h2>
+            <p style="font-size:14px;margin:0">
+              名刺 <strong>{totals.contacts}</strong> 件／議事録・メモ <strong>{totals.notes}</strong> 件
+              <a class="bn-link" href="/brain/export.json" style="margin-left:16px;font-size:12.5px" download="brain-backup.json">全データをJSONでバックアップ</a>
+            </p>
+          </div>
+
+          <div class="bn-card">
+            <h2 style="margin-top:0">最近の議事録・メモ <a class="bn-link" href="/brain/notes/" style="font-size:12.5px;margin-left:10px">一覧へ</a></h2>
+            {recentNotes.length === 0 ? (
+              <p class="bn-muted">まだありません。「議事録・メモ」から追加できます（音声入力・PDF取り込み対応）。</p>
+            ) : (
+              <table class="bn-table">
+                <tbody>
+                  {recentNotes.map((n) => (
+                    <tr>
+                      <td style="white-space:nowrap">{formatDateJa(n.date)}</td>
+                      <td><a class="bn-link" href={`/brain/notes/?id=${n.id}`}>{n.title}</a></td>
+                      <td><span class="bn-src">{SOURCE_LABEL[n.source]}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          <div class="bn-card">
+            <h2 style="margin-top:0">最近の名刺 <a class="bn-link" href="/brain/contacts/" style="font-size:12.5px;margin-left:10px">一覧へ</a></h2>
+            {recentContacts.length === 0 ? (
+              <p class="bn-muted">まだありません。「名刺」から追加できます。</p>
+            ) : (
+              <table class="bn-table">
+                <tbody>
+                  {recentContacts.map((c) => (
+                    <tr>
+                      <td><a class="bn-link" href={`/brain/contacts/?id=${c.id}`}>{c.name}</a></td>
+                      <td>{[c.company, c.role].filter(Boolean).join('／') || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          <div class="bn-card">
+            <h2 style="margin-top:0">操作ログ（直近20件）</h2>
+            {logs.length === 0 ? (
+              <p class="bn-muted">まだ操作履歴はありません。</p>
+            ) : (
+              <table class="bn-table">
+                <tbody>
+                  {logs.map((l) => (
+                    <tr>
+                      <td style="white-space:nowrap" class="bn-muted">{formatDateTimeJa(l.at)}</td>
+                      <td>{l.action}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </>
+      )}
+
+      <form method="post" style="margin-top:32px;text-align:right">
+        <input type="hidden" name="action" value="logout">
+        <button class="bn-logout" type="submit">ログアウト</button>
+      </form>
+    </>
+  )}
+</BrainLayout>

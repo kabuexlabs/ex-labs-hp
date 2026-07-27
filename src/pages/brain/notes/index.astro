@@ -1,0 +1,369 @@
+---
+// 議事録・メモの管理。
+//   /brain/notes/          … 一覧＋新規作成（音声入力対応）＋PDF取り込み
+//   /brain/notes/?id=<id>  … 全文表示・編集・削除
+// 音声入力はブラウザの Web Speech API（ja-JP）で、話した内容が本文に
+// 追記される。PDF はサーバー側でテキスト抽出だけして本文に取り込む
+// （ファイル自体は保存しない）。どの経路で入れても横断検索の対象になる。
+export const prerender = false;
+
+import BrainLayout from '../../../layouts/BrainLayout.astro';
+import BrainLogin from '../../../components/BrainLogin.astro';
+import {
+  handleAuth,
+  checkOrigin,
+  isKvConfigured,
+  isAdminKeyConfigured,
+  getNotes,
+  getNote,
+  createNote,
+  saveNote,
+  deleteNote,
+  addLog,
+  extractPdfText,
+  formatDateJa,
+  formatDateTimeJa,
+  jstToday,
+  MAX_BODY,
+  MAX_PDF_BYTES,
+  SOURCE_LABEL,
+  type Note,
+  type NoteSource,
+} from '../../../lib/brain';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+
+const auth = await handleAuth(Astro);
+if (auth.response) return auth.response;
+
+let error = '';
+const message = (Astro.url.searchParams.get('msg') ?? '').slice(0, 100);
+let viewId = (Astro.url.searchParams.get('id') ?? '').slice(0, 20);
+
+const validDate = (d: string) => /^\d{4}-\d{2}-\d{2}$/.test(d);
+
+function textFields(form: FormData) {
+  const f = (name: string, max: number) => String(form.get(name) ?? '').trim().slice(0, max);
+  let body = String(form.get('body') ?? '').trim();
+  if (body.length > MAX_BODY) body = body.slice(0, MAX_BODY) + '\n\n［文字数上限のためここで切り詰めました］';
+  const src = f('source', 10);
+  return {
+    title: f('title', 120),
+    date: f('date', 10),
+    people: f('people', 300) || undefined,
+    tags: f('tags', 200) || undefined,
+    body,
+    source: (src === 'voice' ? 'voice' : 'manual') as NoteSource,
+  };
+}
+
+if (Astro.request.method === 'POST' && auth.authed) {
+  if (!checkOrigin(Astro.request, Astro.url)) {
+    error = '不正なリクエストです（Origin不一致）。ページを再読み込みしてやり直してください。';
+  } else {
+    const form = await Astro.request.formData();
+    const action = String(form.get('action') ?? '');
+
+    if (action === 'create') {
+      const data = textFields(form);
+      if (!data.title) error = 'タイトルを入力してください。';
+      else if (!validDate(data.date)) error = '日付を選択してください。';
+      else if (!data.body) error = '本文を入力してください。';
+      else {
+        const n = await createNote(data);
+        await addLog(`議事録・メモを作成（${SOURCE_LABEL[n.source]}）：${n.title}`);
+        return Astro.redirect(`/brain/notes/?id=${n.id}&msg=${encodeURIComponent('保存しました。')}`, 303);
+      }
+    } else if (action === 'update') {
+      const id = String(form.get('id') ?? '').slice(0, 20);
+      const existing = await getNote(id);
+      if (!existing) error = '対象が見つかりません。';
+      else {
+        const data = textFields(form);
+        if (!data.title || !validDate(data.date) || !data.body) {
+          error = 'タイトル・日付・本文は必須です。';
+          viewId = id;
+        } else {
+          // source は元の記録（音声・PDF由来か）を保持する
+          await saveNote({ ...existing, ...data, source: existing.source, updatedAt: new Date().toISOString() });
+          await addLog(`議事録・メモを更新：${data.title}`);
+          return Astro.redirect(`/brain/notes/?id=${id}&msg=${encodeURIComponent('保存しました。')}`, 303);
+        }
+      }
+    } else if (action === 'delete') {
+      const id = String(form.get('id') ?? '').slice(0, 20);
+      const existing = await getNote(id);
+      if (existing) {
+        await deleteNote(id);
+        await addLog(`議事録・メモを削除：${existing.title}`);
+        return Astro.redirect(`/brain/notes/?msg=${encodeURIComponent('削除しました。')}`, 303);
+      }
+      error = '対象が見つかりません。';
+    } else if (action === 'pdf') {
+      const file = form.get('file');
+      const date = String(form.get('date') ?? '').trim().slice(0, 10);
+      const titleInput = String(form.get('title') ?? '').trim().slice(0, 120);
+      if (!(file instanceof File) || file.size === 0) {
+        error = 'PDFファイルを選択してください。';
+      } else if (file.size > MAX_PDF_BYTES) {
+        error = 'ファイルが大きすぎます（4MBまで）。ページを分割してから取り込んでください。';
+      } else if (!validDate(date)) {
+        error = '日付を選択してください。';
+      } else {
+        try {
+          const { text, pages } = await extractPdfText(await file.arrayBuffer());
+          if (!text) {
+            error = 'このPDFからテキストを取り出せませんでした（スキャン画像のPDFは文字情報がないため、OCR済みのPDFにしてから取り込んでください）。';
+          } else {
+            let body = text;
+            if (body.length > MAX_BODY) body = body.slice(0, MAX_BODY) + '\n\n［文字数上限のためここで切り詰めました］';
+            const title = titleInput || file.name.replace(/\.pdf$/i, '').slice(0, 120) || 'PDF取り込み';
+            const n = await createNote({ title, date, body, source: 'pdf' });
+            await addLog(`PDFを取り込み（${pages}ページ）：${title}`);
+            return Astro.redirect(`/brain/notes/?id=${n.id}&msg=${encodeURIComponent(`PDF（${pages}ページ）を取り込みました。内容を確認してください。`)}`, 303);
+          }
+        } catch (e) {
+          console.error('[brain] pdf import failed:', e);
+          error = 'PDFの読み取りに失敗しました。ファイルが壊れていないか確認してください。';
+        }
+      }
+    }
+  }
+}
+
+let notes: Note[] = [];
+let viewing: Note | null = null;
+const editMode = Astro.url.searchParams.get('edit') === '1';
+
+if (auth.authed) {
+  notes = await getNotes();
+  if (viewId) viewing = notes.find((n) => n.id === viewId) ?? null;
+}
+const today = jstToday();
+---
+<BrainLayout title="議事録・メモ｜第二の脳" active="notes" authed={auth.authed}>
+  <h1>議事録・メモ</h1>
+  <p class="bn-lede">打ち合わせの記録・思いつき・PDF資料をここへ。手入力でも口頭（音声入力）でもPDFでも、入れたものは全部検索で引っ張れます。</p>
+
+  {!auth.authed ? (
+    <BrainLogin
+      loginFailed={auth.loginFailed}
+      locked={auth.locked}
+      kvConfigured={isKvConfigured()}
+      keyConfigured={isAdminKeyConfigured()}
+    />
+  ) : (
+    <>
+      {message && <p class="bn-done">{message}</p>}
+      {error && <p class="bn-error">{error}</p>}
+
+      {viewing ? (
+        <>
+          <p style="margin-top:20px"><a class="bn-link" href="/brain/notes/">← 一覧に戻る</a></p>
+          {!editMode ? (
+            <div class="bn-card">
+              <h2 style="margin-top:0">{viewing.title}</h2>
+              <p class="bn-muted" style="margin:0 0 4px">
+                {formatDateJa(viewing.date)}／<span class="bn-src">{SOURCE_LABEL[viewing.source]}</span>
+                ／最終更新：{formatDateTimeJa(viewing.updatedAt)}
+              </p>
+              {viewing.people && <p style="font-size:13.5px;margin:6px 0 0"><strong>関係者：</strong>{viewing.people}</p>}
+              {viewing.tags && (
+                <p style="margin:6px 0 0">{viewing.tags.split(',').map((t) => t.trim()).filter(Boolean).map((t) => <span class="bn-tag">{t}</span>)}</p>
+              )}
+              <hr style="border:none;border-top:1px solid #f1ece2;margin:16px 0">
+              <div class="bn-body">{viewing.body}</div>
+              <p style="margin-top:20px">
+                <a class="bn-btn small ghost" href={`/brain/notes/?id=${viewing.id}&edit=1`} style="text-decoration:none">編集する</a>
+              </p>
+              <form method="post" style="margin-top:10px;text-align:right" onsubmit="return confirm('この記録を削除します。よろしいですか？')">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="id" value={viewing.id}>
+                <button class="bn-del" type="submit">この記録を削除する</button>
+              </form>
+            </div>
+          ) : (
+            <div class="bn-card">
+              <h2 style="margin-top:0">「{viewing.title}」の編集</h2>
+              <form method="post">
+                <input type="hidden" name="action" value="update">
+                <input type="hidden" name="id" value={viewing.id}>
+                <div class="bn-row">
+                  <label class="bn-field">タイトル<small>必須</small>
+                    <input type="text" name="title" value={viewing.title} required maxlength="120">
+                  </label>
+                  <label class="bn-field" style="flex:0 1 200px">日付<small>必須</small>
+                    <input type="date" name="date" value={viewing.date} required>
+                  </label>
+                </div>
+                <div class="bn-row">
+                  <label class="bn-field">関係者<small>氏名を書くと名刺と紐づきます</small>
+                    <input type="text" name="people" value={viewing.people ?? ''} maxlength="300">
+                  </label>
+                  <label class="bn-field">タグ<small>カンマ区切り</small>
+                    <input type="text" name="tags" value={viewing.tags ?? ''} maxlength="200">
+                  </label>
+                </div>
+                <label class="bn-field">本文<small>必須</small>
+                  <textarea id="edit-body" name="body" rows="14" required>{viewing.body}</textarea>
+                </label>
+                <button class="bn-voice-btn bn-btn small ghost" type="button" data-target="edit-body" style="margin-top:10px">🎙 音声入力を開始</button>
+                <span class="bn-voice-status bn-muted" data-for="edit-body" style="margin-left:10px"></span>
+                <div><button class="bn-btn" type="submit">保存する</button></div>
+              </form>
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          <div class="bn-card">
+            <h2 style="margin-top:0">新しく記録する<span class="bn-muted" style="font-weight:400;margin-left:10px">手入力＋音声入力</span></h2>
+            <form method="post">
+              <input type="hidden" name="action" value="create">
+              <input type="hidden" name="source" id="create-source" value="manual">
+              <div class="bn-row">
+                <label class="bn-field" style="margin-top:8px">タイトル<small>必須（例：◯◯社 定例MTG）</small>
+                  <input type="text" name="title" required maxlength="120">
+                </label>
+                <label class="bn-field" style="flex:0 1 200px;margin-top:8px">日付<small>必須</small>
+                  <input type="date" name="date" value={today} required>
+                </label>
+              </div>
+              <div class="bn-row">
+                <label class="bn-field">関係者<small>氏名を書くと名刺と紐づきます</small>
+                  <input type="text" name="people" maxlength="300">
+                </label>
+                <label class="bn-field">タグ<small>カンマ区切り</small>
+                  <input type="text" name="tags" maxlength="200">
+                </label>
+              </div>
+              <label class="bn-field">本文<small>必須。🎙ボタンで話した内容がここに追記されます</small>
+                <textarea id="create-body" name="body" rows="8" required></textarea>
+              </label>
+              <button class="bn-voice-btn bn-btn small ghost" type="button" data-target="create-body" style="margin-top:10px">🎙 音声入力を開始</button>
+              <span class="bn-voice-status bn-muted" data-for="create-body" style="margin-left:10px"></span>
+              <div><button class="bn-btn" type="submit">保存する</button></div>
+            </form>
+          </div>
+
+          <div class="bn-card">
+            <h2 style="margin-top:0">PDFを取り込む<span class="bn-muted" style="font-weight:400;margin-left:10px">テキストを抽出して記録として保存（ファイル自体は保存しません）</span></h2>
+            <form method="post" enctype="multipart/form-data">
+              <input type="hidden" name="action" value="pdf">
+              <div class="bn-row">
+                <label class="bn-field" style="margin-top:8px">PDFファイル<small>必須・4MBまで</small>
+                  <input type="file" name="file" accept="application/pdf,.pdf" required>
+                </label>
+                <label class="bn-field" style="flex:0 1 200px;margin-top:8px">日付<small>必須</small>
+                  <input type="date" name="date" value={today} required>
+                </label>
+              </div>
+              <label class="bn-field">タイトル<small>空ならファイル名を使います</small>
+                <input type="text" name="title" maxlength="120">
+              </label>
+              <button class="bn-btn" type="submit">取り込む</button>
+            </form>
+          </div>
+
+          <div class="bn-card">
+            <h2 style="margin-top:0">これまでの記録（{notes.length}件・新しい順）</h2>
+            {notes.length === 0 ? (
+              <p class="bn-muted">まだ記録がありません。</p>
+            ) : (
+              <table class="bn-table">
+                <thead><tr><th>日付</th><th>タイトル</th><th>タグ</th><th>種別</th></tr></thead>
+                <tbody>
+                  {notes.map((n) => (
+                    <tr>
+                      <td style="white-space:nowrap">{formatDateJa(n.date)}</td>
+                      <td><a class="bn-link" href={`/brain/notes/?id=${n.id}`}>{n.title}</a></td>
+                      <td>{(n.tags ?? '').split(',').map((t) => t.trim()).filter(Boolean).map((t) => <span class="bn-tag">{t}</span>)}</td>
+                      <td><span class="bn-src">{SOURCE_LABEL[n.source]}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </>
+      )}
+
+      <script is:inline>
+        // 音声入力（Web Speech API / ja-JP）。話した内容を対象テキストエリアに
+        // 追記する。認識はブラウザ内蔵の機能で、このサイトのサーバーには
+        // 音声データを送らない。
+        (function () {
+          const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+          document.querySelectorAll('.bn-voice-btn').forEach((btn) => {
+            const targetId = btn.dataset.target;
+            const area = document.getElementById(targetId);
+            const status = document.querySelector('.bn-voice-status[data-for="' + targetId + '"]');
+            if (!area) return;
+            if (!SR) {
+              btn.disabled = true;
+              btn.style.opacity = '.5';
+              if (status) status.textContent = 'このブラウザは音声入力に未対応です（Chrome/Edge/Safariをお使いください）';
+              return;
+            }
+            let rec = null;
+            let active = false;
+            const stop = () => {
+              active = false;
+              if (rec) try { rec.stop(); } catch (e) {}
+              btn.textContent = '🎙 音声入力を開始';
+              if (status) status.textContent = '';
+            };
+            btn.addEventListener('click', () => {
+              if (active) { stop(); return; }
+              rec = new SR();
+              rec.lang = 'ja-JP';
+              rec.continuous = true;
+              rec.interimResults = true;
+              rec.onresult = (ev) => {
+                let interim = '';
+                for (let i = ev.resultIndex; i < ev.results.length; i++) {
+                  const r = ev.results[i];
+                  if (r.isFinal) {
+                    const t = r[0].transcript.trim();
+                    if (t) {
+                      area.value += (area.value && !area.value.endsWith('\n') ? '' : '') + t + '\n';
+                      const srcField = document.getElementById('create-source');
+                      if (srcField) srcField.value = 'voice';
+                      area.dispatchEvent(new Event('input'));
+                    }
+                  } else {
+                    interim += r[0].transcript;
+                  }
+                }
+                if (status) status.textContent = interim ? '認識中：' + interim : '聞き取り中…';
+              };
+              rec.onerror = (ev) => {
+                if (status) {
+                  status.textContent = ev.error === 'not-allowed'
+                    ? 'マイクの使用が許可されていません。ブラウザの設定を確認してください。'
+                    : '音声認識エラー：' + ev.error;
+                }
+                if (ev.error === 'not-allowed') stop();
+              };
+              rec.onend = () => {
+                // モバイルでは無音で勝手に切れるので、停止ボタンを押すまで再開する
+                if (active) { try { rec.start(); } catch (e) { stop(); } }
+              };
+              try {
+                rec.start();
+                active = true;
+                btn.textContent = '⏹ 音声入力を停止';
+                if (status) status.textContent = '聞き取り中…';
+              } catch (e) {
+                if (status) status.textContent = '音声入力を開始できませんでした。';
+              }
+            });
+            // ページ移動時に切る
+            window.addEventListener('pagehide', stop);
+          });
+        })();
+      </script>
+    </>
+  )}
+</BrainLayout>

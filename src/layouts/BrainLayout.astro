@@ -1,0 +1,91 @@
+---
+// 「第二の脳」（/brain）専用レイアウト。社内専用の非公開ページなので
+// サイト共通のナビ・OGP は載せず、noindex を必ず付ける。
+export interface Props {
+  title: string;
+  /** ナビの現在地ハイライト用 */
+  active?: 'home' | 'contacts' | 'notes';
+  /** ログイン済みのときだけナビとログアウトを出す */
+  authed?: boolean;
+}
+const { title, active = 'home', authed = false } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>{title}</title>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&family=Shippori+Mincho:wght@700;800&display=swap">
+{/* slot 経由で入るページ側の要素にも当てるため is:global にする */}
+<style is:global>
+:root{--accent:#f4581c;--accent-dark:#d43f07;--yellow:#ffd23f;--ink:#33302b;--cream:#f7f2e9}
+*{box-sizing:border-box}
+body{margin:0;background:#fffdf8;color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1;letter-spacing:.015em;line-height:1.8}
+.bn-wrap{max-width:880px;margin:0 auto;padding:40px 20px 80px}
+.bn-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:28px}
+.bn-head img{height:30px;width:auto}
+.bn-head .bn-sys{font-family:'Shippori Mincho',serif;font-weight:800;font-size:17px;letter-spacing:.06em}
+.bn-head .bn-sys a{color:var(--ink);text-decoration:none}
+.bn-nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.bn-nav a{font-size:13px;font-weight:700;letter-spacing:.04em;color:#5f594f;text-decoration:none;padding:7px 14px;border-radius:999px;border:1.5px solid transparent}
+.bn-nav a:hover{background:var(--cream)}
+.bn-nav a.is-active{color:var(--accent-dark);border-color:var(--accent);background:#fff}
+h1{font-family:'Shippori Mincho',serif;font-weight:800;font-size:24px;line-height:1.4;letter-spacing:.04em;color:var(--accent);margin:0 0 8px}
+h1::after{content:'';display:block;width:46px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--yellow),var(--accent));margin-top:12px}
+h2{font-size:16px;font-weight:800;letter-spacing:.06em;margin:36px 0 12px}
+.bn-lede{font-size:14px;color:#5f594f;margin:12px 0 0}
+.bn-card{background:#fff;border:1px solid #ece5d8;border-radius:16px;padding:22px 22px 24px;margin-top:16px;box-shadow:0 6px 18px rgba(51,48,43,.05)}
+label.bn-field{display:block;margin-top:16px;font-size:13.5px;font-weight:700}
+label.bn-field small{font-weight:400;color:#8a8378;margin-left:6px}
+input[type=text],input[type=tel],input[type=email],input[type=date],input[type=password],input[type=search],input[type=file],textarea{width:100%;margin-top:7px;padding:12px 14px;font:inherit;font-size:15px;border:1.5px solid #ddd5c6;border-radius:10px;background:#fffdf8;color:var(--ink)}
+textarea{resize:vertical;line-height:1.7}
+input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.bn-btn{display:inline-flex;align-items:center;justify-content:center;margin-top:20px;padding:13px 32px;background:linear-gradient(180deg,#f66427 0%,#e04a0f 100%);color:#fff;font:inherit;font-weight:800;font-size:14.5px;letter-spacing:.08em;border:none;border-radius:999px;box-shadow:0 8px 20px rgba(212,63,7,.28);cursor:pointer;transition:transform .2s,box-shadow .2s}
+.bn-btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(212,63,7,.36)}
+.bn-btn.small{padding:8px 18px;font-size:12.5px;margin-top:0;box-shadow:none}
+.bn-btn.ghost{background:#fff;color:var(--accent-dark);border:1.5px solid var(--accent)}
+.bn-error{background:#fdecec;border:1.5px solid #e8b4b4;color:#a13030;border-radius:12px;padding:13px 16px;font-size:14px;margin-top:16px}
+.bn-notice{background:#fff8e0;border:1.5px solid #eedb9a;color:#7a5d00;border-radius:12px;padding:13px 16px;font-size:14px;margin-top:16px}
+.bn-done{background:#effaf1;border:1.5px solid #b5e0bf;color:#1d6b32;border-radius:12px;padding:13px 16px;font-size:14px;margin-top:16px}
+.bn-table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:10px}
+.bn-table th,.bn-table td{text-align:left;padding:9px 10px;border-bottom:1px solid #f1ece2;vertical-align:top}
+.bn-table th{font-size:12px;letter-spacing:.06em;color:#8a8378;white-space:nowrap}
+.bn-inline-form{display:inline}
+.bn-del{background:none;border:none;color:#a13030;font:inherit;font-size:12.5px;cursor:pointer;text-decoration:underline;padding:0}
+.bn-row{display:flex;gap:12px;flex-wrap:wrap}
+.bn-row>label{flex:1;min-width:180px}
+.bn-tag{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.04em;color:#7a5d00;background:#fff4cd;border-radius:999px;padding:2px 10px;margin:0 4px 2px 0;white-space:nowrap}
+.bn-src{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;color:#5f594f;background:var(--cream);border-radius:999px;padding:2px 10px;white-space:nowrap}
+.bn-muted{color:#8a8378;font-size:12.5px}
+.bn-link{color:var(--accent-dark);font-weight:700;text-decoration:none}
+.bn-link:hover{text-decoration:underline}
+.bn-body{white-space:pre-wrap;font-size:14.5px;line-height:1.9;overflow-wrap:anywhere}
+.bn-foot{margin-top:56px;font-size:12px;color:#a79f90;text-align:center}
+.bn-logout{background:none;border:none;color:#8a8378;font:inherit;font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
+@media(max-width:560px){.bn-wrap{padding-top:28px}h1{font-size:21px}.bn-nav{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="bn-wrap">
+<div class="bn-head">
+  <img src="/assets/logo.png" alt="ex Labs">
+  <span class="bn-sys"><a href="/brain/">第二の脳</a></span>
+  {authed && (
+    <nav class="bn-nav">
+      <a href="/brain/" class:list={[{ 'is-active': active === 'home' }]}>検索・ホーム</a>
+      <a href="/brain/contacts/" class:list={[{ 'is-active': active === 'contacts' }]}>名刺</a>
+      <a href="/brain/notes/" class:list={[{ 'is-active': active === 'notes' }]}>議事録・メモ</a>
+    </nav>
+  )}
+</div>
+<slot />
+<p class="bn-foot">© 2026 ex Labs Inc.（社内専用）</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+---
+// /brain 各ページ共通のログインフォーム。合言葉は POST でのみ送る
+// （URL に載せるとブラウザ履歴やアクセスログに残るため、クエリでは受けない）。
+export interface Props {
+  loginFailed: boolean;
+  locked: boolean;
+  kvConfigured: boolean;
+  keyConfigured: boolean;
+}
+const { loginFailed, locked, kvConfigured, keyConfigured } = Astro.props;
+---
+<div class="bn-card" style="max-width:440px">
+  <h2 style="margin-top:0">ログイン</h2>
+  {!kvConfigured && (
+    <p class="bn-notice">データベース（Upstash Redis）が未設定です。docs/brain-setup.md の手順で KV_REST_API_URL / KV_REST_API_TOKEN を設定してください。</p>
+  )}
+  {!keyConfigured && (
+    <p class="bn-notice">合言葉（BRAIN_ADMIN_KEY）が未設定です。環境変数に長いランダムな合言葉を設定してください。</p>
+  )}
+  {locked && <p class="bn-error">試行回数が上限に達しました。15分ほど待ってからやり直してください。</p>}
+  {loginFailed && !locked && <p class="bn-error">合言葉が違います。</p>}
+  <form method="post">
+    <input type="hidden" name="action" value="login">
+    <label class="bn-field">合言葉
+      <input type="password" name="key" required autocomplete="current-password">
+    </label>
+    <button class="bn-btn" type="submit">ログイン</button>
+  </form>
+</div>
