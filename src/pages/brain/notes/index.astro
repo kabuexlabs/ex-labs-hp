@@ -9,11 +9,18 @@ export const prerender = false;
 
 import BrainLayout from '../../../layouts/BrainLayout.astro';
 import BrainLogin from '../../../components/BrainLogin.astro';
+import BrainPhotoInput from '../../../components/BrainPhotoInput.astro';
 import {
   handleAuth,
   checkOrigin,
   isKvConfigured,
   isAdminKeyConfigured,
+  isVisionConfigured,
+  parseImageDataUrl,
+  saveImage,
+  persistImage,
+  deleteImage,
+  extractImageText,
   getNotes,
   getNote,
   createNote,
@@ -67,12 +74,33 @@ if (Astro.request.method === 'POST' && auth.authed) {
 
     if (action === 'create') {
       const data = textFields(form);
+      const photoRaw = String(form.get('photo') ?? '');
+      const parsed = photoRaw ? parseImageDataUrl(photoRaw) : null;
       if (!data.title) error = 'タイトルを入力してください。';
       else if (!validDate(data.date)) error = '日付を選択してください。';
-      else if (!data.body) error = '本文を入力してください。';
+      else if (parsed?.error) error = parsed.error;
+      else if (!data.body && !parsed?.image) error = '本文を入力するか、写真を添付してください。';
       else {
-        const n = await createNote(data);
-        await addLog(`議事録・メモを作成（${SOURCE_LABEL[n.source]}）：${n.title}`);
+        // 写真つきなら保存して文字を書き起こし、本文に取り込む（検索対象になる）
+        let photoId: string | undefined;
+        let body = data.body;
+        let source = data.source;
+        if (parsed?.image) {
+          photoId = await saveImage(parsed.image);
+          await persistImage(photoId);
+          const extracted = await extractImageText(parsed.image);
+          if (extracted) {
+            body = body ? `${body}\n\n--- 写真からの書き起こし ---\n${extracted}` : extracted;
+          } else if (!body) {
+            body = isVisionConfigured()
+              ? '（写真の文字を読み取れませんでした。必要なら編集で追記してください）'
+              : '（写真を添付。自動書き起こしは ANTHROPIC_API_KEY 未設定のため行われていません）';
+          }
+          if (body.length > MAX_BODY) body = body.slice(0, MAX_BODY) + '\n\n［文字数上限のためここで切り詰めました］';
+          if (source === 'manual' && !data.body) source = 'photo';
+        }
+        const n = await createNote({ ...data, body, source, photoId });
+        await addLog(`議事録・メモを作成（${SOURCE_LABEL[n.source]}${photoId ? '・写真あり' : ''}）：${n.title}`);
         return Astro.redirect(`/brain/notes/?id=${n.id}&msg=${encodeURIComponent('保存しました。')}`, 303);
       }
     } else if (action === 'update') {
@@ -96,6 +124,7 @@ if (Astro.request.method === 'POST' && auth.authed) {
       const existing = await getNote(id);
       if (existing) {
         await deleteNote(id);
+        await deleteImage(existing.photoId);
         await addLog(`議事録・メモを削除：${existing.title}`);
         return Astro.redirect(`/brain/notes/?msg=${encodeURIComponent('削除しました。')}`, 303);
       }
@@ -172,6 +201,13 @@ const today = jstToday();
               {viewing.tags && (
                 <p style="margin:6px 0 0">{viewing.tags.split(',').map((t) => t.trim()).filter(Boolean).map((t) => <span class="bn-tag">{t}</span>)}</p>
               )}
+              {viewing.photoId && (
+                <p style="margin:12px 0 0">
+                  <a href={`/brain/img/${viewing.photoId}`} target="_blank" rel="noopener">
+                    <img src={`/brain/img/${viewing.photoId}`} alt="添付写真" style="max-width:300px;max-height:220px;border-radius:10px;border:1px solid #ece5d8">
+                  </a>
+                </p>
+              )}
               <hr style="border:none;border-top:1px solid #f1ece2;margin:16px 0">
               <div class="bn-body">{viewing.body}</div>
               <p style="margin-top:20px">
@@ -238,11 +274,12 @@ const today = jstToday();
                   <input type="text" name="tags" maxlength="200">
                 </label>
               </div>
-              <label class="bn-field">本文<small>必須。🎙ボタンで話した内容がここに追記されます</small>
-                <textarea id="create-body" name="body" rows="8" required></textarea>
+              <label class="bn-field">本文<small>🎙ボタンで話した内容がここに追記されます（写真を添付する場合は空でもOK）</small>
+                <textarea id="create-body" name="body" rows="8"></textarea>
               </label>
               <button class="bn-voice-btn bn-btn small ghost" type="button" data-target="create-body" style="margin-top:10px">🎙 音声入力を開始</button>
               <span class="bn-voice-status bn-muted" data-for="create-body" style="margin-left:10px"></span>
+              <BrainPhotoInput name="photo" label="📷 写真を添付" help="ホワイトボードや紙資料など。文字は自動で書き起こされ検索できるようになります" />
               <div><button class="bn-btn" type="submit">保存する</button></div>
             </form>
           </div>

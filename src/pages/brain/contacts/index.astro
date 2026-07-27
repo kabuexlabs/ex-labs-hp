@@ -7,11 +7,13 @@ export const prerender = false;
 
 import BrainLayout from '../../../layouts/BrainLayout.astro';
 import BrainLogin from '../../../components/BrainLogin.astro';
+import BrainPhotoInput from '../../../components/BrainPhotoInput.astro';
 import {
   handleAuth,
   checkOrigin,
   isKvConfigured,
   isAdminKeyConfigured,
+  isVisionConfigured,
   getContacts,
   getContact,
   createContact,
@@ -20,9 +22,19 @@ import {
   getNotes,
   relatedNotes,
   addLog,
+  parseImageDataUrl,
+  saveImage,
+  persistImage,
+  deleteImage,
+  getImage,
+  saveDraft,
+  getDraft,
+  deleteDraft,
+  extractCardFields,
   formatDateJa,
   formatDateTimeJa,
   type Contact,
+  type ContactDraft,
   type Note,
 } from '../../../lib/brain';
 
@@ -59,14 +71,59 @@ if (Astro.request.method === 'POST' && auth.authed) {
     const form = await Astro.request.formData();
     const action = String(form.get('action') ?? '');
 
-    if (action === 'create') {
+    if (action === 'photo') {
+      // 名刺写真から登録：写真を保存 → AIで項目を読み取り → 確認画面へ
+      const parsed = parseImageDataUrl(String(form.get('photo') ?? ''));
+      if (parsed.error || !parsed.image) {
+        error = parsed.error ?? '写真を選択してください。';
+      } else {
+        const photoId = await saveImage(parsed.image);
+        let extracted: Partial<Contact> | null = null;
+        let notice = '';
+        if (isVisionConfigured()) {
+          extracted = await extractCardFields(parsed.image);
+          notice = extracted
+            ? '名刺を読み取りました。内容を確認・修正して登録してください。'
+            : '写真は保存しましたが、自動読み取りに失敗しました。お手数ですが手入力してください。';
+        } else {
+          notice = '写真を保存しました。自動読み取り（ANTHROPIC_API_KEY）が未設定のため、項目は手入力してください。';
+        }
+        await saveDraft({ photoId, fields: extracted ?? {}, notice });
+        return Astro.redirect(`/brain/contacts/?draft=${photoId}`, 303);
+      }
+    } else if (action === 'create') {
       const data = fields(form);
+      const photoId = String(form.get('photoId') ?? '').slice(0, 20);
       if (!data.name) {
         error = '氏名を入力してください。';
       } else {
-        const c = await createContact(data);
-        await addLog(`名刺を登録：${c.name}${c.company ? `（${c.company}）` : ''}`);
+        let photo: string | undefined;
+        if (photoId && (await getImage(photoId))) {
+          await persistImage(photoId);
+          photo = photoId;
+        }
+        const c = await createContact({ ...data, photoId: photo });
+        if (photoId) await deleteDraft(photoId);
+        await addLog(`名刺を登録${photo ? '（写真あり）' : ''}：${c.name}${c.company ? `（${c.company}）` : ''}`);
         return Astro.redirect(`/brain/contacts/?id=${c.id}&msg=${encodeURIComponent('登録しました。')}`, 303);
+      }
+    } else if (action === 'setphoto') {
+      // 既存の名刺に写真を追加・差し替え
+      const id = String(form.get('id') ?? '').slice(0, 20);
+      const existing = await getContact(id);
+      const parsed = parseImageDataUrl(String(form.get('photo') ?? ''));
+      if (!existing) {
+        error = '対象が見つかりません。';
+      } else if (parsed.error || !parsed.image) {
+        error = parsed.error ?? '写真を選択してください。';
+        viewId = id;
+      } else {
+        const newId = await saveImage(parsed.image);
+        await persistImage(newId);
+        await deleteImage(existing.photoId);
+        await saveContact({ ...existing, photoId: newId, updatedAt: new Date().toISOString() });
+        await addLog(`名刺写真を更新：${existing.name}`);
+        return Astro.redirect(`/brain/contacts/?id=${id}&msg=${encodeURIComponent('写真を保存しました。')}`, 303);
       }
     } else if (action === 'update') {
       const id = String(form.get('id') ?? '').slice(0, 20);
@@ -89,6 +146,7 @@ if (Astro.request.method === 'POST' && auth.authed) {
       const existing = await getContact(id);
       if (existing) {
         await deleteContact(id);
+        await deleteImage(existing.photoId);
         await addLog(`名刺を削除：${existing.name}`);
         return Astro.redirect(`/brain/contacts/?msg=${encodeURIComponent('削除しました。')}`, 303);
       }
@@ -100,6 +158,7 @@ if (Astro.request.method === 'POST' && auth.authed) {
 let contacts: Contact[] = [];
 let viewing: Contact | null = null;
 let related: Note[] = [];
+let draft: ContactDraft | null = null;
 
 if (auth.authed) {
   contacts = await getContacts();
@@ -107,6 +166,8 @@ if (auth.authed) {
     viewing = contacts.find((c) => c.id === viewId) ?? null;
     if (viewing) related = relatedNotes(viewing, await getNotes());
   }
+  const draftId = (Astro.url.searchParams.get('draft') ?? '').slice(0, 20);
+  if (draftId) draft = await getDraft(draftId);
 }
 ---
 <BrainLayout title="名刺｜第二の脳" active="contacts" authed={auth.authed}>
@@ -133,6 +194,13 @@ if (auth.authed) {
             <p class="bn-muted" style="margin:0">
               登録：{formatDateTimeJa(viewing.createdAt)}／最終更新：{formatDateTimeJa(viewing.updatedAt)}
             </p>
+            {viewing.photoId && (
+              <p style="margin:14px 0 0">
+                <a href={`/brain/img/${viewing.photoId}`} target="_blank" rel="noopener">
+                  <img src={`/brain/img/${viewing.photoId}`} alt="名刺写真" style="max-width:260px;max-height:200px;border-radius:10px;border:1px solid #ece5d8">
+                </a>
+              </p>
+            )}
             <form method="post">
               <input type="hidden" name="action" value="update">
               <input type="hidden" name="id" value={viewing.id}>
@@ -179,6 +247,16 @@ if (auth.authed) {
           </div>
 
           <div class="bn-card">
+            <h2 style="margin-top:0">{viewing.photoId ? '名刺写真を差し替える' : '名刺写真を追加する'}</h2>
+            <form method="post">
+              <input type="hidden" name="action" value="setphoto">
+              <input type="hidden" name="id" value={viewing.id}>
+              <BrainPhotoInput name="photo" label="名刺の写真" help="スマホならその場で撮影できます" />
+              <button class="bn-btn small" type="submit" style="margin-top:14px">写真を保存する</button>
+            </form>
+          </div>
+
+          <div class="bn-card">
             <h2 style="margin-top:0">関連する議事録・メモ（{related.length}件）</h2>
             {related.length === 0 ? (
               <p class="bn-muted">この人の名前が出てくる記録はまだありません。議事録の「関係者」欄に氏名を書くとここに並びます。</p>
@@ -199,26 +277,48 @@ if (auth.authed) {
       ) : (
         <>
           <div class="bn-card">
-            <h2 style="margin-top:0">新しい名刺を登録</h2>
+            <h2 style="margin-top:0">📷 名刺の写真から登録<span class="bn-muted" style="font-weight:400;margin-left:10px">撮るだけで項目を自動読み取り</span></h2>
+            <form method="post">
+              <input type="hidden" name="action" value="photo">
+              <BrainPhotoInput name="photo" label="名刺の写真" help="スマホなら「写真を撮る」でその場で撮影できます" />
+              <button class="bn-btn" type="submit" style="margin-top:14px">読み取って登録画面へ</button>
+            </form>
+            {!isVisionConfigured() && (
+              <p class="bn-notice" style="margin-top:14px">自動読み取り（ANTHROPIC_API_KEY）が未設定です。写真の保存はできますが、項目は手入力になります。設定方法は docs/brain-setup.md 参照。</p>
+            )}
+          </div>
+
+          <div class="bn-card" id="create">
+            <h2 style="margin-top:0">{draft ? '読み取り結果の確認・登録' : '手入力で登録'}</h2>
+            {draft && <p class="bn-done" style="margin-top:0">{draft.notice}</p>}
+            {draft && (
+              <p style="margin:0 0 6px">
+                <img src={`/brain/img/${draft.photoId}`} alt="名刺写真" style="max-width:220px;max-height:170px;border-radius:10px;border:1px solid #ece5d8">
+              </p>
+            )}
             <form method="post">
               <input type="hidden" name="action" value="create">
+              {draft && <input type="hidden" name="photoId" value={draft.photoId}>}
               <div class="bn-row">
                 <label class="bn-field" style="margin-top:8px">氏名<small>必須</small>
-                  <input type="text" name="name" required maxlength="100">
+                  <input type="text" name="name" required maxlength="100" value={draft?.fields.name ?? ''}>
+                </label>
+                <label class="bn-field" style="margin-top:8px">ふりがな
+                  <input type="text" name="kana" maxlength="100" value={draft?.fields.kana ?? ''}>
                 </label>
                 <label class="bn-field" style="margin-top:8px">会社名
-                  <input type="text" name="company" maxlength="120">
+                  <input type="text" name="company" maxlength="120" value={draft?.fields.company ?? ''}>
                 </label>
               </div>
               <div class="bn-row">
                 <label class="bn-field">部署・役職
-                  <input type="text" name="role" maxlength="120">
+                  <input type="text" name="role" maxlength="120" value={draft?.fields.role ?? ''}>
                 </label>
                 <label class="bn-field">メール
-                  <input type="email" name="email" maxlength="254">
+                  <input type="email" name="email" maxlength="254" value={draft?.fields.email ?? ''}>
                 </label>
                 <label class="bn-field">電話
-                  <input type="tel" name="phone" maxlength="40">
+                  <input type="tel" name="phone" maxlength="40" value={draft?.fields.phone ?? ''}>
                 </label>
               </div>
               <label class="bn-field">タグ<small>カンマ区切り</small>
@@ -228,7 +328,7 @@ if (auth.authed) {
                 <input type="text" name="met" maxlength="200">
               </label>
               <label class="bn-field">メモ
-                <textarea name="memo" rows="3" maxlength="4000"></textarea>
+                <textarea name="memo" rows="3" maxlength="4000">{draft?.fields.memo ?? ''}</textarea>
               </label>
               <button class="bn-btn" type="submit">登録する</button>
             </form>

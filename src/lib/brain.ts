@@ -30,11 +30,13 @@ export interface Contact {
   tags?: string; // カンマ区切りの自由タグ
   met?: string; // 出会った場所・きっかけ
   memo?: string;
+  /** 名刺写真（brain:img:<id> に保存。/brain/img/<id> で表示） */
+  photoId?: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export type NoteSource = 'manual' | 'voice' | 'pdf';
+export type NoteSource = 'manual' | 'voice' | 'pdf' | 'photo';
 
 export interface Note {
   id: string;
@@ -44,6 +46,8 @@ export interface Note {
   tags?: string;
   body: string;
   source: NoteSource;
+  /** 添付写真（ホワイトボード・資料など） */
+  photoId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -437,6 +441,200 @@ export function snippet(body: string, query: string, width = 60): string {
   return body.slice(0, width).replace(/\s+/g, ' ') + (body.length > width ? '…' : '');
 }
 
+// --- 写真の保存 ---------------------------------------------------------------
+// 写真はブラウザ側でJPEGに圧縮してから data URL で受け取り、マジックバイトを
+// 検証した上で KV に保存する。名刺・ノートに紐づくまでは24時間で自動失効
+// （撮ったが保存しなかった孤児データが残らない）。閲覧は /brain/img/<id> 経由で
+// ログインセッション必須。
+
+// Upstash REST のリクエスト上限（1MB）に収まるようbase64で800KB（実体約600KB）まで
+export const MAX_IMAGE_B64 = 800_000;
+
+const imgKey = (id: string) => `brain:img:${id}`;
+const draftKey = (id: string) => `brain:draft:${id}`;
+
+export type ImageType = 'image/jpeg' | 'image/png' | 'image/webp';
+
+const IMAGE_MAGIC: Record<ImageType, number[]> = {
+  'image/jpeg': [0xff, 0xd8, 0xff],
+  'image/png': [0x89, 0x50, 0x4e, 0x47],
+  'image/webp': [0x52, 0x49, 0x46, 0x46],
+};
+
+export interface ImageData {
+  type: ImageType;
+  data: string; // base64
+}
+
+/** data URL を検証して {type, base64} に分解。不正・過大なら理由を返す。 */
+export function parseImageDataUrl(dataUrl: string): { image?: ImageData; error?: string } {
+  const m = dataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
+  if (!m) return { error: '写真を選択してください（対応形式：JPEG/PNG/WebP）。' };
+  if (m[2].length > MAX_IMAGE_B64) {
+    return { error: '写真が大きすぎます。もう一度選び直してください（自動圧縮が働かなかった可能性があります）。' };
+  }
+  const type = m[1] as ImageType;
+  const buf = Buffer.from(m[2], 'base64');
+  if (!IMAGE_MAGIC[type].every((b, i) => buf[i] === b)) {
+    return { error: '画像ファイルとして読み取れませんでした。' };
+  }
+  return { image: { type, data: m[2] } };
+}
+
+/** 画像を保存（未紐づけのまま24時間で自動失効）。ID を返す。 */
+export async function saveImage(img: ImageData): Promise<string> {
+  const id = randHex(8);
+  await redis('SET', imgKey(id), JSON.stringify(img), 'EX', 86400);
+  return id;
+}
+
+/** 名刺・ノートに紐づいたら失効を解除して永続化する。 */
+export async function persistImage(id: string): Promise<void> {
+  await redis('PERSIST', imgKey(id));
+}
+
+export async function getImage(id: string): Promise<ImageData | null> {
+  if (!/^[0-9a-f]{16}$/.test(id)) return null;
+  const raw = await redis('GET', imgKey(id));
+  if (typeof raw !== 'string') return null;
+  try {
+    return JSON.parse(raw) as ImageData;
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteImage(id: string | undefined): Promise<void> {
+  if (id) await redis('DEL', imgKey(id));
+}
+
+// 名刺写真→AI読み取り→確認画面 の間だけ使う下書き（1時間で自動失効）
+export interface ContactDraft {
+  photoId: string;
+  fields: Partial<Contact>;
+  notice: string;
+}
+
+export async function saveDraft(draft: ContactDraft): Promise<void> {
+  await redis('SET', draftKey(draft.photoId), JSON.stringify(draft), 'EX', 3600);
+}
+
+export async function getDraft(id: string): Promise<ContactDraft | null> {
+  if (!/^[0-9a-f]{16}$/.test(id)) return null;
+  const raw = await redis('GET', draftKey(id));
+  if (typeof raw !== 'string') return null;
+  try {
+    return JSON.parse(raw) as ContactDraft;
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteDraft(id: string): Promise<void> {
+  await redis('DEL', draftKey(id));
+}
+
+// --- 写真のAI読み取り（Claude vision） -----------------------------------------
+// ANTHROPIC_API_KEY を設定すると、名刺写真から氏名・会社などを自動抽出し、
+// ノートの写真（ホワイトボード・資料）から文字を書き起こす。未設定でも
+// 写真の保存・添付自体は動く（読み取りだけ手入力になる）。
+
+export function isVisionConfigured(): boolean {
+  return !!readEnv('ANTHROPIC_API_KEY');
+}
+
+async function anthropicClient() {
+  const Anthropic = (await import('@anthropic-ai/sdk')).default;
+  return new Anthropic({ apiKey: readEnv('ANTHROPIC_API_KEY') });
+}
+
+const CARD_SCHEMA = {
+  type: 'object',
+  properties: {
+    name: { type: 'string', description: '氏名（フルネーム）。読み取れなければ空文字' },
+    kana: { type: 'string', description: '氏名のふりがな。名刺に記載がある場合のみ' },
+    company: { type: 'string', description: '会社名・組織名' },
+    role: { type: 'string', description: '部署・役職（例：営業部 部長）' },
+    email: { type: 'string', description: 'メールアドレス' },
+    phone: { type: 'string', description: '電話番号（携帯優先）' },
+    memo: { type: 'string', description: '住所・URL・その他名刺に書かれた情報' },
+  },
+  required: ['name', 'kana', 'company', 'role', 'email', 'phone', 'memo'],
+  additionalProperties: false,
+} as const;
+
+/** 名刺写真から連絡先情報を抽出する。失敗時は null（呼び出し側で手入力に誘導）。 */
+export async function extractCardFields(img: ImageData): Promise<Partial<Contact> | null> {
+  if (!isVisionConfigured()) return null;
+  try {
+    const client = await anthropicClient();
+    const res = await client.messages.create({
+      model: 'claude-opus-5',
+      max_tokens: 2048,
+      output_config: { effort: 'low', format: { type: 'json_schema', schema: CARD_SCHEMA } },
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: img.type, data: img.data } },
+            { type: 'text', text: 'この名刺の画像から連絡先情報を読み取ってください。読み取れない項目は空文字にしてください。' },
+          ],
+        },
+      ],
+    } as never);
+    if (res.stop_reason === 'refusal') return null;
+    const block = res.content.find((b) => b.type === 'text');
+    if (!block || block.type !== 'text') return null;
+    const raw = JSON.parse(block.text) as Record<string, unknown>;
+    const f = (key: string, max: number) =>
+      typeof raw[key] === 'string' ? (raw[key] as string).trim().slice(0, max) || undefined : undefined;
+    return {
+      name: f('name', 100),
+      kana: f('kana', 100),
+      company: f('company', 120),
+      role: f('role', 120),
+      email: f('email', 254),
+      phone: f('phone', 40),
+      memo: f('memo', 4000),
+    };
+  } catch (e) {
+    console.error('[brain] card extraction failed:', e);
+    return null;
+  }
+}
+
+/** 写真（ホワイトボード・紙資料など）から文字を書き起こす。失敗時は null。 */
+export async function extractImageText(img: ImageData): Promise<string | null> {
+  if (!isVisionConfigured()) return null;
+  try {
+    const client = await anthropicClient();
+    const res = await client.messages.create({
+      model: 'claude-opus-5',
+      max_tokens: 8192,
+      output_config: { effort: 'low' },
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: img.type, data: img.data } },
+            {
+              type: 'text',
+              text: 'この画像に写っている文字情報を、できるだけ忠実にすべて書き起こしてください。ホワイトボード・手書きメモ・紙資料などです。図や表は内容がわかるよう箇条書きにしてください。書き起こし本文のみを出力し、前置きは不要です。文字がなければ「（文字情報は読み取れませんでした）」とだけ出力してください。',
+            },
+          ],
+        },
+      ],
+    } as never);
+    if (res.stop_reason === 'refusal') return null;
+    const block = res.content.find((b) => b.type === 'text');
+    if (!block || block.type !== 'text') return null;
+    return block.text.trim().slice(0, MAX_BODY) || null;
+  } catch (e) {
+    console.error('[brain] image transcription failed:', e);
+    return null;
+  }
+}
+
 // --- PDF テキスト抽出 ----------------------------------------------------------
 
 // Vercel のリクエストボディ上限（約4.5MB）に収まるよう 4MB に抑える
@@ -484,4 +682,5 @@ export const SOURCE_LABEL: Record<NoteSource, string> = {
   manual: '手入力',
   voice: '音声入力',
   pdf: 'PDF取り込み',
+  photo: '写真',
 };

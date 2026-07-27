@@ -1,0 +1,84 @@
+---
+// 写真の選択＋ブラウザ内自動圧縮。選んだ写真を canvas で長辺1568px以下の
+// JPEG に圧縮し、data URL として hidden フィールドに入れてフォーム送信する
+// （KVの1MB上限に収まるサイズまで段階的に品質を落とす）。
+// スマホでは「写真を撮る」「ライブラリから選ぶ」の両方が使える。
+export interface Props {
+  /** hidden フィールドの name（ページ内で一意に） */
+  name: string;
+  label: string;
+  help?: string;
+}
+const { name, label, help } = Astro.props;
+---
+<label class="bn-field">{label}{help && <small>{help}</small>}
+  <input type="file" accept="image/*" class="bn-photo-file" data-target={name}>
+</label>
+<input type="hidden" name={name} id={`photo-${name}`}>
+<p class="bn-muted bn-photo-status" id={`photo-status-${name}`} style="margin:6px 0 0"></p>
+<img id={`photo-preview-${name}`} alt="選択した写真のプレビュー" style="display:none;max-width:220px;max-height:220px;border-radius:10px;border:1px solid #ece5d8;margin-top:8px">
+
+<script is:inline>
+if (!window.__bnPhotoInit) {
+  window.__bnPhotoInit = true;
+
+  async function bnCompress(file) {
+    const bitmap = await createImageBitmap(file);
+    // 名刺・ホワイトボードのOCRに十分な解像度を保ちつつ縮小
+    const attempts = [
+      { max: 1568, q: 0.85 },
+      { max: 1280, q: 0.75 },
+      { max: 1024, q: 0.6 },
+      { max: 800, q: 0.5 },
+    ];
+    for (const { max, q } of attempts) {
+      const scale = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
+      const w = Math.max(1, Math.round(bitmap.width * scale));
+      const h = Math.max(1, Math.round(bitmap.height * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h);
+      const url = canvas.toDataURL('image/jpeg', q);
+      if (url.length <= 780000) return url; // サーバー上限(800KB)に少し余裕
+    }
+    throw new Error('too large');
+  }
+
+  document.addEventListener('change', async (e) => {
+    const input = e.target;
+    if (!input.classList || !input.classList.contains('bn-photo-file')) return;
+    const key = input.dataset.target;
+    const hidden = document.getElementById('photo-' + key);
+    const status = document.getElementById('photo-status-' + key);
+    const preview = document.getElementById('photo-preview-' + key);
+    const file = input.files && input.files[0];
+    hidden.value = '';
+    preview.style.display = 'none';
+    if (!file) { status.textContent = ''; return; }
+    status.textContent = '写真を圧縮しています…';
+    try {
+      const url = await bnCompress(file);
+      hidden.value = url;
+      preview.src = url;
+      preview.style.display = 'block';
+      status.textContent = '準備できました。このまま送信してください。';
+    } catch (err) {
+      input.value = '';
+      status.textContent = 'この写真は読み込めませんでした。別の写真でお試しください。';
+    }
+  });
+
+  // 圧縮が終わる前の送信を防ぐ（ファイル選択済みなのに hidden が空のとき）
+  document.addEventListener('submit', (e) => {
+    const form = e.target;
+    const fileInput = form.querySelector && form.querySelector('.bn-photo-file');
+    if (!fileInput) return;
+    const hidden = document.getElementById('photo-' + fileInput.dataset.target);
+    if (fileInput.files && fileInput.files.length > 0 && hidden && !hidden.value) {
+      e.preventDefault();
+      alert('写真の圧縮が終わるまで少しお待ちください。');
+    }
+  });
+}
+</script>
