@@ -12,6 +12,8 @@ import { jsonLd } from '../../lib/microcms';
 const toc = [
   { id: 'about', label: 'マダミスとは' },
   { id: 'play', label: '遊び方・当日の流れ' },
+  { id: 'time', label: '所要時間の目安' },
+  { id: 'beginner', label: '初心者向け：始め方とコツ' },
   { id: 'types', label: 'マダミスの種類' },
   { id: 'diff', label: '謎解きとの違い' },
   { id: 'where', label: 'マダミスを遊ぶには' },
@@ -32,6 +34,18 @@ const faqs = [
   {
     q: 'マダミスは一度遊んだ作品をもう一度遊べますか？',
     a: '基本的に再プレイはできません。犯人や結末を知ってしまうと推理の楽しみが失われるため、多くの作品が「一度きりの体験」として設計されています。',
+  },
+  {
+    q: 'マダミスの所要時間はどのくらいですか？',
+    a: '作品により60分〜240分ほどです。店舗公演では、読み込み・議論・解説まで含めて3〜4時間程度の作品が主流です。短編なら60〜90分、大型作品では5時間を超えるものもあります。',
+  },
+  {
+    q: 'マダミスは初心者でも楽しめますか？',
+    a: '楽しめます。「初心者歓迎」と書かれた作品や、進行役（GM）が付く店舗公演を選べば、ルール説明からサポートしてもらえます。演技の上手さは必要なく、キャラクターの目的に沿って会話するだけで十分成立します。',
+  },
+  {
+    q: '初心者がマダミスをうまく遊ぶコツはありますか？',
+    a: '「自分のキャラクターの目的を最優先する」「得た情報はメモを取る」「わからないことはGMに質問する」の3つを押さえれば大丈夫です。勝ち負けよりも物語への没入を楽しむ姿勢が、いちばんのコツです。',
   },
   {
     q: 'マダミスの相場・料金はどのくらいですか？',
@@ -83,7 +97,7 @@ const articleLd = {
 ---
 <BaseLayout
   title="マダミスとは？意味・遊び方・種類・費用まで完全ガイド - 株式会社ex Labs"
-  description="マダミスとは？マーダーミステリーの略称・通称で、参加者が登場人物になりきり推理する体験型ゲームです。意味・遊び方・種類・謎解きとの違い・費用・始め方・制作依頼まで、制作会社がまとめて解説します。"
+  description="マダミスとは？マーダーミステリーの略称・通称で、参加者が登場人物になりきり推理する体験型ゲームです。意味・遊び方・所要時間・種類・初心者向けのコツ・謎解きとの違い・費用・制作依頼まで、制作会社がまとめて解説します。"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -121,7 +135,37 @@ const articleLd = {
 <li><strong>投票・推理</strong>：全員で犯人を推理し、投票します。</li>
 <li><strong>解説・感想戦</strong>：真相が明かされ、伏線を振り返ります。ここまで含めて1つの体験です。</li>
 </ul>
-<p class="vc-line">所要時間は作品により60〜240分ほど。進行役（GM）が付く作品と、GM不要でプレイできる作品があります。</p>
+<p class="vc-line">進行役（GM）が付く作品と、GM不要でプレイできる作品があります。</p>
+</div></section>
+
+<section class="section tinted" id="time"><div class="wrap narrow">
+<p class="eyebrow">DURATION</p><h2 class="h2 serif">マダミスの所要時間の目安</h2>
+<p class="lede">マダミス（マーダーミステリー）の所要時間は、作品により<strong>60分〜240分</strong>ほど。店舗公演では読み込み・議論・解説まで含めて<strong>3〜4時間程度</strong>の作品が主流です。</p>
+<ul class="bullets">
+<li><strong>短編（60〜90分）</strong>：初心者の入門やオンラインプレイに人気のボリューム。</li>
+<li><strong>中編（2〜3時間）</strong>：もっとも作品数が多い標準的な長さ。読み込み30分＋議論1〜2時間＋解説という配分が目安。</li>
+<li><strong>長編（4時間〜）</strong>：店舗の本格公演に多い大型作品。5時間を超える大作もあります。</li>
+</ul>
+<p class="vc-line">初めてなら、まずは2〜3時間程度の作品から始めるのがおすすめです。</p>
+</div></section>
+
+<section class="section" id="beginner"><div class="wrap narrow">
+<p class="eyebrow">FOR BEGINNERS</p><h2 class="h2 serif">初心者向け：マダミスの始め方とコツ</h2>
+<p class="lede">マダミスは<strong>初心者でも十分楽しめる</strong>ゲームです。演技の上手さは必要なく、キャラクターの目的に沿って会話するだけで物語は成立します。初めてなら次の選び方・遊び方を押さえておきましょう。</p>
+<h3 class="def-sub serif">初心者向けの作品・公演の選び方</h3>
+<ul class="bullets">
+<li><strong>「初心者歓迎」表記のある作品</strong>を選ぶ。ルールがシンプルで、置いてけぼりになりにくい設計です。</li>
+<li><strong>進行役（GM）付きの店舗公演</strong>を選ぶ。ルール説明から議論の進行までサポートしてもらえます。</li>
+<li>最初は<strong>2〜3時間程度・少人数（4〜6人）</strong>の作品が遊びやすい長さです。</li>
+</ul>
+<h3 class="def-sub serif">初心者が押さえておきたいコツ</h3>
+<ul class="bullets">
+<li><strong>自分のキャラクターの目的を最優先する</strong>：迷ったら「この人ならどうするか」に立ち返るのが基本です。</li>
+<li><strong>得た情報はメモを取る</strong>：誰が・いつ・何をしていたかを整理するだけで推理が格段に楽になります。</li>
+<li><strong>嘘は必要最小限に</strong>：秘密を守る嘘はOKですが、つきすぎると自分の首を絞めます。</li>
+<li><strong>わからないことはGMに質問する</strong>：ルールの確認は減点になりません。</li>
+<li><strong>勝敗より物語を楽しむ</strong>：全員で1つのドラマを作る意識が、いちばん満足度を高めます。</li>
+</ul>
 </div></section>
 
 <section class="section tinted" id="types"><div class="wrap">
@@ -189,6 +233,7 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#about,#play,#types,#diff,#where,#make,#cost,#faq{scroll-margin-top:88px}
+.def-sub{font-size:19px;color:var(--ink);margin:40px 0 6px;text-align:center}
+#about,#play,#time,#beginner,#types,#diff,#where,#make,#cost,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>
