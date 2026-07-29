@@ -15,7 +15,9 @@ const STATIC_PATHS = [
   '/blog/',
   '/press/',
   '/guide/madamis/',
+  '/guide/madamis-cost/',
   '/guide/immersive/',
+  '/guide/immersive-event/',
   '/services/',
   '/services/nazotoki-kenshu/',
   '/services/murder-mystery/',
@@ -66,7 +68,9 @@ export const GET: APIRoute = async ({ site }) => {
       offset += contents.length;
       for (const post of contents) {
         urls.push({
-          loc: new URL(`/blog/${post.id}`, base).toString(),
+          // canonical はスラッシュ付きに正規化しているので sitemap も揃える
+          // （不一致だと Search Console で両方の URL が計上されてしまう）
+          loc: new URL(`/blog/${post.id}/`, base).toString(),
           lastmod: post.revisedAt ?? post.publishedAt,
         });
       }
