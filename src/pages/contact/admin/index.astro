@@ -13,6 +13,8 @@ import {
   listInquiries,
   contactConfigStatus,
   testMailSend,
+  loginAllowed,
+  recordLoginFailure,
   type ContactRecord,
 } from '../../../lib/contact';
 
@@ -29,8 +31,11 @@ if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   const action = String(form.get('action') ?? '');
   if (action === 'login') {
+    const ip = (Astro.request.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
     const entered = String(form.get('key') ?? '').trim();
-    if (checkAdminKey(entered)) {
+    if (!(await loginAllowed(ip))) {
+      loginFailed = true;
+    } else if (checkAdminKey(entered)) {
       Astro.cookies.set(COOKIE, entered, {
         httpOnly: true,
         secure: true,
@@ -38,8 +43,10 @@ if (Astro.request.method === 'POST') {
         path: '/contact/admin',
       });
       return Astro.redirect(Astro.url.pathname, 303);
+    } else {
+      await recordLoginFailure(ip);
+      loginFailed = true;
     }
-    loginFailed = true;
   } else if (action === 'testmail' && checkAdminKey(key)) {
     testResult = await testMailSend(adminEmail());
   }
@@ -65,7 +72,7 @@ function fmtDate(iso: string) {
     <label style="font-size:13px;font-weight:700">合言葉（予約管理と共通）
       <input type="password" name="key" required style="display:block;width:100%;margin-top:8px;padding:12px 14px;border:2px solid var(--ink);font:inherit">
     </label>
-    {loginFailed && <p style="color:#c00;font-size:13px;margin:0">合言葉が違います。</p>}
+    {loginFailed && <p style="color:#c00;font-size:13px;margin:0">合言葉が違うか、試行回数の上限に達しました。しばらくおいてからお試しください。</p>}
     <button type="submit" style="padding:12px;border:2px solid var(--ink);background:var(--accent);color:#fff;font-weight:800;cursor:pointer">ログイン</button>
   </form>
 ) : (

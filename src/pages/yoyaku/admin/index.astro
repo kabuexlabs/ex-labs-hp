@@ -34,6 +34,7 @@ import {
   type EventInfo,
 } from '../../../lib/yoyaku';
 import { randomBytes } from 'node:crypto';
+import { loginAllowed, recordLoginFailure } from '../../../lib/contact';
 
 Astro.response.headers.set('Cache-Control', 'no-store');
 Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
@@ -54,9 +55,13 @@ if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   const action = String(form.get('action') ?? '');
   if (action === 'login') {
-    // 合言葉はコピペ由来の前後空白で弾かれやすいので trim して照合する
+    // 合言葉はコピペ由来の前後空白で弾かれやすいので trim して照合する。
+    // 総当たり対策：10分間に5回失敗したIPはロック（contact管理と共通）。
+    const loginIp = (Astro.request.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
     const entered = String(form.get('key') ?? '').trim();
-    if (checkAdminKey(entered)) {
+    if (!(await loginAllowed(loginIp))) {
+      loginFailed = true;
+    } else if (checkAdminKey(entered)) {
       Astro.cookies.set(COOKIE, entered, {
         httpOnly: true,
         secure: true,
@@ -64,8 +69,10 @@ if (Astro.request.method === 'POST') {
         path: '/yoyaku/admin',
       });
       return Astro.redirect(Astro.url.pathname, 303);
+    } else {
+      await recordLoginFailure(loginIp);
+      loginFailed = true;
     }
-    loginFailed = true;
   } else if (checkAdminKey(key) && configured) {
     await migrateLegacy();
     let msg = '';

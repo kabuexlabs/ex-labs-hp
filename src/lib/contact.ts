@@ -44,6 +44,20 @@ export async function contactRedis(...command: string[]): Promise<unknown | null
 
 export const CONTACT_LOG_KEY = 'contact:log';
 
+// --- 管理ページのログイン総当たり対策 -----------------------------------------
+// 10分間に5回失敗したIPはロックする。KV未設定時は制限なし（合言葉照合は
+// タイミングセーフ比較なので、最低限の防御は残る）。
+
+export async function loginAllowed(ip: string): Promise<boolean> {
+  const n = await contactRedis('GET', `login:rl:${ip}`);
+  return Number(n ?? 0) < 5;
+}
+
+export async function recordLoginFailure(ip: string): Promise<void> {
+  const n = await contactRedis('INCR', `login:rl:${ip}`);
+  if (n === 1) await contactRedis('EXPIRE', `login:rl:${ip}`, '600');
+}
+
 /** 受信箱：KVに保存された問い合わせを新しい順に返す。 */
 export async function listInquiries(limit = 50): Promise<ContactRecord[]> {
   const raw = await contactRedis('LRANGE', CONTACT_LOG_KEY, '0', String(limit - 1));
