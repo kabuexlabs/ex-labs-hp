@@ -17,6 +17,7 @@ const STATIC_PATHS = [
   '/guide/madamis/',
   '/guide/madamis-cost/',
   '/guide/immersive/',
+  '/guide/immersive-cost/',
   '/guide/immersive-event/',
   '/services/',
   '/services/nazotoki-kenshu/',

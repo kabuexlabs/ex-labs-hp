@@ -1,0 +1,190 @@
+---
+// 「イマーシブ 制作 依頼」「イマーシブ 制作 費用」「イマーシブ 制作会社」系の
+// 商用クエリの受け皿となる記事ページ（/guide/madamis-cost/ のイマーシブ版）。
+// 依頼方法と費用の結論を冒頭で明言し（AI検索の引用対策）、
+// 制作LP（/services/immersive/）へ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'summary', label: '費用の目安（結論）' },
+  { id: 'prepare', label: '依頼前に決めておく4つのこと' },
+  { id: 'factors', label: '費用が決まる5つの要素' },
+  { id: 'save', label: '費用を抑える3つの方法' },
+  { id: 'flow', label: '依頼の流れと制作期間' },
+  { id: 'choose', label: '制作会社の選び方' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'イマーシブイベントの制作はどこに依頼できますか？',
+    a: 'イマーシブ（没入型体験）を専門に手掛ける制作会社に依頼するのが一般的です。株式会社ex Labsは、アート×体験「体験する美術館」、香り×体験「Smystery」など複数のイマーシブレーベルを自社運営し、企画からシナリオ・体験設計・当日運営まで一貫して制作依頼を受け付けています。',
+  },
+  {
+    q: 'イマーシブ制作の費用相場はどのくらいですか？',
+    a: '一般的な目安として、施設の一区画などを使う小規模な企画で数十万円台から、施設全体を舞台にしたフルパッケージで100万円台から、街全体を使う大型企画や長期開催では数百万円規模になることがあります。舞台の規模・期間・演出の作り込みで大きく変わるため、目的を添えて見積りを取るのが確実です。',
+  },
+  {
+    q: '予算が少なくてもイマーシブ制作を依頼できますか？',
+    a: '相談可能です。株式会社ex Labsでは、案件によってチケット売上などに応じて費用をお支払いいただくレベニューシェア型（成果報酬型）に対応しており、初期費用を抑えた実施ができます。',
+  },
+  {
+    q: '会場や舞台となる場所がまだ決まっていなくても依頼できますか？',
+    a: '可能です。目的（集客・ブランド体験・話題化など）を伺ったうえで、自社劇場ANATORの活用や、街・施設の選定からご提案できます。すでに施設・エリアをお持ちの場合は、その場所の魅力を軸に企画します。',
+  },
+  {
+    q: 'イマーシブイベントの制作期間はどのくらいかかりますか？',
+    a: '規模により数ヶ月程度が目安です。街全体を使う周遊型や、施設との調整が必要な企画は準備期間が長くなります。開催希望時期が決まっている場合は、早めのご相談をおすすめします。',
+  },
+  {
+    q: '見積りは無料ですか？',
+    a: 'はい、無料です。目的・舞台となる場所（未定でも可）・希望時期・おおよそのご予算をお知らせいただければ、企画の方向性と概算をご案内します。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'イマーシブ制作の依頼方法と費用相場｜制作会社の選び方まで解説',
+  about: 'イマーシブ（没入型体験イベント）制作の依頼と費用',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  mainEntityOfPage: new URL('/guide/immersive-cost/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="イマーシブ制作の依頼方法と費用相場｜制作会社の選び方まで解説 - 株式会社ex Labs"
+  description="イマーシブ（没入型体験イベント）の制作依頼の方法と費用相場を制作会社が解説。小規模企画は数十万円台〜、施設型フルパッケージは100万円台〜が一般的な目安。依頼前に決めておくこと・費用を抑える方法・制作会社の選び方まで紹介。見積り無料。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'イマーシブ完全ガイド', href: '/guide/immersive/' },
+  { name: 'イマーシブ制作の依頼方法と費用相場' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">IMMERSIVE COST GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">イマーシブ制作の</span><span class="nobr">依頼方法・費用相場ガイド</span></h1>
+<p class="lede"><strong>イマーシブ（没入型体験イベント）の制作依頼</strong>は、専門の制作会社に「目的・舞台となる場所・時期・予算感」を伝えて見積りを取るところから始まります。費用は一般的な目安として<strong>施設の一区画を使う小規模企画で数十万円台から、施設全体のフルパッケージで100万円台から</strong>、街全体を使う大型企画では数百万円規模になることがあります。この記事では、依頼前に決めておくこと・費用が決まる要素・制作会社の選び方を、イマーシブ制作会社の株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="summary"><div class="wrap">
+<p class="eyebrow">SUMMARY</p><h2 class="h2 serif">費用の目安（結論）</h2>
+<p class="h2sub">舞台の規模によって、おおまかに3つの価格帯に分かれます。</p>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">小規模・一区画型</span><span class="genre-d">数十万円台〜が目安。施設内の一区画や少人数向けの密室型空間など、コンパクトな舞台での没入体験です。</span></div>
+<div class="genre-cell"><span class="genre-t serif">施設型フルパッケージ</span><span class="genre-d">100万円台〜が目安。商業施設・水族館・宿泊施設などの施設全体を舞台に、企画・シナリオ・体験設計・運営まで一括で依頼する形です。</span></div>
+<div class="genre-cell"><span class="genre-t serif">街全体・大型企画</span><span class="genre-d">数百万円規模になることも。街や商店街エリア全体を舞台にした周遊型や、ブランドの世界観と連動した長期開催の企画などです。</span></div>
+</div>
+<p class="vc-line" style="margin-top:28px">※上記は業界の一般的な相場観であり、当社の料金表ではありません。条件次第で大きく上下するため、正式な金額は<strong>無料見積り</strong>でご確認ください。初期費用を抑えた<strong>レベニューシェア型（成果報酬型）</strong>にも対応しています。</p>
+</div></section>
+
+<section class="section" id="prepare"><div class="wrap narrow">
+<p class="eyebrow">PREPARE</p><h2 class="h2 serif">依頼前に決めておく4つのこと</h2>
+<p class="lede">次の4点が整理されていると、企画提案と見積りがスムーズに進みます。すべて未定のままでも相談は可能です。</p>
+<ul class="bullets">
+<li><strong>目的</strong>：施設への集客か、ブランドの世界観体験か、話題化・PRか。目的によって体験の設計がまったく変わります。</li>
+<li><strong>舞台となる場所</strong>：自社施設・商業施設・街なかエリアなど。場所が未定の場合は、会場選定からの提案も受けられます。</li>
+<li><strong>時期・期間</strong>：開催希望時期と、期間限定か常設・継続か。イマーシブは準備に数ヶ月かかるため、早めの相談が確実です。</li>
+<li><strong>予算感</strong>：概算でも予算帯を伝えると、規模に合った現実的な企画が提案されます。レベニューシェア型の希望もこの段階で伝えましょう。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="factors"><div class="wrap narrow">
+<p class="eyebrow">FACTORS</p><h2 class="h2 serif">費用が決まる5つの要素</h2>
+<ul class="bullets">
+<li><strong>舞台の規模</strong>：施設の一区画か、施設全体か、街全体か。舞台が広がるほど動線設計・許諾調整・制作物の量が増えます。</li>
+<li><strong>開催期間・公演回数</strong>：1日限りのイベントか、数週間〜数ヶ月の開催か。期間が長いほど運営設計と保守の工数が変わります。</li>
+<li><strong>演出の作り込み</strong>：紙の手がかり中心のシンプルな構成か、香り・音・アート作品・俳優の演技まで組み込むかで制作費が大きく変わります。</li>
+<li><strong>キャスト・スタッフの有無</strong>：俳優が演じるイマーシブか、無人で回る周遊型か。当日の運営スタッフまで依頼するかも分かれ目です。</li>
+<li><strong>集客・運営まで含むか</strong>：企画・制作物の納品までか、チケット販売・告知・当日運営まで一貫して任せるかで総額が変わります。</li>
+</ul>
+</div></section>
+
+<section class="section" id="save"><div class="wrap narrow">
+<p class="eyebrow">SAVE</p><h2 class="h2 serif">費用を抑える3つの方法</h2>
+<ul class="bullets">
+<li><strong>レベニューシェア型を検討する</strong>：ex Labsでは、チケット売上などに応じて費用をお支払いいただく成果報酬型に対応しており、案件によっては初期費用を大きく抑えて実施できます。</li>
+<li><strong>既存レーベル・作品を活用する</strong>：ゼロからのオリジナル制作ではなく、「体験する美術館」「Smystery」など既存レーベルの企画をベースにカスタマイズすることで、制作工数を抑えられます。</li>
+<li><strong>舞台の範囲を絞る</strong>：街全体ではなく施設内の一区画から始める、公演期間を区切るなど、目的を保ったまま規模をコンパクトにする設計が可能です。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">依頼の流れと制作期間</h2>
+<ul class="bullets">
+<li><strong>1. お問い合わせ</strong>：目的（集客・ブランド体験・話題化など）、舞台となる場所（未定でも可）、希望時期・予算感をお知らせください。</li>
+<li><strong>2. ヒアリング・企画提案</strong>：場所の特性やブランドの世界観を踏まえた企画と概算お見積りをご提案します。ここまでは無料です。</li>
+<li><strong>3. シナリオ制作・体験設計</strong>：物語の執筆に加え、動線・手がかり・五感の演出を設計し、テストプレイで体験の完成度を高めます。</li>
+<li><strong>4. リリース準備</strong>：進行マニュアル・告知素材の制作、施設との調整、演出リハーサルを行います。</li>
+<li><strong>5. 開催・運営</strong>：当日の運営・スタッフ手配・集客施策までex Labsが一貫して担当します。</li>
+</ul>
+<p class="vc-line">制作期間は規模により数ヶ月程度が目安です。開催日が決まっている場合は早めにご相談ください。</p>
+</div></section>
+
+<section class="section" id="choose"><div class="wrap narrow">
+<p class="eyebrow">HOW TO CHOOSE</p><h2 class="h2 serif">制作会社の選び方</h2>
+<p class="lede">イマーシブは、シナリオの面白さだけでなく<strong>空間・動線・五感の演出まで含めた体験設計</strong>で完成度が決まるコンテンツです。制作会社を選ぶ際は、<strong>自社でイマーシブ作品を企画・運営した実績があるか</strong>、<strong>実在の街や施設を舞台にした調整・設計の経験があるか</strong>、<strong>集客や話題化など目的側の設計まで踏み込めるか</strong>を確認するのがおすすめです。</p>
+<p class="lede">株式会社ex Labsは、アート×体験「体験する美術館」、香り×体験「Smystery」、少人数密室型イマーシブ空間「ANATOR」など複数のイマーシブレーベルを自社運営。下北沢の街全体を舞台にした周遊型アートイマーシブ「ロスト・フレーム」や、香水ブランドWAKA様とのコラボ「紅漂う街角で」、渋谷サクラステージを周遊する「ウワサバナシ調査委員会」など、実在の街・施設・ブランドと連携した制作実績があります。累計コンテンツ体験者数は15,000人を超えました。</p>
+<p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービスの詳細を見る →</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">企業のイマーシブイベント活用事例6選 →</a></p>
+</div></section>
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">イマーシブ制作の無料見積りはこちら</p>
+<a class="btn" href="/#contact">イマーシブ制作について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例6選</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント</a></p>
+</div></section>
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#summary,#prepare,#factors,#save,#flow,#choose,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
