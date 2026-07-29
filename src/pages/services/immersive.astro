@@ -26,6 +26,10 @@ const faqs = [
     q: '一度実施した後、再演することはできますか？',
     a: '複数のエンディングを用意するなど、リプレイ性を持たせた設計も可能です。継続的な集客コンテンツとして展開したい場合もご相談ください。',
   },
+  {
+    q: 'イマーシブイベントの制作を依頼する場合、どのような流れになりますか？',
+    a: 'お問い合わせフォームからご連絡いただいた後、目的・舞台となる場所・ご予算をヒアリングし、企画をご提案します。ご発注後はシナリオ制作・体験設計・テストプレイを経て、当日の運営まで一貫してex Labsが担当します。',
+  },
 ];
 
 const faqLd = {
@@ -43,6 +47,7 @@ const serviceLd = {
   '@type': 'Service',
   serviceType: 'イマーシブコンテンツ制作',
   name: 'イマーシブコンテンツ制作',
+  alternateName: 'イマーシブイベント制作',
   description: '実在する街・空間・ブランドを舞台にした没入型（イマーシブ）体験コンテンツの企画・シナリオ制作・体験設計',
   provider: { '@type': 'Organization', name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
   areaServed: 'JP',
@@ -50,8 +55,8 @@ const serviceLd = {
 };
 ---
 <BaseLayout
-  title="イマーシブコンテンツ制作｜没入型体験の企画・制作 - 株式会社ex Labs"
-  description="イマーシブコンテンツ（没入型体験）の制作なら株式会社ex Labs。実在する街やブランドを舞台にした周遊型アートイマーシブ・香り×イマーシブなど、複数のレーベルで制作実績多数。企画からシナリオ・体験設計・運営まで一貫対応します。"
+  title="イマーシブ制作のご依頼｜没入型体験イベントの企画・制作会社 - 株式会社ex Labs"
+  description="イマーシブ（没入型体験）コンテンツ・イマーシブイベントの制作依頼なら、イマーシブ制作会社の株式会社ex Labs。実在する街やブランドを舞台にした周遊型アートイマーシブ・香り×イマーシブなど制作実績多数。企画からシナリオ・体験設計・運営まで一貫対応。"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(serviceLd)} />
