@@ -52,6 +52,17 @@ export const GET: APIRoute = async ({ site }) => {
     loc: new URL(p, base).toString(),
   }));
 
+  // 新設・更新したページに lastmod を付けて再クロールを促す。
+  const STATIC_LASTMOD: Record<string, string> = {
+    '/guide/madamis-cost/': '2026-07-30',
+    '/guide/immersive-event/': '2026-07-31',
+    '/media/': '2026-07-31',
+  };
+  for (const [p, d] of Object.entries(STATIC_LASTMOD)) {
+    const u = urls.find((x) => x.loc.endsWith(p));
+    if (u) u.lastmod = d;
+  }
+
   // 日付を持つニュース記事は lastmod を付与（Google が再クロール判断に使う）。
   for (const n of tmNews) {
     const u = urls.find((x) => x.loc.endsWith(`/toudaimurder/news/${n.slug}/`));

@@ -3,12 +3,34 @@
 // 追加したらトップページの告知バー・セクションと一緒に自動で反映される。
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import { jsonLd } from '../../lib/microcms';
 import { mediaItems } from '../../data/media';
+
+// 掲載実績をマシンリーダブルにする（AI検索が「ex Labsは日経に掲載された」
+// という事実を出典つきで参照できるようにする）。
+const mediaLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: '株式会社ex Labs メディア掲載実績',
+  itemListElement: mediaItems.map((m, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'NewsArticle',
+      headline: `${m.outlet}：${m.title}`,
+      description: m.desc,
+      publisher: { '@type': 'Organization', name: m.outlet },
+      about: { '@type': 'Organization', name: '株式会社ex Labs' },
+      ...(m.url ? { url: m.url } : {}),
+    },
+  })),
+};
 ---
 <BaseLayout
   title="メディア掲載実績 - 株式会社ex Labs"
   description="株式会社ex Labsのメディア掲載実績の一覧です。日本経済新聞に掲載された渋谷サクラステージの体験型イベント「ウワサバナシ調査委員会」など、新聞・Webメディアで紹介された取り組みをまとめています。"
 >
+<script type="application/ld+json" set:html={jsonLd(mediaLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
   { name: 'メディア掲載実績' },
