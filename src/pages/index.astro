@@ -7,6 +7,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import LatestPosts from '../components/LatestPosts.astro';
 import HeroWorksMarquee from '../components/HeroWorksMarquee.astro';
 import { pressItems } from '../data/press';
+import { mediaItems } from '../data/media';
+
+const latestMedia = mediaItems[0];
 
 const latestPress = [...pressItems].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 3);
 function pressDate(iso: string) {
@@ -80,6 +83,16 @@ const groups: { name: string; logo?: string; h?: number }[] = [
 const marqueeItems = Array(2).fill(groups).flat();
 ---
 <BaseLayout>
+
+{/* メディア掲載の告知バー。ヘッダー直下に常時表示する。
+    最新の掲載は src/data/media.ts の先頭要素から取る。 */}
+{latestMedia && (
+  <a class="newsbar" href="/media/">
+    <span class="newsbar-chip">MEDIA</span>
+    <span class="newsbar-text"><strong>{latestMedia.outlet}様に掲載されました</strong><span class="newsbar-sub">{latestMedia.title}</span></span>
+    <span class="newsbar-arrow" aria-hidden="true">→</span>
+  </a>
+)}
 
 <section class="hero">
 <div class="hero-overlay"></div>
@@ -343,6 +356,22 @@ const marqueeItems = Array(2).fill(groups).flat();
 <div class="cond-item"><span class="cond-check">✓</span>プレスリリース未実施</div>
 <div class="cond-item"><span class="cond-check">✓</span>広告宣伝費0円</div>
 <div class="cond-item"><span class="cond-check">✓</span>Xのみで集客</div>
+</div>
+</div></section>
+
+<section class="section tinted" id="media"><div class="wrap">
+<p class="eyebrow">MEDIA</p><h2 class="h2 serif">メディア掲載実績</h2>
+<div class="media-feature">
+<div class="media-feature-head">
+<span class="media-outlet serif">{latestMedia.outlet}</span>
+<span class="media-date">{latestMedia.date}</span>
+</div>
+<p class="media-title">{latestMedia.title}</p>
+<p class="media-desc">{latestMedia.desc}</p>
+<div class="media-actions">
+{latestMedia.url && <a class="btn" href={latestMedia.url} target="_blank" rel="noopener">記事を読む（外部サイト）</a>}
+<a class="btn ghost" href="/media/">メディア掲載実績の一覧を見る</a>
+</div>
 </div>
 </div></section>
 

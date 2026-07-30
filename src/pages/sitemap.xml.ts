@@ -14,6 +14,7 @@ const STATIC_PATHS = [
   '/',
   '/blog/',
   '/press/',
+  '/media/',
   '/guide/madamis/',
   '/guide/madamis-cost/',
   '/guide/immersive/',

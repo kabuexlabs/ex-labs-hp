@@ -1,0 +1,51 @@
+---
+// メディア掲載実績の一覧ページ。掲載データは src/data/media.ts で管理し、
+// 追加したらトップページの告知バー・セクションと一緒に自動で反映される。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import { mediaItems } from '../../data/media';
+---
+<BaseLayout
+  title="メディア掲載実績 - 株式会社ex Labs"
+  description="株式会社ex Labsのメディア掲載実績の一覧です。日本経済新聞に掲載された渋谷サクラステージの体験型イベント「ウワサバナシ調査委員会」など、新聞・Webメディアで紹介された取り組みをまとめています。"
+>
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'メディア掲載実績' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">MEDIA</p>
+<h1 class="h2 serif">メディア掲載実績</h1>
+<p class="h2sub"><span class="nobr">株式会社ex Labsの取り組みが</span><span class="nobr">紹介された</span><span class="nobr">新聞・メディアの一覧です。</span></p>
+
+<div class="media-list" style="margin-top:48px">
+{mediaItems.map((m) => (
+  <article class="media-item">
+    <div class="media-feature-head">
+      <span class="media-outlet serif">{m.outlet}</span>
+      <span class="media-date">{m.date}</span>
+    </div>
+    <p class="media-title">{m.title}</p>
+    <p class="media-desc" style="margin-bottom:0">{m.desc}</p>
+    {m.url && (
+      <div class="media-actions" style="margin-top:22px">
+        <a class="btn" href={m.url} target="_blank" rel="noopener">記事を読む（外部サイト）</a>
+      </div>
+    )}
+  </article>
+))}
+</div>
+
+<p class="media-note">※外部サイトの記事は、媒体側の都合により閲覧に会員登録が必要な場合や、公開が終了する場合があります。</p>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">取材・掲載のご相談はこちら</p>
+<a class="btn" href="/#contact">取材について問い合わせる</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/press/" style="color:var(--accent)">プレスリリース</a>／<a href="/#works" style="color:var(--accent)">実績紹介</a></p>
+</div></section>
+
+</BaseLayout>
