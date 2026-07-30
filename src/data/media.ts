@@ -21,7 +21,7 @@ export interface MediaItem {
 export const mediaItems: MediaItem[] = [
   {
     outlet: '日本経済新聞',
-    date: '2026.07',
+    date: '2026.07.31',
     title: '「ウワサバナシ調査委員会」が紹介されました',
     desc: '渋谷サクラステージ全体を周遊する都市伝説×イマーシブ×謎解きの体験型イベント「ウワサバナシ調査委員会」（東急不動産株式会社・404 Not Found・TSUTAYA協力）の取り組みが、日本経済新聞に掲載されました。',
     url: 'https://www.nikkei.com/article/DGXZQOUC222NG0S6A720C2000000/',
