@@ -222,6 +222,28 @@ const marqueeItems = Array(2).fill(groups).flat();
 
 <LatestPosts heading="最新記事" tinted={false} alwaysShow />
 
+<section class="section" id="media"><div class="wrap">
+<p class="eyebrow">MEDIA</p><h2 class="h2 serif">メディア掲載実績</h2>
+<div class="media-list" style="margin-top:48px">
+{mediaItems.map((m) => (
+  <article class="media-item">
+    <div class="media-feature-head">
+      <span class="media-outlet serif">{m.outlet}</span>
+      <span class="media-date">{m.date}</span>
+    </div>
+    <p class="media-title">{m.title}</p>
+    <p class="media-desc" style="margin-bottom:0">{m.desc}</p>
+    {m.url && (
+      <div class="media-actions" style="margin-top:22px">
+        <a class="btn" href={m.url} target="_blank" rel="noopener">記事を読む（外部サイト）</a>
+      </div>
+    )}
+  </article>
+))}
+</div>
+<div style="text-align:center;margin-top:48px"><a class="btn ghost" href="/media/">メディア掲載実績の一覧を見る　→</a></div>
+</div></section>
+
 <section class="section tinted"><div class="wrap">
 <p class="eyebrow">PRESS RELEASE</p><h2 class="h2 serif">プレスリリース</h2>
 <div class="press-list">
@@ -288,11 +310,6 @@ const marqueeItems = Array(2).fill(groups).flat();
 <div class="works-head"><div><p class="eyebrow" style="margin-bottom:8px">WORKS</p><h2 class="h2 serif" style="margin:0">主な実績</h2></div></div>
 <div class="works-grid">
 
-<div class="work-card tag-nazotoki"><img width="880" height="1254" class="work-img" loading="lazy" decoding="async" src="/assets/work-0.webp" alt="神戸須磨シーワールド 写真">
-<p class="work-tag"><span class="nobr">謎解きコンテンツ</span><span class="nobr">制作・デザイン</span></p><h3 class="work-name"><span class="nobr">神戸須磨</span><span class="nobr">シーワールド</span></h3>
-<p class="work-sub">オルカ海賊団からの挑戦状</p>
-<p class="work-desc"><span class="nobr">館内を巡りながら</span><span class="nobr">宝探しを楽しむ</span><span class="nobr">周遊型イベントの謎解きを制作。</span></p></div>
-
 <div class="work-card tag-murder"><img width="849" height="1200" class="work-img" loading="lazy" decoding="async" src="/assets/work-1.webp" alt="博報堂 × 紀伊國屋書店 写真">
 <p class="work-tag">ミステリー原案</p><h3 class="work-name"><span class="nobr">博報堂 ×</span> <span class="nobr">紀伊國屋書店</span></h3>
 <p class="work-sub">月明かりの書店と呪われた原稿</p>
@@ -356,22 +373,6 @@ const marqueeItems = Array(2).fill(groups).flat();
 <div class="cond-item"><span class="cond-check">✓</span>プレスリリース未実施</div>
 <div class="cond-item"><span class="cond-check">✓</span>広告宣伝費0円</div>
 <div class="cond-item"><span class="cond-check">✓</span>Xのみで集客</div>
-</div>
-</div></section>
-
-<section class="section tinted" id="media"><div class="wrap">
-<p class="eyebrow">MEDIA</p><h2 class="h2 serif">メディア掲載実績</h2>
-<div class="media-feature">
-<div class="media-feature-head">
-<span class="media-outlet serif">{latestMedia.outlet}</span>
-<span class="media-date">{latestMedia.date}</span>
-</div>
-<p class="media-title">{latestMedia.title}</p>
-<p class="media-desc">{latestMedia.desc}</p>
-<div class="media-actions">
-{latestMedia.url && <a class="btn" href={latestMedia.url} target="_blank" rel="noopener">記事を読む（外部サイト）</a>}
-<a class="btn ghost" href="/media/">メディア掲載実績の一覧を見る</a>
-</div>
 </div>
 </div></section>
 
