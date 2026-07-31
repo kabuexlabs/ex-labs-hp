@@ -10,7 +10,7 @@ export interface PressItem {
 export const pressItems: PressItem[] = [
   {
     date: '2026-07-31',
-    title: '渋谷サクラステージ全体を周遊する都市伝説×イマーシブ×謎解きの体験型イベント『ウワサバナシ調査委員会』を2026年9〜10月に開催。',
+    title: '商業施設の共有区画・未活用時間を集客資産に変える「施設活用事業」を本格展開。第一弾としてShibuya Sakura Stageで『ウワサバナシ調査委員会』を開催、Skyland Ventures・株式会社真空管から資金調達を実施。',
     url: 'https://prtimes.jp/main/html/rd/p/000000002.000185770.html',
     source: 'PR TIMES',
   },
