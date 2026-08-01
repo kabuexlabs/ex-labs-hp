@@ -1,50 +1,37 @@
 ---
-// 公演「怪盗と秘密の試験」（IMMERSIVE ILLUSION）公式ティザーLP。
-// まだ一般公開しないサブページ — noindex を付け、サイトマップ
+// 公演「怪盗と秘密の試験」（IMMERSIVE ILLUSION）公式サイト。
+// design_handoff_kaitou の HTML リファレンス（ノワール×ゴールド）を
+// Astro に移植した再構築版。文言はハンドオフの確定コピーが正。
+// まだ検索に載せないサブページ — noindex を付け、サイトマップ
 // (src/pages/sitemap.xml.ts の STATIC_PATHS) にも載せていない。
 // コーポレートサイトとはデザイン系統が別物なので BaseLayout は
 // 使わず、このファイルだけで完結させている。
-// デザインハンドオフ（Claude Design）を Astro に移植したもの。
 
 const title = '【公式】怪盗と秘密の試験 | イマーシブイリュージョン';
 const description =
-  'イマーシブ×マジック公演「怪盗と秘密の試験」公式サイト。義賊組織「レイヴン怪盗団」からの招待状を手に、会員制バーで団員候補として"秘密の試験"へ挑むイマーシブ体験。日本一・世界7位のプロマジシャン・才藤大芽が監修・出演。2026年9月、東京・六本木にて開催。';
+  'イマーシブ×マジック公演「怪盗と秘密の試験」公式サイト。義賊組織「レイヴン怪盗団」からの招待状を手に、会員制バーで団員候補として"秘密の試験"へ挑むイマーシブ体験。日本一・世界7位のプロマジシャン・才藤大芽が監修・出演。2026年9月〜10月、東京・六本木にて開催。';
 
-const newsItems = [
+// チケット販売ページのURL。確定したらここに入れるだけで
+// 「チケットを購入する」ボタンが実リンクに切り替わる。
+const ticketUrl = '';
+
+const navItems = ['story', 'about', 'team', 'cast', 'ticket', 'flow', 'access', 'faq', 'contact']
+  .map((s) => ({ label: s.toUpperCase(), href: '#' + s }));
+
+const news = [
   { date: '2026.07.22', text: '出演者情報を公開しました' },
   { date: '2026.07.11', text: '出演マジシャンに才藤大芽の出演が決定しました' },
   { date: '2026.07.11', text: 'ティザーサイトを公開しました' },
 ];
 
-// 本イベントの特徴（公式チケットサイトの記載に準拠）。
-const abouts = [
-  {
-    num: '01',
-    h: '「会員制バー」が<br>物語の舞台。',
-    p: '舞台は、通常は会員しか足を踏み入れることのできない会員制バー。限られた人だけが扉を開くことを許される、非日常的で秘密めいた空間そのものが、レイヴン怪盗団の物語を構成する一部となります。',
-  },
-  {
-    num: '02',
-    h: 'あなた自身が<br>“怪盗候補”に。',
-    p: '物語を外から観るだけではありません。あなたはレイヴン怪盗団の団員候補となり、登場人物と実際に会話しながら秘密の試験へ挑戦します。仲間との協力、駆け引き、そして自らの選択が、あなただけの体験を形づくります。',
-  },
-  {
-    num: '03',
-    h: '日本一・世界7位の<br>本格イリュージョン。',
-    p: 'イリュージョンを監修・実演するのは、プロマジシャン・才藤大芽。世界大会で評価された技術と、至近距離だからこそ味わえる驚きを、イマーシブストーリーの中で目の前で体感していただきます。',
-  },
+const aboutItems = [
+  { num: '01', title: '「会員制バー」が物語の舞台。', body: '舞台は、通常は会員しか足を踏み入れることのできない会員制バー。限られた人だけが扉を開くことを許される、非日常的で秘密めいた空間そのものが、レイヴン怪盗団の物語を構成する一部となります。' },
+  { num: '02', title: 'あなた自身が“怪盗候補”に。', body: '物語を外から観るだけではありません。あなたはレイヴン怪盗団の団員候補となり、登場人物と実際に会話しながら秘密の試験へ挑戦します。仲間との協力、駆け引き、そして自らの選択が、あなただけの体験を形づくります。' },
+  { num: '03', title: '日本一・世界7位の本格イリュージョン。', body: 'イリュージョンを監修・実演するのは、プロマジシャン・才藤大芽。世界大会で評価された技術と、至近距離だからこそ味わえる驚きを、イマーシブストーリーの中で目の前で体感していただきます。' },
 ];
 
-// イベント当日の流れ（公式チケットサイトより）。
-const flowSteps = [
-  { n: '1', t: '受付', d: '指定された受付場所へ、チケットに記載された受付時間までにお越しください。受付時にチケットを確認いたします。会員制バーという会場の性質上、受付時間より前に店内へ入ることはできません。スタッフの案内があるまで、指定された場所でお待ちください。' },
-  { n: '2', t: '事前説明', d: 'イベントへの参加方法や注意事項について、スタッフからご案内します。' },
-  { n: '3', t: '会員制バーへの入場', d: 'スタッフの案内に従い、秘密の試験会場となる会員制バーへ入場していただきます。扉を開けた瞬間から、皆様は「レイヴン怪盗団」の団員候補です。' },
-  { n: '4', t: '秘密の試験開始', d: '登場人物との会話や仲間との協力、さまざまな試練を通して、怪盗としての資質を示してください。試験の中では、才藤大芽氏による本格的なイリュージョンも目の前で繰り広げられます。' },
-  { n: '5', t: '物語の終了', d: '試験の結果を見届けたところで、イベント終了となります。終了後はスタッフの案内に従ってご退出ください。' },
-];
-
-// 出演者（才藤大芽は TEAM セクションで別掲）。X ハンドルは @ を除いた値。
+// 出演者（才藤大芽は TEAM セクションで別掲）。bio と X はプロフィール
+// モーダルで表示する。
 const cast = [
   { slug: 'shiera', name: 'しえら', x: 'shierrrrrrra', bio: 'ダンサー、アクターなどをメインに活動しています。たまに歌って踊ったりもします。' },
   { slug: 'ono-ai', name: '大野愛', x: 'madoka145', bio: '舞台やイマーシブシアターを中心に、俳優・ダンサーとして活動中。マーダーミステリーのGMとしての経験も重ね、エンターテイメントの現場で幅広く活躍している。' },
@@ -54,6 +41,25 @@ const cast = [
   { slug: 'sasano-ami', name: '佐々野愛美', x: 'Ami_Sasano', bio: '俳優、タレント、モデルなどマルチに活動中。現在はイマーシブシアターを中心に活動しており、マダミスや謎解きなど体験型コンテンツが大好き。' },
   { slug: 'miyasaka-rino', name: '宮坂莉乃', x: 'MiyasakaRino', bio: '長野県出身。2020年、舞台を中心に活動を開始。近年はイマーシブ作品に出演する。趣味はマーダーミステリー、人狼ゲーム、シナリオ制作。' },
   { slug: 'kameda-risa', name: '亀田理紗', x: 'kame_yuto', bio: '俳優・MC。謎解きゲームやイマーシブシアターなど、体験型エンターテインメントを中心に活動。芝居歴18年、キャスト歴12年。演技と進行を通して、物語への没入感を支えることを得意としている。' },
+];
+
+// 開催日チップ。曜日は2026年カレンダーで補完（公開前に要確認）。
+const dates = ['9/6（土）', '9/13（土）', '9/26（土）', '9/27（日）', '10/3（土）', '10/4（日）', '10/11（日）'];
+
+const flowSteps = [
+  { title: '受付', body: '指定された受付場所へ、チケットに記載された受付時間までにお越しください。受付時にチケットを確認いたします。会員制バーという会場の性質上、受付時間より前に店内へ入ることはできません。スタッフの案内があるまで、指定された場所でお待ちください。' },
+  { title: '事前説明', body: 'イベントへの参加方法や注意事項について、スタッフからご案内します。' },
+  { title: '会員制バーへの入場', body: 'スタッフの案内に従い、秘密の試験会場となる会員制バーへ入場していただきます。扉を開けた瞬間から、皆様は「レイヴン怪盗団」の団員候補です。' },
+  { title: '秘密の試験へ', body: '登場人物との会話や仲間との協力、さまざまな試練を通して、怪盗としての資質を示してください。試験の中では、才藤大芽氏による本格的なイリュージョンも目の前で繰り広げられます。' },
+];
+
+const notices = [
+  { title: 'キャンセル・日時変更について', items: ['チケット購入後のお客様都合によるキャンセル、払い戻しおよび日時変更は、システムの都合上お受けできません。', 'ご購入前に、参加日時や枚数を十分にご確認ください。'] },
+  { title: 'イベント参加について', items: ['本イベントは、参加者自身が物語の登場人物となって楽しむ体験型イベントです。', 'イベント中、キャストとの会話や参加者同士で協力する場面があります。', '受付時間に遅れた場合、演出および進行の都合上、ご参加いただけません。', '18歳以上の方を対象としたイベントです。', '日本語で進行するイベントです。', '飲酒により正常な判断や行動が難しいとスタッフが判断した場合、参加をお断りします。', 'スタッフおよびキャストの指示に従っていただけない場合、イベントの途中でも退場をお願いすることがあります。その場合の返金はいたしかねます。', '本イベントはフィクションです。実在する人物、団体、事件等とは関係ありません。'] },
+  { title: '写真撮影・動画撮影・録音について', items: ['主催者またはスタッフから明確な許可がある場合を除き、会場内での写真撮影、動画撮影および録音はすべて禁止です。', '撮影許可が出た場合も、指定された時間・場所・内容の範囲内でのみ撮影可能です。', 'ネタバレとなる内容や、ほかの参加者が映り込んだ写真・動画を無断で公開することは禁止です。'] },
+  { title: '体験中の行為について', items: ['キャストやほかの参加者に触れる行為は禁止です。', '会場内の備品や装飾品には、スタッフまたはキャストから案内があった場合を除き、触れないでください。', 'キャストやほかの参加者に対する暴言、威圧的な行為、過度な接触は禁止です。', 'イベントの進行を妨げる行為や、ほかの参加者の体験を損なう行為はお控えください。'] },
+  { title: 'ネタバレについて', items: ['イベントの内容、仕掛け、試験の詳細、物語の結末など、ネタバレとなる情報をインターネットやSNS上で公開することはお控えください。', 'これから参加される方の体験を損なわないよう、ご配慮をお願いいたします。'] },
+  { title: '持ち物・手荷物について', items: ['スマートフォンを必ずお持ちください（体験の進行に使用します）。', '徒歩での移動がありますので、水分を必ずお持ちください。', '会場にクロークはございません。', '大きな荷物を保管するスペースもございませんので、駅周辺のコインロッカーなどへお預けのうえ、できる限り身軽な状態でお越しください。', '貴重品は必ずご自身で管理してください。紛失、盗難または破損について、主催者および会場は責任を負いかねます。', 'イベント開始前に、お手洗いなどをお済ませください。'] },
 ];
 
 const faqs = [
@@ -79,102 +85,133 @@ const faqs = [
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="怪盗と秘密の試験">
 <meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://kabuexlabs.com/assets/kaitou/kv.webp">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" href="/favicon-ex.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;700;900&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Shippori+Mincho+B1:wght@400;500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<header class="hdr">
-<div><div class="hdr-title">怪盗と秘密の試験</div><div class="hdr-org latin">IMMERSIVE ILLUSION</div></div>
-<nav class="nav">
-<a href="#story">STORY</a><a href="#about">ABOUT</a><a href="#team">TEAM</a><a href="#cast">CAST</a><a href="#ticket">TICKET</a><a href="#flow">FLOW</a><a href="#access">ACCESS</a><a href="#faq">FAQ</a><a href="#contact">CONTACT</a>
+<nav class="topnav">
+  <a class="brand" href="#top">
+    <span class="brand-en cinzel">IMMERSIVE ILLUSION</span>
+    <span class="brand-ja">怪盗と秘密の試験</span>
+  </a>
+  <div class="topnav-right">
+    <div class="topnav-links" id="navlinks">
+      {navItems.map((nv) => <a class="cinzel" href={nv.href}>{nv.label}</a>)}
+    </div>
+    <a class="topnav-ticket serif" href="#ticket">チケット</a>
+  </div>
 </nav>
-<a class="cta" href="#ticket">チケット</a>
-</header>
+
+<a class="fab serif" href="#ticket"><span class="fab-sheen" aria-hidden="true"></span>チケットを購入する</a>
 
 <main>
 
-<section class="kv" id="kv">
-<div class="kv-scrim"></div>
-<div class="kv-body">
-<div class="kv-logo imgslot" role="img" aria-label="ロゴ画像（準備中）"><span>LOGO</span></div>
-<div class="kv-org latin">IMMERSIVE ILLUSION PRESENTS</div>
-<h1 class="kv-title">怪盗と秘密の試験</h1>
-<div class="kv-sub latin">THE PHANTOM THIEF AND THE SECRET EXAMINATION</div>
-<div class="badge">会員制バー × イマーシブ × イリュージョン</div>
-<div class="kv-date">2026年9月　開催</div>
-<div class="kv-meta"><span>東京・六本木</span><span>出演マジシャン：才藤大芽</span></div>
-</div>
+<header id="top" class="hero">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="hero-vignette" aria-hidden="true"></div>
+  <div class="hero-inner" id="heroinner">
+    <div class="hero-copy">
+      <img class="hero-logo" src="/assets/kaitou/logo.webp" alt="IMMERSIVE ILLUSION イマーシブイリュージョン" width="640" height="578" loading="eager" fetchpriority="high" decoding="async">
+      <p class="hero-presents cinzel">IMMERSIVE ILLUSION PRESENTS</p>
+      <h1 class="hero-title serif">怪盗と<br>秘密の試験</h1>
+      <p class="hero-en cinzel">THE PHANTOM THIEF AND THE SECRET EXAMINATION</p>
+      <div class="hero-genre"><span class="serif">会員制バー × イマーシブ × イリュージョン</span></div>
+      <div class="hero-meta serif">
+        <div><div class="hm-label">DATE</div><div class="hm-value">2026年9月〜10月 開催</div></div>
+        <div><div class="hm-label">PLACE</div><div class="hm-value">東京・六本木</div></div>
+        <div><div class="hm-label">MAGICIAN</div><div class="hm-value">出演マジシャン：才藤大芽</div></div>
+      </div>
+      <a class="btn-gold serif" href="#ticket">チケットを購入する</a>
+    </div>
+    <figure class="hero-poster">
+      <img src="/assets/kaitou/kv.webp" alt="怪盗と秘密の試験 キービジュアル" width="1100" height="1561" loading="eager" decoding="async">
+    </figure>
+  </div>
+</header>
+
+<section id="news" class="news">
+  <div class="news-inner">
+    <h2 class="news-h cinzel">NEWS</h2>
+    <ul class="news-list">
+      {news.map((n) => (
+        <li><span class="news-date cinzel">{n.date}</span><span class="news-text">{n.text}</span></li>
+      ))}
+    </ul>
+  </div>
 </section>
 
-<section class="news" id="news">
-<div class="inner">
-<div class="label label-center">News</div>
-{newsItems.map(({ date, text }) => (
-  <div class="news-row"><span class="news-date latin">{date}</span><span>{text}</span></div>
-))}
-</div>
+<section id="story" class="story">
+  <div class="story-inner">
+    <p class="sec-label cinzel">STORY</p>
+    <h2 class="sec-title serif">ストーリー</h2>
+    <p class="story-p serif">ある日、あなたのもとへ一通の招待状が届く。<br>差出人は、都市伝説として語られる義賊組織<br>「レイヴン怪盗団」。</p>
+    <div class="letter">
+      <div class="letter-frame" aria-hidden="true"></div>
+      <p class="letter-main serif">秘密の試験に<br>招待する</p>
+      <p class="letter-sign serif">レイヴン怪盗団より</p>
+    </div>
+    <p class="story-p serif">招待状に記されていたのは、ただ一文。<br>それが何を意味するのかは、誰も知らない。</p>
+    <p class="story-p serif" style="margin-top:40px">興味をひかれたあなたが指定された場所へ向かうと、<br>そこにあったのは、普段は会員しか<br>入ることのできない秘密のバー。</p>
+    <p class="story-p serif" style="margin-top:64px">重い扉の向こうで、<br>あなたを待ち受けていたものとは──。</p>
+    <p class="story-close serif">その扉を開けた瞬間から、<br>あなたの日常は終わりを告げる。</p>
+  </div>
 </section>
 
-<section class="sec" id="story">
-<div class="sechead rv"><span class="label">Story</span><h2 class="h2">ストーリー</h2><span class="rule"></span></div>
-<div class="narrow">
-<p class="story-p rv">ある日、あなたのもとへ一通の招待状が届く。<br>差出人は、都市伝説として語られる義賊組織<br><span class="acc">「レイヴン怪盗団」</span>。</p>
-<div class="letter rv" role="img" aria-label="招待状：秘密の試験に招待する ── レイヴン怪盗団より">
-<div class="letter-in">
-<div class="lcol lmain">{[...'秘密の試験に'].map((c) => (<span>{c}</span>))}</div>
-<div class="lcol lmain">{[...'招待する'].map((c) => (<span>{c}</span>))}</div>
-<div class="lcol lsign">{[...'レイヴン怪盗団より'].map((c) => (<span>{c}</span>))}</div>
-</div>
-</div>
-<p class="story-p rv" style="margin-top:48px">招待状に記されていたのは、ただ一文。<br>それが何を意味するのかは、誰も知らない。<br><br>興味をひかれたあなたが指定された場所へ向かうと、<br>そこにあったのは、普段は会員しか<br>入ることのできない<span class="acc">秘密のバー。</span></p>
-<div class="story-imgs rv">
-<div class="story-img imgslot" role="img" aria-label="会員制バーの内観写真（準備中）"><span>会員制バーの内観写真</span></div>
-<div class="story-img imgslot" role="img" aria-label="雰囲気写真（準備中）"><span>雰囲気写真</span></div>
-</div>
-<p class="story-p rv" style="margin-bottom:0">重い扉の向こうで、<br>あなたを待ち受けていたものとは──。<br><br>その扉を開けた瞬間から、<br>あなたの日常は<span class="acc">終わりを告げる。</span></p>
-</div>
+<section id="about" class="about">
+  <div class="wide-inner">
+    <p class="sec-label cinzel center">ABOUT</p>
+    <h2 class="sec-title serif center" style="margin-bottom:64px">本公演の楽しみ方</h2>
+    <div class="about-grid">
+      {aboutItems.map((ab) => (
+        <article class="about-card">
+          <div class="about-num cinzel">{ab.num}</div>
+          <h3 class="serif">{ab.title}</h3>
+          <p>{ab.body}</p>
+        </article>
+      ))}
+    </div>
+  </div>
 </section>
 
-<section class="sec sec-alt" id="about">
-<div class="sechead rv"><span class="label">About</span><h2 class="h2">本公演の楽しみ方</h2><span class="rule"></span></div>
-<div class="inner about-grid">
-{abouts.map(({ num, h, p }) => (
-  <div class="about-card rv"><span class="about-num latin">{num}</span><h3 class="about-h" set:html={h}></h3><p class="about-p">{p}</p></div>
-))}
-</div>
+<section id="team" class="team">
+  <div class="team-inner">
+    <p class="sec-label cinzel center">TEAM</p>
+    <h2 class="sec-title serif center" style="margin-bottom:64px">イリュージョン監修・出演</h2>
+    <div class="team-row">
+      <img class="team-photo" src="/assets/kaitou/cast/saito-taiga.jpg" alt="才藤大芽 宣材写真" width="720" height="960" loading="lazy" decoding="async">
+      <div class="team-body">
+        <p class="team-role cinzel">MAGICIAN / SUPERVISOR</p>
+        <h3 class="team-name serif">才藤大芽</h3>
+        <p class="team-en cinzel">SAITO TAIGA</p>
+        <p class="team-bio">京都大学卒業後、プロマジシャンとして活動を開始。マジック界最高峰の世界大会「FISM」に日本代表として2度選出され、2018年大会では世界7位を記録。2021年には「Japan National Championship of Magic」で優勝を果たした、日本一・世界7位の実績を持つマジシャンです。ハリウッドにあるマジック界の殿堂「マジックキャッスル」への出演歴も持ち、『ヒルナンデス！』『チコちゃんに叱られる！』『開運！なんでも鑑定団』など数々のテレビ番組にも出演。本イベントではイリュージョンを監修するだけでなく、才藤氏本人が物語の登場人物として出演し、至近距離ならではの驚きを体感していただきます。</p>
+        <div class="team-links">
+          <a class="cinzel" href="https://www.saitotaiga.com/" target="_blank" rel="noopener">OFFICIAL SITE</a>
+          <a class="cinzel" href="https://x.com/taiga365ib" target="_blank" rel="noopener">X (TWITTER)</a>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<section class="sec" id="team">
-<div class="sechead rv"><span class="label">Team</span><h2 class="h2">イリュージョン監修・出演</h2><span class="rule"></span></div>
-<div class="inner">
-<div class="cast-main rv">
-<img class="cast-photo" src="/assets/kaitou/cast/saito-taiga.jpg" width="720" height="960" loading="lazy" alt="才藤大芽 宣材写真">
-<div>
-<div class="cast-role latin">MAGICIAN / SUPERVISOR</div>
-<h3 class="cast-name">才藤大芽</h3>
-<div class="dim cast-latin">SAITO TAIGA</div>
-<p class="cast-bio">京都大学卒業後、プロマジシャンとして活動を開始。マジック界最高峰の世界大会「FISM」に日本代表として2度選出され、2018年大会では世界7位を記録。2021年には「Japan National Championship of Magic」で優勝を果たした、日本一・世界7位の実績を持つマジシャンです。ハリウッドにあるマジック界の殿堂「マジックキャッスル」への出演歴も持ち、『ヒルナンデス！』『チコちゃんに叱られる！』『開運！なんでも鑑定団』など数々のテレビ番組にも出演。本イベントではイリュージョンを監修するだけでなく、才藤氏本人が物語の登場人物として出演し、至近距離ならではの驚きを体感していただきます。</p>
-<div class="cast-links"><a href="https://www.saitotaiga.com/" target="_blank" rel="noopener">Official Site</a><a href="https://x.com/taiga365ib" target="_blank" rel="noopener">X (Twitter)</a></div>
-</div>
-</div>
-</div>
-</section>
-
-<section class="sec sec-alt" id="cast">
-<div class="sechead rv"><span class="label">Cast</span><h2 class="h2">キャスト</h2><span class="rule"></span></div>
-<div class="inner cast-grid rv">
-{cast.map((c, i) => (
-  <button class="castc" type="button" data-cast={i}>
-  <img class="castc-photo" src={`/assets/kaitou/cast/${c.slug}.jpg`} width="720" height="960" loading="lazy" alt={`${c.name} 宣材写真`}>
-  <span class="castc-name">{c.name}</span>
-  </button>
-))}
-</div>
-<p class="casthint dim">※ 写真をタップするとプロフィールをご覧いただけます</p>
+<section id="cast" class="castsec">
+  <div class="wide-inner">
+    <p class="sec-label cinzel center">CAST</p>
+    <h2 class="sec-title serif center" style="margin-bottom:64px">キャスト</h2>
+    <div class="cast-grid">
+      {cast.map((c, i) => (
+        <button class="cast-card" type="button" data-cast={i}>
+          <img src={`/assets/kaitou/cast/${c.slug}.jpg`} alt={`${c.name} 宣材写真`} width="720" height="960" loading="lazy" decoding="async">
+          <span class="cast-name serif">{c.name}</span>
+        </button>
+      ))}
+    </div>
+    <p class="cast-hint">※ 写真をタップするとプロフィールをご覧いただけます</p>
+  </div>
 </section>
 
 <dialog class="castdlg" id="castdlg">
@@ -182,380 +219,409 @@ const faqs = [
 <div class="dlgbody">
 <img class="dlgimg" id="dlgimg" src="" alt="">
 <div class="dlginfo">
-<p class="dlgname" id="dlgname"></p>
-<a class="dlgx latin" id="dlgx" href="#" target="_blank" rel="noopener"></a>
+<p class="dlgname serif" id="dlgname"></p>
+<a class="dlgx cinzel" id="dlgx" href="#" target="_blank" rel="noopener"></a>
 <p class="dlgbio" id="dlgbio"></p>
 </div>
 </div>
 </dialog>
 
-<section class="sec" id="ticket">
-<div class="sechead rv"><span class="label">Ticket</span><h2 class="h2">チケット情報</h2><span class="rule"></span></div>
-<div class="narrow ticket-box rv">
-<div class="price">¥4,900 <small>（税込）/ 1名</small></div>
-<div class="ticket-type">日時指定チケット制</div>
-<a class="buy" href="#ticket" data-ticket>チケットを購入する</a>
-<div class="tnote">※外部チケットサイトが開きます（販売ページ準備中）<br>※購入後のお客様都合によるキャンセル・払い戻し・日時変更はお受けできません<br>※表示価格のほか、別途手数料がかかる場合があります</div>
-</div>
-</section>
-
-<section class="sec sec-alt" id="flow">
-<div class="sechead rv"><span class="label">Flow</span><h2 class="h2">当日の流れ</h2><span class="rule"></span></div>
-<div class="narrow flow">
-{flowSteps.map((s) => (
-  <div class="flow-row rv">
-  <div class="flow-n latin">{s.n}</div>
-  <div class="flow-body"><h3 class="flow-t">{s.t}</h3><p class="flow-d">{s.d}</p></div>
+<section id="ticket" class="ticket">
+  <div class="ticket-inner">
+    <p class="sec-label cinzel">TICKET</p>
+    <h2 class="sec-title serif" style="margin-bottom:48px">チケット情報</h2>
+    <div class="ticket-card">
+      <div class="ticket-price serif">¥4,900<span>（税込）/ 1名</span></div>
+      <p class="ticket-type serif">日時指定チケット制</p>
+      <div class="ticket-specs">
+        <div><div class="ts-label cinzel">CAPACITY</div><div class="ts-value serif">各回 4名まで</div></div>
+        <div><div class="ts-label cinzel">DURATION</div><div class="ts-value serif">約70分</div></div>
+        <div><div class="ts-label cinzel">AGE</div><div class="ts-value serif">18歳以上</div></div>
+      </div>
+      <div class="ticket-sched">
+        <div class="ts-label cinzel">SCHEDULE</div>
+        <div class="date-chips">
+          {dates.map((d) => <span class="serif">{d}</span>)}
+        </div>
+      </div>
+      {ticketUrl
+        ? <a class="btn-gold serif" style="margin-top:32px" href={ticketUrl} target="_blank" rel="noopener">チケットを購入する</a>
+        : <a class="btn-gold serif" style="margin-top:32px" href="#ticket" data-ticket>チケットを購入する</a>}
+      <div class="ticket-notes">
+        <div>※外部チケットサイトが開きます（販売ページ準備中）</div>
+        <div>※購入後のお客様都合によるキャンセル・払い戻し・日時変更はお受けできません</div>
+        <div>※表示価格のほか、別途手数料がかかる場合があります</div>
+      </div>
+    </div>
   </div>
-))}
-</div>
 </section>
 
-<section class="sec" id="notes">
-<div class="sechead rv"><span class="label">Notice</span><h2 class="h2">注意事項</h2><span class="rule"></span></div>
-<div class="narrow rv">
-<h3 class="notes-h">キャンセル・日時変更について</h3>
-<ul class="notes-ul">
-<li>チケット購入後のお客様都合によるキャンセル、払い戻しおよび日時変更は、システムの都合上お受けできません。</li>
-<li>ご購入前に、参加日時や枚数を十分にご確認ください。</li>
-</ul>
-<h3 class="notes-h">イベント参加について</h3>
-<ul class="notes-ul">
-<li>本イベントは、参加者自身が物語の登場人物となって楽しむ体験型イベントです。</li>
-<li>イベント中、キャストとの会話や参加者同士で協力する場面があります。</li>
-<li>受付時間に遅れた場合、演出および進行の都合上、ご参加いただけません。</li>
-<li>日本語で進行するイベントです。</li>
-<li>飲酒により正常な判断や行動が難しいとスタッフが判断した場合、参加をお断りします。</li>
-<li>スタッフおよびキャストの指示に従っていただけない場合、イベントの途中でも退場をお願いすることがあります。その場合の返金はいたしかねます。</li>
-<li>本イベントはフィクションです。実在する人物、団体、事件等とは関係ありません。</li>
-</ul>
-<h3 class="notes-h">写真撮影・動画撮影・録音について</h3>
-<ul class="notes-ul">
-<li>主催者またはスタッフから明確な許可がある場合を除き、会場内での写真撮影、動画撮影および録音はすべて禁止です。</li>
-<li>撮影許可が出た場合も、指定された時間・場所・内容の範囲内でのみ撮影可能です。</li>
-<li>ネタバレとなる内容や、ほかの参加者が映り込んだ写真・動画を無断で公開することは禁止です。</li>
-</ul>
-<h3 class="notes-h">体験中の行為について</h3>
-<ul class="notes-ul">
-<li>キャストやほかの参加者に触れる行為は禁止です。</li>
-<li>会場内の備品や装飾品には、スタッフまたはキャストから案内があった場合を除き、触れないでください。</li>
-<li>キャストやほかの参加者に対する暴言、威圧的な行為、過度な接触は禁止です。</li>
-<li>イベントの進行を妨げる行為や、ほかの参加者の体験を損なう行為はお控えください。</li>
-</ul>
-<h3 class="notes-h">ネタバレについて</h3>
-<ul class="notes-ul">
-<li>イベントの内容、仕掛け、試験の詳細、物語の結末など、ネタバレとなる情報をインターネットやSNS上で公開することはお控えください。</li>
-<li>これから参加される方の体験を損なわないよう、ご配慮をお願いいたします。</li>
-</ul>
-<h3 class="notes-h">持ち物・手荷物について</h3>
-<ul class="notes-ul">
-<li>会場にクロークはございません。</li>
-<li>大きな荷物を保管するスペースもございませんので、駅周辺のコインロッカーなどへお預けのうえ、できる限り身軽な状態でお越しください。</li>
-<li>貴重品は必ずご自身で管理してください。紛失、盗難または破損について、主催者および会場は責任を負いかねます。</li>
-<li>イベント開始前に、お手洗いなどをお済ませください。</li>
-</ul>
-</div>
+<section id="flow" class="flow">
+  <div class="flow-inner">
+    <p class="sec-label cinzel center">FLOW</p>
+    <h2 class="sec-title serif center" style="margin-bottom:64px">当日の流れ</h2>
+    <ol class="flow-list">
+      {flowSteps.map((f, i) => (
+        <li>
+          <div class="flow-rail">
+            <div class="flow-no cinzel">{i + 1}</div>
+            {i < flowSteps.length - 1 && <div class="flow-line" aria-hidden="true"></div>}
+          </div>
+          <div>
+            <h3 class="serif">{f.title}</h3>
+            <p>{f.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
 </section>
 
-<section class="sec sec-alt" id="access">
-<div class="sechead rv"><span class="label">Access</span><h2 class="h2">アクセス</h2><span class="rule"></span></div>
-<div class="inner acc-grid">
-<div class="acc-dl rv">
-<div class="acc-dt latin" style="margin-top:0">AREA</div><div class="acc-dd">東京・六本木エリアの会員制バー</div>
-<div class="acc-dt latin">RECEPTION</div><div class="acc-dd">受付場所は、チケットご購入者にのみご案内いたします。受付時間より前の入場はできません。</div>
-<div class="acc-dt latin">NEAREST STATION</div><div class="acc-dd">東京メトロ日比谷線・都営大江戸線「六本木駅」周辺</div>
-<div class="acc-dt latin">MAP</div><div class="acc-dd"><a href="https://www.google.com/maps/search/?api=1&query=六本木駅" target="_blank" rel="noopener">Google Mapはこちら</a></div>
-</div>
-<iframe class="map rv" src="https://maps.google.com/maps?q=%E5%85%AD%E6%9C%AC%E6%9C%A8%E9%A7%85&t=&z=15&ie=UTF8&iwloc=B&output=embed" loading="lazy" title="六本木エリアの地図"></iframe>
-</div>
+<section id="notice" class="notice">
+  <div class="flow-inner">
+    <p class="sec-label cinzel center">NOTICE</p>
+    <h2 class="sec-title serif center" style="margin-bottom:56px">注意事項</h2>
+    <div class="notice-list">
+      {notices.map((nt) => (
+        <div class="notice-block">
+          <h3 class="serif">{nt.title}</h3>
+          <ul>
+            {nt.items.map((it) => <li>{it}</li>)}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
 </section>
 
-<section class="sec" id="faq">
-<div class="sechead rv"><span class="label">FAQ</span><h2 class="h2">よくある質問</h2><span class="rule"></span></div>
-<div class="narrow faqlist rv">
-{faqs.map(({ q, a }) => (
-  <details class="faq-item">
-    <summary class="faq-q"><span class="qmark latin">Q</span><span class="faq-qt">{q}</span></summary>
-    <div class="faq-a">{a}</div>
-  </details>
-))}
-</div>
+<section id="access" class="access">
+  <div class="team-inner">
+    <p class="sec-label cinzel center">ACCESS</p>
+    <h2 class="sec-title serif center" style="margin-bottom:56px">アクセス</h2>
+    <div class="access-row">
+      <dl class="access-dl">
+        <div><dt class="cinzel">AREA</dt><dd>東京・六本木エリアの会員制バー</dd></div>
+        <div><dt class="cinzel">MEETING POINT</dt><dd>集合場所はこちら<br><span class="mp-addr serif">東京都港区六本木4-8-5 和幸ビル B1<br>BAR とかね</span><br><span class="mp-note">開演時間丁度にお越しください。</span></dd></div>
+        <div><dt class="cinzel">NEAREST STATION</dt><dd>東京メトロ日比谷線・都営大江戸線「六本木駅」周辺</dd></div>
+        <div><dt class="cinzel">MAP</dt><dd><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=BAR+とかね+東京都港区六本木4-8-5+和幸ビル" target="_blank" rel="noopener">Google Mapはこちら</a></dd></div>
+      </dl>
+      <div class="map-frame">
+        <iframe src="https://maps.google.com/maps?q=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%B8%AF%E5%8C%BA%E5%85%AD%E6%9C%AC%E6%9C%A84-8-5%20%E5%92%8C%E5%B9%B8%E3%83%93%E3%83%AB&t=&z=17&ie=UTF8&iwloc=B&output=embed" loading="lazy" title="六本木駅周辺の地図"></iframe>
+      </div>
+    </div>
+  </div>
 </section>
 
-<section class="sec sec-alt" id="contact">
-<div class="sechead rv"><span class="label">Contact</span><h2 class="h2">お問い合わせ</h2><span class="rule"></span></div>
-<div class="narrow contact-box rv">
-<p class="contact-lead">公演に関するお問い合わせは、下記フォームよりご連絡ください。</p>
-<form class="cform" id="cform" action="/api/contact" method="POST" data-thanks="sentbox">
-<input type="hidden" name="_subject" value="【怪盗と秘密の試験】サイトからのお問い合わせ">
-<input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
-<div class="frow2">
-<label class="flab" for="cf-name">お名前<input id="cf-name" class="fin" name="お名前" required autocomplete="name" placeholder="山田 太郎"></label>
-<label class="flab" for="cf-mail">メールアドレス<input id="cf-mail" class="fin" type="email" name="email" required autocomplete="email" placeholder="mail@example.com"></label>
-</div>
-<label class="flab" for="cf-subject">件名<select id="cf-subject" class="fin" name="件名"><option>チケットについて</option><option>団体・貸切について</option><option>取材・掲載について</option><option>その他</option></select></label>
-<label class="flab" for="cf-message">お問い合わせ内容<textarea id="cf-message" class="fin" name="お問い合わせ内容" rows="6" required></textarea></label>
-<p class="form-err" hidden>送信に失敗しました。お手数ですが時間をおいて再度お試しいただくか、<a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> まで直接ご連絡ください。</p>
-<button class="buy fsubmit sendbtn" type="submit">送信する</button>
-<div class="tnote tnote-center">ご入力いただいた情報は、お問い合わせへの回答のみに使用いたします。</div>
-</form>
-<div class="sent-box" id="sentbox" hidden>
-<div class="sent-h">送信ありがとうございました</div>
-<p class="sent-p">内容を確認のうえ、担当者よりご連絡いたします。<br>数日経っても返信がない場合は、お手数ですが再度お問い合わせください。</p>
-<button class="cta fsubmit" id="cformreset" type="button">フォームに戻る</button>
-</div>
-</div>
+<section id="faq" class="faqsec">
+  <div class="faq-inner">
+    <p class="sec-label cinzel center">FAQ</p>
+    <h2 class="sec-title serif center" style="margin-bottom:56px">よくある質問</h2>
+    <div class="faq-list">
+      {faqs.map((f, i) => (
+        <div class="faq-item">
+          <button class="faq-q" type="button" data-faq={i} aria-expanded="false">
+            <span class="fq-mark cinzel">Q</span>
+            <span class="fq-text">{f.q}</span>
+            <span class="fq-toggle">+</span>
+          </button>
+          <div class="faq-a" hidden>
+            <span class="fa-mark cinzel">A</span>
+            <p>{f.a}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contactsec">
+  <div class="contact-inner">
+    <p class="sec-label cinzel center">CONTACT</p>
+    <h2 class="sec-title serif center" style="margin-bottom:24px">お問い合わせ</h2>
+    <p class="contact-lead">公演に関するお問い合わせは、下記フォームよりご連絡ください。</p>
+    <form class="cform" id="cform" action="/api/contact" method="POST">
+      <input type="hidden" name="_subject" value="【怪盗と秘密の試験】サイトからのお問い合わせ">
+      <input type="hidden" name="_next" value="/kaitou/">
+      <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <label><span>お名前</span><input type="text" name="お名前" required autocomplete="name"></label>
+      <label><span>メールアドレス</span><input type="email" name="email" required autocomplete="email"></label>
+      <label><span>件名</span>
+        <select name="件名">
+          <option>チケットについて</option><option>団体・貸切について</option><option>取材・掲載について</option><option>その他</option>
+        </select></label>
+      <label><span>お問い合わせ内容</span><textarea name="お問い合わせ内容" rows="6" required></textarea></label>
+      <p class="form-err" id="formerr" hidden>送信に失敗しました。お手数ですが時間をおいて再度お試しいただくか、<a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> まで直接ご連絡ください。</p>
+      <button class="form-submit" type="submit">送信する</button>
+      <p class="form-note">ご入力いただいた情報は、お問い合わせへの回答のみに使用いたします。</p>
+    </form>
+    <div class="sent-box" id="sentbox" hidden>
+      <p>内容を確認のうえ、担当者よりご連絡いたします。<br>数日経っても返信がない場合は、お手数ですが再度お問い合わせください。</p>
+      <button class="sent-back" id="sentback" type="button">フォームに戻る</button>
+    </div>
+  </div>
 </section>
 
 </main>
 
-<a class="fab" href="#ticket">チケットを購入する</a>
-
-<footer class="ftr">
-<div class="rv">
-<div class="ftr-org latin">IMMERSIVE ILLUSION</div>
-<div class="ftr-jp">イマーシブイリュージョン</div>
-<div class="ftr-staff">主催・企画：イマーシブイリュージョン<br>イリュージョン監修・出演：才藤大芽<br>会場：東京・六本木 会員制バー<br>運営：<a href="https://kabuexlabs.com/" target="_blank" rel="noopener">株式会社ex Labs</a></div>
-<div class="copy latin">© 2026 IMMERSIVE ILLUSION All Rights Reserved.</div>
-</div>
+<footer class="foot">
+  <div class="foot-inner">
+    <a class="btn-gold serif foot-cta" href="#ticket">チケットを購入する</a>
+    <img class="foot-logo" src="/assets/kaitou/logo.webp" alt="IMMERSIVE ILLUSION" width="640" height="578" loading="lazy" decoding="async">
+    <div class="foot-credits">
+      主催・企画：イマーシブイリュージョン<br>
+      イリュージョン監修・出演：才藤大芽<br>
+      会場：東京・六本木 会員制バー<br>
+      運営：<a href="https://kabuexlabs.com/" target="_blank" rel="noopener">株式会社ex Labs</a>
+    </div>
+    <p class="foot-copy cinzel">© 2026 IMMERSIVE ILLUSION ALL RIGHTS RESERVED.</p>
+  </div>
 </footer>
 
 <style is:global>
-:root{--accent:#C9314B;--kvdim:0.55}
+/* ==== トークン（ノワール×ゴールド） ==== */
+:root{
+  --bg:#0c0907;--bg-alt:#0f0b08;--bg-grad:#120c08;--bg-foot:#080604;
+  --card:#140e09;--card2:#110c08;
+  --head:#f3ead9;--ink:#ece3d3;--body1:#e2d6bf;--body2:#d0c4ac;--body3:#c8bda6;
+  --cap:#9b8a6d;--cap2:#8f7f63;
+  --gold-l:#e8c987;--gold:#d3ab61;--gold-d:#a3823f;
+  --line:rgba(211,171,97,.16);
+  --red:#6e1622;
+  --paper:#f2e9d6;--paper-ink:#241a10;
+}
 [hidden]{display:none!important}
-html{scroll-behavior:smooth;overflow-x:clip}
-/* キーボード操作のフォーカスリング（マウスでは出ない）。 */
-:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-body{margin:0;background:#0E0716;color:#ECE4DA;font-family:'Zen Old Mincho',serif;line-height:1.9}
-a{color:#D8B4C0;text-decoration:none}
-a:hover{color:#E85C74}
-.latin{font-family:'Cinzel',serif}
-.acc{color:var(--accent)}
-.dim{color:#A79DB3}
-.sec{padding:110px 24px}
-.sec-alt{background:#120A1E}
-.inner{max-width:1040px;margin:0 auto}
-.narrow{max-width:720px;margin:0 auto}
-.label{font-family:'Cinzel',serif;font-size:13px;letter-spacing:.45em;color:var(--accent);text-transform:uppercase}
-.label-center{text-align:center;display:block;margin-bottom:24px}
-.h2{font-size:34px;font-weight:700;letter-spacing:.12em;margin:10px 0 0;line-height:1.4}
-.sechead{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;margin-bottom:56px}
-.rule{width:56px;height:1px;background:var(--accent);margin-top:22px}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Zen Kaku Gothic New',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--gold);text-decoration:none;transition:color .18s,background .18s}
+a:hover{color:var(--gold-l)}
+img{max-width:100%}
+input,select,textarea{font-family:'Zen Kaku Gothic New',sans-serif}
+input:focus,select:focus,textarea:focus{outline:1px solid var(--gold-d)}
+::selection{background:var(--red);color:var(--head)}
+.cinzel{font-family:'Cinzel',serif}
+.serif{font-family:'Shippori Mincho B1',serif}
+.center{text-align:center}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glowPulse{0%,100%{box-shadow:0 12px 40px rgba(0,0,0,.65),0 0 18px rgba(224,190,122,.35)}50%{box-shadow:0 12px 40px rgba(0,0,0,.65),0 0 42px rgba(240,217,164,.75)}}
+@keyframes sheen{0%{transform:translateX(-130%) skewX(-20deg)}55%,100%{transform:translateX(230%) skewX(-20deg)}}
+.sec-label{margin:0;font-size:13px;letter-spacing:.4em;color:#c2a468}
+.sec-title{margin:10px 0 0;font-size:clamp(28px,3.4vw,38px);font-weight:700;letter-spacing:.18em;color:var(--head)}
+section[id],header[id]{scroll-margin-top:64px}
 
-/* 写真プレースホルダー（実素材差し替え時は <img> object-fit:cover に置換） */
-.imgslot{display:flex;align-items:center;justify-content:center;background:rgba(236,228,218,.03);border:1px dashed rgba(236,228,218,.2);box-sizing:border-box}
-.imgslot span{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.24em;color:#6E6180}
+/* ==== 固定ナビ ==== */
+.topnav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 clamp(16px,3vw,40px);height:64px;background:rgba(10,7,5,.82);backdrop-filter:blur(10px);border-bottom:1px solid rgba(211,171,97,.22)}
+.brand{display:flex;align-items:baseline;gap:10px;color:var(--ink)}
+.brand-en{font-weight:700;font-size:15px;letter-spacing:.14em;color:#e8dcc4}
+.brand-ja{font-size:11px;letter-spacing:.2em;color:var(--cap)}
+.topnav-right{display:flex;align-items:center;gap:clamp(10px,1.6vw,24px)}
+.topnav-links{display:flex;align-items:center;gap:clamp(10px,1.6vw,24px)}
+.topnav-links a{font-size:12px;letter-spacing:.16em;color:var(--body3)}
+.topnav-links a:hover{color:var(--gold-l)}
+.topnav-ticket{font-size:13px;font-weight:600;letter-spacing:.24em;color:var(--gold-l);border:1px solid rgba(211,171,97,.6);padding:9px 20px;border-radius:2px;background:rgba(211,171,97,.08);white-space:nowrap;flex-shrink:0}
+.topnav-ticket:hover{background:rgba(211,171,97,.18);color:var(--gold-l)}
 
-/* 固定ヘッダー */
-.hdr{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 28px;background:rgba(14,7,22,.82);backdrop-filter:blur(10px);border-bottom:1px solid rgba(236,228,218,.08)}
-.hdr-title{font-size:16px;font-weight:700;letter-spacing:.14em;white-space:nowrap}
-.hdr-org{font-size:10px;letter-spacing:.3em;color:#A79DB3}
-.nav{display:flex;flex-wrap:wrap;gap:22px;font-size:13px;letter-spacing:.18em}
-.nav a{color:#ECE4DA}
-.nav a:hover{color:#E85C74}
-.cta{display:inline-block;background:var(--accent);color:#FDF6EC;padding:10px 26px;font-size:13px;letter-spacing:.22em;border:1px solid rgba(253,246,236,.25);white-space:nowrap;transition:background .3s,transform .3s,color .3s}
-.cta:hover{background:#A82238;color:#FDF6EC}
+/* ==== 右下固定CTA（光るアニメーション必須） ==== */
+.fab{position:fixed;right:clamp(12px,2.5vw,28px);bottom:clamp(12px,2.5vw,28px);z-index:110;font-size:15px;font-weight:700;letter-spacing:.26em;color:#1a1208;border:1px solid #f0d9a4;padding:17px 34px 17px 38px;background:linear-gradient(165deg,#f0d9a4,#d3ab61 55%,#b98f45);animation:glowPulse 2.6s ease-in-out infinite;overflow:hidden}
+.fab:hover{filter:brightness(1.1);color:#1a1208}
+.fab-sheen{position:absolute;top:0;bottom:0;left:0;width:45%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);animation:sheen 3.4s ease-in-out infinite;pointer-events:none}
 
-/* KV */
-.kv{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse at 50% 30%,#2A1440 0%,#0E0716 70%)}
-.kv-scrim{position:absolute;inset:0;background:rgba(10,4,18,var(--kvdim));pointer-events:none}
-.kv-body{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;padding:120px 24px 80px}
-.kv-logo{width:150px;height:150px;border-radius:16px}
-.kv-org{font-size:12px;letter-spacing:.42em;color:#A79DB3}
-.kv-title{font-size:clamp(40px,7vw,84px);font-weight:900;letter-spacing:.08em;line-height:1.3;margin:0;text-shadow:0 4px 40px rgba(0,0,0,.6)}
-.kv-sub{font-size:clamp(11px,1.3vw,15px);letter-spacing:.5em;color:#D8B4C0}
-.badge{border:1px solid rgba(236,228,218,.35);padding:6px 18px;font-size:12px;letter-spacing:.3em;word-break:keep-all;line-height:1.9}
-.kv-date{font-size:clamp(20px,2.6vw,30px);font-weight:700;letter-spacing:.24em;color:#FDF6EC}
-.kv-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 28px;font-size:15px;letter-spacing:.2em;margin-top:14px}
-@keyframes rise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
-.kv-body>*{animation:rise 1s ease-out both}
-.kv-body>*:nth-child(2){animation-delay:.15s}.kv-body>*:nth-child(3){animation-delay:.3s}.kv-body>*:nth-child(4){animation-delay:.45s}.kv-body>*:nth-child(5){animation-delay:.6s}.kv-body>*:nth-child(6){animation-delay:.75s}.kv-body>*:nth-child(7){animation-delay:.9s}
+/* ==== ゴールド枠CTA ==== */
+.btn-gold{display:inline-block;font-size:15px;font-weight:600;letter-spacing:.3em;color:var(--gold-l);border:1px solid rgba(211,171,97,.65);padding:16px 48px 16px 52px;background:linear-gradient(180deg,rgba(211,171,97,.14),rgba(211,171,97,.04));box-shadow:0 8px 30px rgba(0,0,0,.5);transition:background .18s,color .18s}
+.btn-gold:hover{background:rgba(211,171,97,.22);color:var(--head)}
 
-/* NEWS */
-.news{background:#160C24;border-top:1px solid rgba(236,228,218,.07);border-bottom:1px solid rgba(236,228,218,.07);padding:56px 24px}
-.news .inner{max-width:1040px}
-.news-row{display:flex;gap:24px;padding:16px 0;border-bottom:1px solid rgba(236,228,218,.1);font-size:14px;letter-spacing:.06em}
-.news-date{color:var(--accent);letter-spacing:.12em;white-space:nowrap}
+/* ==== Hero ==== */
+.hero{position:relative;overflow:hidden;background:var(--bg)}
+.hero-bg{position:absolute;inset:0;background-image:url('/assets/kaitou/kv.webp');background-size:cover;background-position:center 30%;filter:blur(22px) brightness(.32) saturate(.9);transform:scale(1.1)}
+.hero-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(12,9,7,.1),rgba(12,9,7,.92) 78%)}
+.hero-inner{position:relative;max-width:1180px;margin:0 auto;padding:140px clamp(20px,4vw,48px) 96px;display:flex;flex-wrap:wrap;align-items:center;gap:clamp(32px,5vw,72px);justify-content:center}
+.hero-copy{flex:1 1 420px;min-width:min(320px,100%);max-width:560px;animation:fadeUp .9s ease both}
+.hero-logo{width:min(300px,64%);height:auto;display:block;margin-bottom:28px}
+.hero-presents{margin:0 0 14px;font-size:13px;letter-spacing:.34em;color:#c2a468}
+.hero-title{margin:0;font-weight:800;font-size:clamp(44px,6.4vw,76px);line-height:1.18;letter-spacing:.06em;color:var(--head);text-shadow:0 2px 30px rgba(0,0,0,.6)}
+.hero-en{margin:18px 0 0;font-size:12px;letter-spacing:.24em;color:var(--cap2)}
+.hero-genre{margin-top:30px;display:inline-flex;align-items:center;gap:14px;border-top:1px solid rgba(211,171,97,.4);border-bottom:1px solid rgba(211,171,97,.4);padding:12px 4px}
+.hero-genre span{font-size:clamp(15px,1.7vw,19px);letter-spacing:.14em;color:#e6d7ba}
+.hero-meta{margin-top:26px;display:flex;flex-wrap:wrap;gap:12px 28px}
+.hm-label{font-size:11px;letter-spacing:.26em;color:var(--cap)}
+.hm-value{font-size:19px;letter-spacing:.1em;color:#f0e6d2;margin-top:4px}
+.hero-copy .btn-gold{margin-top:36px}
+.hero-poster{flex:0 1 360px;min-width:280px;margin:0;animation:fadeUp .9s .15s ease both}
+.hero-poster img{width:100%;height:auto;display:block;border:1px solid rgba(211,171,97,.45);box-shadow:0 24px 70px rgba(0,0,0,.65)}
 
-/* STORY */
-.story-p{font-size:17px;letter-spacing:.1em;line-height:2.4;text-align:center;margin:0 0 48px}
-/* 招待状（クリーム地・明朝縦書きの手紙） */
-.letter{background:radial-gradient(130% 120% at 50% 12%,#F7F2E4 0%,#ECE2C8 100%);padding:clamp(56px,7vw,96px) clamp(28px,6vw,72px);display:flex;justify-content:center;align-items:center;box-shadow:0 18px 50px rgba(0,0,0,.45)}
-.letter-in{display:flex;flex-direction:row-reverse;justify-content:center;align-items:flex-start;gap:clamp(14px,2.6vw,38px);color:#26241E}
-.lcol{display:flex;flex-direction:column;align-items:center}
-.lcol span{display:block;line-height:1}
-.lmain{font-family:'Zen Old Mincho',serif;font-weight:600;font-size:clamp(30px,5.4vw,54px);gap:.2em}
-.lsign{font-family:'Zen Old Mincho',serif;font-weight:500;font-size:clamp(14px,1.9vw,20px);color:#4A4636;gap:.28em;padding-top:3.6em}
-.story-imgs{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:64px 0}
-.story-img{height:260px;border-radius:4px}
+/* ==== NEWS ==== */
+.news{background:var(--bg-alt);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.news-inner{max-width:920px;margin:0 auto;padding:40px clamp(20px,4vw,48px);display:flex;flex-wrap:wrap;gap:20px 48px;align-items:flex-start}
+.news-h{margin:0;font-size:18px;letter-spacing:.3em;color:var(--gold);flex:0 0 auto;font-weight:600}
+.news-list{list-style:none;margin:0;padding:0;flex:1 1 480px;display:grid;gap:12px}
+.news-list li{display:flex;gap:20px;align-items:baseline;border-bottom:1px solid rgba(236,227,211,.08);padding-bottom:12px}
+.news-date{font-size:12px;letter-spacing:.1em;color:var(--cap);flex:0 0 auto}
+.news-text{font-size:14px;color:#d9cdb6}
 
-/* ABOUT */
-.about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
-.about-card{background:#160C24;border:1px solid rgba(236,228,218,.1);padding:40px 30px;display:flex;flex-direction:column;gap:16px;transition:transform .35s ease,border-color .35s ease}
-.about-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
-.about-num{font-size:30px;color:var(--accent);letter-spacing:.1em}
-.about-h{font-size:20px;font-weight:700;letter-spacing:.1em;line-height:1.7;margin:0}
-.about-p{font-size:14px;color:#C9BFD4;margin:0}
+/* ==== STORY ==== */
+.story{position:relative;background:linear-gradient(180deg,#0c0907,#120c08 40%,#0c0907);overflow:hidden}
+.story-inner{max-width:860px;margin:0 auto;padding:110px clamp(20px,4vw,48px) 120px;text-align:center}
+.story-inner .sec-title{margin-bottom:60px}
+.story-p{margin:0;font-size:clamp(16px,1.9vw,19px);line-height:2.4;letter-spacing:.08em;color:var(--body1)}
+.story-close{margin:48px 0 0;font-size:clamp(19px,2.3vw,24px);font-weight:700;line-height:2.2;letter-spacing:.12em;color:var(--head)}
+.letter{margin:64px auto;max-width:440px;background:var(--paper);color:var(--paper-ink);padding:44px 36px 34px;box-shadow:0 18px 60px rgba(0,0,0,.55);transform:rotate(-1.2deg);position:relative}
+.letter-frame{position:absolute;inset:8px;border:1px solid rgba(36,26,16,.28);pointer-events:none}
+.letter-main{margin:0;font-size:clamp(22px,2.6vw,28px);font-weight:700;letter-spacing:.22em;line-height:1.9}
+.letter-sign{margin:24px 0 0;font-size:13px;letter-spacing:.2em;text-align:right;color:#5c4a33}
 
-/* CAST グリッド */
-.cast-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
-.castc{background:#160C24;border:1px solid rgba(236,228,218,.1);display:flex;flex-direction:column;overflow:hidden;padding:0;cursor:pointer;text-align:left;font-family:inherit;color:inherit;transition:transform .35s ease,border-color .35s ease}
-.castc:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 55%,transparent)}
-.castc-photo{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;object-position:top center;display:block;background:#1D1130;filter:saturate(.95);transition:filter .3s ease}
-.castc:hover .castc-photo{filter:saturate(1.05) brightness(1.05)}
-.castc-name{display:block;font-size:18px;font-weight:700;letter-spacing:.08em;margin:0;padding:18px 18px 20px}
-.casthint{font-size:12px;letter-spacing:.14em;text-align:center;margin:34px 0 0}
+/* ==== ABOUT ==== */
+.about{background:var(--bg-alt);border-top:1px solid var(--line)}
+.wide-inner{max-width:1120px;margin:0 auto;padding:100px clamp(20px,4vw,48px)}
+.about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:24px}
+.about-card{border:1px solid rgba(211,171,97,.25);background:linear-gradient(180deg,#140e09,#100b07);padding:40px 32px}
+.about-num{font-size:34px;color:var(--gold-d);letter-spacing:.1em}
+.about-card h3{margin:18px 0 16px;font-size:20px;font-weight:700;letter-spacing:.08em;line-height:1.7;color:#f0e6d2}
+.about-card p{margin:0;font-size:14px;line-height:2;color:var(--body3)}
 
-/* キャスト詳細モーダル */
-.castdlg{background:#160C24;color:#ECE4DA;border:1px solid rgba(236,228,218,.14);padding:0;max-width:min(760px,calc(100vw - 40px));width:100%;max-height:calc(100vh - 48px);overflow:auto}
-.castdlg::backdrop{background:rgba(8,3,16,.82);backdrop-filter:blur(3px)}
+/* ==== TEAM ==== */
+.team{background:var(--bg)}
+.team-inner{max-width:1020px;margin:0 auto;padding:100px clamp(20px,4vw,48px)}
+.team-row{display:flex;flex-wrap:wrap;gap:clamp(28px,4vw,56px);align-items:flex-start;justify-content:center}
+.team-photo{flex:0 1 320px;min-width:260px;max-width:360px;width:100%;height:auto;border:1px solid rgba(211,171,97,.35);box-shadow:0 18px 50px rgba(0,0,0,.5)}
+.team-body{flex:1 1 420px;min-width:300px}
+.team-role{margin:0;font-size:12px;letter-spacing:.3em;color:var(--gold-d)}
+.team-name{margin:12px 0 4px;font-size:34px;font-weight:700;letter-spacing:.16em;color:var(--head)}
+.team-en{margin:0 0 24px;font-size:13px;letter-spacing:.28em;color:var(--cap)}
+.team-bio{margin:0;font-size:14px;line-height:2.1;color:var(--body2)}
+.team-links{display:flex;gap:16px;margin-top:28px}
+.team-links a{font-size:12px;letter-spacing:.18em;border:1px solid rgba(211,171,97,.5);padding:10px 22px;color:var(--gold)}
+.team-links a:hover{background:rgba(211,171,97,.12);color:var(--gold)}
+
+/* ==== CAST ==== */
+.castsec{background:var(--bg-alt);border-top:1px solid var(--line)}
+.cast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px}
+.cast-card{background:none;border:0;padding:0;margin:0;text-align:center;cursor:pointer;font-family:inherit;color:inherit}
+.cast-card img{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;object-position:top center;display:block;border:1px solid rgba(211,171,97,.28);filter:saturate(.92);transition:filter .25s}
+.cast-card:hover img{filter:saturate(1.05) brightness(1.06)}
+.cast-name{display:block;margin-top:12px;font-size:16px;letter-spacing:.12em;color:var(--ink)}
+.cast-hint{margin:36px 0 0;font-size:12px;color:var(--cap2);text-align:center}
+
+/* ==== キャスト詳細モーダル ==== */
+.castdlg{background:var(--card);color:var(--ink);border:1px solid rgba(211,171,97,.35);padding:0;max-width:min(760px,calc(100vw - 40px));width:100%;max-height:calc(100vh - 48px);overflow:auto}
+.castdlg::backdrop{background:rgba(8,6,4,.85);backdrop-filter:blur(3px)}
 .dlgbody{display:grid;grid-template-columns:280px 1fr;gap:0}
-.dlgimg{width:100%;height:100%;min-height:280px;object-fit:cover;object-position:top center;display:block;background:#1D1130}
+.dlgimg{width:100%;height:100%;min-height:280px;object-fit:cover;object-position:top center;display:block;background:var(--card2)}
 .dlginfo{padding:34px 32px;display:flex;flex-direction:column;align-items:flex-start;gap:12px}
-.dlgname{font-size:24px;font-weight:700;letter-spacing:.1em;color:#FDF6EC;margin:0}
-.dlgx{font-size:12px;letter-spacing:.1em;color:#A79DB3;word-break:break-all}
-.dlgx:hover{color:#E85C74}
-.dlgbio{font-size:14px;line-height:2.05;color:#C9BFD4;margin:6px 0 0}
-.dlgclose{position:absolute;top:8px;right:12px;background:none;border:0;color:#A79DB3;font-size:28px;line-height:1;cursor:pointer;z-index:1}
-.dlgclose:hover{color:#FDF6EC}
+.dlgname{font-size:24px;font-weight:700;letter-spacing:.14em;color:var(--head);margin:0}
+.dlgx{font-size:12px;letter-spacing:.12em;color:var(--cap);word-break:break-all}
+.dlgx:hover{color:var(--gold-l)}
+.dlgbio{font-size:14px;line-height:2.05;color:var(--body3);margin:6px 0 0}
+.dlgclose{position:absolute;top:8px;right:12px;background:none;border:0;color:var(--cap);font-size:28px;line-height:1;cursor:pointer;z-index:1}
+.dlgclose:hover{color:var(--head)}
 
-/* TEAM（才藤大芽 目玉） */
-.cast-main{display:grid;grid-template-columns:340px 1fr;gap:48px;align-items:start}
-.cast-photo{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;object-position:top center;border-radius:4px;display:block;background:#1D1130}
-.cast-role{font-size:12px;letter-spacing:.34em;color:#A79DB3}
-.cast-name{font-size:32px;font-weight:700;letter-spacing:.16em;margin:6px 0 2px}
-.cast-latin{font-size:13px;letter-spacing:.18em}
-.cast-bio{font-size:14.5px;color:#D6CCE0;margin:20px 0 0}
-.cast-links{display:flex;gap:20px;margin-top:20px;font-size:13px;letter-spacing:.1em}
-.cast-links a{border-bottom:1px solid rgba(216,180,192,.4);padding-bottom:2px}
+/* ==== TICKET ==== */
+.ticket{position:relative;background:linear-gradient(180deg,#120c08,#0c0907);border-top:1px solid var(--line)}
+.ticket-inner{max-width:760px;margin:0 auto;padding:100px clamp(20px,4vw,48px);text-align:center}
+.ticket-card{border:1px solid rgba(211,171,97,.4);background:var(--card);padding:clamp(32px,5vw,56px)}
+.ticket-price{font-size:clamp(36px,5vw,52px);font-weight:700;letter-spacing:.06em;color:var(--head)}
+.ticket-price span{font-size:16px;letter-spacing:.1em;color:var(--body3)}
+.ticket-type{margin:14px 0 0;font-size:14px;letter-spacing:.14em;color:var(--gold)}
+.ticket-specs{margin-top:28px;display:flex;flex-wrap:wrap;justify-content:center;gap:14px 36px;border-top:1px solid rgba(211,171,97,.25);border-bottom:1px solid rgba(211,171,97,.25);padding:18px 8px}
+.ts-label{font-size:10px;letter-spacing:.24em;color:var(--cap)}
+.ts-value{margin-top:4px;font-size:17px;letter-spacing:.1em;color:#f0e6d2}
+.ticket-sched{margin-top:22px}
+.date-chips{margin-top:12px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.date-chips span{font-size:15px;letter-spacing:.08em;color:#e6d7ba;border:1px solid rgba(211,171,97,.45);padding:8px 16px}
+.ticket-notes{margin:28px auto 0;display:grid;gap:6px;font-size:12px;line-height:1.9;color:var(--cap);text-align:left;max-width:460px}
 
-/* TICKET */
-.ticket-box{background:#160C24;border:1px solid rgba(201,49,75,.4);padding:64px 32px;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
-.price{font-size:44px;font-weight:700;letter-spacing:.08em}
-.price small{font-size:16px;color:#A79DB3;letter-spacing:.14em}
-.ticket-type{font-size:14px;letter-spacing:.14em}
-.buy{display:inline-block;background:var(--accent);color:#FDF6EC;padding:18px 64px;font-size:16px;letter-spacing:.3em;border:1px solid rgba(253,246,236,.25);transition:background .3s,transform .3s,color .3s}
-.buy:hover{background:#A82238;color:#FDF6EC;transform:translateY(-2px)}
-.tnote{font-size:12px;color:#A79DB3;letter-spacing:.08em}
-.tnote-center{text-align:center}
+/* ==== FLOW ==== */
+.flow{background:var(--bg-alt);border-top:1px solid var(--line)}
+.flow-inner{max-width:860px;margin:0 auto;padding:100px clamp(20px,4vw,48px)}
+.flow-list{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.flow-list li{display:grid;grid-template-columns:56px 1fr;gap:24px;position:relative;padding-bottom:40px}
+.flow-list li:last-child{padding-bottom:0}
+.flow-rail{display:flex;flex-direction:column;align-items:center;gap:8px}
+.flow-no{width:44px;height:44px;border:1px solid var(--gold-d);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--gold);background:var(--bg);flex:0 0 auto}
+.flow-line{width:1px;flex:1;background:linear-gradient(180deg,rgba(163,130,63,.6),rgba(163,130,63,.15))}
+.flow-list h3{margin:8px 0 10px;font-size:20px;font-weight:700;letter-spacing:.12em;color:#f0e6d2}
+.flow-list p{margin:0;font-size:14px;line-height:2;color:var(--body3)}
 
-/* FLOW（当日の流れ） */
-.flow{display:flex;flex-direction:column}
-.flow-row{display:grid;grid-template-columns:64px 1fr;gap:24px;padding:28px 0;border-bottom:1px solid rgba(236,228,218,.12)}
-.flow-row:last-child{border-bottom:none;padding-bottom:0}
-.flow-row:first-child{padding-top:0}
-.flow-n{font-size:32px;color:var(--accent);letter-spacing:.05em;line-height:1.1}
-.flow-t{font-size:18px;font-weight:700;letter-spacing:.1em;margin:0 0 10px}
-.flow-d{font-size:13.5px;color:#C9BFD4;margin:0;line-height:1.95}
+/* ==== NOTICE ==== */
+.notice{background:var(--bg);border-top:1px solid var(--line)}
+.notice-list{display:grid;gap:36px}
+.notice-block{border-left:1px solid rgba(211,171,97,.4);padding-left:24px}
+.notice-block h3{margin:0 0 14px;font-size:18px;font-weight:700;letter-spacing:.1em;color:#e6d7ba}
+.notice-block ul{margin:0;padding-left:18px;display:grid;gap:8px}
+.notice-block li{font-size:13.5px;line-height:1.9;color:var(--body3)}
 
-/* 注意事項 */
-.notes-h{font-size:17px;font-weight:700;letter-spacing:.14em;border-left:2px solid var(--accent);padding-left:14px;margin:44px 0 14px}
-.notes-h:first-child{margin-top:0}
-.notes-ul{margin:0;padding-left:22px;font-size:13.5px;color:#C9BFD4}
-.notes-ul li{margin:8px 0}
+/* ==== ACCESS ==== */
+.access{background:var(--bg-alt);border-top:1px solid var(--line)}
+.access-row{display:flex;flex-wrap:wrap;gap:40px}
+.access-dl{flex:1 1 380px;min-width:300px;margin:0;display:grid;gap:24px}
+.access-dl dt{font-size:12px;letter-spacing:.28em;color:var(--gold-d)}
+.access-dl dd{margin:8px 0 0;font-size:15px;line-height:1.9;color:var(--body1)}
+.mp-addr{font-size:16px;color:#f0e6d2}
+.mp-note{font-size:13px;color:var(--body3)}
+.map-link{font-size:14px;letter-spacing:.06em;border-bottom:1px solid rgba(211,171,97,.5);padding-bottom:2px}
+.map-frame{flex:1 1 420px;min-width:300px;border:1px solid rgba(211,171,97,.3)}
+.map-frame iframe{width:100%;height:320px;border:0;display:block;filter:grayscale(.5) contrast(.95)}
 
-/* ACCESS */
-.acc-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
-.acc-dl{font-size:15px}
-.acc-dt{font-size:11px;letter-spacing:.3em;color:var(--accent);margin-top:26px}
-.acc-dd{margin:6px 0 0}
-.map{width:100%;height:340px;border:1px solid rgba(236,228,218,.14);filter:grayscale(1) invert(.92) hue-rotate(200deg)}
+/* ==== FAQ ==== */
+.faqsec{background:var(--bg);border-top:1px solid var(--line)}
+.faq-inner{max-width:820px;margin:0 auto;padding:100px clamp(20px,4vw,48px)}
+.faq-list{display:grid;gap:14px}
+.faq-item{border:1px solid rgba(211,171,97,.25);background:var(--card2)}
+.faq-q{all:unset;box-sizing:border-box;display:flex;gap:16px;align-items:baseline;width:100%;padding:20px 22px;cursor:pointer;transition:background .18s}
+.faq-q:hover{background:rgba(211,171,97,.06)}
+.fq-mark{font-size:16px;color:var(--gold-d)}
+.fq-text{flex:1;font-size:15px;font-weight:500;letter-spacing:.04em;color:var(--ink);line-height:1.7}
+.fq-toggle{font-family:monospace;font-size:16px;color:var(--gold-d)}
+.faq-a{display:flex;gap:16px;padding:0 22px 22px;border-top:1px solid rgba(211,171,97,.14)}
+.fa-mark{font-size:16px;color:var(--red);padding-top:16px}
+.faq-a p{margin:16px 0 0;font-size:14px;line-height:2;color:var(--body3)}
 
-/* FAQ */
-.faqlist{}
-.faq-item{border-bottom:1px solid rgba(236,228,218,.12)}
-.faq-q{display:flex;align-items:center;gap:18px;width:100%;color:#ECE4DA;font-family:'Zen Old Mincho',serif;font-size:16px;letter-spacing:.08em;text-align:left;padding:22px 4px;cursor:pointer;list-style:none}
-.faq-q::-webkit-details-marker{display:none}
-.faq-q:hover{color:#E85C74}
-.qmark{color:var(--accent);font-size:18px;flex-shrink:0}
-.faq-qt{flex:1}
-.faq-q::after{content:"+";font-size:20px;color:#A79DB3;flex-shrink:0}
-.faq-item[open] .faq-q::after{content:"−"}
-@keyframes faqin{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-.faq-a{padding:0 4px 26px 42px;font-size:14.5px;color:#C9BFD4;letter-spacing:.06em;animation:faqin .3s ease-out}
+/* ==== CONTACT ==== */
+.contactsec{background:var(--bg-alt);border-top:1px solid var(--line)}
+.contact-inner{max-width:640px;margin:0 auto;padding:100px clamp(20px,4vw,48px)}
+.contact-lead{margin:0 0 48px;font-size:14px;line-height:2;color:var(--body3);text-align:center}
+.cform{display:grid;gap:24px}
+.cform label{display:grid;gap:8px}
+.cform label>span{font-size:13px;letter-spacing:.1em;color:var(--body2)}
+.cform input,.cform select,.cform textarea{background:var(--card);border:1px solid rgba(211,171,97,.3);color:var(--ink);padding:13px 14px;font-size:14px}
+.cform textarea{resize:vertical}
+.form-err{margin:0;font-size:13px;line-height:1.9;color:#e0704f;border:1px solid rgba(224,112,79,.5);padding:12px 16px}
+.form-err a{color:#e0704f;border-bottom:1px solid #e0704f}
+.form-submit{all:unset;box-sizing:border-box;text-align:center;font-size:14px;font-weight:700;letter-spacing:.24em;color:#120d08;background:linear-gradient(160deg,#e2bf7a,#b98f45);padding:16px;cursor:pointer;border-radius:2px;transition:filter .18s}
+.form-submit:hover{filter:brightness(1.08)}
+.form-submit:disabled{opacity:.55;cursor:wait}
+.form-note{margin:0;font-size:12px;line-height:1.9;color:var(--cap2);text-align:center}
+.sent-box{border:1px solid rgba(211,171,97,.35);background:var(--card);padding:48px 32px;text-align:center}
+.sent-box p{margin:0;font-size:14px;line-height:2.2;color:var(--body1)}
+.sent-back{all:unset;box-sizing:border-box;margin-top:28px;font-size:13px;letter-spacing:.14em;color:var(--gold);border:1px solid rgba(211,171,97,.5);padding:11px 26px;cursor:pointer;transition:background .18s}
+.sent-back:hover{background:rgba(211,171,97,.1)}
 
-/* CONTACT */
-.contact-box{text-align:center;display:flex;flex-direction:column;align-items:center;gap:24px}
-.contact-lead{margin:0;font-size:15px;letter-spacing:.1em}
-.cform{display:flex;flex-direction:column;gap:22px;width:100%;max-width:640px;text-align:left;box-sizing:border-box}
-.form-err{color:#E79BBB;border:1px solid rgba(201,49,75,.5);background:rgba(201,49,75,.06);padding:12px 16px;margin:0;font-size:13px;letter-spacing:.04em;text-align:center}
-.form-err a{color:#E79BBB;text-decoration:underline}
-.sendbtn:disabled{opacity:.5;cursor:wait}
-.frow2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-.flab{display:flex;flex-direction:column;gap:8px;font-size:13px;letter-spacing:.16em;color:#C9BFD4}
-.fin{background:#0E0716;border:1px solid rgba(236,228,218,.2);color:#ECE4DA;font-family:'Zen Old Mincho',serif;font-size:15px;padding:12px 14px;letter-spacing:.06em}
-.fin:focus{outline:none;border-color:var(--accent)}
-.fsubmit{cursor:pointer;font-family:'Zen Old Mincho',serif;align-self:center;border:1px solid rgba(253,246,236,.25)}
-.sent-box{border:1px solid rgba(201,49,75,.5);background:rgba(201,49,75,.06);padding:44px 32px;display:flex;flex-direction:column;gap:18px;align-items:center;width:100%;max-width:640px;box-sizing:border-box}
-.sent-h{font-size:20px;font-weight:700;letter-spacing:.16em}
-.sent-p{margin:0;font-size:14px;color:#C9BFD4}
+/* ==== フッター ==== */
+.foot{background:var(--bg-foot);border-top:1px solid rgba(211,171,97,.22)}
+.foot-inner{max-width:1020px;margin:0 auto;padding:72px clamp(20px,4vw,48px) 40px;text-align:center}
+.foot-cta{font-size:14px;padding:15px 44px 15px 48px}
+.foot-logo{width:200px;height:auto;display:block;margin:56px auto 8px}
+.foot-credits{font-size:13px;line-height:2.2;color:var(--cap);margin-top:24px}
+.foot-copy{margin:40px 0 0;font-size:11px;letter-spacing:.18em;color:#6b5d47}
 
-/* 固定CTA */
-@keyframes glowpulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent),0 8px 30px rgba(0,0,0,.45)}50%{box-shadow:0 0 0 18px color-mix(in srgb,var(--accent) 0%,transparent),0 8px 30px rgba(0,0,0,.45)}}
-.fab{position:fixed;right:22px;bottom:22px;z-index:60;background:var(--accent);color:#FDF6EC;padding:16px 32px;font-size:14px;letter-spacing:.24em;white-space:nowrap;border:1px solid rgba(253,246,236,.3);animation:glowpulse 2.6s ease-out infinite;transition:transform .3s,background .3s}
-.fab:hover{transform:translateY(-2px);background:#A82238;color:#FDF6EC}
-
-/* フッター */
-.ftr{border-top:1px solid rgba(236,228,218,.08);padding:64px 24px 40px;text-align:center;background:#0A0511}
-.ftr-org{font-size:18px;letter-spacing:.4em}
-.ftr-jp{font-size:13px;letter-spacing:.3em;margin-top:8px}
-.ftr-staff{font-size:12.5px;color:#A79DB3;letter-spacing:.12em;margin-top:22px;line-height:2.2}
-.copy{font-size:11px;color:#6E6180;letter-spacing:.1em;margin-top:36px}
-
-/* スクロールリビール */
-.rv{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s ease}
-.rv.vis{opacity:1;transform:none}
-
-@media(max-width:1180px){.nav{display:none}}
-@media(max-width:860px){
-.about-grid,.acc-grid,.story-imgs{grid-template-columns:1fr}
-.cast-grid{grid-template-columns:repeat(2,1fr);gap:14px}
-.castc-name{font-size:15px;padding:14px 14px 16px}
-.dlgbody{grid-template-columns:1fr}
-.dlgimg{min-height:0;height:300px}
-.dlginfo{padding:24px 22px 30px}
-.cast-main{grid-template-columns:1fr}
-.cast-photo{max-width:280px;margin:0 auto}
-.flow-row{grid-template-columns:40px 1fr;gap:16px}
-.flow-n{font-size:26px}
-.sec{padding:80px 20px}
-.frow2{grid-template-columns:1fr}
-.fab{right:14px;bottom:14px;padding:14px 22px;font-size:13px}
+/* ==== レスポンシブ ==== */
+@media (max-width:820px){
+  #navlinks{display:none}
+  #heroinner{padding-top:100px}
+  .dlgbody{grid-template-columns:1fr}
+  .dlgimg{min-height:0;height:300px}
+  .dlginfo{padding:24px 22px 30px}
 }
-/* スマホでは KV タイトルを1行に収め、末尾の1文字が孤立しないようにする */
-@media(max-width:560px){
-.kv-title{font-size:clamp(32px,9vw,40px);letter-spacing:.04em;word-break:keep-all}
-.badge{letter-spacing:.22em}
-}
-
-@media (prefers-reduced-motion: reduce){
-html{scroll-behavior:auto}
-.kv-body>*,.fab,.faq-a{animation:none}
-.rv{opacity:1;transform:none;transition:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .hero-copy,.hero-poster{animation:none}
+  .fab{animation:none}
+  .fab-sheen{animation:none;display:none}
 }
 </style>
 
 <script is:inline>
 (function () {
-  // スクロールリビール
-  var els = document.querySelectorAll('.rv');
-  if (els.length) {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
-      els.forEach(function (el) { el.classList.add('vis'); });
-    } else {
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('vis');
-            io.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.1 });
-      els.forEach(function (el) { io.observe(el); });
-    }
-  }
-
-  // チケット購入（販売ページ準備中のためダミー）
+  // チケット購入（販売ページ準備中のためダミー。URL 確定後は
+  // frontmatter の ticketUrl に入れるだけで実リンクに切り替わる）
   var ticket = document.querySelector('[data-ticket]');
   if (ticket) {
     ticket.addEventListener('click', function (e) {
@@ -564,42 +630,57 @@ html{scroll-behavior:auto}
     });
   }
 
-  // お問い合わせフォーム。Formspree 経由で info@kabuexlabs.com へ届く
-  // （本体サイト・他LPと同じ認証済みエンドポイント）。AJAX送信し、
-  // 成功時はデザイン通りのサンクス表示、失敗時はエラー表示して再送可能にする。
-  // JS無効時はブラウザ標準POSTにフォールバック（Formspreeの完了画面経由）。
+  // FAQ アコーディオン（1つだけ開く挙動）
+  var faqBtns = document.querySelectorAll('.faq-q');
+  function closeFaq(btn) {
+    btn.setAttribute('aria-expanded', 'false');
+    btn.querySelector('.fq-toggle').textContent = '+';
+    btn.parentElement.querySelector('.faq-a').hidden = true;
+  }
+  faqBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var wasOpen = btn.getAttribute('aria-expanded') === 'true';
+      faqBtns.forEach(closeFaq);
+      if (!wasOpen) {
+        btn.setAttribute('aria-expanded', 'true');
+        btn.querySelector('.fq-toggle').textContent = '−';
+        btn.parentElement.querySelector('.faq-a').hidden = false;
+      }
+    });
+  });
+
+  // お問い合わせフォーム。自前エンドポイント /api/contact に AJAX 送信し、
+  // 成功したらデザイン通りの完了表示に切り替える。JS 無効時は通常 POST
+  // （_next で本ページへ戻る）。
   var form = document.getElementById('cform');
   var sent = document.getElementById('sentbox');
-  var reset = document.getElementById('cformreset');
+  var back = document.getElementById('sentback');
+  var err = document.getElementById('formerr');
   if (form && sent) {
-    var err = form.querySelector('.form-err');
-    var btn = form.querySelector('.sendbtn');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (err) err.hidden = true;
-      var label = btn ? btn.textContent : '';
+      var btn = form.querySelector('.form-submit');
       if (btn) { btn.disabled = true; btn.textContent = '送信中…'; }
-      fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { Accept: 'application/json' }
-      }).then(function (res) {
-        if (!res.ok) throw new Error('formspree ' + res.status);
-        form.hidden = true;
-        sent.hidden = false;
-      }).catch(function () {
-        if (err) err.hidden = false;
-        if (btn) { btn.disabled = false; btn.textContent = label; }
-      });
+      fetch(form.action, { method: 'POST', body: new FormData(form), redirect: 'follow' })
+        .then(function (res) {
+          if (!res.ok) throw new Error('contact ' + res.status);
+          form.hidden = true;
+          sent.hidden = false;
+        })
+        .catch(function () {
+          if (err) err.hidden = false;
+        })
+        .finally(function () {
+          if (btn) { btn.disabled = false; btn.textContent = '送信する'; }
+        });
     });
   }
-  if (reset && form && sent) {
-    reset.addEventListener('click', function () {
+  if (back && form && sent) {
+    back.addEventListener('click', function () {
       sent.hidden = true;
       form.hidden = false;
       form.reset();
-      var b = form.querySelector('.sendbtn');
-      if (b) { b.disabled = false; b.textContent = '送信する'; }
     });
   }
 })();
@@ -614,7 +695,7 @@ html{scroll-behavior:auto}
   var name = document.getElementById('dlgname');
   var bio = document.getElementById('dlgbio');
   var x = document.getElementById('dlgx');
-  document.querySelectorAll('.castc').forEach(function (btn) {
+  document.querySelectorAll('.cast-card').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var c = cast[Number(btn.dataset.cast)];
       if (!c) return;
