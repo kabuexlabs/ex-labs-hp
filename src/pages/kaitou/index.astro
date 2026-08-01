@@ -149,6 +149,8 @@ const faqs = [
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Shippori+Mincho+B1:wght@400;500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+{/* JS無効環境でもリビール対象が隠れたままにならないための保険 */}
+<noscript><style>.rv{opacity:1!important;transform:none!important}.cast-card{opacity:1!important}</style></noscript>
 </head>
 <body>
 
@@ -552,10 +554,21 @@ section[id],header[id]{scroll-margin-top:64px}
 .team-links a{font-size:12px;letter-spacing:.18em;border:1px solid rgba(211,171,97,.5);padding:10px 22px;color:var(--gold)}
 .team-links a:hover{background:rgba(211,171,97,.12);color:var(--gold)}
 
-/* ==== CAST ==== */
+/* ==== CAST（uwasabanashi と同じ flex グリッド＋ふわふわ浮遊） ==== */
 .castsec{background:var(--bg-alt);border-top:1px solid var(--line)}
-.cast-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px}
-.cast-card{background:none;border:0;padding:0;margin:0;text-align:center;cursor:pointer;font-family:inherit;color:inherit}
+@keyframes castfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.cast-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:26px 20px}
+.cast-card{width:calc((100% - 60px)/4);background:none;border:0;padding:0;margin:0;text-align:center;cursor:pointer;font-family:inherit;color:inherit;opacity:0;transition:opacity .8s ease;animation:castfloat 6s ease-in-out infinite}
+.rv.vis .cast-card{opacity:1}
+.cast-card:hover{animation-play-state:paused}
+.cast-card:nth-child(1){transition-delay:.05s;animation-delay:-0s}
+.cast-card:nth-child(2){transition-delay:.15s;animation-delay:-1s}
+.cast-card:nth-child(3){transition-delay:.25s;animation-delay:-2s}
+.cast-card:nth-child(4){transition-delay:.35s;animation-delay:-3s}
+.cast-card:nth-child(5){transition-delay:.45s;animation-delay:-4s}
+.cast-card:nth-child(6){transition-delay:.55s;animation-delay:-5s}
+.cast-card:nth-child(7){transition-delay:.65s;animation-delay:-.5s}
+.cast-card:nth-child(8){transition-delay:.75s;animation-delay:-2.5s}
 .cast-card img{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;object-position:top center;display:block;border:1px solid rgba(211,171,97,.28);filter:saturate(.92);transition:filter .25s}
 .cast-card:hover img{filter:saturate(1.05) brightness(1.06)}
 .cast-name{display:block;margin-top:12px;font-size:16px;letter-spacing:.12em;color:var(--ink)}
@@ -686,12 +699,18 @@ section[id],header[id]{scroll-margin-top:64px}
   .topnav-ticket{display:none}
   section[id],header[id]{scroll-margin-top:104px}
 
-  /* ヒーローは中央揃えの1カラム（uwasabanashi の KV と同じ見せ方） */
-  #heroinner{padding-top:132px;padding-bottom:64px}
+  /* ヒーローは中央揃えの1カラム。KVポスターを最上部に置き、
+     KV内に含まれるロゴ・題字と重複する透過ロゴは非表示にする */
+  #heroinner{padding-top:116px;padding-bottom:64px;gap:28px}
   .hero-copy{text-align:center}
-  .hero-logo{margin-left:auto;margin-right:auto}
+  .hero-logo{display:none}
   .hero-meta{justify-content:center}
-  .hero-poster{margin:0 auto}
+  .hero-poster{order:-1;flex:0 1 auto;min-width:0;width:min(320px,82%);margin:0 auto}
+
+  /* キャストは uwasabanashi と同じ3列 */
+  .cast-grid{gap:16px 10px}
+  .cast-card{width:calc((100% - 20px)/3)}
+  .cast-name{font-size:11.5px;letter-spacing:.06em}
 
   /* セクションの余白リズムを詰める */
   .wide-inner,.team-inner,.flow-inner,.faq-inner,.contact-inner,.ticket-inner{padding-top:72px;padding-bottom:72px}
@@ -718,6 +737,7 @@ section[id],header[id]{scroll-margin-top:64px}
   .fab{animation:none}
   .fab-sheen{animation:none;display:none}
   .rv{opacity:1;transform:none;transition:none}
+  .cast-card{opacity:1;animation:none;transition:none}
 }
 </style>
 
