@@ -32,6 +32,10 @@ const faqs = [
     a: '例：an immersive experience（没入感のある体験）、an immersive theater（没入型の劇場）。日本語では「イマーシブな演出」「イマーシブ体験」のように使います。',
   },
   {
+    q: '「イマーシブル」という言い方は正しいですか？',
+    a: '元の英語は immersive（イマーシブ）なので「イマーシブ」が正確な表記です。「イマーシブル」と書かれている場合も、意味は同じ「没入型の」を指しています。',
+  },
+  {
     q: 'イマーシブシアターとは何ですか？',
     a: '建物や空間の中を観客が自由に歩き回り、同時多発的に進行する物語を追う没入型の演劇です。俳優との距離が近く、濃密な没入感が得られます。',
   },
@@ -84,6 +88,7 @@ const articleLd = {
   inLanguage: 'ja',
   author: { '@type': 'Organization', name: '株式会社ex Labs' },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  dateModified: '2026-08-01',
   mainEntityOfPage: new URL('/guide/immersive/', Astro.site).toString(),
 };
 ---
@@ -131,13 +136,21 @@ const articleLd = {
 <li><strong>an immersive theater</strong> — 没入型の劇場・演劇（イマーシブシアター）。</li>
 <li>日本語では「<strong>イマーシブな演出</strong>」「<strong>イマーシブ体験</strong>」「<strong>イマーシブ型イベント</strong>」のように使います。</li>
 </ul>
+<h3 class="def-sub serif">「イマーシブル」は正しい？</h3>
+<p class="lede">「<strong>イマーシブル</strong>」と表記されることもありますが、元の英語は immersive（イマーシブ）で、<strong>「イマーシブ」が正確な表記</strong>です。immersive に「ル」で終わる形はありません（-ble ではなく -sive）。検索や会話で「イマーシブル」が使われている場合も、指しているものは同じ「没入型」の意味です。</p>
+<h3 class="def-sub serif">類語・言い換え</h3>
+<ul class="bullets">
+<li><strong>没入型・没入感</strong>：イマーシブのもっとも一般的な日本語訳。「没入型演劇」＝イマーシブシアター。</li>
+<li><strong>体験型</strong>：参加して楽しむ形式全般。イマーシブは体験型の中でも「物語世界への没入」を核にしたものを指します。</li>
+<li><strong>インタラクティブ</strong>：双方向の（操作・対話ができる）という意味。イマーシブが「世界に入り込む」ことを指すのに対し、インタラクティブは「働きかけられる」ことを指します。</li>
+</ul>
 </div></section>
 
 <section class="section tinted" id="types"><div class="wrap">
 <p class="eyebrow">TYPES</p><h2 class="h2 serif">イマーシブ体験の種類</h2>
 <p class="h2sub">ひとくちにイマーシブといっても、舞台や手法によっていくつかのタイプがあります。</p>
 <div class="genre-grid">
-<div class="genre-cell"><span class="genre-t serif">劇場・施設型</span><span class="genre-d">建物内を歩き回り、同時進行する物語を追う形式（イマーシブシアター）。</span></div>
+<div class="genre-cell"><span class="genre-t serif">劇場・施設型</span><span class="genre-d">建物内を歩き回り、同時進行する物語を追う形式（イマーシブシアター）。<a href="/guide/immersive-theater/" style="color:var(--accent)">詳しく →</a></span></div>
 <div class="genre-cell"><span class="genre-t serif">街なか周遊型</span><span class="genre-d">実在する街や商店街を舞台に、スポットを巡りながら物語を体験する形式。</span></div>
 <div class="genre-cell"><span class="genre-t serif">五感・テーマ型</span><span class="genre-d">香り・音・アートなど五感やテーマを軸に世界観を体験する形式。</span></div>
 <div class="genre-cell"><span class="genre-t serif">ミステリー融合型</span><span class="genre-d">謎解きやマダミスと融合し、推理しながら没入する形式。</span></div>
@@ -157,7 +170,7 @@ const articleLd = {
 <section class="section tinted" id="biz"><div class="wrap narrow">
 <p class="eyebrow">FOR BUSINESS</p><h2 class="h2 serif">企業・施設での活用</h2>
 <p class="lede">イマーシブは「そこでしかできない体験」を生むため、<strong>商業施設・観光施設の集客</strong>や、<strong>ブランドの世界観を体験として伝えるプロモーション</strong>に活用が広がっています。来場者が物語を追う構造は、滞在時間の延長・館内回遊・SNSでの話題化にもつながります。</p>
-<p class="vc-line"><a href="/guide/immersive-event/" style="color:var(--accent)">企業のイマーシブイベント活用事例6選を見る →</a></p>
+<p class="vc-line"><a href="/guide/immersive-event/" style="color:var(--accent)">企業のイマーシブイベント活用事例5選を見る →</a></p>
 </div></section>
 
 <section class="section" id="make"><div class="wrap narrow">
@@ -188,7 +201,7 @@ const articleLd = {
 <p class="cta-mini-title serif">イマーシブ制作のご相談はこちら</p>
 <a class="btn" href="/#contact">イマーシブ体験について相談する</a>
 </div>
-<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例</a>／<a href="/taikenbizyutu/" style="color:var(--accent)">体験する美術館</a>／<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは</a></p>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例</a>／<a href="/taikenbizyutu/" style="color:var(--accent)">体験する美術館</a>／<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは</a></p>
 </div></section>
 
 <LatestPosts />

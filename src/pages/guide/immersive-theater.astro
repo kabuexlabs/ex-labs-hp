@@ -1,0 +1,193 @@
+---
+// 「イマーシブシアター」系クエリの受け皿記事。Search Consoleで
+// 「イマーシブシアターとは」「イマーシブ演劇」「イマーシブシアター おすすめ」
+// への表示が確認できたため、専用ページで確実に取りにいく。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'about', label: 'イマーシブシアターとは' },
+  { id: 'diff', label: '普通の演劇との違い' },
+  { id: 'howto', label: '初めての楽しみ方' },
+  { id: 'tokyo', label: '東京で体験できるイマーシブ' },
+  { id: 'make', label: '企業・施設が制作するには' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'イマーシブシアターとは何ですか？',
+    a: '観客が客席から鑑賞するのではなく、物語が進行する空間の中を自由に歩き回り、登場人物のすぐそばで物語を体験する没入型の演劇です。「イマーシブ演劇」「没入型演劇」とも呼ばれます。',
+  },
+  {
+    q: '普通の演劇と何が違いますか？',
+    a: '最大の違いは「客席がない」ことです。観客は舞台の中に入り、どこで何を観るかを自分で選びます。観客ごとに見える物語が変わるため、同じ公演でも人によって体験が異なります。',
+  },
+  {
+    q: '初心者や一人でも参加できますか？',
+    a: '参加できます。多くの公演は予備知識なしで楽しめるよう設計されており、一人参加の観客も珍しくありません。動きやすい服装・靴で参加するのがおすすめです。',
+  },
+  {
+    q: '東京ではどこで体験できますか？',
+    a: '常設の劇場型から、商業施設や街全体を使った期間限定の周遊型まで様々です。ex Labsでは、東京・神田の少人数密室型イマーシブ空間「ANATOR」や、渋谷サクラステージを周遊する「ウワサバナシ調査委員会」などを企画・運営しています。',
+  },
+  {
+    q: 'イマーシブシアターを自社の施設で開催してもらえますか？',
+    a: '可能です。株式会社ex Labsでは、商業施設・文化施設・街を舞台にしたイマーシブ体験の企画・制作・運営を一貫して行っています。初期費用を抑えたレベニューシェア型のご提案にも対応しています。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const definedTermLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: 'イマーシブシアター',
+  alternateName: ['immersive theater', 'イマーシブ演劇', '没入型演劇'],
+  description:
+    'イマーシブシアターは、観客が客席から鑑賞するのではなく、物語が進行する空間の中を歩き回りながら登場人物のそばで物語を体験する没入型の演劇形式。観客ごとに見える物語が変わるのが特徴。',
+  inDefinedTermSet: {
+    '@type': 'DefinedTermSet',
+    name: '体験型エンターテインメント用語集',
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  },
+  url: new URL('/guide/immersive-theater/', Astro.site).toString(),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'イマーシブシアターとは？普通の演劇との違い・楽しみ方・東京の体験スポット',
+  about: 'イマーシブシアター（没入型演劇）',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-01',
+  dateModified: '2026-08-01',
+  mainEntityOfPage: new URL('/guide/immersive-theater/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="イマーシブシアターとは？演劇との違い・楽しみ方・東京の体験スポット - 株式会社ex Labs"
+  description="イマーシブシアター（イマーシブ演劇）とは、観客が空間の中を歩き回りながら物語を体験する没入型の演劇のこと。普通の演劇との違い・初めての楽しみ方・服装・東京で体験できる公演まで、イマーシブ制作会社がわかりやすく解説します。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<script type="application/ld+json" set:html={jsonLd(definedTermLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'イマーシブ完全ガイド', href: '/guide/immersive/' },
+  { name: 'イマーシブシアターとは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">IMMERSIVE THEATER GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">イマーシブシアターとは？</span><span class="nobr">演劇との違い・楽しみ方・</span><span class="nobr">東京の体験スポット</span></h1>
+<div class="def-box">
+<p class="def-word"><span class="serif">イマーシブシアター</span><span class="def-en">immersive theater</span></p>
+<p class="def-body">観客が客席から鑑賞するのではなく、<strong>物語が進行する空間の中を自由に歩き回り、登場人物のすぐそばで物語を体験する没入型の演劇</strong>。「イマーシブ演劇」「没入型演劇」とも呼ばれる。どこで何を観るかを観客自身が選ぶため、<strong>同じ公演でも人によって見える物語が変わる</strong>のが最大の特徴。</p>
+</div>
+<p class="lede">このページでは、イマーシブシアターの意味と仕組み、普通の演劇との違い、初めてでも楽しむコツ、東京で体験できる公演までを、体験型エンターテインメント制作会社の株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">イマーシブシアターとは</h2>
+<p class="lede"><strong>イマーシブシアター</strong>は、英語の immersive（没入型の）と theater（劇場・演劇）を組み合わせた言葉です。観客は開演と同時に物語の世界へ入り込み、部屋から部屋へ、通路から通路へと<strong>自分の足で移動しながら</strong>、同時多発的に進む出来事を追いかけます。</p>
+<p class="lede">俳優との距離は時にゼロになります。目の前で交わされる密談を立ち聞きし、手紙や小道具を自分の手で調べ、ときには登場人物から直接話しかけられる——観客が「観る人」から<strong>「その場に居合わせた人」</strong>に変わることこそ、イマーシブシアターの核心です。</p>
+<p class="vc-line">「イマーシブ」という言葉自体の意味・語源は <a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド →</a></p>
+</div></section>
+
+<section class="section" id="diff"><div class="wrap narrow">
+<p class="eyebrow">VS</p><h2 class="h2 serif">普通の演劇との違い</h2>
+<ul class="bullets">
+<li><strong>客席がない</strong>：観客は舞台の中に立ち、物語のすぐそばまで近づけます。舞台と客席の境界そのものがありません。</li>
+<li><strong>視点を自分で選ぶ</strong>：どの登場人物を追うか、どの部屋に入るかは観客の自由。選択によって見える物語が変わります。</li>
+<li><strong>一回では全体を見られない</strong>：物語が同時多発で進むため、すべてを一度に見ることは不可能。「自分だけの体験」が生まれ、再訪の動機にもなります。</li>
+<li><strong>参加が物語に影響することも</strong>：作品によっては、観客の行動や選択が展開に関わる仕掛けが用意されています。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="howto"><div class="wrap narrow">
+<p class="eyebrow">HOW TO ENJOY</p><h2 class="h2 serif">初めてのイマーシブシアターの楽しみ方</h2>
+<ul class="bullets">
+<li><strong>動きやすい服装・靴で</strong>：歩き回る形式が多いため、スニーカーなど歩きやすい靴がおすすめです。</li>
+<li><strong>気になった人・物を追いかける</strong>：全部を見ようとせず、直感で「気になるもの」を追うのが一番楽しい観方です。</li>
+<li><strong>小道具はよく観察する</strong>：手紙・写真・部屋の隅の小物にも物語の手がかりが仕込まれていることがあります。</li>
+<li><strong>一人参加も歓迎</strong>：多くの公演は一人でも楽しめる設計です。むしろ一人の方が自由に動けるという声もあります。</li>
+</ul>
+</div></section>
+
+<section class="section" id="tokyo"><div class="wrap">
+<p class="eyebrow">TOKYO</p><h2 class="h2 serif">東京で体験できるイマーシブ</h2>
+<p class="h2sub">常設の劇場型から、商業施設・街を使った期間限定の周遊型まで。ex Labsが企画・運営する体験をご紹介します。</p>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">ANATOR（神田）</span><span class="genre-d">少人数密室型のイマーシブ空間。俳優との距離が近い濃密な公演を常設で行う自社劇場です。<a href="/anator/" style="color:var(--accent)">詳細 →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">ウワサバナシ調査委員会（渋谷）</span><span class="genre-d">渋谷サクラステージ全体を周遊しながら都市伝説の真相を追う、施設一体型のイマーシブ×謎解き。2026年9〜10月開催。<a href="/uwasabanashi/" style="color:var(--accent)">特設サイト →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">ロスト・フレーム（下北沢）</span><span class="genre-d">下北沢の街そのものが舞台。絵画を手がかりに街を歩く周遊型アートイマーシブです。<a href="/taikenbizyutu/lostframe/" style="color:var(--accent)">詳細 →</a></span></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="make"><div class="wrap narrow">
+<p class="eyebrow">PRODUCTION</p><h2 class="h2 serif">企業・施設がイマーシブシアターを制作するには</h2>
+<p class="lede">イマーシブシアターは劇場だけのものではありません。<strong>商業施設・文化施設・書店・街並み</strong>など、実在する空間そのものを「物語の舞台」に変えられるため、施設の集客・話題化の施策として導入が広がっています。</p>
+<p class="lede">株式会社ex Labsは、渋谷サクラステージ（東急不動産様）での施設一体型イベントをはじめ、空間を活かしたイマーシブ体験の企画・制作・集客・運営を一貫して手がけています。初期費用を抑えたレベニューシェア型のご提案も可能です。</p>
+<p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービスの詳細を見る →</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">企業のイマーシブイベント事例5選 →</a></p>
+</div></section>
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">イマーシブ制作のご相談はこちら</p>
+<a class="btn" href="/#contact">イマーシブシアターについて相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a></p>
+</div></section>
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+.def-box{max-width:680px;margin:40px auto 26px;background:#fff;border:1px solid rgba(51,48,43,.1);border-left:5px solid var(--accent);border-radius:14px;padding:26px 30px;text-align:left;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.def-word{margin:0 0 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:22px;font-weight:800;color:var(--ink)}
+.def-en{font-size:14px;font-weight:700;color:var(--accent);letter-spacing:.06em}
+.def-body{margin:0;font-size:15px;line-height:2;color:rgba(51,48,43,.85)}
+#about,#diff,#howto,#tokyo,#make,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.def-box{padding:20px 20px}.def-word{font-size:19px;gap:10px}}
+</style>
