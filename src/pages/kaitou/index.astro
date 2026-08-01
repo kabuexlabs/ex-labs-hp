@@ -135,7 +135,7 @@ const faqs = [
 </header>
 
 <section id="news" class="news">
-  <div class="news-inner">
+  <div class="news-inner rv">
     <h2 class="news-h cinzel">NEWS</h2>
     <ul class="news-list">
       {news.map((n) => (
@@ -146,7 +146,7 @@ const faqs = [
 </section>
 
 <section id="story" class="story">
-  <div class="story-inner">
+  <div class="story-inner rv">
     <p class="sec-label cinzel">STORY</p>
     <h2 class="sec-title serif">ストーリー</h2>
     <p class="story-p serif">ある日、あなたのもとへ一通の招待状が届く。<br>差出人は、都市伝説として語られる義賊組織<br>「レイヴン怪盗団」。</p>
@@ -163,7 +163,7 @@ const faqs = [
 </section>
 
 <section id="about" class="about">
-  <div class="wide-inner">
+  <div class="wide-inner rv">
     <p class="sec-label cinzel center">ABOUT</p>
     <h2 class="sec-title serif center" style="margin-bottom:64px">本公演の楽しみ方</h2>
     <div class="about-grid">
@@ -179,7 +179,7 @@ const faqs = [
 </section>
 
 <section id="team" class="team">
-  <div class="team-inner">
+  <div class="team-inner rv">
     <p class="sec-label cinzel center">TEAM</p>
     <h2 class="sec-title serif center" style="margin-bottom:64px">イリュージョン監修・出演</h2>
     <div class="team-row">
@@ -199,7 +199,7 @@ const faqs = [
 </section>
 
 <section id="cast" class="castsec">
-  <div class="wide-inner">
+  <div class="wide-inner rv">
     <p class="sec-label cinzel center">CAST</p>
     <h2 class="sec-title serif center" style="margin-bottom:64px">キャスト</h2>
     <div class="cast-grid">
@@ -227,7 +227,7 @@ const faqs = [
 </dialog>
 
 <section id="ticket" class="ticket">
-  <div class="ticket-inner">
+  <div class="ticket-inner rv">
     <p class="sec-label cinzel">TICKET</p>
     <h2 class="sec-title serif" style="margin-bottom:48px">チケット情報</h2>
     <div class="ticket-card">
@@ -257,7 +257,7 @@ const faqs = [
 </section>
 
 <section id="flow" class="flow">
-  <div class="flow-inner">
+  <div class="flow-inner rv">
     <p class="sec-label cinzel center">FLOW</p>
     <h2 class="sec-title serif center" style="margin-bottom:64px">当日の流れ</h2>
     <ol class="flow-list">
@@ -278,7 +278,7 @@ const faqs = [
 </section>
 
 <section id="notice" class="notice">
-  <div class="flow-inner">
+  <div class="flow-inner rv">
     <p class="sec-label cinzel center">NOTICE</p>
     <h2 class="sec-title serif center" style="margin-bottom:56px">注意事項</h2>
     <div class="notice-list">
@@ -295,7 +295,7 @@ const faqs = [
 </section>
 
 <section id="access" class="access">
-  <div class="team-inner">
+  <div class="team-inner rv">
     <p class="sec-label cinzel center">ACCESS</p>
     <h2 class="sec-title serif center" style="margin-bottom:56px">アクセス</h2>
     <div class="access-row">
@@ -313,7 +313,7 @@ const faqs = [
 </section>
 
 <section id="faq" class="faqsec">
-  <div class="faq-inner">
+  <div class="faq-inner rv">
     <p class="sec-label cinzel center">FAQ</p>
     <h2 class="sec-title serif center" style="margin-bottom:56px">よくある質問</h2>
     <div class="faq-list">
@@ -335,21 +335,24 @@ const faqs = [
 </section>
 
 <section id="contact" class="contactsec">
-  <div class="contact-inner">
+  <div class="contact-inner rv">
     <p class="sec-label cinzel center">CONTACT</p>
     <h2 class="sec-title serif center" style="margin-bottom:24px">お問い合わせ</h2>
     <p class="contact-lead">公演に関するお問い合わせは、下記フォームよりご連絡ください。</p>
+    {/* 本体サイト（トップの CONTACT）と同じ設計:
+        自前 /api/contact への POST + _subject/_gotcha + _next で
+        サンクスページへ遷移（JS有効時はその前に AJAX で完了表示）。 */}
     <form class="cform" id="cform" action="/api/contact" method="POST">
       <input type="hidden" name="_subject" value="【怪盗と秘密の試験】サイトからのお問い合わせ">
-      <input type="hidden" name="_next" value="/kaitou/">
+      <input type="hidden" name="_next" value="/kaitou/contact/thanks/">
       <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <label><span>お名前</span><input type="text" name="お名前" required autocomplete="name"></label>
-      <label><span>メールアドレス</span><input type="email" name="email" required autocomplete="email"></label>
+      <label><span>お名前<span class="req">必須</span></span><input type="text" name="お名前" required autocomplete="name"></label>
+      <label><span>メールアドレス<span class="req">必須</span></span><input type="email" name="email" required autocomplete="email"></label>
       <label><span>件名</span>
         <select name="件名">
           <option>チケットについて</option><option>団体・貸切について</option><option>取材・掲載について</option><option>その他</option>
         </select></label>
-      <label><span>お問い合わせ内容</span><textarea name="お問い合わせ内容" rows="6" required></textarea></label>
+      <label><span>お問い合わせ内容<span class="req">必須</span></span><textarea name="お問い合わせ内容" rows="6" required></textarea></label>
       <p class="form-err" id="formerr" hidden>送信に失敗しました。お手数ですが時間をおいて再度お試しいただくか、<a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> まで直接ご連絡ください。</p>
       <button class="form-submit" type="submit">送信する</button>
       <p class="form-note">ご入力いただいた情報は、お問い合わせへの回答のみに使用いたします。</p>
@@ -581,6 +584,7 @@ section[id],header[id]{scroll-margin-top:64px}
 .cform{display:grid;gap:24px}
 .cform label{display:grid;gap:8px}
 .cform label>span{font-size:13px;letter-spacing:.1em;color:var(--body2)}
+.req{font-size:10px;letter-spacing:.12em;color:var(--gold-l);border:1px solid rgba(211,171,97,.5);padding:2px 7px;margin-left:8px;vertical-align:1px}
 .cform input,.cform select,.cform textarea{background:var(--card);border:1px solid rgba(211,171,97,.3);color:var(--ink);padding:13px 14px;font-size:14px}
 .cform textarea{resize:vertical}
 .form-err{margin:0;font-size:13px;line-height:1.9;color:#e0704f;border:1px solid rgba(224,112,79,.5);padding:12px 16px}
@@ -602,24 +606,83 @@ section[id],header[id]{scroll-margin-top:64px}
 .foot-credits{font-size:13px;line-height:2.2;color:var(--cap);margin-top:24px}
 .foot-copy{margin:40px 0 0;font-size:11px;letter-spacing:.18em;color:#6b5d47}
 
+/* ==== スクロールリビール（uwasabanashi と同じ控えめなフェードアップ） ==== */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s ease}
+.rv.vis{opacity:1;transform:none}
+
+/* 和文見出し・質問文は文節単位で折り返す（対応ブラウザのみ） */
+.sec-title,.about-card h3,.flow-list h3,.notice-block h3,.fq-text{word-break:auto-phrase}
+
 /* ==== レスポンシブ ==== */
 @media (max-width:820px){
-  #navlinks{display:none}
-  #heroinner{padding-top:100px}
+  /* ヘッダーは uwasabanashi と同じく折返しレイアウトに。
+     ブランドを中央1行目に置き、その下にリンクを小さく並べる。 */
+  .topnav{flex-wrap:wrap;height:auto;padding:10px 12px 12px;gap:8px 14px;justify-content:center}
+  .brand{order:-1;flex-basis:100%;justify-content:center}
+  .brand-en{font-size:13px}
+  .brand-ja{white-space:nowrap}
+  .topnav-right{flex-wrap:wrap;justify-content:center;gap:8px 12px}
+  .topnav-links{flex-wrap:wrap;justify-content:center;gap:6px 12px}
+  .topnav-links a{font-size:11px;letter-spacing:.1em}
+  /* ヘッダー内のチケットボタンは非表示（右下の固定CTAが常時ある） */
+  .topnav-ticket{display:none}
+  section[id],header[id]{scroll-margin-top:104px}
+
+  /* ヒーローは中央揃えの1カラム（uwasabanashi の KV と同じ見せ方） */
+  #heroinner{padding-top:132px;padding-bottom:64px}
+  .hero-copy{text-align:center}
+  .hero-logo{margin-left:auto;margin-right:auto}
+  .hero-meta{justify-content:center}
+  .hero-poster{margin:0 auto}
+
+  /* セクションの余白リズムを詰める */
+  .wide-inner,.team-inner,.flow-inner,.faq-inner,.contact-inner,.ticket-inner{padding-top:72px;padding-bottom:72px}
+  .story-inner{padding-top:80px;padding-bottom:88px}
+
+  .fab{right:14px;bottom:14px;padding:13px 22px;font-size:13px;letter-spacing:.18em}
   .dlgbody{grid-template-columns:1fr}
   .dlgimg{min-height:0;height:300px}
   .dlginfo{padding:24px 22px 30px}
+}
+@media (max-width:600px){
+  /* 指定の改行位置がそのまま収まるよう、字間とサイズを詰める
+     （uwasabanashi と同じ対処） */
+  .story-p{font-size:14px;letter-spacing:.04em}
+  .story-close{font-size:17px;letter-spacing:.08em}
+  .letter{padding:36px 24px 28px}
+}
+@media (max-width:380px){
+  .story-p{font-size:13px;letter-spacing:.02em}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .hero-copy,.hero-poster{animation:none}
   .fab{animation:none}
   .fab-sheen{animation:none;display:none}
+  .rv{opacity:1;transform:none;transition:none}
 }
 </style>
 
 <script is:inline>
 (function () {
+  // スクロールリビール（uwasabanashi と同じ実装）。
+  var els = document.querySelectorAll('.rv');
+  if (els.length) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+      els.forEach(function (el) { el.classList.add('vis'); });
+    } else {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('vis');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08 });
+      els.forEach(function (el) { io.observe(el); });
+    }
+  }
+
   // チケット購入（販売ページ準備中のためダミー。URL 確定後は
   // frontmatter の ticketUrl に入れるだけで実リンクに切り替わる）
   var ticket = document.querySelector('[data-ticket]');

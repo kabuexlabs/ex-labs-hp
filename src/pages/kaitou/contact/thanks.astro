@@ -1,0 +1,49 @@
+---
+// お問い合わせ送信完了ページ。JS無効時のフォーム送信（/api/contact の
+// _next リダイレクト）でここへ遷移する。他LP（anator 等）と同じ慣例で、
+// LP本体と同じノワール×ゴールドのトーンで完結させている。
+const title = '送信完了｜怪盗と秘密の試験';
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Shippori+Mincho+B1:wght@400;700&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<main class="thanks">
+  <p class="label">THANK YOU</p>
+  <h1 class="serif">送信完了</h1>
+  <div class="card">
+    <p class="tk serif">お問い合わせありがとうございます。</p>
+    <p class="tkd">内容を確認のうえ、担当者よりご連絡いたします。<br>数日経っても返信がない場合は、お手数ですが再度お問い合わせください。</p>
+  </div>
+  <p class="back"><a href="/kaitou/">トップページへ戻る</a></p>
+</main>
+
+<style is:global>
+body{margin:0;background:#0c0907;color:#ece3d3;font-family:'Zen Kaku Gothic New',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#d3ab61;text-decoration:none}
+a:hover{color:#e8c987}
+.serif{font-family:'Shippori Mincho B1',serif}
+.thanks{max-width:560px;margin:0 auto;padding:160px 24px 120px;text-align:center;min-height:60vh}
+.label{margin:0;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.4em;color:#c2a468}
+h1{margin:10px 0 0;font-size:clamp(28px,3.4vw,38px);font-weight:700;letter-spacing:.18em;color:#f3ead9}
+.card{margin:52px auto 0;border:1px solid rgba(211,171,97,.35);background:#140e09;padding:48px 32px}
+.tk{font-size:18px;letter-spacing:.12em;margin:0 0 16px;color:#f0e6d2}
+.tkd{font-size:14px;line-height:2.1;color:#c8bda6;margin:0}
+.back{margin-top:48px}
+.back a{border-bottom:1px solid rgba(211,171,97,.5);padding-bottom:2px;letter-spacing:.1em}
+</style>
+
+</body>
+</html>
