@@ -2,14 +2,15 @@
 // 公演「怪盗と秘密の試験」（IMMERSIVE ILLUSION）公式サイト。
 // design_handoff_kaitou の HTML リファレンス（ノワール×ゴールド）を
 // Astro に移植した再構築版。文言はハンドオフの確定コピーが正。
-// まだ検索に載せないサブページ — noindex を付け、サイトマップ
-// (src/pages/sitemap.xml.ts の STATIC_PATHS) にも載せていない。
+// 検索インデックス許可済み（sitemap.xml の STATIC_PATHS にも掲載）。
 // コーポレートサイトとはデザイン系統が別物なので BaseLayout は
 // 使わず、このファイルだけで完結させている。
 
 const title = '【公式】怪盗と秘密の試験 | イマーシブイリュージョン';
 const description =
   'イマーシブ×マジック公演「怪盗と秘密の試験」公式サイト。義賊組織「レイヴン怪盗団」からの招待状を手に、会員制バーで団員候補として"秘密の試験"へ挑むイマーシブ体験。日本一・世界7位のプロマジシャン・才藤大芽が監修・出演。2026年9月〜10月、東京・六本木にて開催。';
+const canonical = 'https://kabuexlabs.com/kaitou/';
+const ogImage = 'https://kabuexlabs.com/assets/kaitou/kv.webp';
 
 // チケット販売ページのURL。確定したらここに入れるだけで
 // 「チケットを購入する」ボタンが実リンクに切り替わる。
@@ -62,6 +63,59 @@ const notices = [
   { title: '持ち物・手荷物について', items: ['スマートフォンを必ずお持ちください（体験の進行に使用します）。', '徒歩での移動がありますので、水分を必ずお持ちください。', '会場にクロークはございません。', '大きな荷物を保管するスペースもございませんので、駅周辺のコインロッカーなどへお預けのうえ、できる限り身軽な状態でお越しください。', '貴重品は必ずご自身で管理してください。紛失、盗難または破損について、主催者および会場は責任を負いかねます。', 'イベント開始前に、お手洗いなどをお済ませください。'] },
 ];
 
+// 検索結果のリッチリザルト用イベント構造化データ（uwasabanashi と同じ慣例）。
+const eventLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TheaterEvent',
+  name: '怪盗と秘密の試験',
+  alternateName: 'THE PHANTOM THIEF AND THE SECRET EXAMINATION',
+  description,
+  url: canonical,
+  image: ogImage,
+  startDate: '2026-09-06',
+  endDate: '2026-10-11',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  eventStatus: 'https://schema.org/EventScheduled',
+  typicalAgeRange: '18-',
+  location: {
+    '@type': 'Place',
+    name: 'BAR とかね（会員制バー）',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '六本木4-8-5 和幸ビル B1',
+      addressLocality: '港区',
+      addressRegion: '東京都',
+      addressCountry: 'JP',
+    },
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '4900',
+    priceCurrency: 'JPY',
+    url: canonical,
+    availability: 'https://schema.org/InStock',
+  },
+  performer: [
+    { '@type': 'Person', name: '才藤大芽' },
+  ],
+  organizer: {
+    '@type': 'Organization',
+    name: '株式会社ex Labs',
+    url: 'https://kabuexlabs.com/',
+  },
+};
+
+// FAQリッチリザルト用。ページ内のFAQと同一内容を機械可読で宣言する。
+const faqLd = (faqList: { q: string; a: string }[]) => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqList.map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+});
+
 const faqs = [
   { q: '会場はどんな場所ですか？', a: '通常は会員しか入ることのできない会員制バーが舞台です。閉ざされた秘密めいた空間そのものが、物語を構成する一部となります。' },
   { q: 'マジックショーとの違いは何ですか？', a: '客席から観るショーではなく、あなた自身が団員候補として物語に参加するイマーシブ（没入型）体験です。マジックは物語の中で、目の前で繰り広げられます。' },
@@ -79,13 +133,17 @@ const faqs = [
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
 <meta name="description" content={description}>
-<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href={canonical}>
 <meta property="og:title" content={title}>
 <meta property="og:description" content={description}>
 <meta property="og:type" content="website">
+<meta property="og:url" content={canonical}>
 <meta property="og:site_name" content="怪盗と秘密の試験">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:image" content="https://kabuexlabs.com/assets/kaitou/kv.webp">
+<meta property="og:image" content={ogImage}>
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json" set:html={JSON.stringify(eventLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(faqLd(faqs))} />
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" href="/favicon-ex.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
