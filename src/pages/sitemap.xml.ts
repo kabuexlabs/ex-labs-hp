@@ -43,6 +43,7 @@ const STATIC_PATHS = [
   '/smystery/company/',
   '/uwasabanashi/',
   '/anator/',
+  '/kaitou/',
   ...htPaths,
 ];
 
