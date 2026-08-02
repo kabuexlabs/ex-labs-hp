@@ -47,6 +47,13 @@ const cast = [
 // 開催日チップ。曜日は2026年カレンダーで補完（公開前に要確認）。
 const dates = ['9/6（土）', '9/13（土）', '9/26（土）', '9/27（日）', '10/3（土）', '10/4（日）', '10/11（日）'];
 
+// 参加費用（グループごとの合計金額・税込）。
+const prices = [
+  { label: '2人参加', price: '¥13,000' },
+  { label: '3人参加', price: '¥16,500' },
+  { label: '4人参加', price: '¥19,600' },
+];
+
 const flowSteps = [
   { title: '受付', body: '指定された受付場所へ、チケットに記載された受付時間までにお越しください。受付時にチケットを確認いたします。会員制バーという会場の性質上、受付時間より前に店内へ入ることはできません。スタッフの案内があるまで、指定された場所でお待ちください。' },
   { title: '事前説明', body: 'イベントへの参加方法や注意事項について、スタッフからご案内します。' },
@@ -89,14 +96,18 @@ const eventLd = {
     },
   },
   offers: {
-    '@type': 'Offer',
-    price: '4900',
+    '@type': 'AggregateOffer',
+    lowPrice: '13000',
+    highPrice: '19600',
     priceCurrency: 'JPY',
     url: canonical,
     availability: 'https://schema.org/InStock',
   },
   performer: [
     { '@type': 'Person', name: '才藤大芽' },
+  ],
+  author: [
+    { '@type': 'Person', name: '木皿儀隼一' },
   ],
   organizer: {
     '@type': 'Organization',
@@ -242,11 +253,12 @@ const faqs = [
 <section id="team" class="team">
   <div class="team-inner rv">
     <p class="sec-label cinzel center">TEAM</p>
-    <h2 class="sec-title serif center" style="margin-bottom:64px">イリュージョン監修・出演</h2>
+    <h2 class="sec-title serif center" style="margin-bottom:64px">チーム</h2>
     <div class="team-row">
       <img class="team-photo" src="/assets/kaitou/cast/saito-taiga.jpg" alt="才藤大芽 宣材写真" width="720" height="960" loading="lazy" decoding="async">
       <div class="team-body">
         <p class="team-role cinzel">MAGICIAN / SUPERVISOR</p>
+        <p class="team-role-ja serif">イリュージョン監修・出演</p>
         <h3 class="team-name serif">才藤大芽</h3>
         <p class="team-en cinzel">SAITO TAIGA</p>
         <p class="team-bio">京都大学卒業後、プロマジシャンとして活動を開始。マジック界最高峰の世界大会「FISM」に日本代表として2度選出され、2018年大会では世界7位を記録。2021年には「Japan National Championship of Magic」で優勝を果たした、日本一・世界7位の実績を持つマジシャンです。ハリウッドにあるマジック界の殿堂「マジックキャッスル」への出演歴も持ち、『ヒルナンデス！』『チコちゃんに叱られる！』『開運！なんでも鑑定団』など数々のテレビ番組にも出演。本イベントではイリュージョンを監修するだけでなく、才藤氏本人が物語の登場人物として出演し、至近距離ならではの驚きを体感していただきます。</p>
@@ -254,6 +266,16 @@ const faqs = [
           <a class="cinzel" href="https://www.saitotaiga.com/" target="_blank" rel="noopener">OFFICIAL SITE</a>
           <a class="cinzel" href="https://x.com/taiga365ib" target="_blank" rel="noopener">X (TWITTER)</a>
         </div>
+      </div>
+    </div>
+    <div class="team-row team-row2">
+      <div class="team-body">
+        <p class="team-role cinzel">SCRIPT / PRODUCTION</p>
+        <p class="team-role-ja serif">脚本／制作</p>
+        <h3 class="team-name serif">木皿儀隼一</h3>
+        <p class="team-bio">有限会社ワンドローの代表取締役。体験型コンテンツクリエイター。ボードゲーム、TCGのゲームデザイン、およびマーダーミステリーや推理イベント、体験型コンテンツの制作・脚本などを担当。</p>
+        <p class="works-label cinzel">MAJOR WORKS ── 代表作</p>
+        <p class="works-text serif">『ニューロストレガシー』『グリモワール』<br>『あなたの原罪』『夏色漂流詩』<br>『あなたが犯人かも展』など</p>
       </div>
     </div>
   </div>
@@ -292,7 +314,15 @@ const faqs = [
     <p class="sec-label cinzel">TICKET</p>
     <h2 class="sec-title serif" style="margin-bottom:48px">チケット情報</h2>
     <div class="ticket-card">
-      <div class="ticket-price serif">¥4,900<span>（税込）/ 1名</span></div>
+      <div class="price-grid">
+        {prices.map((p) => (
+          <div class="price-cell">
+            <div class="price-label serif">{p.label}</div>
+            <div class="price-value serif">{p.price}</div>
+          </div>
+        ))}
+      </div>
+      <p class="price-note">※グループごとの合計金額（税込）です</p>
       <p class="ticket-type serif">日時指定チケット制</p>
       <div class="ticket-specs">
         <div><div class="ts-label cinzel">CAPACITY</div><div class="ts-value serif">各回 2〜4名様</div></div>
@@ -547,6 +577,10 @@ section[id],header[id]{scroll-margin-top:64px}
 .team-photo{flex:0 1 320px;min-width:260px;max-width:360px;width:100%;height:auto;border:1px solid rgba(211,171,97,.35);box-shadow:0 18px 50px rgba(0,0,0,.5)}
 .team-body{flex:1 1 420px;min-width:300px}
 .team-role{margin:0;font-size:12px;letter-spacing:.3em;color:var(--gold-d)}
+.team-role-ja{margin:6px 0 0;font-size:13px;letter-spacing:.18em;color:var(--cap)}
+.team-row2{margin-top:72px;padding-top:56px;border-top:1px solid var(--line)}
+.works-label{margin:28px 0 10px;font-size:11px;letter-spacing:.22em;color:var(--gold-d)}
+.works-text{margin:0;font-size:15px;line-height:2.1;letter-spacing:.06em;color:var(--body1)}
 .team-name{margin:12px 0 4px;font-size:34px;font-weight:700;letter-spacing:.16em;color:var(--head)}
 .team-en{margin:0 0 24px;font-size:13px;letter-spacing:.28em;color:var(--cap)}
 .team-bio{margin:0;font-size:14px;line-height:2.1;color:var(--body2)}
@@ -591,8 +625,11 @@ section[id],header[id]{scroll-margin-top:64px}
 .ticket{position:relative;background:linear-gradient(180deg,#120c08,#0c0907);border-top:1px solid var(--line)}
 .ticket-inner{max-width:760px;margin:0 auto;padding:100px clamp(20px,4vw,48px);text-align:center}
 .ticket-card{border:1px solid rgba(211,171,97,.4);background:var(--card);padding:clamp(32px,5vw,56px)}
-.ticket-price{font-size:clamp(36px,5vw,52px);font-weight:700;letter-spacing:.06em;color:var(--head)}
-.ticket-price span{font-size:16px;letter-spacing:.1em;color:var(--body3)}
+.price-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:14px}
+.price-cell{flex:1 1 150px;max-width:200px;border:1px solid rgba(211,171,97,.35);padding:20px 12px 22px}
+.price-label{font-size:13px;letter-spacing:.16em;color:var(--gold)}
+.price-value{margin-top:8px;font-size:clamp(24px,3vw,30px);font-weight:700;letter-spacing:.04em;color:var(--head)}
+.price-note{margin:14px 0 0;font-size:12px;color:var(--cap)}
 .ticket-type{margin:14px 0 0;font-size:14px;letter-spacing:.14em;color:var(--gold)}
 .ticket-specs{margin-top:28px;display:flex;flex-wrap:wrap;justify-content:center;gap:14px 36px;border-top:1px solid rgba(211,171,97,.25);border-bottom:1px solid rgba(211,171,97,.25);padding:18px 8px}
 .ts-label{font-size:10px;letter-spacing:.24em;color:var(--cap)}
