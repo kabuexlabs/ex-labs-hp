@@ -1,7 +1,8 @@
 ---
 import ToudaimurderLayout from '../../layouts/ToudaimurderLayout.astro';
 import ToudaimurderContactForm from '../../components/ToudaimurderContactForm.astro';
-import { tmFeatured, TM_LINE_URL, TM_X_URL } from '../../data/toudaimurderWorks';
+import ToudaimurderVoiceMarquee from '../../components/ToudaimurderVoiceMarquee.astro';
+import { tmFeatured, tmVoices, TM_LINE_URL, TM_X_URL } from '../../data/toudaimurderWorks';
 import { tmNews } from '../../data/toudaimurderNews';
 
 const latestNews = tmNews.slice(0, 2);
@@ -71,6 +72,8 @@ const ticker = [
         </div>
       </div>
     </section>
+
+    <ToudaimurderVoiceMarquee voices={tmVoices} />
 
     <section class="wrap bt" id="whats">
       <div class="shead rv"><h2 class="sh"><span class="sht en" style="font-size:clamp(40px,4.6vw,72px)">MURDER MYSTERY</span><span class="shj">マーダーミステリーとは？</span></h2></div>
