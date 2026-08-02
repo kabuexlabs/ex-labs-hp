@@ -16,4 +16,5 @@ export const heroWorks: HeroWork[] = [
   { src: '/assets/work-4.webp', w: 595, h: 842 },
   { src: '/assets/events/atelier-copel.webp', w: 880, h: 1244 },
   { src: '/assets/events/uwasabanashi-kv.webp', w: 880, h: 1244 },
+  { src: '/assets/events/kaitou-kv.webp', w: 880, h: 1248 },
 ];
