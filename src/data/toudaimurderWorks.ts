@@ -306,3 +306,16 @@ export const TM_LINE_URL = 'https://lin.ee/Vict8us';
 export const TM_X_URL = 'https://x.com/toudaimurder';
 export const TM_CONTACT_EMAIL = 'info@kabuexlabs.com';
 export const TM_COMPANY = { name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' };
+
+// お客様の声 (X投稿のスクリーンショット)。
+// 追加するときは public/assets/toudaimurder/voices/ に画像を置いて配列に足すだけ。
+export interface TmVoice {
+  src: string;
+  alt: string;
+  workSlug?: string;
+}
+
+export const tmVoices: TmVoice[] = [
+  { src: '/assets/toudaimurder/voices/voice-1.webp', alt: 'お客様の声：「フランケンシュタイン城の殺人」は傑作、本格推理小説と並べても遜色のない完成度、というX投稿', workSlug: 'frankenstein' },
+  { src: '/assets/toudaimurder/voices/voice-2.webp', alt: 'お客様の声：「フランケンシュタイン城の殺人」を個人的マダミス大賞にしたい、というX投稿', workSlug: 'frankenstein' },
+];

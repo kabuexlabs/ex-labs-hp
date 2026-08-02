@@ -1,6 +1,7 @@
 ---
 import ToudaimurderLayout from '../../../layouts/ToudaimurderLayout.astro';
-import { TM_LINE_URL, TM_X_URL } from '../../../data/toudaimurderWorks';
+import ToudaimurderVoiceMarquee from '../../../components/ToudaimurderVoiceMarquee.astro';
+import { TM_LINE_URL, TM_X_URL, tmVoices } from '../../../data/toudaimurderWorks';
 
 const base = '/toudaimurder';
 ---
@@ -29,6 +30,7 @@ const base = '/toudaimurder';
       <a class="more en" href={TM_LINE_URL}>公式LINEで予約</a>
     </div>
   </main>
+  <ToudaimurderVoiceMarquee voices={tmVoices} />
 </ToudaimurderLayout>
 
 <style>

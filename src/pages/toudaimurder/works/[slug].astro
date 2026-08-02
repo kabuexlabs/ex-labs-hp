@@ -1,6 +1,7 @@
 ---
 import ToudaimurderLayout from '../../../layouts/ToudaimurderLayout.astro';
-import { tmWorks, TM_LINE_URL, TM_X_URL } from '../../../data/toudaimurderWorks';
+import ToudaimurderVoiceMarquee from '../../../components/ToudaimurderVoiceMarquee.astro';
+import { tmWorks, tmVoices, TM_LINE_URL, TM_X_URL } from '../../../data/toudaimurderWorks';
 import { jsonLd } from '../../../lib/microcms';
 
 export function getStaticPaths() {
@@ -10,6 +11,7 @@ export function getStaticPaths() {
 const { work } = Astro.props;
 const base = '/toudaimurder';
 const others = tmWorks.filter((w) => w.slug !== work.slug);
+const voices = tmVoices.filter((v) => v.workSlug === work.slug);
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const pageUrl = new URL(`${base}/works/${work.slug}/`, site).toString();
@@ -133,6 +135,7 @@ const crumbLd = {
       <div class="olist">{others.map((o) => <a class="oit" href={`${base}/works/${o.slug}/`}>{o.title}</a>)}</div>
     </div>
   </main>
+  <ToudaimurderVoiceMarquee voices={voices} heading={`${work.title} のお客様の声`} />
 </ToudaimurderLayout>
 
 <style>
