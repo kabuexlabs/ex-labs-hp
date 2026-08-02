@@ -178,9 +178,10 @@ const faqs = [
     <div class="hero-copy">
       <img class="hero-logo" src="/assets/kaitou/logo.webp" alt="IMMERSIVE ILLUSION イマーシブイリュージョン" width="640" height="578" loading="eager" fetchpriority="high" decoding="async">
       <p class="hero-presents cinzel">IMMERSIVE ILLUSION PRESENTS</p>
-      <h1 class="hero-title serif">怪盗と<br>秘密の試験</h1>
-      <p class="hero-en cinzel">THE PHANTOM THIEF AND THE SECRET EXAMINATION</p>
-      <div class="hero-genre"><span class="serif">会員制バー × イマーシブ × イリュージョン</span></div>
+      {/* 題字・英題はKVポスター内に含まれるためテキストでは出さない。
+          h1 は検索・読み上げ用に視覚非表示で維持する。 */}
+      <h1 class="sr-only">怪盗と秘密の試験</h1>
+      <div class="hero-genre"><span class="serif">会員制バー × イマーシブ × マジック</span></div>
       <div class="hero-meta serif">
         <div><div class="hm-label">DATE</div><div class="hm-value">2026年9月〜10月 開催</div></div>
         <div><div class="hm-label">PLACE</div><div class="hm-value">東京・六本木</div></div>
@@ -500,8 +501,7 @@ section[id],header[id]{scroll-margin-top:64px}
 .hero-copy{flex:1 1 420px;min-width:min(320px,100%);max-width:560px;animation:fadeUp .9s ease both}
 .hero-logo{width:min(300px,64%);height:auto;display:block;margin-bottom:28px}
 .hero-presents{margin:0 0 14px;font-size:13px;letter-spacing:.34em;color:#c2a468}
-.hero-title{margin:0;font-weight:800;font-size:clamp(44px,6.4vw,76px);line-height:1.18;letter-spacing:.06em;color:var(--head);text-shadow:0 2px 30px rgba(0,0,0,.6)}
-.hero-en{margin:18px 0 0;font-size:12px;letter-spacing:.24em;color:var(--cap2)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .hero-genre{margin-top:30px;display:inline-flex;align-items:center;gap:14px;border-top:1px solid rgba(211,171,97,.4);border-bottom:1px solid rgba(211,171,97,.4);padding:12px 4px}
 .hero-genre span{font-size:clamp(15px,1.7vw,19px);letter-spacing:.14em;color:#e6d7ba}
 .hero-meta{margin-top:26px;display:flex;flex-wrap:wrap;gap:12px 28px}
