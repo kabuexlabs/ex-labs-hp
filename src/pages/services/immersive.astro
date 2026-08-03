@@ -27,6 +27,14 @@ const faqs = [
     a: '複数のエンディングを用意するなど、リプレイ性を持たせた設計も可能です。継続的な集客コンテンツとして展開したい場合もご相談ください。',
   },
   {
+    q: 'イマーシブの制作依頼は、何から始めればいいですか？',
+    a: 'お問い合わせフォームから「目的（集客・話題化・ブランド体験など）・舞台にしたい場所・希望時期」をお知らせください。内容を伺ったうえで、企画の方向性と概算お見積りを無料でご提案します。',
+  },
+  {
+    q: '制作依頼から公開までの期間はどのくらいですか？',
+    a: '体験の規模により数週間〜数ヶ月が目安です。開催希望日が決まっている場合は、お問い合わせ時にお伝えいただければ間に合う構成をご提案します。',
+  },
+  {
     q: 'イマーシブイベントの制作を依頼する場合、どのような流れになりますか？',
     a: 'お問い合わせフォームからご連絡いただいた後、目的・舞台となる場所・ご予算をヒアリングし、企画をご提案します。ご発注後はシナリオ制作・体験設計・テストプレイを経て、当日の運営まで一貫してex Labsが担当します。',
   },
@@ -47,7 +55,7 @@ const serviceLd = {
   '@type': 'Service',
   serviceType: 'イマーシブコンテンツ制作',
   name: 'イマーシブコンテンツ制作',
-  alternateName: 'イマーシブイベント制作',
+  alternateName: ['イマーシブイベント制作', 'イマーシブ制作依頼'],
   description: '実在する街・空間・ブランドを舞台にした没入型（イマーシブ）体験コンテンツの企画・シナリオ制作・体験設計',
   provider: { '@type': 'Organization', name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
   areaServed: 'JP',
@@ -55,7 +63,7 @@ const serviceLd = {
 };
 ---
 <BaseLayout
-  title="イマーシブ制作のご依頼｜没入型体験イベントの企画・制作会社 - 株式会社ex Labs"
+  title="イマーシブ制作依頼・お見積り｜没入型体験イベントの企画・制作会社 - 株式会社ex Labs"
   description="イマーシブ（没入型体験）コンテンツ・イマーシブイベントの制作依頼なら、イマーシブ制作会社の株式会社ex Labs。実在する街やブランドを舞台にした周遊型アートイマーシブ・香り×イマーシブなど制作実績多数。企画からシナリオ・体験設計・運営まで一貫対応。"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
@@ -83,7 +91,7 @@ const serviceLd = {
 <section class="section" style="padding-top:56px"><div class="wrap">
 <p class="eyebrow">SERVICE</p>
 <h2 class="h2 serif">イマーシブコンテンツ制作｜没入型体験の企画・制作</h2>
-<p class="lede">株式会社ex Labsは、参加者が物語を「観る」のではなく<strong>自分自身が物語の当事者として体験する</strong>、イマーシブ（没入型）コンテンツを企画・制作しています。実在する街・空間・香り・アート作品を物語に組み込み、「<strong>その場所だからこそ体験できる物語</strong>」をお届けします。</p>
+<p class="lede">株式会社ex Labsは、参加者が物語を「観る」のではなく<strong>自分自身が物語の当事者として体験する</strong>、イマーシブ（没入型）コンテンツを企画・制作しています。実在する街・空間・香り・アート作品を物語に組み込み、「<strong>その場所だからこそ体験できる物語</strong>」をお届けします。<strong>イマーシブの制作依頼・お見積りは無料</strong>で受け付けています。</p>
 <p class="lede" style="margin-top:20px"><strong>イマーシブ（immersive）とは「没入型」の意味</strong>で、観客が客席から鑑賞するのではなく、物語の世界に入り込んで登場人物として体験するエンターテインメント形式を指します。イマーシブシアターのような劇場型から、街全体を舞台にした周遊型まで、空間そのものを物語に変えるのが特徴です。<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイドはこちら →</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例5選はこちら →</a></p>
 </div></section>
 
@@ -150,7 +158,8 @@ const serviceLd = {
 
 <section class="section tinted"><div class="wrap">
 <p class="eyebrow">FLOW</p>
-<h2 class="h2 serif">イマーシブ制作の流れ</h2>
+<h2 class="h2 serif">イマーシブ制作依頼の流れ</h2>
+<p class="h2sub">制作依頼は以下の流れで進みます。ヒアリング・企画提案・お見積りまでは無料です。</p>
 <div class="flow-row">
 <div class="flow-step"><p class="flow-num">01</p><p class="flow-t">コンセプト設計</p><p class="flow-d">舞台となる街・空間・ブランドの魅力から没入の軸を決定</p></div>
 <div class="flow-step"><p class="flow-num">02</p><p class="flow-t">シナリオ・体験設計</p><p class="flow-d">脚本に加え、動線・手がかり・交流ポイントを設計</p></div>
@@ -174,8 +183,8 @@ const serviceLd = {
 
 <section class="section"><div class="wrap">
 <div class="cta-mini">
-<p class="cta-mini-title serif">イマーシブコンテンツ制作のご相談はこちら</p>
-<a class="btn" href="/#contact">イマーシブ制作について相談する</a>
+<p class="cta-mini-title serif">イマーシブの制作依頼・無料見積りはこちら</p>
+<a class="btn" href="/#contact">イマーシブ制作を依頼・相談する</a>
 </div>
 <p class="vc-line" style="margin-top:48px">関連サービス：<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント</a>／<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作</a></p>
 </div></section>
