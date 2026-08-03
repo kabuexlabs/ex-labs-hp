@@ -67,7 +67,7 @@ const notices = [
   { title: '写真撮影・動画撮影・録音について', items: ['主催者またはスタッフから明確な許可がある場合を除き、会場内での写真撮影、動画撮影および録音はすべて禁止です。', '撮影許可が出た場合も、指定された時間・場所・内容の範囲内でのみ撮影可能です。', 'ネタバレとなる内容や、ほかの参加者が映り込んだ写真・動画を無断で公開することは禁止です。'] },
   { title: '体験中の行為について', items: ['キャストやほかの参加者に触れる行為は禁止です。', '会場内の備品や装飾品には、スタッフまたはキャストから案内があった場合を除き、触れないでください。', 'キャストやほかの参加者に対する暴言、威圧的な行為、過度な接触は禁止です。', 'イベントの進行を妨げる行為や、ほかの参加者の体験を損なう行為はお控えください。'] },
   { title: 'ネタバレについて', items: ['イベントの内容、仕掛け、試験の詳細、物語の結末など、ネタバレとなる情報をインターネットやSNS上で公開することはお控えください。', 'これから参加される方の体験を損なわないよう、ご配慮をお願いいたします。'] },
-  { title: '持ち物・手荷物について', items: ['スマートフォンを必ずお持ちください（体験の進行に使用します）。', '徒歩での移動がありますので、水分を必ずお持ちください。', '会場にクロークはございません。', '大きな荷物を保管するスペースもございませんので、駅周辺のコインロッカーなどへお預けのうえ、できる限り身軽な状態でお越しください。', '貴重品は必ずご自身で管理してください。紛失、盗難または破損について、主催者および会場は責任を負いかねます。', 'イベント開始前に、お手洗いなどをお済ませください。'] },
+  { title: '持ち物・手荷物について', items: ['スマートフォンを必ずお持ちください（体験の進行に使用します）。', 'イヤホンを必ずお持ちください（体験の進行に使用します）。', '徒歩での移動がありますので、水分を必ずお持ちください。', '会場にクロークはございません。', '大きな荷物を保管するスペースもございませんので、駅周辺のコインロッカーなどへお預けのうえ、できる限り身軽な状態でお越しください。', '貴重品は必ずご自身で管理してください。紛失、盗難または破損について、主催者および会場は責任を負いかねます。', 'イベント開始前に、お手洗いなどをお済ませください。'] },
 ];
 
 // 検索結果のリッチリザルト用イベント構造化データ（uwasabanashi と同じ慣例）。
@@ -328,6 +328,10 @@ const faqs = [
         <div><div class="ts-label cinzel">CAPACITY</div><div class="ts-value serif">各回 2〜4名様</div></div>
         <div><div class="ts-label cinzel">DURATION</div><div class="ts-value serif">約70分</div></div>
         <div><div class="ts-label cinzel">AGE</div><div class="ts-value serif">18歳以上</div></div>
+      </div>
+      <div class="bring-box">
+        <div class="ts-label cinzel">BRING ── 必ずお持ちください</div>
+        <div class="bring-items serif"><span>スマートフォン</span> ・ <span>イヤホン</span> ・ <span>水分</span></div>
       </div>
       <div class="ticket-sched">
         <div class="ts-label cinzel">SCHEDULE</div>
@@ -634,6 +638,9 @@ section[id],header[id]{scroll-margin-top:64px}
 .ticket-specs{margin-top:28px;display:flex;flex-wrap:wrap;justify-content:center;gap:14px 36px;border-top:1px solid rgba(211,171,97,.25);border-bottom:1px solid rgba(211,171,97,.25);padding:18px 8px}
 .ts-label{font-size:10px;letter-spacing:.24em;color:var(--cap)}
 .ts-value{margin-top:4px;font-size:17px;letter-spacing:.1em;color:#f0e6d2}
+.bring-box{margin-top:22px;border:1px solid rgba(211,171,97,.5);background:rgba(211,171,97,.07);padding:18px 16px 20px}
+.bring-items{margin-top:10px;font-size:clamp(19px,2.6vw,26px);font-weight:700;letter-spacing:.1em;color:var(--gold-l)}
+.bring-items span{display:inline-block}
 .ticket-sched{margin-top:22px}
 .date-chips{margin-top:12px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
 .date-chips span{font-size:15px;letter-spacing:.08em;color:#e6d7ba;border:1px solid rgba(211,171,97,.45);padding:8px 16px}
