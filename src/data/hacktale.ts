@@ -37,7 +37,7 @@ export const htWorks: HtWork[] = [
     en: 'PRESENT POKER',
     chip: '6人／180分',
     meta: '店舗公演｜4,500円',
-    desc: '裏技と交渉を駆使し、勝利を目指せ。公演終了時、明確に1名の勝利者が出る。',
+    desc: '交渉/閃き/論理を駆使し、勝利を目指せ。公演終了時、明確に1名の勝利者が出る。',
     image: '/assets/hacktale/kv-poker.webp',
     players: 6,
     minutes: 180,
