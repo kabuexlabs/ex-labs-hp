@@ -121,6 +121,8 @@ if (Astro.request.method === 'POST') {
     if (action === 'add' || action === 'update') {
       const name = String(form.get('name') ?? '').trim().slice(0, 80);
       const location = String(form.get('location') ?? '').trim().slice(0, 100);
+      // いつ・何の用途で買ったか（自由記述・任意）。空なら undefined で持つ。
+      const note = String(form.get('note') ?? '').trim().slice(0, 500) || undefined;
       const quantity = parseQuantity(String(form.get('quantity') ?? ''));
       const price = parsePrice(String(form.get('price') ?? ''));
       const photo = await readPhotoField(form);
@@ -138,6 +140,7 @@ if (Astro.request.method === 'POST') {
           quantity,
           price,
           location,
+          note,
           photoUpdatedAt: photo.dataUri ? now : undefined,
           createdAt: now,
           updatedAt: now,
@@ -160,7 +163,7 @@ if (Astro.request.method === 'POST') {
             await deletePhoto(prev.id);
             photoUpdatedAt = undefined;
           }
-          await saveItem({ ...prev, name, quantity, price, location, photoUpdatedAt, updatedAt: now });
+          await saveItem({ ...prev, name, quantity, price, location, note, photoUpdatedAt, updatedAt: now });
           msg = `「${name}」を更新しました。`;
         }
       }
@@ -252,6 +255,9 @@ const photoUrl = (i: Item) => `/bihin/photo/${i.id}?v=${encodeURIComponent(i.pho
       <label class="yk-field">保管場所<small>例：事務所の棚A・倉庫2F</small>
         <input type="text" name="location" required maxlength="100" value={editing.location}>
       </label>
+      <label class="yk-field">いつ・何の用途で買ったか<small>任意・自由記述</small>
+        <textarea name="note" rows="3" maxlength="500" placeholder={`例：2026年3月に購入。\n怪盗イベントの受付で使用`}>{editing.note ?? ''}</textarea>
+      </label>
 
       <label class="yk-field">写真{editing.photoUpdatedAt ? 'を差し替える' : 'を追加する'}<small>選ぶと自動で縮小されます</small>
         <input type="file" name="photofile" accept="image/*" data-compress>
@@ -291,7 +297,7 @@ const photoUrl = (i: Item) => `/bihin/photo/${i.id}?v=${encodeURIComponent(i.pho
     <input type="search" id="bh-search" placeholder="名前・場所でしぼり込み" autocomplete="off">
     <div class="bh-grid">
       {items.map((i) => (
-        <div class="bh-card" data-text={`${i.name} ${i.location}`.toLowerCase()}>
+        <div class="bh-card" data-text={`${i.name} ${i.location} ${i.note ?? ''}`.toLowerCase()}>
           {i.photoUpdatedAt ? (
             <img class="bh-photo" src={photoUrl(i)} alt={`${i.name}の写真`} loading="lazy">
           ) : (
@@ -301,6 +307,7 @@ const photoUrl = (i: Item) => `/bihin/photo/${i.id}?v=${encodeURIComponent(i.pho
             <p class="bh-name">{i.name}</p>
             <p class="bh-meta">保管場所：{i.location}</p>
             <p class="bh-meta">購入価格：{formatPrice(i.price)}</p>
+            {i.note && <p class="bh-note">{i.note}</p>}
             <p class="bh-meta bh-date">最終更新 {i.updatedAt.slice(0, 10)}</p>
             <div class="bh-actions">
               <div class="bh-qty">
@@ -347,6 +354,9 @@ const photoUrl = (i: Item) => `/bihin/photo/${i.id}?v=${encodeURIComponent(i.pho
       <label class="yk-field">保管場所<small>例：事務所の棚A・倉庫2F</small>
         <input type="text" name="location" required maxlength="100" placeholder="例：事務所の棚A">
       </label>
+      <label class="yk-field">いつ・何の用途で買ったか<small>任意・自由記述</small>
+        <textarea name="note" rows="3" maxlength="500" placeholder={`例：2026年3月に購入。\n怪盗イベントの受付で使用`}></textarea>
+      </label>
       <label class="yk-field">写真<small>任意。選ぶと自動で縮小されます</small>
         <input type="file" name="photofile" accept="image/*" data-compress>
       </label>
@@ -370,6 +380,8 @@ const photoUrl = (i: Item) => `/bihin/photo/${i.id}?v=${encodeURIComponent(i.pho
 .bh-name{font-weight:800;font-size:15.5px;margin:0 0 6px;line-height:1.5}
 .bh-meta{font-size:13px;color:#5f594f;margin:2px 0}
 .bh-date{color:#a79f90;font-size:12px}
+/* 購入時期・用途メモ。改行を生かしつつ長文はカードを壊さないよう6行で省略 */
+.bh-note{font-size:12.5px;color:#5f594f;background:#f7f2e9;border-radius:8px;padding:8px 10px;margin:8px 0 4px;white-space:pre-wrap;line-height:1.6;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
 .bh-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:12px}
 .bh-qty{display:flex;align-items:center;gap:8px}
 .bh-qtybtn{width:32px;height:32px;border-radius:50%;border:1.5px solid #ddd5c6;background:#fffdf8;color:var(--ink);font-size:16px;font-weight:700;cursor:pointer;line-height:1}
