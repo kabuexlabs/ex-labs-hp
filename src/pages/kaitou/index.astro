@@ -12,9 +12,8 @@ const description =
 const canonical = 'https://kabuexlabs.com/kaitou/';
 const ogImage = 'https://kabuexlabs.com/assets/kaitou/kv.webp';
 
-// チケット販売ページのURL。確定したらここに入れるだけで
-// 「チケットを購入する」ボタンが実リンクに切り替わる。
-const ticketUrl = '';
+// チケット販売ページのURL。
+const ticketUrl = 'https://escape.id/ImmersiveIllusion-org/e-kaitou/';
 
 const navItems = ['story', 'about', 'team', 'cast', 'ticket', 'flow', 'access', 'faq', 'contact']
   .map((s) => ({ label: s.toUpperCase(), href: '#' + s }));
@@ -100,7 +99,7 @@ const eventLd = {
     lowPrice: '13000',
     highPrice: '19600',
     priceCurrency: 'JPY',
-    url: canonical,
+    url: ticketUrl,
     availability: 'https://schema.org/InStock',
   },
   performer: [
@@ -343,7 +342,7 @@ const faqs = [
         ? <a class="btn-gold serif" style="margin-top:32px" href={ticketUrl} target="_blank" rel="noopener">チケットを購入する</a>
         : <a class="btn-gold serif" style="margin-top:32px" href="#ticket" data-ticket>チケットを購入する</a>}
       <div class="ticket-notes">
-        <div>※外部チケットサイトが開きます（販売ページ準備中）</div>
+        <div>※外部チケットサイト（escape.id）が開きます</div>
         <div>※購入後のお客様都合によるキャンセル・払い戻し・日時変更はお受けできません</div>
         <div>※表示価格のほか、別途手数料がかかる場合があります</div>
       </div>
