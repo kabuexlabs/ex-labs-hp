@@ -4,6 +4,17 @@
   --yellow:#ffd23f;
   --ink:#33302b;
   --cream:#f7f2e9;
+  /* Locked tokens — 印刷物ライクな設計言語（方眼紙の地・角ゼロ・
+     墨の実線フチ・「紙が重なった」ハードなオフセット影）。値は
+     直書きせず必ずこのトークンを参照する。 */
+  --paper:#f4f2ec;
+  --r-s:0;
+  --r-m:2px;
+  --r-l:2px;
+  --hairline:1px solid rgba(51,48,43,.12);
+  --bd:2px solid var(--ink);
+  --shadow-1:6px 6px 0 -1px #fff,6px 6px 0 1px var(--ink);
+  --shadow-2:9px 9px 0 -1px #fff,9px 9px 0 1px var(--ink);
   /* Genre/category accent set — used for tags, badges and per-service
      theming only. The brand accent above stays the one color used for
      primary CTAs and links everywhere, so this is additive, not a
@@ -12,10 +23,14 @@
   --tag-murder:#e75593;
   --tag-zunou:#c2410c;
   --tag-shisetsu:#1fb782;
+  --tag-immersive:#7c3aed;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:#fffdf8;color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth;overflow-x:clip}
+/* "palt" tightens Japanese punctuation/kana spacing for an editorial,
+   typeset look; the slight tracking keeps body text from feeling
+   cramped after the squeeze. */
+body{margin:0;background-color:var(--paper);background-image:linear-gradient(rgba(51,48,43,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(51,48,43,.05) 1px,transparent 1px);background-size:28px 28px;color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1;letter-spacing:.015em}
 ::selection{background:var(--yellow);color:var(--ink)}
 strong{font-weight:700}
 .lede strong,.str-body strong{color:var(--ink)}
@@ -30,18 +45,27 @@ strong{font-weight:700}
    phrase boundaries instead of mid-word. */
 .h2,.hero-title,.cta-title,.cta-mini-title,.str-title,.svc-title,.work-name,.blog-title,.flow-t,.msg-quote,.style-h{text-wrap:balance}
 @supports(word-break:auto-phrase){
-  .h2,.hero-title,.cta-title,.cta-mini-title,.str-title,.svc-title,.work-name,.blog-title,.flow-t,.msg-quote,.lede,.h2sub,.str-lead,.bullets li,.feature-points li,.about-points li,.flow-d,.genre-d,.event-desc,.flow-note{word-break:auto-phrase}
+  .h2,.hero-title,.cta-title,.cta-mini-title,.str-title,.svc-title,.svc-row-title,.svc-row-desc,.work-name,.blog-title,.flow-t,.msg-quote,.lede,.h2sub,.str-lead,.bullets li,.feature-points li,.about-points li,.flow-d,.genre-d,.event-desc,.flow-note{word-break:auto-phrase}
 }
 /* Manual phrase grouping for browsers without auto-phrase (iOS Safari):
    a .nobr chunk wraps as one unit. */
 .nobr{display:inline-block}
 a{color:inherit;text-decoration:none;transition:color .2s}
+/* キーボード操作のフォーカスリング。マウスクリックでは出ない
+   (:focus-visible)。オレンジ地の上ではリングを黄色に切り替える。 */
+:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+:where(.perf,.cta,.cta-mini,.msg-sec,.biz-punch) :where(a,button):focus-visible{outline-color:var(--yellow)}
 img{max-width:100%;display:block}
 .wrap{max-width:1180px;margin:0 auto;padding:0 40px}
 .section{padding:110px 0}
-.eyebrow{font-size:13px;letter-spacing:.24em;font-weight:800;color:var(--accent);margin:0 0 14px;text-align:center}
-.h2{font-size:40px;line-height:1.35;font-weight:800;letter-spacing:.02em;margin:0 0 10px;text-align:center;color:var(--accent)}
-.h2sub{font-size:15px;color:rgba(51,48,43,.6);margin:0 auto 56px;font-weight:500;text-align:center;max-width:720px;line-height:1.9}
+/* Section headers（RIDDLER型）：左寄せの極太英語ディスプレイ＋
+   太い墨のアンダーバー。日本語タイトルはその下のサブタイトルとして
+   ゴシック太字で置く。中央揃え・明朝ラベルはやめ、印刷物の
+   「章扉」のリズムで組む。 */
+.eyebrow{font-family:'Archivo Black','Noto Sans JP',sans-serif;font-weight:400;font-size:clamp(32px,3.8vw,50px);letter-spacing:.02em;line-height:1;color:var(--ink);margin:0 0 18px;text-align:left;text-transform:uppercase}
+.eyebrow::after{content:'';display:block;width:64px;height:6px;background:var(--ink);margin-top:16px}
+.h2{font-family:'Noto Sans JP',sans-serif;font-size:clamp(20px,2vw,26px);line-height:1.6;font-weight:800;letter-spacing:.05em;margin:0 0 10px;text-align:left;color:var(--ink)}
+.h2sub{font-size:15px;color:rgba(51,48,43,.6);margin:0 0 56px;font-weight:500;text-align:left;max-width:720px;line-height:1.9}
 /* Uniform gap between a section heading and its first content block
    when there is no .h2sub in between — some pages (notably the
    zunousen LP) had cards starting 10px under the heading. */
@@ -50,7 +74,7 @@ img{max-width:100%;display:block}
   .h2+.str-grid,.h2+.bullets,.h2+.faq-list,.h2+.works-grid,.h2+.blog-grid,.h2+.press-list,.h2+.svc-rows,.h2+.event-row,.h2+.genre-grid,.h2+.flow-row,.h2+.style-grid,.h2+.voice-marquee,.h2+.info-grid,.h2+.stat-row,.h2+.about-grid,.h2+.lede,.h2+.ceo-arch{margin-top:34px}
 }
 .lede{font-size:16px;line-height:2;color:rgba(51,48,43,.82);max-width:680px;margin-left:auto;margin-right:auto}
-.rule{width:56px;height:4px;border-radius:2px;background:var(--yellow);margin:28px auto}
+.rule{width:44px;height:4px;background:var(--ink);margin:28px auto}
 .breadcrumb{padding:104px 0 0}
 .breadcrumb ol{display:flex;flex-wrap:wrap;list-style:none;margin:0;padding:0;font-size:12.5px;letter-spacing:.01em}
 .breadcrumb li{display:flex;align-items:center;gap:8px}
@@ -60,22 +84,24 @@ img{max-width:100%;display:block}
 .breadcrumb-sep{color:rgba(51,48,43,.25)}
 @media(max-width:640px){.breadcrumb{padding-top:86px}.breadcrumb ol{font-size:11.5px}}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:16px 38px;background:var(--accent);color:#fff;font-weight:800;font-size:14.5px;letter-spacing:.04em;white-space:nowrap;border-radius:999px;box-shadow:0 5px 0 var(--accent-dark);transition:transform .18s,box-shadow .18s,background-color .25s,color .25s,border-color .25s}
-.btn:hover{transform:translateY(3px);box-shadow:0 2px 0 var(--accent-dark)}
-.btn.ghost{background:#fff;color:var(--accent);border:2px solid var(--accent);box-shadow:0 5px 0 rgba(212,63,7,.35)}
-.btn.ghost:hover{background:var(--accent);color:#fff}
-.btn.dark{background:var(--accent);color:#fff;border:none}
-.btn.pill{border-radius:999px;padding:10px 22px;font-size:12.5px;background:#fff;color:var(--accent);border:2px solid var(--accent);box-shadow:none}
-.btn.pill:hover{background:var(--accent);color:#fff;transform:translateY(-2px)}
+/* ボタンは印刷物の「押しボタン」：フラット塗り＋墨フチ＋ハードな
+   オフセット影。ホバーで影の分だけ沈み込む（押し込み）。 */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 36px;background:var(--accent);color:#fff;font-weight:800;font-size:14.5px;letter-spacing:.08em;white-space:nowrap;border:2px solid var(--ink);border-radius:0;box-shadow:4px 4px 0 var(--ink);transition:transform .15s,box-shadow .15s,background-color .2s,color .2s}
+.btn:hover{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.btn.ghost{background:#fff;color:var(--ink)}
+.btn.ghost:hover{background:var(--yellow);color:var(--ink)}
+.btn.dark{color:#fff}
+.btn.pill{padding:10px 22px;font-size:12.5px;background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.btn.pill:hover{background:var(--yellow);color:var(--ink);transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
 
-header.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);box-shadow:0 2px 14px rgba(51,48,43,.08)}
+header.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:var(--bd)}
 .navrow{height:76px;display:flex;align-items:center;justify-content:space-between}
 .navlinks{display:flex;align-items:center;gap:26px}
 .navlinks a{font-size:13px;font-weight:700;letter-spacing:.08em;color:rgba(51,48,43,.78)}
 .navlinks a:hover{color:var(--accent)}
 .logo-header{width:130px;height:36px;object-fit:contain}
 .nav-actions{display:flex;align-items:center;gap:12px}
-.nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:42px;height:42px;padding:10px;border:none;border-radius:10px;background:var(--cream);cursor:pointer}
+.nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:42px;height:42px;padding:10px;border:none;border-radius:var(--r-s);background:var(--cream);cursor:pointer}
 .nav-toggle span{display:block;height:2.5px;border-radius:2px;background:var(--accent);transition:transform .25s,opacity .2s}
 header.nav.open .nav-toggle span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
 header.nav.open .nav-toggle span:nth-child(2){opacity:0}
@@ -83,21 +109,42 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
 
 /* Hero (Pintcle-inspired): big centered logo, message beneath, and a
    full-bleed auto-scrolling strip of real event visuals below. */
-.hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#fffdf8 0%,#fdf2e2 100%);padding-bottom:64px}
-.hero-overlay{position:absolute;inset:0;background-image:radial-gradient(rgba(244,88,28,.08) 2.5px,transparent 2.5px);background-size:34px 34px;opacity:.5}
+.hero{position:relative;overflow:hidden;padding-bottom:64px}
+/* RIDDLER型の透かし：巨大なアウトライン文字を地に沈める。 */
+.hero::before{content:'EX LABS';position:absolute;top:110px;left:50%;transform:translateX(-50%);font-family:'Archivo Black',sans-serif;font-size:clamp(96px,16vw,220px);letter-spacing:.02em;line-height:1;color:transparent;-webkit-text-stroke:2px rgba(51,48,43,.08);pointer-events:none;white-space:nowrap;z-index:1}
+/* ドット網点は生成テンプレの装飾なので出さない（要素は残す）。 */
+.hero-overlay{display:none}
 .hero-center{position:relative;z-index:2;text-align:center;padding-top:150px;padding-bottom:64px}
-.hero-logo{width:min(400px,64vw);height:auto;margin:0 auto 40px;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) both}
-.hero-title{font-size:clamp(20px,2.5vw,32px);line-height:1.6;letter-spacing:.06em;font-weight:800;margin:0 0 22px;color:var(--accent);animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .18s both}
+.hero-logo{width:min(400px,64vw);height:auto;margin:0 auto 40px;animation:hero-in .9s cubic-bezier(.22,1,.36,1) both}
+.hero-title{font-size:clamp(20px,2.5vw,32px);line-height:1.6;letter-spacing:.06em;font-weight:800;margin:0 0 22px;color:var(--accent);animation:hero-in .9s cubic-bezier(.22,1,.36,1) .18s both}
 /* Headline lines sit on orange blocks, white type — richer than bare
    text on the ground. */
-.hero-title .hl{display:inline-block;background:linear-gradient(180deg,#f4581c 0%,#e04a0f 100%);color:#fff;padding:9px 26px;margin:5px 0;border-radius:10px;box-shadow:0 10px 26px rgba(244,88,28,.35)}
-.hero-sub{font-family:'Shippori Mincho',serif;font-size:13px;letter-spacing:.22em;color:rgba(51,48,43,.55);margin:0 0 36px;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .3s both}
-.hero-actions{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;animation:hero-in .9s cubic-bezier(.34,1.4,.64,1) .42s both}
-/* Full-width works marquee */
-.hero-works{position:relative;z-index:2;overflow:hidden;animation:fade-in 1.2s ease .5s both}
-.hero-works-track{display:flex;align-items:center;gap:14px;width:max-content;animation:marquee-works 55s linear infinite}
-.hero-works-track img{height:250px;width:auto;border-radius:10px;flex:none}
-@keyframes marquee-works{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 7px))}}
+.hero-title .hl{display:inline-block;background:var(--accent);color:#fff;padding:9px 26px;margin:6px 0;border:2px solid var(--ink);box-shadow:5px 5px 0 var(--ink)}
+.hero-sub{font-family:'Shippori Mincho',serif;font-size:13px;letter-spacing:.22em;color:rgba(51,48,43,.55);margin:0 0 36px;animation:hero-in .9s cubic-bezier(.22,1,.36,1) .3s both}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;animation:hero-in .9s cubic-bezier(.22,1,.36,1) .42s both}
+/* 実績の看板数字（累計体験者数）。白箱＋墨フチ＋ハード影の
+   印刷物スタイル。エントランスアニメは付けない。 */
+.hero-stat{display:inline-flex;align-items:center;gap:18px;margin-top:30px;background:#fff;border:var(--bd);box-shadow:5px 5px 0 var(--ink);padding:12px 28px}
+.hero-stat-label{font-size:12.5px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;line-height:1.6}
+.hero-stat-num{font-family:'Archivo Black','Noto Sans JP',sans-serif;font-size:34px;line-height:1;color:var(--accent);letter-spacing:.01em}
+.hero-stat-unit{font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:800;color:var(--ink);margin-left:4px}
+/* Full-width works marquee.
+   NOTE: no entrance fade here on purpose. An `animation:fade-in …both`
+   starts the strip at opacity:0 and, if the animation never advances
+   (iOS Safari bfcache "back" restores, throttled/again-loaded tabs),
+   the key visual gets stuck invisible. The strip's own horizontal
+   scroll is enough motion, and this way it is always painted. */
+.hero-works{position:relative;z-index:2;overflow:hidden}
+/* Seamless marquee: spacing lives on each image as margin-right (not a
+   track gap) so the total width divides evenly across the duplicated
+   copies — this makes translateX(-50%) land exactly on a copy boundary
+   with no half-gap seam. The image list is duplicated enough times
+   (see HeroWorksMarquee.astro) that one -50% copy is always wider than
+   the viewport, so the strip never runs out and "cuts off" mid-loop on
+   wide screens. */
+.hero-works-track{display:flex;align-items:center;width:max-content;animation:marquee-works 55s linear infinite}
+.hero-works-track img{height:250px;width:auto;border-radius:var(--r-s);flex:none;margin-right:14px}
+@keyframes marquee-works{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .scrollcue{display:none}
 @keyframes scroll-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
 @keyframes float-slow{0%,100%{transform:translateY(0)}50%{transform:translateY(-24px)}}
@@ -105,8 +152,11 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
 
 /* About */
 .about-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:64px;align-items:center}
-.about-label{margin:36px 0 0;font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:10px;letter-spacing:.04em}
-.about-label::before{content:'';width:20px;height:4px;border-radius:2px;background:var(--accent)}
+/* 会社紹介のリード：地の文ではなく「宣言」。キーワードには黄色の
+   マーカー線（蛍光ペン風、文字の下側だけ塗る）を敷く。 */
+.about-lead{font-size:clamp(19px,2.2vw,25px);font-weight:800;line-height:2;letter-spacing:.04em;color:var(--ink);margin:0;text-wrap:balance}
+.about-lead mark{background:linear-gradient(transparent 62%,var(--yellow) 62%);color:inherit}
+.about-label{margin:36px 0 0;font-size:15px;font-weight:800;color:var(--ink);letter-spacing:.04em}
 .about-label+.about-points{margin-top:16px}
 
 
@@ -128,10 +178,10 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
   .preloader{display:none}
 }
 
-@keyframes hero-in{from{opacity:0;transform:translateY(26px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes hero-in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @keyframes fade-in{from{opacity:0}to{opacity:1}}
-.hero-eyebrow{animation:hero-in .8s cubic-bezier(.34,1.4,.64,1) both}
-.hero-actions{animation:hero-in .8s cubic-bezier(.34,1.4,.64,1) .4s both}
+.hero-eyebrow{animation:hero-in .8s cubic-bezier(.22,1,.36,1) both}
+.hero-actions{animation:hero-in .8s cubic-bezier(.22,1,.36,1) .4s both}
 
 /* Sitewide scroll-reveal: a tiny inline script in BaseLayout.astro adds
    .is-visible to each <section class="section"> as it enters the
@@ -144,7 +194,7 @@ section.section.is-visible{opacity:1;transform:none}
    without it, word-break:auto-phrase turns long phrases into a hard
    minimum width and blows the grid past the viewport on phones. */
 [class$="-grid"]>*{min-width:0}
-[class$="-grid"]>*,.faq-list>*,.stat-row>*,.flow-row>*{opacity:0;transform:translateY(22px) scale(.95);transition:opacity .65s cubic-bezier(.34,1.45,.64,1),transform .65s cubic-bezier(.34,1.45,.64,1)}
+[class$="-grid"]>*,.faq-list>*,.stat-row>*,.flow-row>*{opacity:0;transform:translateY(16px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1)}
 section.section.is-visible [class$="-grid"]>*,
 section.section.is-visible .faq-list>*,
 section.section.is-visible .stat-row>*,
@@ -168,14 +218,25 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
   section.section,[class$="-grid"]>*,.faq-list>*,.stat-row>*,.flow-row>*{opacity:1;transform:none;transition:none}
 }
 
-.tinted{background-color:var(--cream);background-image:radial-gradient(rgba(244,88,28,.06) 2px,transparent 2px);background-size:28px 28px}
+.tinted{background-color:#edeae1;background-image:linear-gradient(rgba(51,48,43,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(51,48,43,.05) 1px,transparent 1px);background-size:28px 28px}
+/* Hairline edge on white cards: shadow-only edges read slightly soft
+   on the cream grounds — the 1px line keeps each block crisp without
+   moving the layout. Kept early in the file so per-card border-top
+   accents declared later (e.g. .svc-card) still win on their side. */
+.str-card,.work-card,.press-item,.event-card,.blog-card,.faq-item,.info-grid,.bullets li,.about-points li,.style-col.them,.style-col.us,.svc-card,.cta-mini,.voice-card{border:var(--bd)}
 .bullets{list-style:none;margin:24px auto 0;padding:0;display:flex;flex-direction:column;gap:12px;max-width:680px;counter-reset:bl}
-.bullets li{display:flex;gap:14px;font-size:15px;line-height:1.7;color:rgba(51,48,43,.85);background:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 3px 12px rgba(51,48,43,.06)}
-.bullets li::before{counter-increment:bl;content:counter(bl);flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:0;box-shadow:0 2px 0 rgba(51,48,43,.15)}
+/* The number badge is absolutely positioned, NOT a flex sibling: with
+   display:flex, any inline <strong> in the li became its own flex item
+   and split the sentence into skinny side-by-side columns. Block flow
+   keeps mixed inline markup on one line. overflow-wrap:anywhere is a
+   last-resort break for auto-phrase misjudging latin＋ダッシュ runs as
+   one unbreakable segment. */
+.bullets li{position:relative;font-size:15px;line-height:1.7;color:rgba(51,48,43,.85);background:#fff;border-radius:var(--r-m);padding:16px 20px 16px 60px;box-shadow:var(--shadow-1);overflow-wrap:anywhere}
+.bullets li::before{counter-increment:bl;content:counter(bl);position:absolute;left:20px;top:16px;width:26px;height:26px;border-radius:3px;background:var(--accent);color:#fff;font-size:13.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
 .vc-line{margin:36px auto 0;font-size:13px;color:rgba(51,48,43,.55);border-top:2px dotted rgba(51,48,43,.18);padding-top:20px;max-width:680px;text-align:center}
 
 .str-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}
-.str-card{background:#fff;border-radius:22px;padding:44px;box-shadow:0 8px 28px rgba(51,48,43,.08);transition:box-shadow .3s,transform .3s;position:relative}
+.str-card{background:#fff;border-radius:var(--r-l);padding:44px;box-shadow:var(--shadow-1);transition:box-shadow .3s,transform .3s;position:relative}
 /* Homepage strength section alternates 2 fixed colors; LP feature
    sections instead carry a single theme via .str-grid.tag-* so both
    cards on a given LP match that page's own accent. */
@@ -189,55 +250,100 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 .str-grid.tag-zunou .feature-points li::before{background:var(--tag-zunou)}
 .str-grid.tag-shisetsu .str-num{background:var(--tag-shisetsu)}
 .str-grid.tag-shisetsu .feature-points li::before{background:var(--tag-shisetsu)}
-.str-card:hover{box-shadow:0 20px 44px rgba(51,48,43,.14);transform:translateY(-6px) rotate(-.3deg)}
-.str-num{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;background:var(--accent);font-family:'Noto Sans JP',sans-serif;font-size:16px;color:#fff;font-weight:800;margin:0 0 20px;box-shadow:0 3px 0 rgba(51,48,43,.12)}
+.str-grid.tag-immersive .str-num{background:var(--tag-immersive)}
+.str-grid.tag-immersive .feature-points li::before{background:var(--tag-immersive)}
+.str-card:hover{box-shadow:var(--shadow-2);transform:translate(-2px,-2px)}
+.str-num{display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:3px;background:var(--accent);font-family:'Noto Sans JP',sans-serif;font-size:16px;color:#fff;font-weight:800;margin:0 0 20px}
 .str-title{font-size:22px;font-weight:800;margin:0 0 16px}
 .str-lead{font-size:15.5px;font-weight:700;line-height:1.6;color:var(--ink);margin:0 0 14px}
 .str-body{font-size:14.5px;line-height:1.9;color:rgba(51,48,43,.75)}
 .feature-points{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px;counter-reset:fp}
 .feature-points li{display:flex;gap:11px;align-items:flex-start;font-size:13.5px;line-height:1.7;color:rgba(51,48,43,.75)}
-.feature-points li::before{counter-increment:fp;content:counter(fp);flex:none;width:21px;height:21px;border-radius:50%;background:var(--accent);color:#fff;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.feature-points li::before{counter-increment:fp;content:counter(fp);flex:none;width:21px;height:21px;border-radius:3px;background:var(--accent);color:#fff;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.stat{border:var(--bd)}
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
-.chip{font-size:12.5px;font-weight:700;padding:8px 18px;background:var(--cream);border-radius:999px;color:rgba(51,48,43,.75)}
+.chip{font-size:12.5px;font-weight:700;padding:8px 18px;background:var(--cream);border-radius:0;color:rgba(51,48,43,.75)}
+
+/* 成果報酬型ビジネスモデルの図。番号付きステップカード＋結論バナー
+   の構成 — 誰が・何を・どう回収するかを1カード1メッセージで示す。 */
+.bizmodel-label{margin:72px 0 34px;font-size:15px;font-weight:800;letter-spacing:.04em;color:var(--ink);text-align:center}
+.biz-flow{display:flex;align-items:stretch;justify-content:center;gap:10px;max-width:1040px;margin:0 auto}
+.biz-step{flex:1 1 0;min-width:0;background:#fff;border:var(--hairline);border-radius:var(--r-m);padding:26px 18px 24px;text-align:center;box-shadow:var(--shadow-1)}
+.biz-no{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:3px;background:var(--accent);color:#fff;font-weight:800;font-size:13.5px;margin-bottom:14px}
+.biz-t{margin:0 0 8px;font-size:15.5px;font-weight:800;color:var(--ink);line-height:1.5}
+.biz-d{margin:0;font-size:12px;line-height:1.75;color:rgba(51,48,43,.65);font-weight:500}
+.biz-d b{color:var(--accent);font-weight:800}
+/* ex Labs のカードだけ塗りにして「弊社が担う範囲」を主役化 */
+.biz-step.is-ex{background:var(--accent);border-color:var(--accent-dark);box-shadow:var(--shadow-1)}
+.biz-step.is-ex .biz-no{background:#fff;color:var(--accent)}
+.biz-step.is-ex .biz-t{color:#fff;font-size:18px;letter-spacing:.03em}
+.biz-step.is-ex .biz-d{color:rgba(255,255,255,.92)}
+.biz-arrow{align-self:center;color:var(--accent);font-size:20px;font-weight:800;flex:none}
+.biz-punch{max-width:620px;margin:40px auto 0;background:var(--ink);color:#fff;border-radius:var(--r-l);padding:30px 32px;text-align:center;box-shadow:var(--shadow-2)}
+.biz-punch-t{margin:0 0 10px;font-size:21px;letter-spacing:.05em;position:relative;z-index:1}
+.biz-punch-t b{color:var(--yellow)}
+.biz-punch-d{margin:0;font-size:13.5px;line-height:1.9;color:rgba(255,255,255,.85);position:relative;z-index:1}
+.biz-punch-d strong{color:var(--yellow)}
+/* スマホでは縦積みせず、横スワイプのステップカルーセルに */
+@media(max-width:860px){
+  .bizmodel-label{margin-top:56px}
+  .biz-flow{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;gap:8px;margin:0 -22px;padding:4px 22px 16px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .biz-flow::-webkit-scrollbar{display:none}
+  .biz-step{flex:0 0 62%;scroll-snap-align:center}
+  .biz-punch{margin-top:26px;padding:24px 22px}
+  .biz-punch-t{font-size:17.5px}
+  .biz-punch-d{font-size:12.5px}
+}
 
 .about-points{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:28px 0 0;padding:0;list-style:none;counter-reset:ap}
-.about-points li{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:16px;box-shadow:0 4px 16px rgba(51,48,43,.07);padding:20px 22px;font-size:13.5px;line-height:1.6;color:rgba(51,48,43,.8);font-weight:500}
-.about-points li::before{counter-increment:ap;content:counter(ap);flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:0;box-shadow:0 2px 0 rgba(51,48,43,.15)}
+.about-points li{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:var(--r-m);box-shadow:var(--shadow-1);padding:20px 22px;font-size:13.5px;line-height:1.6;color:rgba(51,48,43,.8);font-weight:500}
+.about-points li::before{counter-increment:ap;content:counter(ap);flex:none;width:24px;height:24px;border-radius:3px;background:var(--accent);color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:0}
 
 .style-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-.style-col{padding:44px;border-radius:22px}
-.style-col.them{background:#fff;box-shadow:0 8px 28px rgba(51,48,43,.08)}
-.style-col.us{background:var(--accent);color:#fff;box-shadow:0 12px 36px rgba(244,88,28,.35)}
+.style-col{padding:44px;border-radius:var(--r-l)}
+.style-col.them{background:#fff;box-shadow:var(--shadow-1)}
+.style-col.us{background:var(--accent);color:#fff;box-shadow:var(--shadow-1)}
 .style-h{font-size:15px;font-weight:800;letter-spacing:.06em;margin:0 0 22px;text-align:center}
 .style-col.us .style-h{color:var(--yellow)}
 .style-row{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.7;padding:10px 0;border-top:1px dashed rgba(51,48,43,.15)}
 .style-col.us .style-row{border-top:1px dashed rgba(255,255,255,.3)}
 .style-note{margin-top:28px;font-size:13px;line-height:1.8;color:rgba(255,255,255,.85)}
-.mark{width:20px;height:20px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-top:3px}
+.mark{width:20px;height:20px;border-radius:3px;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-top:3px}
 .mark.ok{background:var(--yellow);color:var(--ink)}
 .mark.ok-muted{background:rgba(51,48,43,.12);color:rgba(51,48,43,.6)}
 .mark.no{background:rgba(51,48,43,.08);color:rgba(51,48,43,.35)}
 
-.works-head{display:flex;justify-content:center;align-items:flex-end;margin-bottom:56px;text-align:center}
+.works-head{display:flex;justify-content:flex-start;align-items:flex-end;margin-bottom:56px;text-align:left}
 .works-grid{display:grid;gap:32px;grid-template-columns:repeat(3,1fr)}
-.work-card{display:flex;flex-direction:column;background:#fff;border-radius:20px;padding:18px 18px 26px;box-shadow:0 6px 22px rgba(51,48,43,.08);transition:transform .3s,box-shadow .3s}
-.work-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(51,48,43,.14)}
+.work-card{display:flex;flex-direction:column;background:#fff;border-radius:var(--r-l);padding:18px 18px 26px;box-shadow:var(--shadow-1);transition:transform .3s,box-shadow .3s}
+.work-card:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-2)}
 /* height:auto so width/height HTML attributes (kept for CLS) never win
    over the responsive layout. */
-.work-img{width:100%;height:auto;aspect-ratio:4/5;border-radius:14px;background:var(--cream);padding:14px;object-fit:contain}
-.work-tag{font-size:11px;font-weight:800;color:#fff;background:var(--accent);letter-spacing:.04em;margin:18px 0 10px;align-self:flex-start;padding:5px 14px;border-radius:999px}
+.work-img{width:100%;height:auto;aspect-ratio:4/5;border-radius:var(--r-m);background:var(--cream);padding:14px;object-fit:contain;transition:transform .4s cubic-bezier(.22,1,.36,1)}
+.work-card:hover .work-img{transform:scale(1.035)}
+.work-tag{font-size:11px;font-weight:800;color:#fff;background:var(--accent);letter-spacing:.04em;margin:18px 0 10px;align-self:flex-start;padding:5px 14px;border-radius:0}
 .work-card.tag-nazotoki .work-tag{background:var(--tag-nazotoki)}
 .work-card.tag-murder .work-tag{background:var(--tag-murder)}
 .work-card.tag-zunou .work-tag{background:var(--tag-zunou)}
 .work-card.tag-shisetsu .work-tag{background:var(--tag-shisetsu)}
+.work-card.tag-immersive .work-tag{background:var(--tag-immersive)}
 .work-name{font-size:19px;font-weight:800;margin:0 0 4px}
 .work-sub{font-size:13.5px;color:rgba(51,48,43,.55);margin:0 0 10px;font-weight:500}
 .work-desc{font-size:14px;line-height:1.75;color:rgba(51,48,43,.72)}
+/* 過去コンテンツのネタバレ導線ボックス (WORKS セクション末尾)。/game/ へ遷移する。 */
+.game-box{margin-top:44px;display:flex;align-items:center;justify-content:space-between;gap:24px;background:var(--ink);color:#fff;border-radius:var(--r-l);padding:30px 34px;box-shadow:var(--shadow-1);transition:transform .3s,box-shadow .3s}
+.game-box:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-2)}
+.game-box-eyebrow{font-size:11px;font-weight:800;letter-spacing:.22em;color:var(--accent);margin:0 0 9px}
+.game-box-title{font-size:22px;font-weight:800;margin:0;color:#fff}
+.game-box-desc{font-size:13.5px;line-height:1.7;color:rgba(255,255,255,.72);margin:9px 0 0}
+.game-box-arrow{flex-shrink:0;width:48px;height:48px;border-radius:0;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;transition:transform .25s}
+.game-box:hover .game-box-arrow{transform:translateX(4px)}
+@media(max-width:600px){.game-box{padding:22px 22px 24px;gap:16px}.game-box-title{font-size:18px}.game-box-desc{font-size:12.5px}.game-box-arrow{width:42px;height:42px;font-size:18px}}
 
 .event-row{display:flex;gap:32px;justify-content:center;align-items:flex-start}
-.event-card{flex:0 0 300px;display:flex;flex-direction:column;gap:14px;background:#fff;border-radius:18px;padding:14px 14px 20px;box-shadow:0 6px 22px rgba(51,48,43,.09);transition:transform .25s,box-shadow .25s}
-.event-card img{width:100%;height:auto;border-radius:12px}
-.event-card:hover{transform:translateY(-6px) rotate(-.4deg);box-shadow:0 18px 40px rgba(51,48,43,.16)}
+.event-card{flex:0 0 300px;display:flex;flex-direction:column;gap:14px;background:#fff;border-radius:var(--r-m);padding:14px 14px 20px;box-shadow:var(--shadow-1);transition:transform .25s,box-shadow .25s}
+.event-card img{width:100%;height:auto;border-radius:var(--r-s)}
+.event-card:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-2)}
 .event-name{display:flex;flex-direction:column;gap:4px;font-size:15.5px;font-weight:800;color:var(--ink);padding:0 6px}
 .event-host{font-size:12px;font-weight:700;color:var(--accent)}
 .event-desc{display:block;margin-top:-2px;padding:0 6px;font-size:12.5px;line-height:1.8;font-weight:500;color:rgba(51,48,43,.72)}
@@ -248,10 +354,12 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 }
 
 .press-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
-.press-item{display:flex;align-items:center;gap:20px;background:#fff;border-radius:16px;padding:24px 28px;box-shadow:0 5px 18px rgba(51,48,43,.07);transition:transform .25s,box-shadow .25s}
-.press-item:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(51,48,43,.13)}
-.press-date{flex:none;font-size:12px;font-weight:800;color:#fff;background:var(--accent);padding:5px 14px;border-radius:999px;letter-spacing:.04em}
-.press-title{font-size:15px;font-weight:700;line-height:1.7;color:var(--ink)}
+.press-item{display:flex;align-items:center;gap:20px;background:#fff;border-radius:var(--r-m);padding:24px 28px;box-shadow:var(--shadow-1);transition:transform .25s,box-shadow .25s}
+.press-item:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-2)}
+.press-date{flex:none;font-size:12px;font-weight:800;color:#fff;background:var(--accent);padding:5px 14px;border-radius:0;letter-spacing:.04em}
+/* 各リリースのタイトルは h2（見出し階層を h1→h2 で通すため）。既定の
+   マージンが出ないようリセットして従来の行レイアウトを保つ。 */
+.press-title{margin:0;font-size:15px;font-weight:700;line-height:1.7;color:var(--ink)}
 .press-src{flex:none;margin-left:auto;font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap}
 @media(max-width:640px){
   .press-item{flex-wrap:wrap;gap:10px 12px;padding:18px 20px}
@@ -260,44 +368,45 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 }
 
 .blog-grid{display:grid;gap:32px;grid-template-columns:repeat(3,1fr)}
-.blog-card{display:flex;flex-direction:column;background:#fff;border-radius:20px;padding:16px 16px 24px;box-shadow:0 6px 22px rgba(51,48,43,.08);transition:transform .3s,box-shadow .3s}
-.blog-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(51,48,43,.14)}
-.blog-img{width:100%;aspect-ratio:16/9;border-radius:14px;background:var(--cream);object-fit:cover;transition:opacity .25s}
+.blog-card{display:flex;flex-direction:column;background:#fff;border-radius:var(--r-l);padding:16px 16px 24px;box-shadow:var(--shadow-1);transition:transform .3s,box-shadow .3s}
+.blog-card:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-2)}
+.blog-img{width:100%;aspect-ratio:16/9;border-radius:var(--r-m);background:var(--cream);object-fit:cover;transition:opacity .25s}
 a:hover>.blog-img{opacity:.88}
-.blog-date{font-size:11px;font-weight:800;color:#fff;background:var(--accent);letter-spacing:.04em;margin:16px 0 10px;align-self:flex-start;padding:4px 12px;border-radius:999px}
+.blog-date{font-size:11px;font-weight:800;color:#fff;background:var(--accent);letter-spacing:.04em;margin:16px 0 10px;align-self:flex-start;padding:4px 12px;border-radius:0}
 .blog-title{font-size:18px;font-weight:800;margin:0 0 8px}
 .blog-title a:hover{color:var(--accent)}
 .blog-excerpt{font-size:14px;line-height:1.75;color:rgba(51,48,43,.72)}
 .blog-empty{font-size:15px;line-height:1.9;color:rgba(51,48,43,.6);padding:20px 0 40px;text-align:center}
 .blog-pagination{display:flex;justify-content:center;gap:16px;margin-top:56px}
-.blog-pagination a,.blog-pagination span{padding:10px 24px;border:2px solid var(--accent);color:var(--accent);border-radius:999px;font-size:13px;font-weight:700;transition:background-color .2s,color .2s}
-.blog-pagination a:hover{background:var(--accent);color:#fff}
+.blog-pagination a,.blog-pagination span{padding:10px 24px;border:2px solid var(--ink);color:var(--ink);background:#fff;border-radius:0;font-size:13px;font-weight:700;transition:background-color .2s,color .2s}
+.blog-pagination a:hover{background:var(--ink);color:#fff}
 .blog-pagination span{border-color:rgba(51,48,43,.2);color:rgba(51,48,43,.6)}
 .blog-pagination .disabled{opacity:.35;pointer-events:none}
 
-.article-hero{width:100%;aspect-ratio:16/9;border-radius:18px;background:var(--cream);padding:14px;object-fit:contain;margin-bottom:40px}
+.article-hero{width:100%;aspect-ratio:16/9;border-radius:var(--r-m);background:var(--cream);padding:14px;object-fit:contain;margin-bottom:40px}
 .article-date{font-size:13px;color:rgba(51,48,43,.5);margin:0 0 12px}
 .article-body{font-size:15.5px;line-height:2;color:rgba(51,48,43,.82);max-width:760px}
-.article-body img{max-width:100%;height:auto;border-radius:14px;margin:24px 0}
+.article-body img{max-width:100%;height:auto;border-radius:var(--r-m);margin:24px 0}
 .article-body p{margin:0 0 20px}
-.article-body h2{font-size:24px;font-weight:800;margin:40px 0 16px;padding-left:14px;border-left:5px solid var(--accent);border-radius:2px}
+.article-body h2{font-size:24px;font-weight:800;margin:40px 0 16px;padding-left:14px;border-left:3px solid var(--accent)}
 .article-body h3{font-size:19px;font-weight:800;margin:32px 0 12px}
-.article-back{display:inline-flex;margin-top:48px;font-size:13px;font-weight:700;color:var(--accent);border:2px solid var(--accent);border-radius:999px;padding:10px 24px;transition:background-color .2s,color .2s}
-.article-back:hover{background:var(--accent);color:#fff}
+.article-back{display:inline-flex;margin-top:48px;font-size:13px;font-weight:700;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:0;padding:10px 24px;transition:background-color .2s,color .2s}
+.article-back:hover{background:var(--ink);color:#fff}
 
-.mm-poster{width:100%;border-radius:12px;display:block}
+.mm-poster{width:100%;border-radius:var(--r-m);display:block}
 
 .svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
-.svc-card{background:#fff;border-radius:20px;border-top:6px solid var(--accent);padding:34px 28px;display:flex;flex-direction:column;box-shadow:0 6px 22px rgba(51,48,43,.08);transition:box-shadow .3s,transform .3s}
+.svc-card{background:#fff;border-radius:var(--r-l);border-top:3px solid var(--accent);padding:34px 28px;display:flex;flex-direction:column;box-shadow:var(--shadow-1);transition:box-shadow .3s,transform .3s}
 .svc-card.tag-nazotoki{border-top-color:var(--tag-nazotoki)}
 .svc-card.tag-murder{border-top-color:var(--tag-murder)}
 .svc-card.tag-zunou{border-top-color:var(--tag-zunou)}
 .svc-card.tag-shisetsu{border-top-color:var(--tag-shisetsu)}
-.svc-card:hover{box-shadow:0 18px 40px rgba(51,48,43,.15);transform:translateY(-6px)}
+.svc-card.tag-immersive{border-top-color:var(--tag-immersive)}
+.svc-card:hover{box-shadow:var(--shadow-2);transform:translate(-2px,-2px)}
 .svc-title{font-size:19px;font-weight:800;margin:0 0 12px}
 .svc-desc{font-size:14px;line-height:1.8;color:rgba(51,48,43,.72);margin:0}
-.svc-link{margin-top:24px;align-self:flex-start;display:inline-flex;align-items:center;white-space:nowrap;padding:9px 22px;border-radius:999px;border:2px solid var(--accent);color:var(--accent);font-weight:800;font-size:12.5px;transition:background-color .25s,color .25s,transform .2s}
-.svc-link:hover{background:var(--accent);color:#fff;transform:translateY(-2px)}
+.svc-link{margin-top:24px;align-self:flex-start;display:inline-flex;align-items:center;white-space:nowrap;padding:9px 22px;border-radius:0;border:2px solid var(--accent);color:var(--accent);font-weight:800;font-size:12.5px;transition:background-color .25s,color .25s}
+.svc-link:hover{background:var(--accent);color:#fff}
 .svc-card.tag-nazotoki .svc-link{border-color:var(--tag-nazotoki);color:var(--tag-nazotoki)}
 .svc-card.tag-nazotoki .svc-link:hover{background:var(--tag-nazotoki);color:#fff}
 .svc-card.tag-murder .svc-link{border-color:var(--tag-murder);color:var(--tag-murder)}
@@ -306,44 +415,78 @@ a:hover>.blog-img{opacity:.88}
 .svc-card.tag-zunou .svc-link:hover{background:var(--tag-zunou);color:#fff}
 .svc-card.tag-shisetsu .svc-link{border-color:var(--tag-shisetsu);color:var(--tag-shisetsu)}
 .svc-card.tag-shisetsu .svc-link:hover{background:var(--tag-shisetsu);color:#fff}
+.svc-card.tag-immersive .svc-link{border-color:var(--tag-immersive);color:var(--tag-immersive)}
+.svc-card.tag-immersive .svc-link:hover{background:var(--tag-immersive);color:#fff}
 
 .faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
-.faq-item{background:#fff;border-radius:18px;padding:26px 30px;box-shadow:0 5px 18px rgba(51,48,43,.07)}
+.faq-item{background:#fff;border-radius:var(--r-m);padding:26px 30px;box-shadow:var(--shadow-1)}
 .faq-q{font-size:16px;font-weight:800;margin:0 0 14px;display:flex;gap:14px;align-items:flex-start}
-.faq-q::before{content:'Q';color:#fff;background:var(--accent);font-family:'Noto Sans JP',sans-serif;font-weight:800;flex:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;margin-top:0}
+.faq-q::before{content:'Q';color:#fff;background:var(--accent);font-family:'Noto Sans JP',sans-serif;font-weight:800;flex:none;width:28px;height:28px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:14px;margin-top:0}
 .faq-a{font-size:14.5px;line-height:1.9;color:rgba(51,48,43,.78);margin:0;display:flex;gap:14px;align-items:flex-start}
-.faq-a::before{content:'A';color:var(--ink);background:var(--yellow);font-family:'Noto Sans JP',sans-serif;font-weight:800;flex:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px}
+.faq-a::before{content:'A';color:var(--ink);background:var(--yellow);font-family:'Noto Sans JP',sans-serif;font-weight:800;flex:none;width:28px;height:28px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:14px}
 .faq-list.tag-nazotoki .faq-q::before{background:var(--tag-nazotoki)}
 .faq-list.tag-murder .faq-q::before{background:var(--tag-murder)}
 .faq-list.tag-zunou .faq-q::before{background:var(--tag-zunou)}
 .faq-list.tag-shisetsu .faq-q::before{background:var(--tag-shisetsu)}
+.faq-list.tag-immersive .faq-q::before{background:var(--tag-immersive)}
 
-.cta-mini{background:var(--accent);color:#fff;padding:60px 44px;text-align:center;border-radius:26px;box-shadow:0 16px 40px rgba(244,88,28,.3)}
+.cta-mini{background:var(--accent);color:#fff;padding:60px 44px;text-align:center;border-radius:var(--r-l)}
 .cta-mini-title{font-size:24px;font-weight:800;margin:0 0 26px}
-.cta-mini-title::before{content:'＼';color:var(--yellow);margin-right:14px;font-weight:800}
-.cta-mini-title::after{content:'／';color:var(--yellow);margin-left:14px;font-weight:800}
-.cta-mini .btn{background:#fff;color:var(--accent);box-shadow:0 5px 0 rgba(0,0,0,.15)}
+.cta-mini .btn{background:#fff;color:var(--accent)}
 .cta-mini .btn:hover{background:var(--yellow);color:var(--ink)}
 
 .marquee-block{margin-top:56px}
 .marquee-label{font-size:12px;letter-spacing:.18em;font-weight:800;color:rgba(51,48,43,.5);margin:0 0 20px;text-align:center}
+/* Official label-site links shown under the partner marquee */
+.label-links{margin-top:44px}
+.label-links .marquee-label{margin-bottom:16px}
+/* 6レーベルあるので3列×2段。4列にすると最終行が2枚だけ残って崩れる。 */
+.label-links-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1080px;margin:0 auto}
+@media(max-width:900px){.label-links-row{grid-template-columns:1fr 1fr}}
+.label-link{display:flex;align-items:center;gap:14px;background:#fff;border:var(--hairline);border-radius:var(--r-m);padding:18px 22px;box-shadow:var(--shadow-1);transition:transform .25s,box-shadow .25s,border-color .25s}
+.label-link:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-2);border-color:rgba(244,88,28,.45)}
+.label-link-body{flex:1;min-width:0}
+.label-link-cat{display:block;font-size:11px;font-weight:800;color:var(--accent);letter-spacing:.06em;margin-bottom:5px}
+.label-link-name{display:block;font-size:15px;font-weight:800;color:var(--ink);line-height:1.5}
+.label-link-arrow{flex:none;width:34px;height:34px;border-radius:0;border:2px solid var(--ink);color:var(--ink);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;transition:background-color .25s,color .25s}
+.label-link:hover .label-link-arrow{background:var(--accent);color:#fff}
+@media(max-width:640px){
+  .label-links{margin-top:36px}
+  .label-links-row{grid-template-columns:1fr;gap:12px}
+  .label-link{padding:16px 18px}
+  .label-link-name{font-size:14px}
+}
 /* Edge fade uses gradient overlays instead of mask-image: iOS Safari
    can fail to paint masked content that is also being animated. */
 .marquee{overflow:hidden;position:relative}
 .marquee::before,.marquee::after{content:'';position:absolute;top:0;bottom:0;width:56px;z-index:2;pointer-events:none}
-.marquee::before{left:0;background:linear-gradient(90deg,#fffdf8,rgba(255,253,248,0))}
-.marquee::after{right:0;background:linear-gradient(270deg,#fffdf8,rgba(255,253,248,0))}
+.marquee::before{left:0;background:linear-gradient(90deg,var(--paper),rgba(244,242,236,0))}
+.marquee::after{right:0;background:linear-gradient(270deg,var(--paper),rgba(244,242,236,0))}
 .marquee-track{display:flex;align-items:center;gap:72px;width:max-content;animation:marquee 30s linear infinite}
 .marquee-track>*{flex:none}
+/* Fewer logos means a shorter loop distance; a matching shorter
+   duration keeps the px/s speed the same as the 展開団体 marquee
+   instead of crawling slower over less distance. */
+.marquee-track.partners-track{animation-duration:33.66s}
+/* 取引先マーキー2段目：同じキーフレームを逆再生して右方向に流す。
+   コンテンツを複製しているので逆再生でも継ぎ目なくループする。 */
+.marquee-track.rev{animation-direction:reverse}
+.marquee-row2{margin-top:22px}
+@media(max-width:640px){.marquee-row2{margin-top:16px}}
 .marquee-name{font-size:20px;font-weight:700;color:rgba(51,48,43,.55);white-space:nowrap}
-.marquee-logo{height:44px;width:auto;mix-blend-mode:multiply;opacity:.85}
+/* No mix-blend-mode: blending an element that lives inside a
+   transform-animated track makes the browser intermittently fail to
+   composite it, so logos would vanish at random (esp. iOS Safari). All
+   logos are transparent PNG/WebP, so they sit cleanly on the ground
+   without any blend trick. */
+.marquee-logo{height:44px;width:auto;opacity:.9}
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 36px))}}
 @media (prefers-reduced-motion: reduce){.marquee-track{animation:none}}
 
 .voice-marquee{overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
 .voice-track{display:flex;align-items:flex-start;gap:28px;width:max-content;animation:marquee-voice 18s linear infinite}
 .voice-track:hover{animation-play-state:paused}
-.voice-card{flex:none;height:340px;width:auto;border-radius:16px;box-shadow:0 14px 34px rgba(51,48,43,.16)}
+.voice-card{flex:none;height:340px;width:auto;border-radius:var(--r-m);box-shadow:var(--shadow-2)}
 @keyframes marquee-voice{from{transform:translateX(0)}to{transform:translateX(calc(-50% - 14px))}}
 @media (prefers-reduced-motion: reduce){.voice-track{animation:none}}
 @media(max-width:640px){.voice-card{height:220px}}
@@ -352,67 +495,71 @@ a:hover>.blog-img{opacity:.88}
 .foot-links a{font-size:12.5px;letter-spacing:.04em;color:rgba(255,255,255,.6)}
 .foot-links a:hover{color:var(--yellow)}
 
-.perf{background:var(--accent);color:#fff;position:relative;overflow:hidden;border-radius:44px 44px 0 0}
-.perf::before{content:'';position:absolute;width:420px;height:420px;border-radius:50%;background:rgba(255,255,255,.06);top:-160px;right:-120px}
-.perf::after{content:'';position:absolute;width:280px;height:280px;border-radius:50%;background:rgba(255,210,63,.14);bottom:-120px;left:-80px}
+/* 塗りセクションは装飾の浮遊円やスクープ角を持たない——面そのもので語る。 */
+.perf{background-color:var(--accent);background-image:linear-gradient(rgba(255,255,255,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.14) 1px,transparent 1px);background-size:34px 34px;color:#fff;position:relative;overflow:hidden}
 .perf .wrap{position:relative;z-index:1}
-.perf .eyebrow{color:var(--yellow)}
+.perf .eyebrow{color:#fff}
+.perf .eyebrow::after{background:var(--yellow)}
 .perf .h2{color:#fff}
 .perf-lede{font-size:15px;line-height:1.9;color:rgba(255,255,255,.9);max-width:640px;margin:0 auto 56px;text-align:center}
 .stat-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;max-width:640px;margin:0 auto 64px}
-.stat{background:#fff;color:var(--ink);border-radius:22px;padding:36px 28px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.12)}
+.stat{background:#fff;color:var(--ink);border-radius:var(--r-l);padding:36px 28px;text-align:center;box-shadow:var(--shadow-2)}
 .stat-num{font-size:56px;line-height:1;margin:0 0 14px;font-weight:800;color:var(--accent)}
 .stat-unit{font-size:22px;font-weight:800;margin:0 4px}
 .stat-label{font-size:13px;letter-spacing:.08em;color:rgba(51,48,43,.6);margin:0;font-weight:700}
 .cond-list{display:flex;flex-direction:column;gap:12px;margin:20px auto 0;max-width:420px;counter-reset:cd}
 .cond-item{display:flex;gap:12px;align-items:center;font-size:14.5px;color:#fff;font-weight:700}
-.cond-check{width:24px;height:24px;border-radius:50%;background:var(--yellow);display:flex;align-items:center;justify-content:center;font-size:0;color:var(--ink);flex:none;font-weight:800;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.cond-check{width:24px;height:24px;border-radius:3px;background:var(--yellow);display:flex;align-items:center;justify-content:center;font-size:0;color:var(--ink);flex:none;font-weight:800}
 .cond-check::before{counter-increment:cd;content:counter(cd);font-size:13px}
 
-/* Genre cards — orange-based rich cards: filled gradient + dashed inner
-   frame for genres that link to an LP, white + dashed accent frame for
-   the rest. */
+/* Genre cards — LPへリンクするセルはフラットなオレンジ塗り、その他は
+   白地＋ヘアライン。内枠・グラデーション等の装飾は持たない。 */
 .genre-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1040px;margin-left:auto;margin-right:auto}
-.genre-cell{position:relative;display:flex;flex-direction:column;gap:10px;text-align:left;border-radius:18px;padding:24px 22px;color:var(--ink);background:#fff;border:2px solid rgba(244,88,28,.45);box-shadow:0 6px 18px rgba(51,48,43,.07);transition:transform .25s,box-shadow .25s;overflow:hidden}
-.genre-cell::before{content:'';position:absolute;inset:6px;border:1.5px dashed rgba(244,88,28,.35);border-radius:12px;pointer-events:none}
+.genre-cell{position:relative;display:flex;flex-direction:column;gap:10px;text-align:left;border-radius:var(--r-m);padding:24px 22px;color:var(--ink);background:#fff;border:var(--hairline);box-shadow:var(--shadow-1);transition:transform .25s,box-shadow .25s;overflow:hidden}
 .genre-t{font-size:16.5px;font-weight:800;letter-spacing:.02em;padding-bottom:8px;border-bottom:2px solid var(--accent);align-self:flex-start;position:relative;z-index:1}
 .genre-d{font-size:12.5px;line-height:1.8;font-weight:500;color:rgba(51,48,43,.72);position:relative;z-index:1}
-a.genre-cell{background:linear-gradient(150deg,var(--accent),var(--accent-dark));border-color:var(--accent-dark);color:#fff;box-shadow:0 10px 26px rgba(244,88,28,.3);padding-bottom:54px}
-a.genre-cell::before{border-color:rgba(255,255,255,.45)}
+a.genre-cell{background:var(--accent);border-color:var(--accent-dark);color:#fff;box-shadow:var(--shadow-1);padding-bottom:54px}
 a.genre-cell .genre-t{border-bottom-color:var(--yellow)}
 a.genre-cell .genre-d{color:rgba(255,255,255,.92)}
-.genre-arrow{position:absolute;right:16px;bottom:14px;width:30px;height:30px;border-radius:50%;background:#fff;color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;box-shadow:0 2px 8px rgba(51,48,43,.22);z-index:1}
-a.genre-cell:hover{transform:translateY(-5px);box-shadow:0 16px 34px rgba(244,88,28,.42)}
+.genre-arrow{position:absolute;right:16px;bottom:14px;width:30px;height:30px;border-radius:0;border:2px solid var(--ink);background:#fff;color:var(--ink);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;z-index:1}
+a.genre-cell:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-2)}
 
 .flow-row{display:grid;grid-template-columns:repeat(4,1fr);gap:48px;position:relative;max-width:980px;margin:0 auto}
 .flow-step{text-align:center;position:relative}
 .flow-step:not(:last-child)::after{content:'';position:absolute;top:44px;right:-34px;width:0;height:0;border-top:11px solid transparent;border-bottom:11px solid transparent;border-left:16px solid var(--yellow)}
-.flow-num{display:flex;align-items:center;justify-content:center;width:104px;height:104px;margin:0 auto;border-radius:50%;background:#fff;border:3px solid var(--accent);font-family:'Noto Sans JP',sans-serif;font-size:30px;line-height:1;color:var(--accent);font-weight:800;box-shadow:0 6px 18px rgba(51,48,43,.1)}
+.flow-num{display:flex;align-items:center;justify-content:center;width:104px;height:104px;margin:0 auto;border-radius:0;background:#fff;border:3px solid var(--ink);font-family:'Archivo Black',sans-serif;font-size:28px;line-height:1;color:var(--ink);font-weight:400;box-shadow:var(--shadow-1)}
 .flow-t{font-size:16px;font-weight:800;margin:18px 0 10px}
 .flow-d{font-size:13px;line-height:1.7;color:rgba(51,48,43,.65);margin:0}
 /* Prominent supplement under the flow — e.g. "shorter schedules are
-   possible depending on the project". */
-.flow-note{margin:52px auto 0;max-width:620px;text-align:center;background:linear-gradient(150deg,var(--accent),var(--accent-dark));color:#fff;font-size:15.5px;font-weight:800;line-height:1.9;padding:20px 28px;border-radius:16px;box-shadow:0 10px 26px rgba(244,88,28,.3)}
+   possible depending on the project". White card + accent keyline
+   reads calmer/premium vs. the old loud orange banner. */
+.flow-note{margin:52px auto 0;max-width:640px;text-align:center;background:#fff;border:1.5px solid rgba(244,88,28,.5);color:var(--ink);font-size:15px;font-weight:700;line-height:1.9;padding:22px 30px;border-radius:var(--r-m);box-shadow:var(--shadow-1)}
 
-/* Numbered service rows (Pintcle-style editorial list) */
-.svc-rows{max-width:860px;margin:0 auto;border-bottom:1px solid rgba(51,48,43,.14)}
-.svc-row{display:flex;gap:30px;align-items:flex-start;padding:36px 10px;border-top:1px solid rgba(51,48,43,.14);transition:background-color .25s}
-.svc-row:hover{background:rgba(244,88,28,.05)}
-.svc-no{flex:none;font-family:'Shippori Mincho',serif;font-size:38px;line-height:1;color:var(--accent);font-weight:700;margin-top:2px}
+/* 法人向けサービス：番号付きの太枠カード。トップの主要導線なので
+   ヘアライン行ではなく、白地＋墨フチ＋紙の重なり影でしっかり立たせる。 */
+.svc-rows{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.svc-row{display:flex;gap:26px;align-items:flex-start;padding:26px 28px;background:#fff;border:var(--bd);box-shadow:var(--shadow-1);transition:transform .2s,box-shadow .2s}
+.svc-row:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-2)}
+.svc-no{flex:none;font-family:'Archivo Black','Noto Sans JP',sans-serif;font-size:40px;line-height:1;color:var(--accent);font-weight:400;margin-top:2px}
 .svc-row-body{flex:1;min-width:0}
-.svc-row-title{font-size:21px;font-weight:800;margin:0 0 10px;color:var(--ink)}
+.svc-row-title{font-size:22px;font-weight:800;margin:0 0 10px;color:var(--ink)}
 .svc-row-desc{font-size:14px;line-height:1.9;color:rgba(51,48,43,.7);margin:0}
-.svc-row-arrow{flex:none;align-self:center;width:44px;height:44px;border-radius:50%;border:2px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:800;transition:background-color .25s,color .25s,transform .25s}
-.svc-row:hover .svc-row-arrow{background:var(--accent);color:#fff;transform:translateX(4px)}
+.svc-row-arrow{flex:none;align-self:center;width:44px;height:44px;border-radius:0;border:2px solid var(--ink);background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;transition:background-color .25s,color .25s,transform .25s}
+.svc-row:hover .svc-row-arrow{background:var(--ink);color:#fff;transform:translateX(4px)}
 
 /* Message section — arched portrait, centered stack on brand orange */
-.msg-sec{background:linear-gradient(180deg,#ef5c22 0%,#d9430e 100%);color:#fff;border-radius:44px 44px 0 0}
-.msg-sec .eyebrow{color:var(--yellow)}
+.msg-sec{background-color:var(--accent);background-image:linear-gradient(rgba(255,255,255,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.14) 1px,transparent 1px);background-size:34px 34px;color:#fff}
+.msg-sec .eyebrow{color:#fff}
+.msg-sec .eyebrow::after{background:var(--yellow)}
 .msg-sec .h2{color:#fff}
-.ceo-arch{width:280px;aspect-ratio:3/3.6;object-fit:cover;margin:26px auto 30px;border-radius:150px 150px 16px 16px;border:5px solid rgba(255,255,255,.92);box-shadow:0 18px 40px rgba(0,0,0,.18)}
+.ceo-arch{width:280px;aspect-ratio:3/3.6;object-fit:cover;margin:26px auto 30px;border-radius:0;border:4px solid #fff;box-shadow:12px 12px 0 rgba(0,0,0,.22)}
 .msg-role2{text-align:center;font-size:13px;letter-spacing:.08em;color:rgba(255,255,255,.85);margin:0 0 8px}
 .msg-name2{text-align:center;font-size:28px;letter-spacing:.3em;margin:0 0 40px}
 .msg-quote2{text-align:center;font-size:clamp(20px,2.4vw,28px);line-height:1.8;letter-spacing:.06em;margin:0 0 32px}
+/* 鉤括弧を黄色で添えて「言葉」としての存在感を出す。行末で
+   括弧だけが孤立しないよう、擬似要素ではなく .nobr 内の実要素
+   （index.astro 側の .q-mark）として組み込む。 */
+.msg-quote2 .q-mark{color:var(--yellow)}
 .msg-body2{max-width:640px;margin:0 auto;font-size:14.5px;line-height:2.1;color:rgba(255,255,255,.95)}
 .msg-bio2{max-width:640px;margin:28px auto 0;padding-top:22px;border-top:1px dotted rgba(255,255,255,.4);font-size:12.5px;line-height:1.9;color:rgba(255,255,255,.8)}
 
@@ -422,15 +569,13 @@ a.genre-cell:hover{transform:translateY(-5px);box-shadow:0 16px 34px rgba(244,88
 .msg-name{margin-top:32px;font-size:14px;font-weight:800}
 .msg-role{font-size:12.5px;color:rgba(51,48,43,.55)}
 .msg-bio{margin-top:14px;padding-top:14px;border-top:2px dotted rgba(51,48,43,.15);font-size:12.5px;line-height:1.9;color:rgba(51,48,43,.6);max-width:480px}
-.ceo-photo{width:100%;height:auto;border-radius:18px;background:#fff;padding:12px;box-shadow:0 12px 30px rgba(51,48,43,.14)}
+.ceo-photo{width:100%;height:auto;border-radius:var(--r-l);background:#fff;padding:12px;box-shadow:var(--shadow-2)}
 
-.info-grid{display:grid;grid-template-columns:auto 1fr;gap:16px 40px;font-size:14.5px;max-width:600px;margin:0 auto;background:#fff;border-radius:20px;padding:36px 40px;box-shadow:0 6px 22px rgba(51,48,43,.07)}
-.info-grid dt{color:rgba(51,48,43,.5);font-weight:700;margin:0}
+.info-grid{display:grid;grid-template-columns:auto 1fr;gap:16px 40px;font-size:14.5px;max-width:600px;margin:0 auto;background:#fff;border-radius:var(--r-l);padding:36px 40px;box-shadow:var(--shadow-1)}
+.info-grid dt{font-family:'Shippori Mincho',serif;color:var(--accent);font-weight:700;letter-spacing:.1em;margin:0}
 .info-grid dd{margin:0;font-weight:500}
 
-.cta{background:var(--accent);color:#fff;text-align:center;position:relative;overflow:hidden;border-radius:44px 44px 0 0}
-.cta::before{content:'';position:absolute;width:380px;height:380px;border-radius:50%;background:rgba(255,255,255,.06);top:-140px;left:-100px}
-.cta::after{content:'';position:absolute;width:260px;height:260px;border-radius:50%;background:rgba(255,210,63,.16);bottom:-100px;right:-70px}
+.cta{background-color:var(--accent);background-image:linear-gradient(rgba(255,255,255,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.14) 1px,transparent 1px);background-size:34px 34px;color:#fff;text-align:center;position:relative;overflow:hidden}
 .cta .wrap{position:relative;z-index:1}
 .cta-title{font-size:32px;font-weight:800;margin:0 0 18px;line-height:1.5}
 .cta-sub{font-size:14.5px;color:rgba(255,255,255,.92);margin:0 0 40px}
@@ -440,27 +585,29 @@ a.genre-cell:hover{transform:translateY(-5px);box-shadow:0 16px 34px rgba(244,88
 .contact-form .form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .contact-form label{display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:700;color:#fff}
 .contact-form .label-cap{display:flex;align-items:center;gap:8px}
-.contact-form .req{font-size:10.5px;font-weight:800;color:var(--ink);background:var(--yellow);padding:2px 10px;border-radius:999px}
-.contact-form input,.contact-form textarea{font:inherit;font-size:14px;font-weight:400;padding:14px 16px;border:none;border-radius:12px;background:#fff;color:var(--ink)}
+.contact-form .req{font-size:10.5px;font-weight:800;color:var(--ink);background:var(--yellow);padding:2px 10px;border-radius:0}
+.contact-form input,.contact-form textarea{font:inherit;font-size:14px;font-weight:400;padding:14px 16px;border:2px solid var(--ink);border-radius:0;background:#fff;color:var(--ink)}
 .contact-form input:focus,.contact-form textarea:focus{outline:3px solid var(--yellow);outline-offset:2px}
 .contact-form textarea{resize:vertical}
-.contact-form button{align-self:center;margin-top:4px;border:none;cursor:pointer;background:#fff;color:var(--accent);box-shadow:0 5px 0 rgba(0,0,0,.15)}
+.contact-form button{align-self:center;margin-top:4px;border:none;cursor:pointer;background:#fff;color:var(--accent)}
 .contact-form button:hover{background:var(--yellow);color:var(--ink)}
 
-footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
+/* Footer: フラットな墨色の面＋アクセント1本の締め罫。 */
+footer{padding:76px 0 44px;background:#2f2c26;color:rgba(255,255,255,.85);position:relative}
+footer::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent)}
 .foot-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
-.foot-name{font-weight:800;font-size:15px;margin:0 0 4px;color:#fff}
+.foot-name{font-family:'Shippori Mincho',serif;font-weight:800;font-size:17px;letter-spacing:.05em;margin:0 0 6px;color:#fff}
 .foot-tag{font-size:12px;color:rgba(255,255,255,.55);margin:0 0 6px}
 .foot-addr{font-size:12.5px;color:rgba(255,255,255,.5);margin:0}
 .foot-copy{font-size:12px;color:rgba(255,255,255,.4)}
 
 #about,#strength,#works,#flow,#message,#contact{scroll-margin-top:76px}
 
-/* Nav collapses to the hamburger well above phone width — seven
-   Japanese labels don't fit a tablet row. */
-@media(max-width:1020px){
+/* Nav collapses to the hamburger well above phone width — eight
+   Japanese labels (incl. 過去コンテンツのネタバレ) don't fit a tablet row. */
+@media(max-width:1160px){
   .nav-toggle{display:flex}
-  .navlinks{position:fixed;top:76px;left:0;right:0;display:flex;flex-direction:column;align-items:stretch;gap:0;background:#fff;padding:8px 22px 16px;box-shadow:0 18px 28px rgba(51,48,43,.14);opacity:0;transform:translateY(-12px);pointer-events:none;transition:opacity .25s,transform .25s}
+  .navlinks{position:fixed;top:76px;left:0;right:0;display:flex;flex-direction:column;align-items:stretch;gap:0;background:#fff;padding:8px 22px 16px;box-shadow:var(--shadow-2);opacity:0;transform:translateY(-12px);pointer-events:none;transition:opacity .25s,transform .25s}
   .navlinks a{padding:14px 4px;font-size:14px;border-bottom:1px dashed rgba(51,48,43,.12)}
   .navlinks a:last-child{border-bottom:none}
   header.nav.open .navlinks{opacity:1;transform:none;pointer-events:auto}
@@ -471,7 +618,6 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .flow-row{grid-template-columns:1fr;gap:40px;max-width:420px}
   .flow-step:not(:last-child)::after{top:auto;right:auto;bottom:-30px;left:50%;transform:translateX(-50%);border-left:11px solid transparent;border-right:11px solid transparent;border-top:16px solid var(--yellow);border-bottom:none}
   .hero-title{font-size:20px}
-  .h2{font-size:32px}
   .msg-quote{font-size:30px}
   .section{padding:84px 0}
   .contact-form .form-row{grid-template-columns:1fr}
@@ -490,20 +636,25 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .hero-center{padding-top:112px;padding-bottom:44px}
   .hero-logo{margin-bottom:28px}
   .hero-title{font-size:16px;letter-spacing:.03em}
-  .hero-title .hl{padding:7px 14px;border-radius:8px}
+  .hero-title .hl{padding:7px 14px;border-radius:var(--r-s)}
   .hero-sub{font-size:11px;margin-bottom:28px}
-  .hero-works-track img{height:170px;border-radius:8px}
+  .hero-works-track img{height:170px;border-radius:var(--r-s)}
   .hero-actions{gap:10px}
   .hero-actions .btn{padding:13px 22px;font-size:13px}
-  .perf,.cta{border-radius:28px 28px 0 0}
-  .btn{font-size:13.5px;padding:14px 26px}
+  .btn{font-size:13.5px;padding:14px 22px;white-space:normal;max-width:100%;text-align:center;line-height:1.6}
   .hero-eyebrow{font-size:11px;letter-spacing:.26em;margin-bottom:18px}
   .scrollcue{display:none}
-  .h2{font-size:25px}
   .h2sub{font-size:13.5px;margin-bottom:36px}
   .lede{font-size:14.5px}
   .about-points{grid-template-columns:1fr}
-  .bullets li{font-size:14px;padding:14px 16px}
+  /* スマホは見出しが中央揃えなので、ラベルも中央に合わせて
+     左右の揃えを統一する。 */
+  .about-label{text-align:center}
+  .about-lead{font-size:17.5px;line-height:1.95}
+  .hero-stat{gap:12px;padding:10px 18px;margin-top:22px}
+  .hero-stat-num{font-size:26px}
+  .bullets li{font-size:14px;padding:14px 16px 14px 54px}
+  .bullets li::before{left:16px;top:14px}
   .vc-line{font-size:12px}
   .str-card,.style-col{padding:26px 22px}
   .svc-grid{grid-template-columns:1fr}
@@ -511,8 +662,8 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .str-title{font-size:19px}
   .str-body,.style-row{font-size:13.5px}
   .works-grid{grid-template-columns:1fr 1fr;gap:16px 12px}
-  .work-card{padding:10px 10px 18px;border-radius:16px}
-  .work-img{padding:8px;border-radius:10px}
+  .work-card{padding:10px 10px 18px;border-radius:var(--r-m)}
+  .work-img{padding:8px;border-radius:var(--r-s)}
   .work-tag{font-size:9.5px;margin:10px 0 6px;padding:4px 10px}
   .work-name{font-size:14.5px}
   .work-sub{font-size:11.5px;margin-bottom:6px}
@@ -525,7 +676,7 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .blog-title{font-size:16.5px}
   .blog-excerpt{font-size:13px}
   .stat-row{gap:18px;margin-bottom:48px}
-  .stat{padding:26px 16px;border-radius:18px}
+  .stat{padding:26px 16px;border-radius:var(--r-m)}
   .stat-num{font-size:38px}
   .stat-unit{font-size:16px}
   .stat-label{font-size:11.5px}
@@ -533,10 +684,11 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .cond-item{font-size:13px}
   .genre-grid{grid-template-columns:1fr;gap:14px}
   .genre-cell{padding:20px 18px}
-  a.genre-cell{padding-bottom:20px;padding-right:64px}
+  /* 矢印は右下の定位置のまま、本文の幅を削らない（右パディングを
+     空ける方式だと説明文の折り返しが不自然になるため）。 */
+  a.genre-cell{padding-bottom:52px}
   .genre-t{font-size:15.5px}
   .genre-d{font-size:12px}
-  .genre-arrow{bottom:50%;transform:translateY(50%)}
   .flow-note{font-size:13.5px;padding:16px 20px;margin-top:40px}
   .flow-num{width:84px;height:84px;font-size:24px}
   .flow-step:not(:last-child)::after{top:auto;bottom:-28px}
@@ -549,15 +701,112 @@ footer{padding:64px 0 40px;background:var(--ink);color:rgba(255,255,255,.85)}
   .info-grid{gap:12px 20px;font-size:13.5px;padding:26px 24px}
   .cta-title{font-size:21px}
   .cta-sub{font-size:13px}
-  .cta-mini{padding:36px 22px;border-radius:20px}
+  .cta-mini{padding:36px 22px;border-radius:var(--r-m)}
   .cta-mini-title{font-size:17px}
-  .cta-mini-title::before{margin-right:8px}
-  .cta-mini-title::after{margin-left:8px}
   .faq-item{padding:20px 18px}
   .faq-q{font-size:14.5px}
   .faq-a{font-size:13px}
   .marquee-track{gap:44px}
   .marquee-name{font-size:16px}
+  /* Tighter numbered service rows so long titles (マーダーミステリー制作)
+     keep to one line on phones. */
+  .svc-row{gap:14px;padding:20px 18px}
+  .svc-no{font-size:26px}
+  .svc-row-title{font-size:16.5px;margin-bottom:8px}
+  .svc-row-desc{font-size:12.5px;line-height:1.8}
+  .svc-row-arrow{width:36px;height:36px;font-size:13px}
   .article-body{font-size:14.5px}
   .foot-row{flex-direction:column;align-items:flex-start;gap:12px}
+}
+
+/* ── スマホの横スワイプ・カルーセル ─────────────────────────
+   強み・他社様との違い・提供コンテンツ・制作フローは縦積みだと
+   1画面に1カードで延々スクロールが続くため、.event-row と同じ
+   「はみ出しスワイプ」パターンに変換する。次のカードが端に
+   のぞくことでスワイプできることが伝わる。
+   （このブロックは既存の 640px ルールを上書きするため必ず末尾に置く） */
+@media(max-width:640px){
+  .str-grid,.style-grid,.genre-grid,.flow-row,.works-grid{display:flex;flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin:0 -22px;padding:4px 22px 18px;max-width:none;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .str-grid::-webkit-scrollbar,.style-grid::-webkit-scrollbar,.genre-grid::-webkit-scrollbar,.flow-row::-webkit-scrollbar,.works-grid::-webkit-scrollbar{display:none}
+  .str-card{flex:0 0 84%;scroll-snap-align:center}
+  .style-col{flex:0 0 84%;scroll-snap-align:center}
+  .genre-cell{flex:0 0 74%;scroll-snap-align:center}
+  .flow-row{gap:36px;padding-right:36px}
+  .flow-step{flex:0 0 56%;scroll-snap-align:center}
+  /* 縦積み用の下向き矢印を、横並び用の右向き矢印に戻す */
+  .flow-step:not(:last-child)::after{top:34px;bottom:auto;left:auto;right:-27px;transform:none;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:15px solid var(--yellow);border-right:none}
+  /* 主な実績：2列グリッドだと文字が極小になるため、1枚を大きく
+     見せる横スワイプに。文字サイズも読める大きさへ戻す。 */
+  .work-card{flex:0 0 72%;scroll-snap-align:center;padding:14px 14px 20px;border-radius:var(--r-m)}
+  .work-img{padding:12px;border-radius:var(--r-s)}
+  .work-tag{font-size:10.5px;margin:14px 0 8px;padding:4px 12px}
+  .work-name{font-size:16.5px}
+  .work-sub{font-size:12.5px;margin-bottom:8px}
+  .work-desc{font-size:13px;line-height:1.8}
+  /* カルーセル内テキストの可読性を一段引き上げ */
+  .genre-d{font-size:13px;line-height:1.85}
+  .flow-d{font-size:13px}
+  .event-desc{font-size:12.5px}
+  .svc-row-desc{font-size:13px}
+  .biz-d{font-size:12.5px}
+  .biz-punch-d{font-size:13px}
+  .h2sub{font-size:14px;line-height:2}
+  .lede{font-size:15px}
+  .vc-line{font-size:12.5px;line-height:1.9}
+}
+
+/* 320〜375px級の狭い端末では、カルーセルのカード幅を広げて
+   .nobr の文節チャンクが確実に収まるようにする。 */
+@media(max-width:374px){
+  .work-card{flex-basis:84%}
+  .genre-cell{flex-basis:84%}
+  .str-card,.style-col{flex-basis:92%}
+  .event-card{flex-basis:76%}
+}
+
+/* カルーセル直下の「横にスワイプ」ヒント（BaseLayout の JS が、
+   実際に横へはみ出しているストリップにだけ挿入する）。
+   矢印が左右にゆれて操作を誘導し、一度スクロールすると消える。 */
+.swipe-hint{display:flex;align-items:center;justify-content:center;gap:10px;margin:0;font-size:11px;font-weight:700;letter-spacing:.16em;color:rgba(51,48,43,.5);transition:opacity .45s,visibility .45s}
+.swipe-hint::before{content:'←';color:var(--accent);animation:swipe-nudge-l 1.6s ease-in-out infinite}
+.swipe-hint::after{content:'→';color:var(--accent);animation:swipe-nudge-r 1.6s ease-in-out infinite}
+@keyframes swipe-nudge-l{0%,100%{transform:translateX(0)}50%{transform:translateX(-4px)}}
+@keyframes swipe-nudge-r{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+.swipe-hint.is-fading{opacity:0;visibility:hidden}
+@media (prefers-reduced-motion:reduce){.swipe-hint::before,.swipe-hint::after{animation:none}}
+
+/* ===== メディア掲載（告知バー・トップのセクション・/media/ 一覧） ===== */
+/* ヘッダー直下の告知バー。印刷物テイストに合わせ、アクセント地に
+   墨の実線で区切ったフラットな帯にする（グラデ・角丸・光る影は使わない）。 */
+.newsbar{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:78px;padding:13px 20px;background:var(--accent);color:#fff;border-bottom:var(--bd);text-decoration:none;flex-wrap:wrap;transition:background-color .2s}
+/* 告知バーがヘッダー下の空間を先に使うぶん、ヒーローの上余白を詰める */
+.newsbar~.hero .hero-center{padding-top:72px}
+.newsbar:hover{background:var(--accent-dark)}
+.newsbar:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+.newsbar-chip{flex:none;font-family:'Archivo Black',sans-serif;font-size:11px;letter-spacing:.16em;background:#fff;color:var(--accent);border:2px solid var(--ink);padding:4px 10px;line-height:1}
+.newsbar-text{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:14.5px;line-height:1.5}
+.newsbar-text strong{font-weight:800}
+.newsbar-sub{font-size:12.5px;opacity:.92;font-weight:600}
+.newsbar-arrow{flex:none;font-weight:800}
+/* トップページのメディア掲載カード（紙が重なったハード影の1枚看板） */
+.media-feature{max-width:860px;margin:0 auto;background:#fff;border:var(--bd);box-shadow:var(--shadow-1);padding:44px 48px}
+.media-feature-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.media-outlet{font-size:30px;font-weight:800;letter-spacing:.02em}
+.media-date{font-size:12.5px;font-weight:700;color:rgba(51,48,43,.65);background:var(--cream);padding:6px 14px}
+.media-title{margin:0 0 12px;font-size:17px;font-weight:800}
+.media-desc{margin:0 0 26px;font-size:14.5px;line-height:2;color:rgba(51,48,43,.85)}
+.media-actions{display:flex;gap:16px;flex-wrap:wrap}
+/* /media/ 一覧ページ */
+.media-list{display:flex;flex-direction:column;gap:26px;max-width:860px;margin:0 auto}
+.media-item{background:#fff;border:var(--bd);box-shadow:var(--shadow-1);padding:34px 38px}
+.media-note{max-width:860px;margin:40px auto 0;font-size:13px;color:rgba(51,48,43,.7);line-height:2}
+@media (max-width:640px){
+  .newsbar{gap:10px;margin-top:66px;padding:12px 16px}
+  .newsbar-arrow{display:none}
+  .newsbar~.hero .hero-center{padding-top:52px}
+  .newsbar-text{font-size:13px}
+  .newsbar-sub{font-size:11.5px}
+  .media-feature{padding:30px 22px}
+  .media-item{padding:26px 20px}
+  .media-outlet{font-size:23px}
 }

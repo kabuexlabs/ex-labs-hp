@@ -1,0 +1,441 @@
+---
+// 社内備品管理ページ（/bihin/）。
+//   ・アイテム名／個数／写真／購入価格／保管場所を登録
+//   ・あとから何度でも編集・削除・個数の増減ができる
+// BIHIN_ADMIN_KEY を知っている社内メンバーだけが閲覧・操作できる。
+// 合言葉は POST でのみ受け取り、以降は HttpOnly なセッション Cookie で
+// 認証する — URL に載せるとブラウザ履歴・アクセスログに残るため、
+// クエリでは絶対に受けない（yoyaku/admin と同じ方式）。
+export const prerender = false;
+
+import YoyakuLayout from '../../layouts/YoyakuLayout.astro';
+import {
+  checkBihinKey,
+  isKvConfigured,
+  getItems,
+  getItem,
+  saveItem,
+  deleteItem,
+  newItemId,
+  savePhoto,
+  deletePhoto,
+  formatPrice,
+  type Item,
+} from '../../lib/bihin';
+import { loginAllowed, recordLoginFailure } from '../../lib/contact';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+
+const COOKIE = 'bihin_admin';
+let error = '';
+let loginFailed = false;
+let message = Astro.url.searchParams.get('msg') ?? '';
+let itemId = Astro.url.searchParams.get('item') ?? '';
+
+let key = Astro.cookies.get(COOKIE)?.value ?? '';
+const configured = isKvConfigured();
+
+// --- 入力の検証ヘルパー --------------------------------------------------------
+
+/** 全角数字・全角カンマを半角に寄せる（スマホ入力のゆらぎ対策）。 */
+function normalizeNumber(raw: string): string {
+  return raw
+    .replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
+    .replace(/[,，、\s]/g, '');
+}
+
+function parseQuantity(raw: string): number | null {
+  const n = Number(normalizeNumber(raw));
+  return Number.isInteger(n) && n >= 0 && n <= 999999 ? n : null;
+}
+
+/** 価格は未記入OK（undefined = 不明）。数値として読めない入力は null で弾く。 */
+function parsePrice(raw: string): number | undefined | null {
+  const s = normalizeNumber(raw).replace(/[¥￥円]/g, '');
+  if (!s) return undefined;
+  const n = Number(s);
+  return Number.isInteger(n) && n >= 0 && n <= 999999999 ? n : null;
+}
+
+// 写真は原則ブラウザ側で縮小済みの data URI（hidden の photo フィールド）で
+// 届く。JS が無効な環境では素のファイルが届くので、小さいものだけ受ける。
+// 上限は Upstash 無料枠のリクエストサイズ(1MB)に収まる範囲。
+const MAX_DATA_URI = 800_000;
+const RAW_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+async function readPhotoField(form: FormData): Promise<{ dataUri?: string; error?: string }> {
+  const compressed = String(form.get('photo') ?? '');
+  if (compressed) {
+    if (!/^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(compressed)) {
+      return { error: '写真データの形式が不正です。もう一度選び直してください。' };
+    }
+    if (compressed.length > MAX_DATA_URI) {
+      return { error: '写真が大きすぎます。別の写真でお試しください。' };
+    }
+    return { dataUri: compressed };
+  }
+  const file = form.get('photofile');
+  if (file instanceof File && file.size > 0) {
+    if (!RAW_TYPES.includes(file.type)) {
+      return { error: '写真は JPEG / PNG / WebP 形式でアップロードしてください。' };
+    }
+    if (file.size > 550_000) {
+      return { error: '写真が大きすぎます（550KBまで）。JavaScript を有効にすると自動で縮小されます。' };
+    }
+    const b64 = Buffer.from(await file.arrayBuffer()).toString('base64');
+    return { dataUri: `data:${file.type};base64,${b64}` };
+  }
+  return {};
+}
+
+// --- POST 処理 ----------------------------------------------------------------
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const action = String(form.get('action') ?? '');
+
+  if (action === 'login') {
+    // 合言葉はコピペ由来の前後空白で弾かれやすいので trim して照合する。
+    // 総当たり対策：10分間に5回失敗したIPはロック（contact/yoyaku管理と共通）。
+    const loginIp = (Astro.request.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
+    const entered = String(form.get('key') ?? '').trim();
+    if (!(await loginAllowed(loginIp))) {
+      loginFailed = true;
+    } else if (checkBihinKey(entered)) {
+      Astro.cookies.set(COOKIE, entered, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/bihin',
+      });
+      return Astro.redirect(Astro.url.pathname, 303);
+    } else {
+      await recordLoginFailure(loginIp);
+      loginFailed = true;
+    }
+  } else if (checkBihinKey(key) && configured) {
+    let msg = '';
+    let redirectItem = '';
+
+    if (action === 'add' || action === 'update') {
+      const name = String(form.get('name') ?? '').trim().slice(0, 80);
+      const location = String(form.get('location') ?? '').trim().slice(0, 100);
+      const quantity = parseQuantity(String(form.get('quantity') ?? ''));
+      const price = parsePrice(String(form.get('price') ?? ''));
+      const photo = await readPhotoField(form);
+
+      if (!name) error = 'アイテム名を入力してください。';
+      else if (quantity === null) error = '個数は0以上の整数で入力してください。';
+      else if (price === null) error = '購入価格は数字で入力してください（不明なら空欄でOK）。';
+      else if (!location) error = '保管場所を入力してください。';
+      else if (photo.error) error = photo.error;
+      else if (action === 'add') {
+        const now = new Date().toISOString();
+        const item: Item = {
+          id: newItemId(),
+          name,
+          quantity,
+          price,
+          location,
+          photoUpdatedAt: photo.dataUri ? now : undefined,
+          createdAt: now,
+          updatedAt: now,
+        };
+        if (photo.dataUri) await savePhoto(item.id, photo.dataUri);
+        await saveItem(item);
+        msg = `「${name}」を登録しました。`;
+      } else {
+        const prev = await getItem(String(form.get('item') ?? ''));
+        if (!prev) {
+          error = '備品が見つかりません。すでに削除された可能性があります。';
+        } else {
+          const now = new Date().toISOString();
+          const removePhoto = form.get('removephoto') === 'on';
+          let photoUpdatedAt = prev.photoUpdatedAt;
+          if (photo.dataUri) {
+            await savePhoto(prev.id, photo.dataUri);
+            photoUpdatedAt = now;
+          } else if (removePhoto && prev.photoUpdatedAt) {
+            await deletePhoto(prev.id);
+            photoUpdatedAt = undefined;
+          }
+          await saveItem({ ...prev, name, quantity, price, location, photoUpdatedAt, updatedAt: now });
+          msg = `「${name}」を更新しました。`;
+        }
+      }
+      if (error && action === 'update') redirectItem = String(form.get('item') ?? '');
+    } else if (action === 'qty') {
+      // 一覧の「＋／−」ボタン。棚卸しのときに編集画面を開かず個数だけ直せる。
+      const item = await getItem(String(form.get('item') ?? ''));
+      const delta = String(form.get('delta') ?? '') === '-1' ? -1 : 1;
+      if (item) {
+        await saveItem({
+          ...item,
+          quantity: Math.max(0, item.quantity + delta),
+          updatedAt: new Date().toISOString(),
+        });
+      }
+    } else if (action === 'delete') {
+      const item = await getItem(String(form.get('item') ?? ''));
+      if (item) {
+        await deleteItem(item.id);
+        msg = `「${item.name}」を削除しました。`;
+      }
+    }
+
+    if (!error) {
+      // PRG: リロードで同じ操作が再実行されないようリダイレクト
+      const q = new URLSearchParams();
+      if (msg) q.set('msg', msg);
+      const qs = q.toString();
+      return Astro.redirect(qs ? `${Astro.url.pathname}?${qs}` : Astro.url.pathname, 303);
+    }
+    itemId = redirectItem || itemId;
+  }
+}
+
+const authed = checkBihinKey(key);
+
+// 一覧画面用データ／編集画面用データ
+let items: Item[] = [];
+let editing: Item | null = null;
+
+if (authed && configured) {
+  if (itemId) editing = await getItem(itemId);
+  if (!editing) items = await getItems();
+}
+
+const totalCount = items.reduce((sum, i) => sum + i.quantity, 0);
+const photoUrl = (i: Item) => `/bihin/photo/${i.id}?v=${encodeURIComponent(i.photoUpdatedAt ?? '')}`;
+---
+<YoyakuLayout title="備品管理｜株式会社 ex Labs">
+<h1>備品管理</h1>
+
+{!authed ? (
+  <>
+  {loginFailed && <p class="yk-error">合言葉が違います。</p>}
+  <form method="POST" action={Astro.url.pathname}>
+    <input type="hidden" name="action" value="login">
+    <div class="yk-card">
+      <label class="yk-field">管理用の合言葉
+        <input type="password" name="key" required autocomplete="current-password">
+      </label>
+      <button class="yk-btn" type="submit">ログイン</button>
+    </div>
+  </form>
+  </>
+) : !configured ? (
+  <p class="yk-error">データベース（Upstash Redis）が未接続です。Vercel の Storage 設定を確認してください（docs/bihin-setup.md 参照）。</p>
+) : editing ? (
+  <>
+  <p style="margin:0 0 8px"><a href={Astro.url.pathname} style="font-size:13px;color:#8a8378;text-decoration:underline">← 備品一覧に戻る</a></p>
+  {error && <p class="yk-error">{error}</p>}
+
+  <h2>「{editing.name}」を編集</h2>
+  <form method="POST" action={Astro.url.pathname} enctype="multipart/form-data">
+    <input type="hidden" name="action" value="update">
+    <input type="hidden" name="item" value={editing.id}>
+    <input type="hidden" name="photo" value="">
+    <div class="yk-card" style="padding-top:6px">
+      <label class="yk-field">アイテム名
+        <input type="text" name="name" required maxlength="80" value={editing.name}>
+      </label>
+      <div class="yk-row">
+        <label class="yk-field">個数
+          <input type="text" name="quantity" required inputmode="numeric" value={String(editing.quantity)}>
+        </label>
+        <label class="yk-field">購入価格（円）<small>不明なら空欄でOK</small>
+          <input type="text" name="price" inputmode="numeric" placeholder="例：12800" value={typeof editing.price === 'number' ? String(editing.price) : ''}>
+        </label>
+      </div>
+      <label class="yk-field">保管場所<small>例：事務所の棚A・倉庫2F</small>
+        <input type="text" name="location" required maxlength="100" value={editing.location}>
+      </label>
+
+      <label class="yk-field">写真{editing.photoUpdatedAt ? 'を差し替える' : 'を追加する'}<small>選ぶと自動で縮小されます</small>
+        <input type="file" name="photofile" accept="image/*" data-compress>
+      </label>
+      {editing.photoUpdatedAt && (
+        <div class="bh-current">
+          <img class="bh-editphoto" src={photoUrl(editing)} alt={`${editing.name}の写真`}>
+          <label class="bh-remove"><input type="checkbox" name="removephoto"> 写真を削除する（差し替え時はチェック不要）</label>
+        </div>
+      )}
+      <img class="bh-preview" alt="新しい写真のプレビュー" hidden>
+
+      <button class="yk-btn" type="submit">保存する</button>
+    </div>
+  </form>
+
+  <h2>この備品を削除</h2>
+  <div class="yk-card">
+    <p style="font-size:13.5px;color:#8a8378;margin:4px 0 12px">備品と写真を削除します。この操作は取り消せません。</p>
+    <form method="POST" action={Astro.url.pathname} onsubmit="return confirm('この備品を削除します。よろしいですか？')">
+      <input type="hidden" name="action" value="delete">
+      <input type="hidden" name="item" value={editing.id}>
+      <button class="yk-del" type="submit">この備品を削除する</button>
+    </form>
+  </div>
+  </>
+) : (
+  <>
+  {message && <p class="yk-done">{message}</p>}
+  {error && <p class="yk-error">{error}</p>}
+
+  <h2>備品一覧<small class="bh-count">{items.length}品目・合計{totalCount}個</small></h2>
+  {items.length === 0 ? (
+    <div class="yk-card"><p style="font-size:14px;color:#8a8378;margin:6px 0">備品はまだ登録されていません。下のフォームから登録してください。</p></div>
+  ) : (
+    <>
+    <input type="search" id="bh-search" placeholder="名前・場所でしぼり込み" autocomplete="off">
+    <div class="bh-grid">
+      {items.map((i) => (
+        <div class="bh-card" data-text={`${i.name} ${i.location}`.toLowerCase()}>
+          {i.photoUpdatedAt ? (
+            <img class="bh-photo" src={photoUrl(i)} alt={`${i.name}の写真`} loading="lazy">
+          ) : (
+            <div class="bh-photo bh-nophoto">写真なし</div>
+          )}
+          <div class="bh-body">
+            <p class="bh-name">{i.name}</p>
+            <p class="bh-meta">保管場所：{i.location}</p>
+            <p class="bh-meta">購入価格：{formatPrice(i.price)}</p>
+            <p class="bh-meta bh-date">最終更新 {i.updatedAt.slice(0, 10)}</p>
+            <div class="bh-actions">
+              <div class="bh-qty">
+                <form class="yk-inline-form" method="POST" action={Astro.url.pathname}>
+                  <input type="hidden" name="action" value="qty">
+                  <input type="hidden" name="item" value={i.id}>
+                  <input type="hidden" name="delta" value="-1">
+                  <button class="bh-qtybtn" type="submit" aria-label="1減らす" disabled={i.quantity === 0}>−</button>
+                </form>
+                <span class="bh-qtynum">{i.quantity}<small>個</small></span>
+                <form class="yk-inline-form" method="POST" action={Astro.url.pathname}>
+                  <input type="hidden" name="action" value="qty">
+                  <input type="hidden" name="item" value={i.id}>
+                  <input type="hidden" name="delta" value="1">
+                  <button class="bh-qtybtn" type="submit" aria-label="1増やす">＋</button>
+                </form>
+              </div>
+              <a class="yk-btn small ghost" href={`${Astro.url.pathname}?item=${i.id}`}>編集</a>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+    <p id="bh-noresult" class="bh-meta" hidden style="margin-top:10px">条件に合う備品がありません。</p>
+    </>
+  )}
+
+  <h2>新しい備品を登録</h2>
+  <form method="POST" action={Astro.url.pathname} enctype="multipart/form-data">
+    <input type="hidden" name="action" value="add">
+    <input type="hidden" name="photo" value="">
+    <div class="yk-card" style="padding-top:6px">
+      <label class="yk-field">アイテム名
+        <input type="text" name="name" required maxlength="80" placeholder="例：プロジェクター EPSON EB-W06">
+      </label>
+      <div class="yk-row">
+        <label class="yk-field">個数
+          <input type="text" name="quantity" required inputmode="numeric" placeholder="例：3">
+        </label>
+        <label class="yk-field">購入価格（円）<small>不明なら空欄でOK</small>
+          <input type="text" name="price" inputmode="numeric" placeholder="例：12800">
+        </label>
+      </div>
+      <label class="yk-field">保管場所<small>例：事務所の棚A・倉庫2F</small>
+        <input type="text" name="location" required maxlength="100" placeholder="例：事務所の棚A">
+      </label>
+      <label class="yk-field">写真<small>任意。選ぶと自動で縮小されます</small>
+        <input type="file" name="photofile" accept="image/*" data-compress>
+      </label>
+      <img class="bh-preview" alt="写真のプレビュー" hidden>
+      <button class="yk-btn" type="submit">登録する</button>
+    </div>
+  </form>
+  </>
+)}
+</YoyakuLayout>
+
+<style is:global>
+.bh-count{font-weight:400;font-size:12.5px;color:#8a8378;margin-left:10px;letter-spacing:.02em}
+#bh-search{width:100%;margin-top:4px;padding:12px 14px;font:inherit;font-size:15px;border:1.5px solid #ddd5c6;border-radius:10px;background:#fff;color:var(--ink)}
+#bh-search:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.bh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:14px}
+.bh-card{background:#fff;border:1px solid #ece5d8;border-radius:16px;overflow:hidden;box-shadow:0 6px 18px rgba(51,48,43,.05);display:flex;flex-direction:column}
+.bh-photo{width:100%;height:160px;object-fit:cover;display:block;background:#f7f2e9}
+.bh-nophoto{display:flex;align-items:center;justify-content:center;font-size:12.5px;color:#b6ae9f;letter-spacing:.1em}
+.bh-body{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1}
+.bh-name{font-weight:800;font-size:15.5px;margin:0 0 6px;line-height:1.5}
+.bh-meta{font-size:13px;color:#5f594f;margin:2px 0}
+.bh-date{color:#a79f90;font-size:12px}
+.bh-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:12px}
+.bh-qty{display:flex;align-items:center;gap:8px}
+.bh-qtybtn{width:32px;height:32px;border-radius:50%;border:1.5px solid #ddd5c6;background:#fffdf8;color:var(--ink);font-size:16px;font-weight:700;cursor:pointer;line-height:1}
+.bh-qtybtn:hover:not(:disabled){border-color:var(--accent);color:var(--accent-dark)}
+.bh-qtybtn:disabled{opacity:.35;cursor:default}
+.bh-qtynum{font-size:17px;font-weight:800;min-width:2.2em;text-align:center}
+.bh-qtynum small{font-size:11px;font-weight:400;color:#8a8378;margin-left:2px}
+.bh-current{margin-top:14px}
+.bh-editphoto{max-width:220px;width:100%;border-radius:10px;border:1px solid #ece5d8;display:block}
+.bh-remove{display:flex;align-items:center;gap:7px;font-size:13px;color:#5f594f;margin-top:8px;cursor:pointer}
+.bh-remove input{width:17px;height:17px;accent-color:var(--accent);margin:0}
+.bh-preview{max-width:220px;width:100%;border-radius:10px;border:1.5px solid var(--accent);display:block;margin-top:12px}
+/* display:block が UA の [hidden]{display:none} に勝ってしまうため明示する */
+.bh-preview[hidden]{display:none}
+</style>
+
+<script is:inline>
+// 写真をブラウザ側で縮小してから送る。スマホで撮った 3〜5MB の写真も
+// 長辺1000px の JPEG（およそ100〜300KB）になり、KV の上限に収まる。
+// 縮小結果は hidden の photo フィールドに入れ、元ファイルは送らない。
+document.addEventListener('change', (e) => {
+  const input = e.target;
+  if (!(input instanceof HTMLInputElement) || !input.hasAttribute('data-compress')) return;
+  const file = input.files && input.files[0];
+  const form = input.closest('form');
+  const hidden = form && form.querySelector('input[name=photo]');
+  const preview = form && form.querySelector('.bh-preview');
+  if (!file || !hidden) return;
+  if (!/^image\//.test(file.type)) return;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    try {
+      const max = 1000;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(img.width * scale));
+      canvas.height = Math.max(1, Math.round(img.height * scale));
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      const dataUri = canvas.toDataURL('image/jpeg', 0.8);
+      hidden.value = dataUri;
+      input.value = ''; // 元の大きいファイルは送信しない
+      if (preview) { preview.src = dataUri; preview.hidden = false; }
+    } catch (_) {
+      // 縮小に失敗したら元ファイルをそのまま送る（サーバ側でサイズ検査）
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  };
+  img.onerror = () => URL.revokeObjectURL(url);
+  img.src = url;
+});
+
+// 名前・保管場所でのしぼり込み（表示を隠すだけの簡易フィルタ）
+const search = document.getElementById('bh-search');
+if (search) {
+  search.addEventListener('input', () => {
+    const q = search.value.trim().toLowerCase();
+    let visible = 0;
+    document.querySelectorAll('.bh-card').forEach((card) => {
+      const hit = !q || (card.dataset.text || '').includes(q);
+      card.style.display = hit ? '' : 'none';
+      if (hit) visible++;
+    });
+    const empty = document.getElementById('bh-noresult');
+    if (empty) empty.hidden = visible > 0;
+  });
+}
+</script>

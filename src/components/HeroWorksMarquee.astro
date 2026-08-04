@@ -3,7 +3,10 @@ import { heroWorks } from '../data/heroWorks';
 ---
 <div class="hero-works">
 <div class="hero-works-track">
-{[...Array(2)].map(() => (
+{/* Repeat the list 6× (an even count) so translateX(-50%) loops on a
+    clean boundary and one -50% copy (3 repetitions ≈ 4150px) always
+    exceeds the viewport — even on 4K — so the strip never cuts off. */}
+{[...Array(6)].map(() => (
   heroWorks.map((w) => (
     <img src={w.src} alt="" width={w.w} height={w.h} loading="eager" decoding="async" />
   ))

@@ -1,0 +1,227 @@
+---
+// Rendered on request so newly published blog posts appear in the
+// related-articles section without a redeploy.
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { jsonLd } from '../../lib/microcms';
+import LatestPosts from '../../components/LatestPosts.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import HeroWorksMarquee from '../../components/HeroWorksMarquee.astro';
+import { mediaItems } from '../../data/media';
+
+const faqs = [
+  {
+    q: 'イマーシブコンテンツとは、謎解きやマーダーミステリーと何が違うのですか？',
+    a: '謎解きは「協力して謎を解くこと」、マーダーミステリーは「役になりきって推理すること」が体験の中心です。イマーシブコンテンツは、謎を解くこと自体よりも、実在する街・空間・香り・アート作品などを通じて「物語の中に入り込む没入感」そのものを体験の目的とする点が異なります。',
+  },
+  {
+    q: 'どのような街やブランドと組み合わせられますか？',
+    a: '香水・化粧品などの商品ブランド、商業施設・観光施設・商店街エリアなど、実在する場所やブランドと組み合わせたオリジナルのイマーシブコンテンツを企画・制作します。実際に下北沢の街全体や、香水ブランドとのコラボレーション作品を制作した実績があります。',
+  },
+  {
+    q: '制作期間や費用はどのくらいですか？',
+    a: '舞台となる規模（街全体か、施設単体か）や演出の複雑さによって異なります。案件によっては初期費用を抑えたご提案やレベニューシェア型での実施にも対応しておりますので、まずはご相談ください。',
+  },
+  {
+    q: '一度実施した後、再演することはできますか？',
+    a: '複数のエンディングを用意するなど、リプレイ性を持たせた設計も可能です。継続的な集客コンテンツとして展開したい場合もご相談ください。',
+  },
+  {
+    q: 'イマーシブの制作依頼は、何から始めればいいですか？',
+    a: 'お問い合わせフォームから「目的（集客・話題化・ブランド体験など）・舞台にしたい場所・希望時期」をお知らせください。内容を伺ったうえで、企画の方向性と概算お見積りを無料でご提案します。',
+  },
+  {
+    q: '制作依頼から公開までの期間はどのくらいですか？',
+    a: '体験の規模により数週間〜数ヶ月が目安です。開催希望日が決まっている場合は、お問い合わせ時にお伝えいただければ間に合う構成をご提案します。',
+  },
+  {
+    q: 'イマーシブイベントの制作を依頼する場合、どのような流れになりますか？',
+    a: 'お問い合わせフォームからご連絡いただいた後、目的・舞台となる場所・ご予算をヒアリングし、企画をご提案します。ご発注後はシナリオ制作・体験設計・テストプレイを経て、当日の運営まで一貫してex Labsが担当します。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const serviceLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  serviceType: 'イマーシブコンテンツ制作',
+  name: 'イマーシブコンテンツ制作',
+  alternateName: ['イマーシブイベント制作', 'イマーシブ制作依頼'],
+  description: '実在する街・空間・ブランドを舞台にした没入型（イマーシブ）体験コンテンツの企画・シナリオ制作・体験設計',
+  provider: { '@type': 'Organization', name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
+  areaServed: 'JP',
+  subjectOf: {
+    '@type': 'NewsArticle',
+    headline: '日本経済新聞：渋谷サクラステージの施設一体型イマーシブ「ウワサバナシ調査委員会」が紹介',
+    publisher: { '@type': 'Organization', name: '日本経済新聞' },
+    url: 'https://www.nikkei.com/article/DGXZQOUC222NG0S6A720C2000000/',
+  },
+  url: new URL('/services/immersive/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="イマーシブ制作依頼・お見積り｜没入型体験イベントの企画・制作会社 - 株式会社ex Labs"
+  description="イマーシブ（没入型体験）コンテンツ・イマーシブイベントの制作依頼なら、イマーシブ制作会社の株式会社ex Labs。日本経済新聞に掲載された渋谷サクラステージの施設一体型イマーシブなど制作実績多数。企画から体験設計・運営まで一貫対応。見積り無料。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(serviceLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'サービス', href: '/services/' },
+  { name: 'イマーシブ制作' },
+]} />
+
+<section class="hero">
+<div class="hero-overlay"></div>
+<div class="wrap hero-center" style="padding-top:36px;padding-bottom:44px">
+<img class="hero-logo" src="/assets/logo.png" alt="株式会社 ex Labs" width="2048" height="520" loading="eager" decoding="async" style="width:min(220px,46vw);margin-bottom:26px">
+<h1 class="hero-title serif"><span class="hl">街もブランドも物語になる</span><br><span class="hl">イマーシブ体験を制作しませんか？</span></h1>
+<p class="hero-sub">Immersive Experience Production — ex Labs Inc.</p>
+<div class="hero-actions">
+<a class="btn" href="/#contact">相談してみる</a>
+<a class="btn ghost" href="#works">実績を見る</a>
+</div>
+</div>
+<HeroWorksMarquee />
+</section>
+
+<section class="section" style="padding-top:56px"><div class="wrap">
+<p class="eyebrow">SERVICE</p>
+<h2 class="h2 serif">イマーシブコンテンツ制作｜没入型体験の企画・制作</h2>
+<p class="lede">株式会社ex Labsは、参加者が物語を「観る」のではなく<strong>自分自身が物語の当事者として体験する</strong>、イマーシブ（没入型）コンテンツを企画・制作しています。実在する街・空間・香り・アート作品を物語に組み込み、「<strong>その場所だからこそ体験できる物語</strong>」をお届けします。<strong>イマーシブの制作依頼・お見積りは無料</strong>で受け付けています。</p>
+<p class="lede" style="margin-top:20px"><strong>イマーシブ（immersive）とは「没入型」の意味</strong>で、観客が客席から鑑賞するのではなく、物語の世界に入り込んで登場人物として体験するエンターテインメント形式を指します。イマーシブシアターのような劇場型から、街全体を舞台にした周遊型まで、空間そのものを物語に変えるのが特徴です。<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイドはこちら →</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例5選はこちら →</a></p>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="eyebrow">ISSUES</p>
+<h2 class="h2 serif">こんなご要望はありませんか？</h2>
+<ul class="bullets">
+<li>謎解きやマーダーミステリーとは違う、没入感を軸にした体験を作りたい</li>
+<li>街やエリア全体を舞台にした周遊型のイベントを実施したい</li>
+<li>自社ブランド・商品の世界観を、体験として届けたい</li>
+<li>記憶に残る、話題化するオリジナルの体験コンテンツを企画してほしい</li>
+</ul>
+<div class="rule"></div>
+<p class="lede">イマーシブコンテンツは、ゴールへの到達よりも<strong>体験の過程で得られる没入感や感情の動き</strong>が主役です。だからこそ、シナリオだけでなく、街・空間・香り・アートといった<strong>五感の演出</strong>を物語にどう織り込むかが問われます。</p>
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="eyebrow">FEATURES</p>
+<h2 class="h2 serif">ex Labsのイマーシブ制作が選ばれる理由</h2>
+<div class="str-grid tag-immersive">
+<div class="str-card"><p class="str-num">01</p><h3 class="str-title"><span class="nobr">複数の</span><span class="nobr">イマーシブレーベルを</span><span class="nobr">自社運営</span></h3>
+<p class="str-lead"><span class="nobr">アート×体験の「体験する美術館」、</span><span class="nobr">香り×体験の「Smystery」など、</span><span class="nobr">複数の没入型レーベルを</span><span class="nobr">自社で運営しています。</span></p>
+<ul class="feature-points"><li>ジャンルごとの体験設計ノウハウを蓄積</li><li>それぞれにファン・集客基盤を形成</li></ul></div>
+<div class="str-card"><p class="str-num">02</p><h3 class="str-title"><span class="nobr">街・ブランドと連携した</span><span class="nobr">制作実績</span></h3>
+<p class="str-lead"><span class="nobr">下北沢の街全体や、</span><span class="nobr">実在する香水ブランドと連携した</span><span class="nobr">イマーシブ作品を制作してきました。</span></p>
+<ul class="feature-points"><li>実在の街・商店街を舞台にした周遊型の設計力</li><li>ブランドの世界観を体験に落とし込む企画力</li></ul></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="works"><div class="wrap">
+<p class="eyebrow">WORKS</p>
+<h2 class="h2 serif">イマーシブの制作実績</h2>
+<p class="h2sub">当社のイマーシブの取り組みは、以下のメディアでご紹介いただきました。</p>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;max-width:920px;margin:0 auto 48px">
+{mediaItems.map((m) => (
+  <article class="media-item" style="padding:26px 28px">
+    <div class="media-feature-head" style="margin-bottom:10px">
+      <span class="media-outlet serif" style="font-size:22px">{m.outlet}</span>
+      <span class="media-date">{m.date}</span>
+    </div>
+    <p class="media-title" style="font-size:14px;margin-bottom:0">{m.title}</p>
+    {m.url && <p style="margin:14px 0 0"><a class="nobr" href={m.url} target="_blank" rel="noopener" style="color:var(--accent);font-size:13px;font-weight:700">記事を読む（外部サイト）&nbsp;→</a></p>}
+  </article>
+))}
+</div>
+<div class="str-grid tag-immersive">
+<div class="str-card"><p class="str-num">01</p><h3 class="str-title"><span class="nobr">ウワサバナシ調査委員会</span><span class="nobr">（渋谷サクラステージ）</span></h3>
+<p class="str-lead"><span class="nobr">東急不動産様・404 Not Found様・</span><span class="nobr">TSUTAYA様と連携した、</span><span class="nobr">施設全体を周遊する</span><span class="nobr">都市伝説×イマーシブ×謎解き。</span></p>
+<ul class="feature-points"><li>商業施設の共有区画・館内導線を「体験の目的地」に転換する施設一体型イマーシブ</li><li>本取り組みは日本経済新聞に掲載</li></ul>
+<p class="vc-line" style="margin:16px 0 0;padding-top:12px;text-align:left"><a href="/uwasabanashi/" style="color:var(--accent)">特設サイト →</a></p></div>
+<div class="str-card"><p class="str-num">02</p><h3 class="str-title"><span class="nobr">怪盗と秘密の試験</span><span class="nobr">（IMMERSIVE ILLUSION）</span></h3>
+<p class="str-lead"><span class="nobr">日本一になった実績のある</span><span class="nobr">マジシャン様とのコラボによる、</span><span class="nobr">六本木の会員制バーを舞台にした</span><span class="nobr">マジック×イマーシブ公演。</span></p>
+<ul class="feature-points"><li>実在するバー空間そのものを物語の舞台に変える少人数制の没入体験</li><li>自社レーベル「IMMERSIVE ILLUSION」として企画・制作・運営</li></ul>
+<p class="vc-line" style="margin:16px 0 0;padding-top:12px;text-align:left"><a href="/kaitou/" style="color:var(--accent)">公演サイト →</a></p></div>
+<div class="str-card"><p class="str-num">03</p><h3 class="str-title"><span class="nobr">ロスト・フレーム</span><span class="nobr">（体験する美術館）</span></h3>
+<p class="str-lead"><span class="nobr">下北沢の街全体を舞台にした</span><span class="nobr">アート×イマーシブ体験を制作。</span></p>
+<ul class="feature-points"><li>街に散らばった絵画を探し、隠された物語を辿る周遊型アートイマーシブ</li><li>絵画と街が交差する、その場所ならではの体験設計</li></ul></div>
+<div class="str-card"><p class="str-num">04</p><h3 class="str-title"><span class="nobr">紅漂う街角で</span><span class="nobr">（Smystery × WAKA）</span></h3>
+<p class="str-lead"><span class="nobr">香水ブランドWAKA様との</span><span class="nobr">コラボレーションによる、</span><span class="nobr">匂い×イマーシブミステリーを制作。</span></p>
+<ul class="feature-points"><li>実在する香水を実際に体感しながら物語を進める没入体験</li><li>「ある香水ブランドの秘密」を追う、街歩き型イマーシブ</li></ul></div>
+<div class="str-card"><p class="str-num">05</p><h3 class="str-title"><span class="nobr">ヌル・アーデン展</span><span class="nobr">（自社主催）</span></h3>
+<p class="str-lead"><span class="nobr">東京藝術大学出身</span><span class="nobr">アーティストとの</span><span class="nobr">コラボレーションによる、</span><span class="nobr">アート×謎解きを融合した</span><span class="nobr">没入型の展覧会イベントを企画・制作。</span></p>
+<ul class="feature-points"><li>アート作品の世界に入り込む、体験としての美術展</li><li>公演終了後には作品オークションも開催</li></ul></div>
+</div>
+<p class="vc-line" style="margin-top:32px">このほか、謎解き・マーダーミステリー・頭脳戦など複数ジャンルの制作実績があります。<a href="/#works" style="color:var(--accent)">実績一覧を見る</a></p>
+</div></section>
+
+<section class="section">
+<div class="wrap">
+<p class="eyebrow">GALLERY</p>
+<h2 class="h2 serif">イマーシブイベントの実績ギャラリー</h2>
+<p class="h2sub">ex Labsが企画・制作したイマーシブイベントの数々。</p>
+</div>
+<div class="hero-works" style="margin-top:48px">
+<div class="hero-works-track">
+{[...Array(2)].map(() => (
+  <>
+  <img src="/assets/events/uwasabanashi-kv.webp" alt="渋谷サクラステージの施設一体型イマーシブ「ウワサバナシ調査委員会」" width="880" height="1244" loading="lazy" decoding="async">
+  <img src="/assets/events/kaitou-kv.webp" alt="六本木の会員制バーで開催するマジック×イマーシブ「怪盗と秘密の試験」" width="880" height="1248" loading="lazy" decoding="async">
+  <img src="/assets/work-3.webp" alt="下北沢を舞台にしたアートイマーシブ「ロスト・フレーム」" width="880" height="1252" loading="lazy" decoding="async">
+  <img src="/assets/work-4.webp" alt="香りを手がかりに進むイマーシブミステリー「紅漂う街角で」" width="595" height="842" loading="lazy" decoding="async">
+  <img src="/assets/work-2.webp" alt="アートと謎解きを融合した自社主催イベント「ヌル・アーデン展」" width="880" height="1238" loading="lazy" decoding="async">
+  <img src="/assets/work-1.webp" alt="閉店後の紀伊國屋書店で開催した一夜限りの物語体験「月明かりの書店と呪われた原稿」" width="849" height="1200" loading="lazy" decoding="async">
+  <img src="/assets/events/atelier-copel.webp" alt="ダンス×物語体験の公演「アトリエ・コペル — The Silent Marionette」" width="880" height="1244" loading="lazy" decoding="async">
+  </>
+))}
+</div>
+</div>
+</section>
+
+<section class="section tinted"><div class="wrap">
+<p class="eyebrow">FLOW</p>
+<h2 class="h2 serif">イマーシブ制作依頼の流れ</h2>
+<p class="h2sub">制作依頼は以下の流れで進みます。ヒアリング・企画提案・お見積りまでは無料です。</p>
+<div class="flow-row">
+<div class="flow-step"><p class="flow-num">01</p><p class="flow-t">コンセプト設計</p><p class="flow-d">舞台となる街・空間・ブランドの魅力から没入の軸を決定</p></div>
+<div class="flow-step"><p class="flow-num">02</p><p class="flow-t">シナリオ・体験設計</p><p class="flow-d">脚本に加え、動線・手がかり・交流ポイントを設計</p></div>
+<div class="flow-step"><p class="flow-num">03</p><p class="flow-t">リリース準備</p><p class="flow-d">進行マニュアル・告知素材・演出リハーサルの準備</p></div>
+<div class="flow-step"><p class="flow-num">04</p><p class="flow-t">実施・運営・改善</p><p class="flow-d">当日運営から実施後の振り返り・改善提案まで</p></div>
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="eyebrow">FAQ</p>
+<h2 class="h2 serif">よくあるご質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">イマーシブの制作依頼・無料見積りはこちら</p>
+<a class="btn" href="/#contact">イマーシブ制作を依頼・相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連サービス：<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント</a>／<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作</a></p>
+</div></section>
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
