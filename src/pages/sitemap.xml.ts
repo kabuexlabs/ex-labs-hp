@@ -56,6 +56,7 @@ export const GET: APIRoute = async ({ site }) => {
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {
+    '/guide/madamis/': '2026-08-05',
     '/guide/madamis-cost/': '2026-07-30',
     '/services/immersive/': '2026-08-02',
     '/guide/immersive-event/': '2026-07-31',

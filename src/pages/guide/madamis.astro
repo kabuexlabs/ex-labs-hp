@@ -11,10 +11,10 @@ import { jsonLd } from '../../lib/microcms';
 
 const toc = [
   { id: 'about', label: 'マダミスとは' },
-  { id: 'play', label: '遊び方・当日の流れ' },
+  { id: 'play', label: '遊び方・必要なもの・初心者のコツ' },
   { id: 'types', label: 'マダミスの種類' },
   { id: 'diff', label: '謎解きとの違い' },
-  { id: 'where', label: 'マダミスを遊ぶには' },
+  { id: 'where', label: '遊ぶには（店舗・オンライン）' },
   { id: 'make', label: 'マダミスを制作・依頼するには' },
   { id: 'cost', label: '費用の目安' },
   { id: 'faq', label: 'よくある質問' },
@@ -32,6 +32,14 @@ const faqs = [
   {
     q: 'マダミスは一度遊んだ作品をもう一度遊べますか？',
     a: '基本的に再プレイはできません。犯人や結末を知ってしまうと推理の楽しみが失われるため、多くの作品が「一度きりの体験」として設計されています。',
+  },
+  {
+    q: 'マダミスはオンラインでも遊べますか？',
+    a: '遊べます。ビデオ通話やオンラインセッションツールを使って自宅から参加でき、店舗公演より安価な作品が多いのも魅力です。東大マーダーミステリーサークルでもオンライン対応作品を公演しています。',
+  },
+  {
+    q: '初心者はどのマダミスから始めればいいですか？',
+    a: '人数が少なめ・プレイ時間が短め・GM（進行役）付きの作品がおすすめです。ルール説明から進行までGMがリードしてくれるため、初めてでも迷わず楽しめます。',
   },
   {
     q: 'マダミスの相場・料金はどのくらいですか？',
@@ -78,6 +86,7 @@ const articleLd = {
   inLanguage: 'ja',
   author: { '@type': 'Organization', name: '株式会社ex Labs' },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  dateModified: '2026-08-05',
   mainEntityOfPage: new URL('/guide/madamis/', Astro.site).toString(),
 };
 ---
@@ -122,6 +131,18 @@ const articleLd = {
 <li><strong>解説・感想戦</strong>：真相が明かされ、伏線を振り返ります。ここまで含めて1つの体験です。</li>
 </ul>
 <p class="vc-line">所要時間は作品により60〜240分ほど。進行役（GM）が付く作品と、GM不要でプレイできる作品があります。</p>
+<h3 class="def-sub serif">マダミスに必要なもの</h3>
+<ul class="bullets">
+<li><strong>店舗公演</strong>：基本的に手ぶらでOK。資料・小道具はすべて店舗に用意されています。</li>
+<li><strong>オンライン</strong>：PCまたはスマホ、通話環境（Discordなど）、作品によっては専用のオンラインセッションツールを使います。</li>
+<li><strong>共通して必要なもの</strong>：数時間まとまった時間と、物語に本気でなりきる気持ち。この2つが一番大切です。</li>
+</ul>
+<h3 class="def-sub serif">初心者が楽しむ3つのコツ</h3>
+<ul class="bullets">
+<li><strong>初心者向け作品から始める</strong>：人数が少なめ・時間が短め・GM付きの作品は、初めてでも迷わず楽しめます。</li>
+<li><strong>キャラクターの目的を最優先に</strong>：推理の勝ち負けよりも「自分の役の目的」を追うと、自然に物語へ入り込めます。</li>
+<li><strong>嘘は「役として」つく</strong>：自分の秘密を守る嘘はマダミスの醍醐味。罪悪感は不要です。</li>
+</ul>
 </div></section>
 
 <section class="section tinted" id="types"><div class="wrap">
@@ -143,7 +164,8 @@ const articleLd = {
 <section class="section tinted" id="where"><div class="wrap narrow">
 <p class="eyebrow">WHERE TO PLAY</p><h2 class="h2 serif">マダミスを遊ぶには</h2>
 <p class="lede">マダミス専門店の公演に申し込むのが一般的です。友人同士で貸切予約する方法と、一人でオープン公演（相席）に参加する方法があります。</p>
-<p class="lede">現役東大生と有名作家のチームによる<strong>東大マーダーミステリーサークル</strong>では、推理を重視した本格派のオリジナル作品を店舗・オンラインで公演しています。<a href="/toudaimurder/works/" style="color:var(--accent)">マダミス作品一覧を見る →</a></p>
+<p class="lede"><strong>オンラインで遊ぶ</strong>方法も広がっています。ビデオ通話やオンラインセッションツールを使えば、遠方の友人とも自宅から参加できます。店舗より安価な作品が多く、初めての1作にもおすすめです。</p>
+<p class="lede">現役東大生と有名作家のチームによる<strong>東大マーダーミステリーサークル（UNLIMITED MYSTERY）</strong>では、推理を重視した本格派のオリジナル作品を店舗・オンラインで公演しています。<a href="/toudaimurder/works/" style="color:var(--accent)">マダミス作品一覧を見る →</a></p>
 </div></section>
 
 <section class="section" id="make"><div class="wrap narrow">
@@ -190,6 +212,7 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
+.def-sub{font-size:19px;color:var(--ink);margin:40px 0 6px;text-align:center}
 #about,#play,#types,#diff,#where,#make,#cost,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>
