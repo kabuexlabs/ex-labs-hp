@@ -222,15 +222,38 @@ export async function getSlot(eventId: string, id: string): Promise<Slot | null>
   }
 }
 
+export async function getBooking(eventId: string, slotId: string): Promise<Booking | null> {
+  const raw = await redis('HGET', evBookingsKey(eventId), slotId);
+  if (typeof raw !== 'string') return null;
+  try {
+    return JSON.parse(raw) as Booking;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * 予約の本体。HSETNX が原子的なので、同じ枠に二人が同時に申し込んでも
  * 先に書けた一人だけが成功する（ダブルブッキング防止）。
+ *
+ * 戻り値：
+ *   'ok'        … 新規に予約を確定した（確認メールを送るのは呼び出し側）
+ *   'duplicate' … すでに同じメールアドレスで同じ枠が予約済み。ダブル
+ *                 クリック・戻るボタンでの再送信・通信断後のリトライは
+ *                 すべてここに落ちる。本人には成功として扱い、メールは
+ *                 再送しない（初回リクエストが送っている）。
+ *   'taken'     … 別の方が先に確保していた（本当の満席）
+ * かつては boolean で、再送信が自分の予約に HSETNX で負けて「埋まって
+ * しまいました」と誤表示 → 本人が別の枠を取り直してゴースト予約が残る、
+ * という実害があった。
  */
+export type ReserveResult = 'ok' | 'duplicate' | 'taken';
+
 export async function reserve(
   eventId: string,
   slot: Slot,
   data: { name: string; phone: string; email: string },
-): Promise<boolean> {
+): Promise<ReserveResult> {
   const booking: Booking = {
     slotId: slot.id,
     name: data.name,
@@ -241,7 +264,16 @@ export async function reserve(
     createdAt: new Date().toISOString(),
   };
   const result = await redis('HSETNX', evBookingsKey(eventId), slot.id, JSON.stringify(booking));
-  return result === 1;
+  if (result === 1) return 'ok';
+  // 負けた相手が「同じメールアドレスの既存予約」なら同一人物の再送信と
+  // みなす。一致判定に使うのはメールアドレスのみで、既存予約の氏名・
+  // 電話番号などを応答に含めることはない（不一致なら汎用の満席エラーの
+  // ままなので、他人の予約の存在から個人情報は推測できない）。
+  const existing = await getBooking(eventId, slot.id);
+  if (existing && existing.email.trim().toLowerCase() === data.email.trim().toLowerCase()) {
+    return 'duplicate';
+  }
+  return 'taken';
 }
 
 export async function cancelBooking(eventId: string, slotId: string): Promise<void> {
@@ -334,6 +366,11 @@ async function sendViaSmtp(
       // ローカルテスト（平文モックSMTP）用に SMTP_SECURE=false で無効化できる
       secure: readEnv('SMTP_SECURE') === 'false' ? false : port === 465,
       auth: { user, pass: pass.replace(/\s+/g, '') },
+      // SMTP が詰まったときに予約完了の応答まで道連れにしない。応答が
+      // 遅いほどお客様が再送信し、無用な「埋まってしまいました」を生む。
+      connectionTimeout: 8000,
+      greetingTimeout: 8000,
+      socketTimeout: 15000,
     });
     await transporter.sendMail({
       from: smtpFrom(),

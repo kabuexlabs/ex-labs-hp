@@ -60,32 +60,38 @@ if (Astro.request.method === 'POST') {
     const slot = await getSlot(ev.id, slotId);
     if (!slot || slot.closed || slot.date < jstToday()) {
       error = '選択された日程は現在ご予約いただけません。別の日程をお選びください。';
-    } else if (!(await reserve(ev.id, slot, { name, phone, email }))) {
-      // HSETNX が負けた = 直前に他の方が同じ枠を確保した
-      error = '申し訳ありません、この日程はたった今埋まってしまいました。別の日程をお選びください。';
     } else {
-      const when = formatSlotJa(slot.date, slot.time);
-      const notesBlock = ev.notes ? `■ ご案内\n${ev.notes}\n\n` : '';
-      await Promise.all([
-        sendMail(
-          email,
-          '【ex Labs】ご予約を承りました',
-          `${name} 様\n\nご予約ありがとうございます。以下の内容で承りました。\n\n` +
-            `■ イベント\n${ev.title}\n\n■ 日程\n${when}\n\n` +
-            `■ ご入力内容\nハンドルネーム：${name}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +
-            notesBlock +
-            `前日にリマインドメールをお送りします。\n変更・キャンセルはこのメールへの返信、または ${adminEmail()} までご連絡ください。\n\n株式会社 ex Labs`,
-        ),
-        sendMail(
-          adminEmail(),
-          `【予約】${ev.title}：${when}`,
-          `予約ページから新しい予約が入りました。\n\n■ イベント\n${ev.title}\n\n■ 日程\n${when}\n\n` +
-            `■ お客様情報\nハンドルネーム：${name}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +
-            `管理ページ：${new URL('/yoyaku/admin/', Astro.site ?? Astro.url).toString()}`,
-        ),
-      ]);
-      // PRG: リロードによる二重送信を防ぐため、完了画面へリダイレクト
-      return Astro.redirect(`${Astro.url.pathname}?done=${encodeURIComponent(slotId)}`, 303);
+      const result = await reserve(ev.id, slot, { name, phone, email });
+      if (result === 'taken') {
+        // 本当に他の方が直前に同じ枠を確保したときだけ満席エラーを出す。
+        // 同一人物の再送信（'duplicate'）は成功扱いで完了画面へ流す。
+        error = '申し訳ありません、この日程はたった今埋まってしまいました。別の日程をお選びください。';
+      } else {
+        if (result === 'ok') {
+          const when = formatSlotJa(slot.date, slot.time);
+          const notesBlock = ev.notes ? `■ ご案内\n${ev.notes}\n\n` : '';
+          await Promise.all([
+            sendMail(
+              email,
+              '【ex Labs】ご予約を承りました',
+              `${name} 様\n\nご予約ありがとうございます。以下の内容で承りました。\n\n` +
+                `■ イベント\n${ev.title}\n\n■ 日程\n${when}\n\n` +
+                `■ ご入力内容\nハンドルネーム：${name}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +
+                notesBlock +
+                `前日にリマインドメールをお送りします。\n変更・キャンセルはこのメールへの返信、または ${adminEmail()} までご連絡ください。\n\n株式会社 ex Labs`,
+            ),
+            sendMail(
+              adminEmail(),
+              `【予約】${ev.title}：${when}`,
+              `予約ページから新しい予約が入りました。\n\n■ イベント\n${ev.title}\n\n■ 日程\n${when}\n\n` +
+                `■ お客様情報\nハンドルネーム：${name}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +
+                `管理ページ：${new URL('/yoyaku/admin/', Astro.site ?? Astro.url).toString()}`,
+            ),
+          ]);
+        }
+        // PRG: リロードによる二重送信を防ぐため、完了画面へリダイレクト
+        return Astro.redirect(`${Astro.url.pathname}?done=${encodeURIComponent(slotId)}`, 303);
+      }
     }
   }
 }
@@ -169,4 +175,28 @@ const hasOpen = visible.some((s) => !bookings.has(s.id) && !s.closed);
   )}
   </>
 )}
+
+{/* 二重送信ガード。確定後のメール送信で応答に数秒かかるため、その間の
+    再クリックをここで止める（サーバ側でも reserve() が冪等なので二段構え）。
+    CSP は script-src 'self' 'unsafe-inline' なのでインラインで動く。 */}
+<script is:inline>
+(() => {
+  const form = document.querySelector('form');
+  if (!form) return;
+  const btn = form.querySelector('button[type="submit"]');
+  const label = btn ? btn.textContent : '';
+  let sending = false;
+  form.addEventListener('submit', (e) => {
+    if (sending) { e.preventDefault(); return; }
+    sending = true;
+    if (btn) { btn.disabled = true; btn.textContent = '送信中です…そのままお待ちください'; }
+  });
+  // 戻るボタンで bfcache から復元されたときに押せる状態へ戻す
+  window.addEventListener('pageshow', (e) => {
+    if (!e.persisted) return;
+    sending = false;
+    if (btn) { btn.disabled = false; btn.textContent = label; }
+  });
+})();
+</script>
 </YoyakuLayout>
