@@ -1,8 +1,11 @@
 ---
 // 『ロスト・フレーム』公演LP。
 // 支給されたLP画像 (3枚・縦つなぎでシームレスなグラデーションになっている) を
-// 全幅で積み、チケット購入CTAと追従ボタンを重ねる構成。
+// 全幅で積み、参加申し込みのCTAと追従ボタンを重ねる構成。
 // トップページの WORKS ナビ・Lost Frame カードからここに遷移する。
+// NOTE: LP画像 (lp-1〜3) 内には旧来の「イマーシブ」「チケット」等の文字が
+//       焼き込まれている。画像を作り直さない限り画像内の文言は変更できないため、
+//       ここで制御できる HTML テキスト・alt・メタは芸術文脈に統一している。
 import TaikenbizyutuLayout from '../../../layouts/TaikenbizyutuLayout.astro';
 
 const TICKET_URL = 'https://escape.id/kyoukaiart-org/e-lost/';
@@ -10,24 +13,24 @@ const assets = '/assets/taikenbizyutu';
 
 const title = 'ロスト・フレーム Lost Frame｜体験する美術館';
 const description =
-  '下北沢の街に散らばった絵画を探し、隠された物語を辿る——絵画と街が交差する周遊型アートイマーシブ『ロスト・フレーム』。体験時間75分・1〜4名。チケット販売中。';
+  '下北沢の街に散らばった絵画を探し、隠された物語を辿る——絵画と街が交差する、街を巡る参加型の絵画鑑賞『ロスト・フレーム』。所要時間75分・1〜4名。参加受付中。';
 ---
 
 <TaikenbizyutuLayout title={title} description={description} bare>
 
 <header class="lphdr fx ac jb">
   <a class="lpback" href="/taikenbizyutu/">← 体験する美術館</a>
-  <a class="lpticket-s" href={TICKET_URL} target="_blank" rel="noopener">チケット購入</a>
+  <a class="lpticket-s" href={TICKET_URL} target="_blank" rel="noopener">参加を申し込む</a>
 </header>
 
 <div class="lp">
-  <img class="lpimg" src={`${assets}/lp-1.webp`} alt="ロスト・フレーム Lost Frame ─ 絵画×イマーシブ『体験する美術館』。その日、絵画は街にこぼれた。下北沢の街に散らばった絵画を探し、隠された物語を辿る……絵画と街が交差する周遊型アートイマーシブ" width="1600" height="2900">
-  <img class="lpimg" src={`${assets}/lp-2.webp`} alt="STORY：古着と音楽、演劇とアート。多様な文化が調和する街、下北沢。しかし最近、奇妙な出来事が目撃されている。絵画のモチーフが街にこぼれるように現れはじめたのだ——。ABOUT：絵画×イマーシブ。実際に下北沢の街を歩きながら、この体験のためだけに描かれた絵画と、絵画を巡る物語を体験するアートイマーシブコンテンツ。PAINTING：荒巻まりの、小島有貴、中堀慎治、山科ティナ" width="1600" height="3700" loading="lazy">
-  <img class="lpimg" src={`${assets}/lp-3.webp`} alt="体験時間75分、定員1〜4名。チケット料金（1人あたり）：4,000円［4名参加］、4,500円［3名参加］、5,000円［2名参加］、8,000円［1名参加］。STEP：01 チケットサイトでチケットを購入、02 チケットサイト記載の住所で体験に参加。CREATER：企画 株式会社ex Labs／ディレクター・デザイン・ストーリー制作 荒巻まりの／プロデューサー・謎制作 かるら／監修 御湯波ライト" width="1600" height="4000" loading="lazy">
+  <img class="lpimg" src={`${assets}/lp-1.webp`} alt="ロスト・フレーム Lost Frame ─ 参加型芸術のレーベル『体験する美術館』。その日、絵画は街にこぼれた。下北沢の街に散らばった絵画を探し、隠された物語を辿る……絵画と街が交差する、街を巡る参加型の絵画鑑賞" width="1600" height="2900">
+  <img class="lpimg" src={`${assets}/lp-2.webp`} alt="STORY：古着と音楽、演劇とアート。多様な文化が調和する街、下北沢。しかし最近、奇妙な出来事が目撃されている。絵画のモチーフが街にこぼれるように現れはじめたのだ——。ABOUT：実際に下北沢の街を歩きながら、この公演のためだけに描かれた絵画と物語に出会い、図像を読み解いていく参加型の絵画鑑賞。PAINTING：荒巻まりの、小島有貴、中堀慎治、山科ティナ" width="1600" height="3700" loading="lazy">
+  <img class="lpimg" src={`${assets}/lp-3.webp`} alt="所要時間75分、定員1〜4名。参加費（1人あたり）：4,000円［4名参加］、4,500円［3名参加］、5,000円［2名参加］、8,000円［1名参加］。STEP：01 公式サイトで参加を申し込む、02 記載の住所で公演に参加。CREATER：企画 株式会社ex Labs／ディレクター・デザイン・ストーリー制作 荒巻まりの／プロデューサー・図像設計 かるら／監修 御湯波ライト" width="1600" height="4000" loading="lazy">
 
   <div class="lpcta tc">
-    <a class="lpbtn" href={TICKET_URL} target="_blank" rel="noopener">チケット購入 <span class="arr">▶▶</span></a>
-    <p class="lpnote">チケットサイト（escape.id）へ移動します</p>
+    <a class="lpbtn" href={TICKET_URL} target="_blank" rel="noopener">参加を申し込む <span class="arr">▶▶</span></a>
+    <p class="lpnote">お申し込みページ（escape.id）へ移動します</p>
     <a class="lphome" href="/taikenbizyutu/">← 体験する美術館 トップへ戻る</a>
   </div>
 
@@ -37,7 +40,7 @@ const description =
   </footer>
 </div>
 
-<a class="fab" href={TICKET_URL} target="_blank" rel="noopener">チケット<br>購入 ▶▶</a>
+<a class="fab" href={TICKET_URL} target="_blank" rel="noopener">参加を<br>申し込む ▶▶</a>
 
 <style>
 .lp{background:#4e3f49}
