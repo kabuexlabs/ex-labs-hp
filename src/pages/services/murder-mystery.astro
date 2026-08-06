@@ -31,6 +31,10 @@ const faqs = [
     a: '作品の形式・規模・利用範囲により異なります。案件によっては初期費用を抑えたご提案やレベニューシェア型での実施にも対応しておりますので、まずはご相談ください。',
   },
   {
+    q: 'マダミスの制作依頼は、何から始めればいいですか？',
+    a: 'お問い合わせフォームから「目的（動画企画・店舗集客・イベント・研修など）・おおよその人数・希望時期」をお知らせください。内容を伺ったうえで、構成の方向性と概算お見積りを無料でご提案します。',
+  },
+  {
     q: 'マーダーミステリーの制作を依頼する場合、どのような流れになりますか？',
     a: 'お問い合わせフォームからご連絡いただいた後、目的・人数・実施形式（店舗・オンライン・イベント等）・ご予算をヒアリングし、企画をご提案します。ご発注後はシナリオ制作・テストプレイ・調整を経て納品し、ご希望に応じて公演運営までex Labsが担当します。',
   },
@@ -51,7 +55,7 @@ const serviceLd = {
   '@type': 'Service',
   serviceType: 'マーダーミステリー制作',
   name: 'マーダーミステリー（マダミス）制作',
-  alternateName: 'マダミス制作',
+  alternateName: ['マダミス制作', 'マダミス制作依頼', 'マーダーミステリー制作依頼'],
   description: 'オンライン・オフライン問わず、目的に合わせたオリジナルのマーダーミステリー（マダミス）作品の企画・シナリオ制作',
   provider: { '@type': 'Organization', name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
   areaServed: 'JP',
@@ -59,7 +63,7 @@ const serviceLd = {
 };
 ---
 <BaseLayout
-  title="マーダーミステリー（マダミス）制作のご依頼｜企画・シナリオ制作 - 株式会社ex Labs"
+  title="マダミス制作依頼・お見積り｜マーダーミステリーの企画・シナリオ制作会社 - 株式会社ex Labs"
   description="マーダーミステリー（マダミス）の制作依頼なら、マダミス制作会社の株式会社ex Labs。動画企画・店舗集客・イベント向けなど、目的に合わせたオリジナル作品の企画からシナリオ制作・運営まで対応。制作のご相談・お見積りは無料です。マダミスアンケート1位の実績。"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
@@ -88,7 +92,7 @@ const serviceLd = {
 <p class="eyebrow">SERVICE</p>
 <h2 class="h2 serif"><span class="nobr">マーダーミステリー</span><span class="nobr">（マダミス）</span><span class="nobr">制作のご依頼</span></h2>
 <p class="lede">株式会社ex Labsは、オンライン・オフラインを問わず<strong>マーダーミステリー作品の企画・シナリオ制作</strong>を承っています。物語への没入と推理の面白さを両立させた、<strong>目的に合わせたオリジナル作品</strong>をお届けします。</p>
-<p class="lede" style="margin-top:20px"><strong>マダミス</strong>とは<strong>マーダーミステリー</strong>の略称・通称で、参加者が物語の登場人物になりきり、会話と推理を通じて事件の犯人を突き止める体験型ゲームです。当社では、この<strong>マダミスの制作・シナリオ依頼</strong>を、動画企画から店舗集客・イベントまで目的に応じてお受けしています。<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは？完全ガイドはこちら →</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">制作費用の相場はこちら →</a></p>
+<p class="lede" style="margin-top:20px"><strong>マダミス</strong>とは<strong>マーダーミステリー</strong>の略称・通称で、参加者が物語の登場人物になりきり、会話と推理を通じて事件の犯人を突き止める体験型ゲームです。当社では、この<strong>マダミスの制作依頼・シナリオ依頼</strong>を、動画企画から店舗集客・イベントまで目的に応じてお受けしています。<strong>制作依頼・お見積りは無料</strong>です。<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは？完全ガイドはこちら →</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">制作費用の相場はこちら →</a></p>
 </div></section>
 
 <section class="section tinted"><div class="wrap">
@@ -133,7 +137,8 @@ const serviceLd = {
 
 <section class="section tinted"><div class="wrap">
 <p class="eyebrow">FLOW</p>
-<h2 class="h2 serif"><span class="nobr">マーダーミステリー</span><span class="nobr">制作の流れ</span></h2>
+<h2 class="h2 serif"><span class="nobr">マダミス制作依頼の</span><span class="nobr">流れ</span></h2>
+<p class="h2sub">制作依頼は以下の流れで進みます。ヒアリング・企画提案・お見積りまでは無料です。</p>
 <div class="flow-row">
 <div class="flow-step"><p class="flow-num">01</p><p class="flow-t">企画確定</p><p class="flow-d">利用目的・プレイ人数・形式（オンライン/オフライン）の決定</p></div>
 <div class="flow-step"><p class="flow-num">02</p><p class="flow-t">シナリオ制作</p><p class="flow-d">脚本・トリック設計・デバッグプレイ</p></div>
@@ -157,7 +162,7 @@ const serviceLd = {
 
 <section class="section"><div class="wrap">
 <div class="cta-mini">
-<p class="cta-mini-title serif">マーダーミステリー制作のご相談はこちら</p>
+<p class="cta-mini-title serif">マダミスの制作依頼・無料見積りはこちら</p>
 <a class="btn" href="/#contact">マーダーミステリー制作について相談する</a>
 </div>
 <p class="vc-line" style="margin-top:48px">関連サービス：<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作</a>／<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作</a></p>
