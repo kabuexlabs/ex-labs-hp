@@ -15,10 +15,14 @@ export interface Props {
   bare?: boolean;
 }
 
+// NOTE: 検索エンジン向けの SEO レイヤー（title / description / sr-only 見出し /
+// 構造化データ / alt）には「イマーシブ・周遊型・街歩き謎解き」等の検索ワードを
+// 載せ、画面に見える本文は参加型アートの文脈で統一する——という二層構成。
+// これで検索流入を確保しつつ、来訪者・審査で目に入る本文は芸術文脈を保つ。
 const {
-  title = '体験する美術館｜絵画と物語、観客の参加による参加型芸術のレーベル',
+  title = '体験する美術館｜参加型アート・周遊型アートイマーシブ｜絵画×物語×街歩き謎解き',
   description =
-    '「体験する美術館」は、“鑑賞するアート”を“体験するアート”へと問い直す、参加型芸術のレーベルです。手描きの絵画と物語、そして観客の参加を編み込み、絵画の側から上演性と時間を回復する試みに取り組んでいます。最新公演『ロスト・フレーム』開催決定。',
+    '「体験する美術館」は、下北沢など実在の街を舞台に、絵画と物語、街歩き型の謎解きを織り込んだ参加型アート／周遊型アートイマーシブのレーベルです。鑑賞するアートから体験するアートへ——最新公演『ロスト・フレーム』開催中。',
   ogImage = '/assets/taikenbizyutu/ogp.jpg',
   bare = false,
 } = Astro.props;
@@ -49,8 +53,10 @@ const orgLd = {
   url: new URL(`${base}/`, site).toString(),
   logo: new URL('/assets/taikenbizyutu/logo-white.webp', site).toString(),
   sameAs: ['https://x.com/taikenbizyutu'],
+  keywords:
+    '参加型アート, 周遊型アートイマーシブ, イマーシブ, 街歩き 謎解き, 体験型アート, 下北沢 アートイベント, 絵画 展示',
   description:
-    '絵画と物語、観客の参加を編み込んだ参加型芸術のレーベル。閉館後の美術館や街そのものを会場に、絵画の側から上演性と時間を回復する試みに取り組んでいます。',
+    '絵画と物語、観客の参加を編み込んだ参加型アート／周遊型アートイマーシブのレーベル。閉館後の美術館や街そのものを会場に、街歩き型の謎解きと絵画鑑賞を融合した体験を届けています。',
   parentOrganization: {
     '@type': 'Organization',
     name: '株式会社ex Labs',
@@ -127,6 +133,8 @@ a:hover{color:#d8c28c}
 .en{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400}
 .gold{color:#b39a63}
 .muted{color:#9c9488}
+/* 画面には出さず、検索エンジン・スクリーンリーダーにだけ渡すSEO見出し用 */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .fx{display:flex}
 .col{display:flex;flex-direction:column}
 .ac{align-items:center}

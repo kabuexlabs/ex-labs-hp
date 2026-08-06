@@ -63,6 +63,8 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/immersive-theater/': '2026-08-01',
     '/guide/immersive/': '2026-08-01',
     '/media/': '2026-07-31',
+    '/taikenbizyutu/': '2026-08-06',
+    '/taikenbizyutu/lostframe/': '2026-08-06',
   };
   for (const [p, d] of Object.entries(STATIC_LASTMOD)) {
     const u = urls.find((x) => x.loc.endsWith(p));
