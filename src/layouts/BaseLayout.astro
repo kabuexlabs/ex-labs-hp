@@ -10,8 +10,8 @@ export interface Props {
 }
 
 const {
-  title = '株式会社 ex Labs｜体験型エンターテインメントの企画・制作',
-  description = '株式会社ex Labsは、謎解き・マーダーミステリー・イマーシブコンテンツなど体験型エンターテインメントの企画・制作・集客・運営を一貫して手掛けるクリエイティブカンパニーです。謎解き研修や施設活用イベントもご相談ください。',
+  title = '株式会社 ex Labs｜イマーシブ・マダミス（マーダーミステリー）・謎解きの企画・制作会社',
+  description = '株式会社ex Labsは、イマーシブ（没入型体験）・マダミス（マーダーミステリー）・謎解きなど体験型エンターテインメントの企画・制作・集客・運営を一貫して手掛けるクリエイティブカンパニーです。累計コンテンツ体験者数15,000人超。制作依頼・お見積りは無料。',
   // Fresh filename (not just a query) so scrapers that cached the old
   // logo thumbnail — or that ignore query strings — re-fetch the card.
   ogImage = '/assets/share-card.png',
@@ -23,14 +23,20 @@ const {
 const showPreloader = Astro.url.pathname === '/';
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
-const canonical = new URL(Astro.url.pathname, site);
+// Canonical always uses the trailing-slash form: SSR routes answer
+// both /path and /path/, and a request-echoing canonical would split
+// the page into two competing URLs in Google's eyes.
+const canonical = new URL(Astro.url.pathname.replace(/([^/])$/, '$1/'), site);
 const ogImageAbs = new URL(ogImage, site);
 
 const websiteLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: '株式会社 ex Labs',
+  alternateName: 'ex Labs公式サイト',
   url: site.toString(),
+  description:
+    'イマーシブ（没入型体験）・マダミス（マーダーミステリー）・謎解きなど体験型エンターテインメントの企画・制作会社 ex Labs の公式サイト。',
   inLanguage: 'ja',
 };
 
@@ -38,15 +44,67 @@ const orgLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: '株式会社ex Labs',
+  alternateName: 'ex Labs（イーエックスラボ）',
   url: site.toString(),
   logo: new URL('/assets/logo.png', site).toString(),
+  image: new URL('/assets/share-card.png', site).toString(),
   email: 'info@kabuexlabs.com',
+  description:
+    '謎解き・マーダーミステリー（マダミス）・頭脳戦・イマーシブなど、体験型エンターテインメントの企画・制作・集客・運営を一貫して手掛けるクリエイティブカンパニー。',
+  slogan: 'AI時代に、人間が作る面白さを追求する',
+  foundingDate: '2025-11',
+  founder: { '@type': 'Person', name: '飯田 雄貴', jobTitle: '代表取締役' },
+  // AI検索（AIO）向けの専門領域宣言。「マーダーミステリーの制作会社は？」
+  // のような質問に対し、この会社が該当領域の事業者だと判定させるための情報。
+  knowsAbout: [
+    '謎解きイベントの企画・制作',
+    'マーダーミステリー（マダミス）の制作',
+    'イマーシブ（没入型）体験・イマーシブシアターの企画・制作',
+    '頭脳戦・交渉ゲームコンテンツの制作',
+    '商業施設・観光施設・文化施設の集客イベント',
+    '謎解きを活用した企業研修・チームビルディング',
+  ],
+  // 提供サービスを実体として列挙し、各サービスページに紐づける。
+  makesOffer: [
+    { n: '謎解き研修', p: '/services/nazotoki-kenshu/' },
+    { n: 'マーダーミステリー（マダミス）制作', p: '/services/murder-mystery/' },
+    { n: '施設活用イベントの企画・制作', p: '/services/shisetsu-event/' },
+    { n: 'イマーシブコンテンツ制作', p: '/services/immersive/' },
+    { n: '頭脳戦制作', p: '/services/zunousen/' },
+  ].map((s) => ({
+    '@type': 'Offer',
+    itemOffered: {
+      '@type': 'Service',
+      name: s.n,
+      serviceType: s.n,
+      url: new URL(s.p, site).toString(),
+      provider: { '@type': 'Organization', name: '株式会社ex Labs' },
+      areaServed: { '@type': 'Country', name: '日本' },
+    },
+  })),
+  // Entity consolidation for AI/LLM search: link the official X account
+  // and the PR TIMES company page so answer engines can verify this is
+  // the same organization across sources.
+  sameAs: [
+    'https://x.com/kabuexlabs',
+    'https://prtimes.jp/main/html/searchrlp/company_id/185770',
+  ],
+  knowsLanguage: 'ja',
+  areaServed: { '@type': 'Country', name: '日本' },
   address: {
     '@type': 'PostalAddress',
+    postalCode: '160-0023',
     addressRegion: '東京都',
     addressLocality: '新宿区',
     streetAddress: '西新宿3-3-13 西新宿水間ビル2F',
     addressCountry: 'JP',
+  },
+  contactPoint: {
+    '@type': 'ContactPoint',
+    email: 'info@kabuexlabs.com',
+    contactType: 'customer support',
+    areaServed: 'JP',
+    availableLanguage: 'Japanese',
   },
 };
 ---
@@ -74,11 +132,19 @@ const orgLd = {
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="google-site-verification" content="70Rfozvga_yw5B2FeapOdwuZiC8fwS_oCnVyWKijlRE">
-<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800;900&family=Shippori+Mincho:wght@600;700;800&display=swap" rel="stylesheet">
+{/* ヘッダーロゴ＆ヒーローロゴ（LCP候補）を最優先で先読み。 */}
+<link rel="preload" as="image" href="/assets/logo.png" fetchpriority="high">
+{/* Webフォントはレンダリングをブロックしないよう非同期読み込み
+    （media=print→onloadでall）。未使用の Noto 900 は除外して軽量化。
+    display=swap でフォント取得前もフォールバックで即表示される。 */}
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Sans+JP:wght@400;500;700;800&family=Shippori+Mincho:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Sans+JP:wght@400;500;700;800&family=Shippori+Mincho:wght@600;700;800&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Sans+JP:wght@400;500;700;800&family=Shippori+Mincho:wght@600;700;800&display=swap"></noscript>
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <script type="application/ld+json" set:html={jsonLd(websiteLd)} />
 </head>
@@ -93,7 +159,7 @@ const orgLd = {
 
 <header class="nav"><div class="wrap navrow">
 <a href="/"><img class="logo-header" src="/assets/logo.png" alt="ex Labs"></a>
-<nav class="navlinks"><a href="/#about">会社概要</a><a href="/#strength">強み</a><a href="/#works">実績</a><a href="/services/">サービス</a><a href="/#message">メッセージ</a><a href="/press/">プレスリリース</a><a href="/blog">ブログ</a></nav>
+<nav class="navlinks"><a href="/#about">会社概要</a><a href="/#strength">強み</a><a href="/#works">実績</a><a href="/services/">サービス</a><a href="/#message">メッセージ</a><a href="/press/">プレスリリース</a><a href="/blog/">ブログ</a><a href="/game/">過去コンテンツのネタバレ</a></nav>
 <div class="nav-actions">
 <a class="btn dark" href="/#contact" style="padding:12px 24px;font-size:12.5px">お問い合わせ</a>
 <button class="nav-toggle" type="button" aria-label="メニューを開く" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -111,14 +177,32 @@ const orgLd = {
 <a href="/services/nazotoki-kenshu/">謎解き研修</a>
 <a href="/services/murder-mystery/">マーダーミステリー制作</a>
 <a href="/services/shisetsu-event/">施設活用イベント</a>
+<a href="/services/immersive/">イマーシブ制作</a>
 <a href="/services/zunousen/">頭脳戦制作</a>
-<a href="/hacktale/">HACKTALE（頭脳戦公演）</a>
+<a href="/guide/madamis/">マダミスとは</a>
+<a href="/guide/immersive/">イマーシブとは</a>
+<a href="/game/">過去コンテンツのネタバレ</a>
+<a href="/media/">メディア掲載実績</a>
 <a href="/press/">プレスリリース</a>
-<a href="/blog">ブログ</a>
+<a href="/blog/">ブログ</a>
 </nav>
 </div></footer>
 
 <script is:inline>
+/* Safety net: hero logo/headline/marquee use entrance animations that
+   start at opacity:0. On iOS Safari a bfcache "back" restore or a
+   throttled load can leave those animations un-run, freezing the hero
+   invisible. Force any still-hidden hero element visible after the
+   animations would normally have finished, and again on bfcache show. */
+(function () {
+  function ensureHeroVisible() {
+    document.querySelectorAll('.hero-logo,.hero-title,.hero-sub,.hero-actions,.hero-works').forEach(function (el) {
+      if (parseFloat(getComputedStyle(el).opacity) < 0.99) el.style.opacity = '1';
+    });
+  }
+  window.addEventListener('pageshow', function (e) { if (e.persisted) ensureHeroVisible(); });
+  window.addEventListener('load', function () { setTimeout(ensureHeroVisible, 1800); });
+})();
 (function () {
   var header = document.querySelector('header.nav');
   var toggle = document.querySelector('.nav-toggle');
@@ -135,6 +219,48 @@ const orgLd = {
       });
     });
   }
+})();
+/* マーキーのスクロール速度を全トラックで統一する。CSSの固定
+   duration だとトラック幅（ロゴ枚数）によって px/秒 が変わるため、
+   幅に比例した duration を計算して速度を一定にする。遅延読み込みの
+   画像で幅が変わっても ResizeObserver で追従する。 */
+(function () {
+  var SPEED = 86; // px/秒（従来の展開団体マーキー実測値に合わせ体感を維持）
+  function set(t) {
+    var dist = t.scrollWidth / 2;
+    if (dist > 0) t.style.animationDuration = Math.round((dist / SPEED) * 10) / 10 + 's';
+  }
+  var tracks = document.querySelectorAll('.marquee-track');
+  if (!tracks.length) return;
+  tracks.forEach(set);
+  if ('ResizeObserver' in window) {
+    var ro = new ResizeObserver(function (entries) {
+      entries.forEach(function (e) { set(e.target); });
+    });
+    tracks.forEach(function (t) { ro.observe(t); });
+  } else {
+    window.addEventListener('load', function () { tracks.forEach(set); });
+  }
+})();
+/* 横スワイプできるカルーセルの直下に「スワイプ」ヒントを自動で
+   付ける。実際にはみ出しているときだけ表示し、一度スクロール
+   したらフェードアウトする。対象クラスはCSSの横スクロール
+   ストリップ群と揃えること。 */
+(function () {
+  var strips = document.querySelectorAll('.str-grid,.style-grid,.genre-grid,.flow-row,.biz-flow,.event-row,.blog-strip,.works-grid');
+  function attach() {
+    strips.forEach(function (el) {
+      if (el.dataset.swipeHint || el.scrollWidth <= el.clientWidth + 8) return;
+      el.dataset.swipeHint = '1';
+      var hint = document.createElement('p');
+      hint.className = 'swipe-hint';
+      hint.textContent = '横にスワイプ';
+      el.insertAdjacentElement('afterend', hint);
+      el.addEventListener('scroll', function () { hint.classList.add('is-fading'); }, { once: true, passive: true });
+    });
+  }
+  window.addEventListener('load', attach);
+  attach();
 })();
 (function () {
   var sections = document.querySelectorAll('section.section');

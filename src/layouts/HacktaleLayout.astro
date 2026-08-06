@@ -26,7 +26,10 @@ const {
 } = Astro.props;
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
-const canonical = new URL(Astro.url.pathname, site);
+// Canonical always uses the trailing-slash form: SSR routes answer
+// both /path and /path/, and a request-echoing canonical would split
+// the page into two competing URLs in Google's eyes.
+const canonical = new URL(Astro.url.pathname.replace(/([^/])$/, '$1/'), site);
 const ogImageAbs = new URL(ogImage, site);
 
 const nav = [
@@ -55,7 +58,8 @@ const nav = [
 <meta property="og:locale" content="ja_JP">
 <meta property="og:image" content={ogImageAbs}>
 <meta name="twitter:card" content={twitterCard}>
-<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -81,7 +85,9 @@ const nav = [
 
 <style is:global>
 :root{--acc:#d9e63b}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:clip}
+/* キーボード操作のフォーカスリング（マウスでは出ない）。 */
+:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid var(--acc);outline-offset:3px}
 body{margin:0;background:#0d0d0e;color:#f1efe9;font-family:'Zen Kaku Gothic New',sans-serif;-webkit-font-smoothing:antialiased}
 a{color:#f1efe9;text-decoration:none}
 a:hover{color:var(--acc)}

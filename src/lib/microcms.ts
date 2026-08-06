@@ -2,7 +2,7 @@ import sanitizeHtml from 'sanitize-html';
 
 // Valid values for the optional microCMS "category" field, matching
 // the LP theme keys used elsewhere on the site (tag-nazotoki etc.).
-export type PostCategory = 'nazotoki' | 'murder' | 'zunou' | 'shisetsu';
+export type PostCategory = 'nazotoki' | 'murder' | 'zunou' | 'shisetsu' | 'immersive';
 
 export interface BlogPost {
   id: string;

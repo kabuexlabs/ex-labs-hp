@@ -52,7 +52,7 @@ const faqs = [
   <div class="dust" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="fx col ac gap24" style="padding:120px 24px 140px;position:relative;z-index:1">
     <div class="herox fx ac gap12 hero-el e0"><span>絵&nbsp;画</span><span class="xmark">×</span><span>参&nbsp;加</span><span class="xmark">×</span><span>読&nbsp;解</span></div>
-    <img class="heromark hero-el e1" src={`${assets}/logo-white.webp`} alt="体験する美術館" width="1000" height="487">
+    <h1 class="heromark-h1"><img class="heromark hero-el e1" src={`${assets}/logo-white.webp`} alt="体験する美術館" width="1000" height="487"></h1>
     <p class="herolead m0 hero-el e2">鑑賞するアートから、<wbr>体験するアートへ。</p>
     <p class="note tc m0 hero-el e3" style="letter-spacing:.14em">絵画と物語、観客の参加を編み込んだ<wbr>参加型芸術のレーベル</p>
     <div class="hero-el e4" style="margin-top:28px"><a class="bigx" href="/taikenbizyutu/lostframe/">最新の公演を見る</a></div>
@@ -85,8 +85,8 @@ const faqs = [
           <p class="ewsub en m0">Null Arden Exhibition</p>
           <p class="cdesc" style="margin:14px 0 0">名以外を持たぬ画家「ヌル・アーデン」の個展を会場に、絵画と物語、図像の読解による参加型の展示。全公演、満席にて終了しました。</p>
           <div style="margin-top:10px">
-            <a class="artlink" href="https://note.com/kabuexlabs/n/n9aa3cb9cc3a0" target="_blank" rel="noopener"><span class="arw">→</span><span>ネタバレ解説記事を読む（note）</span></a>
-            <a class="artlink" href="https://note.com/kabuexlabs/n/nb3be468d0a6c" target="_blank" rel="noopener"><span class="arw">→</span><span>作品オークションの記録を読む（note）</span></a>
+            <a class="artlink" href="/game/null-arden/"><span class="arw">→</span><span>ネタバレ公開特設サイトで解説を読む</span></a>
+            <a class="artlink" href="/game/auction/"><span class="arw">→</span><span>作品オークションの記録を読む</span></a>
           </div>
         </div>
       </div>
@@ -263,6 +263,9 @@ const faqs = [
 
 <style>
 .hero{min-height:100vh;background:linear-gradient(180deg,#2b2620 0%,#1b1815 42%,#131110 78%);position:relative}
+/* ロゴ画像がこのページの見出しそのものなので h1 で包む（alt が見出しテキスト
+   になる）。見た目は変えないよう既定のマージン・行間をリセットする。 */
+.heromark-h1{margin:0;line-height:0;font-size:inherit;font-weight:inherit}
 .heromark{width:min(480px,72vw);height:auto}
 .herox{font-size:15px;letter-spacing:.3em;color:#cfc8bc}
 .xmark{color:#b39a63;font-size:12px}

@@ -7,6 +7,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import LatestPosts from '../components/LatestPosts.astro';
 import HeroWorksMarquee from '../components/HeroWorksMarquee.astro';
 import { pressItems } from '../data/press';
+import { mediaItems } from '../data/media';
+
+const latestMedia = mediaItems[0];
 
 const latestPress = [...pressItems].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 3);
 function pressDate(iso: string) {
@@ -17,10 +20,28 @@ function pressDate(iso: string) {
 // 現在実施中のイベント — 終了したら配列から消すだけでOK。
 const liveEvents = [
   {
+    title: 'ウワサバナシ調査委員会',
+    host: 'ex Labs主催',
+    place: '渋谷サクラステージ',
+    desc: '東急不動産株式会社様・\u200b404 Not Found様・\u200bTSUTAYA様のご協力のもと、\u200b渋谷サクラステージを周遊し\u200b都市伝説の謎を解き明かす\u200bイマーシブ体験。',
+    url: 'https://kabuexlabs.com/uwasabanashi/',
+    img: '/assets/events/uwasabanashi-kv.webp',
+    w: 880, h: 1244,
+  },
+  {
+    title: '怪盗と秘密の試験',
+    host: 'IMMERSIVE ILLUSION',
+    place: '東京・六本木',
+    desc: '日本一になった実績のある\u200bマジシャン様との\u200bコラボレーションによる、\u200b怪盗の「秘密の試験」に挑む\u200bマジック×イマーシブ公演。\u200b舞台は六本木の会員制バー。',
+    url: 'https://kabuexlabs.com/kaitou/',
+    img: '/assets/events/kaitou-kv.webp',
+    w: 880, h: 1248,
+  },
+  {
     title: 'ロスト・フレーム',
     host: '体験する美術館',
     place: '下北沢',
-    desc: '下北沢の街に散らばった絵画を探し、隠された物語を辿る──絵画と街が交差する周遊型アートイマーシブ。',
+    desc: '下北沢の街に散らばった\u200b絵画を探し、\u200b隠された物語を辿る──\u200b絵画と街が交差する\u200b周遊型アートイマーシブ。',
     url: 'https://taikenbizyutu.studio.site/',
     img: '/assets/events/lost-frame.webp',
     w: 800, h: 1138,
@@ -29,12 +50,27 @@ const liveEvents = [
     title: '紅漂う街角で',
     host: 'Smystery × WAKA',
     place: '下北沢',
-    desc: '香水ブランドWAKA様とコラボレーションした、香りを手がかりに「ある香水ブランドの秘密」を追うイマーシブミステリー。',
+    desc: '香水ブランドWAKA様と\u200bコラボレーションした、\u200b香りを手がかりに\u200b「ある香水ブランドの秘密」を追う\u200bイマーシブミステリー。',
     url: 'https://smystery.studio.site/',
     img: '/assets/events/beni.webp',
     w: 595, h: 842,
   },
 ];
+
+// お取引先、ご協力企業様 — client/partner company logos shown above the 展開団体
+// marquee. 1段構成（7社）。
+const partnersRow1: { name: string; logo: string; h?: number }[] = [
+  { name: 'Skyland Ventures', logo: '/assets/partners/skylandventures.webp', h: 64 },
+  { name: 'COEN', logo: '/assets/partners/coen.webp', h: 40 },
+  { name: 'MAISON MARC', logo: '/assets/partners/maisonmarc.webp', h: 46 },
+  { name: 'Party', logo: '/assets/partners/party.webp', h: 50 },
+  { name: 'Sally', logo: '/assets/partners/sally.webp', h: 44 },
+  { name: 'Thermal Climb Studio Fuji', logo: '/assets/partners/thermalclimb.webp', h: 60 },
+  { name: 'SHINKUKAN', logo: '/assets/partners/shinkukan.webp', h: 70 },
+];
+// 少ない枚数でも -50% ループが常に画面幅（4Kワイド含む）を超えるよう
+// 十分に複製する。
+const partnerRow1Items = Array(3).fill(partnersRow1).flat();
 
 // 展開団体 — self-run labels/communities shown in the About marquee.
 // Add `logo: '/assets/groups/xxx.png'` to an entry to show an image
@@ -43,12 +79,14 @@ const liveEvents = [
 const groups: { name: string; logo?: string; h?: number }[] = [
   { name: 'ANAVKEY（アナアキー）', logo: '/assets/groups/anavkey.webp', h: 44 },
   { name: 'HACKTALE', logo: '/assets/groups/hacktale.png', h: 34 },
-  { name: 'SMystery', logo: '/assets/groups/smystery.webp', h: 64 },
-  { name: 'UNLIMITED MYSTERY', logo: '/assets/groups/unlimited-mystery.webp', h: 48 },
+  { name: 'Smystery', logo: '/assets/groups/smystery.webp', h: 64 },
+  { name: 'UNLIMITED MYSTERY（東大マーダーミステリーサークル）', logo: '/assets/groups/unlimited-mystery.webp', h: 48 },
   { name: '体験する美術館', logo: '/assets/groups/taiken-bijutsukan.png', h: 72 },
   { name: '午前零時の童話集', logo: '/assets/groups/gozen-reiji.webp', h: 76 },
   { name: 'ウワサバナシ調査委員会', logo: '/assets/groups/uwasabanashi.webp', h: 62 },
-  { name: '東大マーダーミステリーサークル' },
+  { name: 'IMMERSIVE ILLUSION（イマーシブイリュージョン）', logo: '/assets/groups/immersive-illusion.webp', h: 58 },
+  { name: 'myagare（舞やがれ）', logo: '/assets/groups/myagare.webp', h: 60 },
+  { name: 'ANATOR', logo: '/assets/groups/anator.webp', h: 40 },
 ];
 // Repeat the list so the marquee loop has no visible gap on wide
 // screens.
@@ -56,15 +94,31 @@ const marqueeItems = Array(2).fill(groups).flat();
 ---
 <BaseLayout>
 
+{/* メディア掲載の告知バー。ヘッダー直下に常時表示する。
+    最新の掲載は src/data/media.ts の先頭要素から取る。 */}
+{latestMedia && (
+  <a class="newsbar" href="/media/">
+    <span class="newsbar-chip">MEDIA</span>
+    <span class="newsbar-text"><strong>{latestMedia.outlet}様に掲載されました</strong><span class="newsbar-sub">{latestMedia.title}</span></span>
+    <span class="newsbar-arrow" aria-hidden="true">→</span>
+  </a>
+)}
+
 <section class="hero">
 <div class="hero-overlay"></div>
 <div class="wrap hero-center">
-<img class="hero-logo" src="/assets/logo.png" alt="株式会社 ex Labs" width="2048" height="520" loading="eager" decoding="async">
+<img class="hero-logo" src="/assets/logo.png" alt="株式会社 ex Labs" width="2048" height="520" loading="eager" fetchpriority="high" decoding="async">
 <h1 class="hero-title serif"><span class="hl">初期費用0円で謎解きなどの</span><br><span class="hl">体験型イベントを実施しませんか？</span></h1>
 <p class="hero-sub">Experience Entertainment — ex Labs Inc.</p>
 <div class="hero-actions">
 <a class="btn" href="#contact">相談してみる</a>
 <a class="btn ghost" href="#works">実績を見る</a>
+</div>
+{/* 実績の看板数字。エントランスアニメは付けない（iOS bfcache で
+    opacity:0 のまま固まる既知の不具合クラスを避ける）。 */}
+<div class="hero-stat">
+<span class="hero-stat-label"><span class="nobr">累計コンテンツ</span><span class="nobr">体験者数</span></span>
+<span class="hero-stat-num">15,000<span class="hero-stat-unit">人超</span></span>
 </div>
 </div>
 <HeroWorksMarquee />
@@ -74,25 +128,41 @@ const marqueeItems = Array(2).fill(groups).flat();
 <p class="eyebrow">ABOUT</p><h2 class="h2 serif">会社概要</h2>
 <div class="about-grid" style="grid-template-columns:1fr;max-width:720px;margin-left:auto;margin-right:auto">
 <div>
-<p class="lede" style="margin-left:0">株式会社ex Labs（イーエックスラボ）は、<strong>体験型エンターテインメント領域</strong>を主軸とするクリエイティブカンパニーです。</p>
+{/* 会社紹介のリード。地の文ではなく「宣言」として大きく置き、
+    キーワードには黄色のマーカー（印刷物テイスト）を敷く。 */}
+<p class="about-lead"><span class="nobr">株式会社ex Labs</span><span class="nobr">（イーエックスラボ）は、</span><span class="nobr"><mark>体験型エンターテインメント領域</mark>を</span><span class="nobr">主軸とする</span><span class="nobr">クリエイティブカンパニーです。</span></p>
 <p class="about-label">事業内容</p>
-<ul class="about-points"><li>自社主催による体験型イベントの企画・運営</li><li>法人向け体験型コンテンツの企画・制作</li><li>体験型エンターテインメント領域における企画・知見提供</li><li>体験型コンテンツを活用した社内研修プログラムの企画・提供</li></ul>
-<div class="rule" style="margin-left:0"></div>
-<p class="lede" style="margin-left:0">「<strong>その場所だからこそ体験できる物語</strong>」をコンセプトに、商業施設・文化施設・観光施設・IP・ブランドなどの魅力を活かした体験型コンテンツを企画・制作しています。</p>
-<p class="vc-line" style="text-align:left">設立からの期間はまだ長くありませんが、複数の上場企業様とのお取引実績を有しており、Skyland Ventures様をはじめとするベンチャーキャピタル様からのご支援もいただいております。</p>
+{/* li は flex（番号バッジ＋本文）なので、.nobr 群は必ず1つの
+    ラッパー<span>に入れる。直下に並べると各チャンクが別々の
+    flexアイテムになり文が崩れる。 */}
+<ul class="about-points"><li><span class="pt-text"><span class="nobr">自社主催による体験型イベントの</span><span class="nobr">企画・運営</span></span></li><li><span class="pt-text"><span class="nobr">法人向け体験型コンテンツの</span><span class="nobr">企画・制作</span></span></li><li><span class="pt-text"><span class="nobr">体験型エンターテインメント</span><span class="nobr">領域における</span><span class="nobr">企画・知見提供</span></span></li><li><span class="pt-text"><span class="nobr">体験型コンテンツを活用した</span><span class="nobr">社内研修プログラムの</span><span class="nobr">企画・提供</span></span></li></ul>
+<div class="rule"></div>
+<p class="lede">「<strong>その場所だからこそ体験できる物語</strong>」をコンセプトに、商業施設・文化施設・観光施設・IP・ブランドなどの魅力を活かした体験型コンテンツを企画・制作しています。</p>
+<p class="vc-line"><span class="nobr">設立からの期間はまだ長くありませんが、</span><span class="nobr">複数の上場企業様との</span><span class="nobr">お取引実績を有しており、</span><span class="nobr">Skyland Ventures様をはじめとする</span><span class="nobr">ベンチャーキャピタル様からの</span><span class="nobr">ご支援もいただいております。</span></p>
 </div>
+</div>
+<div class="marquee-block">
+<p class="marquee-label">お取引先、ご協力企業様</p>
+<div class="marquee"><div class="marquee-track partners-track">
+{partnerRow1Items.map((p) => (
+  <img class="marquee-logo" src={p.logo} alt={p.name} style={p.h ? `height:${p.h}px` : undefined} loading="lazy" decoding="async" />
+))}
+{partnerRow1Items.map((p) => (
+  <img class="marquee-logo" src={p.logo} alt="" style={p.h ? `height:${p.h}px` : undefined} loading="lazy" decoding="async" />
+))}
+</div></div>
 </div>
 <div class="marquee-block">
 <p class="marquee-label">展開団体</p>
 <div class="marquee"><div class="marquee-track">
 {marqueeItems.map((g) => (
   g.logo
-    ? <img class="marquee-logo" src={g.logo} alt={g.name} style={g.h ? `height:${g.h}px` : undefined} loading="eager" decoding="async" />
+    ? <img class="marquee-logo" src={g.logo} alt={g.name} style={g.h ? `height:${g.h}px` : undefined} loading="lazy" decoding="async" />
     : <span class="marquee-name serif">{g.name}</span>
 ))}
 {marqueeItems.map((g) => (
   g.logo
-    ? <img class="marquee-logo" src={g.logo} alt="" style={g.h ? `height:${g.h}px` : undefined} loading="eager" decoding="async" />
+    ? <img class="marquee-logo" src={g.logo} alt="" style={g.h ? `height:${g.h}px` : undefined} loading="lazy" decoding="async" />
     : <span class="marquee-name serif" aria-hidden="true">{g.name}</span>
 ))}
 </div></div>
@@ -103,7 +173,7 @@ const marqueeItems = Array(2).fill(groups).flat();
 <a class="label-link" href="https://kabuexlabs.com/toudaimurder/" target="_blank" rel="noopener noreferrer">
 <span class="label-link-body">
 <span class="label-link-cat">マーダーミステリーレーベル</span>
-<span class="label-link-name serif">東大マーダーミステリーサークル</span>
+<span class="label-link-name serif">UNLIMITED MYSTERY</span>
 </span>
 <span class="label-link-arrow">↗</span>
 </a>
@@ -111,6 +181,34 @@ const marqueeItems = Array(2).fill(groups).flat();
 <span class="label-link-body">
 <span class="label-link-cat">頭脳戦レーベル</span>
 <span class="label-link-name serif">HACKTALE</span>
+</span>
+<span class="label-link-arrow">↗</span>
+</a>
+<a class="label-link" href="https://kabuexlabs.com/taikenbizyutu/" target="_blank" rel="noopener noreferrer">
+<span class="label-link-body">
+<span class="label-link-cat">アート×体験レーベル</span>
+<span class="label-link-name serif">体験する美術館</span>
+</span>
+<span class="label-link-arrow">↗</span>
+</a>
+<a class="label-link" href="https://kabuexlabs.com/smystery/" target="_blank" rel="noopener noreferrer">
+<span class="label-link-body">
+<span class="label-link-cat">匂い×体験レーベル</span>
+<span class="label-link-name serif">Smystery</span>
+</span>
+<span class="label-link-arrow">↗</span>
+</a>
+<a class="label-link" href="https://kabuexlabs.com/uwasabanashi/" target="_blank" rel="noopener noreferrer">
+<span class="label-link-body">
+<span class="label-link-cat">イマーシブ公演レーベル</span>
+<span class="label-link-name serif">ウワサバナシ調査委員会</span>
+</span>
+<span class="label-link-arrow">↗</span>
+</a>
+<a class="label-link" href="https://kabuexlabs.com/anator/" target="_blank" rel="noopener noreferrer">
+<span class="label-link-body">
+<span class="label-link-cat">少人数密室型イマーシブ空間</span>
+<span class="label-link-name serif">ANATOR</span>
 </span>
 <span class="label-link-arrow">↗</span>
 </a>
@@ -126,13 +224,35 @@ const marqueeItems = Array(2).fill(groups).flat();
   <a class="event-card" href={e.url} target="_blank" rel="noopener noreferrer">
     <img src={e.img} alt={`${e.title} ポスター`} width={e.w} height={e.h} loading="lazy" decoding="async">
     <span class="event-name">{e.title}<span class="event-host"><span class="nobr">{e.host}｜</span><span class="nobr">開催地：{e.place}&nbsp;↗</span></span></span>
-    <span class="event-desc">{e.desc}</span>
+    <span class="event-desc">{e.desc.split('​').map((c) => <span class="nobr">{c}</span>)}</span>
   </a>
 ))}
 </div>
 </div></section>
 
-<LatestPosts heading="最新記事" tinted={false} />
+<LatestPosts heading="最新記事" tinted={false} alwaysShow />
+
+<section class="section" id="media"><div class="wrap">
+<p class="eyebrow">MEDIA</p><h2 class="h2 serif">メディア掲載実績</h2>
+<div class="media-list" style="margin-top:48px">
+{mediaItems.map((m) => (
+  <article class="media-item">
+    <div class="media-feature-head">
+      <span class="media-outlet serif">{m.outlet}</span>
+      <span class="media-date">{m.date}</span>
+    </div>
+    <p class="media-title">{m.title}</p>
+    <p class="media-desc" style="margin-bottom:0">{m.desc}</p>
+    {m.url && (
+      <div class="media-actions" style="margin-top:22px">
+        <a class="btn" href={m.url} target="_blank" rel="noopener">記事を読む（外部サイト）</a>
+      </div>
+    )}
+  </article>
+))}
+</div>
+<div style="text-align:center;margin-top:48px"><a class="btn ghost" href="/media/">メディア掲載実績の一覧を見る　→</a></div>
+</div></section>
 
 <section class="section tinted"><div class="wrap">
 <p class="eyebrow">PRESS RELEASE</p><h2 class="h2 serif">プレスリリース</h2>
@@ -153,14 +273,28 @@ const marqueeItems = Array(2).fill(groups).flat();
 <p class="h2sub">ex Labsが選ばれる、2つの理由</p>
 <div class="str-grid">
 <div class="str-card"><p class="str-num">01</p><h3 class="str-title">初期費用は0円、もしくは格安！</h3>
-<p class="str-lead">弊社は法人様からではなく、イベントのお客様から収益回収するモデルを実現しております。</p>
-<ul class="feature-points"><li>企画の中身だけでなく、集客成果まで責任を持ちます。</li><li>「制作して終わり」ではなく「成功するところまで伴走する」そんな会社を目指しております。</li></ul></div>
-<div class="str-card"><p class="str-num">02</p><h3 class="str-title">どんなコンテンツでも制作可能！</h3>
-<p class="str-lead">謎解き・マーダーミステリー・頭脳戦・イマーシブコンテンツなど、多岐に渡るジャンルを企画・制作可能です。</p>
-<ul class="feature-points"><li>自社団体を複数運営し、それぞれにコミュニティ・ファン層を形成しております。</li><li>そのため、新規プロジェクトでも既存の集客基盤を活かした展開が可能です。</li></ul>
+<p class="str-lead"><span class="nobr">弊社は法人様からではなく、</span><span class="nobr">イベントのお客様から</span><span class="nobr">収益回収するモデルを</span><span class="nobr">実現しております。</span></p>
+<ul class="feature-points"><li><span><span class="nobr">企画の中身だけでなく、</span><span class="nobr">集客成果まで責任を持ちます。</span></span></li><li><span><span class="nobr">「制作して終わり」ではなく</span><span class="nobr">「成功するところまで伴走する」</span><span class="nobr">そんな会社を目指しております。</span></span></li></ul></div>
+<div class="str-card"><p class="str-num">02</p><h3 class="str-title">どんなコンテンツでも<br>制作可能！</h3>
+<p class="str-lead"><span class="nobr">謎解き・マーダーミステリー・</span><span class="nobr">頭脳戦・</span><span class="nobr">イマーシブコンテンツなど、</span><span class="nobr">多岐に渡るジャンルを</span><span class="nobr">企画・制作可能です。</span></p>
+<ul class="feature-points"><li><span><span class="nobr">自社団体を複数運営し、</span><span class="nobr">それぞれに</span><span class="nobr">コミュニティ・ファン層を</span><span class="nobr">形成しております。</span></span></li><li><span><span class="nobr">そのため、</span><span class="nobr">新規プロジェクトでも</span><span class="nobr">既存の集客基盤を活かした</span><span class="nobr">展開が可能です。</span></span></li></ul>
 <div class="chips">
-<a class="chip" href="/services/nazotoki-kenshu/">謎解き</a><a class="chip" href="/services/murder-mystery/">マーダーミステリー</a><a class="chip" href="/services/zunousen/">頭脳戦</a><span class="chip">イマーシブコンテンツ</span>
+<a class="chip" href="/services/nazotoki-kenshu/">謎解き</a><a class="chip" href="/services/murder-mystery/">マーダーミステリー</a><a class="chip" href="/services/zunousen/">頭脳戦</a><a class="chip" href="/services/immersive/">イマーシブ</a>
 </div></div>
+</div>
+<p class="bizmodel-label">成果報酬型のビジネスモデル</p>
+<div class="biz-flow">
+<div class="biz-step"><span class="biz-no">01</span><p class="biz-t">クライアント様</p><p class="biz-d"><b>初期費用0円</b>、<span class="nobr">もしくは格安でご依頼</span></p></div>
+<span class="biz-arrow" aria-hidden="true">→</span>
+<div class="biz-step is-ex"><span class="biz-no">02</span><p class="biz-t serif">ex Labs</p><p class="biz-d"><span class="nobr">企画・制作・運営までを</span><span class="nobr">一貫して担当</span></p></div>
+<span class="biz-arrow" aria-hidden="true">→</span>
+<div class="biz-step"><span class="biz-no">03</span><p class="biz-t">イベント開催</p><p class="biz-d"><span class="nobr">集客もex Labsが</span><span class="nobr">責任を持って実施</span></p></div>
+<span class="biz-arrow" aria-hidden="true">→</span>
+<div class="biz-step"><span class="biz-no">04</span><p class="biz-t">チケット売上で収益化</p><p class="biz-d"><span class="nobr">法人様ではなく、</span><span class="nobr">イベントのお客様から回収</span></p></div>
+</div>
+<div class="biz-punch">
+<p class="biz-punch-t serif"><span class="nobr">売れなければ、</span><span class="nobr"><b>弊社が赤字</b>になる。</span></p>
+<p class="biz-punch-d"><span class="nobr">だからこそ、</span><span class="nobr">私たちは<strong>集客・運営まで</strong></span><span class="nobr"><strong>責任を持って伴走</strong>します。</span></p>
 </div>
 </div></section>
 
@@ -178,7 +312,7 @@ const marqueeItems = Array(2).fill(groups).flat();
 <div class="style-row"><span class="mark ok">✓</span>集客</div>
 <div class="style-row"><span class="mark ok">✓</span>運営</div>
 <div class="style-row"><span class="mark ok">✓</span>コンテンツ改善</div>
-<p class="style-note">企画・制作に加え、集客・運営・コンテンツ改善までを一貫してご支援する<strong>「伴走型」の制作体制</strong>。案件によっては初期費用を抑えたご提案や<strong>レベニューシェア型</strong>での実施にも対応しております。</p></div>
+<p class="style-note"><span class="nobr">企画・制作に加え、</span><span class="nobr">集客・運営・コンテンツ改善までを</span><span class="nobr">一貫してご支援する</span><span class="nobr"><strong>「伴走型」の制作体制</strong>。</span><span class="nobr">案件によっては</span><span class="nobr">初期費用を抑えたご提案や</span><span class="nobr"><strong>レベニューシェア型</strong>での実施にも</span><span class="nobr">対応しております。</span></p></div>
 </div>
 </div></section>
 
@@ -186,58 +320,67 @@ const marqueeItems = Array(2).fill(groups).flat();
 <div class="works-head"><div><p class="eyebrow" style="margin-bottom:8px">WORKS</p><h2 class="h2 serif" style="margin:0">主な実績</h2></div></div>
 <div class="works-grid">
 
-<div class="work-card tag-nazotoki"><img width="880" height="1254" class="work-img" loading="lazy" decoding="async" src="/assets/work-0.webp" alt="神戸須磨シーワールド 写真">
-<p class="work-tag"><span class="nobr">謎解きコンテンツ</span><span class="nobr">制作・デザイン</span></p><h3 class="work-name"><span class="nobr">神戸須磨</span><span class="nobr">シーワールド</span></h3>
-<p class="work-sub">オルカ海賊団からの挑戦状</p>
-<p class="work-desc">館内を巡りながら宝探しを楽しむ周遊型イベントの謎解きを制作。</p></div>
-
 <div class="work-card tag-murder"><img width="849" height="1200" class="work-img" loading="lazy" decoding="async" src="/assets/work-1.webp" alt="博報堂 × 紀伊國屋書店 写真">
 <p class="work-tag">ミステリー原案</p><h3 class="work-name"><span class="nobr">博報堂 ×</span> <span class="nobr">紀伊國屋書店</span></h3>
 <p class="work-sub">月明かりの書店と呪われた原稿</p>
-<p class="work-desc">閉店後の紀伊國屋書店を舞台に開催された、一夜限りの体験型イベントの制作を担当しました。</p></div>
+<p class="work-desc"><span class="nobr">閉店後の紀伊國屋書店を舞台に</span><span class="nobr">開催された、</span><span class="nobr">一夜限りの体験型イベントの</span><span class="nobr">制作を担当しました。</span></p></div>
 
 <div class="work-card"><img width="880" height="1238" class="work-img" loading="lazy" decoding="async" src="/assets/work-2.webp" alt="ヌル・アーデン展 写真">
 <p class="work-tag">企画・制作</p><h3 class="work-name">自社主催</h3>
 <p class="work-sub">ヌル・アーデン展</p>
-<p class="work-desc">東京藝術大学出身アーティストとのコラボレーション企画。アートと謎解きを融合した体験型イベントを実施し、公演終了後には作品オークションも開催しました。</p></div>
+<p class="work-desc"><span class="nobr">東京藝術大学出身アーティストとの</span><span class="nobr">コラボレーション企画。</span><span class="nobr">アートと謎解きを融合した</span><span class="nobr">体験型イベントを実施し、</span><span class="nobr">公演終了後には</span><span class="nobr">作品オークションも開催しました。</span></p></div>
 
 <div class="work-card tag-shisetsu"><img width="880" height="1252" class="work-img" loading="lazy" decoding="async" src="/assets/work-3.webp" alt="ロスト・フレーム 写真">
-<p class="work-tag">企画・制作</p><h3 class="work-name">下北沢連合会</h3>
+<p class="work-tag">企画・制作</p><h3 class="work-name">下北沢</h3>
 <p class="work-sub">ロスト・フレーム</p>
-<p class="work-desc">下北沢連合会様との連携により、街全体を舞台としたアート体験型イベントを制作しました。</p></div>
+<p class="work-desc"><span class="nobr">下北沢の街全体を舞台とした</span><span class="nobr">アート体験型イベントを</span><span class="nobr">制作しました。</span></p></div>
 
 <div class="work-card tag-shisetsu"><img class="work-img" loading="lazy" decoding="async" src="/assets/work-4.webp" alt="紅漂う街角で 写真">
-<p class="work-tag">企画・制作</p><h3 class="work-name">下北沢連合会</h3>
+<p class="work-tag">企画・制作</p><h3 class="work-name">下北沢</h3>
 <p class="work-sub">紅漂う街角で</p>
-<p class="work-desc">下北沢連合会様、香水ブランドWAKA様と連携したミステリーと香水を融合した体験を提供。</p></div>
+<p class="work-desc"><span class="nobr">下北沢の街を舞台に、</span><span class="nobr">香水ブランドWAKA様と連携した</span><span class="nobr">ミステリーと香水を融合した</span><span class="nobr">体験を提供。</span></p></div>
+
+<div class="work-card tag-immersive"><img width="880" height="1244" class="work-img" loading="lazy" decoding="async" src="/assets/events/uwasabanashi-kv.webp" alt="ウワサバナシ調査委員会 キービジュアル">
+<p class="work-tag">企画・制作</p><h3 class="work-name"><span class="nobr">渋谷サクラ</span><span class="nobr">ステージ</span></h3>
+<p class="work-sub">ウワサバナシ調査委員会</p>
+<p class="work-desc"><span class="nobr">東急不動産株式会社様・</span><span class="nobr">404 Not Found様・</span><span class="nobr">TSUTAYA様のご協力のもと、</span><span class="nobr">渋谷サクラステージを周遊する</span><span class="nobr">都市伝説イマーシブ体験を</span><span class="nobr">企画・制作。</span></p></div>
+
+<div class="work-card tag-immersive"><img width="880" height="1248" class="work-img" loading="lazy" decoding="async" src="/assets/events/kaitou-kv.webp" alt="怪盗と秘密の試験 キービジュアル">
+<p class="work-tag">企画・制作</p><h3 class="work-name"><span class="nobr">六本木</span><span class="nobr">会員制バー</span></h3>
+<p class="work-sub">怪盗と秘密の試験</p>
+<p class="work-desc"><span class="nobr">日本一になった実績のある</span><span class="nobr">マジシャン様との</span><span class="nobr">コラボレーションによる</span><span class="nobr">マジック×イマーシブ公演を、</span><span class="nobr">六本木の会員制バーで</span><span class="nobr">企画・制作。</span><a class="nobr" href="/kaitou/" style="color:var(--accent)">詳細&nbsp;→</a></p></div>
 
 <div class="work-card tag-zunou"><img class="work-img" loading="lazy" decoding="async" src="/assets/work-5.webp" alt="カラオケ館 写真">
 <p class="work-tag">コンテンツ制作</p><h3 class="work-name">カラオケ館</h3>
 <p class="work-sub">恣験</p>
-<p class="work-desc">参加者が様々な試験へ挑戦する周遊型頭脳戦コンテンツを制作しました。</p></div>
-
-<div class="work-card tag-murder"><img width="739" height="415" class="work-img" loading="lazy" decoding="async" src="/assets/work-6.webp" alt="ヒカル様 写真">
-<p class="work-tag">マーダーミステリー制作</p><h3 class="work-name">ヒカル様</h3>
-<p class="work-desc">オンライン向け作品を累計3作品制作しました。</p></div>
+<p class="work-desc"><span class="nobr">参加者が様々な試験へ挑戦する</span><span class="nobr">周遊型頭脳戦コンテンツを</span><span class="nobr">制作しました。</span></p></div>
 
 <div class="work-card tag-murder"><img class="work-img" loading="lazy" decoding="async" src="/assets/work-7.webp" alt="サーマルクライムスタジオ 写真">
 <p class="work-tag">マーダーミステリー制作</p><h3 class="work-name"><span class="nobr">サーマルクライム</span><span class="nobr">スタジオ</span></h3>
-<p class="work-desc">宿泊者向けコンテンツを制作し、実施後には新規宿泊予約20件以上の獲得につながりました。</p></div>
+<p class="work-desc"><span class="nobr">宿泊者向けコンテンツを制作し、</span><span class="nobr">実施後には</span><span class="nobr">新規宿泊予約20件以上の獲得に</span><span class="nobr">つながりました。</span></p></div>
 
 <div class="work-card tag-zunou"><img width="880" height="1248" class="work-img" loading="lazy" decoding="async" src="/assets/work-8.webp" alt="東京都頭脳王決定戦 写真">
 <p class="work-tag">企画・制作</p><h3 class="work-name">自社主催</h3>
 <p class="work-sub">東京都頭脳王決定戦</p>
-<p class="work-desc">東京都内4会場を同時に活用し、「東京都で最も頭の良い人を決める」というコンセプトの大型イベントを企画・運営しました。</p></div>
+<p class="work-desc"><span class="nobr">東京都内4会場を同時に活用し、</span><span class="nobr">「東京都で最も頭の良い人を決める」</span><span class="nobr">というコンセプトの</span><span class="nobr">大型イベントを企画・運営しました。</span></p></div>
 
 </div>
+<a class="game-box" href="/game/">
+<div class="game-box-body">
+<p class="game-box-eyebrow">SPOILER ARCHIVE</p>
+<p class="game-box-title serif">過去コンテンツのネタバレはこちら</p>
+<p class="game-box-desc"><span class="nobr">再演を予定していない</span><span class="nobr">謎解き・マーダーミステリー公演の</span><span class="nobr">ネタバレ記録を公開しています。</span></p>
+</div>
+<span class="game-box-arrow" aria-hidden="true">→</span>
+</a>
 </div></section>
 
 <section class="section perf"><div class="wrap">
 <p class="eyebrow">PERFORMANCE</p><h2 class="h2 serif">実績紹介</h2>
-<p class="perf-lede">自社イベント「<strong>ヌル・アーデン展</strong>」では、以下の実績を達成しました。</p>
+<p class="perf-lede"><span class="nobr">自社イベント「<strong>ヌル・アーデン展</strong>」では、</span><span class="nobr">以下の実績を達成しました。</span></p>
 <div class="stat-row">
 <div class="stat"><p class="stat-num serif">1,500<span class="stat-unit">枚</span></p><p class="stat-label">チケット販売枚数</p></div>
-<div class="stat"><p class="stat-num serif"><span class="stat-unit">¥</span>4,000</p><p class="stat-label">チケット価格</p></div>
+<div class="stat"><p class="stat-num serif">4,000<span class="stat-unit">円</span></p><p class="stat-label">チケット価格</p></div>
 </div>
 <p class="perf-lede" style="margin-bottom:0">しかも、以下の条件下での実績です。</p>
 <div class="cond-list">
@@ -254,34 +397,36 @@ const marqueeItems = Array(2).fill(groups).flat();
 <div class="genre-grid">
 <a class="genre-cell" href="/services/murder-mystery/">
 <span class="genre-t serif">マーダーミステリー</span>
-<span class="genre-d">物語への没入と推理を両立した会話型ミステリー。動画・配信企画とも好相性です。</span>
+<span class="genre-d"><span class="nobr">物語への没入と推理を両立した</span><span class="nobr">会話型ミステリー（マダミス）。</span><span class="nobr">動画・配信企画とも好相性です。</span></span>
 <span class="genre-arrow">→</span>
 </a>
 <a class="genre-cell" href="/services/nazotoki-kenshu/">
 <span class="genre-t serif">謎解き</span>
-<span class="genre-d">協力して謎を解く定番の体験型コンテンツ。研修や施設の集客にも展開できます。</span>
+<span class="genre-d"><span class="nobr">協力して謎を解く定番の</span><span class="nobr">体験型コンテンツ。</span><span class="nobr">研修や施設の集客にも</span><span class="nobr">展開できます。</span></span>
 <span class="genre-arrow">→</span>
 </a>
 <a class="genre-cell" href="/services/zunousen/">
 <span class="genre-t serif">頭脳戦</span>
-<span class="genre-d">交渉・心理戦・閃きを軸にした対戦型ゲーム。日本で唯一の特化制作団体です。</span>
+<span class="genre-d"><span class="nobr">交渉・心理戦・閃きを軸にした</span><span class="nobr">対戦型ゲーム。</span><span class="nobr">日本で唯一の特化制作団体です。</span></span>
+<span class="genre-arrow">→</span>
+</a>
+<a class="genre-cell" href="/services/immersive/">
+<span class="genre-t serif">アート×体験</span>
+<span class="genre-d"><span class="nobr">絵画やアート作品と物語を融合した、</span><span class="nobr">特別な物語体験（イマーシブ）。</span></span>
+<span class="genre-arrow">→</span>
+</a>
+<a class="genre-cell" href="/services/immersive/">
+<span class="genre-t serif">匂い×体験</span>
+<span class="genre-d"><span class="nobr">香水・香りを物語に組み込んだ、</span><span class="nobr">五感で楽しむ没入体験（イマーシブ）。</span></span>
 <span class="genre-arrow">→</span>
 </a>
 <div class="genre-cell">
-<span class="genre-t serif">アート×体験</span>
-<span class="genre-d">絵画やアート作品と物語を融合した、特別な物語体験。</span>
-</div>
-<div class="genre-cell">
-<span class="genre-t serif">匂い×体験</span>
-<span class="genre-d">香水・香りを物語に組み込んだ、五感で楽しむ体験コンテンツ。</span>
-</div>
-<div class="genre-cell">
 <span class="genre-t serif">マジック×体験</span>
-<span class="genre-d">マジックの驚きと物語を掛け合わせた、演出型のコンテンツ。</span>
+<span class="genre-d"><span class="nobr">マジックの驚きと物語を</span><span class="nobr">掛け合わせた、</span><span class="nobr">演出型のコンテンツ。</span></span>
 </div>
 <div class="genre-cell">
 <span class="genre-t serif">ダンス×体験</span>
-<span class="genre-d">ダンスパフォーマンスと物語が交差する、没入型の体験。</span>
+<span class="genre-d"><span class="nobr">ダンスパフォーマンスと</span><span class="nobr">物語が交差する、</span><span class="nobr">没入型の体験。</span></span>
 </div>
 </div>
 <p class="vc-line" style="margin-top:32px">現在も、大手不動産会社様や植物園様をはじめ、様々な企業・団体とのプロジェクトが進行しております。</p>
@@ -309,13 +454,20 @@ const marqueeItems = Array(2).fill(groups).flat();
 <p class="svc-row-desc">商業施設・文化施設・観光施設の空間を活かした周遊型イベントで、新規集客と滞在価値向上を実現。</p></div>
 <span class="svc-row-arrow">→</span>
 </a>
-<a class="svc-row" href="/services/zunousen/">
+<a class="svc-row" href="/services/immersive/">
 <span class="svc-no">04</span>
+<div class="svc-row-body"><h3 class="svc-row-title">イマーシブ制作</h3>
+<p class="svc-row-desc">実在する街・空間・ブランドを舞台にした没入型体験を企画・制作。イマーシブの制作依頼・お見積りは無料です。</p></div>
+<span class="svc-row-arrow">→</span>
+</a>
+<a class="svc-row" href="/services/zunousen/">
+<span class="svc-no">05</span>
 <div class="svc-row-body"><h3 class="svc-row-title">頭脳戦制作</h3>
 <p class="svc-row-desc">交渉・心理戦・閃きのゲームに特化した、日本で唯一の専門制作団体によるオリジナル頭脳戦コンテンツ。</p></div>
 <span class="svc-row-arrow">→</span>
 </a>
 </div>
+<div style="text-align:center;margin-top:48px"><a class="btn" href="/services/">サービス一覧を見る　→</a></div>
 </div></section>
 
 <section class="section" id="flow"><div class="wrap">
@@ -335,8 +487,8 @@ const marqueeItems = Array(2).fill(groups).flat();
 <p class="msg-role2">株式会社ex Labs 代表取締役</p>
 <p class="msg-name2 serif">飯田 雄貴</p>
 <p class="msg-quote2 serif"><span class="nobr">面白いことに、</span><wbr><span class="nobr">フルベットする。</span></p>
-<p class="msg-body2">私たちは、「作って終わり」の体験型エンターテインメントではなく、継続的に人を惹きつけ、新たな価値を生み出す体験づくりを目指しています。これからも、企業・自治体・文化施設・クリエイターの皆様とともに、新しいエンターテインメントの可能性を広げてまいります。新しい挑戦をご一緒できることを、心より楽しみにしております。</p>
-<p class="msg-bio2">東京大学法学部4年に在籍。大学1年生のときから起業をし、東大生のオンライン家庭教師サービスを売却後、現在は株式会社ex Labsとバックオフィスの会社を経営。</p>
+<p class="msg-body2"><span class="nobr">私たちは、</span><span class="nobr">「作って終わり」の</span><span class="nobr">体験型エンターテインメントではなく、</span><span class="nobr">継続的に人を惹きつけ、</span><span class="nobr">新たな価値を生み出す</span><span class="nobr">体験づくりを目指しています。</span><span class="nobr">これからも、</span><span class="nobr">企業・自治体・文化施設・</span><span class="nobr">クリエイターの皆様とともに、</span><span class="nobr">新しいエンターテインメントの</span><span class="nobr">可能性を広げてまいります。</span><span class="nobr">新しい挑戦をご一緒できることを、</span><span class="nobr">心より楽しみにしております。</span></p>
+<p class="msg-bio2"><span class="nobr">東京大学法学部4年に在籍。</span><span class="nobr">大学1年生のときから起業をし、</span><span class="nobr">東大生のオンライン家庭教師サービスを</span><span class="nobr">売却後、</span><span class="nobr">現在は株式会社ex Labsと</span><span class="nobr">バックオフィスの会社を経営。</span></p>
 </div></section>
 
 <section class="section"><div class="wrap">
@@ -346,8 +498,11 @@ const marqueeItems = Array(2).fill(groups).flat();
 
 <section class="cta section" id="contact"><div class="wrap">
 <h2 class="cta-title serif">まずは、お気軽にご相談ください</h2>
-<p class="cta-sub">お問い合わせ内容をご入力のうえ送信してください。2〜3営業日以内にご連絡を差し上げます。</p>
-<form class="contact-form" action="https://formspree.io/f/xykqblal" method="POST">
+<p class="cta-sub"><span class="nobr">お問い合わせ内容をご入力のうえ</span><wbr><span class="nobr">送信してください。</span><wbr><span class="nobr">2〜3営業日以内に</span><span class="nobr">ご連絡を差し上げます。</span></p>
+<form class="contact-form" action="/api/contact" method="POST">
+<input type="hidden" name="_next" value="/contact/thanks/">
+{/* ハニーポット：botだけが埋める不可視フィールド */}
+<input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
 <div class="form-row">
 <label><span class="label-cap">お名前<span class="req">必須</span></span><input type="text" name="name" required></label>
 <label><span class="label-cap">会社名</span><input type="text" name="company"></label>

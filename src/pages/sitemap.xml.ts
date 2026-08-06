@@ -6,14 +6,25 @@ import { tmWorks } from '../data/toudaimurderWorks';
 import { tmNews } from '../data/toudaimurderNews';
 import { htPaths } from '../data/hacktale';
 
+// NOTE: keep every URL here in its canonical trailing-slash form, and
+// never list pages that carry noindex (unlisted LPs, private tools) —
+// a sitemap entry that resolves to a noindex page shows up in Search
+// Console as "excluded / not indexed" noise.
 const STATIC_PATHS = [
   '/',
-  '/blog',
+  '/blog/',
   '/press/',
+  '/media/',
+  '/guide/madamis/',
+  '/guide/madamis-cost/',
+  '/guide/immersive/',
+  '/guide/immersive-event/',
+  '/guide/immersive-theater/',
   '/services/',
   '/services/nazotoki-kenshu/',
   '/services/murder-mystery/',
   '/services/shisetsu-event/',
+  '/services/immersive/',
   '/services/zunousen/',
   '/toudaimurder/',
   '/toudaimurder/works/',
@@ -24,6 +35,15 @@ const STATIC_PATHS = [
   '/toudaimurder/contact/',
   '/taikenbizyutu/',
   '/taikenbizyutu/lostframe/',
+  '/game/',
+  '/game/null-arden/',
+  '/game/auction/',
+  '/smystery/',
+  '/smystery/events/',
+  '/smystery/company/',
+  '/uwasabanashi/',
+  '/anator/',
+  '/kaitou/',
   ...htPaths,
 ];
 
@@ -33,6 +53,27 @@ export const GET: APIRoute = async ({ site }) => {
   const urls: { loc: string; lastmod?: string }[] = STATIC_PATHS.map((p) => ({
     loc: new URL(p, base).toString(),
   }));
+
+  // 新設・更新したページに lastmod を付けて再クロールを促す。
+  const STATIC_LASTMOD: Record<string, string> = {
+    '/guide/madamis/': '2026-08-05',
+    '/guide/madamis-cost/': '2026-07-30',
+    '/services/immersive/': '2026-08-02',
+    '/guide/immersive-event/': '2026-07-31',
+    '/guide/immersive-theater/': '2026-08-01',
+    '/guide/immersive/': '2026-08-01',
+    '/media/': '2026-07-31',
+  };
+  for (const [p, d] of Object.entries(STATIC_LASTMOD)) {
+    const u = urls.find((x) => x.loc.endsWith(p));
+    if (u) u.lastmod = d;
+  }
+
+  // 日付を持つニュース記事は lastmod を付与（Google が再クロール判断に使う）。
+  for (const n of tmNews) {
+    const u = urls.find((x) => x.loc.endsWith(`/toudaimurder/news/${n.slug}/`));
+    if (u && n.date) u.lastmod = n.date.replace(/\./g, '-');
+  }
 
   if (isMicrocmsConfigured()) {
     // microCMS caps limit at 100 per request; page through everything.
@@ -45,7 +86,9 @@ export const GET: APIRoute = async ({ site }) => {
       offset += contents.length;
       for (const post of contents) {
         urls.push({
-          loc: new URL(`/blog/${post.id}`, base).toString(),
+          // canonical はスラッシュ付きに正規化しているので sitemap も揃える
+          // （不一致だと Search Console で両方の URL が計上されてしまう）
+          loc: new URL(`/blog/${post.id}/`, base).toString(),
           lastmod: post.revisedAt ?? post.publishedAt,
         });
       }

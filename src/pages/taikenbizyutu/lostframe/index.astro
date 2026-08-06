@@ -24,6 +24,9 @@ const description =
 </header>
 
 <div class="lp">
+  {/* LP は画像のみで構成されているため、検索エンジン・読み上げ用に
+      ページ見出しをテキストで置く（内容は LP 画像1枚目と同一）。 */}
+  <h1 class="sr-only">ロスト・フレーム Lost Frame｜下北沢の街を巡る参加型の絵画鑑賞｜体験する美術館</h1>
   <img class="lpimg" src={`${assets}/lp-1.webp`} alt="ロスト・フレーム Lost Frame ─ 参加型芸術のレーベル『体験する美術館』。その日、絵画は街にこぼれた。下北沢の街に散らばった絵画を探し、隠された物語を辿る……絵画と街が交差する、街を巡る参加型の絵画鑑賞" width="1600" height="2900">
   <img class="lpimg" src={`${assets}/lp-2.webp`} alt="STORY：古着と音楽、演劇とアート。多様な文化が調和する街、下北沢。しかし最近、奇妙な出来事が目撃されている。絵画のモチーフが街にこぼれるように現れはじめたのだ——。ABOUT：実際に下北沢の街を歩きながら、この公演のためだけに描かれた絵画と物語に出会い、図像を読み解いていく参加型の絵画鑑賞。PAINTING：荒巻まりの、小島有貴、中堀慎治、山科ティナ" width="1600" height="3700" loading="lazy">
   <img class="lpimg" src={`${assets}/lp-3.webp`} alt="所要時間75分、定員1〜4名。参加費（1人あたり）：4,000円［4名参加］、4,500円［3名参加］、5,000円［2名参加］、8,000円［1名参加］。STEP：01 公式サイトで参加を申し込む、02 記載の住所で公演に参加。CREATER：企画 株式会社ex Labs／ディレクター・デザイン・ストーリー制作 荒巻まりの／プロデューサー・図像設計 かるら／監修 御湯波ライト" width="1600" height="4000" loading="lazy">
@@ -44,6 +47,7 @@ const description =
 
 <style>
 .lp{background:#4e3f49}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .lpimg{display:block;width:100%;height:auto}
 .lphdr{position:sticky;top:0;z-index:50;background:rgba(19,25,38,.72);backdrop-filter:blur(8px);padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
 .lpback{color:#fff;font-size:13px;letter-spacing:.14em}
