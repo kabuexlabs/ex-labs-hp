@@ -137,10 +137,12 @@ const serviceLd = {
 <p class="h2sub">謎解き研修のノウハウは、以下の商業イベント制作実績から培われています。</p>
 <div class="hero-works" style="max-width:900px;margin:0 auto">
 <div class="hero-works-track">
-{[...Array(2)].map(() => (
+{/* -50%ループの片側コピー（4回分）がコンテナ幅900pxを大きく超えるよう8回繰り返す。
+    動く帯の中の lazy 画像は読み込みが間に合わず空白に見えるため eager 固定 */}
+{[...Array(8)].map((_, i) => (
   <>
-  <img src="/assets/work-1.webp" alt="博報堂×紀伊國屋書店の体験型イベント" width="849" height="1200" loading="lazy" decoding="async">
-  <img src="/assets/work-3.webp" alt="下北沢を舞台にしたイベント「ロスト・フレーム」" width="880" height="1252" loading="lazy" decoding="async">
+  <img src="/assets/work-1.webp" alt={i === 0 ? '博報堂×紀伊國屋書店の体験型イベント' : ''} aria-hidden={i > 0 ? 'true' : undefined} width="849" height="1200" loading="eager" decoding="async">
+  <img src="/assets/work-3.webp" alt={i === 0 ? '下北沢を舞台にしたイベント「ロスト・フレーム」' : ''} aria-hidden={i > 0 ? 'true' : undefined} width="880" height="1252" loading="eager" decoding="async">
   </>
 ))}
 </div>

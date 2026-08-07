@@ -171,14 +171,16 @@ const serviceLd = {
 </div>
 <div class="hero-works" style="margin-top:48px">
 <div class="hero-works-track">
-{[...Array(2)].map(() => (
+{/* -50%ループの片側コピー（4回分）が4Kの画面幅より広くなるよう8回繰り返す。
+    動く帯の中の lazy 画像は読み込みが間に合わず空白に見えるため eager 固定 */}
+{[...Array(8)].map((_, i) => (
   <>
-  <img src="/assets/events/uwasabanashi-kv.webp" alt="渋谷サクラステージの施設一体型イマーシブ「ウワサバナシ調査委員会」" width="880" height="1244" loading="lazy" decoding="async">
-  <img src="/assets/events/kaitou-kv.webp" alt="六本木の会員制バーで開催するマジック×イマーシブ「怪盗と秘密の試験」" width="880" height="1248" loading="lazy" decoding="async">
-  <img src="/assets/work-3.webp" alt="下北沢を舞台にしたアートイマーシブ「ロスト・フレーム」" width="880" height="1252" loading="lazy" decoding="async">
-  <img src="/assets/work-2.webp" alt="アートと謎解きを融合した自社主催イベント「ヌル・アーデン展」" width="880" height="1238" loading="lazy" decoding="async">
-  <img src="/assets/work-1.webp" alt="閉店後の紀伊國屋書店で開催した一夜限りの物語体験「月明かりの書店と呪われた原稿」" width="849" height="1200" loading="lazy" decoding="async">
-  <img src="/assets/events/atelier-copel.webp" alt="ダンス×物語体験の公演「アトリエ・コペル — The Silent Marionette」" width="880" height="1244" loading="lazy" decoding="async">
+  <img src="/assets/events/uwasabanashi-kv.webp" alt={i === 0 ? '渋谷サクラステージの施設一体型イマーシブ「ウワサバナシ調査委員会」' : ''} aria-hidden={i > 0 ? 'true' : undefined} width="880" height="1244" loading="eager" decoding="async">
+  <img src="/assets/events/kaitou-kv.webp" alt={i === 0 ? '六本木の会員制バーで開催するマジック×イマーシブ「怪盗と秘密の試験」' : ''} aria-hidden={i > 0 ? 'true' : undefined} width="880" height="1248" loading="eager" decoding="async">
+  <img src="/assets/work-3.webp" alt={i === 0 ? '下北沢を舞台にしたアートイマーシブ「ロスト・フレーム」' : ''} aria-hidden={i > 0 ? 'true' : undefined} width="880" height="1252" loading="eager" decoding="async">
+  <img src="/assets/work-2.webp" alt={i === 0 ? 'アートと謎解きを融合した自社主催イベント「ヌル・アーデン展」' : ''} aria-hidden={i > 0 ? 'true' : undefined} width="880" height="1238" loading="eager" decoding="async">
+  <img src="/assets/work-1.webp" alt={i === 0 ? '閉店後の紀伊國屋書店で開催した一夜限りの物語体験「月明かりの書店と呪われた原稿」' : ''} aria-hidden={i > 0 ? 'true' : undefined} width="849" height="1200" loading="eager" decoding="async">
+  <img src="/assets/events/atelier-copel.webp" alt={i === 0 ? 'ダンス×物語体験の公演「アトリエ・コペル — The Silent Marionette」' : ''} aria-hidden={i > 0 ? 'true' : undefined} width="880" height="1244" loading="eager" decoding="async">
   </>
 ))}
 </div>

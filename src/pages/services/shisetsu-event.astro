@@ -120,12 +120,13 @@ const serviceLd = {
 <h2 class="h2 serif">空間を活かした体験の一部</h2>
 <div class="hero-works" style="max-width:900px;margin:0 auto">
 <div class="hero-works-track">
-{[...Array(4)].map(() => (
+{/* 動く帯の中の lazy 画像は読み込みが間に合わず空白に見えるため eager 固定 */}
+{[...Array(4)].map((_, i) => (
   <>
-  <img src="/assets/events/uwasabanashi-kv.webp" alt="渋谷サクラステージ「ウワサバナシ調査委員会」" width="880" height="1244" loading="lazy" decoding="async">
-  <img src="/assets/work-3.webp" alt="下北沢を舞台にしたイベント「ロスト・フレーム」" width="880" height="1252" loading="lazy" decoding="async">
-  <img src="/assets/work-1.webp" alt="博報堂×紀伊國屋書店「月明かりの書店と呪われた原稿」" width="849" height="1200" loading="lazy" decoding="async">
-  <img src="/assets/events/lost-frame.webp" alt="ロスト・フレーム ポスター" width="800" height="1138" loading="lazy" decoding="async">
+  <img src="/assets/events/uwasabanashi-kv.webp" alt={i === 0 ? '渋谷サクラステージ「ウワサバナシ調査委員会」' : ''} aria-hidden={i > 0 ? 'true' : undefined} width="880" height="1244" loading="eager" decoding="async">
+  <img src="/assets/work-3.webp" alt={i === 0 ? '下北沢を舞台にしたイベント「ロスト・フレーム」' : ''} aria-hidden={i > 0 ? 'true' : undefined} width="880" height="1252" loading="eager" decoding="async">
+  <img src="/assets/work-1.webp" alt={i === 0 ? '博報堂×紀伊國屋書店「月明かりの書店と呪われた原稿」' : ''} aria-hidden={i > 0 ? 'true' : undefined} width="849" height="1200" loading="eager" decoding="async">
+  <img src="/assets/events/lost-frame.webp" alt={i === 0 ? 'ロスト・フレーム ポスター' : ''} aria-hidden={i > 0 ? 'true' : undefined} width="800" height="1138" loading="eager" decoding="async">
   </>
 ))}
 </div>

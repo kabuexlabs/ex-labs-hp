@@ -10,8 +10,11 @@ export interface Props {
 }
 
 const { voices, heading = 'お客様の声' } = Astro.props;
-// ループの継ぎ目が見えないよう track を複製する。
-const track = [...voices, ...voices];
+// -50%ループの片側コピーがワイド画面でもコンテナ幅を下回って途切れないよう、
+// 声の枚数が少なくても track 全体が最低16枚になるまで「偶数回」繰り返す
+// （偶数でないと -50% がセット境界に揃わず、継ぎ目がズレて見える）。
+const reps = voices.length ? Math.max(2, Math.ceil(16 / voices.length / 2) * 2) : 0;
+const track = Array(reps).fill(voices).flat();
 ---
 
 {voices.length > 0 && (
@@ -19,8 +22,9 @@ const track = [...voices, ...voices];
     <div class="shead rv"><h2 class="sh"><span class="sht en" style="font-size:clamp(40px,4.6vw,72px)">VOICE</span><span class="shj">{heading}</span></h2></div>
     <div class="vmq rv d1">
       <div class="vtrack">
-        {track.map((v) => (
-          <img class="vcard" src={v.src} alt={v.alt} loading="lazy" decoding="async" width="360" height="360">
+        {/* 動く帯の中の lazy 画像は読み込みが間に合わず途切れて見えるため eager 固定 */}
+        {track.map((v, i) => (
+          <img class="vcard" src={v.src} alt={i < voices.length ? v.alt : ''} aria-hidden={i >= voices.length ? 'true' : undefined} loading="eager" decoding="async" width="360" height="360">
         ))}
       </div>
     </div>

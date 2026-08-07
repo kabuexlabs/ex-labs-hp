@@ -23,8 +23,10 @@ const ticker = [
 >
   <div class="rail" slot="rail"><span class="vtx en">UNLIMITED MYSTERY — OFFICIAL SITE</span></div>
 
+  {/* -50%ループの片側コピー（4セット分）が4Kの画面幅より広くなるよう8回繰り返す。
+      2セット目以降は読み上げの重複を避けるため aria-hidden */}
   <div class="tick" slot="ticker"><div class="tin">
-    {[0, 1].map(() => ticker.map((t) => <span class="ti">{t}</span>))}
+    {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => ticker.map((t) => <span class="ti" aria-hidden={i > 0 ? 'true' : undefined}>{t}</span>))}
   </div></div>
 
   <script is:inline>
@@ -62,9 +64,12 @@ const ticker = [
       <div class="shead wrap rv"><h2 class="sh"><span class="sht en">WORKS</span><span class="shj">作品一覧</span></h2><a class="more en" href={`${base}/works/`}>MORE</a></div>
       <div class="wstrip rv d1">
         <div class="wsin">
-          {[0, 1].map(() => tmFeatured.map((w) => (
-            <div class="wcard">
-              <a href={`${base}/works/${w.slug}/`}><div class="ph pv">{w.image ? <img src={w.image} alt={`${w.title} キービジュアル`} loading="lazy" decoding="async" /> : <span class="mono">作品キービジュアル 407×570</span>}</div></a>
+          {/* -50%ループの片側コピー（2セット分）がワイド画面幅を超えるよう4回繰り返す。
+              2セット目以降は inert + aria-hidden で操作・読み上げの対象から外す。
+              動く帯の中の lazy 画像は読み込みが間に合わず途切れて見えるため eager 固定 */}
+          {[0, 1, 2, 3].map((i) => tmFeatured.map((w) => (
+            <div class="wcard" inert={i > 0} aria-hidden={i > 0 ? 'true' : undefined}>
+              <a href={`${base}/works/${w.slug}/`}><div class="ph pv">{w.image ? <img src={w.image} alt={i === 0 ? `${w.title} キービジュアル` : ''} loading="eager" decoding="async" /> : <span class="mono">作品キービジュアル 407×570</span>}</div></a>
               <div class="cmeta"><span class="badge en">{w.badge}</span><span class="cdate mono">{w.meta}</span></div>
               <h3 class="ct"><a href={`${base}/works/${w.slug}/`}>{w.title}</a></h3>
               <p class="cpl">{w.play}</p>

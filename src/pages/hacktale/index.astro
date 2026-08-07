@@ -46,10 +46,12 @@ const orgLd = {
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 
 {/* ループ系は「前半＋複製の後半」を並べ、-50% 移動でちょうど前半の幅ぶん戻る構造。
-    コンテナ側の gap だと継ぎ目がずれるため、間隔は各半分の padding-right で持つ */}
+    コンテナ側の gap だと継ぎ目がずれるため、間隔は各半分の padding-right で持つ。
+    各半分の中で項目を6回繰り返し、半分の幅が4Kの画面幅より広くなるようにして
+    帯の後半が途切れて空白にならないようにする */}
 <div class="tkr"><div class="tk">
-<div class="tkhalf">{tickerItems.map((t) => <span>{t}</span>)}</div>
-<div class="tkhalf" aria-hidden="true">{tickerItems.map((t) => <span>{t}</span>)}</div>
+<div class="tkhalf">{Array(6).fill(tickerItems).flat().map((t, i) => <span aria-hidden={i >= tickerItems.length ? 'true' : undefined}>{t}</span>)}</div>
+<div class="tkhalf" aria-hidden="true">{Array(6).fill(tickerItems).flat().map((t) => <span>{t}</span>)}</div>
 </div></div>
 
 <div class="fmq fmq-top" aria-hidden="true"><div class="fmt en"><span class="fmhalf">HACKTALE — BRAIN &amp; NEGOTIATION GAMES —</span><span class="fmhalf">HACKTALE — BRAIN &amp; NEGOTIATION GAMES —</span></div></div>

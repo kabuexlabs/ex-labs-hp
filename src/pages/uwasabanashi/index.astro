@@ -156,9 +156,11 @@ const faqs = [
 </section>
 
 <div class="news" aria-label="お知らせ">
+{/* -50%ループのため繰り返しは必ず偶数回（奇数だと継ぎ目が項目の途中に来てズレる）。
+    片側コピー（5セット分）が4Kの画面幅より広くなるよう10回繰り返す */}
 <div class="newsin">
-{[...newsItems, ...newsItems, ...newsItems].map((item) => (
-  <span class="newsitem">{item}</span>
+{Array(10).fill(newsItems).flat().map((item, i) => (
+  <span class="newsitem" aria-hidden={i >= newsItems.length ? 'true' : undefined}>{item}</span>
 ))}
 </div>
 </div>

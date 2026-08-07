@@ -136,10 +136,10 @@ const marqueeItems = Array(2).fill(groups).flat();
 <p class="marquee-label">お取引先、ご協力企業様</p>
 <div class="marquee"><div class="marquee-track partners-track">
 {partnerRow1Items.map((p) => (
-  <img class="marquee-logo" src={p.logo} alt={p.name} style={p.h ? `height:${p.h}px` : undefined} loading="lazy" decoding="async" />
+  <img class="marquee-logo" src={p.logo} alt={p.name} style={p.h ? `height:${p.h}px` : undefined} loading="eager" decoding="async" />
 ))}
 {partnerRow1Items.map((p) => (
-  <img class="marquee-logo" src={p.logo} alt="" style={p.h ? `height:${p.h}px` : undefined} loading="lazy" decoding="async" />
+  <img class="marquee-logo" src={p.logo} alt="" style={p.h ? `height:${p.h}px` : undefined} loading="eager" decoding="async" />
 ))}
 </div></div>
 </div>
@@ -148,12 +148,12 @@ const marqueeItems = Array(2).fill(groups).flat();
 <div class="marquee"><div class="marquee-track">
 {marqueeItems.map((g) => (
   g.logo
-    ? <img class="marquee-logo" src={g.logo} alt={g.name} style={g.h ? `height:${g.h}px` : undefined} loading="lazy" decoding="async" />
+    ? <img class="marquee-logo" src={g.logo} alt={g.name} style={g.h ? `height:${g.h}px` : undefined} loading="eager" decoding="async" />
     : <span class="marquee-name serif">{g.name}</span>
 ))}
 {marqueeItems.map((g) => (
   g.logo
-    ? <img class="marquee-logo" src={g.logo} alt="" style={g.h ? `height:${g.h}px` : undefined} loading="lazy" decoding="async" />
+    ? <img class="marquee-logo" src={g.logo} alt="" style={g.h ? `height:${g.h}px` : undefined} loading="eager" decoding="async" />
     : <span class="marquee-name serif" aria-hidden="true">{g.name}</span>
 ))}
 </div></div>
@@ -186,6 +186,13 @@ const marqueeItems = Array(2).fill(groups).flat();
 <span class="label-link-body">
 <span class="label-link-cat">イマーシブ公演レーベル</span>
 <span class="label-link-name serif">ウワサバナシ調査委員会</span>
+</span>
+<span class="label-link-arrow">↗</span>
+</a>
+<a class="label-link" href="https://kabuexlabs.com/kaitou/" target="_blank" rel="noopener noreferrer">
+<span class="label-link-body">
+<span class="label-link-cat">マジック×イマーシブレーベル</span>
+<span class="label-link-name serif">IMMERSIVE ILLUSION</span>
 </span>
 <span class="label-link-arrow">↗</span>
 </a>
