@@ -69,12 +69,18 @@ async function microcmsFetch(path: string): Promise<Response | null> {
 // - 本文に含む記事 → 該当ブロック（段落・見出し・リスト項目・図版など）
 //   を丸ごと取り除いて配信する
 // CMS側の記事本文を直接修正できたら、この一覧から語を消してよい。
-const HIDDEN_TOPICS = ['紅漂う街角で', 'Smystery', 'スミステリー'];
+// 表記ゆれ（読点・空白の挿入、「で」の有無など）にも一致するよう
+// 正規表現で持つ。/g 付き正規表現は lastIndex が残って test() の結果が
+// ぶれるため、使うたびに生成する。
+const HIDDEN_TOPIC_SOURCES = [
+  '紅\\s*、?\\s*漂う\\s*街角\\s*で?',
+  'Smystery',
+  'スミステリー',
+];
+const hiddenTopicRe = () => new RegExp(HIDDEN_TOPIC_SOURCES.join('|'), 'gi');
 
 function containsHiddenTopic(s: string | undefined | null): boolean {
-  if (!s) return false;
-  const t = s.toLowerCase();
-  return HIDDEN_TOPICS.some((w) => t.includes(w.toLowerCase()));
+  return !!s && hiddenTopicRe().test(s);
 }
 
 function isHiddenPost(post: BlogPost): boolean {
@@ -91,7 +97,8 @@ function scrubHiddenTopics(html: string): string {
   }
   // alt属性などに語を含む単独の<img>タグ
   out = out.replace(/<img\b[^>]*>/gi, (m) => (containsHiddenTopic(m) ? '' : m));
-  for (const w of HIDDEN_TOPICS) out = out.split(w).join('');
+  // 最後の保険：どんな構造に紛れていても語そのものは残さない
+  out = out.replace(hiddenTopicRe(), '');
   return out;
 }
 
