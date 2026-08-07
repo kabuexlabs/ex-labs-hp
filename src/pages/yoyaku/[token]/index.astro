@@ -42,17 +42,19 @@ if (!ev) {
 }
 
 let error = '';
-let prev = { name: '', phone: '', email: '', slotId: '' };
+let prev = { name: '', inviter: '', phone: '', email: '', slotId: '' };
 
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   const name = String(form.get('name') ?? '').trim().slice(0, 50);
+  const inviter = String(form.get('inviter') ?? '').trim().slice(0, 50);
   const phone = normalizePhone(String(form.get('phone') ?? ''));
   const email = String(form.get('email') ?? '').trim();
   const slotId = String(form.get('slot') ?? '');
-  prev = { name, phone, email, slotId };
+  prev = { name, inviter, phone, email, slotId };
 
-  if (!name) error = 'ハンドルネームを入力してください。';
+  if (!name) error = 'お名前を入力してください。';
+  else if (!inviter) error = '招待者名を入力してください。';
   else if (!validPhone(phone)) error = '電話番号の形式をご確認ください（例：090-1234-5678）。';
   else if (!validEmail(email)) error = 'メールアドレスの形式をご確認ください。';
   else if (!slotId) error = 'ご希望の日程を選択してください。';
@@ -61,7 +63,7 @@ if (Astro.request.method === 'POST') {
     if (!slot || slot.closed || slot.date < jstToday()) {
       error = '選択された日程は現在ご予約いただけません。別の日程をお選びください。';
     } else {
-      const result = await reserve(ev.id, slot, { name, phone, email });
+      const result = await reserve(ev.id, slot, { name, inviter, phone, email });
       if (result === 'taken') {
         // 本当に他の方が直前に同じ枠を確保したときだけ満席エラーを出す。
         // 同一人物の再送信（'duplicate'）は成功扱いで完了画面へ流す。
@@ -76,7 +78,7 @@ if (Astro.request.method === 'POST') {
               '【ex Labs】ご予約を承りました',
               `${name} 様\n\nご予約ありがとうございます。以下の内容で承りました。\n\n` +
                 `■ イベント\n${ev.title}\n\n■ 日程\n${when}\n\n` +
-                `■ ご入力内容\nハンドルネーム：${name}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +
+                `■ ご入力内容\nお名前：${name}\n招待者名：${inviter}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +
                 notesBlock +
                 `前日にリマインドメールをお送りします。\n変更・キャンセルはこのメールへの返信、または ${adminEmail()} までご連絡ください。\n\n株式会社 ex Labs`,
             ),
@@ -84,7 +86,7 @@ if (Astro.request.method === 'POST') {
               adminEmail(),
               `【予約】${ev.title}：${when}`,
               `予約ページから新しい予約が入りました。\n\n■ イベント\n${ev.title}\n\n■ 日程\n${when}\n\n` +
-                `■ お客様情報\nハンドルネーム：${name}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +
+                `■ お客様情報\nお名前：${name}\n招待者名：${inviter}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +
                 `管理ページ：${new URL('/yoyaku/admin/', Astro.site ?? Astro.url).toString()}`,
             ),
           ]);
@@ -159,8 +161,11 @@ const hasOpen = visible.some((s) => !bookings.has(s.id) && !s.closed);
 
       <h2>2. お客様情報</h2>
       <div class="yk-card" style="padding-top:6px">
-        <label class="yk-field">ハンドルネーム
+        <label class="yk-field">お名前<small>招待者の方に認知されているお名前でご記入ください</small>
           <input type="text" name="name" required maxlength="50" autocomplete="nickname" value={prev.name}>
+        </label>
+        <label class="yk-field">招待者名<small>あなたをご招待した方のお名前</small>
+          <input type="text" name="inviter" required maxlength="50" autocomplete="off" value={prev.inviter}>
         </label>
         <label class="yk-field">電話番号<small>当日ご連絡が取れる番号</small>
           <input type="tel" name="phone" required autocomplete="tel" placeholder="090-1234-5678" value={prev.phone}>

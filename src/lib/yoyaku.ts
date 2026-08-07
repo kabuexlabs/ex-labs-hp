@@ -38,6 +38,9 @@ export interface Slot {
 export interface Booking {
   slotId: string;
   name: string;
+  // 招待者名（お客様を招待した方のお名前）。必須化以前の既存予約には
+  // 無いことがあるため optional のまま扱う。
+  inviter?: string;
   phone: string;
   email: string;
   date: string;
@@ -252,11 +255,12 @@ export type ReserveResult = 'ok' | 'duplicate' | 'taken';
 export async function reserve(
   eventId: string,
   slot: Slot,
-  data: { name: string; phone: string; email: string },
+  data: { name: string; inviter: string; phone: string; email: string },
 ): Promise<ReserveResult> {
   const booking: Booking = {
     slotId: slot.id,
     name: data.name,
+    inviter: data.inviter,
     phone: data.phone,
     email: data.email,
     date: slot.date,

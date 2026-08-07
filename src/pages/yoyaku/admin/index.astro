@@ -375,12 +375,13 @@ const shareUrl = ev ? new URL(`/yoyaku/${ev.token}/`, Astro.site ?? Astro.url).t
       <p style="font-size:14px;color:#8a8378;margin:6px 0">予約はまだありません。</p>
     ) : (
       <table class="yk-table">
-        <thead><tr><th>日程</th><th>お客様</th><th>連絡先</th><th>リマインド</th><th></th></tr></thead>
+        <thead><tr><th>日程</th><th>お客様</th><th>招待者</th><th>連絡先</th><th>リマインド</th><th></th></tr></thead>
         <tbody>
         {bookingList.map((b) => (
           <tr>
             <td>{formatSlotJa(b.date, b.time)}</td>
             <td>{b.name}</td>
+            <td>{b.inviter ?? 'ー'}</td>
             <td>{b.phone}<br>{b.email}</td>
             <td>{b.remindedAt ? '送信済み' : '未送信'}</td>
             <td>
