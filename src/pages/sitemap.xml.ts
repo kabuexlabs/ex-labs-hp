@@ -58,8 +58,8 @@ export const GET: APIRoute = async ({ site }) => {
     '/services/immersive/': '2026-08-02',
     '/guide/immersive-event/': '2026-07-31',
     '/guide/immersive-theater/': '2026-08-01',
-    '/guide/immersive/': '2026-08-01',
-    '/media/': '2026-07-31',
+    '/guide/immersive/': '2026-08-07',
+    '/media/': '2026-08-07',
     '/taikenbizyutu/': '2026-08-06',
     '/taikenbizyutu/lostframe/': '2026-08-06',
   };
