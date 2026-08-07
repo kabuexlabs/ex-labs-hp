@@ -63,6 +63,38 @@ async function microcmsFetch(path: string): Promise<Response | null> {
   }
 }
 
+// サイトから露出させない非公開ワード。CMS上の記事は直接編集できない
+// ことがあるため、配信時にここで一括除去する：
+// - タイトルに含む記事 → 記事ごと非公開（一覧から除外・記事ページは404）
+// - 本文に含む記事 → 該当ブロック（段落・見出し・リスト項目・図版など）
+//   を丸ごと取り除いて配信する
+// CMS側の記事本文を直接修正できたら、この一覧から語を消してよい。
+const HIDDEN_TOPICS = ['紅漂う街角で', 'Smystery', 'スミステリー'];
+
+function containsHiddenTopic(s: string | undefined | null): boolean {
+  if (!s) return false;
+  const t = s.toLowerCase();
+  return HIDDEN_TOPICS.some((w) => t.includes(w.toLowerCase()));
+}
+
+function isHiddenPost(post: BlogPost): boolean {
+  return containsHiddenTopic(post.title);
+}
+
+// 非公開ワードを含むブロック要素を本文HTMLから取り除く。入れ子の外側
+// （figure等）から順に消し、最後に素の文字列としての残存も除去する。
+function scrubHiddenTopics(html: string): string {
+  let out = html;
+  for (const tag of ['figure', 'blockquote', 'tr', 'li', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']) {
+    const re = new RegExp(`<${tag}\\b[^>]*>[\\s\\S]*?<\\/${tag}>`, 'gi');
+    out = out.replace(re, (m) => (containsHiddenTopic(m) ? '' : m));
+  }
+  // alt属性などに語を含む単独の<img>タグ
+  out = out.replace(/<img\b[^>]*>/gi, (m) => (containsHiddenTopic(m) ? '' : m));
+  for (const w of HIDDEN_TOPICS) out = out.split(w).join('');
+  return out;
+}
+
 // The rich-editor field may be called `body` or `content` depending on
 // how the microCMS API schema was created; accept either and make sure
 // the templates always receive strings.
@@ -70,7 +102,7 @@ function normalizePost(raw: any): BlogPost {
   return {
     ...raw,
     title: raw?.title ?? '(無題)',
-    body: sanitizeBody(raw?.body ?? raw?.content ?? ''),
+    body: scrubHiddenTopics(sanitizeBody(raw?.body ?? raw?.content ?? '')),
   };
 }
 
@@ -100,7 +132,11 @@ async function fetchList(offset: number, limit: number, category?: PostCategory)
     return null;
   }
   const data = await res.json();
-  return { ...data, contents: (data.contents ?? []).map(normalizePost) };
+  const all = (data.contents ?? []).map(normalizePost);
+  // タイトルが非公開ワードに該当する記事は一覧・サイトマップから除外する。
+  const contents = all.filter((p: BlogPost) => !isHiddenPost(p));
+  const hidden = all.length - contents.length;
+  return { ...data, contents, totalCount: Math.max(0, (data.totalCount ?? 0) - hidden) };
 }
 
 // `category` narrows results to one LP's theme (see PostCategory). If
@@ -130,7 +166,9 @@ export async function getPost(id: string): Promise<BlogPost | null> {
   try {
     const res = await microcmsFetch(`${ENDPOINT}/${encodeURIComponent(id)}`);
     if (!res || !res.ok) return null;
-    return normalizePost(await res.json());
+    const post = normalizePost(await res.json());
+    // タイトルが非公開ワードに該当する記事は記事ページも404にする。
+    return isHiddenPost(post) ? null : post;
   } catch (e) {
     console.error('[microcms] getPost failed:', e);
     return null;
