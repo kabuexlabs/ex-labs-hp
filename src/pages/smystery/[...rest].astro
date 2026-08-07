@@ -1,0 +1,9 @@
+---
+// Smystery公式サイトは一旦非公開。/smystery/ 配下の全URLをトップへ302
+// リダイレクトする（vercel.json の redirects はアダプターのビルド出力に
+// 反映されないため、サーバーレンダリングで確実に処理する）。
+// ページ本体は src/archive/smystery/ に退避済み。公開を再開するときは
+// このファイルを削除し、archive のページを src/pages/smystery/ に戻す。
+export const prerender = false;
+return Astro.redirect('/', 302);
+---
