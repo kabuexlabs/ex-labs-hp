@@ -1,0 +1,171 @@
+---
+// 「イマーシブ 制作 費用」「イマーシブ 制作依頼」系の商用クエリの
+// 受け皿となる記事ページ。相場の結論を冒頭で明言し（AI検索の引用対策）、
+// 制作LP（/services/immersive/）へ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'summary', label: '費用の目安（結論）' },
+  { id: 'factors', label: '費用が決まる5つの要素' },
+  { id: 'revenue', label: '初期費用を抑える方法（レベニューシェア型）' },
+  { id: 'flow', label: '制作依頼の流れと期間' },
+  { id: 'choose', label: '制作会社の選び方' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'イマーシブイベント制作の費用相場はどのくらいですか？',
+    a: '一般的な目安として、1つの空間で完結する小規模な体験で数十万円台から、商業施設や街全体を舞台にした周遊型のフルパッケージでは数百万円規模になることがあります。会場の規模・体験時間・開催期間・運営範囲で大きく変わるため、まずは目的を添えて見積りを取るのが確実です。',
+  },
+  {
+    q: '初期費用を抑えてイマーシブイベントを実施できますか？',
+    a: '可能なケースがあります。株式会社ex Labsでは、チケット売上などに応じて費用をお支払いいただくレベニューシェア型（成果報酬型）に対応しており、案件によっては初期費用0円または格安で実施できます。特に商業施設・観光施設での開催はこの形式と相性が良いです。',
+  },
+  {
+    q: 'イマーシブイベントの制作期間はどのくらいかかりますか？',
+    a: '規模により数ヶ月程度が目安です。街・施設を舞台にする場合は、関係各所との調整期間も見込む必要があります。開催希望時期が決まっている場合は早めにご相談ください。',
+  },
+  {
+    q: '小さな店舗や1つの部屋でもイマーシブ体験は作れますか？',
+    a: '作れます。当社は六本木の会員制バーを舞台にしたマジック×イマーシブ公演「怪盗と秘密の試験」など、1つの空間を活かした少人数制の没入体験も制作しています。空間の広さよりも、その場所ならではの物語設計が重要です。',
+  },
+  {
+    q: '見積りは無料ですか？',
+    a: 'はい、無料です。舞台にしたい場所（施設・店舗・街・ブランドなど）と目的、おおよその時期をお知らせいただければ、概算をご案内します。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'イマーシブイベント制作の費用相場は？料金の内訳・依頼の流れまで解説',
+  about: 'イマーシブ（没入型体験）イベント制作の費用',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-07',
+  dateModified: '2026-08-07',
+  mainEntityOfPage: new URL('/guide/immersive-cost/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="イマーシブ制作の費用相場は？料金の内訳・依頼の流れまで解説 - 株式会社ex Labs"
+  description="イマーシブイベント（没入型体験）制作の費用相場を制作会社が解説。1空間完結型は数十万円台〜、施設・街を舞台にした周遊型は数百万円規模になることも。レベニューシェア型なら初期費用を抑えた開催も可能。制作依頼・見積りは無料。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'イマーシブ完全ガイド', href: '/guide/immersive/' },
+  { name: 'イマーシブ制作の費用相場' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">IMMERSIVE COST GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">イマーシブ制作の</span><span class="nobr">費用・料金相場ガイド</span></h1>
+<p class="lede"><strong>イマーシブイベント（没入型体験）制作の費用</strong>は、一般的な目安として<strong>1つの空間で完結する小規模な体験で数十万円台から、商業施設や街全体を舞台にした周遊型のフルパッケージで数百万円規模</strong>になることがあります。この記事では、料金が決まる要素・初期費用を抑える方法・制作依頼の流れを、イマーシブ制作会社の株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="summary"><div class="wrap">
+<p class="eyebrow">SUMMARY</p><h2 class="h2 serif">費用の目安（結論）</h2>
+<p class="h2sub">舞台の規模と依頼範囲によって、おおまかに3つの価格帯に分かれます。</p>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">1空間・少人数型</span><span class="genre-d">数十万円台〜が目安。バー・店舗・1フロアなど、1つの空間を舞台にした少人数制の没入体験。既存フォーマットの活用で抑えられることも。</span></div>
+<div class="genre-cell"><span class="genre-t serif">施設・街周遊型</span><span class="genre-d">数百万円規模になることも。商業施設全体や街を舞台に、複数スポットを巡る周遊型。シナリオ・制作物・運営体制の規模が大きくなります。</span></div>
+<div class="genre-cell"><span class="genre-t serif">レベニューシェア型</span><span class="genre-d">初期費用0円または格安で開催できるケースも。チケット売上などに応じて費用をお支払いいただく成果報酬型です。</span></div>
+</div>
+<p class="vc-line" style="margin-top:28px">※上記は業界の一般的な相場観であり、当社の料金表ではありません。条件次第で大きく上下するため、正式な金額は<strong>無料見積り</strong>でご確認ください。</p>
+</div></section>
+
+<section class="section" id="factors"><div class="wrap narrow">
+<p class="eyebrow">FACTORS</p><h2 class="h2 serif">費用が決まる5つの要素</h2>
+<ul class="bullets">
+<li><strong>舞台の規模</strong>：1つの部屋か、施設全体か、街全体か。周遊するスポットが増えるほど、シナリオ・制作物・当日運営の工数が増えます。</li>
+<li><strong>体験の形式と時間</strong>：定時公演型か自由参加の周遊型か、体験時間はどのくらいか。同時に体験できる人数の設計も費用に直結します。</li>
+<li><strong>開催期間</strong>：1日限りのイベントか、数週間〜数ヶ月の常設的な開催か。期間が長いほど運営費は増えますが、1日あたりの費用効率は上がります。</li>
+<li><strong>演出・制作物の量</strong>：小道具・装飾・音響・香りなど五感の演出をどこまで作り込むか。世界観の密度と費用はトレードオフです。</li>
+<li><strong>運営まで含むか</strong>：企画・シナリオの納品までか、キャスト・スタッフの手配と当日の公演運営まで任せるかで大きく変わります。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="revenue"><div class="wrap narrow">
+<p class="eyebrow">REVENUE SHARE</p><h2 class="h2 serif"><span class="nobr">初期費用を抑える方法</span><span class="nobr">（レベニューシェア型）</span></h2>
+<p class="lede">株式会社ex Labsは、<strong>チケット売上などに応じて費用をお支払いいただくレベニューシェア型（成果報酬型）</strong>に対応しています。案件によっては<strong>初期費用0円または格安</strong>でイマーシブイベントを開催でき、特に商業施設・観光施設の共有区画や未活用時間を活かした開催と相性の良い形式です。</p>
+<p class="lede">実際に、渋谷サクラステージ全体を周遊する「ウワサバナシ調査委員会」のような施設一体型イマーシブでは、施設側は空間を提供し、企画・制作・集客・運営を当社が担う形で、施設の負担を抑えた開催を実現しています。この取り組みは日本経済新聞にも掲載されました。<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントについて詳しく →</a></p>
+</div></section>
+
+<section class="section" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">制作依頼の流れと期間</h2>
+<ul class="bullets">
+<li><strong>1. お問い合わせ</strong>：舞台にしたい場所（施設・店舗・街・ブランド）と目的、おおよその時期をお知らせください。</li>
+<li><strong>2. ヒアリング・企画提案</strong>：場所の魅力と課題を伺ったうえで、体験コンセプトと概算お見積りをご提案します。ここまでは無料です。</li>
+<li><strong>3. シナリオ・体験設計</strong>：脚本に加えて、動線・手がかり・演出ポイントを設計し、テストを重ねます。</li>
+<li><strong>4. 実施・運営・改善</strong>：告知素材の準備から当日運営、実施後の振り返りまで一貫して対応します。</li>
+</ul>
+<p class="vc-line">制作期間は規模により数ヶ月程度が目安です。街・施設が舞台の場合は関係各所との調整期間も見込んでください。</p>
+</div></section>
+
+<section class="section tinted" id="choose"><div class="wrap narrow">
+<p class="eyebrow">HOW TO CHOOSE</p><h2 class="h2 serif">制作会社の選び方</h2>
+<p class="lede">イマーシブは「シナリオの面白さ」だけでなく、<strong>実在する空間を物語に変える設計力</strong>と<strong>当日の運営力</strong>で体験の質が決まります。制作会社を選ぶ際は、<strong>実空間での開催実績があるか</strong>、<strong>集客まで含めて設計できるか</strong>、<strong>施設・店舗側との調整経験があるか</strong>を確認するのがおすすめです。</p>
+<p class="lede">株式会社ex Labsは、渋谷サクラステージ全体を周遊する「ウワサバナシ調査委員会」（日本経済新聞掲載）、下北沢の街を舞台にした「ロスト・フレーム」、六本木の会員制バーでのマジック×イマーシブ「怪盗と秘密の試験」（電ファミニコゲーマー紹介）など、<strong>街・施設・店舗を舞台にしたイマーシブ制作の実績</strong>を重ねています。累計コンテンツ体験者数は15,000人を超えました。</p>
+<p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）はこちら →</a></p>
+</div></section>
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">イマーシブ制作の無料見積りはこちら</p>
+<a class="btn" href="/#contact">イマーシブ制作について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例4選</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a></p>
+</div></section>
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#summary,#factors,#revenue,#flow,#choose,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

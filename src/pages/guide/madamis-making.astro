@@ -1,0 +1,179 @@
+---
+// 「マダミス 作り方」「マーダーミステリー シナリオ 書き方」系クエリの
+// 受け皿となる記事ページ。作り方の全体像を実用的に解説しつつ、
+// 商用制作は制作LP（/services/murder-mystery/）へ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'overview', label: 'マダミス制作の全体像（7ステップ）' },
+  { id: 'steps', label: '各ステップの作り方' },
+  { id: 'tips', label: '面白くする3つのコツ' },
+  { id: 'needs', label: '制作に必要なもの' },
+  { id: 'pro', label: '自作とプロ依頼の分かれ目' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'マダミスを作るには何から始めればいいですか？',
+    a: 'まず「事件の真相」から決めるのがおすすめです。誰が・なぜ・どうやって事件を起こしたのかを先に固め、そこから逆算して各キャラクターの秘密・動機・持っている情報を配置していくと、破綻のないシナリオになります。',
+  },
+  {
+    q: 'マダミスのシナリオ制作にはどのくらい時間がかかりますか？',
+    a: '個人制作の小規模作品でも、執筆とテストプレイを含めて数週間〜数ヶ月かかるのが一般的です。商用クオリティの作品では、テストプレイと改稿を繰り返すため、さらに期間を見込む必要があります。',
+  },
+  {
+    q: 'マダミス制作で一番重要なことは何ですか？',
+    a: 'テストプレイです。マダミスは「読んで面白い」と「遊んで面白い」が一致しないことが多く、実際に遊んでもらって初めて、情報量の偏り・議論の停滞・推理の破綻が見つかります。制作時間の多くはテストプレイと改稿に使われます。',
+  },
+  {
+    q: '店舗やイベントで使うマダミスを作ってもらうことはできますか？',
+    a: '可能です。株式会社ex Labsでは、店舗集客・動画企画・イベント・研修など目的に合わせたオリジナルマダミスを、企画からシナリオ・テストプレイ・当日運営まで一貫して制作しています。制作依頼・お見積りは無料です。',
+  },
+  {
+    q: '自作のマダミスを商用利用してもいいですか？',
+    a: '完全オリジナルであれば問題ありませんが、既存作品のトリック・設定の流用や、他作品の画像・音楽の無断使用は権利侵害になり得ます。商用利用では品質だけでなく権利面の管理も重要になるため、不安があれば専門の制作会社への依頼をおすすめします。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'マダミスの作り方｜シナリオ制作の手順7ステップとコツを解説',
+  about: 'マーダーミステリー（マダミス）シナリオの作り方',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-07',
+  dateModified: '2026-08-07',
+  mainEntityOfPage: new URL('/guide/madamis-making/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="マダミスの作り方｜シナリオ制作の手順7ステップとコツを解説 - 株式会社ex Labs"
+  description="マダミス（マーダーミステリー）の作り方を制作会社が解説。事件の真相から逆算する7ステップ、全員に秘密と動機を持たせるコツ、テストプレイの重要性まで。店舗・イベント向けの商用マダミス制作の依頼方法も紹介。見積り無料。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'マダミス完全ガイド', href: '/guide/madamis/' },
+  { name: 'マダミスの作り方' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">MADAMIS MAKING GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">マダミスの作り方</span><br><span class="nobr">シナリオ制作の手順とコツ</span></h1>
+<p class="lede"><strong>マダミス（マーダーミステリー）の作り方</strong>の基本は、<strong>「事件の真相」を最初に決めて、そこから逆算してキャラクターと情報を配置する</strong>ことです。この記事では、マダミスアンケート1位作品を手がけたチームを擁する株式会社ex Labsが、シナリオ制作の手順7ステップ・面白くするコツ・自作とプロ依頼の分かれ目を解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="overview"><div class="wrap">
+<p class="eyebrow">OVERVIEW</p><h2 class="h2 serif">マダミス制作の全体像（7ステップ）</h2>
+<p class="h2sub">制作は大きく次の7つの工程で進みます。順番が重要です。</p>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">1. コンセプト設計</span><span class="genre-d">人数・時間・舞台・後味（感動系/どんでん返し系など）を決める。</span></div>
+<div class="genre-cell"><span class="genre-t serif">2. 真相の設計</span><span class="genre-d">誰が・なぜ・どうやって。物語の核となる事件の真相を先に固める。</span></div>
+<div class="genre-cell"><span class="genre-t serif">3. キャラクター設計</span><span class="genre-d">全員に秘密・動機・目的を配る。「犯人以外も怪しい」状態を作る。</span></div>
+<div class="genre-cell"><span class="genre-t serif">4. 情報の配置</span><span class="genre-d">証拠・証言・タイムラインを分散させ、議論で真相に迫れるようにする。</span></div>
+<div class="genre-cell"><span class="genre-t serif">5. 進行の設計</span><span class="genre-d">フェーズ割り・調査ルール・投票と結末の分岐を決める。</span></div>
+<div class="genre-cell"><span class="genre-t serif">6. テストプレイ</span><span class="genre-d">実際に遊んで、破綻・情報の偏り・議論の停滞を潰す。最重要工程。</span></div>
+<div class="genre-cell"><span class="genre-t serif">7. 資料の仕上げ</span><span class="genre-d">キャラクターブック・GM進行資料・配布物を完成させる。</span></div>
+</div>
+</div></section>
+
+<section class="section" id="steps"><div class="wrap narrow">
+<p class="eyebrow">STEPS</p><h2 class="h2 serif">各ステップの作り方</h2>
+<h3 class="def-sub serif">真相から逆算する</h3>
+<p class="lede">最初に決めるのは<strong>事件の真相</strong>です。「誰が・なぜ・どうやって」を1枚にまとめ、矛盾がないタイムラインを作ります。真相が固まっていないままキャラクターを書き始めると、後から辻褄合わせに追われて破綻しやすくなります。</p>
+<h3 class="def-sub serif">全員に「秘密」を配る</h3>
+<p class="lede">マダミスの面白さは「全員が何かを隠している」ことから生まれます。犯人以外のキャラクターにも、<strong>事件とは別の秘密や、疑われても仕方ない行動</strong>を持たせることで、議論に緊張感が生まれます。各キャラクターに「勝利条件」を設定し、全員が能動的に動く理由を作りましょう。</p>
+<h3 class="def-sub serif">情報は「議論で組み上がる」ように分散させる</h3>
+<p class="lede">真相にたどり着くための手がかりは、1人が独占せず<strong>複数のキャラクター・証拠品に分散</strong>させます。「AさんとBさんの情報を突き合わせると矛盾が見える」という構造が、議論そのものを推理体験に変えます。</p>
+<h3 class="def-sub serif">テストプレイで「遊んで面白い」に仕上げる</h3>
+<p class="lede">マダミスは「読んで面白い」と「遊んで面白い」が一致しないことが多いコンテンツです。テストプレイでは、<strong>議論が停滞した時間帯・誰も使わなかった情報・早く真相に到達しすぎた原因</strong>を記録し、改稿を繰り返します。商用作品では、この工程に制作時間の多くを使います。</p>
+</div></section>
+
+<section class="section tinted" id="tips"><div class="wrap narrow">
+<p class="eyebrow">TIPS</p><h2 class="h2 serif">面白くする3つのコツ</h2>
+<ul class="bullets">
+<li><strong>フェアネスを守る</strong>：プレイヤーが「その情報があれば解けた」と納得できる状態にする。理不尽な後出しは満足度を大きく下げます。</li>
+<li><strong>「犯人当て」以外の物語も用意する</strong>：恋愛・友情・過去の因縁など、推理と並走する人間ドラマがあると、犯人でも犯人以外でも遊んだ満足感が残ります。</li>
+<li><strong>終了後の「答え合わせ」を設計する</strong>：真相解説で全ての伏線が回収される瞬間が、マダミス体験のクライマックスです。解説資料まで手を抜かないこと。</li>
+</ul>
+</div></section>
+
+<section class="section" id="needs"><div class="wrap narrow">
+<p class="eyebrow">NEEDS</p><h2 class="h2 serif">制作に必要なもの</h2>
+<ul class="bullets">
+<li><strong>キャラクターブック</strong>：各プレイヤーに配る、背景・秘密・目的・持ち情報をまとめた資料。</li>
+<li><strong>共通資料</strong>：事件の概要・舞台設定・ルール説明・タイムライン。</li>
+<li><strong>証拠品・調査カード</strong>：調査フェーズで公開されていく手がかり。</li>
+<li><strong>GM進行資料</strong>：フェーズごとの進行手順・想定問答・真相解説。GMなし作品では、これを全て自動進行できる形に落とし込みます。</li>
+<li><strong>テストプレイヤー</strong>：初見の感想が得られる協力者。制作者だけでは面白さを客観視できません。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="pro"><div class="wrap narrow">
+<p class="eyebrow">PRO</p><h2 class="h2 serif">自作とプロ依頼の分かれ目</h2>
+<p class="lede">仲間内で遊ぶ作品なら、自作はマダミスの一番贅沢な楽しみ方のひとつです。一方、<strong>店舗の集客・動画企画・企業イベント・研修など「目的」がある商用利用</strong>では、体験の品質がそのまま成果とブランドの評価に直結します。テストプレイの体制・権利面の管理・当日の運営設計まで含めると、専門の制作会社への依頼が確実です。</p>
+<p class="lede">株式会社ex Labsは、<strong>マダミスアンケート1位作品を手がけたチーム</strong>が、企画からシナリオ・テストプレイ・公演運営まで一貫して担当します。宿泊施設向けマダミスで新規宿泊予約20件以上を獲得した実績など、「目的の達成」まで含めた制作を行っています。</p>
+<p class="vc-line"><a href="/services/murder-mystery/" style="color:var(--accent)">マダミスの制作依頼・お見積り（無料）はこちら →</a></p>
+</div></section>
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-murder">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">商用マダミス制作の無料見積りはこちら</p>
+<a class="btn" href="/#contact">マダミス制作について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは？完全ガイド</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作サービス</a>／<a href="/toudaimurder/" style="color:var(--accent)">UNLIMITED MYSTERY（制作レーベル）</a></p>
+</div></section>
+
+<LatestPosts category="murder" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.def-sub{font-size:19px;color:var(--ink);margin:40px 0 6px;text-align:center}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#overview,#steps,#tips,#needs,#pro,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

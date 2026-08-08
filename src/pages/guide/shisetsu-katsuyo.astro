@@ -1,0 +1,207 @@
+---
+// 「施設活用イベント」「商業施設 集客イベント」系クエリの受け皿となる
+// 記事ページ。用語の定義を冒頭で明言し（AI検索の引用対策）、
+// 施設活用LP（/services/shisetsu-event/）へ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'about', label: '施設活用イベントとは' },
+  { id: 'why', label: 'なぜ今、施設活用が注目されるのか' },
+  { id: 'examples', label: '事例（渋谷サクラステージほか）' },
+  { id: 'merit', label: '施設側のメリット' },
+  { id: 'cost', label: '費用と実施形態（レベニューシェア型）' },
+  { id: 'flow', label: '実施までの流れ' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '施設活用イベントとは何ですか？',
+    a: '商業施設・観光施設・書店・ホテルなどの空間や、共有区画・営業時間外といった未活用の時間を「体験型イベントの舞台」に変えて、新規集客・館内回遊・滞在時間の延長につなげる取り組みです。謎解き・イマーシブ・マーダーミステリーなどの体験コンテンツと組み合わせるのが代表的な形です。',
+  },
+  {
+    q: 'どんな施設で実施できますか？',
+    a: '商業施設・観光施設・書店・宿泊施設・飲食店・イベントスペースなど、人が訪れる空間であれば幅広く実施できます。当社は渋谷サクラステージのような大型商業施設から、書店・会員制バーのような1店舗まで、規模を問わず制作実績があります。',
+  },
+  {
+    q: '施設側の費用負担はどのくらいですか？',
+    a: '実施形態によります。株式会社ex Labsでは、チケット売上などに応じて費用をお支払いいただくレベニューシェア型（成果報酬型）に対応しており、案件によっては施設側の初期費用0円または格安で開催できます。まずは無料でご相談ください。',
+  },
+  {
+    q: '施設の通常営業に影響はありませんか？',
+    a: '通常営業と共存する設計が基本です。共有区画や通路・空きスペースを活用した周遊型や、営業時間外・閑散時間帯を使った開催など、施設のオペレーションに合わせて体験を設計します。',
+  },
+  {
+    q: '集客効果はどのように生まれますか？',
+    a: 'イベント自体が来館の「目的」になることで、これまで施設を訪れなかった層の新規来館が生まれます。さらに、施設内を巡る周遊型の設計により、館内の回遊・滞在時間の延長・店舗への送客にもつながります。SNSやメディアで話題化しやすいのも特徴です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+// 用語定義の構造化データ：AI検索・「〜とは」クエリへの引用元として、
+// このページが「施設活用イベント」の定義を持つことを明示する。
+const definedTermLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: '施設活用イベント',
+  alternateName: ['施設活用', '商業施設の集客イベント'],
+  description:
+    '商業施設・観光施設などの空間や、共有区画・営業時間外といった未活用の時間を体験型イベントの舞台に変えて、新規集客・館内回遊・滞在価値の向上につなげる取り組み。',
+  inDefinedTermSet: {
+    '@type': 'DefinedTermSet',
+    name: '体験型エンターテインメント用語集',
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  },
+  url: new URL('/guide/shisetsu-katsuyo/', Astro.site).toString(),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '施設活用イベントとは?商業施設の集客イベント事例・効果・費用を解説',
+  about: '施設活用イベント（商業施設の集客イベント）',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-07',
+  dateModified: '2026-08-07',
+  mainEntityOfPage: new URL('/guide/shisetsu-katsuyo/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="施設活用イベントとは？商業施設の集客イベント事例・効果・費用 - 株式会社ex Labs"
+  description="施設活用イベントとは、商業施設などの空間・未活用時間を体験型イベントの舞台に変えて集客につなげる取り組み。渋谷サクラステージでの周遊型イマーシブ（日経掲載）などの事例・施設側のメリット・レベニューシェア型の費用まで解説。相談無料。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<script type="application/ld+json" set:html={jsonLd(definedTermLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '施設活用イベントとは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">FACILITY EVENT GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">施設活用イベントとは？</span><span class="nobr">事例・効果・費用を</span><span class="nobr">わかりやすく解説</span></h1>
+<div class="def-box">
+<p class="def-word"><span class="serif">施設活用イベント</span><span class="def-en">しせつかつようイベント</span></p>
+<p class="def-body">商業施設・観光施設・書店・ホテルなどの<strong>空間や、共有区画・営業時間外といった未活用の時間</strong>を、謎解き・イマーシブなどの<strong>体験型イベントの舞台</strong>に変えて、<strong>新規集客・館内回遊・滞在価値の向上</strong>につなげる取り組み。施設は場所を提供し、企画・制作・集客・運営を専門会社が担う形が広がっている。</p>
+</div>
+<p class="lede">このページでは、施設活用イベントの仕組み・事例・施設側のメリットから、費用と実施形態までをまとめて解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">施設活用イベントとは</h2>
+<p class="lede"><strong>施設活用イベント</strong>とは、施設が持つ空間そのものを「体験の舞台」として活かす集客施策です。ポスターやセールのような「告知型」の販促と違い、<strong>イベント自体が来館の目的になる</strong>のが特徴で、施設の共有区画・通路・空きスペース・営業時間外といった、これまで収益を生みにくかった場所や時間を集客資産に変えられます。</p>
+<p class="lede">組み合わせる体験コンテンツは、施設全体を巡る<strong>周遊型の謎解き・イマーシブ</strong>、店舗空間を使った<strong>物語体験・マーダーミステリー</strong>、イベントスペースでの<strong>参加型の対戦イベント</strong>までさまざまです。<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？ →</a></p>
+</div></section>
+
+<section class="section" id="why"><div class="wrap narrow">
+<p class="eyebrow">WHY NOW</p><h2 class="h2 serif">なぜ今、施設活用が注目されるのか</h2>
+<ul class="bullets">
+<li><strong>「モノ消費」から「コト消費」へ</strong>：買い物だけなら通販で済む時代に、施設へ足を運ぶ理由として「そこでしかできない体験」の価値が高まっています。</li>
+<li><strong>未活用スペース・時間の存在</strong>：共有区画・催事場・営業時間外など、施設には収益化されていない場所と時間が多くあります。体験イベントはこれらを低リスクで活かせます。</li>
+<li><strong>回遊・滞在への効果</strong>：施設内を巡る設計にすることで、来館者が普段通らないフロアや店舗の前を通り、滞在時間と接触機会が増えます。</li>
+<li><strong>話題化のしやすさ</strong>：物語性のある体験はSNSで共有されやすく、メディアにも取り上げられやすいコンテンツです。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="examples"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLES</p><h2 class="h2 serif">事例（渋谷サクラステージほか）</h2>
+<ul class="bullets">
+<li><strong>ウワサバナシ調査委員会（渋谷サクラステージ）</strong>：東急不動産様・404 Not Found様・TSUTAYA様のご協力のもと、商業施設全体を周遊する都市伝説×イマーシブ×謎解き。施設の共有区画・館内導線を「体験の目的地」に変える施設一体型の取り組みで、<strong>日本経済新聞に掲載</strong>されました。</li>
+<li><strong>東京都頭脳王決定戦（TUNNEL TOKYO）</strong>：セガサミーグループ様が運営するイベントスペース「TUNNEL TOKYO」（東京・大崎）で本戦を開催した参加型頭脳戦イベント。全公演チケット完売。</li>
+<li><strong>月明かりの書店と呪われた原稿（紀伊國屋書店）</strong>：博報堂様との取り組みで、閉店後の書店を舞台にした一夜限りの物語体験を実施。営業時間外の空間活用の代表例です。</li>
+<li><strong>宿泊施設向けマーダーミステリー</strong>：宿泊とセットの物語体験により、新規宿泊予約20件以上の獲得につながりました。</li>
+</ul>
+<p class="vc-line"><a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの企業活用事例4選も見る →</a></p>
+</div></section>
+
+<section class="section" id="merit"><div class="wrap narrow">
+<p class="eyebrow">MERIT</p><h2 class="h2 serif">施設側のメリット</h2>
+<ul class="bullets">
+<li><strong>新規来館の創出</strong>：イベント目的の来館者という、従来の商圏・客層の外からの集客が生まれます。</li>
+<li><strong>館内回遊・滞在時間の延長</strong>：周遊型の設計により、普段足が向かないフロア・店舗への送客と接触時間の増加が見込めます。</li>
+<li><strong>未活用資産の収益化</strong>：空き区画・閑散時間帯が体験の舞台に変わり、収益とにぎわいを生みます。</li>
+<li><strong>話題化・ブランディング</strong>：「あの施設で面白いことをやっている」という認知が、SNS・メディアを通じて広がります。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif"><span class="nobr">費用と実施形態</span><span class="nobr">（レベニューシェア型）</span></h2>
+<p class="lede">実施形態は大きく、施設が制作費を負担して主催する<strong>発注型</strong>と、チケット売上などに応じて費用を分配する<strong>レベニューシェア型（成果報酬型）</strong>に分かれます。株式会社ex Labsはレベニューシェア型に対応しており、案件によっては<strong>施設側の初期費用0円または格安</strong>で開催できます。</p>
+<p class="lede">レベニューシェア型では、施設は空間を提供し、<strong>企画・制作・集客・運営を当社が一貫して担当</strong>します。「イベントをやりたいが、企画も運営もノウハウがない」という施設様でも導入しやすい形式です。</p>
+<p class="vc-line"><a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブ制作の費用相場も見る →</a></p>
+</div></section>
+
+<section class="section" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">実施までの流れ</h2>
+<ul class="bullets">
+<li><strong>1. お問い合わせ</strong>：施設の種類・活用したい空間や時間帯・目的（集客・回遊・話題化など）をお知らせください。</li>
+<li><strong>2. ヒアリング・企画提案</strong>：施設の特徴と課題を伺い、体験コンセプト・実施形態・概算をご提案します。ここまでは無料です。</li>
+<li><strong>3. 制作・準備</strong>：シナリオ・制作物・告知素材を準備し、施設のオペレーションに合わせて運営設計を行います。</li>
+<li><strong>4. 開催・運営・振り返り</strong>：当日運営から効果の振り返り・次回に向けた改善提案まで一貫して対応します。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">施設活用イベントのご相談はこちら（無料）</p>
+<a class="btn" href="/#contact">施設活用について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例4選</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/media/" style="color:var(--accent)">メディア掲載実績</a></p>
+</div></section>
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+/* 辞書風の即答ボックス（強調スニペット・「とは」検索の受け皿） */
+.def-box{max-width:680px;margin:40px auto 26px;background:#fff;border:1px solid rgba(51,48,43,.1);border-left:5px solid var(--accent);border-radius:14px;padding:26px 30px;text-align:left;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.def-word{margin:0 0 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:22px;font-weight:800;color:var(--ink)}
+.def-en{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.06em}
+.def-body{margin:0;font-size:14.5px;line-height:2;color:rgba(51,48,43,.82)}
+@media(max-width:640px){.def-box{padding:20px 20px}.def-word{font-size:19px;gap:10px}}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#why,#examples,#merit,#cost,#flow,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
