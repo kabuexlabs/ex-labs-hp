@@ -46,8 +46,9 @@ const guideItems: Item[] = guideArticles
 const blogItems: Item[] = fetched.map((p) => ({
   href: `/blog/${p.id}/`,
   title: p.title,
-  date: p.publishedAt.slice(0, 10),
-  desc: stripHtml(p.body),
+  // publishedAt が無い異常データでも枠ごと落とさない
+  date: (p.publishedAt ?? '').slice(0, 10) || '1970-01-01',
+  desc: stripHtml(p.body ?? ''),
   img: p.eyecatch?.url,
 }));
 
