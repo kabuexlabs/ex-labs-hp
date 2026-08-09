@@ -6,6 +6,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -67,6 +68,7 @@ const articleLd = {
 <BaseLayout
   title="イマーシブイベントとは？企業の活用事例4選と費用・開催の流れ - 株式会社ex Labs"
   description="イマーシブイベント（没入型体験イベント）の企業活用事例を制作会社が紹介。渋谷サクラステージでの都市伝説イマーシブ、下北沢の街歩きアート体験など実例4選と、メリット・費用の目安・開催までの流れを解説します。"
+  ogImage="/assets/guide/immersive-event.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -132,6 +134,8 @@ const articleLd = {
 </ul>
 <p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）はこちら →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

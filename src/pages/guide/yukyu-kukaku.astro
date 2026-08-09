@@ -5,6 +5,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -66,6 +67,7 @@ const articleLd = {
 <BaseLayout
   title="遊休区画・空きスペースの活用アイデア｜体験型イベントで目的地に変える - 株式会社ex Labs"
   description="商業施設の遊休区画・空きテナント・使われていないスペースの活用方法を解説。短期賃貸や省人設置との比較、体験型イベント（謎解き・イマーシブ）で空間を「目的地」に変える方法、レベニューシェア型で初期費用0円から始める形まで。相談無料。"
+  ogImage="/assets/guide/yukyu-kukaku.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -131,6 +133,8 @@ const articleLd = {
 </ul>
 <p class="vc-line"><a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談（無料）はこちら →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

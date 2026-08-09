@@ -5,6 +5,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -65,6 +66,7 @@ const articleLd = {
 <BaseLayout
   title="イマーシブ制作依頼はどこにする？制作会社の選び方5つの基準 - 株式会社ex Labs"
   description="イマーシブイベント（没入型体験）の制作依頼先の選び方を解説。実空間での開催実績・体験設計力・運営力・集客力・施設調整の5つの基準と依頼の流れ。渋谷サクラステージでの周遊型イマーシブ（日経掲載）などの実績あり。見積り無料。"
+  ogImage="/assets/guide/immersive-company.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -125,6 +127,8 @@ const articleLd = {
 <p class="lede">株式会社ex Labsは、<strong>複数のイマーシブレーベルを自社運営する東京大学発の制作会社</strong>です。アート×体験の「体験する美術館」、マジック×イマーシブの「IMMERSIVE ILLUSION」などを展開し、企画・体験設計・集客・運営まで一貫対応。<strong>レベニューシェア型（初期費用0円または格安）</strong>にも対応しています。累計コンテンツ体験者数は15,000人超。</p>
 <p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）はこちら →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section tinted" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

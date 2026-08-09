@@ -6,6 +6,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -67,6 +68,7 @@ const articleLd = {
 <BaseLayout
   title="イマーシブ制作の費用相場は？料金の内訳・依頼の流れまで解説 - 株式会社ex Labs"
   description="イマーシブイベント（没入型体験）制作の費用相場を制作会社が解説。1空間完結型は数十万円台〜、施設・街を舞台にした周遊型は数百万円規模になることも。レベニューシェア型なら初期費用を抑えた開催も可能。制作依頼・見積りは無料。"
+  ogImage="/assets/guide/immersive-cost.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -134,6 +136,8 @@ const articleLd = {
 <p class="lede">株式会社ex Labsは、渋谷サクラステージ全体を周遊する「ウワサバナシ調査委員会」（日本経済新聞掲載）、下北沢の街を舞台にした「ロスト・フレーム」、六本木の会員制バーでのマジック×イマーシブ「怪盗と秘密の試験」（電ファミニコゲーマー紹介）など、<strong>街・施設・店舗を舞台にしたイマーシブ制作の実績</strong>を重ねています。累計コンテンツ体験者数は15,000人を超えました。</p>
 <p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）はこちら →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

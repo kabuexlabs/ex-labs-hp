@@ -5,6 +5,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -65,6 +66,7 @@ const articleLd = {
 <BaseLayout
   title="企業・店舗のマダミス活用ガイド｜集客・研修・プロモーション事例 - 株式会社ex Labs"
   description="マダミス（マーダーミステリー）の企業活用を制作会社が解説。店舗集客・宿泊施設・動画企画・チームビルディング研修・ブランドプロモーションの6つの活用シーンと、新規宿泊予約20件以上を獲得した事例を紹介。制作依頼・見積り無料。"
+  ogImage="/assets/guide/madamis-business.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -128,6 +130,8 @@ const articleLd = {
 <p class="lede">費用は一般的な目安として、シナリオのみで数十万円台〜、フルパッケージで100万円前後〜。<strong>レベニューシェア型で初期費用を抑えた導入</strong>にも対応しています。<a href="/guide/madamis-cost/" style="color:var(--accent)">費用相場の詳細 →</a></p>
 <p class="vc-line"><a href="/services/murder-mystery/" style="color:var(--accent)">マダミスの制作依頼・お見積り（無料）はこちら →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section tinted" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

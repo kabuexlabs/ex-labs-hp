@@ -6,6 +6,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -67,6 +68,7 @@ const articleLd = {
 <BaseLayout
   title="ホテル・宿泊施設の集客イベント｜泊まる理由を作る体験型企画 - 株式会社ex Labs"
   description="ホテル・旅館・宿泊施設の集客イベントを解説。施設全体を物語の舞台にするマーダーミステリー・謎解きで「泊まる理由」を作る方法。宿泊×マダミスで新規宿泊予約20件以上を獲得した実績あり。閑散期対策・小規模施設もOK。相談無料。"
+  ogImage="/assets/guide/hotel-event.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -130,6 +132,8 @@ const articleLd = {
 <p class="lede">費用の一般的な目安はシナリオのみで数十万円台〜、フルパッケージで100万円前後〜。<strong>宿泊料金への体験費上乗せによる回収設計や、レベニューシェア型</strong>のご相談も可能です。</p>
 <p class="vc-line"><a href="/services/murder-mystery/" style="color:var(--accent)">マダミスの制作依頼（無料見積り）→</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談 →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

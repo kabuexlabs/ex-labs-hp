@@ -4,6 +4,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -99,6 +100,7 @@ const articleLd = {
 <BaseLayout
   title="イマーシブ（immersive）とは？意味・読み方・使い方をわかりやすく解説 - 株式会社ex Labs"
   description="イマーシブ（immersive）とは英語で「没入型の」という意味。読み方は「イマーシブ」。語源・例文・使い方から、イマーシブシアターなど体験の種類・企業活用・制作依頼まで、イマーシブ制作会社がまとめて解説します。"
+  ogImage="/assets/guide/immersive.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -194,6 +196,8 @@ const articleLd = {
 <p class="lede">イマーシブ制作の費用は、<strong>体験の規模（会場数・公演回数・出演者数）・制作物の量・運営範囲</strong>によって決まります。チケット収益から回収する成果報酬型・レベニューシェア型に対応しており、初期費用を抑えた導入も可能です。</p>
 <p class="vc-line"><a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブ制作の費用相場を詳しく見る →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

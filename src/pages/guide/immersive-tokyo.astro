@@ -6,6 +6,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -66,6 +67,7 @@ const articleLd = {
 <BaseLayout
   title="東京で体験できるイマーシブイベント｜種類・選び方・注目公演 - 株式会社ex Labs"
   description="東京のイマーシブ体験（没入型イベント）を制作会社が解説。渋谷サクラステージの周遊型「ウワサバナシ調査委員会」、六本木の会員制バーで開催する「怪盗と秘密の試験」、下北沢の「ロスト・フレーム」など注目公演と、初めての選び方を紹介。"
+  ogImage="/assets/guide/immersive-tokyo.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -122,6 +124,8 @@ const articleLd = {
 <p class="lede">上で紹介した公演は、いずれも株式会社ex Labsが<strong>企画・制作・運営</strong>を手がけたものです。商業施設・店舗・街を舞台にしたオリジナルのイマーシブイベントを、<strong>レベニューシェア型（初期費用0円または格安）</strong>を含む柔軟な形で開催できます。</p>
 <p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）はこちら →</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section tinted" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

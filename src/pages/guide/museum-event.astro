@@ -6,6 +6,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -67,6 +68,7 @@ const articleLd = {
 <BaseLayout
   title="美術館・博物館・水族館の集客イベント｜展示×体験型で新規来館を - 株式会社ex Labs"
   description="美術館・博物館・水族館・植物園などミュージアムの集客イベントを解説。展示空間を舞台にした謎解き・イマーシブで、普段来ない層の新規来館を作る方法。アート×謎解きの「ヌル・アーデン展」（広告費0円でチケット1,500枚）などの実績。相談無料。"
+  ogImage="/assets/guide/museum-event.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -134,6 +136,8 @@ const articleLd = {
 <p class="lede"><strong>レベニューシェア型（成果報酬型）</strong>に対応しており、案件によっては<strong>施設側の初期費用0円または格安</strong>で開催できます。</p>
 <p class="vc-line"><a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談（無料）はこちら →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

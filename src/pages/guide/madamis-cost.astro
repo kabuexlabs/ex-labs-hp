@@ -6,6 +6,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -67,6 +68,7 @@ const articleLd = {
 <BaseLayout
   title="マダミス制作の費用相場は？料金の内訳・安く抑える方法まで解説 - 株式会社ex Labs"
   description="マダミス（マーダーミステリー）制作の費用相場を制作会社が解説。シナリオのみなら数十万円台〜、運営まで含むフルパッケージは100万円前後〜が一般的な目安です。料金が決まる要素・費用を抑える方法・依頼の流れまで紹介。見積り無料。"
+  ogImage="/assets/guide/madamis-cost.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -137,6 +139,8 @@ const articleLd = {
 <p class="lede">株式会社ex Labsは、マダミスアンケート1位作品を手がけたチームが、企画からシナリオ・テストプレイ・公演運営まで一貫して担当。宿泊施設向けのマダミスで新規宿泊予約20件以上の獲得につながった実績など、「目的の達成」まで含めた制作を行っています。累計コンテンツ体験者数は15,000人を超えました。</p>
 <p class="vc-line"><a href="/services/murder-mystery/" style="color:var(--accent)">マダミスの制作依頼・お見積り（無料）はこちら →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

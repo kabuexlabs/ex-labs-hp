@@ -6,6 +6,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -67,6 +68,7 @@ const articleLd = {
 <BaseLayout
   title="マダミスの作り方｜シナリオ制作の手順7ステップとコツを解説 - 株式会社ex Labs"
   description="マダミス（マーダーミステリー）の作り方を制作会社が解説。事件の真相から逆算する7ステップ、全員に秘密と動機を持たせるコツ、テストプレイの重要性まで。店舗・イベント向けの商用マダミス制作の依頼方法も紹介。見積り無料。"
+  ogImage="/assets/guide/madamis-making.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -141,6 +143,8 @@ const articleLd = {
 <p class="lede">株式会社ex Labsは、<strong>マダミスアンケート1位作品を手がけたチーム</strong>が、企画からシナリオ・テストプレイ・公演運営まで一貫して担当します。宿泊施設向けマダミスで新規宿泊予約20件以上を獲得した実績など、「目的の達成」まで含めた制作を行っています。</p>
 <p class="vc-line"><a href="/services/murder-mystery/" style="color:var(--accent)">マダミスの制作依頼・お見積り（無料）はこちら →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

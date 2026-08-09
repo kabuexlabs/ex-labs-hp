@@ -4,6 +4,7 @@ export const prerender = false;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import { getPostList, isMicrocmsConfigured } from '../../lib/microcms';
+import { guideArticles } from '../../data/guides';
 
 const configured = isMicrocmsConfigured();
 const PAGE_SIZE = 12;
@@ -16,6 +17,9 @@ const { contents, totalCount } = configured
 
 const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 
+// サイト内の解説記事（静的ガイド）。新しい順に表示する。
+const guides = [...guideArticles].sort((a, b) => b.date.localeCompare(a.date));
+
 function formatDate(iso: string) {
   const d = new Date(iso);
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
@@ -26,14 +30,37 @@ function excerpt(html: string, length = 80) {
   return text.length > length ? text.slice(0, length) + '…' : text;
 }
 ---
-<BaseLayout title="ブログ｜謎解き研修・マダミス・イマーシブの解説記事 - 株式会社ex Labs" description="謎解き研修の効果と進め方、マーダーミステリー（マダミス）制作の流れ、イマーシブイベントの企画方法、施設集客の事例など、体験型エンターテインメントの実務ノウハウを制作会社の視点で解説します。">
+<BaseLayout title="ブログ・解説記事｜謎解き研修・マダミス・イマーシブ・施設活用 - 株式会社ex Labs" description="マダミス（マーダーミステリー）・イマーシブ・施設活用イベントの解説記事と、体験型エンターテインメントの実務ノウハウを制作会社の視点で発信。制作依頼の費用相場・会社の選び方・施設集客の事例まで網羅しています。">
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
   { name: 'ブログ' },
 ]} />
 
 <section class="section" id="blog-top" style="padding-top:56px"><div class="wrap">
-<p class="eyebrow">BLOG</p><h1 class="h2 serif">ブログ</h1>
+<p class="eyebrow">GUIDE</p><h1 class="h2 serif">解説記事・完全ガイド</h1>
+<p class="h2sub">マダミス・イマーシブ・施設活用の基礎知識から制作依頼の実務まで、制作会社の視点で解説しています。</p>
+
+{page === 1 && (
+  <div class="blog-grid">
+    {guides.map((g) => (
+      <div class="blog-card">
+        <a href={g.href}>
+          <img class="blog-img" src={g.thumb} alt={g.title} width="1200" height="630" loading="lazy" decoding="async" />
+        </a>
+        <p class="blog-date">{formatDate(g.date)}</p>
+        <h2 class="blog-title"><a href={g.href}>{g.title}</a></h2>
+        <p class="blog-excerpt">{g.desc}</p>
+      </div>
+    ))}
+  </div>
+)}
+{page > 1 && (
+  <p class="vc-line">解説記事の一覧は<a href="/blog/" style="color:var(--accent)">1ページ目</a>に表示しています。</p>
+)}
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="eyebrow">BLOG</p><h2 class="h2 serif">最新のブログ記事</h2>
 
 {!configured && (
   <p class="blog-empty">まだブログの準備中です。もうしばらくお待ちください。</p>
@@ -56,7 +83,7 @@ function excerpt(html: string, length = 80) {
           )}
         </a>
         <p class="blog-date">{formatDate(post.publishedAt)}</p>
-        <h2 class="blog-title"><a href={`/blog/${post.id}`}>{post.title}</a></h2>
+        <h3 class="blog-title"><a href={`/blog/${post.id}`}>{post.title}</a></h3>
         <p class="blog-excerpt">{excerpt(post.body)}</p>
       </div>
     ))}

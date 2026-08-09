@@ -6,6 +6,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -93,6 +94,7 @@ const articleLd = {
 <BaseLayout
   title="マダミスとは？意味・遊び方・種類・費用まで完全ガイド - 株式会社ex Labs"
   description="マダミスとは？マーダーミステリーの略称・通称で、参加者が登場人物になりきり推理する体験型ゲームです。意味・遊び方・種類・謎解きとの違い・費用・始め方・制作依頼まで、制作会社がまとめて解説します。"
+  ogImage="/assets/guide/madamis.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -180,6 +182,8 @@ const articleLd = {
 <p class="lede"><strong>制作を依頼する場合</strong>は、作品の形式・規模・利用範囲によって変わります。案件によっては初期費用を抑えたご提案やレベニューシェア型にも対応しています。</p>
 <p class="vc-line"><a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場を詳しく見る →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

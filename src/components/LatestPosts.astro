@@ -1,5 +1,6 @@
 ---
 import { getPostList, isMicrocmsConfigured, type PostCategory } from '../lib/microcms';
+import { guideArticles } from '../data/guides';
 
 export interface Props {
   heading?: string;
@@ -9,50 +10,81 @@ export interface Props {
   /** 記事が取得できない時もセクション自体は出す（トップページ用）。
       CMS側の障害や設定切れでブログへの導線ごと消えるのを防ぐ。 */
   alwaysShow?: boolean;
+  /** このページ自身のパス。関連記事に自分自身を出さないための除外に使う */
+  excludeHref?: string;
 }
 
-const { heading = '関連記事', limit = 3, tinted = true, category, alwaysShow = false } = Astro.props;
+const { heading = '関連記事', limit = 3, tinted = true, category, alwaysShow = false, excludeHref } = Astro.props;
 
 const { contents: fetched } = isMicrocmsConfigured()
   ? await getPostList(0, limit, category)
   : { contents: [] };
-const contents = fetched.slice(0, limit);
+
+// サイト内の解説記事（静的ガイド）とCMSブログ記事を1つのリストに統合し、
+// 新しい順に limit 件表示する。ガイドはCMSに依存しないため、CMSが空でも
+// 関連記事枠に必ずコンテンツが出る。
+interface Item {
+  href: string;
+  title: string;
+  date: string; // YYYY-MM-DD
+  desc: string;
+  img?: string;
+}
+
+const currentPath = excludeHref ?? Astro.url.pathname;
+
+function stripHtml(html: string, length = 60) {
+  const text = html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  return text.length > length ? text.slice(0, length) + '…' : text;
+}
+
+const guideItems: Item[] = guideArticles
+  .filter((g) => !category || g.category === category)
+  .filter((g) => g.href !== currentPath)
+  .map((g) => ({ href: g.href, title: g.title, date: g.date, desc: g.desc, img: g.thumb }));
+
+const blogItems: Item[] = fetched.map((p) => ({
+  href: `/blog/${p.id}/`,
+  title: p.title,
+  date: p.publishedAt.slice(0, 10),
+  desc: stripHtml(p.body),
+  img: p.eyecatch?.url,
+}));
+
+const items = [...guideItems, ...blogItems]
+  .sort((a, b) => b.date.localeCompare(a.date))
+  .slice(0, limit);
 
 function formatDate(iso: string) {
   const d = new Date(iso);
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 }
-
-function excerpt(html: string, length = 60) {
-  const text = html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
-  return text.length > length ? text.slice(0, length) + '…' : text;
-}
 ---
-{(contents.length > 0 || alwaysShow) && (
+{(items.length > 0 || alwaysShow) && (
   <section class:list={['section', { tinted }]}><div class="wrap">
     <p class="eyebrow">BLOG</p>
     <h2 class="h2 serif">{heading}</h2>
-    {contents.length === 0 && (
-      <div style="text-align:center;margin-top:8px"><a class="btn ghost" href="/blog/">ブログ記事一覧を見る　→</a></div>
+    {items.length === 0 && (
+      <div style="text-align:center;margin-top:8px"><a class="btn ghost" href="/blog/">記事一覧を見る　→</a></div>
     )}
     <div class="blog-grid blog-strip">
-      {contents.map((post) => (
+      {items.map((item) => (
         <div class="blog-card">
-          <a href={`/blog/${post.id}`}>
-            {post.eyecatch ? (
-              <img class="blog-img" loading="lazy" decoding="async" src={post.eyecatch.url} alt={post.title} />
+          <a href={item.href}>
+            {item.img ? (
+              <img class="blog-img" loading="lazy" decoding="async" src={item.img} alt={item.title} />
             ) : (
               <div class="blog-img"></div>
             )}
           </a>
-          <p class="blog-date">{formatDate(post.publishedAt)}</p>
-          <h3 class="blog-title"><a href={`/blog/${post.id}`}>{post.title}</a></h3>
-          <p class="blog-excerpt">{excerpt(post.body)}</p>
+          <p class="blog-date">{formatDate(item.date)}</p>
+          <h3 class="blog-title"><a href={item.href}>{item.title}</a></h3>
+          <p class="blog-excerpt">{item.desc}</p>
         </div>
       ))}
     </div>
-    {contents.length > 0 && (
-      <p class="vc-line" style="margin-top:40px"><a href="/blog/" style="color:var(--accent)">ブログ記事一覧を見る →</a></p>
+    {items.length > 0 && (
+      <p class="vc-line" style="margin-top:40px"><a href="/blog/" style="color:var(--accent)">記事一覧を見る →</a></p>
     )}
   </div></section>
 )}

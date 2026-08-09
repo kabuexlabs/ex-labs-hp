@@ -5,6 +5,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -65,6 +66,7 @@ const articleLd = {
 <BaseLayout
   title="マダミス制作依頼はどこにする？制作会社の選び方5つの基準 - 株式会社ex Labs"
   description="マダミス（マーダーミステリー）の制作依頼先の選び方を解説。専門制作会社・個人ライター・イベント会社の違い、確認すべき5つの基準（実績・テストプレイ体制・運営経験・権利・目的設計）、依頼の流れまで。制作依頼・お見積りは無料。"
+  ogImage="/assets/guide/madamis-company.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -123,6 +125,8 @@ const articleLd = {
 <p class="lede">株式会社ex Labsは、<strong>マダミスアンケート1位作品を手がけたチーム</strong>を擁する東京大学発の制作会社です。現役東大生と有名作家による制作レーベル「UNLIMITED MYSTERY」を自社運営し、<strong>企画・シナリオ・テストプレイ・公演運営まで一貫対応</strong>。宿泊施設向けマダミスで新規宿泊予約20件以上を獲得するなど、目的達成まで含めた制作を行っています。累計コンテンツ体験者数は15,000人超。</p>
 <p class="vc-line"><a href="/services/murder-mystery/" style="color:var(--accent)">マダミスの制作依頼・お見積り（無料）はこちら →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section tinted" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

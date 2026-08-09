@@ -6,6 +6,7 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -82,6 +83,7 @@ const articleLd = {
 <BaseLayout
   title="イマーシブシアターとは？演劇との違い・楽しみ方・東京の体験スポット - 株式会社ex Labs"
   description="イマーシブシアター（イマーシブ演劇）とは、観客が空間の中を歩き回りながら物語を体験する没入型の演劇のこと。普通の演劇との違い・初めての楽しみ方・服装・東京で体験できる公演まで、イマーシブ制作会社がわかりやすく解説します。"
+  ogImage="/assets/guide/immersive-theater.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -152,6 +154,8 @@ const articleLd = {
 <p class="lede">株式会社ex Labsは、渋谷サクラステージ（東急不動産様）での施設一体型イベントをはじめ、空間を活かしたイマーシブ体験の企画・制作・集客・運営を一貫して手がけています。初期費用を抑えたレベニューシェア型のご提案も可能です。</p>
 <p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼はこちら →</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">企業のイマーシブイベント事例4選 →</a></p>
 </div></section>
+
+<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
