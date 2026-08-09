@@ -799,7 +799,7 @@ section[id],header[id]{scroll-margin-top:64px}
             io.unobserve(entry.target);
           }
         });
-      }, { threshold: 0.08 });
+      }, { threshold: 0 }); // 縦長要素で発火しない問題を避けるため割合しきい値は使わない
       els.forEach(function (el) { io.observe(el); });
     }
   }

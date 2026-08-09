@@ -269,6 +269,10 @@ const orgLd = {
     sections.forEach(function (el) { el.classList.add('is-visible'); });
     return;
   }
+  /* threshold は 0 にする。割合しきい値（例 0.12）だと、画面の高さより
+     「セクション高の12%」が大きい縦長セクション（記事一覧など）で
+     しきい値に永遠に達せず、opacity:0 のまま表示されないことがある
+     （スマホ実機の画面高で発生）。 */
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
       if (entry.isIntersecting) {
@@ -276,7 +280,7 @@ const orgLd = {
         io.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+  }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
   sections.forEach(function (el) { io.observe(el); });
 })();
 </script>

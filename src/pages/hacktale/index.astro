@@ -255,7 +255,7 @@ const io = new IntersectionObserver(
       }
     });
   },
-  { threshold: 0.15 },
+  { threshold: 0 }, // 縦長要素で発火しない問題を避けるため割合しきい値は使わない
 );
 els.forEach((el, i) => {
   if (el.getBoundingClientRect().top > window.innerHeight * 0.9) {
