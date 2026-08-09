@@ -1,0 +1,162 @@
+---
+// 「イマーシブ 制作依頼」「イマーシブ 制作会社」系の商用クエリの受け皿。
+// 選び方の基準を解説しつつ、制作LP（/services/immersive/）へ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'points', label: '制作会社を選ぶ5つの基準' },
+  { id: 'works', label: '実績で見るイマーシブ制作の幅' },
+  { id: 'flow', label: '制作依頼の流れ' },
+  { id: 'exlabs', label: 'ex Labsのイマーシブ制作' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'イマーシブイベントの制作依頼はどこにすればいいですか？',
+    a: 'イマーシブ（没入型体験）は、演劇・謎解き・空間演出・運営が交差する総合的なコンテンツです。シナリオだけでなく「実在の空間を物語に変えた実績」を持つ専門制作会社に依頼するのが確実です。',
+  },
+  {
+    q: 'イマーシブ制作会社を選ぶ基準は何ですか？',
+    a: '①実空間（施設・街・店舗）での開催実績、②物語と動線・オペレーションを両立させる設計力、③キャスト・スタッフを含む当日の運営力、④集客まで含めた企画力、⑤施設や関係者との調整経験、の5点が重要です。',
+  },
+  {
+    q: 'イマーシブ制作の費用はどのくらいかかりますか？',
+    a: '一般的な目安として、1つの空間で完結する体験で数十万円台から、施設・街全体を舞台にした周遊型では数百万円規模になることがあります。レベニューシェア型なら初期費用を抑えた開催も可能です。',
+  },
+  {
+    q: '小さな店舗でもイマーシブイベントを開催できますか？',
+    a: 'できます。当社は六本木の会員制バーを舞台にした少人数制のマジック×イマーシブ公演「怪盗と秘密の試験」など、1店舗規模の没入体験も制作しています。',
+  },
+  {
+    q: '相談や見積りにお金はかかりますか？',
+    a: '株式会社ex Labsでは、ヒアリング・企画提案・お見積りまで無料です。舞台にしたい場所と目的をお知らせください。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'イマーシブ制作依頼はどこにする？制作会社の選び方5つの基準',
+  about: 'イマーシブ（没入型体験）制作会社の選び方',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-07',
+  dateModified: '2026-08-07',
+  mainEntityOfPage: new URL('/guide/immersive-company/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="イマーシブ制作依頼はどこにする？制作会社の選び方5つの基準 - 株式会社ex Labs"
+  description="イマーシブイベント（没入型体験）の制作依頼先の選び方を解説。実空間での開催実績・体験設計力・運営力・集客力・施設調整の5つの基準と依頼の流れ。渋谷サクラステージでの周遊型イマーシブ（日経掲載）などの実績あり。見積り無料。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'イマーシブ完全ガイド', href: '/guide/immersive/' },
+  { name: 'イマーシブ制作会社の選び方' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">IMMERSIVE COMPANY GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">イマーシブ制作依頼は</span><span class="nobr">どこにする？</span><br><span class="nobr">制作会社の選び方</span></h1>
+<p class="lede"><strong>イマーシブ（没入型体験）の制作依頼</strong>で失敗しないために最も重要なのは、<strong>「実在の空間を物語に変えた実績」があるか</strong>です。イマーシブは脚本・空間演出・動線設計・当日運営が絡み合う総合コンテンツで、机上のシナリオ力だけでは成立しません。この記事では、制作会社選びの5つの基準を、日本経済新聞掲載の施設一体型イマーシブを手がけた株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="points"><div class="wrap narrow">
+<p class="eyebrow">POINTS</p><h2 class="h2 serif">制作会社を選ぶ5つの基準</h2>
+<ul class="bullets">
+<li><strong>1. 実空間での開催実績</strong>：ホール公演だけでなく、商業施設・街・店舗など「日常の空間」を舞台にした実績があるか。空間の制約を物語の魅力に変える経験値が問われます。</li>
+<li><strong>2. 体験設計力</strong>：物語・動線・手がかり・混雑時のオペレーションを一体で設計できるか。没入感は演出だけでなく「ストレスのなさ」からも生まれます。</li>
+<li><strong>3. 当日の運営力</strong>：キャスト・スタッフの手配と教育、進行トラブルへの対応まで自社で担えるか。</li>
+<li><strong>4. 集客まで含めた企画力</strong>：作って終わりではなく、ターゲット設定・告知・チケット販売まで設計できるか。</li>
+<li><strong>5. 施設・関係者との調整経験</strong>：施設運営者・テナント・行政など、関係各所と調整しながら進めた経験があるか。実空間のイマーシブでは必須のスキルです。</li>
+</ul>
+</div></section>
+
+<section class="section" id="works"><div class="wrap narrow">
+<p class="eyebrow">WORKS</p><h2 class="h2 serif">実績で見るイマーシブ制作の幅</h2>
+<ul class="bullets">
+<li><strong>商業施設全体×周遊型</strong>：渋谷サクラステージを周遊する「ウワサバナシ調査委員会」（東急不動産様ほか協力）。<strong>日本経済新聞に掲載</strong>。</li>
+<li><strong>1店舗×少人数制</strong>：六本木の会員制バーでのマジック×イマーシブ「怪盗と秘密の試験」。<strong>電ファミニコゲーマーで紹介</strong>。</li>
+<li><strong>街全体×アート</strong>：下北沢の街を歩く周遊型アートイマーシブ「ロスト・フレーム」。</li>
+<li><strong>展覧会×謎解き</strong>：アートの世界に入り込む自社主催「ヌル・アーデン展」（広告費0円でチケット1,500枚販売）。</li>
+</ul>
+<p class="vc-line"><a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの企業活用事例4選 →</a></p>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">制作依頼の流れ</h2>
+<ul class="bullets">
+<li><strong>1. お問い合わせ</strong>：舞台にしたい場所（施設・店舗・街・ブランド）と目的、おおよその時期をお知らせください。</li>
+<li><strong>2. ヒアリング・企画提案</strong>：体験コンセプトと概算お見積りをご提案します。ここまでは無料です。</li>
+<li><strong>3. シナリオ・体験設計</strong>：脚本・動線・演出・運営マニュアルを設計し、テストを重ねます。</li>
+<li><strong>4. 実施・運営・改善</strong>：当日運営から振り返り・改善提案まで一貫対応します。</li>
+</ul>
+<p class="vc-line"><a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブ制作の費用相場はこちら →</a></p>
+</div></section>
+
+<section class="section" id="exlabs"><div class="wrap narrow">
+<p class="eyebrow">EX LABS</p><h2 class="h2 serif">ex Labsのイマーシブ制作</h2>
+<p class="lede">株式会社ex Labsは、<strong>複数のイマーシブレーベルを自社運営する東京大学発の制作会社</strong>です。アート×体験の「体験する美術館」、マジック×イマーシブの「IMMERSIVE ILLUSION」などを展開し、企画・体験設計・集客・運営まで一貫対応。<strong>レベニューシェア型（初期費用0円または格安）</strong>にも対応しています。累計コンテンツ体験者数は15,000人超。</p>
+<p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）はこちら →</a></p>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">イマーシブ制作の無料見積りはこちら</p>
+<a class="btn" href="/#contact">イマーシブ制作について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド</a>／<a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブ制作の費用相場</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a></p>
+</div></section>
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#points,#works,#flow,#exlabs,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

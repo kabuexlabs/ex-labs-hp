@@ -1,0 +1,165 @@
+---
+// 「マダミス 企業」「マダミス イベント」「マダミス 店舗 集客」系クエリの
+// 受け皿。ビジネス活用の型を示し、制作LP（/services/murder-mystery/）へ送客。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'why', label: 'なぜ企業がマダミスを使うのか' },
+  { id: 'usecase', label: '活用シーン6選' },
+  { id: 'examples', label: '事例（宿泊予約20件獲得ほか）' },
+  { id: 'flow', label: '導入の流れと費用感' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '企業がマダミスを活用するメリットは何ですか？',
+    a: '参加者が数時間、物語の当事者として深く没入するため、記憶への残り方が通常の販促やレクリエーションと大きく異なります。店舗集客・商品や施設の世界観訴求・チームビルディング・動画企画など、幅広い目的に使えます。',
+  },
+  {
+    q: 'マダミスは何人くらいで遊べますか？',
+    a: '1卓あたり4〜10名程度が一般的です。企業イベントでは複数卓の同時進行や、大人数で楽しめる形式への調整も可能なので、想定人数を添えてご相談ください。',
+  },
+  {
+    q: '自社の商品や施設を題材にしたマダミスは作れますか？',
+    a: '作れます。商品・ブランド・施設の世界観を物語に織り込んだオリジナル作品の制作が、企業活用のマダミスでは最も効果的です。宿泊施設を舞台にした作品で新規宿泊予約20件以上を獲得した実績があります。',
+  },
+  {
+    q: '研修としても使えますか？',
+    a: '使えます。マダミスは情報共有・論理的思考・交渉・合意形成の要素を含むため、チームビルディング研修と相性が良いコンテンツです。謎解き研修と組み合わせたプログラムもご提案できます。',
+  },
+  {
+    q: '費用はどのくらいかかりますか？',
+    a: '一般的な目安として、シナリオ制作のみで数十万円台から、運営まで含むフルパッケージで100万円前後からです。目的・人数・利用範囲で変わるため、無料見積りをご利用ください。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '企業・店舗のマダミス活用ガイド｜集客・研修・プロモーション事例',
+  about: 'マーダーミステリー（マダミス）の企業活用',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-07',
+  dateModified: '2026-08-07',
+  mainEntityOfPage: new URL('/guide/madamis-business/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="企業・店舗のマダミス活用ガイド｜集客・研修・プロモーション事例 - 株式会社ex Labs"
+  description="マダミス（マーダーミステリー）の企業活用を制作会社が解説。店舗集客・宿泊施設・動画企画・チームビルディング研修・ブランドプロモーションの6つの活用シーンと、新規宿泊予約20件以上を獲得した事例を紹介。制作依頼・見積り無料。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'マダミス完全ガイド', href: '/guide/madamis/' },
+  { name: '企業・店舗のマダミス活用' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">MADAMIS FOR BUSINESS</p>
+<h1 class="h2 serif"><span class="nobr">企業・店舗の</span><span class="nobr">マダミス活用ガイド</span></h1>
+<p class="lede"><strong>マダミス（マーダーミステリー）</strong>は、いま<strong>店舗集客・プロモーション・研修</strong>の手段として企業導入が広がっています。参加者が数時間にわたり物語の当事者として没入する体験は、通常の販促では得られない記憶への残り方をします。この記事では、活用シーン6選と実例・導入の流れを、マダミス制作会社の株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="why"><div class="wrap narrow">
+<p class="eyebrow">WHY</p><h2 class="h2 serif">なぜ企業がマダミスを使うのか</h2>
+<ul class="bullets">
+<li><strong>滞在時間が長い</strong>：1回の体験が2〜4時間。飲食・物販とのセット設計で客単価と満足度を同時に高められます。</li>
+<li><strong>「その場所に行く理由」になる</strong>：作品はその会場でしか遊べないため、来店・来館・宿泊の動機そのものになります。</li>
+<li><strong>世界観を「体験」で伝えられる</strong>：商品・ブランド・施設の魅力を、説明ではなく物語の当事者体験として届けられます。</li>
+<li><strong>リピート・口コミが生まれる</strong>：体験の感想は語りたくなるもの。SNS投稿や紹介による二次拡散が期待できます。</li>
+</ul>
+</div></section>
+
+<section class="section" id="usecase"><div class="wrap">
+<p class="eyebrow">USE CASE</p><h2 class="h2 serif">活用シーン6選</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">店舗・施設の集客</span><span class="genre-d">カフェ・バー・商業施設での常設公演やイベント開催。「ここでしか遊べない」が集客装置になる。</span></div>
+<div class="genre-cell"><span class="genre-t serif">宿泊施設のプラン化</span><span class="genre-d">宿泊×マダミスのセットプラン。当社事例では新規宿泊予約20件以上を獲得。</span></div>
+<div class="genre-cell"><span class="genre-t serif">動画・配信企画</span><span class="genre-d">YouTube等の企画用シナリオ。出演者の人間ドラマを引き出す設計が鍵。</span></div>
+<div class="genre-cell"><span class="genre-t serif">チームビルディング研修</span><span class="genre-d">情報共有・交渉・合意形成を体験から学ぶ。謎解き研修との組み合わせも。</span></div>
+<div class="genre-cell"><span class="genre-t serif">ブランドプロモーション</span><span class="genre-d">商品・ブランドの世界観を物語に織り込み、ファン体験として届ける。</span></div>
+<div class="genre-cell"><span class="genre-t serif">周年・社内イベント</span><span class="genre-d">パーティーや周年行事の目玉コンテンツとして。大人数向けの調整も可能。</span></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="examples"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLES</p><h2 class="h2 serif">事例（宿泊予約20件獲得ほか）</h2>
+<ul class="bullets">
+<li><strong>宿泊施設向けマダミス</strong>：宿泊とセットの物語体験を制作し、<strong>新規宿泊予約20件以上</strong>の獲得につながりました。</li>
+<li><strong>店舗公演（UNLIMITED MYSTERY）</strong>：現役東大生と有名作家による自社レーベルで、『フランケンシュタイン城の殺人』などの推理系マダミスを店舗公演・オンラインで展開。<strong>マダミスアンケート1位</strong>の実績。</li>
+<li><strong>体験型イベントとの融合</strong>：謎解き・イマーシブと組み合わせた大型イベントの企画・制作にも対応しています。</li>
+</ul>
+</div></section>
+
+<section class="section" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">導入の流れと費用感</h2>
+<ul class="bullets">
+<li><strong>1. お問い合わせ</strong>：目的・人数・時期・会場の有無をお知らせください。</li>
+<li><strong>2. ヒアリング・企画提案</strong>：目的に合わせた作品構成と概算お見積りをご提案します。ここまでは無料です。</li>
+<li><strong>3. 制作・テストプレイ・運営</strong>：シナリオ制作から当日運営まで一貫対応します。</li>
+</ul>
+<p class="lede">費用は一般的な目安として、シナリオのみで数十万円台〜、フルパッケージで100万円前後〜。<strong>レベニューシェア型で初期費用を抑えた導入</strong>にも対応しています。<a href="/guide/madamis-cost/" style="color:var(--accent)">費用相場の詳細 →</a></p>
+<p class="vc-line"><a href="/services/murder-mystery/" style="color:var(--accent)">マダミスの制作依頼・お見積り（無料）はこちら →</a></p>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-murder">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">マダミス活用の無料相談はこちら</p>
+<a class="btn" href="/#contact">マダミス活用について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは？完全ガイド</a>／<a href="/guide/madamis-company/" style="color:var(--accent)">マダミス制作会社の選び方</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作サービス</a>／<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修</a></p>
+</div></section>
+
+<LatestPosts category="murder" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#why,#usecase,#examples,#flow,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

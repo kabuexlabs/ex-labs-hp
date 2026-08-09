@@ -1,0 +1,168 @@
+---
+// 「遊休区画 活用」「空きスペース 活用 イベント」「空きテナント 活用」系
+// クエリの受け皿。遊休空間の体験型イベント活用を提案し、施設活用LPへ送客。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'about', label: '遊休区画・遊休スペースとは' },
+  { id: 'method', label: '活用方法の比較（貸す・埋める・活かす）' },
+  { id: 'taiken', label: '体験型イベントという選択肢' },
+  { id: 'example', label: '活用イメージと事例' },
+  { id: 'flow', label: '始め方（初期費用0円の形も）' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '遊休区画・遊休スペースとは何ですか？',
+    a: '商業施設の空きテナント区画・催事に使われていない共有部・使われていない倉庫やフロアなど、収益やにぎわいを生んでいない空間のことです。テナント誘致が決まるまでの期間限定活用も含みます。',
+  },
+  {
+    q: '遊休区画の活用方法にはどんなものがありますか？',
+    a: '大きく、ポップアップストア等への短期賃貸、自動販売機・ガチャ等の省人設置、そして体験型イベントの舞台としての活用があります。体験型は空間を「目的地」に変えるため、施設全体の集客・回遊への波及が最も大きい方法です。',
+  },
+  {
+    q: '狭い区画や変形区画でも活用できますか？',
+    a: 'できます。体験型イベントでは、狭さ・暗さ・不規則な形状が「物語の舞台」としてむしろ魅力に変わることがあります。物語の「本部」や「隠れ家」など、区画の個性を活かした設計が可能です。',
+  },
+  {
+    q: '内装工事は必要ですか？',
+    a: '大規模な造作は必須ではありません。既存の空間を活かした装飾・小道具中心の設計で、原状回復しやすい形での開催が可能です。',
+  },
+  {
+    q: '費用はどのくらいかかりますか？',
+    a: '株式会社ex Labsでは、チケット売上などに応じて費用をお支払いいただくレベニューシェア型に対応しており、案件によっては施設側の初期費用0円または格安で始められます。まずは無料でご相談ください。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '遊休区画・空きスペースの活用アイデア｜体験型イベントで目的地に変える',
+  about: '商業施設の遊休区画・遊休スペースの活用',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-07',
+  dateModified: '2026-08-07',
+  mainEntityOfPage: new URL('/guide/yukyu-kukaku/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="遊休区画・空きスペースの活用アイデア｜体験型イベントで目的地に変える - 株式会社ex Labs"
+  description="商業施設の遊休区画・空きテナント・使われていないスペースの活用方法を解説。短期賃貸や省人設置との比較、体験型イベント（謎解き・イマーシブ）で空間を「目的地」に変える方法、レベニューシェア型で初期費用0円から始める形まで。相談無料。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '施設活用イベントとは', href: '/guide/shisetsu-katsuyo/' },
+  { name: '遊休区画の活用' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">VACANT SPACE GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">遊休区画・空きスペースの</span><span class="nobr">活用アイデア</span></h1>
+<p class="lede">商業施設の空きテナント区画、使われていない共有部や倉庫——こうした<strong>遊休区画・遊休スペース</strong>は、施設にとって「埋めるべき空白」と捉えられがちです。しかし体験型イベントの舞台として活かせば、<strong>空白はむしろ来館の目的地に変わります</strong>。この記事では、遊休空間の活用方法の比較と、体験型イベントによる活用の始め方を、施設活用事業を展開する株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">遊休区画・遊休スペースとは</h2>
+<p class="lede"><strong>遊休区画</strong>とは、テナント退去後の空き区画・稼働していない催事スペース・使われていない共有部やバックヤードなど、<strong>収益もにぎわいも生んでいない空間</strong>のことです。次のテナントが決まるまでの「空白期間」も含みます。空いたままの区画は、賃料の機会損失だけでなく、<strong>施設全体の活気の印象</strong>にも影響します。</p>
+</div></section>
+
+<section class="section" id="method"><div class="wrap">
+<p class="eyebrow">METHOD</p><h2 class="h2 serif">活用方法の比較（貸す・埋める・活かす）</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">貸す：短期賃貸</span><span class="genre-d">ポップアップストア等への期間貸し。賃料収入は得られるが、施設全体の回遊への波及は限定的。</span></div>
+<div class="genre-cell"><span class="genre-t serif">埋める：省人設置</span><span class="genre-d">自販機・ガチャ・無人販売など。手軽だが収益もにぎわい効果も小さい。</span></div>
+<div class="genre-cell"><span class="genre-t serif">活かす：体験の舞台に</span><span class="genre-d">謎解き・イマーシブの拠点として活用。空間自体が「目的地」になり、施設全体の集客・回遊に波及する。</span></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="taiken"><div class="wrap narrow">
+<p class="eyebrow">EXPERIENCE</p><h2 class="h2 serif">体験型イベントという選択肢</h2>
+<p class="lede">体験型イベントでは、遊休区画を物語の<strong>「調査本部」「隠れ家」「展示室」</strong>などに変え、施設全体を巡る体験の起点・目的地にします。ポイントは、<strong>区画単体で完結させず、施設全体の回遊に接続する</strong>こと。参加者は区画を訪れたあと、手がかりを追って館内を歩き、テナントの前を通り、飲食・買い物と組み合わせて滞在します。</p>
+<ul class="bullets">
+<li><strong>原状回復しやすい</strong>：大規模造作なしの装飾・什器中心で設計可能。テナント誘致が決まれば撤収できます。</li>
+<li><strong>変形・狭小区画も活きる</strong>：狭さや暗さが「物語の舞台」としては魅力に変わります。</li>
+<li><strong>施設の話題づくりになる</strong>：「あの空き区画が面白いことになっている」という話題性が、SNS・メディア露出につながります。</li>
+</ul>
+</div></section>
+
+<section class="section" id="example"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLE</p><h2 class="h2 serif">活用イメージと事例</h2>
+<ul class="bullets">
+<li><strong>商業施設の共有区画×周遊型イマーシブ</strong>：渋谷サクラステージでは、施設の共有区画・館内導線を「体験の目的地」に転換する施設一体型イベント「ウワサバナシ調査委員会」を開催（<strong>日本経済新聞掲載</strong>）。</li>
+<li><strong>空き区画×物語の拠点</strong>：空きテナント区画を体験の受付・調査本部として活用し、そこから施設全体へ参加者を送り出す設計。</li>
+<li><strong>倉庫・バックヤード×特別感</strong>：普段入れない空間を「関係者だけが知る場所」として物語に組み込み、特別な体験価値に変換。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">始め方（初期費用0円の形も）</h2>
+<p class="lede">株式会社ex Labsは、商業施設などの共有区画・未活用時間を集客資産に変える<strong>施設活用事業</strong>を展開しています。<strong>レベニューシェア型（成果報酬型）</strong>により、案件によっては<strong>施設側の初期費用0円または格安</strong>で開始可能。企画・制作・集客・運営は当社が一貫して担当するため、施設側の運用負担も抑えられます。</p>
+<ul class="bullets">
+<li><strong>1. お問い合わせ</strong>：区画の場所・広さ・活用したい期間をお知らせください。</li>
+<li><strong>2. 現地確認・企画提案</strong>：区画と施設全体の動線を拝見し、活用プランと実施形態をご提案します。ここまでは無料です。</li>
+<li><strong>3. 制作・開催</strong>：制作・告知・当日運営まで一貫対応します。</li>
+</ul>
+<p class="vc-line"><a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談（無料）はこちら →</a></p>
+</div></section>
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">遊休区画の活用相談はこちら（無料）</p>
+<a class="btn" href="/#contact">遊休区画の活用について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベント</a>／<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の施設活用</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a></p>
+</div></section>
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#method,#taiken,#example,#flow,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

@@ -1,0 +1,160 @@
+---
+// 「マダミス 制作依頼」「マダミス 制作会社」系の商用クエリの受け皿。
+// 選び方の基準を解説しつつ、制作LP（/services/murder-mystery/）へ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'points', label: '制作会社を選ぶ5つの基準' },
+  { id: 'type', label: '依頼先のタイプ別の特徴' },
+  { id: 'flow', label: '制作依頼の流れ' },
+  { id: 'exlabs', label: 'ex Labsのマダミス制作' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'マダミスの制作依頼はどこにすればいいですか？',
+    a: '依頼先は大きく、マダミス専門の制作会社、個人シナリオライター、総合イベント会社の3タイプです。商用利用（店舗集客・動画企画・企業イベント）では、テストプレイ体制と公演運営の実績を持つ専門制作会社への依頼が確実です。',
+  },
+  {
+    q: '制作会社を選ぶとき、何を確認すればいいですか？',
+    a: '①商用作品の制作実績、②テストプレイを重ねる体制、③公演運営まで自社で経験しているか、④権利関係の取り決めが明確か、⑤集客や研修など「目的側」の設計まで踏み込めるか、の5点を確認するのがおすすめです。',
+  },
+  {
+    q: 'マダミスの制作依頼にかかる費用はどのくらいですか？',
+    a: '一般的な目安として、シナリオ制作のみで数十万円台から、テストプレイ・運営設計まで含むフルパッケージで100万円前後からです。詳しくは費用相場の解説記事をご覧ください。',
+  },
+  {
+    q: '完成後の権利はどうなりますか？',
+    a: '契約によります。買い切りで利用権を譲渡する形、利用範囲（店舗公演のみ・動画利用のみなど）を定める形などがあるため、依頼時に利用目的を伝えて取り決めを明確にしておくことが重要です。',
+  },
+  {
+    q: '相談や見積りにお金はかかりますか？',
+    a: '株式会社ex Labsでは、ヒアリング・企画提案・お見積りまで無料です。目的とおおよその人数・時期をお知らせください。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'マダミス制作依頼はどこにする？制作会社の選び方5つの基準',
+  about: 'マーダーミステリー（マダミス）制作会社の選び方',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-07',
+  dateModified: '2026-08-07',
+  mainEntityOfPage: new URL('/guide/madamis-company/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="マダミス制作依頼はどこにする？制作会社の選び方5つの基準 - 株式会社ex Labs"
+  description="マダミス（マーダーミステリー）の制作依頼先の選び方を解説。専門制作会社・個人ライター・イベント会社の違い、確認すべき5つの基準（実績・テストプレイ体制・運営経験・権利・目的設計）、依頼の流れまで。制作依頼・お見積りは無料。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'マダミス完全ガイド', href: '/guide/madamis/' },
+  { name: 'マダミス制作会社の選び方' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">MADAMIS COMPANY GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">マダミス制作依頼は</span><span class="nobr">どこにする？</span><br><span class="nobr">制作会社の選び方</span></h1>
+<p class="lede"><strong>マダミス（マーダーミステリー）の制作依頼</strong>先は、専門制作会社・個人シナリオライター・総合イベント会社に大きく分かれます。商用利用では<strong>「読んで面白い」ではなく「遊んで面白い」を保証できる体制</strong>があるかが決定的な違いになります。この記事では、依頼先選びの5つの基準を、マダミスアンケート1位作品を手がけたチームを擁する株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="points"><div class="wrap narrow">
+<p class="eyebrow">POINTS</p><h2 class="h2 serif">制作会社を選ぶ5つの基準</h2>
+<ul class="bullets">
+<li><strong>1. 商用作品の制作実績</strong>：店舗公演・企業イベント・動画企画など、「目的のある案件」を完遂した実績があるか。作品名と成果まで公開している会社は信頼しやすいです。</li>
+<li><strong>2. テストプレイの体制</strong>：マダミスの品質はテストプレイと改稿の回数で決まります。初見プレイヤーでのテストを何度行うか、依頼前に確認しましょう。</li>
+<li><strong>3. 公演運営の経験</strong>：シナリオ納品だけでなく、GM育成・当日運営まで自社で回した経験がある会社は、「現場で起きること」を織り込んだ設計ができます。</li>
+<li><strong>4. 権利関係の明確さ</strong>：利用範囲（店舗公演・動画・配信・グッズ）と権利の帰属を契約で明確にできるか。曖昧なまま進めると後々トラブルになります。</li>
+<li><strong>5. 目的側の設計力</strong>：集客・話題化・研修効果など、マダミスを「手段」として目的達成まで設計できるか。ゲームの面白さと事業成果は別のスキルです。</li>
+</ul>
+</div></section>
+
+<section class="section" id="type"><div class="wrap">
+<p class="eyebrow">TYPE</p><h2 class="h2 serif">依頼先のタイプ別の特徴</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">専門制作会社</span><span class="genre-d">制作から運営まで一貫対応。テストプレイ体制と商用実績が強み。商用利用・法人案件に最適。</span></div>
+<div class="genre-cell"><span class="genre-t serif">個人シナリオライター</span><span class="genre-d">費用を抑えやすく作家性も魅力。ただし運営・権利・納期の管理は依頼側の負担になりがち。</span></div>
+<div class="genre-cell"><span class="genre-t serif">総合イベント会社</span><span class="genre-d">大規模案件の運営力が強み。マダミス固有のシナリオ品質は外注になる場合があり、確認が必要。</span></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">制作依頼の流れ</h2>
+<ul class="bullets">
+<li><strong>1. お問い合わせ</strong>：目的（店舗集客・動画企画・イベント・研修）、人数・時期・予算感をお知らせください。</li>
+<li><strong>2. ヒアリング・企画提案</strong>：目的に合わせた構成と概算お見積りをご提案します。ここまでは無料です。</li>
+<li><strong>3. 制作・テストプレイ</strong>：執筆とテストプレイを繰り返し、完成度を高めます。</li>
+<li><strong>4. 納品・運営</strong>：資料一式の納品、ご希望に応じて当日の公演運営まで対応します。</li>
+</ul>
+<p class="vc-line"><a href="/guide/madamis-cost/" style="color:var(--accent)">費用相場の詳細はこちら →</a>／<a href="/guide/madamis-making/" style="color:var(--accent)">マダミスの作り方はこちら →</a></p>
+</div></section>
+
+<section class="section" id="exlabs"><div class="wrap narrow">
+<p class="eyebrow">EX LABS</p><h2 class="h2 serif">ex Labsのマダミス制作</h2>
+<p class="lede">株式会社ex Labsは、<strong>マダミスアンケート1位作品を手がけたチーム</strong>を擁する東京大学発の制作会社です。現役東大生と有名作家による制作レーベル「UNLIMITED MYSTERY」を自社運営し、<strong>企画・シナリオ・テストプレイ・公演運営まで一貫対応</strong>。宿泊施設向けマダミスで新規宿泊予約20件以上を獲得するなど、目的達成まで含めた制作を行っています。累計コンテンツ体験者数は15,000人超。</p>
+<p class="vc-line"><a href="/services/murder-mystery/" style="color:var(--accent)">マダミスの制作依頼・お見積り（無料）はこちら →</a></p>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-murder">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">マダミス制作の無料見積りはこちら</p>
+<a class="btn" href="/#contact">マダミス制作について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作サービス</a>／<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは？完全ガイド</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場</a>／<a href="/guide/madamis-business/" style="color:var(--accent)">企業・店舗のマダミス活用</a></p>
+</div></section>
+
+<LatestPosts category="murder" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#points,#type,#flow,#exlabs,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

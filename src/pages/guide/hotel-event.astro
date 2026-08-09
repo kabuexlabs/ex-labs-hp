@@ -1,0 +1,167 @@
+---
+// 「ホテル イベント 企画」「宿泊施設 集客」「旅館 集客 アイデア」系
+// クエリの受け皿。宿泊×体験型イベントを提案し、実績（宿泊予約20件超）
+// を核に施設活用LP・マダミスLPへ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'problem', label: '宿泊施設の集客の課題' },
+  { id: 'taiken', label: '「泊まる理由」を作る体験型イベント' },
+  { id: 'example', label: '事例：新規宿泊予約20件以上を獲得' },
+  { id: 'idea', label: '宿泊×体験のアイデア4選' },
+  { id: 'flow', label: '始め方と費用' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'ホテル・旅館の集客イベントにはどんな方法がありますか？',
+    a: '料理・温泉・季節企画などに加え、近年は宿泊施設全体を物語の舞台にしたマーダーミステリーや謎解きなどの体験型イベントが注目されています。「そのホテルに泊まること自体が体験の一部」になるため、宿泊予約の直接的な動機を作れるのが特徴です。',
+  },
+  {
+    q: '体験型イベントは宿泊予約の増加につながりますか？',
+    a: 'つながります。株式会社ex Labsが制作した宿泊施設向けマーダーミステリーでは、宿泊とセットの物語体験により新規宿泊予約20件以上の獲得につながりました。',
+  },
+  {
+    q: '小規模な旅館やゲストハウスでも実施できますか？',
+    a: '実施できます。むしろ貸切にしやすい小規模施設は、館内全体を物語の舞台にできるため体験型イベントと好相性です。客室数・間取りに合わせた作品設計を行います。',
+  },
+  {
+    q: '通常の宿泊営業と両立できますか？',
+    a: 'できます。一部客室・時間帯だけを使う設計、閑散期・平日限定の開催、貸切日を設ける形など、稼働状況に合わせて柔軟に設計します。閑散期の稼働対策としても有効です。',
+  },
+  {
+    q: '費用はどのくらいかかりますか？',
+    a: '一般的な目安として、シナリオ制作のみで数十万円台から、運営まで含むフルパッケージで100万円前後からです。宿泊料金に体験費を上乗せする収益設計や、レベニューシェア型のご相談も可能です。見積りは無料です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'ホテル・宿泊施設の集客イベント｜泊まる理由を作る体験型企画',
+  about: 'ホテル・旅館・宿泊施設の集客イベント',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-07',
+  dateModified: '2026-08-07',
+  mainEntityOfPage: new URL('/guide/hotel-event/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="ホテル・宿泊施設の集客イベント｜泊まる理由を作る体験型企画 - 株式会社ex Labs"
+  description="ホテル・旅館・宿泊施設の集客イベントを解説。施設全体を物語の舞台にするマーダーミステリー・謎解きで「泊まる理由」を作る方法。宿泊×マダミスで新規宿泊予約20件以上を獲得した実績あり。閑散期対策・小規模施設もOK。相談無料。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '施設活用イベントとは', href: '/guide/shisetsu-katsuyo/' },
+  { name: 'ホテル・宿泊施設の集客イベント' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">HOTEL EVENT GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">ホテル・宿泊施設の</span><span class="nobr">集客イベント</span></h1>
+<p class="lede">価格と立地の比較から抜け出すには、<strong>「そのホテルに泊まること自体が目的になる」体験</strong>を作るのが近道です。宿泊施設全体を物語の舞台にするマーダーミステリーや謎解きは、まさにその装置。この記事では、宿泊×体験型イベントの設計と、<strong>新規宿泊予約20件以上を獲得した実例</strong>を、株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="problem"><div class="wrap narrow">
+<p class="eyebrow">PROBLEM</p><h2 class="h2 serif">宿泊施設の集客の課題</h2>
+<ul class="bullets">
+<li><strong>価格・立地の比較で選ばれる</strong>：予約サイト上の比較競争では、値下げ以外の打ち手が乏しくなりがち。</li>
+<li><strong>閑散期・平日の稼働</strong>：観光需要の波に左右され、稼働率の谷が埋まらない。</li>
+<li><strong>連泊・再訪の理由がない</strong>：一度泊まったら「もう行った場所」になってしまう。</li>
+<li><strong>施設の個性が伝わらない</strong>：建物・歴史・雰囲気という資産が、予約の決め手として活きていない。</li>
+</ul>
+</div></section>
+
+<section class="section" id="taiken"><div class="wrap narrow">
+<p class="eyebrow">SOLUTION</p><h2 class="h2 serif">「泊まる理由」を作る体験型イベント</h2>
+<p class="lede">宿泊×体験型イベントの核心は、<strong>宿泊そのものを物語の一部にする</strong>ことです。チェックインから始まり、館内で事件が起き、食事の時間に証言が交わされ、夜が更けるほど真相に近づく——こうした設計では、<strong>その施設に泊まらなければ体験が成立しません</strong>。予約サイトの比較軸（価格・立地）の外側で選ばれる理由が生まれ、体験費を上乗せした客単価の向上、閑散期の稼働対策、SNS・口コミでの話題化まで一気につながります。</p>
+</div></section>
+
+<section class="section tinted" id="example"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLE</p><h2 class="h2 serif">事例：新規宿泊予約20件以上を獲得</h2>
+<p class="lede">株式会社ex Labsが制作した<strong>宿泊施設向けマーダーミステリー</strong>では、宿泊とセットの物語体験を提供し、<strong>新規宿泊予約20件以上</strong>の獲得につながりました。マダミスは1公演2〜4時間・少人数制で、宿泊のスケジュールと組み合わせやすく、「物語のための宿泊」という新しい予約動機を作れます。</p>
+<p class="vc-line"><a href="/guide/madamis-business/" style="color:var(--accent)">企業・店舗のマダミス活用を詳しく →</a></p>
+</div></section>
+
+<section class="section" id="idea"><div class="wrap">
+<p class="eyebrow">IDEA</p><h2 class="h2 serif">宿泊×体験のアイデア4選</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">一棟貸切×マダミス</span><span class="genre-d">館全体が事件の舞台に。夕食・夜・朝食まで物語が続く宿泊型公演。</span></div>
+<div class="genre-cell"><span class="genre-t serif">客室×謎解き</span><span class="genre-d">客室に仕掛けた謎を解く滞在型コンテンツ。少ない運営負担で常設化できる。</span></div>
+<div class="genre-cell"><span class="genre-t serif">館内周遊×イマーシブ</span><span class="genre-d">ロビー・廊下・大浴場前など館内を巡る物語体験。滞在時間が体験時間になる。</span></div>
+<div class="genre-cell"><span class="genre-t serif">閑散期の特別公演</span><span class="genre-d">平日・オフシーズン限定の公演で稼働の谷を埋める。地域の観光資源との連動も。</span></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">始め方と費用</h2>
+<ul class="bullets">
+<li><strong>1. お問い合わせ</strong>：施設の規模（客室数・間取り）と目的（新規予約・閑散期対策・話題化）をお知らせください。</li>
+<li><strong>2. ヒアリング・企画提案</strong>：施設の個性を活かした作品構成と収益設計をご提案します。ここまでは無料です。</li>
+<li><strong>3. 制作・テストプレイ・開催</strong>：シナリオ制作から運営マニュアル・当日運営まで一貫対応します。</li>
+</ul>
+<p class="lede">費用の一般的な目安はシナリオのみで数十万円台〜、フルパッケージで100万円前後〜。<strong>宿泊料金への体験費上乗せによる回収設計や、レベニューシェア型</strong>のご相談も可能です。</p>
+<p class="vc-line"><a href="/services/murder-mystery/" style="color:var(--accent)">マダミスの制作依頼（無料見積り）→</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談 →</a></p>
+</div></section>
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">宿泊施設の集客イベント相談はこちら（無料）</p>
+<a class="btn" href="/#contact">宿泊×体験について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>／<a href="/guide/madamis-business/" style="color:var(--accent)">企業・店舗のマダミス活用</a>／<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の施設活用</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a></p>
+</div></section>
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#problem,#taiken,#example,#idea,#flow,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

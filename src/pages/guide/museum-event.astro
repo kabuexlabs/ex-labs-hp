@@ -1,0 +1,171 @@
+---
+// 「美術館 集客」「博物館 イベント 企画」「水族館 謎解き」系クエリの
+// 受け皿。文化施設・ミュージアム向けの体験型イベントを提案し、
+// 施設活用LPへ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'problem', label: 'ミュージアム集客の課題' },
+  { id: 'taiken', label: '展示×物語という解決策' },
+  { id: 'idea', label: '施設タイプ別のアイデア' },
+  { id: 'example', label: 'ex Labsのアート×体験の実績' },
+  { id: 'flow', label: '始め方と費用' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '美術館・博物館の集客イベントにはどんな方法がありますか？',
+    a: '企画展・ワークショップ・ナイトミュージアムなどに加え、近年は展示空間を舞台にした謎解き・イマーシブなどの体験型イベントが広がっています。「観る」だけだった展示に「参加する」文脈が加わり、普段ミュージアムに来ない層への訴求力が高いのが特徴です。',
+  },
+  {
+    q: '展示品の保護と両立できますか？',
+    a: 'できます。展示品には触れない前提で、鑑賞動線・照度・立入範囲などの施設ルールに沿って体験を設計します。物語の手がかりは展示を「よく観察する」ことで見つかる形にするなど、むしろ鑑賞を深める設計が可能です。',
+  },
+  {
+    q: '水族館や植物園でも実施できますか？',
+    a: '実施できます。生体・植物の環境に配慮した運用設計のうえで、館内を巡る周遊型の物語体験を制作します。夜間開催（ナイトアクアリウム等）との組み合わせも効果的です。',
+  },
+  {
+    q: '若い来館者を増やしたいのですが、効果はありますか？',
+    a: '体験型イベントの主要参加層は10〜30代で、SNSでの拡散も活発です。「謎解きで初めてこの美術館に来た」という新規層の来館動機を作れるのが、体験型の最大の価値です。',
+  },
+  {
+    q: '費用はどのくらいかかりますか？',
+    a: 'チケット売上などに応じたレベニューシェア型に対応しており、案件によっては施設側の初期費用0円または格安で開催できます。まずは無料でご相談ください。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '美術館・博物館・水族館の集客イベント｜展示×体験型で新規来館を作る',
+  about: 'ミュージアム（美術館・博物館・水族館）の集客イベント',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-07',
+  dateModified: '2026-08-07',
+  mainEntityOfPage: new URL('/guide/museum-event/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="美術館・博物館・水族館の集客イベント｜展示×体験型で新規来館を - 株式会社ex Labs"
+  description="美術館・博物館・水族館・植物園などミュージアムの集客イベントを解説。展示空間を舞台にした謎解き・イマーシブで、普段来ない層の新規来館を作る方法。アート×謎解きの「ヌル・アーデン展」（広告費0円でチケット1,500枚）などの実績。相談無料。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '施設活用イベントとは', href: '/guide/shisetsu-katsuyo/' },
+  { name: 'ミュージアムの集客イベント' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">MUSEUM EVENT GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">美術館・博物館・水族館の</span><span class="nobr">集客イベント</span></h1>
+<p class="lede">美術館・博物館・水族館・植物園——<strong>ミュージアムの展示空間は、体験型イベントにとって最高の舞台</strong>です。展示を「観る」体験に、物語を「生きる」体験を重ねることで、これまでミュージアムに足を運ばなかった層の来館動機を作れます。この記事では、文化施設の集客に体験型イベントが効く理由と施設タイプ別のアイデアを、アート×体験レーベル「体験する美術館」を運営する株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="problem"><div class="wrap narrow">
+<p class="eyebrow">PROBLEM</p><h2 class="h2 serif">ミュージアム集客の課題</h2>
+<ul class="bullets">
+<li><strong>来館層の固定化</strong>：常連・愛好家に支えられる一方、若年層・ファミリー層の新規来館が伸びにくい。</li>
+<li><strong>企画展頼みの波</strong>：大型企画展の期間は賑わうが、常設展だけの期間の集客に波がある。</li>
+<li><strong>「一度観たら終わり」</strong>：同じ展示を再訪する理由が作りにくい。</li>
+<li><strong>夜間・閑散時間帯の未活用</strong>：閉館後の空間という資産が収益を生んでいない。</li>
+</ul>
+</div></section>
+
+<section class="section" id="taiken"><div class="wrap narrow">
+<p class="eyebrow">SOLUTION</p><h2 class="h2 serif">展示×物語という解決策</h2>
+<p class="lede">謎解き・イマーシブを展示空間に重ねると、<strong>展示品が「物語の手がかり」に変わります</strong>。参加者は謎を解くために作品を普段より深く観察し、キャプションを読み、館内をくまなく歩きます。つまり体験型イベントは、集客装置であると同時に<strong>鑑賞体験を深める装置</strong>でもあるのです。「謎解きがきっかけで初めて来た」という新規層が、展示そのもののファンになって戻ってくる——この循環を設計できるのが最大の価値です。</p>
+</div></section>
+
+<section class="section tinted" id="idea"><div class="wrap">
+<p class="eyebrow">IDEA</p><h2 class="h2 serif">施設タイプ別のアイデア</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">美術館</span><span class="genre-d">作品世界に入り込むイマーシブ×謎解き。絵画の中の物語を辿る周遊型体験。</span></div>
+<div class="genre-cell"><span class="genre-t serif">博物館</span><span class="genre-d">収蔵品・歴史を題材にしたミステリー。「学び」と「遊び」を一体化できる。</span></div>
+<div class="genre-cell"><span class="genre-t serif">水族館</span><span class="genre-d">館内周遊×物語体験。夜の水槽を舞台にしたナイトイベントは特別感が別格。</span></div>
+<div class="genre-cell"><span class="genre-t serif">植物園・庭園</span><span class="genre-d">園内を歩いて巡る屋外周遊型。季節の変化と組み合わせたリピート設計も。</span></div>
+</div>
+</div></section>
+
+<section class="section" id="example"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLE</p><h2 class="h2 serif">ex Labsのアート×体験の実績</h2>
+<ul class="bullets">
+<li><strong>ヌル・アーデン展（自社主催）</strong>：東京藝術大学出身アーティストとのコラボによる、アート×謎解きの没入型展覧会。<strong>広告費0円でチケット1,500枚を販売</strong>し、終了後には作品オークションも開催しました。</li>
+<li><strong>ロスト・フレーム（下北沢）</strong>：街に散らばった絵画を探して歩く周遊型アートイマーシブ。「展示空間の外」にまで鑑賞体験を拡張した事例です。</li>
+<li><strong>体験する美術館（自社レーベル）</strong>：絵画×イマーシブ×謎解きを掛け合わせた公演を継続的に企画・制作しています。</li>
+</ul>
+<p class="vc-line"><a href="/taikenbizyutu/" style="color:var(--accent)">体験する美術館 公式サイト →</a></p>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">始め方と費用</h2>
+<ul class="bullets">
+<li><strong>1. お問い合わせ</strong>：施設の種類・展示の特徴・目的（新規層・閑散期・夜間活用など）をお知らせください。</li>
+<li><strong>2. 現地確認・企画提案</strong>：展示保護・動線のルールを踏まえた体験コンセプトと実施形態をご提案します。ここまでは無料です。</li>
+<li><strong>3. 制作・開催</strong>：学術・展示側の監修体制とも連携しながら、制作から当日運営まで一貫対応します。</li>
+</ul>
+<p class="lede"><strong>レベニューシェア型（成果報酬型）</strong>に対応しており、案件によっては<strong>施設側の初期費用0円または格安</strong>で開催できます。</p>
+<p class="vc-line"><a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談（無料）はこちら →</a></p>
+</div></section>
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">ミュージアムの集客イベント相談はこちら（無料）</p>
+<a class="btn" href="/#contact">集客イベントについて相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>／<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の施設活用</a>／<a href="/taikenbizyutu/" style="color:var(--accent)">体験する美術館</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a></p>
+</div></section>
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#problem,#taiken,#idea,#example,#flow,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

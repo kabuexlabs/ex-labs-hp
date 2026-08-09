@@ -1,0 +1,162 @@
+---
+// 「商業施設 集客イベント」「ショッピングモール イベント 企画」系クエリの
+// 受け皿。施設運営者向けに体験型イベントを提案し、施設活用LPへ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'problem', label: '商業施設の集客イベントの課題' },
+  { id: 'taiken', label: 'なぜ「体験型」が効くのか' },
+  { id: 'idea', label: 'イベントアイデア5選' },
+  { id: 'example', label: '事例：渋谷サクラステージ（日経掲載）' },
+  { id: 'cost', label: '費用（初期費用0円の形も）' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '商業施設の集客イベントにはどんな種類がありますか？',
+    a: '物販催事・キャラクターショー・ワークショップなどの従来型に加え、近年は施設全体を舞台にした謎解き・イマーシブなどの「体験型イベント」が広がっています。体験型は施設への来館そのものが目的になり、館内回遊・滞在時間の延長に直結するのが特徴です。',
+  },
+  {
+    q: '体験型イベントは施設のどこで開催するのですか？',
+    a: '共有区画・通路・空き区画・催事スペースなど、既存の空間をそのまま「物語の舞台」として使います。大規模な造作は必須ではなく、施設の通常営業と共存する設計が可能です。',
+  },
+  {
+    q: 'テナントへの効果はありますか？',
+    a: '周遊型の設計により、来館者が普段通らないフロアやテナントの前を通る動線を作れます。参加特典とテナントの購買を連動させる設計も可能です。',
+  },
+  {
+    q: '施設側の費用負担を抑える方法はありますか？',
+    a: 'あります。株式会社ex Labsはチケット売上などに応じたレベニューシェア型（成果報酬型）に対応しており、案件によっては施設側の初期費用0円または格安で開催できます。',
+  },
+  {
+    q: 'どのくらいの期間開催できますか？',
+    a: '週末だけの短期から、数週間〜数ヶ月の長期開催まで設計できます。長期開催は「何度も来る理由」を作りやすく、施設の定番コンテンツ化も狙えます。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '商業施設の集客イベントアイデア｜体験型で回遊・滞在を伸ばす方法',
+  about: '商業施設の集客イベント企画',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-07',
+  dateModified: '2026-08-07',
+  mainEntityOfPage: new URL('/guide/shogyoshisetsu-event/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="商業施設の集客イベントアイデア｜体験型で回遊・滞在を伸ばす方法 - 株式会社ex Labs"
+  description="商業施設・ショッピングモールの集客イベント企画を解説。謎解き・イマーシブなど体験型イベントが新規来館・館内回遊・滞在時間に効く理由と、渋谷サクラステージでの施設一体型イベント事例（日経掲載）を紹介。レベニューシェア型で初期費用0円の開催も。"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '施設活用イベントとは', href: '/guide/shisetsu-katsuyo/' },
+  { name: '商業施設の集客イベント' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">SHOPPING MALL EVENT GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">商業施設の</span><span class="nobr">集客イベントアイデア</span><br><span class="nobr">体験型で回遊・滞在を伸ばす</span></h1>
+<p class="lede"><strong>商業施設の集客イベント</strong>は、いま「モノを配る・見せる」型から<strong>「施設全体を体験の舞台にする」型</strong>へ進化しています。謎解きやイマーシブなどの体験型イベントは、来館の目的そのものになり、館内回遊・滞在時間・テナント送客に直結します。この記事では、体験型が効く理由とアイデア・事例・費用を、渋谷サクラステージでの施設一体型イベント（日本経済新聞掲載）を手がけた株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="problem"><div class="wrap narrow">
+<p class="eyebrow">PROBLEM</p><h2 class="h2 serif">商業施設の集客イベントの課題</h2>
+<ul class="bullets">
+<li><strong>単発で終わる</strong>：物販催事やショーは開催日に人を集めても、再来館の理由が残りにくい。</li>
+<li><strong>回遊につながらない</strong>：イベント広場だけが賑わい、上層階や奥のテナントに人が流れない。</li>
+<li><strong>差別化が難しい</strong>：どの施設でもできる企画は、来館の決め手になりにくい。</li>
+<li><strong>遊休スペースが活きていない</strong>：共有区画・空き区画・閑散時間帯が収益もにぎわいも生んでいない。</li>
+</ul>
+</div></section>
+
+<section class="section" id="taiken"><div class="wrap narrow">
+<p class="eyebrow">WHY</p><h2 class="h2 serif">なぜ「体験型」が効くのか</h2>
+<p class="lede">謎解き・イマーシブなどの体験型イベントは、<strong>施設の空間そのものをコンテンツに変える</strong>ため、上の課題を構造的に解決します。物語の手がかりを施設のあちこちに配置すれば、<strong>参加者は自然に館内を巡り</strong>、これまで通らなかったフロア・テナントの前を歩きます。体験時間は60〜120分程度と長く、飲食・買い物と組み合わさって<strong>滞在時間と消費の両方</strong>が伸びます。さらに「この施設でしかできない体験」は来館の決定的な理由となり、SNS・メディアでの話題化も期待できます。</p>
+</div></section>
+
+<section class="section tinted" id="idea"><div class="wrap">
+<p class="eyebrow">IDEA</p><h2 class="h2 serif">イベントアイデア5選</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">施設周遊×謎解き</span><span class="genre-d">館内に散りばめた手がかりを巡る定番形式。全フロアの回遊を設計できる。</span></div>
+<div class="genre-cell"><span class="genre-t serif">施設一体型イマーシブ</span><span class="genre-d">施設全体が物語の舞台になる没入体験。話題化・メディア露出に強い。</span></div>
+<div class="genre-cell"><span class="genre-t serif">空き区画の体験拠点化</span><span class="genre-d">空きテナント区画を物語の「本部」や展示空間に。遊休区画が目的地に変わる。</span></div>
+<div class="genre-cell"><span class="genre-t serif">閉館後のナイトイベント</span><span class="genre-d">営業時間外の館内を舞台にした特別公演。非日常感が最大の付加価値。</span></div>
+<div class="genre-cell"><span class="genre-t serif">テナント連動キャンペーン</span><span class="genre-d">体験の特典・手がかりをテナントと連動させ、購買・送客まで設計する。</span></div>
+</div>
+</div></section>
+
+<section class="section" id="example"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLE</p><h2 class="h2 serif">事例：渋谷サクラステージ（日経掲載）</h2>
+<p class="lede">東急不動産様・404 Not Found様・TSUTAYA様のご協力のもと、渋谷サクラステージ全体を周遊する都市伝説×イマーシブ×謎解き<strong>「ウワサバナシ調査委員会」</strong>を開催。施設の共有区画・館内導線を「体験の目的地」に転換する施設一体型の取り組みとして、<strong>日本経済新聞に掲載</strong>されました。</p>
+<p class="vc-line"><a href="/uwasabanashi/" style="color:var(--accent)">特設サイト →</a>／<a href="/media/" style="color:var(--accent)">メディア掲載実績 →</a></p>
+</div></section>
+
+<section class="section tinted" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif">費用（初期費用0円の形も）</h2>
+<p class="lede">株式会社ex Labsは、<strong>チケット売上などに応じて費用をお支払いいただくレベニューシェア型</strong>に対応しています。施設は空間を提供し、<strong>企画・制作・集客・運営を当社が一貫して担当</strong>。案件によっては<strong>施設側の初期費用0円または格安</strong>で開催でき、「イベントのノウハウがない」施設様でも導入しやすい形です。</p>
+<p class="vc-line"><a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントの仕組みを詳しく →</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談（無料）→</a></p>
+</div></section>
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">商業施設の集客イベントのご相談はこちら（無料）</p>
+<a class="btn" href="/#contact">集客イベントについて相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>／<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用</a>／<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の施設活用</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a></p>
+</div></section>
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#problem,#taiken,#idea,#example,#cost,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
