@@ -119,7 +119,7 @@ export const guideArticles: GuideArticle[] = [
   {
     href: '/guide/shogyoshisetsu-event/',
     title: '商業施設の集客イベントアイデア｜体験型で回遊・滞在を伸ばす',
-    desc: '体験型イベントが新規来館・館内回遊・滞在時間に効く理由とアイデア5選。渋谷サクラステージの事例つき。',
+    desc: '体験型イベントが新規来館・館内回遊・滞在時間に効く理由とアイデア10選。渋谷サクラステージの事例つき。',
     date: '2026-08-07',
     category: 'shisetsu',
     thumb: '/assets/guide/shogyoshisetsu-event.webp',

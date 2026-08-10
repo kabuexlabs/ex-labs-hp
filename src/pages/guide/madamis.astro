@@ -12,8 +12,10 @@ import { jsonLd } from '../../lib/microcms';
 
 const toc = [
   { id: 'about', label: 'マダミスとは' },
+  { id: 'history', label: 'マダミスの歴史・発祥' },
   { id: 'play', label: '遊び方・必要なもの・初心者のコツ' },
   { id: 'types', label: 'マダミスの種類' },
+  { id: 'words', label: 'マダミス用語ミニ辞典' },
   { id: 'diff', label: '謎解きとの違い' },
   { id: 'where', label: '遊ぶには（店舗・オンライン）' },
   { id: 'make', label: 'マダミスを制作・依頼するには' },
@@ -87,7 +89,7 @@ const articleLd = {
   inLanguage: 'ja',
   author: { '@type': 'Organization', name: '株式会社ex Labs' },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
-  dateModified: '2026-08-05',
+  dateModified: '2026-08-10',
   mainEntityOfPage: new URL('/guide/madamis/', Astro.site).toString(),
 };
 ---
@@ -123,7 +125,13 @@ const articleLd = {
 <p class="lede">最大の特徴は、<strong>結末を知ると遊べなくなる「一度きりの体験」</strong>であること。だからこそ、その一回に全力で没入できる特別なエンターテインメントとして人気を集めています。</p>
 </div></section>
 
-<section class="section" id="play"><div class="wrap narrow">
+<section class="section" id="history"><div class="wrap narrow">
+<p class="eyebrow">HISTORY</p><h2 class="h2 serif">マダミスの歴史・発祥</h2>
+<p class="lede">マダミスの源流は、欧米で親しまれてきた<strong>マーダーミステリーパーティー</strong>（参加者が容疑者を演じ合うパーティーゲーム）にあります。これがゲームとして体系化され、中国で<strong>「剧本殺（ジューベンシャー）」</strong>として専門店が数万店規模に広がる爆発的なブームとなり、日本には2019年前後に上陸。専門店の公演やオンラインアプリを通じて急速に広がりました。</p>
+<p class="lede">現在の日本では、店舗公演・オンライン・パッケージ販売・動画配信企画と遊び方が多様化し、<strong>企業の集客イベントや研修への活用</strong>という新しい広がりも生まれています。</p>
+</div></section>
+
+<section class="section tinted" id="play"><div class="wrap narrow">
 <p class="eyebrow">HOW TO PLAY</p><h2 class="h2 serif">マダミスの遊び方・当日の流れ</h2>
 <ul class="bullets">
 <li><strong>キャラクター配布</strong>：各自に「あなたは誰で、何を知っていて、何を目的とするか」が書かれた資料が配られます。</li>
@@ -147,7 +155,7 @@ const articleLd = {
 </ul>
 </div></section>
 
-<section class="section tinted" id="types"><div class="wrap">
+<section class="section" id="types"><div class="wrap">
 <p class="eyebrow">TYPES</p><h2 class="h2 serif">マダミスの種類</h2>
 <p class="h2sub">マダミスは、形式や作風によっていくつかのタイプに分かれます。</p>
 <div class="genre-grid">
@@ -155,6 +163,17 @@ const articleLd = {
 <div class="genre-cell"><span class="genre-t serif">オンライン型</span><span class="genre-d">ビデオ通話で遠隔から参加できる形式。遠方の友人とも一緒に遊べます。</span></div>
 <div class="genre-cell"><span class="genre-t serif">推理系マダミス</span><span class="genre-d">ロジックと証拠で犯人を論理的に導く、推理小説のような本格派。</span></div>
 <div class="genre-cell"><span class="genre-t serif">人狼×マダミス</span><span class="genre-d">正体隠匿ゲーム「人狼」の駆け引きと融合したハイブリッド型。</span></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="words"><div class="wrap">
+<p class="eyebrow">GLOSSARY</p><h2 class="h2 serif">マダミス用語ミニ辞典</h2>
+<p class="h2sub">公演の案内や感想でよく使われる基本用語です。これだけ知っていれば迷いません。</p>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">GM（ゲームマスター）</span><span class="genre-d">進行役。ルール説明・フェーズ管理・真相解説を担う。GMレス（不要）作品もある。</span></div>
+<div class="genre-cell"><span class="genre-t serif">HO（ハンドアウト）</span><span class="genre-d">各プレイヤーに配られるキャラクター資料。背景・秘密・目的が書かれている。</span></div>
+<div class="genre-cell"><span class="genre-t serif">密談</span><span class="genre-d">特定の相手とだけ話せる時間。情報交換・取引・駆け引きの主戦場。</span></div>
+<div class="genre-cell"><span class="genre-t serif">エンディング・感想戦</span><span class="genre-d">投票後に真相が明かされ、各自の秘密や伏線を振り返る時間。マダミスのクライマックス。</span></div>
 </div>
 </div></section>
 
@@ -217,6 +236,6 @@ const articleLd = {
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
 .def-sub{font-size:19px;color:var(--ink);margin:40px 0 6px;text-align:center}
-#about,#play,#types,#diff,#where,#make,#cost,#faq{scroll-margin-top:88px}
+#about,#history,#play,#types,#words,#diff,#where,#make,#cost,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>

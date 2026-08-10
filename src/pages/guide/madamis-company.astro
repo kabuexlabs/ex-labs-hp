@@ -13,6 +13,7 @@ const toc = [
   { id: 'points', label: '制作会社を選ぶ5つの基準' },
   { id: 'type', label: '依頼先のタイプ別の特徴' },
   { id: 'flow', label: '制作依頼の流れ' },
+  { id: 'checklist', label: '発注前チェックリスト' },
   { id: 'exlabs', label: 'ex Labsのマダミス制作' },
   { id: 'faq', label: 'よくある質問' },
 ];
@@ -59,7 +60,7 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs' },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
   datePublished: '2026-08-07',
-  dateModified: '2026-08-07',
+  dateModified: '2026-08-10',
   mainEntityOfPage: new URL('/guide/madamis-company/', Astro.site).toString(),
 };
 ---
@@ -120,7 +121,19 @@ const articleLd = {
 <p class="vc-line"><a href="/guide/madamis-cost/" style="color:var(--accent)">費用相場の詳細はこちら →</a>／<a href="/guide/madamis-making/" style="color:var(--accent)">マダミスの作り方はこちら →</a></p>
 </div></section>
 
-<section class="section" id="exlabs"><div class="wrap narrow">
+<section class="section" id="checklist"><div class="wrap narrow">
+<p class="eyebrow">CHECKLIST</p><h2 class="h2 serif">発注前チェックリスト</h2>
+<p class="h2sub">問い合わせ前にこの5つを整理しておくと、提案と見積りの精度が一気に上がります。</p>
+<ul class="bullets">
+<li><strong>目的</strong>：集客・話題化・研修・動画企画など、「マダミスで何を達成したいか」を一言で言えるようにする。</li>
+<li><strong>人数と時間</strong>：想定参加人数（1回あたり／総数）と、使える時間枠。</li>
+<li><strong>利用範囲</strong>：1回きりか、継続公演か、動画・配信で使うか。権利の取り決めに直結します。</li>
+<li><strong>予算レンジ</strong>：概算でOK。レベニューシェア型の希望があればその旨も。</li>
+<li><strong>実施希望日</strong>：制作は数週間〜数ヶ月かかるため、日程が決まっているなら早めに共有を。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="exlabs"><div class="wrap narrow">
 <p class="eyebrow">EX LABS</p><h2 class="h2 serif">ex Labsのマダミス制作</h2>
 <p class="lede">株式会社ex Labsは、<strong>マダミスアンケート1位作品を手がけたチーム</strong>を擁する東京大学発の制作会社です。現役東大生と有名作家による制作レーベル「UNLIMITED MYSTERY」を自社運営し、<strong>企画・シナリオ・テストプレイ・公演運営まで一貫対応</strong>。宿泊施設向けマダミスで新規宿泊予約20件以上を獲得するなど、目的達成まで含めた制作を行っています。累計コンテンツ体験者数は15,000人超。</p>
 <p class="vc-line"><a href="/services/murder-mystery/" style="color:var(--accent)">マダミスの制作依頼・お見積り（無料）はこちら →</a></p>
@@ -128,7 +141,7 @@ const articleLd = {
 
 <ZeroCostBanner />
 
-<section class="section tinted" id="faq"><div class="wrap">
+<section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
 <div class="faq-list tag-murder">
 {faqs.map((f) => (
@@ -140,7 +153,7 @@ const articleLd = {
 </div>
 </div></section>
 
-<section class="section"><div class="wrap">
+<section class="section tinted"><div class="wrap">
 <div class="cta-mini">
 <p class="cta-mini-title serif">マダミス制作の無料見積りはこちら</p>
 <a class="btn" href="/#contact">マダミス制作について相談する</a>
@@ -159,6 +172,6 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#points,#type,#flow,#exlabs,#faq{scroll-margin-top:88px}
+#points,#type,#flow,#checklist,#exlabs,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>
