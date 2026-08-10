@@ -1,0 +1,181 @@
+---
+// 「イマーシブ 作り方」「イマーシブイベント 企画 方法」系クエリの受け皿。
+// イマーシブ記事群の網羅性を高め、制作LP（/services/immersive/）へ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'overview', label: 'イマーシブ制作の全体像（7ステップ）' },
+  { id: 'steps', label: '各ステップの進め方' },
+  { id: 'tips', label: '没入感を生む3つの設計原則' },
+  { id: 'mistakes', label: 'よくある失敗4選' },
+  { id: 'pro', label: '自作とプロ依頼の分かれ目' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'イマーシブイベントを作るには何から始めればいいですか？',
+    a: 'まず「舞台となる場所」と「参加者に味わわせたい感情」を決めるのがおすすめです。イマーシブは空間そのものがコンテンツになるため、場所の魅力・制約を先に把握し、そこから物語とシナリオを設計する順番が失敗しにくいです。',
+  },
+  {
+    q: 'イマーシブ制作にはどんなスキル・役割が必要ですか？',
+    a: '脚本（物語）、空間・美術（世界観の具現化）、動線・体験設計（参加者の行動管理）、キャスト・演出、当日運営の5領域が必要です。演劇制作と違い「観客が自由に動く」前提の設計力が独自に求められます。',
+  },
+  {
+    q: '制作期間はどのくらいかかりますか？',
+    a: '規模により数ヶ月程度が目安です。施設・街を舞台にする場合は、関係各所との調整期間も見込む必要があります。',
+  },
+  {
+    q: '小規模でも作れますか？',
+    a: '作れます。1つの部屋・バー・店舗を舞台にした少人数制イマーシブは、制作規模を抑えながら濃い没入体験を作れる形式です。当社も六本木の会員制バーを舞台にした公演を制作しています。',
+  },
+  {
+    q: '商用のイマーシブイベント制作を依頼できますか？',
+    a: 'できます。株式会社ex Labsは、渋谷サクラステージ全体を周遊する「ウワサバナシ調査委員会」（日本経済新聞掲載）など、実空間を舞台にしたイマーシブを企画・制作・集客・運営まで一貫対応しています。制作依頼・お見積りは無料です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'イマーシブイベントの作り方｜企画・制作の7ステップと設計原則',
+  about: 'イマーシブイベント（没入型体験）の作り方・企画方法',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-10',
+  dateModified: '2026-08-10',
+  mainEntityOfPage: new URL('/guide/immersive-making/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="イマーシブイベントの作り方｜企画・制作の7ステップと設計原則 - 株式会社ex Labs"
+  description="イマーシブイベント（没入型体験）の作り方を制作会社が解説。場所と感情から始める企画の7ステップ、没入感を生む3つの設計原則、よくある失敗、プロ依頼の分かれ目まで。日経掲載の施設一体型イマーシブを手がけたex Labsが執筆。見積り無料。"
+  ogImage="/assets/guide/immersive-making.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'イマーシブ完全ガイド', href: '/guide/immersive/' },
+  { name: 'イマーシブイベントの作り方' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">IMMERSIVE MAKING GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">イマーシブイベントの</span><span class="nobr">作り方</span><br><span class="nobr">企画・制作の7ステップ</span></h1>
+<p class="lede"><strong>イマーシブイベント（没入型体験）の作り方</strong>の基本は、<strong>「場所」と「参加者に味わわせたい感情」から逆算する</strong>ことです。脚本が主役の演劇と違い、イマーシブは空間・動線・演出が一体になって初めて成立します。この記事では、企画から開催までの7ステップと設計原則を、日本経済新聞に掲載された施設一体型イマーシブを手がけた株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="overview"><div class="wrap">
+<p class="eyebrow">OVERVIEW</p><h2 class="h2 serif">イマーシブ制作の全体像（7ステップ）</h2>
+<p class="h2sub">制作は大きく次の7つの工程で進みます。</p>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">1. 場所と感情を決める</span><span class="genre-d">舞台となる空間と、参加者に残したい感情（緊張・感動・驚き）を先に固める。</span></div>
+<div class="genre-cell"><span class="genre-t serif">2. コンセプト設計</span><span class="genre-d">場所の魅力・制約から「この場所だから成立する物語」の核を作る。</span></div>
+<div class="genre-cell"><span class="genre-t serif">3. シナリオ・世界観</span><span class="genre-d">脚本に加え、空間装飾・音・小道具まで含めた世界観を設計する。</span></div>
+<div class="genre-cell"><span class="genre-t serif">4. 動線・体験設計</span><span class="genre-d">参加者がどう動き、どこで何に出会うか。混雑・所要時間も設計する。</span></div>
+<div class="genre-cell"><span class="genre-t serif">5. キャスト・演出</span><span class="genre-d">参加者と即興で関わるキャストの選定・稽古。イマーシブ固有の演技力が要る。</span></div>
+<div class="genre-cell"><span class="genre-t serif">6. テスト・リハーサル</span><span class="genre-d">実際に体験して、詰まる場所・冷める瞬間を潰す。品質の生命線。</span></div>
+<div class="genre-cell"><span class="genre-t serif">7. 開催・運営・改善</span><span class="genre-d">当日運営と参加者の反応観察、公演を重ねながらの改善まで含めて制作。</span></div>
+</div>
+</div></section>
+
+<section class="section" id="steps"><div class="wrap narrow">
+<p class="eyebrow">STEPS</p><h2 class="h2 serif">各ステップの進め方</h2>
+<h3 class="def-sub serif">「場所」から発想する</h3>
+<p class="lede">イマーシブ制作の最初の問いは「何を書くか」ではなく<strong>「この場所で何が起きたら面白いか」</strong>です。閉店後の書店なら「夜の書店に隠された秘密」、商業施設なら「日常の風景に紛れた異変」。場所の日常性が強いほど、物語による異化のインパクトは大きくなります。</p>
+<h3 class="def-sub serif">「自由」と「導き」のバランスを設計する</h3>
+<p class="lede">参加者に完全な自由を与えると迷子になり、導きすぎると没入が冷めます。<strong>「自分で見つけた」と感じさせる誘導</strong>——光・音・キャストの視線・手がかりの配置——がイマーシブ設計の核心技術です。</p>
+<h3 class="def-sub serif">キャストは「対応力」で選ぶ</h3>
+<p class="lede">イマーシブのキャストは、台本にない参加者の行動に<strong>役として即興で応える</strong>必要があります。上手なセリフより、どんな問いかけにも世界観を壊さず返せる対応力が重要です。稽古も「想定外の練習」を中心に組みます。</p>
+<h3 class="def-sub serif">テストで「冷める瞬間」を潰す</h3>
+<p class="lede">没入は連続的な状態で、一度冷めると戻りにくいもの。テスト体験では、<strong>待ち時間・意味のわからない指示・世界観の破れ</strong>という3大冷めポイントを重点的に観察し、改善を繰り返します。</p>
+</div></section>
+
+<section class="section tinted" id="tips"><div class="wrap narrow">
+<p class="eyebrow">PRINCIPLES</p><h2 class="h2 serif">没入感を生む3つの設計原則</h2>
+<ul class="bullets">
+<li><strong>五感を揃える</strong>：視覚だけでなく、音・香り・手触りまで世界観を統一する。1つでも「現実」が混ざると没入は破れます。</li>
+<li><strong>参加者に役割を与える</strong>：「観客」ではなく「調査員」「招待客」など物語上の立場を与えると、行動のすべてが体験に変わります。</li>
+<li><strong>選択に意味を持たせる</strong>：どの道を選ぶか、誰に話しかけるかで体験が変わる設計が、「自分の物語」という感覚を生みます。</li>
+</ul>
+</div></section>
+
+<section class="section" id="mistakes"><div class="wrap narrow">
+<p class="eyebrow">MISTAKES</p><h2 class="h2 serif">よくある失敗4選</h2>
+<ul class="bullets">
+<li><strong>物語が場所と無関係</strong>：どこでもできる話は没入も話題性も生みません。「その場所ならでは」が最重要です。</li>
+<li><strong>動線・混雑の設計不足</strong>：同じ場所に人が溜まる、次に行く場所がわからない——オペレーションの破綻は没入を一瞬で壊します。</li>
+<li><strong>説明過多</strong>：ルール説明が長いほど世界から覚めます。説明自体を物語の中に溶かし込む設計が必要です。</li>
+<li><strong>運営を軽視する</strong>：イマーシブは「上演し続けるもの」。当日のスタッフ対応・トラブル処理まで含めて体験の品質です。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="pro"><div class="wrap narrow">
+<p class="eyebrow">PRO</p><h2 class="h2 serif">自作とプロ依頼の分かれ目</h2>
+<p class="lede">小規模な自主公演なら自作も十分可能です。一方、<strong>商業施設・店舗・ブランドが目的を持って開催する場合</strong>は、動線設計・キャストマネジメント・施設との調整・集客まで含む総合力が問われるため、実空間での制作実績を持つ専門会社への依頼が確実です。</p>
+<p class="lede">株式会社ex Labsは、渋谷サクラステージ全体を周遊する<strong>「ウワサバナシ調査委員会」（日本経済新聞掲載）</strong>、六本木の会員制バーでの<strong>「怪盗と秘密の試験」（電ファミニコゲーマー紹介）</strong>など、街・施設・店舗を舞台にしたイマーシブを一貫制作しています。</p>
+<p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）はこちら →</a>／<a href="/guide/immersive-cost/" style="color:var(--accent)">費用相場はこちら →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">イマーシブ制作の無料相談はこちら</p>
+<a class="btn" href="/#contact">イマーシブ制作について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド</a>／<a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブ制作の費用相場</a>／<a href="/guide/immersive-company/" style="color:var(--accent)">制作会社の選び方</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a></p>
+</div></section>
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.def-sub{font-size:19px;color:var(--ink);margin:40px 0 6px;text-align:center}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#overview,#steps,#tips,#mistakes,#pro,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

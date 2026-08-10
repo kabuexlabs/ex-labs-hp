@@ -188,4 +188,20 @@ export const guideArticles: GuideArticle[] = [
     category: 'murder',
     thumb: '/assets/guide/madamis-kenshu.webp',
   },
+  {
+    href: '/guide/immersive-making/',
+    title: 'イマーシブイベントの作り方｜企画・制作の7ステップと設計原則',
+    desc: '場所と感情から逆算する7ステップ、没入感を生む設計原則、よくある失敗まで。制作会社の実務知見で解説。',
+    date: '2026-08-10',
+    category: 'immersive',
+    thumb: '/assets/guide/immersive-making.webp',
+  },
+  {
+    href: '/guide/immersive-vr/',
+    title: 'イマーシブとVR・メタバースの違い｜リアル型没入体験の強み',
+    desc: 'イマーシブ＝VRではない。リアル型とデジタル型の違い、目的別の選び方、リアル型の強みを解説。',
+    date: '2026-08-10',
+    category: 'immersive',
+    thumb: '/assets/guide/immersive-vr.webp',
+  },
 ];

@@ -10,12 +10,14 @@ import { jsonLd } from '../../lib/microcms';
 
 const toc = [
   { id: 'about', label: 'イマーシブとは' },
+  { id: 'history', label: 'イマーシブの歴史・広がり' },
   { id: 'origin', label: 'イマーシブの意味・読み方・語源・例文' },
   { id: 'types', label: 'イマーシブ体験の種類' },
   { id: 'examples', label: 'イマーシブ体験の例' },
   { id: 'biz', label: '企業・施設での活用' },
   { id: 'make', label: 'イマーシブを制作・依頼するには' },
   { id: 'cost', label: '費用の目安' },
+  { id: 'articles', label: 'イマーシブ関連記事一覧' },
   { id: 'faq', label: 'よくある質問' },
 ];
 
@@ -93,7 +95,7 @@ const articleLd = {
   inLanguage: 'ja',
   author: { '@type': 'Organization', name: '株式会社ex Labs' },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
-  dateModified: '2026-08-07',
+  dateModified: '2026-08-10',
   mainEntityOfPage: new URL('/guide/immersive/', Astro.site).toString(),
 };
 ---
@@ -133,7 +135,13 @@ const articleLd = {
 <p class="lede">大型施設や都市型コンテンツの登場で注目が高まり、いまや商業施設・観光地・ブランドのマーケティング施策としても導入が広がっています。</p>
 </div></section>
 
-<section class="section" id="origin"><div class="wrap narrow">
+<section class="section" id="history"><div class="wrap narrow">
+<p class="eyebrow">HISTORY</p><h2 class="h2 serif">イマーシブの歴史・広がり</h2>
+<p class="lede">イマーシブ体験の潮流を作ったのは、2000年代にイギリスの劇団が確立し、2011年からニューヨークで長期公演された<strong>没入型演劇（イマーシブシアター）</strong>だと言われています。観客が建物内を自由に歩き回り、物語を「目撃」する形式は世界の演劇シーンに衝撃を与えました。</p>
+<p class="lede">日本では2010年代後半からイマーシブ型の公演・イベントが広がり、<strong>2024年には大型テーマパーク型施設が開業</strong>するなど市場が急拡大。現在は劇場の外へも広がり、<strong>商業施設・街・店舗を舞台にした周遊型イマーシブ</strong>が、集客・話題化を目的とした企業活用の主戦場になっています。当社が渋谷サクラステージで開催した施設一体型イマーシブが<strong>日本経済新聞に取り上げられた</strong>のも、この流れの中にあります。</p>
+</div></section>
+
+<section class="section tinted" id="origin"><div class="wrap narrow">
 <p class="eyebrow">MEANING</p><h2 class="h2 serif"><span class="nobr">イマーシブの意味・</span><span class="nobr">読み方・語源・例文</span><span class="nobr">（英語 immersive）</span></h2>
 <p class="lede"><strong>イマーシブの意味は、一言でいえば「没入型」</strong>。イマーシブ（immersive）は、英語の動詞 <strong>immerse（浸す・没頭させる）</strong> を語源とする形容詞で、「<strong>没入型の</strong>」という意味です。読み方は「<strong>イマーシブ</strong>」（発音記号 /ɪmˈɜːrsɪv/）。水に浸かるように、その世界へ深く入り込む状態を表し、転じて映像・ゲーム・演劇・空間演出など、<strong>強い没入感を生む体験</strong>を「イマーシブ」と呼びます。</p>
 <h3 class="def-sub serif">例文・使い方</h3>
@@ -159,7 +167,7 @@ const articleLd = {
 </ul>
 </div></section>
 
-<section class="section tinted" id="types"><div class="wrap">
+<section class="section" id="types"><div class="wrap">
 <p class="eyebrow">TYPES</p><h2 class="h2 serif">イマーシブ体験の種類</h2>
 <p class="h2sub">ひとくちにイマーシブといっても、舞台や手法によっていくつかのタイプがあります。</p>
 <div class="genre-grid">
@@ -170,7 +178,7 @@ const articleLd = {
 </div>
 </div></section>
 
-<section class="section" id="examples"><div class="wrap narrow">
+<section class="section tinted" id="examples"><div class="wrap narrow">
 <p class="eyebrow">EXAMPLES</p><h2 class="h2 serif">イマーシブ体験の例</h2>
 <p class="lede">株式会社ex Labsが制作したイマーシブ体験には、次のようなものがあります。</p>
 <ul class="bullets">
@@ -179,25 +187,36 @@ const articleLd = {
 </ul>
 </div></section>
 
-<section class="section tinted" id="biz"><div class="wrap narrow">
+<section class="section" id="biz"><div class="wrap narrow">
 <p class="eyebrow">FOR BUSINESS</p><h2 class="h2 serif">企業・施設での活用</h2>
 <p class="lede">イマーシブは「そこでしかできない体験」を生むため、<strong>商業施設・観光施設の集客</strong>や、<strong>ブランドの世界観を体験として伝えるプロモーション</strong>に活用が広がっています。来場者が物語を追う構造は、滞在時間の延長・館内回遊・SNSでの話題化にもつながります。</p>
 <p class="vc-line"><a href="/guide/immersive-event/" style="color:var(--accent)">企業のイマーシブイベント活用事例4選を見る →</a></p>
 </div></section>
 
-<section class="section" id="make"><div class="wrap narrow">
+<section class="section tinted" id="make"><div class="wrap narrow">
 <p class="eyebrow">PRODUCTION</p><h2 class="h2 serif">イマーシブを制作・依頼するには</h2>
 <p class="lede">実在する街・空間・ブランドを舞台にした<strong>オリジナルのイマーシブ体験</strong>を制作できます。株式会社ex Labsは、アート×体験レーベル「体験する美術館」、マジック×イマーシブレーベル「IMMERSIVE ILLUSION」など複数の自社レーベルを運営し、企画・体験設計・集客・運営まで一貫して対応します。</p>
 <p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）はこちら →</a></p>
 </div></section>
 
-<section class="section tinted" id="cost"><div class="wrap narrow">
+<section class="section" id="cost"><div class="wrap narrow">
 <p class="eyebrow">COST</p><h2 class="h2 serif">費用の目安</h2>
 <p class="lede">イマーシブ制作の費用は、<strong>体験の規模（会場数・公演回数・出演者数）・制作物の量・運営範囲</strong>によって決まります。チケット収益から回収する成果報酬型・レベニューシェア型に対応しており、初期費用を抑えた導入も可能です。</p>
 <p class="vc-line"><a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブ制作の費用相場を詳しく見る →</a></p>
 </div></section>
 
 <ZeroCostBanner />
+
+<section class="section tinted" id="articles"><div class="wrap">
+<p class="eyebrow">ARTICLES</p><h2 class="h2 serif">イマーシブ関連記事一覧</h2>
+<p class="h2sub">目的別に、イマーシブをさらに詳しく解説しています。</p>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">意味を知る</span><span class="genre-d"><a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは →</a><br><a href="/guide/immersive-vr/" style="color:var(--accent)">VR・メタバースとの違い →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">体験する</span><span class="genre-d"><a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブ →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">開催を検討する</span><span class="genre-d"><a href="/guide/immersive-event/" style="color:var(--accent)">企業の活用事例4選 →</a><br><a href="/guide/immersive-making/" style="color:var(--accent)">イマーシブイベントの作り方 →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">制作を依頼する</span><span class="genre-d"><a href="/guide/immersive-cost/" style="color:var(--accent)">制作の費用相場 →</a><br><a href="/guide/immersive-company/" style="color:var(--accent)">制作会社の選び方 →</a><br><a href="/services/immersive/" style="color:var(--accent)">制作依頼・無料見積り →</a></span></div>
+</div>
+</div></section>
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
@@ -238,6 +257,6 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#about,#origin,#types,#examples,#biz,#make,#cost,#faq{scroll-margin-top:88px}
+#about,#history,#origin,#types,#examples,#biz,#make,#cost,#articles,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>
