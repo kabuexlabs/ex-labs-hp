@@ -1,0 +1,85 @@
+---
+// 解説記事の一覧ハブ（/guide/）。URL を短く削ったユーザーの受け皿と、
+// 全記事へリンクエクイティを配るハブを兼ねる。データは guides.ts から。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import { jsonLd } from '../../lib/microcms';
+import { guideArticles } from '../../data/guides';
+
+const groups = [
+  { key: 'immersive', label: 'イマーシブ', desc: '意味・費用・作り方から制作依頼まで' },
+  { key: 'murder', label: 'マダミス（マーダーミステリー）', desc: '遊び方・作り方・制作依頼・企業活用' },
+  { key: 'shisetsu', label: '施設活用・体験型イベント', desc: '商業施設・遊休区画・営業時間外の集客' },
+  { key: 'nazotoki', label: '謎解き', desc: '謎解きイベントの企画・制作' },
+] as const;
+
+const byCat = (key: string) =>
+  guideArticles.filter((g) => g.category === key).sort((a, b) => b.date.localeCompare(a.date));
+
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+}
+
+const listLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: '解説記事・完全ガイド一覧',
+  description: 'マダミス・イマーシブ・施設活用イベント・謎解きの解説記事一覧',
+  url: new URL('/guide/', Astro.site).toString(),
+  hasPart: guideArticles.map((g) => ({
+    '@type': 'Article',
+    headline: g.title,
+    url: new URL(g.href, Astro.site).toString(),
+  })),
+};
+---
+<BaseLayout
+  title="解説記事・完全ガイド一覧｜マダミス・イマーシブ・施設活用 - 株式会社ex Labs"
+  description="体験型エンターテインメントの解説記事一覧。マダミス（マーダーミステリー）・イマーシブ・施設活用イベント・謎解きの基礎知識から、制作依頼の費用相場・会社の選び方まで、制作会社の視点で解説しています。"
+>
+<script type="application/ld+json" set:html={jsonLd(listLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '解説記事一覧' },
+]} />
+
+<section class="section" style="padding-top:56px"><div class="wrap">
+<p class="eyebrow">GUIDE</p><h1 class="h2 serif">解説記事・完全ガイド一覧</h1>
+<p class="h2sub">基礎知識から制作依頼の実務まで、体験型エンターテインメントのすべてを制作会社の視点で解説しています。</p>
+</div></section>
+
+{groups.map((grp, gi) => {
+  const items = byCat(grp.key);
+  return items.length > 0 && (
+    <section class:list={['section', { tinted: gi % 2 === 0 }]}><div class="wrap">
+    <p class="eyebrow">{grp.key.toUpperCase()}</p>
+    <h2 class="h2 serif">{grp.label}</h2>
+    <p class="h2sub">{grp.desc}</p>
+    <div class="blog-grid">
+      {items.map((g) => (
+        <div class="blog-card">
+          <a href={g.href}>
+            <img class="blog-img" src={g.thumb} alt={g.title} width="1200" height="630" loading="lazy" decoding="async" />
+          </a>
+          <p class="blog-date">{formatDate(g.date)}</p>
+          <h3 class="blog-title"><a href={g.href}>{g.title}</a></h3>
+          <p class="blog-excerpt">{g.desc}</p>
+        </div>
+      ))}
+    </div>
+    </div></section>
+  );
+})}
+
+<section class="section"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">体験型イベントのご相談はこちら（無料）</p>
+<a class="btn" href="/#contact">制作について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/" style="color:var(--accent)">サービス一覧</a>／<a href="/blog/" style="color:var(--accent)">ブログ</a>／<a href="/media/" style="color:var(--accent)">メディア掲載実績</a></p>
+</div></section>
+
+</BaseLayout>

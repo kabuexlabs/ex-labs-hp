@@ -15,6 +15,7 @@ const STATIC_PATHS = [
   '/blog/',
   '/press/',
   '/media/',
+  '/guide/',
   '/guide/madamis/',
   '/guide/madamis-cost/',
   '/guide/madamis-making/',
@@ -71,6 +72,7 @@ export const GET: APIRoute = async ({ site }) => {
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {
+    '/guide/': '2026-08-10',
     '/guide/madamis/': '2026-08-10',
     '/guide/madamis-cost/': '2026-07-30',
     '/guide/madamis-making/': '2026-08-10',
