@@ -1,0 +1,194 @@
+---
+// 「周遊型イベント」「回遊型イベント とは」系クエリの受け皿。
+// 施設活用系記事群の中核用語を定義し、施設活用LPへ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'about', label: '周遊型イベントとは' },
+  { id: 'why', label: 'なぜ「回遊」が生まれるのか' },
+  { id: 'types', label: '周遊型イベントの形式4タイプ' },
+  { id: 'examples', label: '事例：渋谷サクラステージ・下北沢' },
+  { id: 'making', label: '作り方のポイントと費用' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '周遊型イベントとは何ですか？',
+    a: '参加者が複数のスポットを巡りながら楽しむイベント形式です。回遊型イベントとも呼ばれます。謎解きや物語の手がかりを各所に配置することで、参加者が自発的に施設内・街なかを歩き回る構造を作れるのが特徴です。',
+  },
+  {
+    q: '周遊型と回遊型に違いはありますか？',
+    a: 'ほぼ同じ意味で使われます。商業施設の文脈では「館内回遊」という言葉との対応で回遊型、観光・街歩きの文脈では周遊型と呼ばれることが多い、程度の違いです。',
+  },
+  {
+    q: '周遊型イベントはどんな場所で開催できますか？',
+    a: '商業施設・観光地・商店街・美術館・ホテルなど、複数のスポットを設定できる場所なら幅広く開催できます。当社は渋谷サクラステージ（商業施設全体）や下北沢（街全体）での開催実績があります。',
+  },
+  {
+    q: '混雑やオペレーションが心配です。',
+    a: '周遊型はスタート時間の分散・ルートの複線化により、混雑を自然に分散できる形式です。施設のオペレーションに合わせた動線・所要時間の設計まで含めて制作します。',
+  },
+  {
+    q: '費用はどのくらいかかりますか？',
+    a: '規模により数十万円台〜数百万円規模まで。株式会社ex Labsではレベニューシェア型（成果報酬型）に対応しており、案件によっては施設側の初期費用0円または格安で開催できます。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const definedTermLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: '周遊型イベント',
+  alternateName: ['回遊型イベント', '周遊イベント'],
+  description:
+    '参加者が謎解きや物語の手がかりを追って複数のスポットを巡りながら楽しむイベント形式。施設内・街なかの回遊と滞在時間の延長を生むため、商業施設・観光地の集客施策として使われる。',
+  inDefinedTermSet: {
+    '@type': 'DefinedTermSet',
+    name: '体験型エンターテインメント用語集',
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  },
+  url: new URL('/guide/shuyu-event/', Astro.site).toString(),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '周遊型イベント（回遊型）とは？仕組み・事例・作り方を解説',
+  about: '周遊型イベント・回遊型イベント',
+  inLanguage: 'ja',
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-10',
+  dateModified: '2026-08-10',
+  mainEntityOfPage: new URL('/guide/shuyu-event/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="周遊型イベント（回遊型）とは？仕組み・事例・作り方を解説 - 株式会社ex Labs"
+  description="周遊型イベント（回遊型イベント）とは、参加者が複数のスポットを巡りながら楽しむイベント形式。回遊が生まれる仕組み、形式4タイプ、渋谷サクラステージ・下北沢での事例（日経掲載）、作り方と費用まで制作会社が解説。相談無料。"
+  ogImage="/assets/guide/shuyu-event.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<script type="application/ld+json" set:html={jsonLd(definedTermLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '体験型イベントとは', href: '/guide/taikengata-event/' },
+  { name: '周遊型イベントとは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">EXCURSION EVENT GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">周遊型イベント</span><span class="nobr">（回遊型）とは?</span><br><span class="nobr">仕組み・事例・作り方</span></h1>
+<div class="def-box">
+<p class="def-word"><span class="serif">周遊型イベント</span><span class="def-en">しゅうゆうがたイベント</span></p>
+<p class="def-body">参加者が謎解きや物語の手がかりを追って、<strong>複数のスポットを巡りながら楽しむ</strong>イベント形式。<strong>回遊型イベント</strong>とも呼ばれる。施設内・街なかの回遊と滞在時間の延長を自然に生むため、商業施設・観光地の集客施策として広く使われている。</p>
+</div>
+<p class="lede">このページでは、周遊型イベントの仕組み・形式・事例・作り方をまとめて解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">周遊型イベントとは</h2>
+<p class="lede"><strong>周遊型イベント</strong>とは、1か所に留まらず、<strong>複数のスポットを巡ること自体が体験になる</strong>イベントです。各スポットに謎・手がかり・物語の断片を配置し、参加者はそれを追って歩き回ります。ステージイベントのように「人を1か所に集める」のではなく、<strong>「人を動かす」ことで施設・街全体を活性化</strong>できるのが最大の特徴です。</p>
+</div></section>
+
+<section class="section" id="why"><div class="wrap narrow">
+<p class="eyebrow">WHY</p><h2 class="h2 serif">なぜ「回遊」が生まれるのか</h2>
+<p class="lede">周遊型イベントでは、<strong>次に行く場所を決めるのは運営ではなく物語</strong>です。「この手がかりの続きはあの場所にある」という構造が、参加者を普段通らないフロア・エリアへ自然に導きます。結果として、<strong>滞在時間の延長・普段接点のない店舗の前の通過・館内全体のにぎわい</strong>が同時に生まれます。単なるスタンプラリーとの違いは、移動の理由が「作業」ではなく<strong>「物語の続きを知りたい」という動機</strong>になっている点です。</p>
+</div></section>
+
+<section class="section tinted" id="types"><div class="wrap">
+<p class="eyebrow">TYPES</p><h2 class="h2 serif">周遊型イベントの形式4タイプ</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">施設一体型</span><span class="genre-d">商業施設全体が舞台。共有区画・館内導線を体験の目的地に変える。</span></div>
+<div class="genre-cell"><span class="genre-t serif">街歩き型</span><span class="genre-d">商店街・エリア全体を巡る形式。観光・街おこしと好相性。</span></div>
+<div class="genre-cell"><span class="genre-t serif">謎解きラリー型</span><span class="genre-d">各スポットの謎を解いて進む定番形式。ファミリー層に強い。</span></div>
+<div class="genre-cell"><span class="genre-t serif">イマーシブ周遊型</span><span class="genre-d">キャストや演出が組み込まれた没入型。話題化・メディア露出に最も強い。</span></div>
+</div>
+</div></section>
+
+<section class="section" id="examples"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLES</p><h2 class="h2 serif">事例：渋谷サクラステージ・下北沢</h2>
+<ul class="bullets">
+<li><strong>ウワサバナシ調査委員会（渋谷サクラステージ）</strong>：商業施設全体を周遊する都市伝説×イマーシブ×謎解き。施設の共有区画・館内導線を「体験の目的地」に転換し、<strong>日本経済新聞に掲載</strong>されました。</li>
+<li><strong>ロスト・フレーム（下北沢）</strong>：街に散らばった絵画を探して歩く周遊型アートイマーシブ。街全体を美術館に変える設計です。</li>
+</ul>
+<p class="vc-line"><a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントの事例をもっと見る →</a></p>
+</div></section>
+
+<section class="section tinted" id="making"><div class="wrap narrow">
+<p class="eyebrow">MAKING</p><h2 class="h2 serif">作り方のポイントと費用</h2>
+<ul class="bullets">
+<li><strong>回遊させたい場所から逆算する</strong>：施設側の「人を流したいエリア」を先に決め、そこに物語の目的地を配置します。</li>
+<li><strong>混雑を設計で分散する</strong>：スタート時間の分散・ルートの複線化で、行列を作らないオペレーションにします。</li>
+<li><strong>所要時間をコントロールする</strong>：60〜120分程度に収め、飲食・買い物の時間と共存させるのが定石です。</li>
+<li><strong>その場所ならではの物語にする</strong>：場所と物語が結びついた体験は満足度・話題性が段違いです。</li>
+</ul>
+<p class="lede">費用は規模により数十万円台〜数百万円規模まで。<strong>レベニューシェア型（成果報酬型）なら施設側の初期費用0円または格安</strong>で開催できるケースもあります。</p>
+<p class="vc-line"><a href="/services/shisetsu-event/" style="color:var(--accent)">周遊型イベントのご相談（無料）はこちら →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">周遊型イベントのご相談はこちら（無料）</p>
+<a class="btn" href="/#contact">周遊型イベントについて相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/nazotoki-event/" style="color:var(--accent)">謎解きイベントの企画・制作</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベント</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a></p>
+</div></section>
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.def-box{max-width:680px;margin:40px auto 26px;background:#fff;border:1px solid rgba(51,48,43,.1);border-left:5px solid var(--accent);border-radius:14px;padding:26px 30px;text-align:left;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.def-word{margin:0 0 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:22px;font-weight:800;color:var(--ink)}
+.def-en{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.06em}
+.def-body{margin:0;font-size:14.5px;line-height:2;color:rgba(51,48,43,.82)}
+@media(max-width:640px){.def-box{padding:20px 20px}.def-word{font-size:19px;gap:10px}}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#why,#types,#examples,#making,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
