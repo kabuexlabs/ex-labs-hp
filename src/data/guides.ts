@@ -197,6 +197,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/immersive-making.webp',
   },
   {
+    href: '/guide/case-uwasabanashi/',
+    title: 'イマーシブイベント制作事例：渋谷サクラステージ「ウワサバナシ調査委員会」',
+    desc: '商業施設全体を舞台にした施設一体型イマーシブの制作事例。共有区画を「目的地」に変えた設計の裏側を当事者が解説。',
+    date: '2026-08-11',
+    category: 'immersive',
+    thumb: '/assets/guide/case-uwasabanashi.webp',
+  },
+  {
     href: '/guide/immersive-vr/',
     title: 'イマーシブとVR・メタバースの違い｜リアル型没入体験の強み',
     desc: 'イマーシブ＝VRではない。リアル型とデジタル型の違い、目的別の選び方、リアル型の強みを解説。',

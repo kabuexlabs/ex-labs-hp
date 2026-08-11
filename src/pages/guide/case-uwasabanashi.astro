@@ -1,0 +1,163 @@
+---
+// 「イマーシブイベント 事例」「商業施設 イベント 事例」系クエリの受け皿。
+// 当事者しか書けない一次情報のケーススタディで、まとめ記事型の競合と
+// 差別化する。制作LP・施設活用LPへ送客。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'summary', label: 'プロジェクト概要' },
+  { id: 'background', label: '背景：施設の「共有区画」を目的地に' },
+  { id: 'concept', label: '企画：なぜ「都市伝説」だったのか' },
+  { id: 'design', label: '体験設計の工夫3つ' },
+  { id: 'media', label: '成果：日本経済新聞・電ファミニコゲーマー掲載' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'このような施設一体型イマーシブは、他の商業施設でも開催できますか？',
+    a: 'できます。施設の規模・構造・客層に合わせて、物語・動線・運営を個別に設計します。共有区画や通路など、既存の空間をそのまま舞台として活かせるのがこの形式の特徴です。',
+  },
+  {
+    q: '施設側にはどのような負担がありますか？',
+    a: '基本的には空間の提供と運用ルールのすり合わせが中心です。企画・制作・集客・当日運営は当社が一貫して担当し、レベニューシェア型（成果報酬型）なら初期費用を抑えた開催も可能です。',
+  },
+  {
+    q: '開催までにどのくらいの期間が必要ですか？',
+    a: '施設との調整を含めて数ヶ月程度が目安です。開催希望時期が決まっている場合は、早めにご相談ください。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'イマーシブイベント制作事例：渋谷サクラステージ「ウワサバナシ調査委員会」',
+  about: '商業施設の施設一体型イマーシブイベントの制作事例',
+  inLanguage: 'ja',
+  image: [new URL('/assets/events/uwasabanashi-kv.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-11',
+  dateModified: '2026-08-11',
+  mainEntityOfPage: new URL('/guide/case-uwasabanashi/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="イマーシブイベント制作事例：渋谷サクラステージ「ウワサバナシ調査委員会」 - 株式会社ex Labs"
+  description="商業施設全体を舞台にした施設一体型イマーシブの制作事例を、企画した当事者が解説。渋谷サクラステージの共有区画を「体験の目的地」に変えた設計の裏側、都市伝説×謎解きという企画意図、日本経済新聞・電ファミニコゲーマー掲載までの記録。"
+  ogImage="/assets/events/uwasabanashi-kv.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'イマーシブ完全ガイド', href: '/guide/immersive/' },
+  { name: '制作事例：ウワサバナシ調査委員会' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">CASE STUDY</p>
+<h1 class="h2 serif"><span class="nobr">イマーシブイベント制作事例</span><br><span class="nobr">渋谷サクラステージ</span><span class="nobr">「ウワサバナシ調査委員会」</span></h1>
+<p class="lede">商業施設<strong>全体</strong>を物語の舞台に変える——株式会社ex Labsが企画・制作した施設一体型イマーシブ<strong>「ウワサバナシ調査委員会」</strong>は、渋谷サクラステージの共有区画・館内導線を「体験の目的地」に転換する取り組みとして、<strong>日本経済新聞に掲載</strong>されました。この記事では、制作した当事者の視点から、企画意図と体験設計の裏側を解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="summary"><div class="wrap narrow">
+<p class="eyebrow">SUMMARY</p><h2 class="h2 serif">プロジェクト概要</h2>
+<ul class="bullets">
+<li><strong>作品名</strong>：ウワサバナシ調査委員会 case1「現実を改変する文房具」</li>
+<li><strong>形式</strong>：都市伝説×イマーシブ×謎解きの施設一体型周遊イベント（体験約70分）</li>
+<li><strong>会場</strong>：渋谷サクラステージ（施設全体を周遊）</li>
+<li><strong>開催</strong>：2026年9月19日〜10月4日の週末6日間</li>
+<li><strong>協力</strong>：東急不動産株式会社様・404 Not Found様・TSUTAYA様</li>
+<li><strong>当社の担当</strong>：企画・シナリオ・体験設計・キャスト・集客・運営の一貫制作</li>
+<li><strong>メディア掲載</strong>：日本経済新聞・電ファミニコゲーマー</li>
+</ul>
+</div></section>
+
+<section class="section" id="background"><div class="wrap narrow">
+<p class="eyebrow">BACKGROUND</p><h2 class="h2 serif">背景：施設の「共有区画」を目的地に</h2>
+<p class="lede">商業施設の共有区画や通路は、来館者にとって「通過する場所」です。ここを<strong>「わざわざ来る目的地」に変えられないか</strong>——それがこのプロジェクトの出発点でした。テナント区画に手を入れるのではなく、施設がすでに持っている<strong>共有空間・館内導線そのもの</strong>を体験の舞台として活かす。施設側は空間を提供し、企画・制作・集客・運営を当社が担う、<strong>施設の負担を抑えた開催モデル</strong>です。</p>
+<p class="vc-line"><a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントという考え方について詳しく →</a></p>
+</div></section>
+
+<section class="section tinted" id="concept"><div class="wrap narrow">
+<p class="eyebrow">CONCEPT</p><h2 class="h2 serif">企画：なぜ「都市伝説」だったのか</h2>
+<p class="lede">題材に選んだのは<strong>「現実を改変するノート」をめぐる都市伝説</strong>。理由は2つあります。第一に、都市伝説は<strong>「この街のどこかで本当に起きているかもしれない」</strong>という感覚を作れる題材で、日常の商業施設という舞台と組み合わせたとき、現実と物語の境界が最も曖昧になること。第二に、「ねぇ、知ってる？」という<strong>口コミの構造そのものを物語に内蔵</strong>していて、SNSでの拡散と相性が良いことです。</p>
+<p class="lede">参加者は「ウワサバナシ調査委員会」の新人調査員として、施設内を巡り、キャストへの聞き込みを重ねながら、ウワサの真相を追いかけます。<strong>買い物客が行き交う日常の風景の中で物語が進行する</strong>——この「日常との地続き感」こそ、劇場では作れない施設一体型イマーシブの醍醐味です。</p>
+</div></section>
+
+<section class="section" id="design"><div class="wrap narrow">
+<p class="eyebrow">DESIGN</p><h2 class="h2 serif">体験設計の工夫3つ</h2>
+<ul class="bullets">
+<li><strong>①「聞き込み」で回遊を作る</strong>：手がかりは掲示物ではなく、施設内に配置されたキャストとの会話から得る設計にしました。「人に話を聞くために移動する」構造が、施設全体の自然な回遊を生みます。</li>
+<li><strong>②営業中の施設と共存する動線</strong>：スタート時間の分散と複数ルートの設計で、買い物客の動線と干渉しないオペレーションを組みました。行列や滞留を作らないことは、施設一体型の絶対条件です。</li>
+<li><strong>③選択で変わる展開</strong>：誰に聞き込むか、どの情報を信じるかで体験が変わる設計にし、リピート参加の余地を残しました。</li>
+</ul>
+<p class="vc-line"><a href="/guide/immersive-making/" style="color:var(--accent)">イマーシブイベントの作り方（設計原則の詳細）→</a></p>
+</div></section>
+
+<section class="section tinted" id="media"><div class="wrap narrow">
+<p class="eyebrow">MEDIA</p><h2 class="h2 serif">成果：日本経済新聞・電ファミニコゲーマー掲載</h2>
+<p class="lede">本取り組みは、開催に先立ち<strong>日本経済新聞に「渋谷サクラステージで周遊型ミステリ体験」として掲載</strong>され、ゲーム・エンタメメディアの<strong>電ファミニコゲーマーでも紹介</strong>されました。施設の未活用空間を集客資産に変えるモデルとして、経済メディアからも注目を集めています。</p>
+<p class="vc-line"><a href="/media/" style="color:var(--accent)">メディア掲載実績の一覧 →</a>／<a href="/uwasabanashi/" style="color:var(--accent)">公演の特設サイト →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">貴施設でも施設一体型イマーシブを開催しませんか？（相談無料）</p>
+<a class="btn" href="/#contact">開催について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例4選</a>／<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントとは</a></p>
+</div></section>
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#summary,#background,#concept,#design,#media,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
