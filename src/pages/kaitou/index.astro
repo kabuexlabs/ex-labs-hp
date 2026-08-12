@@ -1,4 +1,5 @@
 ---
+import SiteGuard from '../../components/SiteGuard.astro';
 // 公演「怪盗と秘密の試験」（IMMERSIVE ILLUSION）公式サイト。
 // design_handoff_kaitou の HTML リファレンス（ノワール×ゴールド）を
 // Astro に移植した再構築版。文言はハンドオフの確定コピーが正。
@@ -161,6 +162,7 @@ const faqs = [
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Shippori+Mincho+B1:wght@400;500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 {/* JS無効環境でもリビール対象が隠れたままにならないための保険 */}
 <noscript><style>.rv{opacity:1!important;transform:none!important}.cast-card{opacity:1!important}</style></noscript>
+<SiteGuard />
 </head>
 <body>
 
@@ -472,6 +474,7 @@ const faqs = [
       イマーシブ公演の制作依頼：<a href="https://kabuexlabs.com/services/immersive/" target="_blank" rel="noopener">イマーシブ制作のex Labs</a>
     </div>
     <p class="foot-copy cinzel">© 2026 IMMERSIVE ILLUSION ALL RIGHTS RESERVED.</p>
+    <p class="foot-copy">本サイトに掲載の文章・画像等の無断転載・複製を禁じます。</p>
   </div>
 </footer>
 

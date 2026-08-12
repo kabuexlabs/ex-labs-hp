@@ -1,4 +1,5 @@
 ---
+import SiteGuard from '../components/SiteGuard.astro';
 // 体験する美術館 (/taikenbizyutu/) 専用レイアウト。
 // 本体サイトとは別ブランドのマイクロサイトなので BaseLayout は使わず、
 // フォント・配色・ヘッダー/フッターをここで完結させる。
@@ -89,6 +90,7 @@ const orgLd = {
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <noscript><style>.rv{opacity:1 !important;transform:none !important}.hero-el{opacity:1 !important;transform:none !important;animation:none !important}</style></noscript>
 <slot name="head" />
+<SiteGuard />
 </head>
 <body>
 <div class="page">
@@ -118,6 +120,7 @@ const orgLd = {
     <p class="fsmall m0">企画・運営：<a href="https://kabuexlabs.com/">株式会社 ex Labs</a></p>
     <p class="fsmall m0">イマーシブイベントの制作依頼：<a href="https://kabuexlabs.com/services/immersive/">イマーシブ制作のex Labs</a></p>
     <p class="fsmall m0">© 2026 ex Labs Inc. All Rights Reserved.</p>
+    <p class="fsmall m0">本サイトに掲載の文章・画像等の無断転載・複製を禁じます。</p>
   </div>
 </footer>
 )}

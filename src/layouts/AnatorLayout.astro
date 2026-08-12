@@ -1,4 +1,5 @@
 ---
+import SiteGuard from '../components/SiteGuard.astro';
 // ANATOR (/anator/) 専用レイアウト。
 // 少人数密室型イマーシブ空間「ANATOR」のマイクロサイト。
 // 本体サイトとは別ブランドなので BaseLayout は使わず、フォント・配色・
@@ -87,6 +88,7 @@ const orgLd = {
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <noscript><style>.rv{opacity:1 !important;transform:none !important}</style></noscript>
 <slot name="head" />
+<SiteGuard />
 </head>
 <body style={`--accent:${accent}`}>
 
@@ -110,6 +112,7 @@ const orgLd = {
     <a href="https://kabuexlabs.com/services/immersive/" target="_blank" rel="noopener">イマーシブ制作の依頼はex Labs ↗</a>
   </div>
   <p class="copy">© 2026 ex Labs Inc.</p>
+  <p class="copy">本サイトに掲載の文章・画像等の無断転載・複製を禁じます。</p>
 </footer>
 
 <style is:global>

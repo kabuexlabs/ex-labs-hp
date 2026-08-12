@@ -1,4 +1,5 @@
 ---
+import SiteGuard from '../components/SiteGuard.astro';
 // ネタバレ公開特設サイト (/game/) 専用レイアウト。
 // Claude Design のハンドオフ (ネタバレ公開特設サイト.dc.html) を Astro に移植したもの。
 // 再演のないコンテンツ (謎解き・マーダーミステリー) のネタバレ記録を公開する特設サイト。
@@ -65,11 +66,12 @@ const orgLd = {
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <slot name="head" />
+<SiteGuard />
 </head>
 <body>
 <div class="page">
 <slot />
-<footer class="footer"><a class="foot-home" href="/">株式会社ex Labs 公式サイトへ →</a><br>© ex Labs Inc. All Rights Reserved.</footer>
+<footer class="footer"><a class="foot-home" href="/">株式会社ex Labs 公式サイトへ →</a><br>© ex Labs Inc. All Rights Reserved.<br>本サイトに掲載の文章・画像等の無断転載・複製を禁じます。</footer>
 </div>
 
 <style is:global>

@@ -1,4 +1,5 @@
 ---
+import SiteGuard from '../components/SiteGuard.astro';
 import '../styles/global.css';
 import { jsonLd } from '../lib/microcms';
 
@@ -148,11 +149,7 @@ const orgLd = {
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Sans+JP:wght@400;500;700;800&family=Shippori+Mincho:wght@600;700;800&display=swap"></noscript>
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <script type="application/ld+json" set:html={jsonLd(websiteLd)} />
-{/* 流入元の先取り保存：セッション最初のページで参照元と着地URLを保持し、
-    お問い合わせフォーム（SourceField）が送信時に添付する。 */}
-<script is:inline>
-try{var k='exl_src';if(!sessionStorage.getItem(k))sessionStorage.setItem(k,JSON.stringify({r:document.referrer,l:location.href}))}catch(e){}
-</script>
+<SiteGuard />
 </head>
 <body>
 
@@ -178,6 +175,7 @@ try{var k='exl_src';if(!sessionStorage.getItem(k))sessionStorage.setItem(k,JSON.
 <div class="foot-row">
 <div><p class="foot-name">株式会社 ex Labs</p><p class="foot-tag">AI時代に、人間が作る面白さを追求する — 体験型エンターテインメントの企画・制作</p><p class="foot-addr">東京都新宿区西新宿3-3-13 西新宿水間ビル2F</p></div>
 <p class="foot-copy">© 2026 ex Labs Inc.</p>
+<p class="foot-copy">本サイトに掲載の文章・画像等の無断転載・複製を禁じます。</p>
 </div>
 <nav class="foot-links">
 <a href="/services/nazotoki-kenshu/">謎解き研修</a>

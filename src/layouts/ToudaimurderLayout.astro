@@ -1,4 +1,5 @@
 ---
+import SiteGuard from '../components/SiteGuard.astro';
 // 東大マーダーミステリーサークル (/toudaimurder/) 専用レイアウト。
 // 本体サイトとは別ブランドのマイクロサイトなので BaseLayout は使わず、
 // フォント・配色・ヘッダー/フッターをここで完結させる。
@@ -91,6 +92,7 @@ const orgLd = {
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@600;800&family=JetBrains+Mono:wght@400&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <slot name="head" />
+<SiteGuard />
 </head>
 <body>
 <div class:list={['pg', { pgwide: wide }]}>
@@ -123,6 +125,7 @@ const orgLd = {
     <div class="umlk"><img class="ummark" src="/assets/toudaimurder/um-mark.svg" alt="UNLIMITED MYSTERY ロゴ" width="46" height="41" loading="lazy"><span class="umtx">UNLIMITED<br>MYSTERY</span></div>
     <p class="copy">運営会社：<a href="https://kabuexlabs.com/">株式会社ex Labs</a>｜<a href="https://kabuexlabs.com/services/murder-mystery/">マーダーミステリー制作のご依頼（法人向け）</a></p>
     <p class="copy en" style="margin-top:6px">© UNLIMITED MYSTERY. All Rights Reserved.</p>
+    <p class="copy" style="margin-top:4px">本サイトに掲載の文章・画像等の無断転載・複製を禁じます。</p>
   </footer>
 </slot>
 </div>

@@ -1,0 +1,28 @@
+---
+// 全サイト共通の <head> 用スニペット。全レイアウト・独立ページに入れる。
+//  1) 流入元の先取り保存：セッション最初のページで参照元と着地URLを保持し、
+//     お問い合わせフォーム（SourceField）が送信時に添付する
+//  2) Vercel Web Analytics：全ページの流入元・PVデータを取得
+//     （Vercelダッシュボードで Web Analytics を有効化すると動き出す。
+//       未有効の間はスクリプトが404になるだけで実害はない）
+//  3) コピー抑止：長文コピーに出典を自動付与＋画像の右クリック/ドラッグ保存を抑止
+//     （公開ページの複製を完全には防げないため、あくまで抑止と証拠付け）
+---
+<script is:inline defer src="/_vercel/insights/script.js"></script>
+<script is:inline>
+try{var k='exl_src';if(!sessionStorage.getItem(k))sessionStorage.setItem(k,JSON.stringify({r:document.referrer,l:location.href}))}catch(e){}
+document.addEventListener('copy',function(e){
+  try{
+    var sel=String(window.getSelection());
+    if(sel.length<80||!e.clipboardData)return;
+    e.clipboardData.setData('text/plain',sel+'\n\n出典: 株式会社ex Labs '+location.origin+location.pathname);
+    e.preventDefault();
+  }catch(_){}
+});
+document.addEventListener('contextmenu',function(e){
+  var t=e.target;if(t&&t.tagName==='IMG')e.preventDefault();
+});
+document.addEventListener('dragstart',function(e){
+  var t=e.target;if(t&&t.tagName==='IMG')e.preventDefault();
+});
+</script>

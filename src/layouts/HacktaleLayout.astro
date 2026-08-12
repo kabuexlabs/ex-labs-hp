@@ -1,4 +1,5 @@
 ---
+import SiteGuard from '../components/SiteGuard.astro';
 // HACKTALE (/hacktale/) 専用レイアウト。本体サイトとは別ブランドのマイクロサイトなので
 // BaseLayout は使わず、フォント・配色・ヘッダーをここで完結させる。
 // ページ固有のスタイルは各ページの scoped <style> に置き、ここには全ページ共通の
@@ -63,6 +64,7 @@ const nav = [
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<SiteGuard />
 </head>
 <body class:list={[{ 'ht-detail': !!back }]}>
 <header class="hdr">
