@@ -12,6 +12,12 @@ export type Question = {
   note?: string;
   /** 問題画像 (public/ 配下のパス)。無い問題もあるため optional。 */
   image?: string;
+  /**
+   * 問題一覧カード用のサムネイル (public/ 配下のパス)。
+   * 未設定で image がある問題は image を流用し、どちらも無い場合は
+   * プレースホルダー枠を表示する。
+   */
+  thumbnail?: string;
   /** 許容する正解のリスト。判定時に正規化して比較する。 */
   answers: string[];
   /** 段階ヒント。配列の先頭から順に開示する。 */
