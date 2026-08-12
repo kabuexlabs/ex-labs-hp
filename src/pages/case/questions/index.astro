@@ -5,6 +5,7 @@ import CaseLayout from '../../../layouts/CaseLayout.astro';
 import ProgressBar from '../../../components/case/ProgressBar.astro';
 import QuestionCard from '../../../components/case/QuestionCard.astro';
 import ConfirmFinishModal from '../../../components/case/ConfirmFinishModal.astro';
+import ExpiredNotice from '../../../components/case/ExpiredNotice.astro';
 import { caseConfig } from '../../../data/case/config';
 import { questions } from '../../../data/case/questions';
 ---
@@ -15,6 +16,11 @@ import { questions } from '../../../data/case/questions';
       <header class="list-head">
         <p class="en-label list-title">{caseConfig.title}</p>
         <ProgressBar total={questions.length} />
+        {caseConfig.timeLimitHours !== null && (
+          <p class="time-remaining" id="time-remaining" hidden>
+            調査期限 あと<span id="time-remaining-value"></span>
+          </p>
+        )}
       </header>
 
       <ol class="q-list">
@@ -32,6 +38,7 @@ import { questions } from '../../../data/case/questions';
     </div>
   </main>
   <ConfirmFinishModal />
+  <ExpiredNotice />
 </CaseLayout>
 
 <script>
@@ -41,9 +48,37 @@ import { questions } from '../../../data/case/questions';
     ensureStarted,
     finishInvestigation,
     getQuestionProgress,
+    loadProgress,
   } from '../../../lib/case/progress';
+  import { formatRemaining, isExpired, remainingMs } from '../../../lib/case/limit';
 
   const progress = ensureStarted();
+
+  // ── 時間制限 ──
+  // 期限切れなら全画面のロック表示を出す（一覧・回答への操作を遮る）。
+  // ページを開いたまま期限を迎えるケースに備えて30秒ごとに再判定する。
+  const expiredOverlay = document.getElementById('expired-overlay');
+  const remainingEl = document.getElementById('time-remaining');
+  const remainingValueEl = document.getElementById('time-remaining-value');
+  function checkExpiry(): void {
+    const current = loadProgress();
+    if (isExpired(current)) {
+      const attempted = current.questions.some((p) => p.attempted);
+      const resultLink = document.getElementById('expired-result');
+      if (resultLink) resultLink.hidden = !attempted;
+      expiredOverlay?.classList.add('open');
+      expiredOverlay?.setAttribute('aria-hidden', 'false');
+      remainingEl?.setAttribute('hidden', '');
+      return;
+    }
+    const ms = remainingMs(current);
+    if (ms !== null && remainingEl && remainingValueEl) {
+      remainingValueEl.textContent = formatRemaining(ms);
+      remainingEl.hidden = false;
+    }
+  }
+  checkExpiry();
+  setInterval(checkExpiry, 30_000);
 
   // ── 各カードへ状態を反映 ──
   let attemptedCount = 0;
@@ -131,4 +166,9 @@ import { questions } from '../../../data/case/questions';
 }
 .finish-note{margin:0 0 14px;font-size:14px;color:var(--sub);letter-spacing:.08em}
 .finish-button{min-height:58px;font-size:17px}
+.time-remaining{
+  margin:6px 0 0;font-size:11.5px;color:var(--sub);letter-spacing:.08em;
+  text-align:right;
+}
+.time-remaining span{font-weight:700;color:var(--ink)}
 </style>

@@ -80,6 +80,20 @@ function schedule(): void {
   timer = setTimeout(flush, DEBOUNCE_MS);
 }
 
+/**
+ * 匿名IDを新しく振り直す（リピーターの再スタート用）。
+ * 前回の記録はサーバーに残したまま、新しい調査は別の参加者として
+ * 集計される — 消してしまうと前回の来場が統計から消えてしまうため。
+ */
+export function rotateDeviceId(): void {
+  const id = randomId();
+  try {
+    window.localStorage.setItem(DEVICE_KEY, id);
+  } catch {
+    memoryDeviceId = id;
+  }
+}
+
 /** この端末のサーバー側記録を削除する（開発用リセットと合わせて使う）。 */
 export function resetRemoteRecord(): void {
   dirty = false;

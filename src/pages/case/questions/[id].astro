@@ -4,6 +4,7 @@
 import CaseLayout from '../../../layouts/CaseLayout.astro';
 import HintSheet from '../../../components/case/HintSheet.astro';
 import CorrectModal from '../../../components/case/CorrectModal.astro';
+import ExpiredNotice from '../../../components/case/ExpiredNotice.astro';
 import { questions } from '../../../data/case/questions';
 
 export function getStaticPaths() {
@@ -75,6 +76,7 @@ const num = String(question.number).padStart(2, '0');
 
   <HintSheet hintCount={question.hints.length} />
   <CorrectModal />
+  <ExpiredNotice />
 </CaseLayout>
 
 <script>
@@ -83,9 +85,11 @@ const num = String(question.number).padStart(2, '0');
   import {
     ensureStarted,
     getQuestionProgress,
+    loadProgress,
     recordAttempt,
     recordHintLevel,
   } from '../../../lib/case/progress';
+  import { isExpired } from '../../../lib/case/limit';
 
   const root = document.getElementById('question-root')!;
   const questionId = Number(root.dataset.questionId);
@@ -109,10 +113,30 @@ const num = String(question.number).padStart(2, '0');
   const initial = getQuestionProgress(ensureStarted(), questionId);
   if (initial?.solved) applySolvedState();
 
+  // ── 時間制限 ──
+  // 期限切れなら問題内容を覆うロック表示を出し、回答も受け付けない。
+  // ページを開いたまま期限を迎えるケースに備えて30秒ごとに再判定する。
+  const expiredOverlay = document.getElementById('expired-overlay');
+  function checkExpiry(): boolean {
+    const current = loadProgress();
+    if (!isExpired(current)) return false;
+    const attempted = current.questions.some((p) => p.attempted);
+    const resultLink = document.getElementById('expired-result');
+    if (resultLink) resultLink.hidden = !attempted;
+    expiredOverlay?.classList.add('open');
+    expiredOverlay?.setAttribute('aria-hidden', 'false');
+    input.disabled = true;
+    submit.disabled = true;
+    return true;
+  }
+  checkExpiry();
+  setInterval(checkExpiry, 30_000);
+
   // ── 回答判定 ──
   const correctOverlay = document.getElementById('correct-overlay')!;
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    if (checkExpiry()) return;
     const value = input.value;
     if (value.trim() === '') {
       input.focus();

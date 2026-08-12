@@ -27,6 +27,9 @@ import { questions } from '../../data/case/questions';
 
       <div class="start-action">
         <a href="/case/questions/" class="btn btn-primary" id="start-button">調査を開始する</a>
+        <p class="restart-note" id="restart-note" hidden>
+          前回の調査は期間終了しました。開始すると新しい調査として最初から始まります。
+        </p>
       </div>
 
       <section class="start-notes" aria-label="注意事項">
@@ -41,9 +44,22 @@ import { questions } from '../../data/case/questions';
 
 <script>
   // 「調査を開始する」を押した時点で開始時刻を記録する。
-  import { ensureStarted } from '../../lib/case/progress';
+  // 前回の調査が期間終了している端末（リピーター）は、案内を表示した
+  // うえで新しい調査として最初から開始する。
+  import { ensureStarted, loadProgress } from '../../lib/case/progress';
+  import { isExpired } from '../../lib/case/limit';
+  import { restartInvestigation } from '../../lib/case/session';
+
+  const expired = isExpired(loadProgress());
+  const note = document.getElementById('restart-note');
+  if (note) note.hidden = !expired;
+
   document.getElementById('start-button')?.addEventListener('click', () => {
-    ensureStarted();
+    if (isExpired(loadProgress())) {
+      restartInvestigation();
+    } else {
+      ensureStarted();
+    }
   });
 </script>
 
@@ -62,6 +78,7 @@ import { questions } from '../../data/case/questions';
 .start-lede p{margin:0 0 18px;font-size:15px;line-height:2}
 .line{display:block}
 .start-action{margin:36px 0 0}
+.restart-note{margin:12px 0 0;font-size:12px;color:var(--sub);line-height:1.9}
 .start-notes{margin:44px 0 0;border-top:1px solid var(--line);padding-top:20px}
 .notes-title{margin:0 0 10px;font-size:11px;color:var(--sub)}
 .start-notes ul{margin:0;padding:0;list-style:none}

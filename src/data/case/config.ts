@@ -25,6 +25,13 @@ export const caseConfig = {
   ],
   /** マップ画像 (public/ 配下)。null の間はプレースホルダーを表示。 */
   mapImage: null as string | null,
+  /**
+   * 体験の制限時間（時間）。「調査を開始する」を押してからこの時間を
+   * 過ぎると問題の閲覧・回答がロックされる。リピーターはロック画面から
+   * 新しい調査として再スタートできる（進捗はリセット）。
+   * null にすると無制限。
+   */
+  timeLimitHours: 5 as number | null,
 } as const;
 
 /**
