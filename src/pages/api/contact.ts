@@ -28,7 +28,9 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // フォーム側で使われているハニーポット名（bot はここを埋めてしまう）
 const HONEYPOTS = ['_gotcha', '_honey', 'website'];
 // メール本文に含めない制御用フィールド
-const META = new Set(['_subject', '_next', '_template', '_captcha', ...HONEYPOTS]);
+// （_source は流入元の自動記録。管理者通知にのみ別枠で記載し、
+//   お客様への控えメールには載せない）
+const META = new Set(['_subject', '_next', '_template', '_captcha', '_source', ...HONEYPOTS]);
 
 export const POST: APIRoute = async ({ request }) => {
   let form: FormData;
@@ -72,11 +74,13 @@ export const POST: APIRoute = async ({ request }) => {
   if (lines.length === 0 || totalLen > 8000) return redirect();
 
   const subject = (get('_subject') || '【ex Labs】サイトからのお問い合わせ').slice(0, 150);
+  const source = get('_source').slice(0, 600);
   const record = {
     id: crypto.randomUUID(),
     subject,
     email,
     fields: lines.join('\n\n'),
+    source,
     ip,
     ua: (request.headers.get('user-agent') ?? '').slice(0, 300),
     createdAt: new Date().toISOString(),
@@ -94,6 +98,7 @@ export const POST: APIRoute = async ({ request }) => {
   const body =
     `サイトのお問い合わせフォームから送信がありました。\n\n${record.fields}\n\n` +
     `——\n送信者メールアドレス: ${email}\n受信日時: ${record.createdAt}\n` +
+    (source ? `流入元:\n${source}\n` : '') +
     `このメールに返信すると送信者宛に届きます。`;
   const mailed = await sendMail(adminEmail(), subject, body, email);
 

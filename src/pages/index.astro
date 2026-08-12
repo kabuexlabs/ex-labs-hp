@@ -6,6 +6,7 @@ export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LatestPosts from '../components/LatestPosts.astro';
 import HeroWorksMarquee from '../components/HeroWorksMarquee.astro';
+import SourceField from '../components/SourceField.astro';
 import { pressItems } from '../data/press';
 import { mediaItems } from '../data/media';
 
@@ -497,6 +498,7 @@ const marqueeItems = Array(2).fill(groups).flat();
 <input type="hidden" name="_next" value="/contact/thanks/">
 {/* ハニーポット：botだけが埋める不可視フィールド */}
 <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
+<SourceField />
 <div class="form-row">
 <label><span class="label-cap">お名前<span class="req">必須</span></span><input type="text" name="name" required></label>
 <label><span class="label-cap">会社名</span><input type="text" name="company"></label>

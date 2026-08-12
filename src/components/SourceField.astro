@@ -1,0 +1,26 @@
+---
+// お問い合わせの「流入元」を送信内容に添付する hidden フィールド。
+// セッション最初のページで document.referrer と着地URLを sessionStorage に
+// 保存し（BaseLayout でも同じキーを先取り保存）、送信時に _source として
+// POST する。/api/contact 側で管理者通知メールにのみ記載され、
+// お客様への控えメールには載せない。
+---
+<input type="hidden" name="_source" value="">
+
+<script>
+try {
+  const KEY = 'exl_src';
+  if (!sessionStorage.getItem(KEY)) {
+    sessionStorage.setItem(KEY, JSON.stringify({ r: document.referrer, l: location.href }));
+  }
+  const d = JSON.parse(sessionStorage.getItem(KEY) || '{}');
+  const v = [
+    `参照元: ${d.r || '(なし＝直接アクセス・アプリ内ブラウザなど)'}`,
+    `最初に開いたページ: ${d.l || '(不明)'}`,
+    `送信したページ: ${location.href}`,
+  ].join('\n');
+  document.querySelectorAll<HTMLInputElement>('input[name="_source"]').forEach((el) => {
+    el.value = v;
+  });
+} catch { /* 記録に失敗しても送信は妨げない */ }
+</script>

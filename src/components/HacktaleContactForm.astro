@@ -6,6 +6,7 @@
 // FormSubmit 側の制約で失敗することがあるため使わない）。
 // 注意: 宛先メールアドレスは FormSubmit の初回認証（届いた確認メールの承認）が必要。
 import { HT_CONTACT_EMAIL, htFormWorks } from '../data/hacktale';
+import SourceField from './SourceField.astro';
 
 const formAction = '/api/contact';
 const thanksUrl = 'https://kabuexlabs.com/hacktale/contact/thanks/';
@@ -17,6 +18,7 @@ const thanksUrl = 'https://kabuexlabs.com/hacktale/contact/thanks/';
 <input type="hidden" name="_captcha" value="false">
 <input type="hidden" name="_next" value={thanksUrl}>
 <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+<SourceField />
 <div><div class="fl">お名前<span class="req">必須</span></div><input class="in" type="text" name="お名前" required autocomplete="name"></div>
 <div><div class="fl">メールアドレス<span class="req">必須</span></div><input class="in" type="email" name="email" required autocomplete="email"></div>
 <div><div class="fl">お問い合わせ種別</div><select class="in" name="お問い合わせ種別"><option>公演の予約</option><option>貸切公演の相談</option><option>制作の依頼</option><option>取材・コラボのご相談</option><option>その他</option></select></div>

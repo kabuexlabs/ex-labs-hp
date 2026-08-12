@@ -6,6 +6,8 @@
 // (smystery / toudaimurder / taikenbizyutu のフォームと同じ)。
 // 送信は fetch (AJAX) で行い、完了後は当サイトのサンクスページへ遷移する。
 // JS 無効時は通常 POST にフォールバックする (Formspree の完了画面経由)。
+import SourceField from './SourceField.astro';
+
 const FORM_ENDPOINT = '/api/contact';
 const thanksPath = '/anator/contact/thanks/';
 ---
@@ -13,6 +15,7 @@ const thanksPath = '/anator/contact/thanks/';
 <form class="anator-form" action={FORM_ENDPOINT} method="POST" data-thanks={thanksPath}>
   <input type="hidden" name="_subject" value="【ANATOR】サイトからのお問い合わせ">
   <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+  <SourceField />
 
   <label class="field">
     <span class="flabel">お名前</span>

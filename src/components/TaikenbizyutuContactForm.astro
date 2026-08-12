@@ -6,6 +6,8 @@
 // (toudaimurder のフォームと同じ経緯で Formspree に統一している)。
 // 送信は fetch (AJAX) で行い、完了後は当サイトのサンクスページへ遷移する。
 // JS が無効な環境では通常 POST にフォールバックする (Formspree の完了画面経由)。
+import SourceField from './SourceField.astro';
+
 const FORM_ENDPOINT = '/api/contact';
 const thanksPath = '/taikenbizyutu/contact/thanks/';
 ---
@@ -13,6 +15,7 @@ const thanksPath = '/taikenbizyutu/contact/thanks/';
 <form class="frm" action={FORM_ENDPOINT} method="POST" data-thanks={thanksPath}>
   <input type="hidden" name="_subject" value="【体験する美術館】サイトからのお問い合わせ">
   <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+  <SourceField />
 
   <div class="fldgrid">
     <div>
