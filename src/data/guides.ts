@@ -181,6 +181,22 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/shuyu-event.webp',
   },
   {
+    href: '/guide/madamis-asobikata/',
+    title: 'マダミスの遊び方｜初心者向けに流れ・所要時間・必要なものを解説',
+    desc: '当日の流れ6ステップ・所要時間の目安・必要なもの・初心者向け作品の選び方まで。演技が苦手でも大丈夫な理由も解説。',
+    date: '2026-08-12',
+    category: 'murder',
+    thumb: '/assets/guide/madamis-asobikata.webp',
+  },
+  {
+    href: '/guide/nazotoki-company/',
+    title: '謎解き制作会社の選び方と費用相場｜依頼の流れ・納期まで解説',
+    desc: '失敗しない選び方5つの基準、費用相場（数十万円台〜）、依頼から開催までの流れと納期、集客のポイントを解説。',
+    date: '2026-08-12',
+    category: 'nazotoki',
+    thumb: '/assets/guide/nazotoki-company.webp',
+  },
+  {
     href: '/guide/madamis-kenshu/',
     title: 'マダミス研修とは？チームビルディング効果・進め方・費用',
     desc: '情報共有・交渉・合意形成が自然に表出する理由と、謎解き研修との使い分け・実施の流れを解説。',

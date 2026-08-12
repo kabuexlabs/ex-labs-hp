@@ -1,0 +1,185 @@
+---
+// 「謎解き 会社」「謎解き 制作 依頼」「謎解き 制作 料金 相場」など
+// 謎解き制作の商用クエリ群の受け皿。マダミス・イマーシブには
+// 費用/会社選び記事があるのに謎解きだけ欠けていた穴を埋めるスポーク記事。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'what', label: '謎解き制作会社に依頼できること' },
+  { id: 'select', label: '制作会社の選び方5つの基準' },
+  { id: 'cost', label: '制作費用の相場と抑え方' },
+  { id: 'flow', label: '制作依頼の流れと納期の目安' },
+  { id: 'shukyaku', label: '集客まで見据えた謎解きイベントにするには' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '謎解きイベントの制作費用はいくらくらいですか？',
+    a: '規模によって大きく変わります。1会場完結のワークショップ型・研修型は数十万円台から、商業施設や街を舞台にした周遊型・大規模イベントは100万円前後から数百万円規模が目安です。チケット収益から回収するレベニューシェア型なら、初期費用を抑えた開催も可能です。',
+  },
+  {
+    q: '制作の納期はどのくらいですか？',
+    a: '内容にもよりますが、企画からテストプレイ・当日運営準備まで含めて2〜4ヶ月程度が目安です。開催希望日が決まっている場合は、早めにご相談いただくと確実です。',
+  },
+  {
+    q: '東京以外でも依頼できますか？',
+    a: '可能です。企画・制作はリモートで進行でき、当日運営も全国の会場に対応します。会場選びの段階からのご相談も承っています。',
+  },
+  {
+    q: '社内研修やチームビルディングにも使えますか？',
+    a: '使えます。謎解きは「協力しなければ解けない」構造を自然に作れるため、チームビルディング研修との相性が非常に良い形式です。研修目的の場合は、体験後の振り返りまで含めてプログラムを設計します。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '謎解き制作会社の選び方と費用相場｜制作依頼の流れ・納期まで解説',
+  about: '謎解きイベント制作会社の選び方・費用相場・依頼の流れ',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/nazotoki-company.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-12',
+  dateModified: '2026-08-12',
+  mainEntityOfPage: new URL('/guide/nazotoki-company/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="謎解き制作会社の選び方と費用相場｜制作依頼の流れ・納期まで解説 - 株式会社ex Labs"
+  description="謎解きイベントの制作会社選びで失敗しない5つの基準と、制作費用の相場（数十万円台〜）、依頼から開催までの流れ・納期を、制作会社が解説。商業施設の集客・企業プロモーション・研修まで。レベニューシェア型で初期費用を抑えた開催も可能です。"
+  ogImage="/assets/guide/nazotoki-company.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '謎解きイベントの企画・制作', href: '/guide/nazotoki-event/' },
+  { name: '制作会社の選び方・費用相場' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">NAZOTOKI GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">謎解き制作会社の選び方と</span><span class="nobr">費用相場</span><br><span class="nobr">制作依頼の流れ・納期まで解説</span></h1>
+<p class="lede">謎解きイベントの制作を外部に依頼するとき、<strong>どの会社を選ぶかで成果は大きく変わります</strong>。この記事では、謎解き制作会社に依頼できることの整理から、<strong>選び方の5つの基準・費用相場・依頼から開催までの流れと納期</strong>までを、体験型イベントの制作会社である株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="what"><div class="wrap narrow">
+<p class="eyebrow">SERVICE</p><h2 class="h2 serif">謎解き制作会社に依頼できること</h2>
+<ul class="bullets">
+<li><strong>企画・シナリオ制作</strong>：目的（集客・プロモーション・研修）に合わせた物語と謎の設計。</li>
+<li><strong>制作物のデザイン・製作</strong>：問題冊子・キット・掲示物・小道具などのアートワーク。</li>
+<li><strong>会場・動線設計</strong>：会場の下見から、参加者の動きと運営オペレーションの設計まで。</li>
+<li><strong>テストプレイ・難易度調整</strong>：「解けなくて楽しくない」「簡単すぎて物足りない」を防ぐ調整工程。</li>
+<li><strong>集客・広報</strong>：チケット販売・SNS施策・プレスリリースなどの集客支援。</li>
+<li><strong>当日運営</strong>：スタッフ配置・進行管理・トラブル対応まで。</li>
+</ul>
+<p class="lede">会社によって対応範囲は異なります。<strong>企画から当日運営まで一貫して任せられるか</strong>は、最初に確認したいポイントです。</p>
+</div></section>
+
+<section class="section" id="select"><div class="wrap narrow">
+<p class="eyebrow">CRITERIA</p><h2 class="h2 serif">制作会社の選び方5つの基準</h2>
+<ul class="bullets">
+<li><strong>①商業イベントの実績</strong>：企業・商業施設との案件は、納期・品質・安全管理の水準が問われます。どんな企業と組んできたかは実力の証明です。ex Labsは博報堂×紀伊國屋書店様の体験型イベントや、渋谷サクラステージでの施設一体型イベント（日本経済新聞掲載）などの実績があります。</li>
+<li><strong>②体験設計力</strong>：謎の面白さだけでなく、「参加者がどこで驚き、どこで盛り上がるか」という感情の設計ができるか。過去作品の体験概要を見せてもらいましょう。</li>
+<li><strong>③テストプレイ体制</strong>：難易度調整は謎解きの品質を決める最重要工程です。テストプレイを何回行うか、必ず確認してください。</li>
+<li><strong>④運営力</strong>：当日のスタッフ運営・進行管理まで任せられるか。制作と運営が分業だと、当日のトラブル対応が弱くなりがちです。</li>
+<li><strong>⑤集客力</strong>：一般向けイベントの場合、作って終わりではなく集客まで支援できるか。自社イベントで集客した実績（媒体・数字）を聞くのが確実です。ex Labsには広告費0円でチケット1,500枚を売り切った自社イベントの実績があります。</li>
+</ul>
+<p class="vc-line"><a href="/guide/madamis-company/" style="color:var(--accent)">マダミス制作会社の選び方はこちら →</a>／<a href="/guide/immersive-company/" style="color:var(--accent)">イマーシブ制作会社の選び方はこちら →</a></p>
+</div></section>
+
+<section class="section tinted" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif">制作費用の相場と抑え方</h2>
+<ul class="bullets">
+<li><strong>ワークショップ型・研修型（1会場完結）</strong>：数十万円台〜。既存コンテンツを活用すればさらに抑えられます。</li>
+<li><strong>会場型イベント（オリジナル制作）</strong>：50万〜200万円程度。シナリオ・制作物・運営の範囲で変動します。</li>
+<li><strong>商業施設・街なか周遊型（大規模）</strong>：100万円前後〜数百万円規模。会場数・開催期間・スタッフ数で決まります。</li>
+</ul>
+<h3 class="def-sub serif">費用を抑える3つの方法</h3>
+<ul class="bullets">
+<li><strong>既存コンテンツの活用</strong>：フルオリジナルでなく既存作品のカスタマイズで、制作費を大きく圧縮できます。</li>
+<li><strong>レベニューシェア型（成果報酬型）</strong>：チケット収益から制作費を回収する方式。初期費用を抑えて開催できます。</li>
+<li><strong>既存空間をそのまま舞台に</strong>：大掛かりな装飾を作らず、施設・店舗の空間をそのまま物語の舞台として活かす設計なら、美術費を最小化できます。</li>
+</ul>
+<p class="vc-line">ご相談内容によっては、<strong>貴社負担なし</strong>でのイベント開催も可能です。まずは条件をお聞かせください。</p>
+</div></section>
+
+<section class="section" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">制作依頼の流れと納期の目安</h2>
+<div class="flow-row">
+<div class="flow-step"><p class="flow-num">01</p><p class="flow-t">ヒアリング</p><p class="flow-d">目的・会場・予算・希望時期を確認（無料）</p></div>
+<div class="flow-step"><p class="flow-num">02</p><p class="flow-t">企画提案</p><p class="flow-d">コンセプト・体験概要・お見積りを提案</p></div>
+<div class="flow-step"><p class="flow-num">03</p><p class="flow-t">制作</p><p class="flow-d">シナリオ・謎・制作物・動線を設計</p></div>
+<div class="flow-step"><p class="flow-num">04</p><p class="flow-t">テストプレイ</p><p class="flow-d">難易度・所要時間・運営を検証し調整</p></div>
+<div class="flow-step"><p class="flow-num">05</p><p class="flow-t">開催・運営</p><p class="flow-d">集客・当日運営・振り返りまで対応</p></div>
+</div>
+<p class="vc-line">納期の目安は、企画開始から開催まで<strong>2〜4ヶ月程度</strong>。規模が大きい場合や施設との調整を要する場合は、さらに余裕を持ったスケジュールをおすすめします。</p>
+</div></section>
+
+<section class="section tinted" id="shukyaku"><div class="wrap narrow">
+<p class="eyebrow">MARKETING</p><h2 class="h2 serif">集客まで見据えた謎解きイベントにするには</h2>
+<p class="lede">謎解きイベントの成果は「作ったあと」で決まります。集客の柱は、<strong>①参加したくなるビジュアルとタイトル、②SNSで語りたくなる体験（写真を撮りたくなる瞬間・人に話したくなる驚き）、③メディア・プレスリリースでの話題化</strong>の3つ。制作段階からこの3つを織り込んでおくことが、「作ったのに人が来ない」を防ぐ最大のポイントです。制作会社を選ぶ際は、<strong>集客設計まで企画に含めて提案してくれるか</strong>を確認しましょう。</p>
+<p class="vc-line"><a href="/guide/nazotoki-event/" style="color:var(--accent)">謎解きイベントの活用シーン・成功の条件はこちら →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-nazotoki">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">謎解きイベントの制作依頼・お見積りはこちら（相談無料）</p>
+<a class="btn" href="/#contact">謎解き制作について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/nazotoki-event/" style="color:var(--accent)">謎解きイベントの企画・制作ガイド</a>／<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a></p>
+</div></section>
+
+<LatestPosts category="nazotoki" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#what,#select,#cost,#flow,#shukyaku,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
