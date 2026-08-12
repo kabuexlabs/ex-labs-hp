@@ -189,6 +189,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/madamis-asobikata.webp',
   },
   {
+    href: '/guide/nazotoki-idea/',
+    title: '謎解きイベントの企画アイデア10選｜種類・目的別の選び方',
+    desc: '形式4タイプの整理と、集客・プロモーション・研修それぞれに効く企画アイデア10選、成功の3条件を解説。',
+    date: '2026-08-12',
+    category: 'nazotoki',
+    thumb: '/assets/guide/nazotoki-idea.webp',
+  },
+  {
     href: '/guide/nazotoki-company/',
     title: '謎解き制作会社の選び方と費用相場｜依頼の流れ・納期まで解説',
     desc: '失敗しない選び方5つの基準、費用相場（数十万円台〜）、依頼から開催までの流れと納期、集客のポイントを解説。',
