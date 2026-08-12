@@ -1,0 +1,134 @@
+---
+// 問題一覧（メイン画面）。カード自体は静的に描画し、状態（未調査/
+// 調査済み/解決）と進捗数はクライアント側で localStorage から反映する。
+import CaseLayout from '../../../layouts/CaseLayout.astro';
+import ProgressBar from '../../../components/case/ProgressBar.astro';
+import QuestionCard from '../../../components/case/QuestionCard.astro';
+import ConfirmFinishModal from '../../../components/case/ConfirmFinishModal.astro';
+import { caseConfig } from '../../../data/case/config';
+import { questions } from '../../../data/case/questions';
+---
+
+<CaseLayout activeNav="questions">
+  <main class="list">
+    <div class="case-wrap">
+      <header class="list-head">
+        <p class="en-label list-title">{caseConfig.title}</p>
+        <ProgressBar total={questions.length} />
+      </header>
+
+      <ol class="q-list">
+        {questions.map((q) => (
+          <li><QuestionCard question={q} /></li>
+        ))}
+      </ol>
+
+      <section class="finish-section" id="finish-section" hidden>
+        <p class="finish-note">すべての調査が完了しました。</p>
+        <button type="button" class="btn btn-primary finish-button" id="finish-open">
+          体験を終了する
+        </button>
+      </section>
+    </div>
+  </main>
+  <ConfirmFinishModal />
+</CaseLayout>
+
+<script>
+  import { questions } from '../../../data/case/questions';
+  import { isFinishConditionMet } from '../../../data/case/config';
+  import {
+    ensureStarted,
+    finishInvestigation,
+    getQuestionProgress,
+  } from '../../../lib/case/progress';
+
+  const progress = ensureStarted();
+
+  // ── 各カードへ状態を反映 ──
+  let attemptedCount = 0;
+  let solvedCount = 0;
+  document
+    .querySelectorAll<HTMLElement>('[data-question-card]')
+    .forEach((card) => {
+      const id = Number(card.dataset.questionId);
+      const p = getQuestionProgress(progress, id);
+      const label = card.querySelector('[data-status-label]');
+      if (p?.solved) {
+        card.dataset.status = 'solved';
+        if (label) label.textContent = '解決';
+        solvedCount += 1;
+        attemptedCount += 1;
+      } else if (p?.attempted) {
+        card.dataset.status = 'attempted';
+        if (label) label.textContent = '調査済み';
+        attemptedCount += 1;
+      }
+    });
+
+  // ── 進捗表示 ──
+  const total = questions.length;
+  const attemptedEl = document.querySelector('[data-progress-attempted]');
+  const solvedEl = document.querySelector('[data-progress-solved]');
+  const fillEl = document.querySelector<HTMLElement>('[data-progress-fill]');
+  const barEl = document.querySelector<HTMLElement>('[data-progress-bar]');
+  if (attemptedEl) attemptedEl.textContent = String(attemptedCount);
+  if (solvedEl) solvedEl.textContent = String(solvedCount);
+  if (barEl) barEl.setAttribute('aria-valuenow', String(attemptedCount));
+  if (fillEl) {
+    // 初期描画後に width を入れてバーのアニメーションを効かせる
+    requestAnimationFrame(() => {
+      fillEl.style.width = `${(attemptedCount / total) * 100}%`;
+    });
+  }
+
+  // ── 終了条件判定 ──
+  const finishSection = document.getElementById('finish-section');
+  if (finishSection && isFinishConditionMet(progress, questions)) {
+    finishSection.hidden = false;
+  }
+
+  // ── 終了確認モーダル ──
+  const overlay = document.getElementById('finish-overlay');
+  const setOpen = (open: boolean) => {
+    overlay?.classList.toggle('open', open);
+    overlay?.setAttribute('aria-hidden', String(!open));
+  };
+  document
+    .getElementById('finish-open')
+    ?.addEventListener('click', () => setOpen(true));
+  document
+    .getElementById('finish-cancel')
+    ?.addEventListener('click', () => setOpen(false));
+  overlay?.addEventListener('click', (e) => {
+    if (e.target === overlay) setOpen(false);
+  });
+  document.getElementById('finish-confirm')?.addEventListener('click', () => {
+    finishInvestigation();
+    window.location.href = '/case/result/';
+  });
+</script>
+
+<style>
+.list{padding:20px 0 40px}
+.list-head{
+  position:sticky;top:0;z-index:30;
+  margin:-20px -20px 0;padding:20px 20px 14px;
+  background:rgba(247,247,245,.94);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line-soft);
+}
+.list-title{margin:0 0 14px;font-size:15px}
+.q-list{
+  list-style:none;margin:20px 0 0;padding:0;
+  display:flex;flex-direction:column;gap:10px;
+}
+.finish-section{
+  margin:36px 0 8px;padding-top:24px;
+  border-top:1px solid var(--line);
+  text-align:center;
+}
+.finish-note{margin:0 0 14px;font-size:14px;color:var(--sub);letter-spacing:.08em}
+.finish-button{min-height:58px;font-size:17px}
+</style>

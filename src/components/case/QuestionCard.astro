@@ -1,0 +1,69 @@
+---
+// 問題一覧の1行。状態表示（未調査/調査済み/解決）はクライアント側
+// スクリプトが data-status 属性を書き換えて反映する。
+// 状態は色相ではなく「背景濃度・打ち消し線・チェックアイコン」で表現。
+import type { Question } from '../../types/case';
+
+export interface Props {
+  question: Question;
+}
+const { question } = Astro.props;
+const num = String(question.number).padStart(2, '0');
+---
+
+<a
+  href={`/case/questions/${question.id}/`}
+  class="q-card"
+  data-question-card
+  data-question-id={question.id}
+  data-status="none"
+>
+  <span class="q-num en-label">{num}</span>
+  <span class="q-body">
+    <span class="q-title">{question.title}</span>
+    <span class="q-status" data-status-label>未調査</span>
+  </span>
+  <span class="q-mark" aria-hidden="true">
+    {/* 未調査・調査済み: chevron / 解決: check */}
+    <svg class="mark-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    <svg class="mark-check" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  </span>
+</a>
+
+<style>
+.q-card{
+  display:flex;align-items:center;gap:14px;
+  min-height:64px;padding:14px 16px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:4px;
+  transition:background 200ms var(--ease),transform 150ms var(--ease);
+}
+.q-card:active{transform:scale(.99)}
+.q-num{
+  flex:none;width:30px;
+  font-size:15px;color:var(--ink);
+  letter-spacing:.08em;
+}
+.q-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.q-title{
+  font-size:15px;font-weight:500;line-height:1.5;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.q-status{font-size:11.5px;color:var(--sub);letter-spacing:.1em}
+.q-mark{flex:none;display:flex;color:var(--line)}
+.mark-check{display:none}
+
+/* 調査済み（挑戦したが未解決）: 番号をグレーに落として差を付ける */
+.q-card[data-status="attempted"] .q-num{color:var(--sub)}
+.q-card[data-status="attempted"] .q-mark{color:var(--sub)}
+
+/* 解決済み: 背景濃度を一段落とし、チェックを表示 */
+.q-card[data-status="solved"]{background:var(--solved-bg);border-color:var(--line-soft)}
+.q-card[data-status="solved"] .q-num{color:var(--sub)}
+.q-card[data-status="solved"] .q-title{color:var(--sub)}
+.q-card[data-status="solved"] .q-status{color:var(--ink);font-weight:700}
+.q-card[data-status="solved"] .mark-chevron{display:none}
+.q-card[data-status="solved"] .mark-check{display:block}
+.q-card[data-status="solved"] .q-mark{color:var(--ink)}
+</style>

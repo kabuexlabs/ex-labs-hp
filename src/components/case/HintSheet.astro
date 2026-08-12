@@ -1,0 +1,58 @@
+---
+// ヒント表示用の Bottom Sheet。段階ヒントを1枚ずつ開示する。
+// 開閉と開示状態の制御は問題詳細ページのスクリプトが行う。
+export interface Props {
+  hintCount: number;
+}
+const { hintCount } = Astro.props;
+---
+
+<div class="overlay" id="hint-overlay" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="hint-title">
+    <div class="hint-head">
+      <p class="en-label hint-heading" id="hint-title">Hint</p>
+      <button type="button" class="hint-close" id="hint-close" aria-label="閉じる">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <p class="hint-lede">
+      ヒントを見ると、この問題を解くための手がかりが表示されます。
+    </p>
+    <ol class="hint-list" id="hint-list">
+      {Array.from({ length: hintCount }, (_, i) => (
+        <li class="hint-item" data-hint-item data-level={i + 1}>
+          <p class="en-label hint-item-label">Hint {String(i + 1).padStart(2, '0')}</p>
+          <p class="hint-text" data-hint-text></p>
+          <button type="button" class="btn btn-ghost hint-reveal" data-hint-reveal>
+            ヒント {i + 1} を見る
+          </button>
+        </li>
+      ))}
+    </ol>
+  </div>
+</div>
+
+<style>
+.hint-head{display:flex;align-items:center;justify-content:space-between}
+.hint-heading{margin:0;font-size:13px}
+.hint-close{
+  display:flex;align-items:center;justify-content:center;
+  width:44px;height:44px;margin:-10px -10px 0 0;
+  background:none;border:none;color:var(--sub);cursor:pointer;
+}
+.hint-lede{margin:10px 0 18px;font-size:13px;color:var(--sub)}
+.hint-list{
+  list-style:none;margin:0;padding:0;
+  display:flex;flex-direction:column;gap:12px;
+  max-height:55vh;overflow-y:auto;
+}
+.hint-item{border-top:1px solid var(--line-soft);padding-top:12px}
+.hint-item-label{margin:0 0 6px;font-size:11px;color:var(--sub)}
+.hint-text{display:none;margin:0;font-size:15px;line-height:1.8}
+.hint-reveal{min-height:48px;font-size:14px;font-weight:500;border-color:var(--line)}
+/* 開示済み: 本文を出しボタンを消す */
+.hint-item.revealed .hint-text{display:block}
+.hint-item.revealed .hint-reveal{display:none}
+/* まだ前の段階が開いていないヒントはボタンを無効化 */
+.hint-item.locked .hint-reveal{opacity:.35;pointer-events:none}
+</style>

@@ -1,0 +1,21 @@
+---
+// 体験終了の確認モーダル。表示制御と終了処理は問題一覧ページの
+// スクリプトが行う。
+---
+
+<div class="overlay center" id="finish-overlay" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="finish-title">
+    <p class="finish-title" id="finish-title">調査を終了しますか？</p>
+    <p class="finish-desc">終了すると今回の調査結果が表示されます。</p>
+    <div class="finish-actions">
+      <button type="button" class="btn btn-ghost" id="finish-cancel">キャンセル</button>
+      <button type="button" class="btn btn-primary" id="finish-confirm">調査を終了する</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.finish-title{margin:0;font-size:18px;font-weight:700;letter-spacing:.05em}
+.finish-desc{margin:10px 0 24px;font-size:14px;color:var(--sub)}
+.finish-actions{display:flex;flex-direction:column;gap:10px}
+</style>

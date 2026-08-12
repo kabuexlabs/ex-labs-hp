@@ -1,0 +1,62 @@
+---
+// 会場マップの差し込み領域。
+// caseConfig.mapImage に画像パスを設定すると画像表示へ切り替わり、
+// その上へ mapPosition (%) を持つ問題番号ピンを重ねられる構造。
+// Google Maps / Mapbox を使う場合はこのコンポーネントを差し替える。
+import type { Question } from '../../types/case';
+import { caseConfig } from '../../data/case/config';
+
+export interface Props {
+  questions: Question[];
+}
+const { questions } = Astro.props;
+const pins = caseConfig.mapImage
+  ? questions.filter((q) => q.mapPosition)
+  : [];
+---
+
+<div class="map-area">
+  {caseConfig.mapImage ? (
+    <div class="map-canvas">
+      <img src={caseConfig.mapImage} alt="会場マップ" />
+      {pins.map((q) => (
+        <span
+          class="map-pin en-label"
+          style={`left:${q.mapPosition!.x}%;top:${q.mapPosition!.y}%`}
+          data-map-pin
+          data-question-id={q.id}
+        >
+          {String(q.number).padStart(2, '0')}
+        </span>
+      ))}
+    </div>
+  ) : (
+    <div class="map-placeholder">
+      <span class="en-label map-placeholder-label">Map Area</span>
+      <span class="map-placeholder-note">会場マップは準備中です</span>
+    </div>
+  )}
+</div>
+
+<style>
+.map-area{border:1px solid var(--line);border-radius:4px;background:var(--surface);overflow:hidden}
+.map-canvas{position:relative}
+.map-canvas img{width:100%}
+.map-pin{
+  position:absolute;transform:translate(-50%,-50%);
+  display:flex;align-items:center;justify-content:center;
+  min-width:26px;height:26px;padding:0 4px;
+  background:var(--ink);color:#fff;
+  border-radius:50%;font-size:11px;
+}
+.map-placeholder{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  aspect-ratio:3/4;
+  background:
+    linear-gradient(rgba(17,17,17,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(17,17,17,.045) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+.map-placeholder-label{font-size:14px;color:var(--sub)}
+.map-placeholder-note{font-size:12px;color:var(--sub)}
+</style>

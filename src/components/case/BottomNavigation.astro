@@ -1,0 +1,72 @@
+---
+// スマートフォン下部の固定ナビゲーション。項目を増やす場合は items 配列へ
+// 追加するだけでよい（例: 情報ページ）。アイコンは Lucide のパスを
+// インライン SVG として埋め込み、外部依存を持たない。
+export interface Props {
+  active: 'questions' | 'map';
+}
+const { active } = Astro.props;
+
+const items = [
+  {
+    key: 'questions',
+    href: '/case/questions/',
+    label: '調査',
+    // lucide: file-search
+    icon: 'M14 2v4a2 2 0 0 0 2 2h4 M4.268 21a2 2 0 0 0 1.727 1H18a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v3 M9 18l-1.5-1.5 M5 14a3 3 0 1 0 6 0 3 3 0 1 0-6 0',
+  },
+  {
+    key: 'map',
+    href: '/case/map/',
+    label: 'マップ',
+    // lucide: map
+    icon: 'M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z M15 5.764v15 M9 3.236v15',
+  },
+] as const;
+---
+
+<nav class="bottom-nav" aria-label="メインナビゲーション">
+  {items.map((item) => (
+    <a
+      href={item.href}
+      class:list={['nav-item', { active: active === item.key }]}
+      aria-current={active === item.key ? 'page' : undefined}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="22"
+        height="22"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d={item.icon} />
+      </svg>
+      <span>{item.label}</span>
+    </a>
+  ))}
+</nav>
+
+<style>
+.bottom-nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;
+  display:flex;
+  height:calc(var(--nav-h) + env(safe-area-inset-bottom));
+  padding-bottom:env(safe-area-inset-bottom);
+  background:rgba(255,255,255,.94);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);
+}
+.nav-item{
+  flex:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  color:var(--sub);
+  font-size:11px;font-weight:500;letter-spacing:.08em;
+  transition:color 200ms var(--ease);
+}
+.nav-item.active{color:var(--ink);font-weight:700}
+</style>

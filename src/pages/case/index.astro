@@ -1,0 +1,73 @@
+---
+// スタート画面。文言はすべて caseConfig から供給する。
+import CaseLayout from '../../layouts/CaseLayout.astro';
+import { caseConfig } from '../../data/case/config';
+import { questions } from '../../data/case/questions';
+---
+
+<CaseLayout>
+  <main class="start">
+    <div class="case-wrap start-inner">
+      <header class="start-head">
+        <p class="en-label start-eyebrow">Investigation Guide</p>
+        <h1 class="start-title en-label">{caseConfig.title}</h1>
+        <p class="start-subtitle">{caseConfig.subtitle}</p>
+      </header>
+
+      <div class="start-lede">
+        <p>{caseConfig.intro.map((line) => <span class="line">{line}</span>)}</p>
+        <p>
+          {caseConfig.mission.map((line) => (
+            <span class="line">
+              {line.replace('30件', `${questions.length}件`)}
+            </span>
+          ))}
+        </p>
+      </div>
+
+      <div class="start-action">
+        <a href="/case/questions/" class="btn btn-primary" id="start-button">調査を開始する</a>
+      </div>
+
+      <section class="start-notes" aria-label="注意事項">
+        <h2 class="en-label notes-title">Notes</h2>
+        <ul>
+          {caseConfig.notes.map((note) => <li>{note}</li>)}
+        </ul>
+      </section>
+    </div>
+  </main>
+</CaseLayout>
+
+<script>
+  // 「調査を開始する」を押した時点で開始時刻を記録する。
+  import { ensureStarted } from '../../lib/case/progress';
+  document.getElementById('start-button')?.addEventListener('click', () => {
+    ensureStarted();
+  });
+</script>
+
+<style>
+.start{min-height:100dvh;display:flex;align-items:center}
+.start-inner{width:100%;padding-top:48px;padding-bottom:48px}
+.start-head{border-bottom:1px solid var(--ink);padding-bottom:28px}
+.start-eyebrow{margin:0;font-size:11px;color:var(--sub)}
+.start-title{
+  margin:18px 0 0;
+  font-size:clamp(40px,12vw,56px);
+  font-weight:700;line-height:1.05;letter-spacing:.06em;
+}
+.start-subtitle{margin:14px 0 0;font-size:15px;font-weight:700;letter-spacing:.2em}
+.start-lede{margin:32px 0 0}
+.start-lede p{margin:0 0 18px;font-size:15px;line-height:2}
+.line{display:block}
+.start-action{margin:36px 0 0}
+.start-notes{margin:44px 0 0;border-top:1px solid var(--line);padding-top:20px}
+.notes-title{margin:0 0 10px;font-size:11px;color:var(--sub)}
+.start-notes ul{margin:0;padding:0;list-style:none}
+.start-notes li{
+  position:relative;padding-left:14px;
+  font-size:12.5px;color:var(--sub);line-height:1.9;
+}
+.start-notes li::before{content:"—";position:absolute;left:0;color:var(--line)}
+</style>

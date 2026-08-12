@@ -1,0 +1,137 @@
+---
+// 展示型謎解きアプリ (/case/) 専用レイアウト。
+// 本体サイトの印刷物テイストとは独立した「現代美術館の展示ガイド ×
+// 捜査資料」トーンのモノクロデザイン。GameLayout と同様に BaseLayout は
+// 使わず、フォント・配色・共通UIをここで完結させる。
+import BottomNavigation from '../components/case/BottomNavigation.astro';
+import { caseConfig } from '../data/case/config';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  /** 下部ナビの選択状態。null なら下部ナビ自体を表示しない。 */
+  activeNav?: 'questions' | 'map' | null;
+}
+
+const {
+  title = `${caseConfig.title}｜${caseConfig.subtitle}`,
+  description = `展示会場で楽しむ体験型謎解きイベント「${caseConfig.subtitle}」の調査アプリです。`,
+  activeNav = null,
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{title}</title>
+<meta name="description" content={description}>
+{/* イベント来場者向けアプリのため検索エンジンには載せない。
+    一般公開する際はこの1行を外す。 */}
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#F7F7F5">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<slot name="head" />
+</head>
+<body class={activeNav ? 'has-nav' : ''}>
+<slot />
+{activeNav && <BottomNavigation active={activeNav} />}
+
+<style is:global>
+/* ── Design tokens ──────────────────────────────────────────────
+   モノクロ基調。状態はアイコン・線・背景濃度で表現し、色相は使わない。 */
+:root{
+  --bg:#F7F7F5;
+  --surface:#FFFFFF;
+  --ink:#111111;
+  --sub:#777777;
+  --line:#DADADA;
+  --line-soft:#EAEAE8;
+  --solved-bg:#EFEFEC;
+  --font-jp:'Noto Sans JP',sans-serif;
+  --font-en:'Inter','Noto Sans JP',sans-serif;
+  --nav-h:60px;
+  --dur:250ms;
+  --ease:cubic-bezier(.25,.1,.25,1);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+/* hidden 属性は display 指定を持つ要素でも常に優先させる */
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-jp);
+  font-feature-settings:"palt" 1;
+  letter-spacing:.02em;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+body.has-nav{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom))}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button{font-family:inherit;letter-spacing:inherit}
+:where(a,button,input):focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
+/* ── Shared type styles ── */
+/* QUESTION 01 / CASE FILE などの英字ラベル。Editorial なトラッキング。 */
+.en-label{
+  font-family:var(--font-en);
+  font-weight:600;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+}
+.case-wrap{max-width:560px;margin:0 auto;padding:0 20px}
+
+/* ── Buttons ── 立って操作する来場者向けに大きめのタップ領域を確保 */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;min-height:54px;padding:14px 20px;
+  border:1px solid var(--ink);border-radius:2px;
+  font-size:16px;font-weight:700;cursor:pointer;
+  transition:opacity var(--dur) var(--ease),transform 150ms var(--ease),background var(--dur) var(--ease);
+  user-select:none;
+}
+.btn:active{transform:scale(.985)}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{opacity:.85}
+.btn-ghost{background:transparent;color:var(--ink)}
+.btn-ghost:hover{background:rgba(17,17,17,.04)}
+.btn[disabled]{opacity:.35;pointer-events:none}
+
+/* ── Modal / Bottom sheet ── */
+.overlay{
+  position:fixed;inset:0;z-index:50;
+  display:flex;align-items:flex-end;justify-content:center;
+  background:rgba(17,17,17,.45);
+  opacity:0;pointer-events:none;
+  transition:opacity var(--dur) var(--ease);
+}
+.overlay.center{align-items:center;padding:24px}
+.overlay.open{opacity:1;pointer-events:auto}
+.sheet{
+  width:100%;max-width:560px;
+  background:var(--surface);
+  border-top:1px solid var(--line);
+  border-radius:14px 14px 0 0;
+  padding:24px 20px calc(24px + env(safe-area-inset-bottom));
+  transform:translateY(24px);
+  transition:transform var(--dur) var(--ease);
+}
+.overlay.center .sheet{
+  border:1px solid var(--line);border-radius:6px;
+  padding:28px 24px;transform:translateY(8px) scale(.98);
+}
+.overlay.open .sheet{transform:none}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+</style>
+</body>
+</html>
