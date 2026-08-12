@@ -42,6 +42,12 @@ const {
 <slot />
 {activeNav && <BottomNavigation active={activeNav} />}
 
+<script>
+  // 統計収集（匿名・fire-and-forget）。全 /case ページで初期化する。
+  import { initCaseSync } from '../lib/case/sync';
+  initCaseSync();
+</script>
+
 <style is:global>
 /* ── Design tokens ──────────────────────────────────────────────
    モノクロ基調。状態はアイコン・線・背景濃度で表現し、色相は使わない。 */

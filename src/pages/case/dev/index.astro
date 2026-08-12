@@ -45,8 +45,12 @@ import { questions } from '../../../data/case/questions';
 
 <script>
   import { resetProgress } from '../../../lib/case/progress';
+  import { resetRemoteRecord } from '../../../lib/case/sync';
   const done = document.getElementById('reset-done');
   document.getElementById('reset-button')?.addEventListener('click', () => {
+    // サーバー側の統計記録も一緒に消す（テスト端末が本番の集計を
+    // 汚さないようにする）
+    resetRemoteRecord();
     resetProgress();
     if (done) done.hidden = false;
   });

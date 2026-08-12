@@ -6,6 +6,21 @@ import type { QuestionProgress, UserProgress } from '../../types/case';
 
 const STORAGE_KEY = 'exlabs-case-progress-v1';
 
+/**
+ * 進捗が保存されるたびに window へ発火するイベント名。
+ * 統計送信 (sync.ts) が購読する。保存処理自体はこのイベントの購読者が
+ * いなくても完結する（統計はあくまで付随機能）。
+ */
+export const PROGRESS_CHANGED_EVENT = 'case:progress-changed';
+
+function notifyChanged(): void {
+  try {
+    window.dispatchEvent(new CustomEvent(PROGRESS_CHANGED_EVENT));
+  } catch {
+    /* noop */
+  }
+}
+
 // プライベートブラウズ等で localStorage が使えない環境向けの
 // フォールバック（タブを閉じるまでは保持される）。
 let memoryStore: string | null = null;
@@ -57,6 +72,7 @@ export function loadProgress(): UserProgress {
 
 function persist(progress: UserProgress): UserProgress {
   writeRaw(JSON.stringify(progress));
+  notifyChanged();
   return progress;
 }
 
