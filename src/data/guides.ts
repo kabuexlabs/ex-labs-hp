@@ -181,6 +181,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/shuyu-event.webp',
   },
   {
+    href: '/guide/sankagata-event/',
+    title: '参加型イベントとは？体験型との違い・種類・実例・企画の方法',
+    desc: '観客を受け身にさせない参加型イベントの意味、体験型との違い、種類4タイプと実例、企画の方法を解説。',
+    date: '2026-08-13',
+    category: 'shisetsu',
+    thumb: '/assets/guide/sankagata-event.webp',
+  },
+  {
     href: '/guide/madamis-asobikata/',
     title: 'マダミスの遊び方｜初心者向けに流れ・所要時間・必要なものを解説',
     desc: '当日の流れ6ステップ・所要時間の目安・必要なもの・初心者向け作品の選び方まで。演技が苦手でも大丈夫な理由も解説。',
