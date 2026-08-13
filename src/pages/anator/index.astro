@@ -27,9 +27,33 @@ const rentalTags = ['イマーシブ公演', '謎解き公演', '頭脳戦公演
 
 const mapSrc =
   'https://maps.google.com/maps?q=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E5%8F%B8%E7%94%BA2%E4%B8%81%E7%9B%AE15-11&z=17&output=embed';
+
+// 会場エンティティの構造化データ。公式Xを sameAs で紐付けて
+// X上の言及・被リンクとサイトを同一実体として認識させる。
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'PerformingArtsTheater',
+  name: 'ANATOR（アナター）',
+  description: '少人数密室型イマーシブ空間。公演とスペースレンタルを行う劇場（東京・神田司町）。',
+  url: 'https://kabuexlabs.com/anator/',
+  address: {
+    '@type': 'PostalAddress',
+    addressRegion: '東京都',
+    addressLocality: '千代田区',
+    streetAddress: '神田司町2丁目15-11',
+    addressCountry: 'JP',
+  },
+  sameAs: ['https://x.com/anator_official'],
+  parentOrganization: {
+    '@type': 'Organization',
+    name: '株式会社ex Labs',
+    url: 'https://kabuexlabs.com/',
+  },
+};
 ---
 
 <AnatorLayout>
+<script type="application/ld+json" set:html={JSON.stringify(orgLd)} />
 
 <header id="top" class="hero">
   <div class="hero-beam" aria-hidden="true"></div>
