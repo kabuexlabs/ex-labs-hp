@@ -298,10 +298,12 @@ export const tmWorks: TmWork[] = [
     slug: 'kurenai',
     title: '紅の散乱',
     badge: 'NEW',
+    image: '/assets/toudaimurder/kurenai.webp',
     meta: '5人／180分',
     play: '店舗公演',
     desc: '数多のデスゲーム予選を勝ち抜いた9人が辿り着くファイナルゲーム『リアルマーダーミステリー』。疑心暗鬼の中、命を賭けた推理戦が幕を開ける。',
     specs: ['5人', '180分', '店舗公演'],
+    descTop: '疑心暗鬼の霧の中、命を賭けた究極の推理戦が幕を開ける。あなたは誰を信じ、誰を疑うのか。',
     catch: 'その真実は、紅く染まる。',
     synopsis:
       '数多のデスゲーム予選を勝ち抜き、屍の山を越えてきた9人の男女。\n彼らはついにファイナルゲーム『リアルマーダーミステリー』に辿り着く。\n「ようこそ、『リアルマーダーミステリー』へ。このゲームのクリア方法は至って簡単。犯人に殺されないように行動し、議論を通じて犯人を処刑することです」\n疑心暗鬼の霧の中、命を賭けた究極の推理戦が幕を開ける。あなたは誰を信じ、誰を疑うのか。',
@@ -310,12 +312,13 @@ export const tmWorks: TmWork[] = [
       { label: '時間', value: '180分（感想戦含む）' },
       { label: '形式', value: '店舗公演型' },
     ],
+    featured: true,
   },
 ];
 
 /** トップページのマーキーに載せる作品 (掲載順)。
  *  殺人鬼Xの独白・あるマーダーミステリーについて はマーキー非掲載。 */
-export const tmFeatured = ['frankenstein', 'sonohi', 'bluedia', 'akuma']
+export const tmFeatured = ['kurenai', 'frankenstein', 'sonohi', 'bluedia', 'akuma']
   .map((slug) => tmWorks.find((w) => w.slug === slug)!)
   .filter(Boolean);
 
