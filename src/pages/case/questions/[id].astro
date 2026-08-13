@@ -211,7 +211,7 @@ const num = String(question.number).padStart(2, '0');
 .detail{min-height:100dvh;padding-bottom:48px}
 .detail-head{
   position:sticky;top:0;z-index:30;
-  background:rgba(247,247,245,.94);
+  background:var(--head-bg);
   -webkit-backdrop-filter:blur(10px);
   backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line-soft);
@@ -259,7 +259,7 @@ const num = String(question.number).padStart(2, '0');
 }
 .answer-input:focus{border-color:var(--ink);outline:none}
 .answer-input:disabled{background:var(--solved-bg);color:var(--sub)}
-.answer-input::placeholder{color:#AAAAA6}
+.answer-input::placeholder{color:var(--placeholder)}
 .answer-feedback{
   display:flex;flex-direction:column;gap:2px;
   margin:12px 0 0;padding:12px 14px;

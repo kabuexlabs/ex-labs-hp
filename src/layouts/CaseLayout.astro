@@ -21,7 +21,7 @@ const {
 ---
 
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-theme={caseConfig.theme}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -30,7 +30,7 @@ const {
 {/* イベント来場者向けアプリのため検索エンジンには載せない。
     一般公開する際はこの1行を外す。 */}
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#F7F7F5">
+<meta name="theme-color" content={caseConfig.theme === 'dark' ? '#101010' : '#F7F7F5'}>
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" href="/favicon-ex.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,20 +50,52 @@ const {
 
 <style is:global>
 /* ── Design tokens ──────────────────────────────────────────────
-   モノクロ基調。状態はアイコン・線・背景濃度で表現し、色相は使わない。 */
+   モノクロ基調。状態はアイコン・線・背景濃度で表現し、色相は使わない。
+   ライト/ダークは caseConfig.theme → html[data-theme] で切り替わる。
+   コンポーネント側は必ずトークンを参照し、色値を直書きしない。 */
 :root{
   --bg:#F7F7F5;
   --surface:#FFFFFF;
   --ink:#111111;
+  /* --ink を地にした要素（主ボタン・マップピン）の上に載せる文字色 */
+  --on-ink:#FFFFFF;
   --sub:#777777;
   --line:#DADADA;
   --line-soft:#EAEAE8;
   --solved-bg:#EFEFEC;
+  --placeholder:#AAAAA6;
+  /* 下部ナビ・固定ヘッダーの半透明地（blur と併用） */
+  --nav-bg:rgba(255,255,255,.94);
+  --head-bg:rgba(247,247,245,.94);
+  /* モーダル背景の遮蔽。strong は期限切れなど下を隠したい場面用 */
+  --scrim:rgba(17,17,17,.45);
+  --scrim-strong:rgba(17,17,17,.72);
+  --hover-soft:rgba(17,17,17,.04);
+  --grid-line:rgba(17,17,17,.045);
   --font-jp:'Noto Sans JP',sans-serif;
   --font-en:'Inter','Noto Sans JP',sans-serif;
   --nav-h:60px;
   --dur:250ms;
   --ease:cubic-bezier(.25,.1,.25,1);
+}
+html[data-theme="dark"]{
+  --bg:#101010;
+  --surface:#1A1A1A;
+  --ink:#F5F5F3;
+  --on-ink:#111111;
+  --sub:#9A9A96;
+  --line:#3B3B3B;
+  --line-soft:#2A2A2A;
+  --solved-bg:#242422;
+  --placeholder:#6E6E6A;
+  --nav-bg:rgba(16,16,16,.92);
+  --head-bg:rgba(16,16,16,.92);
+  --scrim:rgba(0,0,0,.6);
+  --scrim-strong:rgba(0,0,0,.8);
+  --hover-soft:rgba(255,255,255,.06);
+  --grid-line:rgba(255,255,255,.05);
+  /* フォーム部品・スクロールバーもダーク描画にする */
+  color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* hidden 属性は display 指定を持つ要素でも常に優先させる */
@@ -105,17 +137,17 @@ button{font-family:inherit;letter-spacing:inherit}
   user-select:none;
 }
 .btn:active{transform:scale(.985)}
-.btn-primary{background:var(--ink);color:#fff}
+.btn-primary{background:var(--ink);color:var(--on-ink)}
 .btn-primary:hover{opacity:.85}
 .btn-ghost{background:transparent;color:var(--ink)}
-.btn-ghost:hover{background:rgba(17,17,17,.04)}
+.btn-ghost:hover{background:var(--hover-soft)}
 .btn[disabled]{opacity:.35;pointer-events:none}
 
 /* ── Modal / Bottom sheet ── */
 .overlay{
   position:fixed;inset:0;z-index:50;
   display:flex;align-items:flex-end;justify-content:center;
-  background:rgba(17,17,17,.45);
+  background:var(--scrim);
   opacity:0;pointer-events:none;
   transition:opacity var(--dur) var(--ease);
 }
