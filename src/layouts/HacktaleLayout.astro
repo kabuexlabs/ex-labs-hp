@@ -82,6 +82,20 @@ const nav = [
 </div>
 </header>
 <slot />
+{back && (
+  <footer class="lftr">
+    <div class="wrap">
+      <nav class="lftr-nav">
+        <a href={`${htBase}/`}>HACKTALEトップ</a>
+        <a href={`${htBase}/works/`}>作品一覧</a>
+        <a href={`${htBase}/event/zunouou/`}>東京都頭脳王決定戦 2026</a>
+        <a href="https://kabuexlabs.com/services/zunousen/">頭脳戦制作の依頼 — ex Labs</a>
+      </nav>
+      <p class="lftr-cr en">© HACKTALE. ALL RIGHTS RESERVED.</p>
+      <p class="lftr-cr">本サイトに掲載の文章・画像等の無断転載・複製を禁じます。</p>
+    </div>
+  </footer>
+)}
 </body>
 </html>
 
@@ -130,4 +144,10 @@ a:hover{color:var(--acc)}
 .ht-detail .t1{font-size:clamp(24px,7.6vw,44px)}
 }
 @media(max-width:480px){:root{--pagepad:24px}}
+/* 詳細ページ共通フッター（一覧・イベント・運営会社への導線） */
+.lftr{border-top:1px solid rgba(255,255,255,.1);margin-top:72px;padding:36px 0 44px}
+.lftr-nav{display:flex;flex-wrap:wrap;gap:10px 26px;margin-bottom:20px}
+.lftr-nav a{font-size:13px;font-weight:700;letter-spacing:.06em;color:#9b978c}
+.lftr-nav a:hover{color:var(--acc)}
+.lftr-cr{margin:4px 0 0;font-size:11px;color:#6d6a62;letter-spacing:.08em}
 </style>
