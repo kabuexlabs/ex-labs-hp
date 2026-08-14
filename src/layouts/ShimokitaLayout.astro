@@ -1,0 +1,54 @@
+---
+import SiteGuard from '../components/SiteGuard.astro';
+// 街歩き謎解き（/shimokita）専用レイアウト。
+// スマホ縦画面を基本とし、探偵・調査資料をモチーフにした
+// 白黒グレー＋赤アクセントのシンプルなデザイン（要件 §41）。
+// イベント参加者だけが使うページなので noindex。
+export interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="theme-color" content="#16181d">
+<title>{title}</title>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Shippori+Mincho:wght@600;700;800&display=swap">
+<style is:global>
+:root{
+  --ink:#1c1e22;        /* 本文の黒 */
+  --paper:#f5f4f0;      /* 紙の白 */
+  --paper-2:#ecebe6;
+  --line:#d8d6cf;
+  --mute:#6d6f74;
+  --red:#b32121;        /* 調査ファイルの朱色（アクセント） */
+  --navy:#243046;
+  --green:#1d5a43;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:'Noto Sans JP',sans-serif;font-size:15px;line-height:1.85;
+  -webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1;letter-spacing:.02em;
+}
+.smk-serif{font-family:'Shippori Mincho',serif}
+.smk-pre{white-space:pre-wrap;overflow-wrap:anywhere}
+button{font:inherit}
+</style>
+<SiteGuard />
+</head>
+<body>
+<slot />
+</body>
+</html>

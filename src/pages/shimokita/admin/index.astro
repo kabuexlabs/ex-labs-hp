@@ -1,0 +1,893 @@
+---
+// 街歩き謎解き（/shimokita）の運営管理画面（§32〜§38, §48）。
+//   /shimokita/admin/                    … 当日ダッシュボード
+//   /shimokita/admin/?view=stores        … 店舗一覧・営業状態ワンタップ変更
+//   /shimokita/admin/?view=store&id=…    … 店舗編集（スケジュール・例外日含む）
+//   /shimokita/admin/?view=steps         … STEP一覧
+//   /shimokita/admin/?view=step&id=…     … STEP編集（ストーリー・謎・ヒント・店舗グループ）
+//   /shimokita/admin/?view=players       … プレイヤー一覧
+//   /shimokita/admin/?view=player&id=…   … プレイヤー詳細・運営操作（§38, §31）
+//   /shimokita/admin/?view=settings      … 基本設定・最終推理・エンディング
+// 認証は yoyaku と同じ合言葉＋セッションCookie方式（SMK_ADMIN_KEY、
+// 未設定時は YOYAKU_ADMIN_KEY を流用）。コンテンツはすべて Redis 上にあり、
+// ここでの変更は再デプロイなしで即時反映される（§48）。
+export const prerender = false;
+
+import ShimokitaLayout from '../../../layouts/ShimokitaLayout.astro';
+import {
+  isKvConfigured,
+  checkAdminKey,
+  getContent,
+  saveContent,
+  getAllPlayers,
+  getPlayer,
+  savePlayer,
+  deletePlayer,
+  getStats,
+  jstToday,
+  effectiveStatus,
+  advanceToNextStep,
+  newId,
+  STORE_STATUS_LABEL,
+  WEEKDAY_JA,
+  type GameContent,
+  type Store,
+  type Step,
+  type StoreStatus,
+  type Player,
+} from '../../../lib/shimokita';
+import { loginAllowed, recordLoginFailure } from '../../../lib/contact';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+
+const COOKIE = 'smk_admin';
+const STATUSES: StoreStatus[] = ['OPEN', 'CLOSED', 'TEMPORARILY_UNAVAILABLE', 'FULL'];
+
+let error = '';
+let loginFailed = false;
+const message = Astro.url.searchParams.get('msg') ?? '';
+let view = Astro.url.searchParams.get('view') ?? 'dashboard';
+let targetId = Astro.url.searchParams.get('id') ?? '';
+
+let key = Astro.cookies.get(COOKIE)?.value ?? '';
+const configured = isKvConfigured();
+
+const str = (form: FormData, name: string, max = 4000) => String(form.get(name) ?? '').trim().slice(0, max);
+const num = (form: FormData, name: string, fallback = 0) => {
+  const n = Number(String(form.get(name) ?? ''));
+  return Number.isFinite(n) ? n : fallback;
+};
+const lines = (s: string) => s.split('\n').map((l) => l.trim()).filter(Boolean);
+
+function redirectTo(v: string, id: string, msg: string) {
+  const p = new URLSearchParams();
+  if (v !== 'dashboard') p.set('view', v);
+  if (id) p.set('id', id);
+  if (msg) p.set('msg', msg);
+  const q = p.toString();
+  return Astro.redirect(`/shimokita/admin/${q ? `?${q}` : ''}`, 303);
+}
+
+if (Astro.request.method === 'POST' && configured) {
+  const form = await Astro.request.formData();
+  const action = String(form.get('action') ?? '');
+
+  if (action === 'login') {
+    const ip = (Astro.request.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
+    const entered = String(form.get('key') ?? '').trim();
+    if (!(await loginAllowed(ip))) {
+      loginFailed = true;
+    } else if (checkAdminKey(entered)) {
+      Astro.cookies.set(COOKIE, entered, { httpOnly: true, secure: true, sameSite: 'lax', path: '/shimokita/admin' });
+      return Astro.redirect('/shimokita/admin/', 303);
+    } else {
+      await recordLoginFailure(ip);
+      loginFailed = true;
+    }
+  } else if (checkAdminKey(key)) {
+    const content = await getContent();
+    const backView = str(form, 'back_view', 60) || 'dashboard';
+    const backId = str(form, 'back_id', 60);
+
+    // --- 店舗（§34〜§37） ---
+    if (action === 'store_status') {
+      // その日の実効ステータスを例外日（overrides）として書く＝ワンタップ当日変更
+      const s = content.stores.find((x) => x.id === str(form, 'store'));
+      const status = str(form, 'status') as StoreStatus;
+      if (s && STATUSES.includes(status)) {
+        s.overrides[str(form, 'date', 10) || jstToday()] = status;
+        await saveContent(content);
+        return redirectTo(backView, backId, `「${s.name}」を${STORE_STATUS_LABEL[status]}に変更しました。`);
+      }
+      error = '店舗が見つかりません。';
+    } else if (action === 'store_override_del') {
+      const s = content.stores.find((x) => x.id === str(form, 'store'));
+      if (s) {
+        delete s.overrides[str(form, 'date', 10)];
+        await saveContent(content);
+        return redirectTo(backView, backId, '例外日を削除しました。');
+      }
+    } else if (action === 'store_add') {
+      const store: Store = {
+        id: newId('store'),
+        name: str(form, 'name', 80) || '新しい店舗',
+        address: '',
+        lat: 35.6614,
+        lng: 139.6682,
+        seatingAvailable: false,
+        purchaseRequired: false,
+        missionDescription: '',
+        verification: { type: 'keyword', code: '' },
+        reward: { title: '', content: '' },
+        weekly: [true, true, true, true, true, true, true],
+        overrides: {},
+      };
+      content.stores.push(store);
+      await saveContent(content);
+      return redirectTo('store', store.id, '店舗を追加しました。詳細を入力してください。');
+    } else if (action === 'store_save') {
+      const s = content.stores.find((x) => x.id === str(form, 'store'));
+      if (s) {
+        s.name = str(form, 'name', 80) || s.name;
+        s.image = str(form, 'image', 500) || undefined;
+        s.address = str(form, 'address', 200);
+        s.lat = num(form, 'lat', s.lat);
+        s.lng = num(form, 'lng', s.lng);
+        s.description = str(form, 'description', 1000) || undefined;
+        s.hours = str(form, 'hours', 80) || undefined;
+        s.seatingAvailable = form.get('seating') === 'on';
+        s.purchaseRequired = form.get('purchase') === 'on';
+        s.purchaseItem = str(form, 'purchase_item', 120) || undefined;
+        s.purchasePrice = form.get('purchase_price') ? num(form, 'purchase_price') : undefined;
+        s.missionDescription = str(form, 'mission', 1000);
+        s.notes = str(form, 'notes', 1000) || undefined;
+        s.verification = {
+          type: str(form, 'vtype') === 'code' ? 'code' : 'keyword',
+          code: str(form, 'vcode', 120),
+        };
+        s.reward = {
+          title: str(form, 'reward_title', 120),
+          content: str(form, 'reward_content', 2000),
+          image: str(form, 'reward_image', 500) || undefined,
+        };
+        s.weekly = [0, 1, 2, 3, 4, 5, 6].map((d) => form.get(`w${d}`) === 'on');
+        await saveContent(content);
+        return redirectTo('store', s.id, '店舗情報を保存しました（即時反映）。');
+      }
+      error = '店舗が見つかりません。';
+    } else if (action === 'store_del') {
+      const id = str(form, 'store');
+      content.stores = content.stores.filter((x) => x.id !== id);
+      for (const st of content.steps) {
+        if (st.storePhase) st.storePhase.storeIds = st.storePhase.storeIds.filter((x) => x !== id);
+      }
+      await saveContent(content);
+      return redirectTo('stores', '', '店舗を削除しました。');
+    }
+
+    // --- STEP（§10, §37） ---
+    else if (action === 'step_add') {
+      const step: Step = {
+        id: newId('step'),
+        title: `STEP ${content.steps.length + 1}`,
+        mission: '',
+        story: { text: '' },
+        puzzle: { question: '', answer: '', variations: [], successText: '正解です。', hints: [] },
+        storePhase: null,
+      };
+      content.steps.push(step);
+      await saveContent(content);
+      return redirectTo('step', step.id, 'STEPを追加しました。内容を入力してください。');
+    } else if (action === 'step_save') {
+      const st = content.steps.find((x) => x.id === str(form, 'step'));
+      if (st) {
+        st.title = str(form, 'title', 120) || st.title;
+        st.subtitle = str(form, 'subtitle', 120) || undefined;
+        st.mission = str(form, 'mission', 300);
+        st.story = { text: str(form, 'story', 8000), image: str(form, 'story_image', 500) || undefined };
+        st.puzzle = {
+          question: str(form, 'question', 4000),
+          image: str(form, 'puzzle_image', 500) || undefined,
+          answer: str(form, 'answer', 200),
+          variations: lines(str(form, 'variations', 2000)),
+          successText: str(form, 'success', 2000) || '正解です。',
+          hints: lines(str(form, 'hints', 4000)),
+        };
+        if (form.get('has_stores') === 'on') {
+          const storeIds = content.stores.map((s) => s.id).filter((id) => form.get(`g_${id}`) === 'on');
+          st.storePhase = {
+            prompt: str(form, 'prompt', 300),
+            storeIds,
+            requiredVisitCount: Math.max(1, Math.min(num(form, 'required', 1), Math.max(1, storeIds.length))),
+            skipped: form.get('skipped') === 'on',
+          };
+        } else {
+          st.storePhase = null;
+        }
+        await saveContent(content);
+        return redirectTo('step', st.id, 'STEPを保存しました（即時反映）。');
+      }
+      error = 'STEPが見つかりません。';
+    } else if (action === 'step_move') {
+      const i = content.steps.findIndex((x) => x.id === str(form, 'step'));
+      const dir = str(form, 'dir') === 'up' ? -1 : 1;
+      if (i >= 0 && i + dir >= 0 && i + dir < content.steps.length) {
+        const [moved] = content.steps.splice(i, 1);
+        content.steps.splice(i + dir, 0, moved);
+        await saveContent(content);
+      }
+      return redirectTo('steps', '', '並び順を変更しました。');
+    } else if (action === 'step_del') {
+      content.steps = content.steps.filter((x) => x.id !== str(form, 'step'));
+      await saveContent(content);
+      return redirectTo('steps', '', 'STEPを削除しました。');
+    }
+
+    // --- 設定・最終推理・エンディング（§37, §39〜§40） ---
+    else if (action === 'settings_save') {
+      content.settings = {
+        title: str(form, 'title', 120) || content.settings.title,
+        tagline: str(form, 'tagline', 200) || undefined,
+        startCode: str(form, 'start_code', 60) || undefined,
+        playTime: str(form, 'play_time', 80) || undefined,
+        notes: str(form, 'notes', 2000) || undefined,
+      };
+      await saveContent(content);
+      return redirectTo('settings', '', '基本設定を保存しました。');
+    } else if (action === 'final_save') {
+      const count = num(form, 'q_count', 0);
+      const questions = [];
+      for (let i = 0; i < count; i++) {
+        const q = str(form, `q_${i}`, 2000);
+        if (!q) continue;
+        questions.push({ question: q, answer: str(form, `a_${i}`, 200), variations: lines(str(form, `v_${i}`, 1000)) });
+      }
+      if (form.get('q_add') === 'on') questions.push({ question: '新しい問い', answer: '', variations: [] });
+      content.final = {
+        story: str(form, 'story', 4000),
+        questions,
+        successText: str(form, 'success', 2000) || content.final.successText,
+      };
+      await saveContent(content);
+      return redirectTo('settings', '', '最終推理を保存しました。');
+    } else if (action === 'ending_save') {
+      content.ending = {
+        title: str(form, 'title', 120) || 'CASE CLOSED',
+        text: str(form, 'text', 8000),
+        image: str(form, 'image', 500) || undefined,
+      };
+      await saveContent(content);
+      return redirectTo('settings', '', 'エンディングを保存しました。');
+    }
+
+    // --- プレイヤー操作（§38, §31） ---
+    else if (action.startsWith('player_')) {
+      const p = await getPlayer(str(form, 'player'));
+      if (!p) {
+        error = 'プレイヤーが見つかりません。';
+      } else if (action === 'player_setstep') {
+        const idx = Math.max(0, Math.min(num(form, 'step_index', 0), content.steps.length - 1));
+        p.stepIndex = idx;
+        p.phase = 'story';
+        await savePlayer(p);
+        return redirectTo('player', p.id, `STEP ${idx + 1} の冒頭に移動しました。`);
+      } else if (action === 'player_tofinal') {
+        p.phase = 'final';
+        await savePlayer(p);
+        return redirectTo('player', p.id, '最終推理へ移動しました。');
+      } else if (action === 'player_clearstores') {
+        // 店舗イベントを運営側でクリア扱いにする（緊急用進行ルート §31）
+        if (p.phase === 'stores') {
+          advanceToNextStep(p, content);
+          await savePlayer(p);
+          return redirectTo('player', p.id, '店舗フェーズをクリア扱いにして先へ進めました。');
+        }
+        error = 'このプレイヤーは現在店舗フェーズではありません。';
+      } else if (action === 'player_grantvisit') {
+        const storeId = str(form, 'store');
+        const step = content.steps[p.stepIndex];
+        const store = content.stores.find((s) => s.id === storeId);
+        if (step?.storePhase && store) {
+          const cleared = p.visited[step.id] ?? [];
+          if (!cleared.includes(storeId)) {
+            p.visited[step.id] = [...cleared, storeId];
+            p.evidence.push({
+              id: newId('ev'),
+              title: store.reward.title || `${store.name}の調査`,
+              content: store.reward.content || '（運営付与）',
+              image: store.reward.image,
+              storeName: store.name,
+              at: new Date().toISOString(),
+            });
+            await savePlayer(p);
+          }
+          return redirectTo('player', p.id, `「${store.name}」を訪問済みにしました。`);
+        }
+        error = '店舗またはSTEPが不正です。';
+      } else if (action === 'player_reset') {
+        p.stepIndex = 0;
+        p.phase = 'story';
+        p.visited = {};
+        p.evidence = [];
+        p.hintsUsed = {};
+        p.wrongAnswers = 0;
+        p.completedAt = undefined;
+        await savePlayer(p);
+        return redirectTo('player', p.id, 'ゲームをリセットしました。');
+      } else if (action === 'player_del') {
+        await deletePlayer(p.id);
+        return redirectTo('players', '', 'プレイヤーを削除しました。');
+      }
+    } else {
+      error = '不明な操作です。';
+    }
+  } else {
+    error = 'ログインし直してください。';
+  }
+  key = Astro.cookies.get(COOKIE)?.value ?? '';
+}
+
+const authed = configured && checkAdminKey(key);
+
+// --- 表示用データ ---
+let content: GameContent | null = null;
+let players: Player[] = [];
+let player: Player | null = null;
+let stats: Record<string, number> = {};
+const today = jstToday();
+
+if (authed) {
+  content = await getContent();
+  if (view === 'dashboard' || view === 'players') {
+    players = await getAllPlayers();
+  }
+  if (view === 'player' && targetId) {
+    player = await getPlayer(targetId);
+    if (!player) { view = 'players'; players = await getAllPlayers(); }
+  }
+  if (view === 'dashboard') stats = await getStats();
+}
+
+const fmtTime = (iso?: string) =>
+  iso ? new Date(new Date(iso).getTime() + 9 * 3600 * 1000).toISOString().slice(11, 16) : '—';
+const fmtDate = (iso?: string) =>
+  iso ? new Date(new Date(iso).getTime() + 9 * 3600 * 1000).toISOString().slice(0, 16).replace('T', ' ') : '—';
+const jstDateOf = (iso: string) => new Date(new Date(iso).getTime() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+
+const startedToday = players.filter((p) => jstDateOf(p.startedAt) === today);
+const finishedToday = players.filter((p) => p.completedAt && jstDateOf(p.completedAt) === today);
+const playingNow = players.filter(
+  (p) => !p.completedAt && Date.now() - Date.parse(p.lastAccessAt) < 30 * 60 * 1000,
+);
+
+const curStore = view === 'store' && content ? content.stores.find((s) => s.id === targetId) : null;
+const curStep = view === 'step' && content ? content.steps.find((s) => s.id === targetId) : null;
+
+const phaseLabel: Record<string, string> = {
+  story: 'ストーリー', puzzle: '謎解き中', stores: '店舗調査中', final: '最終推理', ending: 'クリア',
+};
+---
+<ShimokitaLayout title="運営管理 | 街歩き謎解き">
+<style is:global>
+.ad{max-width:860px;margin:0 auto;padding:28px 18px 90px}
+.ad h1{font-family:'Shippori Mincho',serif;font-size:21px;margin:0 0 4px}
+.ad h2{font-size:15px;font-weight:800;letter-spacing:.05em;margin:30px 0 10px;border-left:4px solid var(--red);padding-left:10px}
+.ad-nav{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 4px}
+.ad-nav a{font-size:12.5px;font-weight:700;color:var(--ink);text-decoration:none;border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;background:#fff}
+.ad-nav a.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.ad-card{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:18px;margin-top:12px}
+.ad table{width:100%;border-collapse:collapse;font-size:13px}
+.ad th,.ad td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--paper-2);vertical-align:middle}
+.ad th{font-size:11px;color:var(--mute);letter-spacing:.06em;white-space:nowrap}
+.ad label{display:block;margin-top:12px;font-size:12.5px;font-weight:700}
+.ad label small{font-weight:400;color:var(--mute)}
+.ad input[type=text],.ad input[type=number],.ad input[type=date],.ad input[type=password],.ad textarea,.ad select{width:100%;margin-top:5px;padding:10px 12px;font:inherit;font-size:14px;border:1.5px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
+.ad textarea{resize:vertical;line-height:1.7}
+.ad .row{display:flex;gap:12px;flex-wrap:wrap}
+.ad .row>label{flex:1;min-width:150px}
+.ad .btn{display:inline-flex;align-items:center;justify-content:center;margin-top:14px;padding:11px 26px;background:var(--ink);color:#fff;font-weight:800;font-size:13px;border:none;border-radius:999px;cursor:pointer}
+.ad .btn.sm{padding:6px 14px;font-size:11.5px;margin-top:0}
+.ad .btn.red{background:var(--red)}
+.ad .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--ink)}
+.ad .inline{display:inline}
+.st-chip{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.st-OPEN{background:#e6f2ea;color:var(--green)}
+.st-CLOSED{background:#f5e5e5;color:var(--red)}
+.st-TEMPORARILY_UNAVAILABLE{background:#efe8d8;color:#7a5d00}
+.st-FULL{background:#e3e8f2;color:var(--navy)}
+.msg-ok{background:#e9f2ec;border:1.5px solid #b9d4c3;color:var(--green);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:14px}
+.msg-err{background:#fbeaea;border:1.5px solid #e3b6b6;color:var(--red);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:14px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:12px}
+.kpi div{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+.kpi .v{font-size:24px;font-weight:900}
+.kpi .l{font-size:11px;color:var(--mute);letter-spacing:.08em}
+.weekrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.weekrow label{display:flex;align-items:center;gap:4px;font-weight:400;margin:0;font-size:13px}
+.chkline{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13.5px;font-weight:700}
+.grp{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;margin-top:8px}
+.grp label{display:flex;align-items:center;gap:6px;font-weight:400;margin:0;font-size:13px;background:var(--paper);border-radius:8px;padding:8px 10px}
+.ad a{color:var(--navy)}
+</style>
+
+<div class="ad">
+<h1>運営管理コンソール</h1>
+<p style="font-size:12.5px;color:var(--mute);margin:0">{today}（JST）／変更は再デプロイなしで即時反映されます</p>
+
+{!configured && <p class="msg-err">データベース（Upstash Redis）が未設定です。docs/shimokita-setup.md を参照してください。</p>}
+
+{configured && !authed && (
+  <div class="ad-card" style="max-width:420px">
+    <form method="post">
+      <input type="hidden" name="action" value="login">
+      <label>管理用の合言葉
+        <input type="password" name="key" autocomplete="current-password" />
+      </label>
+      {loginFailed && <p class="msg-err">合言葉が違うか、試行回数の上限に達しました（10分後に再試行できます）。</p>}
+      <button class="btn" type="submit">ログイン</button>
+    </form>
+  </div>
+)}
+
+{authed && content && (
+<>
+  <nav class="ad-nav">
+    <a href="/shimokita/admin/" class={view === 'dashboard' ? 'on' : ''}>ダッシュボード</a>
+    <a href="/shimokita/admin/?view=stores" class={view === 'stores' || view === 'store' ? 'on' : ''}>店舗</a>
+    <a href="/shimokita/admin/?view=steps" class={view === 'steps' || view === 'step' ? 'on' : ''}>STEP・謎</a>
+    <a href="/shimokita/admin/?view=players" class={view === 'players' || view === 'player' ? 'on' : ''}>プレイヤー</a>
+    <a href="/shimokita/admin/?view=settings" class={view === 'settings' ? 'on' : ''}>設定・エンディング</a>
+  </nav>
+
+  {message && <p class="msg-ok">{message}</p>}
+  {error && <p class="msg-err">{error}</p>}
+
+  {/* ================= ダッシュボード ================= */}
+  {view === 'dashboard' && (
+    <>
+      <h2>本日の状況</h2>
+      <div class="kpi">
+        <div><div class="v">{playingNow.length}</div><div class="l">現在プレイ中</div></div>
+        <div><div class="v">{startedToday.length}</div><div class="l">本日ゲーム開始</div></div>
+        <div><div class="v">{finishedToday.length}</div><div class="l">本日クリア</div></div>
+        <div><div class="v">{players.length}</div><div class="l">累計プレイヤー</div></div>
+      </div>
+
+      <h2>本日の営業店舗（タップで即時変更）</h2>
+      <div class="ad-card">
+        <table>
+          <tr><th>店舗</th><th>本日の状態</th><th>変更</th></tr>
+          {content.stores.map((s) => {
+            const st = effectiveStatus(s, today);
+            return (
+              <tr>
+                <td><a href={`/shimokita/admin/?view=store&id=${s.id}`}>{s.name}</a></td>
+                <td><span class={`st-chip st-${st}`}>{STORE_STATUS_LABEL[st]}</span></td>
+                <td style="white-space:nowrap">
+                  {STATUSES.filter((x) => x !== st).map((x) => (
+                    <form method="post" class="inline">
+                      <input type="hidden" name="action" value="store_status">
+                      <input type="hidden" name="store" value={s.id}>
+                      <input type="hidden" name="status" value={x}>
+                      <button class="btn sm ghost" type="submit" style="margin:2px">{STORE_STATUS_LABEL[x]}</button>
+                    </form>
+                  ))}
+                </td>
+              </tr>
+            );
+          })}
+        </table>
+      </div>
+
+      <h2>分析（累計）</h2>
+      <div class="kpi">
+        <div><div class="v">{stats['start'] ?? 0}</div><div class="l">ゲーム開始</div></div>
+        <div><div class="v">{stats['clear'] ?? 0}</div><div class="l">クリア</div></div>
+        <div><div class="v">{stats['reach:final'] ?? 0}</div><div class="l">最終推理到達</div></div>
+      </div>
+      <div class="ad-card">
+        <table>
+          <tr><th>STEP</th><th>到達</th><th>誤答</th><th>ヒント</th></tr>
+          {content.steps.map((s, i) => (
+            <tr>
+              <td>{s.title}</td>
+              <td>{stats[`reach:step:${i}`] ?? 0}</td>
+              <td>{stats[`wrong:${s.id}`] ?? 0}</td>
+              <td>{stats[`hint:${s.id}`] ?? 0}</td>
+            </tr>
+          ))}
+        </table>
+      </div>
+      <div class="ad-card">
+        <table>
+          <tr><th>店舗</th><th>訪問（クリア）数</th><th>コード誤入力</th></tr>
+          {content.stores.map((s) => (
+            <tr>
+              <td>{s.name}</td>
+              <td>{stats[`visit:${s.id}`] ?? 0}</td>
+              <td>{stats[`wrong:visit:${s.id}`] ?? 0}</td>
+            </tr>
+          ))}
+        </table>
+      </div>
+    </>
+  )}
+
+  {/* ================= 店舗一覧 ================= */}
+  {view === 'stores' && (
+    <>
+      <h2>店舗一覧</h2>
+      <div class="ad-card">
+        <table>
+          <tr><th>店舗名</th><th>本日</th><th>訪問確認</th><th>定休</th></tr>
+          {content.stores.map((s) => {
+            const st = effectiveStatus(s, today);
+            return (
+              <tr>
+                <td><a href={`/shimokita/admin/?view=store&id=${s.id}`}>{s.name}</a></td>
+                <td><span class={`st-chip st-${st}`}>{STORE_STATUS_LABEL[st]}</span></td>
+                <td>{s.verification.type === 'code' ? '店舗コード' : 'キーワード'}</td>
+                <td style="font-size:12px;color:var(--mute)">
+                  {s.weekly.map((w, d) => (!w ? WEEKDAY_JA[d] : '')).filter(Boolean).join('・') || 'なし'}
+                </td>
+              </tr>
+            );
+          })}
+        </table>
+        <form method="post">
+          <input type="hidden" name="action" value="store_add">
+          <div class="row">
+            <label style="flex:2">新しい店舗名<input type="text" name="name" placeholder="店舗名" /></label>
+            <button class="btn" type="submit" style="align-self:flex-end">＋ 店舗を追加</button>
+          </div>
+        </form>
+      </div>
+    </>
+  )}
+
+  {/* ================= 店舗編集 ================= */}
+  {view === 'store' && curStore && (
+    <>
+      <h2>店舗編集：{curStore.name}</h2>
+      <div class="ad-card">
+        <form method="post">
+          <input type="hidden" name="action" value="store_save">
+          <input type="hidden" name="store" value={curStore.id}>
+          <div class="row">
+            <label>店舗名<input type="text" name="name" value={curStore.name} /></label>
+            <label>営業時間表記<input type="text" name="hours" value={curStore.hours ?? ''} placeholder="11:00〜19:00" /></label>
+          </div>
+          <label>住所<input type="text" name="address" value={curStore.address} /></label>
+          <div class="row">
+            <label>緯度<input type="text" name="lat" value={String(curStore.lat)} /></label>
+            <label>経度<input type="text" name="lng" value={String(curStore.lng)} /></label>
+          </div>
+          <label>店舗画像URL <small>（任意）</small><input type="text" name="image" value={curStore.image ?? ''} /></label>
+          <label>説明<textarea name="description" rows="2">{curStore.description ?? ''}</textarea></label>
+          <label class="chkline"><input type="checkbox" name="seating" checked={curStore.seatingAvailable} /> 席利用可能（店内で座れる）</label>
+          <label class="chkline"><input type="checkbox" name="purchase" checked={curStore.purchaseRequired} /> 商品購入が必要</label>
+          <div class="row">
+            <label>購入する商品<input type="text" name="purchase_item" value={curStore.purchaseItem ?? ''} /></label>
+            <label>価格（円）<input type="number" name="purchase_price" value={curStore.purchasePrice != null ? String(curStore.purchasePrice) : ''} /></label>
+          </div>
+          <label>この店舗ですること（店舗ミッション）<textarea name="mission" rows="3">{curStore.missionDescription}</textarea></label>
+          <label>注意事項<textarea name="notes" rows="2">{curStore.notes ?? ''}</textarea></label>
+          <div class="row">
+            <label>訪問確認の方式
+              <select name="vtype">
+                <option value="keyword" selected={curStore.verification.type === 'keyword'}>キーワード入力</option>
+                <option value="code" selected={curStore.verification.type === 'code'}>店舗コード（数字等）</option>
+              </select>
+            </label>
+            <label>正解コード／キーワード<input type="text" name="vcode" value={curStore.verification.code} /></label>
+          </div>
+          <label>獲得できる証拠：タイトル<input type="text" name="reward_title" value={curStore.reward.title} placeholder="証拠01：〜" /></label>
+          <label>証拠の内容<textarea name="reward_content" rows="3">{curStore.reward.content}</textarea></label>
+          <label>証拠の画像URL <small>（任意）</small><input type="text" name="reward_image" value={curStore.reward.image ?? ''} /></label>
+          <label>通常営業スケジュール <small>チェック＝営業</small></label>
+          <div class="weekrow">
+            {WEEKDAY_JA.map((d, i) => (
+              <label><input type="checkbox" name={`w${i}`} checked={curStore.weekly[i] !== false} />{d}</label>
+            ))}
+          </div>
+          <button class="btn" type="submit">保存する</button>
+        </form>
+      </div>
+
+      <h2>特定日の例外・当日変更</h2>
+      <div class="ad-card">
+        {Object.keys(curStore.overrides).length === 0 && <p style="font-size:13px;color:var(--mute);margin:0">例外日はありません。</p>}
+        <table>
+          {Object.entries(curStore.overrides).sort().map(([d, st]) => (
+            <tr>
+              <td>{d}</td>
+              <td><span class={`st-chip st-${st}`}>{STORE_STATUS_LABEL[st as StoreStatus]}</span></td>
+              <td>
+                <form method="post" class="inline">
+                  <input type="hidden" name="action" value="store_override_del">
+                  <input type="hidden" name="store" value={curStore.id}>
+                  <input type="hidden" name="date" value={d}>
+                  <input type="hidden" name="back_view" value="store">
+                  <input type="hidden" name="back_id" value={curStore.id}>
+                  <button class="btn sm ghost" type="submit">削除</button>
+                </form>
+              </td>
+            </tr>
+          ))}
+        </table>
+        <form method="post">
+          <input type="hidden" name="action" value="store_status">
+          <input type="hidden" name="store" value={curStore.id}>
+          <input type="hidden" name="back_view" value="store">
+          <input type="hidden" name="back_id" value={curStore.id}>
+          <div class="row">
+            <label>日付<input type="date" name="date" value={today} /></label>
+            <label>状態
+              <select name="status">
+                {STATUSES.map((s) => <option value={s}>{STORE_STATUS_LABEL[s]}</option>)}
+              </select>
+            </label>
+            <button class="btn" type="submit" style="align-self:flex-end">設定</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="ad-card">
+        <form method="post" onsubmit="return confirm('この店舗を削除しますか？STEPの候補からも外れます。')">
+          <input type="hidden" name="action" value="store_del">
+          <input type="hidden" name="store" value={curStore.id}>
+          <button class="btn red" type="submit">この店舗を削除</button>
+        </form>
+      </div>
+    </>
+  )}
+
+  {/* ================= STEP一覧 ================= */}
+  {view === 'steps' && (
+    <>
+      <h2>STEP一覧（上から順に進行）</h2>
+      <div class="ad-card">
+        <table>
+          <tr><th>順</th><th>タイトル</th><th>店舗フェーズ</th><th>並び替え</th></tr>
+          {content.steps.map((s, i) => (
+            <tr>
+              <td>{i + 1}</td>
+              <td><a href={`/shimokita/admin/?view=step&id=${s.id}`}>{s.title}</a>{s.storePhase?.skipped && <span class="st-chip st-CLOSED" style="margin-left:6px">スキップ中</span>}</td>
+              <td style="font-size:12px;color:var(--mute)">
+                {s.storePhase ? `${s.storePhase.storeIds.length}店舗中 ${s.storePhase.requiredVisitCount}店舗` : 'なし（謎のみ）'}
+              </td>
+              <td style="white-space:nowrap">
+                <form method="post" class="inline"><input type="hidden" name="action" value="step_move"><input type="hidden" name="step" value={s.id}><input type="hidden" name="dir" value="up"><button class="btn sm ghost" type="submit">↑</button></form>
+                <form method="post" class="inline"><input type="hidden" name="action" value="step_move"><input type="hidden" name="step" value={s.id}><input type="hidden" name="dir" value="down"><button class="btn sm ghost" type="submit">↓</button></form>
+              </td>
+            </tr>
+          ))}
+        </table>
+        <form method="post">
+          <input type="hidden" name="action" value="step_add">
+          <button class="btn" type="submit">＋ STEPを追加</button>
+        </form>
+      </div>
+    </>
+  )}
+
+  {/* ================= STEP編集 ================= */}
+  {view === 'step' && curStep && (
+    <>
+      <h2>STEP編集：{curStep.title}</h2>
+      <div class="ad-card">
+        <form method="post">
+          <input type="hidden" name="action" value="step_save">
+          <input type="hidden" name="step" value={curStep.id}>
+          <div class="row">
+            <label>STEPタイトル<input type="text" name="title" value={curStep.title} /></label>
+            <label>サブタイトル<input type="text" name="subtitle" value={curStep.subtitle ?? ''} /></label>
+          </div>
+          <label>現在の目的（CURRENT MISSION）<input type="text" name="mission" value={curStep.mission} /></label>
+          <label>ストーリー本文<textarea name="story" rows="7">{curStep.story.text}</textarea></label>
+          <label>ストーリー画像URL <small>（任意）</small><input type="text" name="story_image" value={curStep.story.image ?? ''} /></label>
+
+          <h2>謎</h2>
+          <label>問題文<textarea name="question" rows="5">{curStep.puzzle.question}</textarea></label>
+          <label>問題画像URL <small>（任意）</small><input type="text" name="puzzle_image" value={curStep.puzzle.image ?? ''} /></label>
+          <div class="row">
+            <label>正答<input type="text" name="answer" value={curStep.puzzle.answer} /></label>
+          </div>
+          <label>許容する別解 <small>（1行に1つ。全半角・カナ/かな・大小文字のゆれは自動吸収）</small>
+            <textarea name="variations" rows="2">{curStep.puzzle.variations.join('\n')}</textarea>
+          </label>
+          <label>正解時に表示する文章<textarea name="success" rows="3">{curStep.puzzle.successText}</textarea></label>
+          <label>ヒント <small>（1行に1つ。上から順に開示されます）</small>
+            <textarea name="hints" rows="3">{curStep.puzzle.hints.join('\n')}</textarea>
+          </label>
+
+          <h2>店舗フェーズ</h2>
+          <label class="chkline"><input type="checkbox" name="has_stores" checked={!!curStep.storePhase} /> このSTEPに店舗訪問フェーズがある</label>
+          <label>行動指示 <small>（例「3つの場所のうち2か所で情報を集めてください」）</small>
+            <input type="text" name="prompt" value={curStep.storePhase?.prompt ?? ''} />
+          </label>
+          <label>候補店舗グループ <small>（当日営業中の店舗だけがプレイヤーに表示されます）</small></label>
+          <div class="grp">
+            {content.stores.map((s) => (
+              <label><input type="checkbox" name={`g_${s.id}`} checked={curStep.storePhase?.storeIds.includes(s.id)} />{s.name}</label>
+            ))}
+          </div>
+          <div class="row">
+            <label>必要訪問数（required_visit_count）
+              <input type="number" name="required" min="1" value={String(curStep.storePhase?.requiredVisitCount ?? 1)} />
+            </label>
+          </div>
+          <p style="font-size:12px;color:var(--mute);margin:6px 0 0">営業店舗数が必要訪問数を下回った場合、必要数は自動的に営業店舗数まで下がります（進行不能防止）。</p>
+          <label class="chkline"><input type="checkbox" name="skipped" checked={curStep.storePhase?.skipped} /> 緊急スキップ：全プレイヤーがこの店舗フェーズを省略可能にする</label>
+          <button class="btn" type="submit">保存する</button>
+        </form>
+      </div>
+      <div class="ad-card">
+        <form method="post" onsubmit="return confirm('このSTEPを削除しますか？')">
+          <input type="hidden" name="action" value="step_del">
+          <input type="hidden" name="step" value={curStep.id}>
+          <button class="btn red" type="submit">このSTEPを削除</button>
+        </form>
+      </div>
+    </>
+  )}
+
+  {/* ================= プレイヤー一覧 ================= */}
+  {view === 'players' && (
+    <>
+      <h2>プレイヤー一覧（新しい順）</h2>
+      <div class="ad-card">
+        <table>
+          <tr><th>ID</th><th>開始</th><th>現在</th><th>最終アクセス</th></tr>
+          {players.slice(0, 200).map((p) => (
+            <tr>
+              <td><a href={`/shimokita/admin/?view=player&id=${p.id}`}>#{p.id.slice(0, 6)}</a></td>
+              <td>{fmtDate(p.startedAt)}</td>
+              <td>{p.phase === 'ending' ? 'クリア' : `STEP ${Math.min(p.stepIndex + 1, content.steps.length)}・${phaseLabel[p.phase]}`}</td>
+              <td>{fmtDate(p.lastAccessAt)}</td>
+            </tr>
+          ))}
+        </table>
+        {players.length === 0 && <p style="font-size:13px;color:var(--mute)">まだプレイヤーがいません。</p>}
+      </div>
+    </>
+  )}
+
+  {/* ================= プレイヤー詳細 ================= */}
+  {view === 'player' && player && (
+    <>
+      <h2>プレイヤー #{player.id.slice(0, 6)}（{player.id}）</h2>
+      <div class="kpi">
+        <div><div class="v">{fmtTime(player.startedAt)}</div><div class="l">開始時刻</div></div>
+        <div><div class="v">{player.phase === 'ending' ? 'クリア' : `STEP ${Math.min(player.stepIndex + 1, content.steps.length)}`}</div><div class="l">{phaseLabel[player.phase]}</div></div>
+        <div><div class="v">{Object.values(player.visited).reduce((a, b) => a + b.length, 0)}</div><div class="l">訪問店舗</div></div>
+        <div><div class="v">{Object.values(player.hintsUsed).reduce((a, b) => a + b, 0)}</div><div class="l">ヒント使用</div></div>
+        <div><div class="v">{fmtTime(player.lastAccessAt)}</div><div class="l">最終アクセス</div></div>
+      </div>
+
+      <h2>獲得済み証拠</h2>
+      <div class="ad-card">
+        {player.evidence.length === 0 && <p style="font-size:13px;color:var(--mute);margin:0">まだありません。</p>}
+        <table>
+          {player.evidence.map((ev) => <tr><td>{ev.title}</td><td style="color:var(--mute);font-size:12px">{ev.storeName ?? ''}</td></tr>)}
+        </table>
+      </div>
+
+      <h2>運営操作</h2>
+      <div class="ad-card">
+        <form method="post">
+          <input type="hidden" name="action" value="player_setstep">
+          <input type="hidden" name="player" value={player.id}>
+          <div class="row">
+            <label>STEPを移動
+              <select name="step_index">
+                {content.steps.map((s, i) => <option value={String(i)} selected={i === player.stepIndex}>{i + 1}. {s.title}</option>)}
+              </select>
+            </label>
+            <button class="btn sm ghost" type="submit" style="align-self:flex-end;margin-bottom:4px">冒頭へ移動</button>
+          </div>
+        </form>
+        <form method="post" class="inline">
+          <input type="hidden" name="action" value="player_clearstores">
+          <input type="hidden" name="player" value={player.id}>
+          <button class="btn sm" type="submit" style="margin-top:10px">現在の店舗フェーズをクリア扱いにする</button>
+        </form>
+        <form method="post" class="inline">
+          <input type="hidden" name="action" value="player_tofinal">
+          <input type="hidden" name="player" value={player.id}>
+          <button class="btn sm ghost" type="submit" style="margin:10px 0 0 8px">最終推理へ送る</button>
+        </form>
+        {content.steps[player.stepIndex]?.storePhase && (
+          <form method="post">
+            <input type="hidden" name="action" value="player_grantvisit">
+            <input type="hidden" name="player" value={player.id}>
+            <div class="row">
+              <label>店舗訪問を付与（証拠も渡す）
+                <select name="store">
+                  {content.steps[player.stepIndex].storePhase!.storeIds.map((id) => {
+                    const s = content.stores.find((x) => x.id === id);
+                    return s ? <option value={s.id}>{s.name}</option> : null;
+                  })}
+                </select>
+              </label>
+              <button class="btn sm ghost" type="submit" style="align-self:flex-end;margin-bottom:4px">付与</button>
+            </div>
+          </form>
+        )}
+        <hr style="border:none;border-top:1px dashed var(--line);margin:16px 0">
+        <form method="post" class="inline" onsubmit="return confirm('このプレイヤーの進行を最初からにリセットしますか？')">
+          <input type="hidden" name="action" value="player_reset">
+          <input type="hidden" name="player" value={player.id}>
+          <button class="btn sm red" type="submit">ゲームリセット</button>
+        </form>
+        <form method="post" class="inline" onsubmit="return confirm('このプレイヤーを完全に削除しますか？')">
+          <input type="hidden" name="action" value="player_del">
+          <input type="hidden" name="player" value={player.id}>
+          <button class="btn sm red" type="submit" style="margin-left:8px">削除</button>
+        </form>
+      </div>
+    </>
+  )}
+
+  {/* ================= 設定・最終推理・エンディング ================= */}
+  {view === 'settings' && (
+    <>
+      <h2>基本設定</h2>
+      <div class="ad-card">
+        <form method="post">
+          <input type="hidden" name="action" value="settings_save">
+          <label>イベントタイトル<input type="text" name="title" value={content.settings.title} /></label>
+          <label>キャッチコピー<input type="text" name="tagline" value={content.settings.tagline ?? ''} /></label>
+          <div class="row">
+            <label>参加コード <small>（空欄なら誰でも開始可能）</small><input type="text" name="start_code" value={content.settings.startCode ?? ''} /></label>
+            <label>推奨プレイ時間<input type="text" name="play_time" value={content.settings.playTime ?? ''} /></label>
+          </div>
+          <label>注意事項（TOPに表示）<textarea name="notes" rows="4">{content.settings.notes ?? ''}</textarea></label>
+          <button class="btn" type="submit">保存する</button>
+        </form>
+      </div>
+
+      <h2>最終推理</h2>
+      <div class="ad-card">
+        <form method="post">
+          <input type="hidden" name="action" value="final_save">
+          <input type="hidden" name="q_count" value={String(content.final.questions.length)}>
+          <label>導入文<textarea name="story" rows="4">{content.final.story}</textarea></label>
+          {content.final.questions.map((q, i) => (
+            <div style="border:1.5px dashed var(--line);border-radius:10px;padding:4px 14px 14px;margin-top:14px">
+              <label>問{i + 1}<textarea name={`q_${i}`} rows="2">{q.question}</textarea></label>
+              <div class="row">
+                <label>正答<input type="text" name={`a_${i}`} value={q.answer} /></label>
+                <label>別解（1行1つ）<textarea name={`v_${i}`} rows="1">{q.variations.join('\n')}</textarea></label>
+              </div>
+              <p style="font-size:11.5px;color:var(--mute);margin:6px 0 0">※問文を空にして保存すると削除されます。</p>
+            </div>
+          ))}
+          <label class="chkline"><input type="checkbox" name="q_add" /> 保存時に問いを1つ追加する</label>
+          <label>全問正解時に表示する文章<textarea name="success" rows="3">{content.final.successText}</textarea></label>
+          <button class="btn" type="submit">保存する</button>
+        </form>
+      </div>
+
+      <h2>エンディング</h2>
+      <div class="ad-card">
+        <form method="post">
+          <input type="hidden" name="action" value="ending_save">
+          <label>タイトル<input type="text" name="title" value={content.ending.title} /></label>
+          <label>本文<textarea name="text" rows="6">{content.ending.text}</textarea></label>
+          <label>画像URL <small>（任意）</small><input type="text" name="image" value={content.ending.image ?? ''} /></label>
+          <button class="btn" type="submit">保存する</button>
+        </form>
+      </div>
+
+      <h2>プレイヤー向けURL</h2>
+      <div class="ad-card" style="font-size:13.5px">
+        <p style="margin:0">TOP（QRコードにするURL）：<code>https://kabuexlabs.com/shimokita/</code></p>
+        <p style="margin:6px 0 0;color:var(--mute)">コンテンツ更新は保存した瞬間から全プレイヤーに反映されます。</p>
+      </div>
+    </>
+  )}
+</>
+)}
+</div>
+</ShimokitaLayout>
