@@ -1,0 +1,688 @@
+---
+// プレイ画面本体（§5, §8, §42〜§44）。
+// SSR はアプリの「殻」だけを返し、進行状況・ストーリー・店舗などの中身は
+// すべて /api/shimokita/state から取得してクライアント側で描画する。
+// 正答・未解放コンテンツはAPIが返さないため、ここには一切埋め込まれない（§46）。
+export const prerender = false;
+
+import ShimokitaLayout from '../../../layouts/ShimokitaLayout.astro';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+---
+<ShimokitaLayout title="調査端末 | 街歩き謎解き">
+<style is:global>
+/* ---- アプリ全体レイアウト ---- */
+.app{max-width:520px;margin:0 auto;min-height:100svh;display:flex;flex-direction:column}
+.view{flex:1;padding:18px 18px calc(86px + env(safe-area-inset-bottom))}
+/* ---- ヘッダー ---- */
+.hd{position:sticky;top:0;z-index:500;background:var(--ink);color:var(--paper);padding:10px 18px calc(10px);display:flex;align-items:center;gap:10px}
+.hd .t{font-family:'Shippori Mincho',serif;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .step{flex:none;margin-left:auto;font-size:10.5px;font-weight:800;letter-spacing:.18em;border:1.5px solid rgba(245,244,240,.5);border-radius:4px;padding:3px 8px 2px}
+/* ---- 下部ナビ（§43） ---- */
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:600;background:#fff;border-top:1.5px solid var(--line);display:flex;max-width:520px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom)}
+.nav button{flex:1;background:none;border:none;padding:10px 0 9px;cursor:pointer;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:2px}
+.nav button .ic{font-size:19px;line-height:1}
+.nav button .lb{font-size:9.5px;font-weight:800;letter-spacing:.14em}
+.nav button.on{color:var(--ink)}
+.nav button.on .lb{color:var(--red)}
+.nav button .bdg{position:absolute;display:none}
+/* ---- 汎用パーツ ---- */
+.card{background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);padding:20px 18px;margin-top:14px}
+.card.ink{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.k{font-size:10.5px;font-weight:800;letter-spacing:.24em;color:var(--red);margin:0 0 8px}
+.card.ink .k{color:#e0a1a1}
+h2.hh{font-family:'Shippori Mincho',serif;font-weight:800;font-size:20px;line-height:1.5;margin:0}
+.sub{font-size:12.5px;color:var(--mute);margin:4px 0 0}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:16px;padding:15px;background:var(--ink);color:#fff;font-weight:800;font-size:14.5px;letter-spacing:.1em;border:none;border-radius:999px;cursor:pointer;transition:transform .12s}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{opacity:.45;cursor:default}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--ink)}
+.btn.red{background:var(--red)}
+.btn.sm{width:auto;padding:9px 18px;font-size:12.5px;margin-top:0}
+.input{width:100%;margin-top:8px;padding:13px 14px;font:inherit;font-size:16px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}
+.input:focus{outline:2px solid var(--ink);outline-offset:1px}
+.note{font-size:12.5px;color:var(--mute)}
+.errbox{background:#fbeaea;border:1.5px solid #e3b6b6;color:var(--red);border-radius:10px;padding:11px 13px;font-size:13.5px;margin-top:12px}
+.okbox{background:#e9f2ec;border:1.5px solid #b9d4c3;color:var(--green);border-radius:10px;padding:11px 13px;font-size:13.5px;margin-top:12px}
+/* 現在の目的（§44） */
+.mission{background:#fff;border:1.5px solid var(--ink);border-left:6px solid var(--red);border-radius:10px;padding:14px 16px;margin-top:14px}
+.mission .k{color:var(--mute);margin-bottom:4px}
+.mission .m{font-weight:700;font-size:14.5px;line-height:1.7}
+.mission .prog{margin-top:6px;font-size:12.5px;color:var(--red);font-weight:800;letter-spacing:.06em}
+/* ストーリー */
+.story-p{font-size:15px;line-height:2.05;margin:0}
+.story-img{width:100%;border-radius:10px;margin-top:14px}
+/* ヒント */
+.hint-item{border:1.5px dashed var(--line);border-radius:10px;padding:12px 14px;margin-top:10px;font-size:13.5px;background:var(--paper)}
+.hint-item b{color:var(--red);font-size:11px;letter-spacing:.18em;display:block;margin-bottom:3px}
+/* ---- マップ（§42） ---- */
+/* z-index:0 でスタッキングコンテキストを作り、Leaflet内部の高いz-indexが
+   シート・ナビ・ヘッダーの上に漏れ出さないよう封じ込める */
+.map-wrap{margin:14px -18px 0;position:relative;z-index:0}
+#map{height:46svh;min-height:280px;background:var(--paper-2)}
+.smk-pin{width:30px;height:30px;border-radius:50% 50% 50% 0;background:var(--red);border:2.5px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.35);transform:rotate(-45deg);display:flex;align-items:center;justify-content:center}
+.smk-pin span{transform:rotate(45deg);color:#fff;font-size:12px;font-weight:900}
+.smk-pin.done{background:var(--green)}
+.store-card{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:14px 15px;margin-top:10px;cursor:pointer}
+.store-card.done{border-color:var(--green);background:#f4f9f6}
+.store-card .nm{font-weight:800;font-size:14.5px}
+.store-card .st{font-size:11.5px;color:var(--mute);margin-top:2px;display:flex;gap:10px;flex-wrap:wrap}
+.store-card .chip{flex:none;font-size:10.5px;font-weight:800;letter-spacing:.08em;border-radius:999px;padding:3px 10px;border:1.5px solid}
+.chip.open{color:var(--green);border-color:var(--green)}
+.chip.done{color:#fff;background:var(--green);border-color:var(--green)}
+/* ---- 調査記録（§23） ---- */
+.ev{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:15px 16px;margin-top:10px}
+.ev .tt{font-weight:800;font-size:14px;display:flex;gap:8px;align-items:center}
+.ev .tt::before{content:'✓';color:var(--green);font-weight:900}
+.ev .bd{font-size:13.5px;margin-top:6px;color:#3c3e44}
+.ev .src{font-size:11px;color:var(--mute);margin-top:6px;letter-spacing:.04em}
+.ev.unknown{border-style:dashed;color:var(--mute)}
+.ev.unknown .tt::before{content:'？';color:var(--mute)}
+/* ---- オーバーレイ／シート ---- */
+.ovl{position:fixed;inset:0;z-index:900;background:rgba(20,21,24,.55);display:none;align-items:flex-end;justify-content:center}
+.ovl.show{display:flex}
+.sheet{background:var(--paper);width:100%;max-width:520px;max-height:88svh;overflow-y:auto;border-radius:18px 18px 0 0;padding:20px 20px calc(28px + env(safe-area-inset-bottom));position:relative}
+.sheet .close{position:absolute;top:12px;right:14px;background:var(--paper-2);border:none;width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer;color:var(--mute)}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 14px}
+/* 全画面演出（正解・証拠獲得・エンディング） */
+.full{position:fixed;inset:0;z-index:1000;background:var(--ink);color:var(--paper);display:none;align-items:center;justify-content:center;padding:32px 26px}
+.full.show{display:flex}
+.full .in{max-width:440px;width:100%;text-align:center}
+.full .big{font-family:'Shippori Mincho',serif;font-weight:800;font-size:26px;letter-spacing:.18em;margin:0}
+.full .bd{text-align:left;font-size:14.5px;line-height:2.05;margin:20px 0 0;max-height:52svh;overflow-y:auto}
+.full .stampline{width:56px;height:3px;background:var(--red);margin:18px auto 0}
+.full .btn{background:var(--paper);color:var(--ink)}
+/* 店舗詳細 */
+.sd-img{width:100%;border-radius:12px;margin-top:10px}
+.sd-row{display:flex;gap:10px;padding:9px 2px;border-top:1px dashed var(--line);font-size:13.5px}
+.sd-row b{flex:none;width:86px;color:var(--mute);font-weight:700;font-size:12px;padding-top:2px}
+.sd-mission{background:#fff;border:1.5px solid var(--red);border-radius:12px;padding:15px 16px;margin-top:16px}
+.sd-mission .k{margin-bottom:6px}
+/* ローディング・エラー */
+.center{min-height:70svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--mute)}
+.spin{width:34px;height:34px;border:3.5px solid var(--line);border-top-color:var(--red);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* エンディング統計 */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px;text-align:center}
+.stats div{background:rgba(245,244,240,.08);border:1px solid rgba(245,244,240,.25);border-radius:10px;padding:12px 6px}
+.stats .v{font-size:20px;font-weight:900}
+.stats .l{font-size:10.5px;letter-spacing:.14em;color:#b9b8b2}
+.leaflet-container{font:inherit}
+</style>
+
+<div class="app">
+  <header class="hd">
+    <span class="t" id="hdTitle">調査端末</span>
+    <span class="step" id="hdStep"></span>
+  </header>
+  <main class="view" id="view">
+    <div class="center"><div class="spin"></div><div>調査データを読み込み中…</div></div>
+  </main>
+  <nav class="nav" id="nav" style="display:none">
+    <button data-tab="home"><span class="ic">🏠</span><span class="lb">ホーム</span></button>
+    <button data-tab="story"><span class="ic">📖</span><span class="lb">物語</span></button>
+    <button data-tab="map"><span class="ic">🗺</span><span class="lb">マップ</span></button>
+    <button data-tab="record"><span class="ic">🗂</span><span class="lb">調査記録</span></button>
+  </nav>
+</div>
+
+<!-- 店舗詳細シート -->
+<div class="ovl" id="storeOvl"><div class="sheet" id="storeSheet"></div></div>
+<!-- 謎解きシート -->
+<div class="ovl" id="puzzleOvl"><div class="sheet" id="puzzleSheet"></div></div>
+<!-- 全画面演出 -->
+<div class="full" id="fullOvl"><div class="in" id="fullIn"></div></div>
+
+<script>
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// ---------------------------------------------------------------------------
+// 状態管理：サーバーの /api/shimokita/state が唯一の真実。
+// 画面はすべて state から描き直す（リロード・通信断後も同じ経路で復旧 §47）。
+// ---------------------------------------------------------------------------
+type AnyState = any;
+
+let S: AnyState = null;
+let tab: 'home' | 'story' | 'map' | 'record' = 'home';
+let busy = false; // 二重送信防止（§47）
+let map: L.Map | null = null;
+let markers: L.LayerGroup | null = null;
+let geo: { lat: number; lng: number } | null = null;
+
+const $ = (id: string) => document.getElementById(id)!;
+const esc = (s: unknown) =>
+  String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+const para = (s: unknown) => `<p class="story-p smk-pre">${esc(s)}</p>`;
+
+async function api(path: string, body?: unknown): Promise<AnyState> {
+  const res = await fetch(`/api/shimokita/${path}`, {
+    method: body === undefined ? 'GET' : 'POST',
+    credentials: 'same-origin',
+    headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({ ok: false, error: '通信エラー' }));
+  if (res.status === 401) {
+    location.href = '/shimokita/';
+    throw new Error('no player');
+  }
+  return data;
+}
+
+async function refresh(): Promise<void> {
+  try {
+    const data = await api('state');
+    if (data.ok) {
+      S = data;
+      render();
+    } else {
+      renderError(data.error || 'エラーが発生しました');
+    }
+  } catch {
+    renderError('通信に失敗しました。電波の良い場所で再試行してください。');
+  }
+}
+
+/** アクション実行。成功時は返ってきた最新stateで置き換える。 */
+async function act(body: Record<string, unknown>): Promise<AnyState | null> {
+  if (busy) return null;
+  busy = true;
+  try {
+    const data = await api('action', body);
+    if (data.ok) S = data;
+    return data;
+  } catch {
+    return { ok: false, error: '通信に失敗しました。もう一度お試しください。' };
+  } finally {
+    busy = false;
+  }
+}
+
+function renderError(msg: string): void {
+  $('view').innerHTML = `
+    <div class="center">
+      <div style="font-size:30px">⚠️</div>
+      <div style="text-align:center">${esc(msg)}</div>
+      <button class="btn ghost" style="width:auto;padding:12px 32px" id="retryBtn">再試行</button>
+    </div>`;
+  $('retryBtn').addEventListener('click', () => {
+    $('view').innerHTML = '<div class="center"><div class="spin"></div><div>再接続中…</div></div>';
+    refresh();
+  });
+}
+
+// ---------------------------------------------------------------------------
+// 描画
+// ---------------------------------------------------------------------------
+function render(): void {
+  if (!S) return;
+  $('hdTitle').textContent = S.game.title;
+  $('hdStep').textContent =
+    S.player.phase === 'final' || S.player.phase === 'ending'
+      ? 'FINAL'
+      : `STEP ${S.player.stepNumber}/${S.player.stepCount}`;
+  $('nav').style.display = S.player.phase === 'ending' ? 'none' : 'flex';
+
+  document.querySelectorAll<HTMLButtonElement>('.nav button').forEach((b) => {
+    b.classList.toggle('on', b.dataset.tab === tab);
+  });
+
+  if (S.player.phase === 'ending') return renderEnding();
+  if (tab === 'home') renderHome();
+  else if (tab === 'story') renderStory();
+  else if (tab === 'map') renderMap();
+  else renderRecord();
+}
+
+function missionHtml(): string {
+  let m = '';
+  let prog = '';
+  if (S.player.phase === 'final') {
+    m = 'すべての証拠から、事件の真相を導き出してください';
+  } else if (S.step) {
+    m = S.step.mission;
+    if (S.player.phase === 'stores' && S.stores) {
+      prog = `${S.stores.done} / ${S.stores.required} 完了`;
+    }
+  }
+  return `
+    <div class="mission">
+      <p class="k">CURRENT MISSION — 現在の目的</p>
+      <div class="m">${esc(m)}</div>
+      ${prog ? `<div class="prog">${esc(prog)}</div>` : ''}
+    </div>`;
+}
+
+function renderHome(): void {
+  const p = S.player.phase;
+  let stepCard = '';
+  if (p === 'final') {
+    stepCard = `
+      <div class="card ink">
+        <p class="k">LAST PHASE</p>
+        <h2 class="hh">最終推理</h2>
+        <p class="sub" style="color:#b9b8b2">集めた証拠がすべて、ひとつの真実を指している。</p>
+      </div>`;
+  } else if (S.step) {
+    stepCard = `
+      <div class="card ink">
+        <p class="k">CASE PROGRESS</p>
+        <h2 class="hh">${esc(S.step.title)}</h2>
+        ${S.step.subtitle ? `<p class="sub" style="color:#b9b8b2">${esc(S.step.subtitle)}</p>` : ''}
+      </div>`;
+  }
+
+  let actions = '';
+  if (p === 'story') {
+    actions = `<button class="btn" id="goStory">📖 ストーリーを読む</button>`;
+  } else if (p === 'puzzle') {
+    actions = `
+      <button class="btn red" id="goPuzzle">🔍 謎を解く</button>
+      <button class="btn ghost" id="goStory">ストーリーをふり返る</button>`;
+  } else if (p === 'stores') {
+    const clearedAll = S.stores && S.stores.done >= S.stores.required;
+    actions = `
+      ${clearedAll ? `<button class="btn red" id="goAdvance">✅ 調査完了 — 次へ進む</button>` : ''}
+      <button class="btn" id="goMap">🗺 マップを見る</button>
+      <button class="btn ghost" id="goPuzzle">謎をふり返る</button>`;
+  } else if (p === 'final') {
+    actions = `<button class="btn red" id="goFinal">⚖️ 最終推理をはじめる</button>`;
+  }
+
+  $('view').innerHTML = `${stepCard}${missionHtml()}<div style="margin-top:18px">${actions}</div>
+    <p class="note" style="margin-top:26px;text-align:center">困ったときは各画面の指示、またはスタッフへ。</p>`;
+
+  $('goStory')?.addEventListener('click', () => { tab = 'story'; render(); });
+  $('goPuzzle')?.addEventListener('click', openPuzzle);
+  $('goMap')?.addEventListener('click', () => { tab = 'map'; render(); });
+  $('goFinal')?.addEventListener('click', openFinal);
+  $('goAdvance')?.addEventListener('click', doAdvance);
+}
+
+function renderStory(): void {
+  let inner = '';
+  if (S.player.phase === 'final' && S.final) {
+    inner = `
+      <div class="card">
+        <p class="k">FINAL — 最終推理</p>
+        ${para(S.final.story)}
+      </div>
+      <button class="btn red" id="stFinal">⚖️ 最終推理をはじめる</button>`;
+  } else if (S.step) {
+    inner = `
+      <div class="card">
+        <p class="k">${esc(S.step.title)}</p>
+        ${S.step.subtitle ? `<h2 class="hh" style="margin-bottom:12px">${esc(S.step.subtitle)}</h2>` : ''}
+        ${S.step.story.image ? `<img class="story-img" src="${esc(S.step.story.image)}" alt="">` : ''}
+        ${para(S.step.story.text)}
+      </div>
+      ${S.player.phase === 'story' ? `<button class="btn red" id="stDone">🔍 読み終えた — 謎を解く</button>` : ''}`;
+  } else {
+    inner = `<div class="card"><p class="note">表示できるストーリーがありません。</p></div>`;
+  }
+  $('view').innerHTML = `${missionHtml()}${inner}`;
+  $('stDone')?.addEventListener('click', async () => {
+    const r = await act({ action: 'read_story' });
+    if (r?.ok) { openPuzzle(); render(); }
+  });
+  $('stFinal')?.addEventListener('click', openFinal);
+}
+
+// ---- 謎解き（§11〜§13） ----
+function openPuzzle(): void {
+  if (!S.puzzle) {
+    if (S.player.phase === 'story') { tab = 'story'; render(); }
+    return;
+  }
+  const pz = S.puzzle;
+  $('puzzleSheet').innerHTML = `
+    <div class="grab"></div>
+    <button class="close" id="pzClose">✕</button>
+    <p class="k">PUZZLE — 捜査資料</p>
+    ${pz.image ? `<img class="story-img" src="${esc(pz.image)}" alt="">` : ''}
+    <div class="card" style="margin-top:10px">${para(pz.question)}</div>
+    ${pz.solved
+      ? `<div class="okbox">この謎は解決済みです。マップで調査を続けてください。</div>`
+      : `
+        <label style="display:block;margin-top:16px;font-size:13px;font-weight:700">回答
+          <input class="input" id="pzInput" autocomplete="off" placeholder="答えを入力">
+        </label>
+        <div id="pzMsg"></div>
+        <button class="btn red" id="pzSubmit">回答する</button>`}
+    <div id="pzHints">${(pz.hintsRevealed as string[]).map((h: string, i: number) =>
+      `<div class="hint-item"><b>HINT ${i + 1}</b><span class="smk-pre">${esc(h)}</span></div>`).join('')}</div>
+    ${pz.hintsRevealed.length < pz.hintCount
+      ? `<button class="btn ghost" id="pzHint">💡 ヒントを見る（${pz.hintsRevealed.length}/${pz.hintCount} 使用）</button>`
+      : ''}
+  `;
+  $('storeOvl').classList.remove('show');
+  $('puzzleOvl').classList.add('show');
+  $('pzClose').addEventListener('click', () => $('puzzleOvl').classList.remove('show'));
+
+  $('pzHint')?.addEventListener('click', async () => {
+    if (!confirm('ヒントを表示しますか？')) return;
+    const r = await act({ action: 'hint' });
+    if (r?.ok) openPuzzle();
+    render();
+  });
+
+  $('pzSubmit')?.addEventListener('click', async () => {
+    const input = $('pzInput') as HTMLInputElement;
+    const text = input.value.trim();
+    if (!text) return;
+    (($('pzSubmit')) as HTMLButtonElement).disabled = true;
+    const r = await act({ action: 'answer', text });
+    if (!r) return;
+    if (r.ok && r.correct) {
+      $('puzzleOvl').classList.remove('show');
+      showFull('正解', r.successText, () => {
+        tab = S.player.phase === 'stores' ? 'map' : 'home';
+        render();
+      });
+    } else {
+      const msg = $('pzMsg');
+      if (msg) msg.innerHTML = `<div class="errbox">${esc(r.message || r.error || 'エラーが発生しました')}</div>`;
+      (($('pzSubmit')) as HTMLButtonElement).disabled = false;
+    }
+    render();
+  });
+}
+
+// ---- マップ（§14〜§16, §42） ----
+function walkMinutes(lat: number, lng: number): string {
+  if (!geo) return '';
+  const R = 6371000;
+  const dLat = ((lat - geo.lat) * Math.PI) / 180;
+  const dLng = ((lng - geo.lng) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((geo.lat * Math.PI) / 180) * Math.cos((lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  const d = 2 * R * Math.asin(Math.sqrt(a));
+  return `徒歩約${Math.max(1, Math.round(d / 67))}分`;
+}
+
+function renderMap(): void {
+  if (S.player.phase !== 'stores' || !S.stores) {
+    map = null;
+    $('view').innerHTML = `${missionHtml()}
+      <div class="card" style="text-align:center;padding:36px 18px">
+        <div style="font-size:30px">🔒</div>
+        <p style="font-weight:800;margin:10px 0 4px">マップはまだ解放されていません</p>
+        <p class="note">謎を解くと、調査すべき場所がここに表示されます。</p>
+      </div>`;
+    return;
+  }
+  const st = S.stores;
+  const clearedAll = st.done >= st.required;
+
+  let notice = '';
+  if (st.skipped || st.noStoresOpen) {
+    notice = `<div class="okbox">本日は運営の判断によりこの調査は省略できます。「次へ進む」で先へどうぞ。</div>`;
+  }
+
+  $('view').innerHTML = `
+    ${missionHtml()}
+    ${notice}
+    <div class="map-wrap"><div id="map"></div></div>
+    <p class="k" style="margin-top:16px">調査可能な場所（${st.list.length}）</p>
+    <div id="storeCards">
+      ${st.list.map((s: any) => `
+        <div class="store-card ${s.cleared ? 'done' : ''}" data-store="${esc(s.id)}">
+          <div style="flex:1">
+            <div class="nm">${esc(s.name)}</div>
+            <div class="st">
+              ${walkMinutes(s.lat, s.lng) ? `<span>${walkMinutes(s.lat, s.lng)}</span>` : ''}
+              <span>席利用 ${s.seatingAvailable ? '○' : '×'}</span>
+              ${s.hours ? `<span>${esc(s.hours)}</span>` : ''}
+            </div>
+          </div>
+          <span class="chip ${s.cleared ? 'done' : 'open'}">${s.cleared ? '調査済' : esc(s.statusLabel)}</span>
+        </div>`).join('')}
+    </div>
+    ${clearedAll || st.skipped || st.noStoresOpen ? `<button class="btn red" id="mapAdvance">✅ 調査完了 — 次へ進む</button>` : ''}
+  `;
+
+  document.querySelectorAll<HTMLElement>('[data-store]').forEach((el) => {
+    el.addEventListener('click', () => openStore(el.dataset.store!));
+  });
+  $('mapAdvance')?.addEventListener('click', doAdvance);
+
+  // Leaflet 初期化（マップタブを開くたびに作り直す — DOMごと差し替えているため）
+  map = L.map('map', { zoomControl: false, attributionControl: true });
+  L.control.zoom({ position: 'bottomright' }).addTo(map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  }).addTo(map);
+  markers = L.layerGroup().addTo(map);
+  const pts: [number, number][] = [];
+  st.list.forEach((s: any, i: number) => {
+    pts.push([s.lat, s.lng]);
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="smk-pin ${s.cleared ? 'done' : ''}"><span>${i + 1}</span></div>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 30],
+    });
+    L.marker([s.lat, s.lng], { icon })
+      .addTo(markers!)
+      .on('click', () => openStore(s.id));
+  });
+  if (pts.length) map.fitBounds(L.latLngBounds(pts).pad(0.35));
+  else map.setView([35.6614, 139.6682], 16);
+  setTimeout(() => map?.invalidateSize(), 60);
+}
+
+// ---- 店舗詳細・店舗ミッション（§8-9, §16〜§22） ----
+function openStore(storeId: string): void {
+  const s = S.stores?.list.find((x: any) => x.id === storeId);
+  if (!s) return;
+  const wm = walkMinutes(s.lat, s.lng);
+  const gmap = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${s.lat},${s.lng}`)}`;
+  $('storeSheet').innerHTML = `
+    <div class="grab"></div>
+    <button class="close" id="sdClose">✕</button>
+    <p class="k">INVESTIGATION SPOT</p>
+    <h2 class="hh">${esc(s.name)}</h2>
+    <div class="st" style="margin-top:6px;font-size:12.5px;color:var(--mute)">
+      <span class="chip ${s.cleared ? 'done' : 'open'}" style="margin-right:8px">${s.cleared ? '調査済' : esc(s.statusLabel)}</span>
+      ${wm ? `${esc(wm)}　` : ''}${s.hours ? `営業 ${esc(s.hours)}` : ''}
+    </div>
+    ${s.image ? `<img class="sd-img" src="${esc(s.image)}" alt="">` : ''}
+    ${s.description ? `<p style="font-size:13.5px;margin:12px 0 0">${esc(s.description)}</p>` : ''}
+    <div style="margin-top:14px">
+      <div class="sd-row"><b>住所</b><span>${esc(s.address)}　<a href="${gmap}" target="_blank" rel="noopener" style="color:var(--navy)">地図アプリで開く</a></span></div>
+      <div class="sd-row"><b>店内利用</b><span>${s.seatingAvailable ? '○ 席に座ることができます' : '× 店内利用はできません。情報を確認したら次の場所へ移動してください。'}</span></div>
+      ${s.purchaseRequired ? `<div class="sd-row"><b>購入するもの</b><span>「${esc(s.purchaseItem)}」${s.purchasePrice != null ? `　価格：${Number(s.purchasePrice).toLocaleString()}円` : ''}</span></div>` : ''}
+      ${s.notes ? `<div class="sd-row"><b>注意事項</b><span class="smk-pre">${esc(s.notes)}</span></div>` : ''}
+    </div>
+    <div class="sd-mission">
+      <p class="k">この店舗ですること</p>
+      <div class="smk-pre" style="font-size:14px;font-weight:500">${esc(s.missionDescription)}</div>
+    </div>
+    ${s.cleared
+      ? `<div class="okbox">この店舗の調査は完了しています。</div>`
+      : `
+      <label style="display:block;margin-top:18px;font-size:13px;font-weight:700">
+        ${s.verificationType === 'code' ? '店舗で伝えられたコードを入力してください' : '店舗で発見したキーワードを入力してください'}
+        <input class="input" id="sdInput" autocomplete="off" placeholder="${s.verificationType === 'code' ? '例：123' : 'キーワード'}">
+      </label>
+      <div id="sdMsg"></div>
+      <button class="btn red" id="sdSubmit">送信する</button>`}
+  `;
+  $('storeOvl').classList.add('show');
+  $('sdClose').addEventListener('click', () => $('storeOvl').classList.remove('show'));
+
+  $('sdSubmit')?.addEventListener('click', async () => {
+    const code = ($('sdInput') as HTMLInputElement).value.trim();
+    if (!code) return;
+    (($('sdSubmit')) as HTMLButtonElement).disabled = true;
+    const r = await act({ action: 'visit', storeId, code });
+    if (!r) return;
+    if (r.ok && r.correct) {
+      $('storeOvl').classList.remove('show');
+      const ev = r.evidence;
+      showFull(
+        '調査完了',
+        ev ? `新しい証拠を入手しました。\n\n【${ev.title}】\n${ev.content}` : 'この店舗の調査は完了しています。',
+        () => { tab = 'map'; render(); },
+      );
+    } else {
+      const msg = $('sdMsg');
+      if (msg) msg.innerHTML = `<div class="errbox">${esc(r.message || r.error || 'エラーが発生しました')}</div>`;
+      (($('sdSubmit')) as HTMLButtonElement)?.removeAttribute('disabled');
+    }
+  });
+}
+
+async function doAdvance(): Promise<void> {
+  const r = await act({ action: 'advance' });
+  if (!r) return;
+  if (r.ok) {
+    tab = 'home';
+    if (S.player.phase === 'final') {
+      showFull('全STEPクリア', 'すべての調査が完了した。\nいよいよ、最終推理の時間だ。', () => render());
+    } else {
+      showFull(`STEP ${S.player.stepNumber}`, '新しい章が解放されました。\nストーリーを読み、調査を続けてください。', () => render());
+    }
+  } else {
+    alert(r.error || 'まだ進行できません。');
+  }
+}
+
+// ---- 調査記録（§23） ----
+function renderRecord(): void {
+  const items = S.record.items as any[];
+  const unknown = Math.max(0, S.record.totalSlots - items.length);
+  $('view').innerHTML = `
+    ${missionHtml()}
+    <p class="k" style="margin-top:18px">INVESTIGATION RECORD — 調査記録</p>
+    ${items.length === 0 ? `<div class="card"><p class="note">まだ証拠がありません。街で調査を進めましょう。</p></div>` : ''}
+    ${items.map((ev) => `
+      <div class="ev">
+        <div class="tt">${esc(ev.title)}</div>
+        ${ev.image ? `<img class="story-img" src="${esc(ev.image)}" alt="">` : ''}
+        <div class="bd smk-pre">${esc(ev.content)}</div>
+        ${ev.storeName ? `<div class="src">入手場所：${esc(ev.storeName)}</div>` : ''}
+      </div>`).join('')}
+    ${Array.from({ length: unknown }, () => `<div class="ev unknown"><div class="tt">？？？</div><div class="bd">未発見</div></div>`).join('')}
+  `;
+}
+
+// ---- 最終推理（§39） ----
+function openFinal(): void {
+  if (!S.final) return;
+  $('puzzleSheet').innerHTML = `
+    <div class="grab"></div>
+    <button class="close" id="pzClose">✕</button>
+    <p class="k">FINAL DEDUCTION — 最終推理</p>
+    <div class="card">${para(S.final.story)}</div>
+    ${S.final.questions.map((q: any, i: number) => `
+      <label style="display:block;margin-top:16px;font-size:13.5px;font-weight:700">
+        <span class="smk-pre">${esc(q.question)}</span>
+        <input class="input" data-final="${i}" autocomplete="off" placeholder="回答">
+        <span id="fw${i}" style="display:none;color:var(--red);font-size:12px;font-weight:800">▲ この推理は誤っているようだ</span>
+      </label>`).join('')}
+    <div id="fnMsg"></div>
+    <button class="btn red" id="fnSubmit">推理を確定する</button>
+    <p class="note" style="margin-top:10px">※確定しても、間違っていれば何度でも推理し直せます。</p>
+  `;
+  $('puzzleOvl').classList.add('show');
+  $('pzClose').addEventListener('click', () => $('puzzleOvl').classList.remove('show'));
+
+  $('fnSubmit').addEventListener('click', async () => {
+    const answers = Array.from(document.querySelectorAll<HTMLInputElement>('[data-final]')).map((el) => el.value);
+    if (answers.some((a) => !a.trim())) {
+      $('fnMsg').innerHTML = `<div class="errbox">すべての問いに回答してください。</div>`;
+      return;
+    }
+    (($('fnSubmit')) as HTMLButtonElement).disabled = true;
+    const r = await act({ action: 'final', answers });
+    if (!r) return;
+    if (r.ok && r.correct) {
+      $('puzzleOvl').classList.remove('show');
+      showFull('推理成立', r.successText, () => render());
+    } else {
+      (r.results as boolean[] | undefined)?.forEach((okAns, i) => {
+        const w = document.getElementById(`fw${i}`);
+        if (w) w.style.display = okAns ? 'none' : 'inline';
+      });
+      $('fnMsg').innerHTML = `<div class="errbox">${esc(r.message || r.error || 'エラーが発生しました')}</div>`;
+      (($('fnSubmit')) as HTMLButtonElement).disabled = false;
+    }
+  });
+}
+
+// ---- エンディング（§40） ----
+function renderEnding(): void {
+  const e = S.ending;
+  $('view').innerHTML = '';
+  $('fullIn').innerHTML = `
+    <p class="big">${esc(e.title)}</p>
+    <div class="stampline"></div>
+    <div class="bd smk-pre">${esc(e.text)}</div>
+    <div class="stats">
+      <div><div class="v">${e.stats.playMinutes}<small>分</small></div><div class="l">調査時間</div></div>
+      <div><div class="v">${e.stats.storesVisited}</div><div class="l">訪問店舗</div></div>
+      <div><div class="v">${e.stats.hintsUsed}</div><div class="l">ヒント使用</div></div>
+      <div><div class="v">${e.stats.wrongAnswers}</div><div class="l">誤答数</div></div>
+    </div>
+    ${navigator.share ? `<button class="btn" id="shareBtn" style="margin-top:22px">結果をシェアする</button>` : ''}
+  `;
+  $('fullOvl').classList.add('show');
+  $('shareBtn')?.addEventListener('click', () => {
+    navigator.share({
+      title: S.game.title,
+      text: `「${S.game.title}」事件解決！ 調査時間${e.stats.playMinutes}分・訪問店舗${e.stats.storesVisited}か所`,
+      url: location.origin + '/shimokita/',
+    }).catch(() => {});
+  });
+}
+
+// ---- 全画面演出 ----
+function showFull(title: string, body: string, onClose: () => void): void {
+  $('fullIn').innerHTML = `
+    <p class="big">${esc(title)}</p>
+    <div class="stampline"></div>
+    <div class="bd smk-pre">${esc(body)}</div>
+    <button class="btn" id="fullNext" style="margin-top:24px">つづける</button>
+  `;
+  $('fullOvl').classList.add('show');
+  $('fullNext').addEventListener('click', () => {
+    $('fullOvl').classList.remove('show');
+    onClose();
+  });
+}
+
+// ---- 起動 ----
+document.querySelectorAll<HTMLButtonElement>('.nav button').forEach((b) => {
+  b.addEventListener('click', () => {
+    tab = b.dataset.tab as typeof tab;
+    render();
+  });
+});
+['storeOvl', 'puzzleOvl'].forEach((id) => {
+  $(id).addEventListener('click', (e) => {
+    if (e.target === $(id)) $(id).classList.remove('show');
+  });
+});
+
+// 現在地（任意・拒否されても問題なし）— 徒歩分数の目安表示にだけ使う
+if ('geolocation' in navigator) {
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      geo = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      if (tab === 'map') render();
+    },
+    () => {},
+    { maximumAge: 120000, timeout: 8000 },
+  );
+}
+
+refresh();
+// オンライン復帰時に自動で再同期（§47）
+window.addEventListener('online', refresh);
+</script>
+</ShimokitaLayout>

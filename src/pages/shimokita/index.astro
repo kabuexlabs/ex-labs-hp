@@ -1,0 +1,138 @@
+---
+// TOP / タイトル画面（§6）。
+// イベントタイトル・注意事項・推奨環境を表示し、「調査を開始する」から
+// プレイヤーを発行して /shimokita/play/ へ送る。参加コードが設定されている
+// 場合のみコード入力欄を出す。
+export const prerender = false;
+
+import ShimokitaLayout from '../../layouts/ShimokitaLayout.astro';
+import { isKvConfigured, getContent } from '../../lib/shimokita';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+
+let title = '街歩き謎解きイベント';
+let tagline = '';
+let playTime = '';
+let notes = '';
+let needsCode = false;
+let configured = isKvConfigured();
+if (configured) {
+  try {
+    const content = await getContent();
+    title = content.settings.title;
+    tagline = content.settings.tagline ?? '';
+    playTime = content.settings.playTime ?? '';
+    notes = content.settings.notes ?? '';
+    needsCode = !!content.settings.startCode?.trim();
+  } catch {
+    configured = false;
+  }
+}
+---
+<ShimokitaLayout title={title}>
+<style>
+.top{min-height:100svh;display:flex;flex-direction:column;justify-content:center;max-width:480px;margin:0 auto;padding:48px 24px 56px}
+.file-tab{align-self:flex-start;background:var(--ink);color:var(--paper);font-size:11px;font-weight:700;letter-spacing:.28em;padding:6px 14px 5px;border-radius:4px 4px 0 0}
+.file{border:1.5px solid var(--ink);border-radius:0 var(--radius) var(--radius) var(--radius);background:#fff;padding:34px 26px 30px;box-shadow:6px 6px 0 rgba(28,30,34,.08)}
+.case-no{font-size:11px;letter-spacing:.24em;color:var(--mute);margin:0 0 14px}
+h1{font-family:'Shippori Mincho',serif;font-weight:800;font-size:30px;line-height:1.35;letter-spacing:.06em;margin:0}
+.tagline{margin:14px 0 0;font-size:13.5px;color:var(--mute)}
+.stamp{display:inline-block;margin-top:20px;border:2.5px solid var(--red);color:var(--red);font-weight:900;font-size:12px;letter-spacing:.3em;padding:5px 12px 4px;transform:rotate(-4deg);border-radius:4px;opacity:.85}
+.meta{margin:26px 0 0;padding:0;list-style:none;font-size:13px;color:var(--mute)}
+.meta li{display:flex;gap:10px;padding:7px 0;border-top:1px dashed var(--line)}
+.meta li:last-child{border-bottom:1px dashed var(--line)}
+.meta b{flex:none;color:var(--ink);font-weight:700}
+.notes{white-space:pre-wrap;font-size:12.5px;color:var(--mute);margin:18px 0 0;line-height:1.9}
+label.code{display:block;margin-top:24px;font-size:13px;font-weight:700}
+input[type=text]{width:100%;margin-top:8px;padding:13px 14px;font:inherit;font-size:16px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink)}
+input[type=text]:focus{outline:2px solid var(--ink);outline-offset:1px}
+.start{display:flex;align-items:center;justify-content:center;width:100%;margin-top:26px;padding:17px;background:var(--ink);color:#fff;font-weight:800;font-size:15.5px;letter-spacing:.14em;border:none;border-radius:999px;cursor:pointer;transition:transform .15s}
+.start:active{transform:scale(.98)}
+.start[disabled]{opacity:.5;cursor:wait}
+.err{display:none;background:#fbeaea;border:1.5px solid #e3b6b6;color:var(--red);border-radius:10px;padding:12px 14px;font-size:13.5px;margin-top:16px}
+.resume{display:none;margin-top:14px;text-align:center;font-size:13px}
+.resume a{color:var(--navy);font-weight:700}
+.foot{margin-top:34px;text-align:center;font-size:11px;color:var(--mute);letter-spacing:.08em}
+</style>
+
+<div class="top">
+  <div class="file-tab">CASE FILE</div>
+  <div class="file">
+    <p class="case-no">SHIMOKITAZAWA INVESTIGATION</p>
+    <h1>{title}</h1>
+    {tagline && <p class="tagline">{tagline}</p>}
+    <span class="stamp">CONFIDENTIAL</span>
+
+    <ul class="meta">
+      {playTime && <li><b>プレイ時間</b><span>{playTime}</span></li>}
+      <li><b>推奨環境</b><span>スマートフォン（iPhone / Safari・Android / Chrome）</span></li>
+      <li><b>会場</b><span>下北沢エリア一帯</span></li>
+    </ul>
+
+    {notes && <p class="notes">{notes}</p>}
+
+    {!configured && <p class="err" style="display:block">現在準備中です。開始できるようになるまでお待ちください。</p>}
+
+    {configured && (
+      <form id="startForm">
+        {needsCode && (
+          <label class="code">参加コード
+            <input type="text" id="startCode" autocomplete="off" placeholder="チケットに記載のコード" />
+          </label>
+        )}
+        <p class="err" id="startErr"></p>
+        <button type="submit" class="start" id="startBtn">調査を開始する</button>
+        <p class="resume" id="resumeNote">前回の続きから再開します。</p>
+      </form>
+    )}
+  </div>
+  <p class="foot">produced by ex Labs</p>
+</div>
+
+<script>
+// 進行中のプレイヤーがいるかを軽く確認して文言を変える。
+// 開始ボタンは /api/shimokita/start を叩き、成功したらプレイ画面へ。
+const form = document.getElementById('startForm');
+if (form) {
+  const btn = document.getElementById('startBtn') as HTMLButtonElement;
+  const err = document.getElementById('startErr') as HTMLElement;
+  const resumeNote = document.getElementById('resumeNote') as HTMLElement;
+
+  fetch('/api/shimokita/state', { credentials: 'same-origin' })
+    .then((r) => {
+      if (r.ok) {
+        btn.textContent = '調査を再開する';
+        resumeNote.style.display = 'block';
+      }
+    })
+    .catch(() => {});
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btn.disabled = true;
+    err.style.display = 'none';
+    try {
+      const codeInput = document.getElementById('startCode') as HTMLInputElement | null;
+      const res = await fetch('/api/shimokita/start', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: codeInput?.value ?? '' }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        location.href = '/shimokita/play/';
+        return;
+      }
+      err.textContent = data.error || 'エラーが発生しました。もう一度お試しください。';
+      err.style.display = 'block';
+    } catch {
+      err.textContent = '通信に失敗しました。電波の良い場所でもう一度お試しください。';
+      err.style.display = 'block';
+    }
+    btn.disabled = false;
+  });
+}
+</script>
+</ShimokitaLayout>
