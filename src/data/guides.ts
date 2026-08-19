@@ -181,6 +181,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/shuyu-event.webp',
   },
   {
+    href: '/guide/taikengata-company/',
+    title: '体験型イベント制作会社の選び方｜5つの基準・費用相場・依頼の流れ',
+    desc: '失敗しない5つの基準、謎解き・マダミス・イマーシブなどジャンル別の依頼先の考え方、費用相場と納期を解説。',
+    date: '2026-08-19',
+    category: 'shisetsu',
+    thumb: '/assets/guide/taikengata-company.webp',
+  },
+  {
     href: '/guide/sankagata-event/',
     title: '参加型イベントとは？体験型との違い・種類・実例・企画の方法',
     desc: '観客を受け身にさせない参加型イベントの意味、体験型との違い、種類4タイプと実例、企画の方法を解説。',

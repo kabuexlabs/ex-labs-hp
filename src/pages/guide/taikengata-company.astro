@@ -1,0 +1,187 @@
+---
+// 「体験型イベント 制作会社」「イベント企画会社 選び方」系クエリの受け皿。
+// ジャンル別の会社選び記事（nazotoki/madamis/immersive-company）の
+// 上位に立つ「体験型全般」の会社選びハブ。比較一覧型SERPに対し、
+// 制作会社自身が書く「選び方の基準」で差別化する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'what', label: '体験型イベント制作会社に依頼できること' },
+  { id: 'select', label: '制作会社選びで失敗しない5つの基準' },
+  { id: 'genre', label: 'ジャンル別・依頼先の考え方' },
+  { id: 'cost', label: '費用相場の目安' },
+  { id: 'flow', label: '依頼から開催までの流れ' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '体験型イベントの制作費用はどのくらいかかりますか？',
+    a: '形式と規模で大きく変わります。1会場完結のワークショップ型・研修型は数十万円台から、商業施設や街全体を使う大型の周遊型・イマーシブ型は100万円前後から数百万円規模が目安です。チケット収益から回収するレベニューシェア型なら、初期費用を抑えた開催も可能です。',
+  },
+  {
+    q: 'どのジャンル（謎解き・マダミス・イマーシブ）を選べばいいかわかりません。',
+    a: '目的から逆算するのが確実です。幅広い層の集客なら謎解き、少人数の濃い体験や研修ならマダミス、話題化・メディア露出を狙うならイマーシブが定石です。ジャンル選びの段階からの相談に乗ってくれる会社を選ぶと失敗がありません。',
+  },
+  {
+    q: '企画だけ、制作だけの部分的な依頼はできますか？',
+    a: '会社によりますが可能です。ただし体験型イベントは企画・制作・運営が密接に絡むため、部分委託より一貫して任せられる会社の方が当日の体験品質は安定します。',
+  },
+  {
+    q: '小さな会社と大手、どちらに依頼すべきですか？',
+    a: '規模より「実績の質」で選ぶことをおすすめします。確認すべきは、商業施設や企業との案件をやり切った実績・テストプレイ体制・自社イベントでの集客実績の3点です。この3点が揃っていれば、会社の規模に関わらず品質は担保されます。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '体験型イベント制作会社の選び方｜5つの基準・費用相場・依頼の流れ',
+  about: '体験型イベント制作会社の選び方・費用相場・依頼方法',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/taikengata-company.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-19',
+  dateModified: '2026-08-19',
+  mainEntityOfPage: new URL('/guide/taikengata-company/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="体験型イベント制作会社の選び方｜5つの基準・費用相場・依頼の流れ - 株式会社ex Labs"
+  description="体験型イベントの制作会社選びで失敗しない5つの基準を、制作会社自身が解説。謎解き・マダミス・イマーシブなどジャンル別の依頼先の考え方、費用相場（数十万円台〜）、依頼から開催までの流れと納期まで。レベニューシェア型で初期費用を抑えた開催も。"
+  ogImage="/assets/guide/taikengata-company.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '体験型イベントとは', href: '/guide/taikengata-event/' },
+  { name: '制作会社の選び方' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">EVENT GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">体験型イベント制作会社の</span><span class="nobr">選び方</span><br><span class="nobr">5つの基準・費用相場・</span><span class="nobr">依頼の流れ</span></h1>
+<p class="lede">体験型イベントの成否は、<strong>どの制作会社と組むかでほぼ決まります</strong>。この記事では、「会社の一覧」ではなく<strong>選ぶための基準そのもの</strong>を、体験型イベントの制作会社である株式会社ex Labsが内側の視点から解説します。謎解き・マダミス・イマーシブなどジャンル別の依頼先の考え方、費用相場、依頼から開催までの流れまで、発注前に知っておくべきことをまとめました。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="what"><div class="wrap narrow">
+<p class="eyebrow">SERVICE</p><h2 class="h2 serif">体験型イベント制作会社に依頼できること</h2>
+<ul class="bullets">
+<li><strong>企画・コンセプト設計</strong>：目的（集客・プロモーション・研修）の整理から、ジャンル選び・体験の核となるアイデアまで。</li>
+<li><strong>シナリオ・コンテンツ制作</strong>：物語・謎・ゲームシステムの設計と、冊子・小道具・掲示物などの制作。</li>
+<li><strong>会場・動線・運営設計</strong>：参加者の動きとスタッフ配置、混雑対策までのオペレーション設計。</li>
+<li><strong>テストプレイ・品質調整</strong>：難易度と所要時間の検証・調整。体験の満足度を決める工程です。</li>
+<li><strong>集客・広報</strong>：ビジュアル制作・チケット販売・SNS・プレスリリースなどの集客支援。</li>
+<li><strong>当日運営</strong>：進行管理・キャスト・トラブル対応まで。</li>
+</ul>
+<p class="lede">対応範囲は会社によって大きく異なります。<strong>「企画から当日運営まで一貫して任せられるか」</strong>が最初の分かれ目です。</p>
+</div></section>
+
+<section class="section" id="select"><div class="wrap narrow">
+<p class="eyebrow">CRITERIA</p><h2 class="h2 serif">制作会社選びで失敗しない5つの基準</h2>
+<ul class="bullets">
+<li><strong>①商業案件をやり切った実績</strong>：企業・商業施設との案件は、納期・品質・安全管理の水準が個人向けと桁違いです。「どんな企業・施設と組んだか」を必ず確認しましょう。ex Labsは博報堂×紀伊國屋書店様の体験型イベント、渋谷サクラステージ（東急不動産様）での施設一体型イマーシブ（日本経済新聞掲載）などの実績があります。</li>
+<li><strong>②体験設計力</strong>：謎やゲームの面白さ以前に、「参加者がどこで驚き、何を持ち帰るか」という感情の設計ができるか。過去作品の体験の流れを説明してもらうと力量がわかります。</li>
+<li><strong>③テストプレイ体制</strong>：体験型イベントの品質はテストプレイの回数で決まります。この工程を軽視する会社は避けるべきです。</li>
+<li><strong>④集客まで設計できるか</strong>：「作ったのに人が来ない」が体験型イベント最大の失敗パターン。自社イベントで集客した実績（数字）を持つ会社なら安心です。ex Labsには広告費0円でチケット1,500枚を売り切った実績があります。</li>
+<li><strong>⑤運営力</strong>：制作と当日運営が分業だと、トラブル対応が弱くなりがちです。当日の進行・スタッフィングまで一貫対応できる会社を選びましょう。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="genre"><div class="wrap">
+<p class="eyebrow">GENRE</p><h2 class="h2 serif">ジャンル別・依頼先の考え方</h2>
+<p class="h2sub">体験型イベントはジャンルごとに制作ノウハウが異なります。目的に合うジャンルの実績がある会社を選びましょう。</p>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">謎解きイベント</span><span class="genre-d">幅広い層の集客・施設周遊に最適。<a href="/guide/nazotoki-company/" style="color:var(--accent)">謎解き制作会社の選び方 →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">マーダーミステリー</span><span class="genre-d">少人数の濃い体験・研修・動画企画に。<a href="/guide/madamis-company/" style="color:var(--accent)">マダミス制作会社の選び方 →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">イマーシブ</span><span class="genre-d">話題化・メディア露出に最も強い形式。<a href="/guide/immersive-company/" style="color:var(--accent)">イマーシブ制作会社の選び方 →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">頭脳戦・対戦型</span><span class="genre-d">明確な勝敗が生む熱狂とリピート。<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦の制作サービス →</a></span></div>
+</div>
+<div class="rule"></div>
+<p class="lede"><strong>複数ジャンルを横断できる会社は希少です。</strong>ジャンル選びの段階から相談したい場合は、謎解き・マダミス・イマーシブ・頭脳戦のすべてを自社レーベルで企画・公演している会社（当社はこのタイプです）に声をかけると、目的に対して中立なジャンル提案を受けられます。</p>
+</div></section>
+
+<section class="section" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif">費用相場の目安</h2>
+<ul class="bullets">
+<li><strong>ワークショップ型・研修型（1会場完結）</strong>：数十万円台〜。既存コンテンツの活用でさらに抑えられます。</li>
+<li><strong>会場型イベント（オリジナル制作）</strong>：50万〜200万円程度。</li>
+<li><strong>商業施設・街なか周遊型／イマーシブ型（大規模）</strong>：100万円前後〜数百万円規模。</li>
+</ul>
+<p class="lede"><strong>チケット収益から制作費を回収するレベニューシェア型（成果報酬型）</strong>に対応する会社なら、初期費用を大きく抑えられます。ご相談内容によっては、貴社負担なしでの開催も可能です。</p>
+<p class="vc-line"><a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブ制作の費用相場 →</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場 →</a></p>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">依頼から開催までの流れ</h2>
+<div class="flow-row">
+<div class="flow-step"><p class="flow-num">01</p><p class="flow-t">ヒアリング</p><p class="flow-d">目的・会場・予算・希望時期を確認（無料）</p></div>
+<div class="flow-step"><p class="flow-num">02</p><p class="flow-t">企画提案</p><p class="flow-d">ジャンル・コンセプト・お見積りを提案</p></div>
+<div class="flow-step"><p class="flow-num">03</p><p class="flow-t">制作</p><p class="flow-d">シナリオ・制作物・動線・運営を設計</p></div>
+<div class="flow-step"><p class="flow-num">04</p><p class="flow-t">テストプレイ</p><p class="flow-d">難易度・所要時間・運営を検証し調整</p></div>
+<div class="flow-step"><p class="flow-num">05</p><p class="flow-t">開催・運営</p><p class="flow-d">集客・当日運営・振り返りまで対応</p></div>
+</div>
+<p class="vc-line">納期の目安は企画開始から開催まで<strong>2〜4ヶ月程度</strong>。施設との調整を伴う大型案件は、さらに余裕を持ったスケジュールが安心です。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">体験型イベントの制作依頼・お見積りはこちら（相談無料）</p>
+<a class="btn" href="/#contact">体験型イベントについて相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/sankagata-event/" style="color:var(--accent)">参加型イベントとは</a>／<a href="/guide/nazotoki-idea/" style="color:var(--accent)">謎解きイベントの企画アイデア10選</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a></p>
+</div></section>
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#what,#select,#genre,#cost,#flow,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
