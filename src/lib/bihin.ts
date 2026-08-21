@@ -22,6 +22,8 @@ export interface Item {
   // 購入価格（円）。不明・未記入は undefined のまま持ち「不明」と表示する。
   price?: number;
   location: string;
+  // いつ・何の用途で買ったかの自由記述メモ。未記入は undefined。
+  note?: string;
   // 写真の有無＋<img> のキャッシュバスターを兼ねる（写真自体は別キー）。
   photoUpdatedAt?: string;
   createdAt: string;
