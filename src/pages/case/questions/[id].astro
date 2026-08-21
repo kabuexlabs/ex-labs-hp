@@ -1,0 +1,276 @@
+---
+// 問題詳細ページ。30問ぶんを静的生成する。
+// 正誤判定・進捗保存・ヒント開示はすべてクライアント側で行う。
+import CaseLayout from '../../../layouts/CaseLayout.astro';
+import HintSheet from '../../../components/case/HintSheet.astro';
+import CorrectModal from '../../../components/case/CorrectModal.astro';
+import ExpiredNotice from '../../../components/case/ExpiredNotice.astro';
+import { questions } from '../../../data/case/questions';
+
+export function getStaticPaths() {
+  return questions.map((q) => ({
+    params: { id: String(q.id) },
+    props: { question: q },
+  }));
+}
+
+const { question } = Astro.props;
+const num = String(question.number).padStart(2, '0');
+---
+
+<CaseLayout title={`QUESTION ${num}｜CASE FILE`}>
+  <main class="detail" id="question-root" data-question-id={question.id}>
+    <header class="detail-head">
+      <div class="case-wrap detail-head-inner">
+        <a href="/case/questions/" class="head-btn back" aria-label="問題一覧へ戻る">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7M5 12h14"/></svg>
+        </a>
+        <p class="en-label head-title">Question {num}</p>
+        <button type="button" class="head-btn hint" id="hint-open">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+          <span>ヒント</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="case-wrap detail-body">
+      <article>
+        <h1 class="q-title">{question.title}</h1>
+        <p class="q-desc">{question.description}</p>
+        {question.note && <p class="q-note">{question.note}</p>}
+        {question.image && (
+          <figure class="q-figure">
+            <img src={question.image} alt={`QUESTION ${num} の資料画像`} loading="lazy" />
+          </figure>
+        )}
+      </article>
+
+      {/* 解決済みのとき表示する帯（クライアント側で切替） */}
+      <div class="solved-banner" id="solved-banner" hidden>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+        <span>この問題は解決済みです。</span>
+      </div>
+
+      <form class="answer-form" id="answer-form" autocomplete="off">
+        <label class="answer-label" for="answer-input">回答</label>
+        <input
+          type="text"
+          id="answer-input"
+          name="answer"
+          class="answer-input"
+          placeholder="回答を入力してください"
+          enterkeyhint="go"
+          autocapitalize="off"
+          autocorrect="off"
+        />
+        <p class="answer-feedback" id="answer-feedback" role="status" hidden>
+          <span class="en-label feedback-en">Not Correct</span>
+          <span class="feedback-jp">答えが違うようです。もう一度調査してみてください。</span>
+        </p>
+        <button type="submit" class="btn btn-primary answer-submit" id="answer-submit">
+          回答する
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <HintSheet hintCount={question.hints.length} />
+  <CorrectModal />
+  <ExpiredNotice />
+</CaseLayout>
+
+<script>
+  import { questions } from '../../../data/case/questions';
+  import { checkAnswer } from '../../../lib/case/answer';
+  import {
+    ensureStarted,
+    getQuestionProgress,
+    loadProgress,
+    recordAttempt,
+    recordHintLevel,
+  } from '../../../lib/case/progress';
+  import { isExpired } from '../../../lib/case/limit';
+
+  const root = document.getElementById('question-root')!;
+  const questionId = Number(root.dataset.questionId);
+  const question = questions.find((q) => q.id === questionId)!;
+
+  const form = document.getElementById('answer-form') as HTMLFormElement;
+  const input = document.getElementById('answer-input') as HTMLInputElement;
+  const submit = document.getElementById('answer-submit') as HTMLButtonElement;
+  const feedback = document.getElementById('answer-feedback')!;
+  const solvedBanner = document.getElementById('solved-banner')!;
+
+  // ── 解決済みなら回答フォームを閉じる ──
+  function applySolvedState() {
+    solvedBanner.hidden = false;
+    input.disabled = true;
+    input.placeholder = '調査完了';
+    submit.disabled = true;
+    submit.textContent = '解決済み';
+    feedback.hidden = true;
+  }
+  const initial = getQuestionProgress(ensureStarted(), questionId);
+  if (initial?.solved) applySolvedState();
+
+  // ── 時間制限 ──
+  // 期限切れなら問題内容を覆うロック表示を出し、回答も受け付けない。
+  // ページを開いたまま期限を迎えるケースに備えて30秒ごとに再判定する。
+  const expiredOverlay = document.getElementById('expired-overlay');
+  function checkExpiry(): boolean {
+    const current = loadProgress();
+    if (!isExpired(current)) return false;
+    const attempted = current.questions.some((p) => p.attempted);
+    const resultLink = document.getElementById('expired-result');
+    if (resultLink) resultLink.hidden = !attempted;
+    expiredOverlay?.classList.add('open');
+    expiredOverlay?.setAttribute('aria-hidden', 'false');
+    input.disabled = true;
+    submit.disabled = true;
+    return true;
+  }
+  checkExpiry();
+  setInterval(checkExpiry, 30_000);
+
+  // ── 回答判定 ──
+  const correctOverlay = document.getElementById('correct-overlay')!;
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (checkExpiry()) return;
+    const value = input.value;
+    if (value.trim() === '') {
+      input.focus();
+      return;
+    }
+    const solved = checkAnswer(value, question.answers);
+    recordAttempt(questionId, solved);
+    if (solved) {
+      feedback.hidden = true;
+      applySolvedState();
+      correctOverlay.classList.add('open');
+      correctOverlay.setAttribute('aria-hidden', 'false');
+    } else {
+      // 不正解: メッセージを出し、そのまま再回答できる状態を保つ
+      feedback.hidden = false;
+      input.select();
+    }
+  });
+  input.addEventListener('input', () => {
+    feedback.hidden = true;
+  });
+
+  // ── ヒント Bottom Sheet ──
+  const hintOverlay = document.getElementById('hint-overlay')!;
+  const hintItems = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-hint-item]'),
+  );
+
+  function syncHintItems() {
+    const level =
+      getQuestionProgress(ensureStarted(), questionId)?.hintLevel ?? 0;
+    hintItems.forEach((item) => {
+      const itemLevel = Number(item.dataset.level);
+      const text = item.querySelector<HTMLElement>('[data-hint-text]');
+      if (itemLevel <= level) {
+        item.classList.add('revealed');
+        item.classList.remove('locked');
+        if (text) text.textContent = question.hints[itemLevel - 1] ?? '';
+      } else {
+        // 直後の1段階だけ開示ボタンを有効化し、先のヒントはロック
+        item.classList.toggle('locked', itemLevel > level + 1);
+      }
+    });
+  }
+  syncHintItems();
+
+  hintItems.forEach((item) => {
+    item
+      .querySelector('[data-hint-reveal]')
+      ?.addEventListener('click', () => {
+        recordHintLevel(questionId, Number(item.dataset.level));
+        syncHintItems();
+      });
+  });
+
+  const setHintOpen = (open: boolean) => {
+    hintOverlay.classList.toggle('open', open);
+    hintOverlay.setAttribute('aria-hidden', String(!open));
+  };
+  document
+    .getElementById('hint-open')
+    ?.addEventListener('click', () => setHintOpen(true));
+  document
+    .getElementById('hint-close')
+    ?.addEventListener('click', () => setHintOpen(false));
+  hintOverlay.addEventListener('click', (e) => {
+    if (e.target === hintOverlay) setHintOpen(false);
+  });
+</script>
+
+<style>
+.detail{min-height:100dvh;padding-bottom:48px}
+.detail-head{
+  position:sticky;top:0;z-index:30;
+  background:var(--head-bg);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line-soft);
+}
+.detail-head-inner{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  height:56px;
+}
+.head-title{margin:0;font-size:13px}
+.head-btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  min-width:44px;height:44px;
+  background:none;border:none;color:var(--ink);cursor:pointer;
+  font-size:13px;font-weight:500;
+}
+.head-btn.back{margin-left:-10px}
+.head-btn.hint{
+  margin-right:-6px;padding:0 10px;
+  border:1px solid var(--line);border-radius:999px;height:38px;
+}
+.detail-body{padding-top:28px}
+.q-title{margin:0;font-size:24px;font-weight:700;line-height:1.4;letter-spacing:.04em}
+.q-desc{margin:16px 0 0;font-size:15.5px;line-height:2}
+.q-note{
+  margin:14px 0 0;padding:10px 14px;
+  background:var(--surface);border-left:2px solid var(--line);
+  font-size:13px;color:var(--sub);line-height:1.8;
+}
+.q-figure{margin:20px 0 0}
+.q-figure img{width:100%;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
+.solved-banner{
+  display:flex;align-items:center;gap:8px;
+  margin:24px 0 0;padding:12px 14px;
+  background:var(--solved-bg);border:1px solid var(--line-soft);border-radius:4px;
+  font-size:13.5px;font-weight:700;
+}
+.answer-form{margin:28px 0 0;border-top:1px solid var(--line);padding-top:22px}
+.answer-label{display:block;font-size:12px;font-weight:500;color:var(--sub);letter-spacing:.14em;margin-bottom:8px}
+.answer-input{
+  width:100%;min-height:54px;padding:14px 16px;
+  background:var(--surface);
+  border:1px solid var(--line);border-radius:4px;
+  font-family:inherit;font-size:16px;color:var(--ink);
+  transition:border-color 200ms var(--ease);
+}
+.answer-input:focus{border-color:var(--ink);outline:none}
+.answer-input:disabled{background:var(--solved-bg);color:var(--sub)}
+.answer-input::placeholder{color:var(--placeholder)}
+.answer-feedback{
+  display:flex;flex-direction:column;gap:2px;
+  margin:12px 0 0;padding:12px 14px;
+  border:1px solid var(--ink);border-radius:4px;
+  animation:feedback-in 250ms var(--ease);
+}
+.feedback-en{font-size:11px}
+.feedback-jp{font-size:13px;color:var(--sub)}
+@keyframes feedback-in{
+  from{opacity:0;transform:translateY(-4px)}
+  to{opacity:1;transform:none}
+}
+.answer-submit{margin-top:14px}
+</style>

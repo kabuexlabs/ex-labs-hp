@@ -1,0 +1,79 @@
+---
+// 開発・運営用ページ。一般導線からはリンクしない（URL 直打ちのみ）。
+// 進捗リセットと、動作確認用の正解一覧を提供する。
+import CaseLayout from '../../../layouts/CaseLayout.astro';
+import { questions } from '../../../data/case/questions';
+---
+
+<CaseLayout title="DEV｜CASE FILE">
+  <main class="dev">
+    <div class="case-wrap">
+      <header class="dev-head">
+        <p class="en-label dev-title">Dev Tools</p>
+        <p class="dev-note">運営・動作確認用のページです。一般来場者には案内しないでください。</p>
+      </header>
+
+      <section class="dev-section">
+        <h2 class="dev-heading">進捗リセット</h2>
+        <p class="dev-desc">この端末に保存された調査進捗をすべて削除します。</p>
+        <button type="button" class="btn btn-primary" id="reset-button">進捗をリセット</button>
+        <p class="dev-done" id="reset-done" role="status" hidden>進捗をリセットしました。</p>
+      </section>
+
+      <section class="dev-section">
+        <h2 class="dev-heading">正解一覧（確認用）</h2>
+        <table class="dev-table">
+          <thead>
+            <tr><th>No.</th><th>タイトル</th><th>正解</th></tr>
+          </thead>
+          <tbody>
+            {questions.map((q) => (
+              <tr>
+                <td class="en-label">{String(q.number).padStart(2, '0')}</td>
+                <td><a href={`/case/questions/${q.id}/`}>{q.title}</a></td>
+                <td>{q.answers[0]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      <p class="dev-back"><a href="/case/">← スタート画面へ</a></p>
+    </div>
+  </main>
+</CaseLayout>
+
+<script>
+  import { resetProgress } from '../../../lib/case/progress';
+  import { resetRemoteRecord } from '../../../lib/case/sync';
+  const done = document.getElementById('reset-done');
+  document.getElementById('reset-button')?.addEventListener('click', () => {
+    // サーバー側の統計記録も一緒に消す（テスト端末が本番の集計を
+    // 汚さないようにする）
+    resetRemoteRecord();
+    resetProgress();
+    if (done) done.hidden = false;
+  });
+</script>
+
+<style>
+.dev{padding:32px 0 48px}
+.dev-head{border-bottom:1px solid var(--ink);padding-bottom:16px}
+.dev-title{margin:0;font-size:14px}
+.dev-note{margin:8px 0 0;font-size:12.5px;color:var(--sub)}
+.dev-section{margin-top:28px}
+.dev-heading{margin:0 0 6px;font-size:16px;font-weight:700}
+.dev-desc{margin:0 0 14px;font-size:13px;color:var(--sub)}
+.dev-done{margin:12px 0 0;font-size:13px;font-weight:700}
+.dev-table{
+  width:100%;border-collapse:collapse;
+  font-size:13px;background:var(--surface);
+}
+.dev-table th,.dev-table td{
+  border:1px solid var(--line);padding:8px 10px;text-align:left;
+}
+.dev-table th{font-size:11px;color:var(--sub);font-weight:500;letter-spacing:.1em}
+.dev-table a{text-decoration:underline}
+.dev-back{margin-top:32px;font-size:13px}
+.dev-back a{text-decoration:underline}
+</style>

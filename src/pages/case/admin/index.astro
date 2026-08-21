@@ -1,0 +1,329 @@
+---
+// 謎解きアプリの統計管理ページ（/case/admin/）。
+// 参加者全体の正答率・真相到達率・問題ごとの難易度などを集計表示する。
+// CASE_ADMIN_KEY を知っている運営メンバーだけが閲覧できる。
+// 合言葉は POST でのみ受け取り、以降は HttpOnly なセッション Cookie で
+// 認証する — URL に載せるとブラウザ履歴・アクセスログに残るため、
+// クエリでは絶対に受けない（bihin / yoyaku/admin と同じ方式）。
+export const prerender = false;
+
+import CaseLayout from '../../../layouts/CaseLayout.astro';
+import { questions } from '../../../data/case/questions';
+import { detectiveRanks } from '../../../data/case/ranks';
+import { rankForScore } from '../../../lib/case/ranking';
+import {
+  aggregateStats,
+  checkCaseAdminKey,
+  deleteAllSnapshots,
+  getSnapshots,
+  isKvConfigured,
+  type CaseStats,
+} from '../../../lib/caseStats';
+import { loginAllowed, recordLoginFailure } from '../../../lib/contact';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+
+const COOKIE = 'case_admin';
+const configured = isKvConfigured();
+let loginFailed = false;
+let message = '';
+
+let key = Astro.cookies.get(COOKIE)?.value ?? '';
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const action = String(form.get('action') ?? '');
+
+  if (action === 'login') {
+    // 合言葉はコピペ由来の前後空白で弾かれやすいので trim して照合する。
+    // 総当たり対策：10分間に5回失敗したIPはロック（contact/yoyaku管理と共通）。
+    const loginIp =
+      (Astro.request.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
+    const entered = String(form.get('key') ?? '').trim();
+    if (!(await loginAllowed(loginIp))) {
+      loginFailed = true;
+    } else if (checkCaseAdminKey(entered)) {
+      Astro.cookies.set(COOKIE, entered, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+        path: '/case/admin',
+      });
+      return Astro.redirect(Astro.url.pathname, 303);
+    } else {
+      await recordLoginFailure(loginIp);
+      loginFailed = true;
+    }
+  } else if (action === 'clear' && checkCaseAdminKey(key) && configured) {
+    await deleteAllSnapshots();
+    message = '統計データをすべて削除しました。';
+  }
+}
+
+const authed = checkCaseAdminKey(key);
+const keyConfigured = !!(import.meta.env.CASE_ADMIN_KEY ?? process.env.CASE_ADMIN_KEY);
+
+let stats: CaseStats | null = null;
+if (authed && configured) {
+  const snapshots = await getSnapshots();
+  const finalQuestion = questions.reduce((a, b) => (a.number > b.number ? a : b));
+  stats = aggregateStats(
+    snapshots,
+    questions.map((q) => q.id),
+    finalQuestion.id,
+    rankForScore,
+  );
+
+  // CSVエクスポート（?csv=1）。表計算ソフトでの共有・保存用。
+  if (Astro.url.searchParams.get('csv')) {
+    const esc = (v: string) => `"${v.replaceAll('"', '""')}"`;
+    const rows = [
+      ['番号', 'タイトル', '挑戦者数', '解決者数', '正答率(%)', '平均回答回数', 'ヒント使用者数'],
+      ...stats.perQuestion.map((row) => {
+        const q = questions.find((x) => x.id === row.id)!;
+        return [
+          String(q.number),
+          q.title,
+          String(row.attemptedDevices),
+          String(row.solvedDevices),
+          row.accuracy === null ? '' : String(row.accuracy),
+          row.avgAttempts === null ? '' : String(row.avgAttempts),
+          String(row.hintDevices),
+        ];
+      }),
+    ];
+    // ExcelでUTF-8として開けるようBOMを付ける
+    const csv = '﻿' + rows.map((r) => r.map(esc).join(',')).join('\r\n');
+    return new Response(csv, {
+      headers: {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': 'attachment; filename="case-stats.csv"',
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
+}
+
+const pct = (n: number, d: number) => (d === 0 ? '–' : `${Math.round((n / d) * 100)}%`);
+const titleOf = (id: number) => questions.find((q) => q.id === id)?.title ?? '';
+const numOf = (id: number) =>
+  String(questions.find((q) => q.id === id)?.number ?? 0).padStart(2, '0');
+---
+
+<CaseLayout title="STATS｜CASE FILE ADMIN">
+  <main class="admin">
+    <div class="admin-wrap">
+      <header class="admin-head">
+        <p class="en-label admin-eyebrow">Case File — Investigation Stats</p>
+        <h1 class="admin-title">統計管理</h1>
+      </header>
+
+      {!configured && (
+        <p class="admin-alert">
+          データベース（Upstash Redis）が未設定です。Vercel ダッシュボード → Storage で
+          Redis を接続すると統計の収集が始まります（予約システムと共通のデータベースです）。
+        </p>
+      )}
+
+      {configured && !authed && (
+        <section class="login">
+          {!keyConfigured ? (
+            <p class="admin-alert">
+              環境変数 <code>CASE_ADMIN_KEY</code>（このページの合言葉）が未設定です。
+              Vercel ダッシュボード → Settings → Environment Variables で設定してください。
+            </p>
+          ) : (
+            <form method="post" class="login-form">
+              <input type="hidden" name="action" value="login" />
+              <label class="login-label" for="key">合言葉</label>
+              <input
+                type="password"
+                id="key"
+                name="key"
+                class="login-input"
+                autocomplete="current-password"
+                required
+              />
+              {loginFailed && (
+                <p class="login-error">合言葉が違うか、試行回数の上限に達しました。</p>
+              )}
+              <button type="submit" class="btn btn-primary">ログイン</button>
+            </form>
+          )}
+        </section>
+      )}
+
+      {stats && (
+        <div class="dashboard">
+          {message && <p class="admin-message">{message}</p>}
+
+          <section class="tiles">
+            <div class="tile">
+              <p class="tile-label">参加者数</p>
+              <p class="tile-value">{stats.totalDevices}</p>
+            </div>
+            <div class="tile">
+              <p class="tile-label">1問以上回答</p>
+              <p class="tile-value">{stats.activeDevices}</p>
+            </div>
+            <div class="tile">
+              <p class="tile-label">完走（結果表示）</p>
+              <p class="tile-value">{stats.finishedDevices}</p>
+              <p class="tile-sub">{pct(stats.finishedDevices, stats.totalDevices)}</p>
+            </div>
+            <div class="tile">
+              <p class="tile-label">平均正答率</p>
+              <p class="tile-value">{stats.avgAccuracy === null ? '–' : `${stats.avgAccuracy}%`}</p>
+            </div>
+            <div class="tile">
+              <p class="tile-label">真相へ挑戦</p>
+              <p class="tile-value">{stats.finalAttemptedDevices}</p>
+              <p class="tile-sub">{pct(stats.finalAttemptedDevices, stats.totalDevices)}</p>
+            </div>
+            <div class="tile">
+              <p class="tile-label">真相を解明</p>
+              <p class="tile-value">{stats.finalSolvedDevices}</p>
+              <p class="tile-sub">{pct(stats.finalSolvedDevices, stats.totalDevices)}</p>
+            </div>
+          </section>
+
+          <section class="ranks">
+            <h2 class="section-title">探偵ランク分布<span class="section-note">（1問以上回答した端末）</span></h2>
+            <div class="rank-row">
+              {detectiveRanks.map((r) => (
+                <div class="rank-cell">
+                  <p class="en-label rank-cell-letter">{r.rank}</p>
+                  <p class="rank-cell-count">{stats.rankCounts[r.rank] ?? 0}</p>
+                  <p class="rank-cell-title">{r.title}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section class="per-question">
+            <h2 class="section-title">問題別</h2>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>No.</th>
+                    <th class="th-title">タイトル</th>
+                    <th>挑戦</th>
+                    <th>解決</th>
+                    <th>正答率</th>
+                    <th>平均回答</th>
+                    <th>ヒント</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.perQuestion.map((row) => (
+                    <tr>
+                      <td class="en-label td-num">{numOf(row.id)}</td>
+                      <td class="td-title">{titleOf(row.id)}</td>
+                      <td>{row.attemptedDevices}</td>
+                      <td>{row.solvedDevices}</td>
+                      <td class:list={['td-accuracy', { low: row.accuracy !== null && row.accuracy < 50 }]}>
+                        {row.accuracy === null ? '–' : `${row.accuracy}%`}
+                      </td>
+                      <td>{row.avgAttempts ?? '–'}</td>
+                      <td>{row.hintDevices}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p class="table-note">
+              正答率は「解決した端末 ÷ 挑戦した端末」。正答率50%未満の問題は濃色で表示しています。
+            </p>
+          </section>
+
+          <section class="actions">
+            <a href="?csv=1" class="btn btn-ghost action-btn">CSVをダウンロード</a>
+            <form
+              method="post"
+              onsubmit="return confirm('全端末の統計データを削除します。よろしいですか？（この操作は取り消せません）')"
+            >
+              <input type="hidden" name="action" value="clear" />
+              <button type="submit" class="btn btn-ghost action-btn danger">統計をリセット</button>
+            </form>
+          </section>
+          <p class="admin-note">
+            数値は各端末から匿名で送信された進捗の集計です（個人情報は含まれません）。
+            送信は数秒間隔のため、直前の回答が反映されるまで少しズレることがあります。
+            ページを再読み込みすると最新の集計になります。
+          </p>
+        </div>
+      )}
+    </div>
+  </main>
+</CaseLayout>
+
+<style>
+.admin{padding:32px 0 64px}
+.admin-wrap{max-width:880px;margin:0 auto;padding:0 20px}
+.admin-head{border-bottom:1px solid var(--ink);padding-bottom:16px;margin-bottom:24px}
+.admin-eyebrow{margin:0;font-size:11px;color:var(--sub)}
+.admin-title{margin:8px 0 0;font-size:24px;font-weight:700;letter-spacing:.06em}
+.admin-alert{
+  padding:14px 16px;background:var(--surface);
+  border:1px solid var(--ink);border-radius:4px;
+  font-size:13.5px;line-height:1.9;
+}
+.admin-alert code{font-family:var(--font-en);font-size:12.5px;background:var(--solved-bg);padding:1px 5px}
+.admin-message{margin:0 0 16px;font-size:13.5px;font-weight:700}
+
+/* ── ログイン ── */
+.login-form{max-width:380px;display:flex;flex-direction:column;gap:10px}
+.login-label{font-size:12px;color:var(--sub);letter-spacing:.14em}
+.login-input{
+  min-height:52px;padding:12px 16px;
+  background:var(--surface);border:1px solid var(--line);border-radius:4px;
+  font-family:inherit;font-size:16px;
+}
+.login-input:focus{border-color:var(--ink);outline:none}
+.login-error{margin:0;font-size:13px;font-weight:700}
+
+/* ── サマリータイル ── */
+.tiles{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;
+}
+.tile{
+  background:var(--surface);border:1px solid var(--line);border-radius:4px;
+  padding:14px;
+}
+.tile-label{margin:0;font-size:11px;color:var(--sub);letter-spacing:.1em}
+.tile-value{margin:6px 0 0;font-family:var(--font-en);font-size:28px;font-weight:600;line-height:1}
+.tile-sub{margin:4px 0 0;font-size:11.5px;color:var(--sub)}
+
+/* ── ランク分布 ── */
+.section-title{margin:36px 0 12px;font-size:15px;font-weight:700;letter-spacing:.06em}
+.section-note{font-size:11.5px;font-weight:400;color:var(--sub);margin-left:8px}
+.rank-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.rank-cell{
+  background:var(--surface);border:1px solid var(--line);border-radius:4px;
+  padding:12px;text-align:center;
+}
+.rank-cell-letter{margin:0;font-size:14px;color:var(--sub)}
+.rank-cell-count{margin:4px 0 0;font-family:var(--font-en);font-size:24px;font-weight:600}
+.rank-cell-title{margin:2px 0 0;font-size:11px;color:var(--sub)}
+
+/* ── 問題別テーブル ── */
+.table-scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:4px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line-soft);white-space:nowrap}
+th{font-size:11px;font-weight:500;color:var(--sub);letter-spacing:.08em}
+.th-title,.td-title{text-align:left}
+.td-title{max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.td-num{color:var(--sub);letter-spacing:.12em}
+tbody tr:last-child td{border-bottom:none}
+.td-accuracy.low{font-weight:700}
+.table-note{margin:10px 0 0;font-size:11.5px;color:var(--sub);line-height:1.8}
+
+/* ── 操作 ── */
+.actions{display:flex;gap:10px;margin-top:32px;flex-wrap:wrap}
+.actions form{flex:1;min-width:200px;display:flex}
+.action-btn{flex:1;min-height:48px;font-size:14px;font-weight:500;border-color:var(--line)}
+.action-btn.danger{color:var(--sub)}
+.admin-note{margin:20px 0 0;font-size:11.5px;color:var(--sub);line-height:1.9}
+</style>

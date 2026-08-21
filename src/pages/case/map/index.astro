@@ -1,0 +1,30 @@
+---
+// マップ画面。現段階ではプレースホルダー領域のみ。
+// 画像・ピンの差し込みは MapPlaceholder / caseConfig.mapImage 側で行う。
+import CaseLayout from '../../../layouts/CaseLayout.astro';
+import MapPlaceholder from '../../../components/case/MapPlaceholder.astro';
+import { questions } from '../../../data/case/questions';
+---
+
+<CaseLayout activeNav="map">
+  <main class="map-page">
+    <div class="case-wrap">
+      <header class="map-head">
+        <p class="en-label map-title">Map</p>
+        <h1 class="map-heading">調査エリア</h1>
+      </header>
+      <MapPlaceholder questions={questions} />
+      <p class="map-note">
+        会場マップが公開されると、各調査項目の場所がこの画面に表示されます。
+      </p>
+    </div>
+  </main>
+</CaseLayout>
+
+<style>
+.map-page{padding:24px 0 40px}
+.map-head{margin-bottom:18px}
+.map-title{margin:0;font-size:13px;color:var(--sub)}
+.map-heading{margin:6px 0 0;font-size:22px;font-weight:700;letter-spacing:.06em}
+.map-note{margin:14px 0 0;font-size:12.5px;color:var(--sub);line-height:1.9}
+</style>
