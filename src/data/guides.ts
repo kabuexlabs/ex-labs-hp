@@ -221,6 +221,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/nazotoki-company.webp',
   },
   {
+    href: '/guide/nazotoki-kenshu/',
+    title: '謎解き研修とは？チームビルディング効果・進め方・費用を解説',
+    desc: '協力が自然に生まれる4つの効果、マダミス研修との使い分け、進め方・費用相場。会議室で実施でき数百名まで対応。',
+    date: '2026-08-23',
+    category: 'nazotoki',
+    thumb: '/assets/guide/nazotoki-kenshu.webp',
+  },
+  {
     href: '/guide/madamis-kenshu/',
     title: 'マダミス研修とは？チームビルディング効果・進め方・費用',
     desc: '情報共有・交渉・合意形成が自然に表出する理由と、謎解き研修との使い分け・実施の流れを解説。',

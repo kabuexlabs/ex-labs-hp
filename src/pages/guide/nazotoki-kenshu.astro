@@ -1,0 +1,169 @@
+---
+// 「謎解き 研修」「チームビルディング 謎解き」系クエリの受け皿。
+// マダミス研修ガイド（madamis-kenshu）と対になるスポーク記事で、
+// 研修LP（/services/nazotoki-kenshu/）へ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'about', label: '謎解き研修とは' },
+  { id: 'effect', label: 'チームビルディング効果4つ' },
+  { id: 'vs', label: 'マダミス研修との違い・使い分け' },
+  { id: 'flow', label: '進め方・当日の流れ' },
+  { id: 'cost', label: '費用相場' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '謎解き研修とはどのような研修ですか？',
+    a: '謎解きゲームを教材にした体験型のチームビルディング研修です。チームで協力しないと解けない構造になっているため、役割分担・情報共有・時間管理といった実務に直結するコミュニケーションを、楽しみながら体験できます。',
+  },
+  {
+    q: '何人から実施できますか？',
+    a: '少人数のチーム単位から数百名規模の全社イベントまで、人数に応じてプログラムを設計できます。大人数でもチーム対抗形式にすることで全員が主体的に参加できます。',
+  },
+  {
+    q: '謎解きが苦手な社員がいても大丈夫ですか？',
+    a: '大丈夫です。謎解き研修の目的は「解けること」ではなく「協力の過程」にあります。ひらめき担当・整理担当・時間管理担当など自然に役割が生まれる設計なので、謎解き経験の有無に関わらず全員に見せ場が作れます。',
+  },
+  {
+    q: '会場はどこで実施できますか？',
+    a: '貴社の会議室・研修施設・宴会場など、既存のスペースをそのまま活用できます。オンライン実施や、会場選びの段階からのご相談も可能です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '謎解き研修とは？チームビルディング効果・進め方・費用を解説',
+  about: '謎解き研修・謎解きを使ったチームビルディング',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/nazotoki-kenshu.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-23',
+  dateModified: '2026-08-23',
+  mainEntityOfPage: new URL('/guide/nazotoki-kenshu/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="謎解き研修とは？チームビルディング効果・進め方・費用を解説 - 株式会社ex Labs"
+  description="謎解き研修（謎解きを使ったチームビルディング研修）の効果と仕組みを制作会社が解説。協力が自然に生まれる4つの効果、マダミス研修との使い分け、進め方・当日の流れ、費用相場まで。会議室で実施でき、少人数から数百名まで対応可能です。"
+  ogImage="/assets/guide/nazotoki-kenshu.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '謎解きイベントの企画・制作', href: '/guide/nazotoki-event/' },
+  { name: '謎解き研修とは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">NAZOTOKI GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">謎解き研修とは？</span><br><span class="nobr">チームビルディング効果・</span><span class="nobr">進め方・費用を解説</span></h1>
+<p class="lede"><strong>謎解き研修</strong>とは、謎解きゲームを教材にした体験型のチームビルディング研修です。「協力しなければ解けない」構造を自然に作れるため、<strong>座学では生まれない部署・役職を越えたコミュニケーション</strong>が短時間で生まれます。この記事では、謎解き研修の効果の仕組み・マダミス研修との使い分け・進め方・費用相場を、体験型研修の制作会社である株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">謎解き研修とは</h2>
+<p class="lede">チームで謎や暗号を解き、制限時間内にミッションの達成を目指す体験型研修です。ポイントは、よくできた謎解きが<strong>「1人では絶対に解けないが、全員で挑めば解ける」ように設計されている</strong>こと。ひらめきが得意な人、情報を整理する人、時間を管理する人——参加者それぞれの強みが自然に引き出され、<strong>普段の会議では見えないチームの姿</strong>が表れます。研修らしさを感じさせずに、実務に直結する協働体験を作れるのが最大の特徴です。</p>
+</div></section>
+
+<section class="section" id="effect"><div class="wrap narrow">
+<p class="eyebrow">EFFECT</p><h2 class="h2 serif">チームビルディング効果4つ</h2>
+<ul class="bullets">
+<li><strong>①役職・部署を越えたフラットな協力が生まれる</strong>：謎の前では新人もベテランも対等です。普段は接点のないメンバー同士の会話が、開始数分で自然に始まります。</li>
+<li><strong>②全員に役割と見せ場ができる</strong>：受け身になりがちな研修が、一人ひとりの「主体的な参加」に変わります。謎解きが苦手な人にも整理役・進行役という活躍の場が生まれます。</li>
+<li><strong>③実務のコミュニケーションを疑似体験できる</strong>：制限時間内での役割分担・情報共有・意思決定——謎解きの過程は、プロジェクト実務の縮図です。</li>
+<li><strong>④成功体験の共有が職場に持ち帰られる</strong>：「解けた！」という感情の共有は強い記憶になり、研修後の職場コミュニケーションを円滑にします。</li>
+</ul>
+<p class="vc-line">効果を一過性にしないため、体験後の<strong>振り返り（リフレクション）</strong>までセットで設計するのがポイントです。</p>
+</div></section>
+
+<section class="section tinted" id="vs"><div class="wrap narrow">
+<p class="eyebrow">VS</p><h2 class="h2 serif">マダミス研修との違い・使い分け</h2>
+<p class="lede">体験型研修には謎解きのほかに<strong>マダミス（マーダーミステリー）研修</strong>という選択肢もあります。使い分けの目安はこうです：</p>
+<ul class="bullets">
+<li><strong>謎解き研修が向くケース</strong>：大人数（数十〜数百名）を一体感で盛り上げたい／協力・役割分担・時間管理を体験させたい／新人研修・全社イベント・懇親会</li>
+<li><strong>マダミス研修が向くケース</strong>：少人数でじっくり相互理解を深めたい／情報共有・交渉・合意形成の質を観察したい／管理職研修・チームの相互理解ワーク</li>
+</ul>
+<p class="vc-line"><a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修とは？効果・進め方の詳細 →</a></p>
+</div></section>
+
+<section class="section" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">進め方・当日の流れ</h2>
+<div class="flow-row">
+<div class="flow-step"><p class="flow-num">01</p><p class="flow-t">目的のヒアリング</p><p class="flow-d">チームビルディング・相互理解・懇親など目的を整理</p></div>
+<div class="flow-step"><p class="flow-num">02</p><p class="flow-t">プログラム設計</p><p class="flow-d">人数・会場・目的に合わせて謎と進行を設計</p></div>
+<div class="flow-step"><p class="flow-num">03</p><p class="flow-t">当日実施</p><p class="flow-d">ルール説明→チーム戦（60〜90分が目安）→結果発表</p></div>
+<div class="flow-step"><p class="flow-num">04</p><p class="flow-t">振り返り</p><p class="flow-d">体験を実務の学びに変換するリフレクション</p></div>
+</div>
+<p class="vc-line">会場は<strong>貴社の会議室・研修施設でそのまま実施可能</strong>。既存コンテンツの活用からフルオリジナル制作まで対応できます。</p>
+</div></section>
+
+<section class="section tinted" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif">費用相場</h2>
+<p class="lede">人数・内容・オリジナル制作の有無で変動しますが、<strong>既存コンテンツを活用したプランは数十万円台から</strong>、貴社の理念やビジョンを織り込んだフルオリジナル制作はそれ以上が目安です。ご予算に応じた設計が可能なので、まずは目的と人数をお聞かせください。</p>
+<p class="vc-line"><a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベント制作会社の選び方 →</a>／<a href="/guide/nazotoki-company/" style="color:var(--accent)">謎解き制作会社の選び方と費用相場 →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-nazotoki">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">謎解き研修の企画・制作のご相談はこちら（無料）</p>
+<a class="btn" href="/services/nazotoki-kenshu/">謎解き研修サービスの詳細を見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修サービス</a>／<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修とは</a>／<a href="/guide/nazotoki-event/" style="color:var(--accent)">謎解きイベントの企画・制作ガイド</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a></p>
+</div></section>
+
+<LatestPosts category="nazotoki" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#effect,#vs,#flow,#cost,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
