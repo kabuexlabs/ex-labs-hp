@@ -1,0 +1,164 @@
+---
+// 「社内イベント 企画」「懇親会 コンテンツ」「全社総会 企画」系クエリの受け皿。
+// 研修クラスタ（nazotoki-kenshu/madamis-kenshu）の隣接地で、
+// 研修LPと各ジャンル記事へ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'why', label: '社内イベントが「体験型」に向かう理由' },
+  { id: 'ideas', label: '体験型の社内イベント企画アイデア8選' },
+  { id: 'scene', label: 'シーン別の選び方（懇親会・総会・研修）' },
+  { id: 'point', label: '失敗しない3つのポイント' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '社内イベントの企画はどう決めればいいですか？',
+    a: '「目的」から逆算するのが確実です。部署間交流なら協力型の謎解き、チームの相互理解ならマダミス、大人数の一体感なら対抗戦形式が定石です。目的を伝えるだけで最適な形式から提案してくれる制作会社に相談するのが近道です。',
+  },
+  {
+    q: '大人数（数百名規模）でも実施できますか？',
+    a: 'できます。チーム対抗形式にすることで、数百名規模でも全員が主体的に参加できます。会場も貴社の宴会場・ホール・会議室をそのまま活用可能です。',
+  },
+  {
+    q: 'お酒の入る懇親会でもできますか？',
+    a: 'できます。食事や歓談と並行して進められる軽めの謎解きや、テーブル対抗のゲーム形式など、懇親会の空気を壊さない設計が可能です。',
+  },
+  {
+    q: '費用はどのくらいかかりますか？',
+    a: '既存コンテンツを活用したプランは数十万円台から、会社の理念やメッセージを織り込んだフルオリジナル制作はそれ以上が目安です。人数・目的・予算に応じて柔軟に設計できます。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '社内イベントの企画アイデア8選｜体験型で盛り上がる懇親会・全社会',
+  about: '社内イベント・懇親会・全社総会の体験型企画アイデア',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/shanai-event.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-24',
+  dateModified: '2026-08-24',
+  mainEntityOfPage: new URL('/guide/shanai-event/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="社内イベントの企画アイデア8選｜体験型で盛り上がる懇親会・全社会 - 株式会社ex Labs"
+  description="社内イベント・懇親会・全社総会の企画アイデアを体験型に絞って8つ紹介。謎解き・マダミス・頭脳戦など「全員が主役になる」形式の選び方、シーン別の使い分け、失敗しない3つのポイントを、体験型イベントの制作会社が解説します。"
+  ogImage="/assets/guide/shanai-event.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '体験型イベントとは', href: '/guide/taikengata-event/' },
+  { name: '社内イベントの企画アイデア' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">CORPORATE EVENT</p>
+<h1 class="h2 serif"><span class="nobr">社内イベントの</span><span class="nobr">企画アイデア8選</span><br><span class="nobr">体験型で盛り上がる</span><span class="nobr">懇親会・全社会</span></h1>
+<p class="lede">社内イベントの一番の失敗は、<strong>「参加者が受け身のまま終わる」</strong>こと。立食と歓談だけの懇親会、聞くだけの総会は、翌日には忘れられてしまいます。この記事では、<strong>全員が主役になる「体験型」の社内イベント企画</strong>に絞って、アイデア8選とシーン別の選び方を、体験型イベントの制作会社である株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="why"><div class="wrap narrow">
+<p class="eyebrow">WHY</p><h2 class="h2 serif">社内イベントが「体験型」に向かう理由</h2>
+<p class="lede">歓談型のイベントでは、<strong>結局いつも話す人同士が話して終わる</strong>——多くの担当者が抱えるこの課題を、体験型は構造で解決します。謎解きやマダミスのような「協力しないと進まない仕掛け」があると、部署も役職も関係なく会話が自然発生し、普段接点のないメンバー同士に共通の思い出が生まれます。<strong>「イベントの目的（交流・一体感）を、プログラムの構造そのもので実現する」</strong>のが体験型の本質です。</p>
+</div></section>
+
+<section class="section" id="ideas"><div class="wrap narrow">
+<p class="eyebrow">8 IDEAS</p><h2 class="h2 serif">体験型の社内イベント企画アイデア8選</h2>
+<ul class="bullets">
+<li><strong>①チーム対抗の謎解きゲーム</strong>：協力必須の構造で交流を作る定番。数十〜数百名まで対応でき、会議室・宴会場でそのまま実施できます。<a href="/guide/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修とは →</a></li>
+<li><strong>②マダミス（マーダーミステリー）会</strong>：少人数でじっくり。演じて話すうちに、メンバーの意外な一面が見える相互理解の最強フォーマット。<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修とは →</a></li>
+<li><strong>③交渉・心理戦の頭脳戦大会</strong>：明確な勝敗が生む熱狂。優勝をかけたトーナメントは総会の目玉企画になります。<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦の制作 →</a></li>
+<li><strong>④オフィス全体を使った周遊型謎解き</strong>：自社オフィスが舞台になる特別感。フロアを越えた移動が、普段行かない部署との接点を作ります。</li>
+<li><strong>⑤会社の歴史・理念を織り込んだオリジナルストーリー体験</strong>：創業エピソードやバリューを物語に変換。理念浸透を「読む」から「体験する」に変えます。</li>
+<li><strong>⑥懇親会×テーブル謎解き</strong>：食事・歓談と並行できる軽量形式。乾杯後の中だるみ時間をチーム戦で盛り上げます。</li>
+<li><strong>⑦内定者・新人向けアイスブレイク企画</strong>：初対面同士でも「役割」があるから話せる。配属前の関係構築に。</li>
+<li><strong>⑧オンライン・多拠点同時開催</strong>：全国の拠点をつないで同じゲームに挑戦。リモートメンバーの疎外感を解消します。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="scene"><div class="wrap">
+<p class="eyebrow">SCENE</p><h2 class="h2 serif">シーン別の選び方（懇親会・総会・研修）</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">懇親会・歓送迎会</span><span class="genre-d">食事と並行できる軽めの謎解き・テーブル対抗形式（⑥）。空気を壊さず一体感だけ足せます。</span></div>
+<div class="genre-cell"><span class="genre-t serif">全社総会・キックオフ</span><span class="genre-d">大人数の熱狂を作る対抗戦（①③）や、理念を織り込んだストーリー体験（⑤）。</span></div>
+<div class="genre-cell"><span class="genre-t serif">研修・チームビルディング</span><span class="genre-d">振り返りまで設計する本格プログラム（①②）。<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修サービス →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">内定者・新人フォロー</span><span class="genre-d">初対面の壁を壊すアイスブレイク企画（⑦）。オンライン対応も可（⑧）。</span></div>
+</div>
+</div></section>
+
+<section class="section" id="point"><div class="wrap narrow">
+<p class="eyebrow">POINT</p><h2 class="h2 serif">失敗しない3つのポイント</h2>
+<ul class="bullets">
+<li><strong>①「全員に役割」を最優先する</strong>：盛り上がるのは一部だけ、が最大の失敗。謎解きやマダミスは全員に見せ場が生まれる構造を最初から持っています。</li>
+<li><strong>②難易度は「素人がギリギリ解ける」に調整する</strong>：難しすぎると白け、簡単すぎると盛り上がらない。テストプレイを重ねた市販品質のコンテンツを使うのが安全です。</li>
+<li><strong>③運営を現場担当者に背負わせない</strong>：進行・説明・トラブル対応を担当者が抱えると、当人だけ楽しめません。進行込みで外部に任せるのがおすすめです。</li>
+</ul>
+<p class="vc-line"><a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベント制作会社の選び方 →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-nazotoki">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">社内イベントの企画・制作のご相談はこちら（無料）</p>
+<a class="btn" href="/#contact">社内イベントについて相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修とは</a>／<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修とは</a>／<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修サービス</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a></p>
+</div></section>
+
+<LatestPosts category="nazotoki" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#why,#ideas,#scene,#point,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

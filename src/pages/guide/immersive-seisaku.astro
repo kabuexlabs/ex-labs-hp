@@ -1,0 +1,220 @@
+---
+// 「イマーシブ 制作」単体クエリの正面受け皿となるピラーページ。
+// SERPはリアル体験型とデジタル型（VR/映像）のインテントが混在するため、
+// 両方を体系的に整理する「制作の全体像」記事として頭を取りに行く。
+// making(作り方)/cost(費用)/company(会社選び)/case(事例)を束ねる制作クラスタの頂点。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'about', label: 'イマーシブ制作とは' },
+  { id: 'types', label: 'イマーシブ制作の種類（リアル型とデジタル型）' },
+  { id: 'flow', label: '制作の工程7ステップ' },
+  { id: 'team', label: '制作に関わる職種・体制' },
+  { id: 'cost', label: '制作費用の目安' },
+  { id: 'works', label: 'ex Labsのイマーシブ制作実績' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'イマーシブ制作とは何をすることですか？',
+    a: '参加者が物語や空間に没入する体験（イマーシブ体験）を作ることです。物語・空間・キャスト・音響などを一体で設計するリアル体験型と、VR・映像・プロジェクションなどで没入空間を作るデジタル型に大別されます。',
+  },
+  {
+    q: 'リアル型とデジタル型、どちらで作るべきですか？',
+    a: '目的次第です。施設の集客・話題化・ファン作りなら、その場所でしか体験できないリアル体験型が強く、常設展示や映像コンテンツの再利用を重視するならデジタル型が向きます。両者を組み合わせる設計も可能です。',
+  },
+  {
+    q: 'イマーシブ制作の期間はどのくらいかかりますか？',
+    a: '規模によりますが、企画からテストプレイ・当日運営準備まで含めて2〜4ヶ月程度が目安です。商業施設全体を使う大型企画や施設との調整を伴う場合は、さらに余裕を持ったスケジュールをおすすめします。',
+  },
+  {
+    q: 'イマーシブ制作の費用はいくらくらいですか？',
+    a: 'リアル体験型の場合、1空間で完結する公演型は数十万円台から、商業施設・街全体を舞台にした周遊型は100万円前後から数百万円規模が目安です。チケット収益から回収するレベニューシェア型なら初期費用を抑えられます。',
+  },
+  {
+    q: 'イマーシブ制作を依頼するにはどうすればいいですか？',
+    a: '目的（集客・プロモーション・公演）と会場・希望時期を整理して制作会社に相談するのが第一歩です。株式会社ex Labsでは企画から体験設計・集客・当日運営まで一貫して対応しており、相談・お見積りは無料です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const definedTermLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: 'イマーシブ制作',
+  description:
+    'イマーシブ制作とは、参加者が物語や空間に没入する体験（イマーシブ体験）を企画・設計・実装すること。物語・空間・キャストを一体で設計するリアル体験型と、VR・映像技術で没入空間を作るデジタル型に大別される。',
+  inDefinedTermSet: {
+    '@type': 'DefinedTermSet',
+    name: '体験型エンターテインメント用語集',
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  },
+  url: new URL('/guide/immersive-seisaku/', Astro.site).toString(),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'イマーシブ制作とは？種類・工程・費用・依頼先まで完全ガイド',
+  about: 'イマーシブ制作（没入型体験の企画・制作）の全体像',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/immersive-seisaku.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-24',
+  dateModified: '2026-08-24',
+  mainEntityOfPage: new URL('/guide/immersive-seisaku/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="イマーシブ制作とは？種類・工程・費用・依頼先まで完全ガイド - 株式会社ex Labs"
+  description="イマーシブ制作の全体像を制作会社が解説。リアル体験型とデジタル型（VR・映像）の違いと選び方、制作の工程7ステップ、関わる職種・体制、費用の目安、依頼の方法まで。日本経済新聞掲載の渋谷サクラステージ施設一体型イマーシブなどの制作実績も紹介。"
+  ogImage="/assets/guide/immersive-seisaku.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<script type="application/ld+json" set:html={jsonLd(definedTermLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'イマーシブ完全ガイド', href: '/guide/immersive/' },
+  { name: 'イマーシブ制作とは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">IMMERSIVE PRODUCTION</p>
+<h1 class="h2 serif"><span class="nobr">イマーシブ制作とは？</span><br><span class="nobr">種類・工程・費用・依頼先まで</span><span class="nobr">完全ガイド</span></h1>
+<div class="def-box">
+<p class="def-word"><span class="serif">イマーシブ制作</span><span class="def-en">immersive production</span></p>
+<p class="def-body"><strong>参加者が物語や空間に没入する体験を企画・設計・実装すること</strong>。物語・空間・キャスト・音響を一体で設計する<strong>リアル体験型</strong>と、VR・映像・プロジェクションで没入空間を作る<strong>デジタル型</strong>に大別される。</p>
+</div>
+<p class="lede">このページでは、イマーシブ制作の種類と選び方から、制作の工程・体制・費用・依頼の方法までの全体像を、<strong>日本経済新聞に掲載された渋谷サクラステージの施設一体型イマーシブ</strong>などを手がけるイマーシブ制作会社・株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">イマーシブ制作とは</h2>
+<p class="lede">イマーシブ制作とは、観客を「見る人」から<strong>「物語の当事者」</strong>に変える体験を作る仕事です。映画やテレビの制作が「画面の中」を作るのに対し、イマーシブ制作は<strong>参加者を取り囲む空間・時間・人のすべて</strong>を設計対象にします。台本があるのに観客ごとに体験が変わる、会場そのものが作品になる——この特殊性ゆえに、シナリオ・空間設計・キャスト運用・オペレーションを横断する<strong>総合的な制作技術</strong>が求められます。</p>
+</div></section>
+
+<section class="section" id="types"><div class="wrap">
+<p class="eyebrow">TYPES</p><h2 class="h2 serif">イマーシブ制作の種類（リアル型とデジタル型）</h2>
+<p class="h2sub">「イマーシブ制作」と呼ばれるものは大きく2系統あります。目的に合う方を選びましょう。</p>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">リアル体験型</span><span class="genre-d">実在の施設・街・空間を舞台に、キャストと物語で没入を作る形式。イマーシブイベント・イマーシブシアター・施設一体型など。<strong>集客・話題化・ファン作り</strong>に強い。<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例 →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">デジタル型</span><span class="genre-d">VR・大型映像・プロジェクションマッピング・立体音響で没入空間を作る形式。常設展示・ショールーム・映像コンテンツに向く。<a href="/guide/immersive-vr/" style="color:var(--accent)">リアル型とVRの違い →</a></span></div>
+</div>
+<div class="rule"></div>
+<p class="lede">当社の専門は<strong>リアル体験型</strong>です。「その場所だからこそ体験できる物語」を軸に、商業施設・書店・バー・街全体を舞台にした制作を行っています。デジタル演出を物語に組み込むハイブリッド設計にも対応します。</p>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">制作の工程7ステップ</h2>
+<ul class="bullets">
+<li><strong>①目的・コンセプト設計</strong>：誰に、何を感じて帰ってほしいのか。集客・プロモーション・公演などの目的から体験のゴールを定めます。</li>
+<li><strong>②舞台（場所）の選定・調整</strong>：イマーシブ制作は「場所」が主役。空間の魅力と制約を洗い出し、施設との調整を進めます。</li>
+<li><strong>③シナリオ・世界観制作</strong>：その場所でしか成立しない物語を執筆。参加者の選択で展開が変わる分岐設計もここで行います。</li>
+<li><strong>④体験設計・動線設計</strong>：参加者がどこで驚き、誰と話し、どう移動するか。感情曲線と物理的な動線を同時に設計します。</li>
+<li><strong>⑤制作物・空間演出</strong>：小道具・掲示物・衣装・音響照明。「作り込みすぎない」判断も含めて空間を仕上げます。</li>
+<li><strong>⑥テストプレイ・調整</strong>：所要時間・難易度・没入の途切れを検証。品質はこの工程の回数で決まります。</li>
+<li><strong>⑦集客・当日運営</strong>：チケット販売・SNS・プレス対応から、キャスト進行・トラブル対応まで。</li>
+</ul>
+<p class="vc-line"><a href="/guide/immersive-making/" style="color:var(--accent)">イマーシブイベントの作り方（設計原則の詳細）→</a></p>
+</div></section>
+
+<section class="section" id="team"><div class="wrap narrow">
+<p class="eyebrow">TEAM</p><h2 class="h2 serif">制作に関わる職種・体制</h2>
+<ul class="bullets">
+<li><strong>プロデューサー</strong>：目的・予算・スケジュールの全体統括と施設・企業との調整。</li>
+<li><strong>脚本・シナリオライター</strong>：物語と分岐の設計。イマーシブでは「観客が介入しても壊れない物語」を書く特殊技術が要ります。</li>
+<li><strong>体験設計（ゲームデザイナー）</strong>：謎・選択肢・インタラクションの設計。没入と難易度のバランスを司ります。</li>
+<li><strong>美術・空間演出</strong>：小道具・装飾・音響照明で世界観を実体化。</li>
+<li><strong>キャスト・演出</strong>：参加者と直接関わる俳優と、その演技・アドリブの設計。</li>
+<li><strong>運営・制作進行</strong>：当日のオペレーション、安全管理、施設営業との共存。</li>
+</ul>
+<p class="lede">これらを別々の会社に分けると、物語と運営が噛み合わずに没入が壊れがちです。<strong>一貫体制の制作会社に任せるのが品質の近道</strong>です。<a href="/guide/immersive-company/" style="color:var(--accent)">イマーシブ制作会社の選び方 →</a></p>
+</div></section>
+
+<section class="section tinted" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif">制作費用の目安</h2>
+<ul class="bullets">
+<li><strong>1空間完結の公演型</strong>：数十万円台〜。バー・店舗・小規模スペースでの少人数公演など。</li>
+<li><strong>会場型・劇場型</strong>：100万円前後〜。キャスト数・公演回数・美術の規模で変動します。</li>
+<li><strong>商業施設・街なか周遊型（施設一体型）</strong>：数百万円規模。会場数・開催期間・運営体制で決まります。</li>
+</ul>
+<p class="lede"><strong>チケット収益から制作費を回収するレベニューシェア型（成果報酬型）</strong>に対応しており、ご相談内容によっては貴社負担なしでの開催も可能です。</p>
+<p class="vc-line"><a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブ制作の費用相場の詳細 →</a></p>
+</div></section>
+
+<section class="section" id="works"><div class="wrap narrow">
+<p class="eyebrow">WORKS</p><h2 class="h2 serif">ex Labsのイマーシブ制作実績</h2>
+<ul class="bullets">
+<li><strong>ウワサバナシ調査委員会（渋谷サクラステージ）</strong>：商業施設全体を周遊する都市伝説×イマーシブ×謎解き。東急不動産様ほかのご協力による施設一体型で、<strong>日本経済新聞に掲載</strong>。<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">制作の裏側を公開した事例記事 →</a></li>
+<li><strong>怪盗と秘密の試験（六本木）</strong>：会員制バーを貸し切ったマジック×イマーシブ公演。<strong>電ファミニコゲーマーで紹介</strong>。</li>
+<li><strong>ロスト・フレーム（下北沢）</strong>：街に散らばった絵画を辿る周遊型アートイマーシブ。</li>
+<li><strong>閉店後の紀伊國屋書店での物語体験</strong>（博報堂様案件）：営業時間外の書店を舞台にした体験型イベント。</li>
+</ul>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">イマーシブ制作のご相談・お見積りはこちら（無料）</p>
+<a class="btn" href="/services/immersive/">イマーシブ制作サービスの詳細を見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作の依頼・見積り</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは（完全ガイド）</a>／<a href="/guide/immersive-cost/" style="color:var(--accent)">制作の費用相場</a>／<a href="/guide/immersive-company/" style="color:var(--accent)">制作会社の選び方</a></p>
+</div></section>
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.def-box{max-width:680px;margin:40px auto 26px;background:#fff;border:1px solid rgba(51,48,43,.1);border-left:5px solid var(--accent);border-radius:14px;padding:26px 30px;text-align:left;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.def-word{margin:0 0 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:22px;font-weight:800;color:var(--ink)}
+.def-en{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.06em}
+.def-body{margin:0;font-size:14.5px;line-height:2;color:rgba(51,48,43,.82)}
+@media(max-width:640px){.def-box{padding:20px 20px}.def-word{font-size:19px;gap:10px}}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#types,#flow,#team,#cost,#works,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

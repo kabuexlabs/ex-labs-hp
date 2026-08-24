@@ -1,0 +1,166 @@
+---
+// 「ハロウィン イベント 企画 商業施設」「クリスマス イベント 集客」など
+// 季節催事×体験型のクエリの受け皿。施設の季節企画は開催の2〜3ヶ月前に
+// 検討されるため、秋冬シーズンに向けた鮮度が武器。
+// shogyoshisetsu-event（通年の集客アイデア）とは「季節催事特化」で棲み分け。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'why', label: '季節イベントを「体験型」にする効果' },
+  { id: 'halloween', label: 'ハロウィンの体験型企画アイデア' },
+  { id: 'christmas', label: 'クリスマス〜年末年始の企画アイデア' },
+  { id: 'point', label: '季節企画を成功させる3つのポイント' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '季節イベントはいつから準備すればいいですか？',
+    a: '企画開始から開催まで2〜4ヶ月が目安です。ハロウィン（10月）なら夏頃、クリスマス（12月）なら秋口の始動が理想ですが、既存コンテンツをカスタマイズする形なら1〜2ヶ月での実施も可能です。まずは開催希望時期をご相談ください。',
+  },
+  {
+    q: '飾り付けやイルミネーションと何が違うのですか？',
+    a: '装飾は「見る」だけで終わりますが、体験型は装飾された空間を「物語の舞台」に変えます。同じハロウィン装飾でも、そこに謎解きや物語が重なることで、来館の目的そのものになり、滞在時間と回遊が大きく変わります。',
+  },
+  {
+    q: '毎年恒例の企画にできますか？',
+    a: 'できます。むしろ季節イベントは「今年も来た」というリピート構造を作りやすい形式です。物語やコースを毎年更新することで、恒例企画として集客資産に育てられます。',
+  },
+  {
+    q: '小規模な施設でも実施できますか？',
+    a: '可能です。施設の規模に合わせてコースや所要時間を設計します。1フロア・1区画だけを使った小規模な企画から、施設全体の周遊型まで柔軟に対応できます。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '商業施設の季節イベント企画｜ハロウィン・クリスマスを体験型で集客に変える',
+  about: '商業施設のハロウィン・クリスマスなど季節イベントの体験型企画',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/kisetsu-event.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-24',
+  dateModified: '2026-08-24',
+  mainEntityOfPage: new URL('/guide/kisetsu-event/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="商業施設の季節イベント企画｜ハロウィン・クリスマスを体験型で集客に - 株式会社ex Labs"
+  description="商業施設のハロウィン・クリスマス・年末年始イベントを「装飾を見る」から「物語を体験する」に変える企画アイデアを制作会社が解説。季節装飾×謎解き・イマーシブで滞在時間と回遊を伸ばし、毎年のリピート集客資産に育てる方法。"
+  ogImage="/assets/guide/kisetsu-event.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '施設活用イベントとは', href: '/guide/shisetsu-katsuyo/' },
+  { name: '季節イベントの企画' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">SEASONAL EVENT</p>
+<h1 class="h2 serif"><span class="nobr">商業施設の季節イベント企画</span><br><span class="nobr">ハロウィン・クリスマスを</span><span class="nobr">体験型で集客に変える</span></h1>
+<p class="lede">ハロウィンの装飾、クリスマスのイルミネーション——きれいだけど、<strong>「写真を撮って終わり」</strong>になっていませんか？季節装飾に物語と謎解きを重ねるだけで、装飾は「見るもの」から<strong>「わざわざ来る目的」</strong>に変わります。この記事では、商業施設・文化施設の季節イベントを体験型にする企画アイデアと成功のポイントを、施設一体型イベントの制作会社である株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="why"><div class="wrap narrow">
+<p class="eyebrow">WHY</p><h2 class="h2 serif">季節イベントを「体験型」にする効果</h2>
+<ul class="bullets">
+<li><strong>①装飾投資の回収率が上がる</strong>：同じハロウィン装飾でも、物語の舞台として使えば「装飾を巡る周遊体験」に変わり、投資が集客に直結します。</li>
+<li><strong>②滞在時間と館内回遊が伸びる</strong>：手がかりを探して施設を巡る構造が、普段行かないフロア・テナントへの送客を生みます。</li>
+<li><strong>③毎年のリピート資産になる</strong>：「あの施設のハロウィン謎解き」が恒例になれば、季節ごとの集客装置として毎年機能します。</li>
+<li><strong>④SNS・メディアの話題になる</strong>：「見る装飾」は他施設と横並びですが、「体験できる物語」はニュースになります。当社の渋谷サクラステージでの施設一体型イベントは日本経済新聞に掲載されました。</li>
+</ul>
+</div></section>
+
+<section class="section" id="halloween"><div class="wrap narrow">
+<p class="eyebrow">HALLOWEEN</p><h2 class="h2 serif">ハロウィンの体験型企画アイデア</h2>
+<ul class="bullets">
+<li><strong>館内周遊×ハロウィンミステリー</strong>：「施設に隠されたおばけの謎を追う」周遊型謎解き。仮装スタッフ（キャスト）との会話で手がかりを集める設計にすると、没入感が一気に上がります。</li>
+<li><strong>ナイトハロウィン（閉店後開催）</strong>：営業終了後の暗い館内は、ハロウィンと相性抜群の特別な舞台。「夜の商業施設に入れる」こと自体が強い集客フックです。<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の施設活用 →</a></li>
+<li><strong>キッズ向けトリック・オア・トリート×スタンプラリー</strong>：テナントを巡ってお菓子と手がかりを集める買い回り連動型。ファミリー集客とテナント送客を両立します。</li>
+<li><strong>都市伝説×イマーシブ</strong>：「この施設にまつわる奇妙なウワサ」を軸にした物語体験。当社が渋谷サクラステージで開催した都市伝説×イマーシブ「ウワサバナシ調査委員会」はこの形式です。<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">制作事例を読む →</a></li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="christmas"><div class="wrap narrow">
+<p class="eyebrow">CHRISTMAS & NEW YEAR</p><h2 class="h2 serif">クリスマス〜年末年始の企画アイデア</h2>
+<ul class="bullets">
+<li><strong>イルミネーション×物語体験</strong>：「消えたサンタの贈り物を探す」など、イルミネーションスポットを巡る物語を重ねて、点灯エリア全体を舞台化。デートの目的地になります。</li>
+<li><strong>クリスマスマーケット×謎解き</strong>：出店ブースを巡る手がかり集めで、マーケットの回遊と購買を促進。</li>
+<li><strong>年末年始の福袋×宝探し</strong>：初売りと連動した「施設に隠された福を探す」企画。混雑を施設全体に分散させる効果もあります。</li>
+<li><strong>バレンタイン・ホワイトデーへの連続展開</strong>：秋冬の企画をシリーズ化し、「次の季節も来る理由」を作る設計が最も費用対効果が高い方法です。</li>
+</ul>
+</div></section>
+
+<section class="section" id="point"><div class="wrap narrow">
+<p class="eyebrow">POINT</p><h2 class="h2 serif">季節企画を成功させる3つのポイント</h2>
+<ul class="bullets">
+<li><strong>①準備は2〜4ヶ月前から</strong>：企画・制作・テストプレイ・運営準備の期間を逆算しましょう。ハロウィンなら夏、クリスマスなら秋口の始動が理想です。</li>
+<li><strong>②装飾と体験を一体で設計する</strong>：装飾を作ってから謎を「後付け」すると噛み合いません。装飾計画の段階から体験設計を並走させると、同じ予算で数倍の効果が出ます。</li>
+<li><strong>③営業と共存する動線を組む</strong>：買い物客の動線と干渉しない参加ルート・時間分散の設計は、施設一体型イベントの生命線です。</li>
+</ul>
+<p class="vc-line"><a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベントアイデア10選 →</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">貴施設の季節イベント、体験型にしませんか？（相談無料）</p>
+<a class="btn" href="/#contact">季節イベントについて相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>／<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用アイデア</a>／<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">渋谷サクラステージの制作事例</a>／<a href="/guide/taikengata-company/" style="color:var(--accent)">制作会社の選び方</a></p>
+</div></section>
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#why,#halloween,#christmas,#point,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
