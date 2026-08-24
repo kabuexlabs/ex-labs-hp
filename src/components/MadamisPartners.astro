@@ -1,0 +1,80 @@
+---
+// 提携マダミス会社様のロゴカードセクション。
+// /guide/madamis/ と /services/murder-mystery/ で共用する。
+// ロゴは public/assets/partners/ に配置し、w/h は画像の実寸
+// （レイアウトシフト防止のため必ず指定する）。
+export interface Props {
+  /** 背景を薄色にする（前後セクションとの交互パターンに合わせて指定） */
+  tinted?: boolean;
+}
+const { tinted = false } = Astro.props;
+
+const partners = [
+  {
+    name: 'ロストプロダクト',
+    sub: 'エンターテイメント',
+    url: 'https://www.lostproduct.jp',
+    logo: '/assets/partners/lostproduct.webp',
+    w: 700,
+    h: 178,
+  },
+  {
+    name: 'apri la porta',
+    sub: 'アプリ ラ ポルタ',
+    url: 'https://apri-la-porta.com/',
+    logo: '/assets/partners/apri-la-porta.webp',
+    w: 560,
+    h: 558,
+  },
+  {
+    name: 'Light and Geek',
+    sub: 'ライトアンドギーク',
+    url: 'https://lightandgeek.yorozuyagakudan.com/',
+    logo: '/assets/partners/lightandgeek.webp',
+    w: 560,
+    h: 553,
+  },
+];
+---
+
+<section class:list={['section', { tinted }]} id="partners"><div class="wrap">
+<p class="eyebrow">PARTNERS</p><h2 class="h2 serif">提携マダミス会社様</h2>
+<p class="h2sub">マーダーミステリーの制作・公演で連携させていただいている企業・団体様です。</p>
+<div class="partner-grid">
+{partners.map((p) => (
+  <a class="partner-card" href={p.url} target="_blank" rel="noopener">
+    <span class="partner-logo">
+      <img src={p.logo} alt={`${p.name} ${p.sub}`} width={p.w} height={p.h} loading="lazy" decoding="async">
+    </span>
+    <span class="partner-name">{p.name}<span class="partner-sub">{p.sub}</span></span>
+    <span class="partner-more">公式サイトを見る →</span>
+  </a>
+))}
+</div>
+</div></section>
+
+<style>
+/* ロゴの縦横比が大きく違うため、固定高のロゴ枠に contain で収めて
+   視覚的な大きさを揃える。 */
+.partner-grid{display:grid;gap:24px;grid-template-columns:repeat(3,1fr);margin-top:40px}
+.partner-card{display:flex;flex-direction:column;align-items:center;gap:14px;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:var(--r-l);padding:30px 24px;box-shadow:var(--shadow-1);transition:transform .3s,box-shadow .3s}
+.partner-card:hover{transform:translate(-2px,-2px);box-shadow:var(--shadow-2)}
+.partner-logo{display:flex;align-items:center;justify-content:center;height:92px;width:100%}
+.partner-logo img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+.partner-name{font-size:14px;font-weight:800;line-height:1.6;text-align:center;color:var(--ink)}
+.partner-sub{display:block;font-size:11.5px;font-weight:600;color:rgba(51,48,43,.6)}
+.partner-more{font-size:12.5px;font-weight:700;letter-spacing:.04em;color:var(--accent)}
+/* 狭幅では2列にしてセクションが縦に伸びすぎないようにする。
+   3枚目は1枚だけ余るので、列をまたいで中央に置く。 */
+@media(max-width:900px){.partner-grid{gap:16px}.partner-card{padding:26px 16px}}
+@media(max-width:640px){
+.partner-grid{gap:12px;margin-top:30px;grid-template-columns:repeat(2,1fr)}
+.partner-card{gap:10px;padding:20px 14px}
+.partner-card:last-child:nth-child(odd){grid-column:1/-1;justify-self:center;width:calc(50% - 6px)}
+.partner-logo{height:64px}
+.partner-name{font-size:12.5px}
+.partner-sub{font-size:10.5px}
+.partner-more{font-size:11px}
+}
+#partners{scroll-margin-top:88px}
+</style>
