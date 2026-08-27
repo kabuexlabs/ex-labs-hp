@@ -10,6 +10,7 @@ import { guideArticles } from '../../data/guides';
 
 const groups = [
   { key: 'immersive', label: 'イマーシブ', desc: '意味・費用・作り方から制作依頼まで' },
+  { key: 'zunou', label: '頭脳戦', desc: '頭脳戦の意味・ゲームの種類から制作依頼まで' },
   { key: 'murder', label: 'マダミス（マーダーミステリー）', desc: '遊び方・作り方・制作依頼・企業活用' },
   { key: 'shisetsu', label: '施設活用・体験型イベント', desc: '商業施設・遊休区画・営業時間外の集客' },
   { key: 'nazotoki', label: '謎解き', desc: '謎解きイベントの企画・制作' },
@@ -27,7 +28,7 @@ const listLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
   name: '解説記事・完全ガイド一覧',
-  description: 'マダミス・イマーシブ・施設活用イベント・謎解きの解説記事一覧',
+  description: 'マダミス・イマーシブ・頭脳戦・施設活用イベント・謎解きの解説記事一覧',
   url: new URL('/guide/', Astro.site).toString(),
   hasPart: guideArticles.map((g) => ({
     '@type': 'Article',
@@ -38,7 +39,7 @@ const listLd = {
 ---
 <BaseLayout
   title="解説記事・完全ガイド一覧｜マダミス・イマーシブ・施設活用 - 株式会社ex Labs"
-  description="体験型エンターテインメントの解説記事一覧。マダミス（マーダーミステリー）・イマーシブ・施設活用イベント・謎解きの基礎知識から、制作依頼の費用相場・会社の選び方まで、制作会社の視点で解説しています。"
+  description="体験型エンターテインメントの解説記事一覧。マダミス（マーダーミステリー）・イマーシブ・頭脳戦・施設活用イベント・謎解きの基礎知識から、制作依頼の費用相場・会社の選び方まで、制作会社の視点で解説しています。"
 >
 <script type="application/ld+json" set:html={jsonLd(listLd)} />
 <Breadcrumb items={[

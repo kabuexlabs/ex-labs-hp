@@ -25,6 +25,36 @@ function safeNext(raw: string | undefined): string {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// --- 営業スパム自動判定 ------------------------------------------------------
+// 実際に届いた営業メールに共通する高精度シグナルだけを見る。
+// 該当しても破棄はしない（KV保存・管理者通知はそのまま）。件名に
+// 【営業・スパムの疑い】を付けて仕分けし、お客様向け自動控えメールだけ止める。
+// 誤判定してもメール自体は届くので、問い合わせを取りこぼす事故は起きない。
+const SPAM_STRONG: RegExp[] = [
+  // 被リンク・相互リンク営業（nocode-sol型）
+  /相互リンク|被リンク|リンク設置|ドメインパワー|dofollow/i,
+  // 日程調整URLを貼ってくる営業（Wedia型）
+  /timerex\.net|youcanbook\.me|calendly\.com|meetings\.hubspot/i,
+  // 営業代行・広告運用・SEO業者の定型文
+  /営業代行|テレアポ|アポ(?:イント)?(?:獲得)?代行/,
+  /広告運用(?:代行)?の|リスティング広告|MEO対策/,
+  /SEO(?:対策|コンサル)(?:の)?(?:ご案内|ご提案|サービス)|検索順位を(?:上げ|改善)/i,
+  // 一斉配信メールの常套句（通常の問い合わせには絶対に現れない）
+  /配信(?:の)?(?:停止|解除)|受信を希望(?:され)?ない|一斉(?:送信|配信)/,
+];
+const SPAM_WEAK: RegExp[] = [
+  /補助金|助成金/,
+  /貴社(?:の)?(?:ホームページ|ＨＰ|HP|サイト)を拝見/i,
+  /無料(?:診断|トライアル)/,
+];
+function spamCheck(text: string, source: string): boolean {
+  const strong = SPAM_STRONG.some((re) => re.test(text));
+  const weak = SPAM_WEAK.filter((re) => re.test(text)).length;
+  // _source が空＝ブラウザのJSを経由していない直POSTの可能性が高い。
+  // 単独では判定せず、弱シグナルと組み合わせたときだけ効かせる。
+  return strong || weak >= 2 || (weak >= 1 && !source);
+}
 // フォーム側で使われているハニーポット名（bot はここを埋めてしまう）
 const HONEYPOTS = ['_gotcha', '_honey', 'website'];
 // メール本文に含めない制御用フィールド
@@ -73,11 +103,14 @@ export const POST: APIRoute = async ({ request }) => {
   }
   if (lines.length === 0 || totalLen > 8000) return redirect();
 
-  const subject = (get('_subject') || '【ex Labs】サイトからのお問い合わせ').slice(0, 150);
+  const baseSubject = (get('_subject') || '【ex Labs】サイトからのお問い合わせ').slice(0, 150);
   const source = get('_source').slice(0, 600);
+  const spam = spamCheck(`${baseSubject}\n${lines.join('\n')}`, source);
+  const subject = spam ? `【営業・スパムの疑い】${baseSubject}` : baseSubject;
   const record = {
     id: crypto.randomUUID(),
     subject,
+    spam,
     email,
     fields: lines.join('\n\n'),
     source,
@@ -96,6 +129,9 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const body =
+    (spam
+      ? `※自動判定: 営業・スパムの可能性が高い送信です（送信者への自動控えメールは送っていません）。\n\n`
+      : '') +
     `サイトのお問い合わせフォームから送信がありました。\n\n${record.fields}\n\n` +
     `——\n送信者メールアドレス: ${email}\n受信日時: ${record.createdAt}\n` +
     (source ? `流入元:\n${source}\n` : '') +
@@ -104,7 +140,9 @@ export const POST: APIRoute = async ({ request }) => {
 
   // 送信者への自動控えメール。受付が成立した場合のみ送る。
   // 返信先は info@ なので、送信者がこのメールに返信すればそのまま届く。
-  if (stored || mailed) {
+  // 営業スパム判定時は送らない（営業リストに「生きているアドレス」と
+  // 認識させないため。誤判定でも本人には後から手動で返信できる）。
+  if (!spam && (stored || mailed)) {
     const receipt =
       `お問い合わせありがとうございます。\n以下の内容で受け付けました。\n\n` +
       `${record.fields}\n\n——\n` +
