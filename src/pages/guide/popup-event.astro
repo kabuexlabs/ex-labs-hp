@@ -1,0 +1,199 @@
+---
+// 「ポップアップイベント」「ポップアップストア 活用」系クエリの受け皿。
+// 施設活用クラスタ（yukyu-kukaku/eigyo-jikangai/kisetsu-event）の隣接語を
+// 「物販ポップアップ vs 体験型ポップアップ」という独自の切り口で刈り取る。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'about', label: 'ポップアップイベントとは' },
+  { id: 'types', label: '物販型と体験型の違い' },
+  { id: 'merit', label: '施設側・出店側それぞれのメリット' },
+  { id: 'taiken', label: '体験型ポップアップの企画例' },
+  { id: 'flow', label: '開催までの流れと費用' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'ポップアップイベントとは何ですか？',
+    a: '商業施設の空き区画やイベントスペースなどに、期間限定で出店・開催されるイベントの総称です。数日〜数週間の短期開催が特徴で、物販中心のポップアップストアと、謎解き・イマーシブなどの体験型ポップアップに大別されます。',
+  },
+  {
+    q: 'ポップアップストアと何が違うのですか？',
+    a: 'ポップアップストアは期間限定の「店舗」（物販が主目的）を指すのに対し、ポップアップイベントは物販に限らず、体験・展示・プロモーションを含むより広い概念です。近年は「買う」より「体験する」目的の来場を作る体験型が伸びています。',
+  },
+  {
+    q: '空き区画でポップアップイベントを開催できますか？',
+    a: 'できます。空きテナント区画・催事スペース・共用部などが会場になります。体験型イベントなら大掛かりな内装工事をせず、既存の空間をそのまま物語の舞台として活かせるため、原状回復の負担も小さく済みます。',
+  },
+  {
+    q: '開催までにどのくらいの期間が必要ですか？',
+    a: '既存コンテンツを活用する場合は1〜2ヶ月、オリジナル制作の場合は2〜4ヶ月が目安です。会期・区画の条件が決まっていれば、それに合わせた企画をご提案します。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const definedTermLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: 'ポップアップイベント',
+  description:
+    'ポップアップイベントとは、商業施設の空き区画やイベントスペースなどに期間限定で出店・開催されるイベントの総称。物販中心のポップアップストアと、謎解き・イマーシブなどの体験型ポップアップに大別される。',
+  inDefinedTermSet: {
+    '@type': 'DefinedTermSet',
+    name: '体験型エンターテインメント用語集',
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  },
+  url: new URL('/guide/popup-event/', Astro.site).toString(),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'ポップアップイベントとは？体験型で空き区画を集客に変える方法',
+  about: 'ポップアップイベント・体験型ポップアップの企画',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/popup-event.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-27',
+  dateModified: '2026-08-27',
+  mainEntityOfPage: new URL('/guide/popup-event/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="ポップアップイベントとは？体験型で空き区画を集客に変える方法 - 株式会社ex Labs"
+  description="ポップアップイベントとは、空き区画・催事スペースで期間限定開催されるイベントのこと。物販型ポップアップストアとの違い、施設側・出店側のメリット、謎解き・イマーシブを使った体験型ポップアップの企画例、開催までの流れと費用を解説。"
+  ogImage="/assets/guide/popup-event.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<script type="application/ld+json" set:html={jsonLd(definedTermLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '施設活用イベントとは', href: '/guide/shisetsu-katsuyo/' },
+  { name: 'ポップアップイベントとは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">POP-UP EVENT</p>
+<h1 class="h2 serif"><span class="nobr">ポップアップイベントとは？</span><br><span class="nobr">体験型で空き区画を</span><span class="nobr">集客に変える方法</span></h1>
+<div class="def-box">
+<p class="def-word"><span class="serif">ポップアップイベント</span><span class="def-en">pop-up event</span></p>
+<p class="def-body">商業施設の空き区画やイベントスペースなどに、<strong>期間限定で出店・開催されるイベント</strong>の総称。数日〜数週間の短期開催が特徴で、物販中心の<strong>ポップアップストア</strong>と、謎解き・イマーシブなどの<strong>体験型ポップアップ</strong>に大別される。</p>
+</div>
+<p class="lede">この記事では、ポップアップイベントの意味と種類、施設側・出店側それぞれのメリット、そして<strong>「買う」ではなく「体験する」目的の来場を作る体験型ポップアップ</strong>の企画方法を、施設一体型イベントの制作会社である株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">ポップアップイベントとは</h2>
+<p class="lede">ポップアップ（pop-up）は「突然現れる」という意味。<strong>常設ではなく期間限定だからこそ「今行かないと終わってしまう」という来場動機が生まれる</strong>のが、ポップアップイベント最大の武器です。施設にとっては空き区画・催事スペースの活用手段として、ブランドにとっては出店リスクを抑えたテストマーケティングや話題化の手段として、双方のニーズが噛み合い市場が拡大しています。</p>
+<p class="vc-line"><a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画・空きスペースの活用アイデア →</a></p>
+</div></section>
+
+<section class="section" id="types"><div class="wrap">
+<p class="eyebrow">TYPES</p><h2 class="h2 serif">物販型と体験型の違い</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">物販型（ポップアップストア）</span><span class="genre-d">期間限定の店舗。商品・グッズの販売が主目的で、ブランドの認知拡大・テスト出店に使われる定番形式。</span></div>
+<div class="genre-cell"><span class="genre-t serif">体験型ポップアップ</span><span class="genre-d">謎解き・イマーシブ・展示などの「体験」が主役。<strong>チケット収益＋施設への送客</strong>を同時に生み、SNSで拡散されやすいのが強み。</span></div>
+</div>
+<div class="rule"></div>
+<p class="lede">両者は競合ではなく組み合わせも可能です。ただし集客の構造が異なります——物販型は「ブランドのファンが来る」のに対し、<strong>体験型は「体験そのものを目的に新規客が来る」</strong>。施設の新規来館・回遊を作りたい場合は体験型が向いています。</p>
+</div></section>
+
+<section class="section tinted" id="merit"><div class="wrap narrow">
+<p class="eyebrow">MERIT</p><h2 class="h2 serif">施設側・出店側それぞれのメリット</h2>
+<ul class="bullets">
+<li><strong>施設側①：空き区画が収益源に変わる</strong>：埋まらない区画・催事スペースが、賃料またはレベニューシェアの収入源になります。</li>
+<li><strong>施設側②：館全体の鮮度が上がる</strong>：「行くたびに何かやっている施設」という印象が、定期来館の理由を作ります。</li>
+<li><strong>施設側③：新規客層の開拓</strong>：体験型なら、普段その施設に来ない層（謎解きファン・イベント目的の来場者）を呼び込めます。</li>
+<li><strong>出店側①：低リスクの試験出店</strong>：常設契約なしで立地・客層をテストできます。</li>
+<li><strong>出店側②：「期間限定」自体が話題になる</strong>：短期だからこそニュースになり、SNS・メディアに取り上げられやすくなります。</li>
+</ul>
+</div></section>
+
+<section class="section" id="taiken"><div class="wrap narrow">
+<p class="eyebrow">IDEAS</p><h2 class="h2 serif">体験型ポップアップの企画例</h2>
+<ul class="bullets">
+<li><strong>空き区画×没入型の物語体験</strong>：区画を丸ごと物語の舞台に変える期間限定イマーシブ。当社は渋谷サクラステージで施設一体型イマーシブを開催し、<strong>日本経済新聞に掲載</strong>されました。<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">制作事例 →</a></li>
+<li><strong>期間限定の謎解きルーム</strong>：1区画で完結する体験型コンテンツ。内装工事を最小限に、既存空間を活かして開催できます。</li>
+<li><strong>アート×体験の展覧会型</strong>：当社の「ヌル・アーデン展」は、アート×謎解きの没入型展覧会として<strong>広告費0円でチケット1,500枚</strong>を販売しました。</li>
+<li><strong>季節連動ポップアップ</strong>：ハロウィン・クリスマスなど季節催事と連動させ、毎年の恒例企画に育てる形。<a href="/guide/kisetsu-event/" style="color:var(--accent)">季節イベントの企画 →</a></li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">開催までの流れと費用</h2>
+<ul class="bullets">
+<li><strong>1. 区画・会期の確認</strong>：広さ・利用条件・希望時期をお知らせください。区画の下見から企画を逆算します。</li>
+<li><strong>2. 企画提案・お見積り</strong>：空間に合わせた体験内容と収支計画をご提案（ここまで無料）。</li>
+<li><strong>3. 制作・テストプレイ</strong>：コンテンツ制作と運営設計。既存コンテンツ活用なら1〜2ヶ月、オリジナルは2〜4ヶ月が目安。</li>
+<li><strong>4. 開催・運営</strong>：集客・当日運営・振り返りまで一貫対応します。</li>
+</ul>
+<p class="lede">費用は数十万円台〜。<strong>チケット収益から回収するレベニューシェア型（成果報酬型）</strong>に対応しており、ご相談内容によっては施設様の負担なしでの開催も可能です。</p>
+<p class="vc-line"><a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">貴施設の空き区画、体験型ポップアップにしませんか？（相談無料）</p>
+<a class="btn" href="/#contact">ポップアップイベントについて相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>／<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用アイデア</a>／<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の施設活用</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベントアイデア10選</a></p>
+</div></section>
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.def-box{max-width:680px;margin:40px auto 26px;background:#fff;border:1px solid rgba(51,48,43,.1);border-left:5px solid var(--accent);border-radius:14px;padding:26px 30px;text-align:left;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.def-word{margin:0 0 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:22px;font-weight:800;color:var(--ink)}
+.def-en{font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.06em}
+.def-body{margin:0;font-size:14.5px;line-height:2;color:rgba(51,48,43,.82)}
+@media(max-width:640px){.def-box{padding:20px 20px}.def-word{font-size:19px;gap:10px}}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#types,#merit,#taiken,#flow,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

@@ -1,0 +1,164 @@
+---
+// 「頭脳戦 ゲーム」「心理戦 ゲーム」「交渉 ゲーム」系クエリの受け皿。
+// 頭脳戦ピラー（/guide/zunousen/）のスポークとして、遊びたい人向けの
+// タイプ別ガイドで検索面を広げ、HACKTALE作品・公演へ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'types', label: '頭脳戦ゲームの種類4タイプ' },
+  { id: 'select', label: '目的別の選び方' },
+  { id: 'original', label: 'HACKTALEのオリジナル頭脳戦' },
+  { id: 'real', label: 'リアルイベントで対人頭脳戦を体験する' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '頭脳戦ゲームとはどんなゲームですか？',
+    a: '知識量ではなく、閃き・論理・交渉・心理の読み合いで勝敗を競うゲームの総称です。ポーカーの駆け引き、人狼ゲームの正体の読み合い、交渉型ボードゲームなどが代表例で、その場の思考力だけで勝負が決まるのが特徴です。',
+  },
+  {
+    q: '初心者でも楽しめる頭脳戦ゲームはありますか？',
+    a: 'あります。頭脳戦はルール自体はシンプルなものが多く、深さは対人の読み合いから生まれます。最初は手数の少ない心理戦系（読み合い1点勝負のゲーム）から始めると、頭脳戦の面白さの核をすぐ体感できます。',
+  },
+  {
+    q: '大人数で遊べる頭脳戦はありますか？',
+    a: 'あります。チーム対抗戦やトーナメント形式にすることで、数十〜数百名規模でも実施できます。全公演チケット完売となった「東京都頭脳王決定戦 2026」のように、大会形式のリアルイベントは特に熱量が生まれます。',
+  },
+  {
+    q: 'オリジナルの頭脳戦ゲームを作ってもらえますか？',
+    a: '可能です。株式会社ex Labsは交渉・心理戦・閃きのゲームに特化した頭脳戦制作を行っており、イベント・プロモーション・研修向けのオリジナル頭脳戦を企画から運営まで一貫して制作します。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '頭脳戦ゲームの種類と選び方｜心理戦・交渉ゲームのおすすめガイド',
+  about: '頭脳戦ゲーム・心理戦ゲーム・交渉ゲームの種類と選び方',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/zunousen-game.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-27',
+  dateModified: '2026-08-27',
+  mainEntityOfPage: new URL('/guide/zunousen-game/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="頭脳戦ゲームの種類と選び方｜心理戦・交渉ゲームのおすすめガイド - 株式会社ex Labs"
+  description="頭脳戦ゲーム（心理戦・交渉・論理・運×戦略）の種類4タイプと目的別の選び方を、日本で唯一の頭脳戦専門レーベルHACKTALEを運営する制作会社が解説。初心者向けの始め方から、大人数の大会イベント・オリジナル制作まで。"
+  ogImage="/assets/guide/zunousen-game.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '頭脳戦とは', href: '/guide/zunousen/' },
+  { name: '頭脳戦ゲームの種類と選び方' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">BRAIN BATTLE GAMES</p>
+<h1 class="h2 serif"><span class="nobr">頭脳戦ゲームの種類と選び方</span><br><span class="nobr">心理戦・交渉ゲームの</span><span class="nobr">おすすめガイド</span></h1>
+<p class="lede"><strong>頭脳戦ゲーム</strong>とは、知識ではなく<strong>閃き・論理・交渉・心理の読み合い</strong>で勝敗を競うゲームのこと。この記事では、頭脳戦ゲームの種類4タイプと目的別の選び方を、<strong>日本で唯一の頭脳戦専門レーベル「HACKTALE（ハックテイル）」</strong>を運営する株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="types"><div class="wrap">
+<p class="eyebrow">TYPES</p><h2 class="h2 serif">頭脳戦ゲームの種類4タイプ</h2>
+<p class="h2sub">頭脳戦ゲームは「何で勝負が決まるか」で4タイプに分けられます。</p>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">心理戦系</span><span class="genre-d">相手の選択を読み、裏をかくタイプ。じゃんけんの拡張のような読み合い勝負から、ポーカーのブラフ、正体隠匿系まで。<strong>ルールが最もシンプルで初心者向き</strong>。</span></div>
+<div class="genre-cell"><span class="genre-t serif">交渉系</span><span class="genre-d">取引・同盟・裏切りで資源を奪い合うタイプ。「誰を信じ、いつ裏切るか」。会話が主役なので、初対面同士でも一気に距離が縮まります。</span></div>
+<div class="genre-cell"><span class="genre-t serif">論理系</span><span class="genre-d">限られた情報から真実を推理するタイプ。人狼ゲームの発言分析や推理ゲームなど、筋道を立てる思考が武器になります。</span></div>
+<div class="genre-cell"><span class="genre-t serif">運×戦略系</span><span class="genre-d">サイコロ・カードの偶然に、賭け方と引き際の判断を重ねるタイプ。実力差があっても番狂わせが起き、場が最も沸きます。</span></div>
+</div>
+</div></section>
+
+<section class="section" id="select"><div class="wrap narrow">
+<p class="eyebrow">HOW TO CHOOSE</p><h2 class="h2 serif">目的別の選び方</h2>
+<ul class="bullets">
+<li><strong>初めての頭脳戦なら</strong>：心理戦系。ルール説明1分で「読み合いの快感」の核心に触れられます。</li>
+<li><strong>初対面のメンバーで遊ぶなら</strong>：交渉系。会話そのものがゲームなので、アイスブレイクとして最強です。</li>
+<li><strong>じっくり考えるのが好きなら</strong>：論理系。1人で考え込むのではなく「議論で真実に迫る」タイプを選ぶと対人戦の面白さが乗ります。</li>
+<li><strong>大人数で盛り上がるなら</strong>：運×戦略系またはチーム対抗形式。実力差が出すぎず、全員が最後まで勝負に絡めます。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="original"><div class="wrap narrow">
+<p class="eyebrow">HACKTALE</p><h2 class="h2 serif">HACKTALEのオリジナル頭脳戦</h2>
+<p class="lede">当社の頭脳戦専門レーベル<strong>HACKTALE</strong>は、市販ゲームでは味わえない「対人戦のために設計されたオリジナル頭脳戦」を制作・公演しています：</p>
+<ul class="bullets">
+<li><strong>プレゼント・ポーカー</strong>（交渉系）：贈り物をめぐる交渉と読み合い。</li>
+<li><strong>人狼定理</strong>（論理×心理戦）：正体隠匿の駆け引きを論理で切り崩すハイブリッド。</li>
+<li><strong>ダイスボックス</strong>（運×戦略系）：賭け方と引き際の判断を突き詰めたダイスゲーム。</li>
+</ul>
+<p class="vc-line"><a href="/hacktale/works/" style="color:var(--accent)">HACKTALEの作品一覧（貸切公演の予約可）→</a></p>
+</div></section>
+
+<section class="section" id="real"><div class="wrap narrow">
+<p class="eyebrow">REAL EVENT</p><h2 class="h2 serif">リアルイベントで対人頭脳戦を体験する</h2>
+<p class="lede">頭脳戦の面白さが最大化するのは、<strong>生身の相手と向かい合うリアルの場</strong>です。表情・沈黙・声色——画面越しでは読めない情報戦が加わり、勝敗の一瞬に会場全体が沸きます。当社が主催した参加型リアルイベント<strong>「東京都頭脳王決定戦 2026」は全公演チケット完売</strong>。都内4会場で「東京で最も頭の良い人間」を決める大会として開催しました。</p>
+<p class="lede">企業の社内対抗戦・懇親会の目玉企画・施設の集客イベントとしての<strong>オリジナル頭脳戦の制作・開催</strong>も承っています。</p>
+<p class="vc-line"><a href="/hacktale/event/zunouou/" style="color:var(--accent)">東京都頭脳王決定戦 2026 →</a>／<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作サービス →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-zunou">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">オリジナル頭脳戦の制作・大会イベントのご相談はこちら（無料）</p>
+<a class="btn" href="/services/zunousen/">頭脳戦制作サービスを見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは（完全ガイド）</a>／<a href="/hacktale/" style="color:var(--accent)">HACKTALE公式サイト</a>／<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア8選</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a></p>
+</div></section>
+
+<LatestPosts category="zunou" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#types,#select,#original,#real,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
