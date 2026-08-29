@@ -165,6 +165,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/taikengata-event.webp',
   },
   {
+    href: '/guide/shinrisen/',
+    title: '心理戦とは？意味・頭脳戦との違い・強い人の特徴・ゲーム例まで解説',
+    desc: '相手の思考を読み裏をかく心理戦の意味、頭脳戦・駆け引きとの違い、強い人の特徴4つ、代表的なゲーム例を解説。',
+    date: '2026-08-29',
+    category: 'zunou',
+    thumb: '/assets/guide/shinrisen.webp',
+  },
+  {
     href: '/guide/zunousen-game/',
     title: '頭脳戦ゲームの種類と選び方｜心理戦・交渉ゲームのおすすめガイド',
     desc: '心理戦・交渉・論理・運×戦略の4タイプと目的別の選び方。初心者の始め方から大会イベント・オリジナル制作まで。',

@@ -1,0 +1,201 @@
+---
+// 「心理戦とは」「心理戦」クエリの受け皿となる頭脳戦ピラーのスポーク記事。
+// 8/29のGSCで「心理戦とは」9.57位/14表示・「心理戦 意味」1位・
+// 「頭脳戦 心理戦 違い」5位(クリックあり)と山が立ち上がったため、
+// 勝ちパターン（定義先出し＋DefinedTerm）でトップ3を取りに行く。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'about', label: '心理戦とは' },
+  { id: 'diff', label: '頭脳戦・駆け引きとの違い' },
+  { id: 'strong', label: '心理戦に強い人の特徴' },
+  { id: 'games', label: '心理戦ゲームの例' },
+  { id: 'real', label: 'リアルで心理戦を体験する' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '心理戦とはどういう意味ですか？',
+    a: '相手の思考や意図を読み、同時に自分の狙いを隠したり偽ったりして、判断の裏をかくことで優位に立つ戦い方のことです。ゲームの分野では、ポーカーのブラフや人狼ゲームの正体の読み合いのように、「相手が何を考えているか」の読み合いそのものが勝敗を決めるゲームを指します。',
+  },
+  {
+    q: '心理戦と頭脳戦は何が違いますか？',
+    a: '頭脳戦は閃き・論理・交渉・心理の読み合いなど「頭の使い方」で競う戦い全般を指す広い言葉で、心理戦はそのうち「相手の思考を読み、裏をかく」ことに特化した一分野です。つまり心理戦は頭脳戦の一種で、ルールが最もシンプルなのに読み合いが深い、頭脳戦の入り口に最適なタイプです。',
+  },
+  {
+    q: '心理戦に強い人にはどんな特徴がありますか？',
+    a: '観察力が高く相手の癖や違和感に気付ける、感情が表に出にくい、「相手から自分がどう見えているか」を1段深く考えられる、負けた選択から素早く学ぶ——といった特徴があります。いずれも生まれつきの才能ではなく、対人戦の回数を重ねることで鍛えられます。',
+  },
+  {
+    q: '心理戦を体験できるゲームやイベントはありますか？',
+    a: 'ポーカーや人狼ゲームなどの市販ゲームのほか、株式会社ex Labsの頭脳戦専門レーベル「HACKTALE（ハックテイル）」が対人心理戦のオリジナルゲームを制作・公演しています。全公演チケット完売となった「東京都頭脳王決定戦 2026」でも心理戦種目を実施しました。',
+  },
+  {
+    q: 'オリジナルの心理戦ゲームを制作してもらえますか？',
+    a: '可能です。株式会社ex Labsは交渉・心理戦・閃きのゲームに特化した頭脳戦制作を行っており、イベント・プロモーション・研修向けのオリジナル心理戦を企画から運営まで一貫して制作します。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const definedTermLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: '心理戦',
+  description:
+    '心理戦とは、相手の思考や意図を読み、自分の狙いを隠して裏をかくことで優位に立つ戦い方のこと。ゲーム・イベントの分野では、ブラフや正体の読み合いなど「相手が何を考えているか」の読み合いそのもので勝敗が決まる対戦型コンテンツを指す。',
+  inDefinedTermSet: {
+    '@type': 'DefinedTermSet',
+    name: '体験型エンターテインメント用語集',
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  },
+  url: new URL('/guide/shinrisen/', Astro.site).toString(),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '心理戦とは？意味・頭脳戦との違い・強い人の特徴・ゲーム例まで解説',
+  about: '心理戦（相手の思考を読み合う対戦型ゲーム・イベント）',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/shinrisen.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-08-29',
+  dateModified: '2026-08-29',
+  mainEntityOfPage: new URL('/guide/shinrisen/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="心理戦とは？意味・頭脳戦との違い・強い人の特徴・ゲーム例まで解説 - 株式会社ex Labs"
+  description="心理戦とは、相手の思考を読み、自分の狙いを隠して裏をかくことで優位に立つ戦い方のこと。頭脳戦との違い、心理戦に強い人の特徴、代表的なゲーム例、リアルイベントでの体験方法まで、日本で唯一の頭脳戦専門レーベル「HACKTALE」を運営する制作会社が解説します。"
+  ogImage="/assets/guide/shinrisen.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<script type="application/ld+json" set:html={jsonLd(definedTermLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '頭脳戦とは', href: '/guide/zunousen/' },
+  { name: '心理戦とは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">MIND GAME GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">心理戦とは？</span><span class="nobr">意味・頭脳戦との違い・</span><span class="nobr">強い人の特徴まで解説</span></h1>
+<div class="def-box">
+<p class="def-word"><span class="serif">心理戦</span><span class="def-yomi">読み方：しんりせん</span></p>
+<p class="def-body">相手の思考や意図を読み、<strong>自分の狙いを隠して裏をかく</strong>ことで優位に立つ戦い方のこと。ゲーム・イベントの分野では、ブラフや正体の読み合いなど<strong>「相手が何を考えているか」の読み合いそのもので勝敗が決まる対戦型コンテンツ</strong>を指す。</p>
+</div>
+<p class="lede">このページでは、心理戦の意味、頭脳戦との違い、心理戦に強い人の特徴から、代表的なゲーム例・リアルイベントでの体験方法までを、<strong>日本で唯一の頭脳戦専門レーベル「HACKTALE（ハックテイル）」</strong>を運営する株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">心理戦とは</h2>
+<p class="lede">心理戦とは、<strong>「相手の頭の中」を戦場にする戦い</strong>です。自分の手の内を隠し、ときに嘘の情報を流し、相手の表情・言葉・選択の癖から本音を見抜く——ルール上の強い手ではなく、<strong>相手の判断を狂わせること</strong>で勝ちに行くのが心理戦の本質です。</p>
+<p class="lede">たとえばポーカーで弱い手なのに強気に賭ける「ブラフ」、人狼ゲームで人狼なのに村人らしく振る舞う演技、じゃんけんで「相手は次に何を出すか」を読む駆け引き。どれも共通するのは、<strong>ゲームの答えが盤面ではなく相手の心の中にある</strong>ことです。だから同じルールでも相手が変われば別のゲームになり、何度遊んでも飽きません。</p>
+<p class="lede">もうひとつの特徴は、<strong>ルールが極端にシンプルでも成立する</strong>こと。「読み合い」そのものが面白さの核なので、ルール説明1分のゲームでも、大人が本気で唸る深さが生まれます。初心者がベテランに勝つ番狂わせも頻繁に起こり、<strong>誰でも今日から対等に戦える</strong>のが心理戦の魅力です。</p>
+</div></section>
+
+<section class="section" id="diff"><div class="wrap narrow">
+<p class="eyebrow">DIFFERENCE</p><h2 class="h2 serif">頭脳戦・駆け引きとの違い</h2>
+<p class="lede"><strong>心理戦は「頭脳戦」の一分野</strong>です。頭脳戦が閃き・論理・交渉・心理の読み合いなど「頭の使い方」で競う戦い全般を指すのに対し、心理戦はそのうち<strong>「相手の思考を読み、裏をかく」ことに特化したタイプ</strong>を指します。</p>
+<ul class="bullets">
+<li><strong>頭脳戦</strong>：頭の使い方で勝敗を競う戦いの総称。心理戦のほか、論理系（推理）・交渉系（取引と裏切り）・運×戦略系（賭けの判断）を含む広い言葉。</li>
+<li><strong>心理戦</strong>：相手の選択を読み、自分の意図を隠して裏をかく読み合い勝負。頭脳戦の中で<strong>最もルールがシンプルで、最も対人の深さが出る</strong>タイプ。</li>
+<li><strong>駆け引き</strong>：交渉や勝負の中で有利になるよう探り合う行為そのもの。心理戦は駆け引きを「ゲームの勝敗の中心」に据えたものと言えます。</li>
+</ul>
+<p class="vc-line"><a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは？意味・種類・ゲーム例の完全ガイド →</a></p>
+</div></section>
+
+<section class="section tinted" id="strong"><div class="wrap narrow">
+<p class="eyebrow">TRAITS</p><h2 class="h2 serif">心理戦に強い人の特徴</h2>
+<p class="lede">数多くの対人戦イベントを制作・運営してきた経験から、心理戦に強い人には共通点があります。いずれも<strong>才能ではなく、対人戦の回数で鍛えられる技術</strong>です。</p>
+<ul class="bullets">
+<li><strong>①観察力が高い</strong>：発言の間、視線、賭け方の変化——相手の「いつもと違う」に気付けること。読みの材料は全て観察から生まれます。</li>
+<li><strong>②感情が漏れない</strong>：良い手でも悪い手でも振る舞いが変わらない。自分が「読まれない」ことは、相手を読むのと同じくらい強力な武器です。</li>
+<li><strong>③1段深く考えられる</strong>：「相手はこう出す」で止まらず、「相手は、自分がこう読むと予想して、その裏を突いてくる」まで潜れること。ただし深読みしすぎも罠で、どこで思考を止めるかの判断も実力のうちです。</li>
+<li><strong>④負けから学ぶのが速い</strong>：読み負けた原因を振り返り、次の勝負で修正できること。心理戦の上達は、この回転の速さで決まります。</li>
+</ul>
+</div></section>
+
+<section class="section" id="games"><div class="wrap narrow">
+<p class="eyebrow">GAMES</p><h2 class="h2 serif">心理戦ゲームの例</h2>
+<ul class="bullets">
+<li><strong>ポーカー</strong>：ブラフと賭け方の読み合いの代名詞。手札の強さより「強く見せるか、弱く見せるか」が勝敗を分けます。</li>
+<li><strong>人狼ゲーム</strong>：正体隠匿系の代表格。嘘を見抜く側と、嘘を突き通す側の心理戦が議論の中で展開されます。</li>
+<li><strong>HACKTALEのオリジナル心理戦</strong>：当社の頭脳戦専門レーベルHACKTALEでは、対人の読み合いのために設計されたオリジナルゲームを制作・公演しています。正体隠匿の駆け引きを論理で切り崩す<strong>「人狼定理」</strong>、贈り物をめぐる交渉と読み合いの<strong>「プレゼント・ポーカー」</strong>など、ルール説明数分で心理戦の核心に触れられる作品群です。</li>
+</ul>
+<p class="vc-line"><a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類4タイプと選び方 →</a>／<a href="/hacktale/works/" style="color:var(--accent)">HACKTALEの作品一覧 →</a></p>
+</div></section>
+
+<section class="section tinted" id="real"><div class="wrap narrow">
+<p class="eyebrow">REAL EVENT</p><h2 class="h2 serif">リアルで心理戦を体験する</h2>
+<p class="lede">心理戦の面白さが最大化するのは、<strong>生身の相手と向かい合うリアルの場</strong>です。オンラインでは読めない表情の強張り、沈黙の長さ、声色の揺れ——対面だからこそ情報戦の材料が増え、読み勝った瞬間の快感も桁違いになります。当社が主催した参加型リアルイベント<strong>「東京都頭脳王決定戦 2026」は全公演チケット完売</strong>。心理戦を含む複数種目で「東京で最も頭の良い人間」を決める大会として開催しました。</p>
+<p class="lede">社内イベントの対抗戦・懇親会の目玉企画・施設の集客イベントとしての<strong>オリジナル心理戦の制作・開催</strong>も承っています。</p>
+<p class="vc-line"><a href="/hacktale/event/zunouou/" style="color:var(--accent)">東京都頭脳王決定戦 2026 →</a>／<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作サービス →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-zunou">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">オリジナル心理戦・頭脳戦イベントのご相談はこちら（無料）</p>
+<a class="btn" href="/services/zunousen/">頭脳戦制作サービスを見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは（完全ガイド）</a>／<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類と選び方</a>／<a href="/hacktale/" style="color:var(--accent)">HACKTALE公式サイト</a>／<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア8選</a></p>
+</div></section>
+
+<LatestPosts category="zunou" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.def-box{max-width:680px;margin:40px auto 26px;background:#fff;border:1px solid rgba(51,48,43,.1);border-left:5px solid var(--accent);border-radius:14px;padding:26px 30px;text-align:left;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.def-word{margin:0 0 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:22px;font-weight:800;color:var(--ink)}
+.def-yomi{font-size:13px;font-weight:600;color:rgba(51,48,43,.55);letter-spacing:.04em}
+.def-body{margin:0;font-size:14.5px;line-height:2;color:rgba(51,48,43,.82)}
+@media(max-width:640px){.def-box{padding:20px 20px}.def-word{font-size:19px;gap:10px}}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#diff,#strong,#games,#real,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
