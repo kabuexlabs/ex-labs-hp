@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ex Labs 月次PLシミュレーター</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --bg:#F3F2F4; --surface:#FFFFFF; --surface2:#EBE9EE;
+    --ink:#221E26; --muted:#6A6371; --line:#DFDBE3;
+    --accent:#8A3B4C; --accent-ink:#FFFFFF; --accent-soft:rgba(138,59,76,.10);
+    --data2:#47616E; --good:#2F6B4F; --bad:#A33B2E; --warn:#96651D;
+    --track:#E7E4EA; --focus:#8A3B4C;
+  }
+  :root:not([data-theme="light"]){}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#17141A; --surface:#211D26; --surface2:#2A2530;
+      --ink:#ECE8EF; --muted:#9C94A6; --line:#383241;
+      --accent:#C97A8B; --accent-ink:#1C1218; --accent-soft:rgba(201,122,139,.14);
+      --data2:#86AAB9; --good:#74C098; --bad:#DB8070; --warn:#D2A455;
+      --track:#332E3B; --focus:#C97A8B;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#17141A; --surface:#211D26; --surface2:#2A2530;
+    --ink:#ECE8EF; --muted:#9C94A6; --line:#383241;
+    --accent:#C97A8B; --accent-ink:#1C1218; --accent-soft:rgba(201,122,139,.14);
+    --data2:#86AAB9; --good:#74C098; --bad:#DB8070; --warn:#D2A455;
+    --track:#332E3B; --focus:#C97A8B;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    font-size:15px; line-height:1.7;
+  }
+  .wrap{max-width:1060px; margin:0 auto; padding:40px 20px 80px}
+  header.masthead{border-bottom:1px solid var(--line); padding-bottom:24px; margin-bottom:32px}
+  .eyebrow{font-size:12px; letter-spacing:.14em; color:var(--muted); text-transform:uppercase; margin:0 0 6px}
+  h1{
+    font-family:"Shippori Mincho","Hiragino Mincho ProN",serif; font-weight:700;
+    font-size:clamp(26px,4vw,34px); margin:0 0 8px; letter-spacing:.02em; text-wrap:balance;
+  }
+  .lede{color:var(--muted); max-width:40em; margin:0}
+  h2{
+    font-family:"Shippori Mincho","Hiragino Mincho ProN",serif; font-weight:600;
+    font-size:20px; margin:0 0 4px; letter-spacing:.02em;
+  }
+  .sec{margin-top:44px}
+  .sec-note{color:var(--muted); font-size:13px; margin:0 0 16px}
+  .num{font-variant-numeric:tabular-nums}
+
+  /* ---- hero tiles ---- */
+  .tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px}
+  .tile{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:16px 18px}
+  .tile .k{font-size:12px; letter-spacing:.08em; color:var(--muted); margin:0 0 4px}
+  .tile .v{font-family:"Shippori Mincho",serif; font-size:28px; font-weight:700; line-height:1.2; margin:0}
+  .tile .s{font-size:12px; color:var(--muted); margin:6px 0 0}
+  .tile.lead{border-left:3px solid var(--accent)}
+  .bar-track{height:8px; background:var(--track); border-radius:4px; margin-top:10px; position:relative; overflow:hidden}
+  .bar-fill{height:100%; background:var(--accent); border-radius:4px; transition:width .25s ease}
+  .goal-chip{display:inline-block; font-size:12px; padding:2px 10px; border-radius:999px; margin-top:8px}
+  .goal-chip.ok{background:var(--accent-soft); color:var(--good)}
+  .goal-chip.under{background:var(--accent-soft); color:var(--warn)}
+  .profit-pos{color:var(--good)} .profit-neg{color:var(--bad)}
+
+  /* ---- inputs ---- */
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:20px}
+  .in-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px}
+  fieldset{border:none; margin:0; padding:0; min-width:0}
+  legend{font-weight:700; font-size:14px; padding:0; margin-bottom:8px}
+  legend .tag{font-weight:500; font-size:11px; color:var(--muted); margin-left:6px}
+  .row{display:flex; align-items:center; gap:8px; margin-bottom:8px}
+  .row label{flex:1 1 auto; font-size:13px; color:var(--muted)}
+  .row .unit{font-size:12px; color:var(--muted); width:2.5em}
+  input[type="number"]{
+    width:6.2em; padding:6px 8px; border:1px solid var(--line); border-radius:6px;
+    background:var(--bg); color:var(--ink); font:inherit; font-size:14px; text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  input[type="number"]:focus-visible{outline:2px solid var(--focus); outline-offset:1px; border-color:transparent}
+  .row output{font-size:13px; font-weight:700; min-width:6.5em; text-align:right}
+
+  /* ---- revenue bars ---- */
+  .bars{display:grid; gap:10px}
+  .brow{display:grid; grid-template-columns:13.5em 1fr; gap:12px; align-items:center}
+  .brow .bl{font-size:13px}
+  .brow .bl b{font-weight:700}
+  .btrack{position:relative; height:22px; background:var(--track); border-radius:4px}
+  .bfill{position:absolute; inset:0 auto 0 0; background:var(--accent); border-radius:4px; min-width:2px; transition:width .25s ease}
+  .bval{position:absolute; inset:0 8px 0 auto; display:flex; align-items:center; font-size:12px; font-weight:700; color:var(--ink)}
+  .rank-chip{display:inline-block; font-size:12px; padding:3px 12px; border-radius:999px; background:var(--accent-soft)}
+  .rank-chip.ok{color:var(--good)} .rank-chip.ng{color:var(--warn)}
+
+  /* ---- PL table ---- */
+  table{width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--line); border-radius:8px; overflow:hidden; font-size:14px}
+  .tbl-scroll{overflow-x:auto}
+  th,td{padding:9px 14px; text-align:left; border-top:1px solid var(--line)}
+  thead th{border-top:none; font-size:12px; letter-spacing:.06em; color:var(--muted); background:var(--surface2)}
+  td.r,th.r{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+  tr.sub td{color:var(--muted); font-size:13px}
+  tr.sub td:first-child{padding-left:2em}
+  tr.total td{font-weight:700; background:var(--accent-soft)}
+  tr.total td:first-child{font-family:"Shippori Mincho",serif}
+  td .memo{color:var(--muted); font-size:12px}
+
+  /* ---- KPI table ---- */
+  .kpi-note{font-size:12px; color:var(--muted)}
+  ol.prio{margin:8px 0 0; padding-left:1.4em}
+  ol.prio li{margin-bottom:6px}
+  footer.foot{margin-top:56px; border-top:1px solid var(--line); padding-top:16px; color:var(--muted); font-size:12px}
+  footer.foot ul{margin:6px 0 0; padding-left:1.3em}
+  @media (prefers-reduced-motion: reduce){ .bar-fill,.bfill{transition:none} }
+  @media (max-width:560px){ .brow{grid-template-columns:1fr}; .brow .btrack{height:18px} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="masthead">
+    <p class="eyebrow">株式会社 ex Labs ─ 店舗事業計画</p>
+    <h1>月次PLシミュレーター</h1>
+    <p class="lede">マダミス・人狼・シーシャ店舗の月次損益とKPIを試算します。単価・回数・料率はすべて仮置きなので、入力欄を変えるとPL・KPI・損益分岐点がその場で再計算されます。初期費用・オーナー報酬・税金は含みません。</p>
+  </header>
+
+  <section class="tiles" aria-label="サマリー">
+    <div class="tile lead">
+      <p class="k">月間売上（目標 150万円）</p>
+      <p class="v num" id="o-rev">―</p>
+      <div class="bar-track"><div class="bar-fill" id="o-rev-bar" style="width:0%"></div></div>
+      <span class="goal-chip" id="o-rev-chip">―</span>
+    </div>
+    <div class="tile">
+      <p class="k">営業利益</p>
+      <p class="v num" id="o-profit">―</p>
+      <p class="s">営業利益率 <span class="num" id="o-profit-rate">―</span></p>
+    </div>
+    <div class="tile">
+      <p class="k">限界利益（売上 − 変動費）</p>
+      <p class="v num" id="o-cm">―</p>
+      <p class="s">限界利益率 <span class="num" id="o-cm-rate">―</span></p>
+    </div>
+    <div class="tile">
+      <p class="k">損益分岐点売上</p>
+      <p class="v num" id="o-bep">―</p>
+      <p class="s">固定費 ÷ 限界利益率。ここを下回ると赤字</p>
+    </div>
+  </section>
+
+  <section class="sec" aria-label="前提条件">
+    <h2>前提条件</h2>
+    <p class="sec-note">単価（①〜④）はリプライ確定後に差し替え。シーシャは公演料金への上乗せ、ドリンクはほぼ利益なしの想定。</p>
+    <div class="panel in-grid">
+
+      <fieldset>
+        <legend>④ 人狼 <span class="tag">収益の柱・想定1位</span></legend>
+        <div class="row"><label for="p4">単価</label><input type="number" id="p4" value="3000" min="0" step="100"><span class="unit">円</span></div>
+        <div class="row"><label for="n4">開催数 / 月</label><input type="number" id="n4" value="16" min="0"><span class="unit">回</span></div>
+        <div class="row"><label for="a4">平均参加人数</label><input type="number" id="a4" value="10" min="0"><span class="unit">人</span></div>
+        <div class="row"><label>月間売上</label><output class="num" id="r4">―</output></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>③ マダミス（ライセンス） <span class="tag">想定2位</span></legend>
+        <div class="row"><label for="p3">単価</label><input type="number" id="p3" value="5000" min="0" step="100"><span class="unit">円</span></div>
+        <div class="row"><label for="n3">開催数 / 月</label><input type="number" id="n3" value="12" min="0"><span class="unit">回</span></div>
+        <div class="row"><label for="a3">平均参加人数</label><input type="number" id="a3" value="7" min="0"><span class="unit">人</span></div>
+        <div class="row"><label>月間売上</label><output class="num" id="r3">―</output></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>① パンドラ人狼（自作）</legend>
+        <div class="row"><label for="p1">単価</label><input type="number" id="p1" value="4000" min="0" step="100"><span class="unit">円</span></div>
+        <div class="row"><label for="n1">開催数 / 月</label><input type="number" id="n1" value="8" min="0"><span class="unit">回</span></div>
+        <div class="row"><label for="a1">平均参加人数</label><input type="number" id="a1" value="6" min="0"><span class="unit">人</span></div>
+        <div class="row"><label>月間売上</label><output class="num" id="r1">―</output></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>② マダミス（自作）</legend>
+        <div class="row"><label for="p2">単価</label><input type="number" id="p2" value="4500" min="0" step="100"><span class="unit">円</span></div>
+        <div class="row"><label for="n2">開催数 / 月</label><input type="number" id="n2" value="7" min="0"><span class="unit">回</span></div>
+        <div class="row"><label for="a2">平均参加人数</label><input type="number" id="a2" value="6" min="0"><span class="unit">人</span></div>
+        <div class="row"><label>月間売上</label><output class="num" id="r2">―</output></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>⑤ シーシャ <span class="tag">公演料金＋2,000円想定</span></legend>
+        <div class="row"><label for="p5">単価（上乗せ）</label><input type="number" id="p5" value="2000" min="0" step="100"><span class="unit">円</span></div>
+        <div class="row"><label for="n5">利用数 / 月</label><input type="number" id="n5" value="90" min="0"><span class="unit">回</span></div>
+        <div class="row"><label for="c5">原価 / 回</label><input type="number" id="c5" value="500" min="0" step="50"><span class="unit">円</span></div>
+        <div class="row"><label>月間売上</label><output class="num" id="r5">―</output></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>⑥ ペットボトルドリンク <span class="tag">ほぼ利益なし</span></legend>
+        <div class="row"><label for="p6">売価 / 本</label><input type="number" id="p6" value="200" min="0" step="10"><span class="unit">円</span></div>
+        <div class="row"><label for="n6">販売本数 / 月</label><input type="number" id="n6" value="300" min="0" step="10"><span class="unit">本</span></div>
+        <div class="row"><label for="c6">原価 / 本</label><input type="number" id="c6" value="150" min="0" step="10"><span class="unit">円</span></div>
+        <div class="row"><label>月間売上</label><output class="num" id="r6">―</output></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>変動費</legend>
+        <div class="row"><label for="lic">ライセンス料率（③に対して）</label><input type="number" id="lic" value="27.5" min="0" max="100" step="0.5"><span class="unit">%</span></div>
+        <div class="row"><label for="wage">バイト時給</label><input type="number" id="wage" value="1500" min="0" step="50"><span class="unit">円</span></div>
+        <div class="row"><label for="hrs">1枠の時間</label><input type="number" id="hrs" value="6" min="0"><span class="unit">h</span></div>
+        <div class="row"><label for="slots">枠数 / 月</label><input type="number" id="slots" value="6" min="0"><span class="unit">枠</span></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>固定費</legend>
+        <div class="row"><label for="rent">家賃（20〜23万円）</label><input type="number" id="rent" value="215000" min="0" step="5000"><span class="unit">円</span></div>
+        <div class="row"><label for="util">光熱費</label><input type="number" id="util" value="50000" min="0" step="5000"><span class="unit">円</span></div>
+        <div class="row"><label for="comm">通信費</label><input type="number" id="comm" value="10000" min="0" step="1000"><span class="unit">円</span></div>
+        <div class="row"><label for="supp">消耗品／雑費</label><input type="number" id="supp" value="30000" min="0" step="5000"><span class="unit">円</span></div>
+        <div class="row"><label for="ent">接待交際費</label><input type="number" id="ent" value="30000" min="0" step="5000"><span class="unit">円</span></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>KPI前提</legend>
+        <div class="row"><label for="repeat">リピート率（目標）</label><input type="number" id="repeat" value="40" min="0" max="100" step="5"><span class="unit">%</span></div>
+        <div class="row"><label for="sns">SNS登録 純増（目標）</label><input type="number" id="sns" value="150" min="0" step="10"><span class="unit">人</span></div>
+        <div class="row"><label for="evt">イベント開催数</label><input type="number" id="evt" value="2" min="0"><span class="unit">回</span></div>
+        <div class="row"><label for="spd">1日の枠数（昼/夜/深夜）</label><input type="number" id="spd" value="3" min="1"><span class="unit">枠</span></div>
+        <div class="row"><label for="days">営業日数 / 月</label><input type="number" id="days" value="30" min="1" max="31"><span class="unit">日</span></div>
+      </fieldset>
+    </div>
+  </section>
+
+  <section class="sec" aria-label="売上構成">
+    <h2>売上構成</h2>
+    <p class="sec-note">想定の収入順は ④人狼 ＞ ③マダミス(ライセンス) ＞ ①②自作 ＞ ⑤シーシャ ＞ ⑥ドリンク。</p>
+    <div class="panel">
+      <div class="bars" id="bars"></div>
+      <p style="margin:14px 0 0"><span class="rank-chip" id="rank-chip">―</span></p>
+    </div>
+  </section>
+
+  <section class="sec" aria-label="月次PL">
+    <h2>月次PL</h2>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>科目</th><th class="r">金額</th><th>備考</th></tr></thead>
+      <tbody>
+        <tr class="total"><td>売上高</td><td class="r" id="t-rev">―</td><td></td></tr>
+        <tr><td>変動費</td><td class="r" id="t-var">―</td><td></td></tr>
+        <tr class="sub"><td>ライセンス料</td><td class="r" id="t-lic">―</td><td><span class="memo" id="t-lic-memo">―</span></td></tr>
+        <tr class="sub"><td>バイト人件費</td><td class="r" id="t-wage">―</td><td><span class="memo" id="t-wage-memo">―</span></td></tr>
+        <tr class="sub"><td>シーシャ原価</td><td class="r" id="t-shc">―</td><td><span class="memo" id="t-shc-memo">―</span></td></tr>
+        <tr class="sub"><td>ドリンク原価</td><td class="r" id="t-drc">―</td><td><span class="memo" id="t-drc-memo">―</span></td></tr>
+        <tr class="total"><td>限界利益</td><td class="r" id="t-cm">―</td><td><span class="memo" id="t-cm-memo">―</span></td></tr>
+        <tr><td>固定費</td><td class="r" id="t-fix">―</td><td></td></tr>
+        <tr class="sub"><td>家賃</td><td class="r" id="t-rent">―</td><td></td></tr>
+        <tr class="sub"><td>光熱費</td><td class="r" id="t-util">―</td><td></td></tr>
+        <tr class="sub"><td>通信費</td><td class="r" id="t-comm">―</td><td></td></tr>
+        <tr class="sub"><td>消耗品／雑費</td><td class="r" id="t-supp">―</td><td></td></tr>
+        <tr class="sub"><td>接待交際費</td><td class="r" id="t-ent">―</td><td></td></tr>
+        <tr class="total"><td>営業利益</td><td class="r" id="t-op">―</td><td><span class="memo" id="t-op-memo">―</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="kpi-note" style="margin-top:10px" id="lic-range">―</p>
+  </section>
+
+  <section class="sec" aria-label="KPI">
+    <h2>KPI（売上150万円に向けた月次目標）</h2>
+    <p class="sec-note">売上 ＝ 延べ来店人数 × 客単価。上の前提から自動計算される値と、目標として置く値を並べています。</p>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>KPI</th><th class="r">月次目標</th><th>根拠・メモ</th></tr></thead>
+      <tbody>
+        <tr><td>月間来店人数（延べ）</td><td class="r" id="k-visitors">―</td><td><span class="memo">①〜④の公演参加の延べ人数</span></td></tr>
+        <tr><td>客単価（参考）</td><td class="r" id="k-arpu">―</td><td><span class="memo">シーシャ・ドリンク込みの売上 ÷ 延べ来店</span></td></tr>
+        <tr><td>リピート率</td><td class="r" id="k-repeat">―</td><td><span class="memo" id="k-repeat-memo">―</span></td></tr>
+        <tr><td>新規来店人数</td><td class="r" id="k-new">―</td><td><span class="memo">延べ来店 ×（1 − リピート率）。SNS・イベント経由で獲得</span></td></tr>
+        <tr><td>SNS登録人数（純増）</td><td class="r" id="k-sns">―</td><td><span class="memo" id="k-sns-memo">―</span></td></tr>
+        <tr><td>稼働率（全体）</td><td class="r" id="k-util">―</td><td><span class="memo" id="k-util-memo">―</span></td></tr>
+        <tr class="sub"><td>昼稼働率</td><td class="r">25%前後</td><td><span class="memo">週末中心。平日昼は貸切・イベント開拓枠</span></td></tr>
+        <tr class="sub"><td>夜稼働率</td><td class="r">75%前後</td><td><span class="memo">主力枠。マダミス・人狼を集中配置</span></td></tr>
+        <tr class="sub"><td>深夜稼働率</td><td class="r">45%前後</td><td><span class="memo">人狼・シーシャと親和性が高い枠</span></td></tr>
+        <tr><td>① パンドラ人狼 開催数</td><td class="r" id="k-n1">―</td><td></td></tr>
+        <tr><td>② マダミス（自作）開催数</td><td class="r" id="k-n2">―</td><td></td></tr>
+        <tr><td>③ マダミス（ライセンス）開催数</td><td class="r" id="k-n3">―</td><td></td></tr>
+        <tr class="sub"><td>（④ 人狼 開催数）</td><td class="r" id="k-n4">―</td><td><span class="memo">KPIリスト外だが収益の柱なので併記</span></td></tr>
+        <tr><td>イベント開催数</td><td class="r" id="k-evt">―</td><td><span class="memo">新規獲得とSNS登録の起爆剤</span></td></tr>
+        <tr><td>シーシャ利用率（参考）</td><td class="r" id="k-shr">―</td><td><span class="memo">延べ来店に対する利用割合</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="kpi-note" style="margin-top:14px"><b>このモデルでの感度（効く順）:</b></p>
+    <ol class="prio kpi-note">
+      <li><b>④人狼・③ライセンスマダミスの開催数 × 集客人数</b> — 2本で売上の約6割</li>
+      <li><b>リピート率</b> — 上がるほど毎月の新規獲得目標が下がる</li>
+      <li><b>シーシャ利用率</b> — 原価率25%で利益率が高く、深夜稼働と連動</li>
+      <li><b>SNS登録人数</b> — 新規→リピート転換の中間指標</li>
+    </ol>
+  </section>
+
+  <footer class="foot">
+    <p>前提メモ</p>
+    <ul>
+      <li>①〜④の単価は仮置き。確定したら入力欄を差し替えてください</li>
+      <li>ライセンス料率は25〜30%レンジの中央値27.5%を初期値に設定（交渉方針: 料率を上げずに優先卸しを獲得）</li>
+      <li>バイト6枠/月はオーナー中心運営の前提。公演数を増やす場合はここが最初に増えます</li>
+      <li>初期費用・オーナー報酬・税金・減価償却は含みません</li>
+    </ul>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var TARGET = 1500000;
+  var $ = function(id){ return document.getElementById(id); };
+  var ids = ['p1','n1','a1','p2','n2','a2','p3','n3','a3','p4','n4','a4',
+             'p5','n5','c5','p6','n6','c6','lic','wage','hrs','slots',
+             'rent','util','comm','supp','ent','repeat','sns','evt','spd','days'];
+  function val(id){ var v = parseFloat($(id).value); return isFinite(v) ? v : 0; }
+  function yen(n){ return Math.round(n).toLocaleString('ja-JP') + '円'; }
+  function man(n){ return (n/10000).toLocaleString('ja-JP',{maximumFractionDigits:1}) + '万円'; }
+  function pct(n){ return (n*100).toLocaleString('ja-JP',{maximumFractionDigits:1}) + '%'; }
+
+  function recalc(){
+    var r1 = val('p1')*val('n1')*val('a1');
+    var r2 = val('p2')*val('n2')*val('a2');
+    var r3 = val('p3')*val('n3')*val('a3');
+    var r4 = val('p4')*val('n4')*val('a4');
+    var r5 = val('p5')*val('n5');
+    var r6 = val('p6')*val('n6');
+    var rev = r1+r2+r3+r4+r5+r6;
+
+    var licFee = r3*val('lic')/100;
+    var wageCost = val('wage')*val('hrs')*val('slots');
+    var shishaCost = val('c5')*val('n5');
+    var drinkCost = val('c6')*val('n6');
+    var varCost = licFee+wageCost+shishaCost+drinkCost;
+
+    var cm = rev-varCost;
+    var cmRate = rev>0 ? cm/rev : 0;
+    var fix = val('rent')+val('util')+val('comm')+val('supp')+val('ent');
+    var op = cm-fix;
+    var bep = cmRate>0 ? fix/cmRate : 0;
+
+    // hero
+    $('o-rev').textContent = yen(rev);
+    var prog = rev/TARGET;
+    $('o-rev-bar').style.width = Math.min(prog,1)*100+'%';
+    var chip = $('o-rev-chip');
+    chip.textContent = '目標達成率 '+pct(prog);
+    chip.className = 'goal-chip '+(prog>=1?'ok':'under');
+    $('o-profit').textContent = yen(op);
+    $('o-profit').className = 'v num '+(op>=0?'profit-pos':'profit-neg');
+    $('o-profit-rate').textContent = rev>0?pct(op/rev):'―';
+    $('o-cm').textContent = yen(cm);
+    $('o-cm-rate').textContent = pct(cmRate);
+    $('o-bep').textContent = cmRate>0 ? '約'+man(bep) : '―';
+
+    // per-line outputs
+    $('r1').textContent = yen(r1); $('r2').textContent = yen(r2);
+    $('r3').textContent = yen(r3); $('r4').textContent = yen(r4);
+    $('r5').textContent = yen(r5); $('r6').textContent = yen(r6);
+
+    // bars (fixed display order = target ranking)
+    var lines = [
+      {label:'④ 人狼', v:r4},
+      {label:'③ マダミス（ライセンス）', v:r3},
+      {label:'① パンドラ人狼（自作）', v:r1},
+      {label:'② マダミス（自作）', v:r2},
+      {label:'⑤ シーシャ', v:r5},
+      {label:'⑥ ドリンク', v:r6}
+    ];
+    var max = Math.max.apply(null, lines.map(function(l){return l.v;}).concat([1]));
+    var host = $('bars'); host.textContent='';
+    lines.forEach(function(l){
+      var row = document.createElement('div'); row.className='brow';
+      var bl = document.createElement('div'); bl.className='bl';
+      bl.innerHTML = '<b>'+l.label+'</b>';
+      var tr = document.createElement('div'); tr.className='btrack';
+      var f = document.createElement('div'); f.className='bfill';
+      f.style.width = (l.v/max*100)+'%';
+      var bv = document.createElement('div'); bv.className='bval num';
+      bv.textContent = yen(l.v)+'（'+(rev>0?pct(l.v/rev):'―')+'）';
+      tr.appendChild(f); tr.appendChild(bv);
+      row.appendChild(bl); row.appendChild(tr);
+      host.appendChild(row);
+    });
+    var rankOk = r4>r3 && r3>Math.max(r1,r2) && Math.min(r1,r2)>r5 && r5>r6;
+    var rc = $('rank-chip');
+    rc.textContent = rankOk ? '✓ 収入順 ④＞③＞①②＞⑤＞⑥ を満たしています'
+                            : '△ 収入順が想定（④＞③＞①②＞⑤＞⑥）と異なります';
+    rc.className = 'rank-chip '+(rankOk?'ok':'ng');
+
+    // PL table
+    $('t-rev').textContent = yen(rev);
+    $('t-var').textContent = yen(varCost);
+    $('t-lic').textContent = yen(licFee);
+    $('t-lic-memo').textContent = '③売上 × '+val('lic')+'%';
+    $('t-wage').textContent = yen(wageCost);
+    $('t-wage-memo').textContent = val('wage').toLocaleString('ja-JP')+'円 × '+val('hrs')+'h × '+val('slots')+'枠';
+    $('t-shc').textContent = yen(shishaCost);
+    $('t-shc-memo').textContent = val('c5')+'円 × '+val('n5')+'回';
+    $('t-drc').textContent = yen(drinkCost);
+    $('t-drc-memo').textContent = val('c6')+'円 × '+val('n6')+'本';
+    $('t-cm').textContent = yen(cm);
+    $('t-cm-memo').textContent = '限界利益率 '+pct(cmRate);
+    $('t-fix').textContent = yen(fix);
+    $('t-rent').textContent = yen(val('rent'));
+    $('t-util').textContent = yen(val('util'));
+    $('t-comm').textContent = yen(val('comm'));
+    $('t-supp').textContent = yen(val('supp'));
+    $('t-ent').textContent = yen(val('ent'));
+    $('t-op').textContent = yen(op);
+    $('t-op-memo').textContent = rev>0 ? '営業利益率 '+pct(op/rev) : '';
+    $('lic-range').textContent = 'ライセンス料率の感度: 25%なら'+yen(r3*0.25)+' ／ 30%なら'+yen(r3*0.30)
+      +'（差額 '+yen(r3*0.05)+'/月）。料率を上げない代わりに優先卸しを獲る方針。';
+
+    // KPI
+    var visitors = val('n1')*val('a1')+val('n2')*val('a2')+val('n3')*val('a3')+val('n4')*val('a4');
+    var sessions = val('n1')+val('n2')+val('n3')+val('n4');
+    var capacity = val('spd')*val('days');
+    var repeatRate = val('repeat')/100;
+    $('k-visitors').textContent = Math.round(visitors).toLocaleString('ja-JP')+'人';
+    $('k-arpu').textContent = visitors>0 ? yen(rev/visitors) : '―';
+    $('k-repeat').textContent = pct(repeatRate);
+    $('k-repeat-memo').textContent = 'リピート約'+Math.round(visitors*repeatRate)+'人／新規約'+Math.round(visitors*(1-repeatRate))+'人';
+    $('k-new').textContent = Math.round(visitors*(1-repeatRate))+'人';
+    $('k-sns').textContent = '+'+val('sns')+'人';
+    $('k-sns-memo').textContent = visitors>0 ? '来店者の約'+pct(val('sns')/visitors)+'が登録する想定' : '';
+    $('k-util').textContent = capacity>0 ? pct(sessions/capacity) : '―';
+    $('k-util-memo').textContent = sessions+'公演 ÷ '+capacity+'枠（'+val('spd')+'枠 × '+val('days')+'日）';
+    $('k-n1').textContent = val('n1')+'回'; $('k-n2').textContent = val('n2')+'回';
+    $('k-n3').textContent = val('n3')+'回'; $('k-n4').textContent = val('n4')+'回';
+    $('k-evt').textContent = val('evt')+'回';
+    $('k-shr').textContent = visitors>0 ? pct(val('n5')/visitors) : '―';
+  }
+
+  ids.forEach(function(id){ $(id).addEventListener('input', recalc); });
+  recalc();
+})();
+</script>
+</body>
+</html>
