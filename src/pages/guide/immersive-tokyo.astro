@@ -12,6 +12,7 @@ import { jsonLd } from '../../lib/microcms';
 
 const toc = [
   { id: 'types', label: '東京のイマーシブ体験の種類' },
+  { id: 'trend2026', label: '2026年の東京イマーシブ動向' },
   { id: 'now', label: 'ex Labsの東京イマーシブ体験' },
   { id: 'choose', label: '初めての選び方3つのポイント' },
   { id: 'biz', label: '開催したい企業・施設の方へ' },
@@ -61,7 +62,7 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs' },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
   datePublished: '2026-08-07',
-  dateModified: '2026-08-13',
+  dateModified: '2026-08-31',
   mainEntityOfPage: new URL('/guide/immersive-tokyo/', Astro.site).toString(),
 };
 ---
@@ -101,7 +102,13 @@ const articleLd = {
 </div>
 </div></section>
 
-<section class="section" id="now"><div class="wrap narrow">
+<section class="section" id="trend2026"><div class="wrap narrow">
+<p class="eyebrow">2026 TREND</p><h2 class="h2 serif">2026年の東京イマーシブ動向</h2>
+<p class="lede">2026年の東京イマーシブシーンは、大きな転換点を迎えています。世界最大級のイマーシブ・テーマパークとして2024年に開業した<strong>「イマーシブ・フォート東京」（お台場）が、2026年2月28日をもって閉業</strong>しました。運営側は理由を「施設規模が過大だったため」と説明しており、実際に人気が集中したのは大人数向けのライトな体験ではなく、<strong>人数限定の濃密な没入体験</strong>だったと報じられています。</p>
+<p class="lede">つまり、常設の大型パークが終わった一方で、<strong>イマーシブ体験そのものの需要はむしろ「少人数×高密度」に集中している</strong>のが2026年の実態です。東京では、期間限定公演・店舗型・街なか周遊型など、物語との距離が近い小規模高密度のイマーシブが主流になりつつあります。これから体験するなら、この「距離の近さ」を基準に選ぶのがおすすめです。</p>
+</div></section>
+
+<section class="section tinted" id="now"><div class="wrap narrow">
 <p class="eyebrow">PICK UP</p><h2 class="h2 serif">ex Labsの東京イマーシブ体験</h2>
 <ul class="bullets">
 <li><strong>ウワサバナシ調査委員会（渋谷）</strong>：渋谷サクラステージ全体を周遊する都市伝説×イマーシブ×謎解き。2026年9〜10月開催。東急不動産様ほかのご協力で実現した施設一体型で、<strong>日本経済新聞に掲載</strong>されました。<a href="/uwasabanashi/" style="color:var(--accent)">特設サイト →</a></li>
@@ -111,7 +118,7 @@ const articleLd = {
 </ul>
 </div></section>
 
-<section class="section tinted" id="choose"><div class="wrap narrow">
+<section class="section" id="choose"><div class="wrap narrow">
 <p class="eyebrow">HOW TO CHOOSE</p><h2 class="h2 serif">初めての選び方3つのポイント</h2>
 <ul class="bullets">
 <li><strong>没入の深さで選ぶ</strong>：がっつり演じたいなら公演型、気軽に楽しみたいなら謎解き付きの周遊型が入りやすいです。</li>
@@ -120,7 +127,7 @@ const articleLd = {
 </ul>
 </div></section>
 
-<section class="section" id="biz"><div class="wrap narrow">
+<section class="section tinted" id="biz"><div class="wrap narrow">
 <p class="eyebrow">FOR BUSINESS</p><h2 class="h2 serif">開催したい企業・施設の方へ</h2>
 <p class="lede">上で紹介した公演は、いずれも株式会社ex Labsが<strong>企画・制作・運営</strong>を手がけたものです。商業施設・店舗・街を舞台にしたオリジナルのイマーシブイベントを、<strong>レベニューシェア型（初期費用0円または格安）</strong>を含む柔軟な形で開催できます。</p>
 <p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）はこちら →</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは →</a></p>
@@ -159,6 +166,6 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#types,#now,#choose,#biz,#faq{scroll-margin-top:88px}
+#types,#trend2026,#now,#choose,#biz,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>
