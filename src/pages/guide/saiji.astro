@@ -1,0 +1,202 @@
+---
+// 「催事とは」「催事 ポップアップ 違い」クエリの受け皿となる施設活用スポーク記事。
+// 9/1のGSCで「ポップアップ ストア 催事 違い」8.5位・「ポップアップイベントとは」
+// 9.2位/26表示と催事関連の山が立ち上がったため、勝ちパターン
+// （定義先出し＋DefinedTerm）で「催事」の検索面を取りに行く。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const toc = [
+  { id: 'about', label: '催事とは' },
+  { id: 'diff', label: 'ポップアップストア・物産展との違い' },
+  { id: 'types', label: '催事の種類3タイプ' },
+  { id: 'taiken', label: 'いま「体験型催事」が注目される理由' },
+  { id: 'flow', label: '企画から開催までの流れと費用' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '催事とはどういう意味ですか？',
+    a: '商業施設・百貨店・駅などの一角で、期間限定で開催される販売会やイベントのことです。「催し物」を略した言葉で、北海道物産展のような食催事、期間限定の物販催事、参加して楽しむ体験型催事などが含まれます。施設側にとっては集客の目玉、出店側にとっては短期間で顧客と出会える場です。',
+  },
+  {
+    q: '催事とポップアップストアは何が違いますか？',
+    a: 'どちらも期間限定の出店ですが、催事は施設が主導する「企画枠」で複数の出店者が入ることも多いのに対し、ポップアップストアはブランド側が主導する単独出店を指すのが一般的です。実際には重なる部分も多く、近年は両者とも物販だけでなく体験型の企画が増えています。',
+  },
+  {
+    q: '体験型催事とはどんなものですか？',
+    a: '物を売るのではなく「体験」を提供する催事です。謎解きイベント、イマーシブ（没入型）イベント、マーダーミステリー公演、参加型の展示などが代表例で、来館の目的そのものになるため、施設の集客・回遊・滞在時間に直接効くのが特徴です。',
+  },
+  {
+    q: '催事スペースが埋まらないときの活用方法はありますか？',
+    a: '体験型イベントでの活用が有効です。株式会社ex Labsはチケット売上に応じたレベニューシェア型（成果報酬型）に対応しており、案件によっては施設側の初期費用0円または格安で、空いた催事場・共有区画を集客コンテンツに変えられます。',
+  },
+  {
+    q: '催事の企画・制作を依頼できますか？',
+    a: 'できます。株式会社ex Labsは商業施設での施設一体型イベント（渋谷サクラステージ・日経掲載）をはじめ、体験型催事の企画・制作・集客・運営を一貫して手がけています。ご相談・お見積りは無料です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const definedTermLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: '催事',
+  description:
+    '催事とは、商業施設・百貨店・駅などの一角で期間限定に開催される販売会やイベントのこと。「催し物」を略した言葉で、物産展などの食催事、期間限定の物販催事、謎解きやイマーシブなどの体験型催事が含まれる。',
+  inDefinedTermSet: {
+    '@type': 'DefinedTermSet',
+    name: '体験型エンターテインメント用語集',
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  },
+  url: new URL('/guide/saiji/', Astro.site).toString(),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '催事とは？意味・ポップアップストアとの違い・体験型催事の企画例まで解説',
+  about: '催事（商業施設の期間限定イベント・販売会）',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/saiji.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs' },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  datePublished: '2026-09-01',
+  dateModified: '2026-09-01',
+  mainEntityOfPage: new URL('/guide/saiji/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="催事とは？意味・ポップアップストアとの違い・体験型催事の企画例まで解説 - 株式会社ex Labs"
+  description="催事とは、商業施設や百貨店で期間限定に開催される販売会・イベントのこと。読み方、ポップアップストア・物産展との違い、催事の種類3タイプ、いま注目される「体験型催事」の企画例と費用まで、施設一体型イベント（日経掲載）を手がける制作会社が解説します。"
+  ogImage="/assets/guide/saiji.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<script type="application/ld+json" set:html={jsonLd(definedTermLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '施設活用イベントとは', href: '/guide/shisetsu-katsuyo/' },
+  { name: '催事とは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">SAIJI GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">催事とは？</span><span class="nobr">意味・ポップアップとの違い・</span><span class="nobr">体験型催事の企画例まで解説</span></h1>
+<div class="def-box">
+<p class="def-word"><span class="serif">催事</span><span class="def-yomi">読み方：さいじ</span></p>
+<p class="def-body">商業施設・百貨店・駅などの一角で、<strong>期間限定に開催される販売会やイベント</strong>のこと。「催し物」を略した言葉で、物産展などの食催事、期間限定の物販催事、謎解きやイマーシブなどの<strong>体験型催事</strong>が含まれる。</p>
+</div>
+<p class="lede">このページでは、催事の意味とポップアップストアとの違い、種類3タイプ、いま施設の集客手段として注目される「体験型催事」の企画例と費用までを、渋谷サクラステージでの施設一体型イベント（日本経済新聞掲載）を手がけた株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">催事とは</h2>
+<p class="lede">催事とは、<strong>施設の空間を期間限定で「特別な何か」に変える企画</strong>の総称です。百貨店の催事場で開かれる北海道物産展、ショッピングモールの通路に現れる期間限定ショップ、駅構内のイベントスペースで開かれる展示——どれも催事です。</p>
+<p class="lede">施設側から見ると、催事は<strong>「いつ来ても同じ」を壊して来館の理由を作る装置</strong>です。常設テナントだけでは生まれない「今だけ」の目玉が、新規来館・再来館のきっかけになります。出店側から見ると、固定店舗を持たずに短期間で多くの顧客と出会えるテストマーケティングの場でもあります。</p>
+</div></section>
+
+<section class="section" id="diff"><div class="wrap narrow">
+<p class="eyebrow">DIFFERENCE</p><h2 class="h2 serif">ポップアップストア・物産展との違い</h2>
+<ul class="bullets">
+<li><strong>催事</strong>：施設側が主導する期間限定企画の総称。催事場・共有区画などの「枠」に対して企画を入れる発想で、複数の出店者が集まる形式も多い。</li>
+<li><strong>ポップアップストア</strong>：ブランド・企業側が主導する期間限定の単独出店。近年は物販だけでなく体験・世界観の発信を目的にした出店が増えています。<a href="/guide/popup-event/" style="color:var(--accent)">ポップアップイベントとは →</a></li>
+<li><strong>物産展</strong>：地域の産品を集めて販売する催事の代表格。食催事として百貨店の集客の柱になってきました。</li>
+</ul>
+<p class="lede">実際にはこの3つは重なり合っており、境界は年々あいまいになっています。重要なのは主導が誰かよりも、<strong>「その企画は来館の理由になるか」</strong>です。</p>
+</div></section>
+
+<section class="section tinted" id="types"><div class="wrap">
+<p class="eyebrow">TYPES</p><h2 class="h2 serif">催事の種類3タイプ</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">物販催事</span><span class="genre-d">期間限定ショップ・雑貨市・古本市など、モノを売る催事。手堅い定番ですが、EC時代には「そこで買う理由」の設計が課題になっています。</span></div>
+<div class="genre-cell"><span class="genre-t serif">食催事</span><span class="genre-d">物産展・スイーツフェア・グルメイベントなど。集客力は高い一方、企画の同質化で差別化が難しくなりつつあります。</span></div>
+<div class="genre-cell"><span class="genre-t serif">体験型催事</span><span class="genre-d">謎解き・イマーシブ・マダミス公演・参加型展示など、「体験」そのものを提供する催事。来館の目的になり、回遊・滞在時間に直結する成長分野です。</span></div>
+</div>
+</div></section>
+
+<section class="section" id="taiken"><div class="wrap narrow">
+<p class="eyebrow">WHY</p><h2 class="h2 serif">いま「体験型催事」が注目される理由</h2>
+<ul class="bullets">
+<li><strong>①ECに奪えない価値だから</strong>：モノはネットで買えても、体験は「その場所」でしかできません。体験型催事は施設に行く理由そのものを作ります。</li>
+<li><strong>②施設全体に効果が波及するから</strong>：物販催事の効果は催事場に留まりがちですが、周遊型の体験催事は<strong>手がかりや物語を館内に配置して回遊動線を設計</strong>でき、テナント送客まで狙えます。</li>
+<li><strong>③空間がそのままコンテンツになるから</strong>：空き区画・共有部・営業時間外といった「使われていない空間・時間」を、造作を最小限にしたまま物語の舞台に変えられます。<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用とは →</a></li>
+</ul>
+<p class="lede">当社が渋谷サクラステージで開催した施設一体型イベント「ウワサバナシ調査委員会」は、施設全体を体験の舞台に変える取り組みとして<strong>日本経済新聞に掲載</strong>されました。<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベント事例 →</a></p>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW &amp; COST</p><h2 class="h2 serif">企画から開催までの流れと費用</h2>
+<ul class="bullets">
+<li><strong>①目的の整理（〜2週間）</strong>：集客・回遊・空き区画活用・話題化など、施設として何を達成したいかを決めます。</li>
+<li><strong>②企画・体験設計（1〜2ヶ月）</strong>：施設の空間・導線に合わせて体験を設計。既存コンテンツの導入なら短縮できます。</li>
+<li><strong>③制作・準備（1〜2ヶ月）</strong>：キット・装飾・運営マニュアルの制作、スタッフ手配、告知開始。</li>
+<li><strong>④開催・運営</strong>：週末のみの短期から数ヶ月の長期開催まで。長期のほうが「何度も来る理由」を作りやすくなります。</li>
+</ul>
+<p class="lede">費用は規模・期間により大きく変わりますが、株式会社ex Labsは<strong>チケット売上などに応じたレベニューシェア型（成果報酬型）</strong>に対応しており、案件によっては<strong>施設側の初期費用0円または格安</strong>で開催できます。空いた催事枠を「コストをかけて埋める場所」から「収益とにぎわいを生む資産」に変える形です。</p>
+<p class="vc-line"><a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談（無料）→</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">体験型催事・施設イベントのご相談はこちら（無料）</p>
+<a class="btn" href="/services/shisetsu-event/">施設活用イベントサービスを見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>／<a href="/guide/popup-event/" style="color:var(--accent)">ポップアップイベントとは</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベントアイデア10選</a>／<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の活用とは</a></p>
+</div></section>
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.def-box{max-width:680px;margin:40px auto 26px;background:#fff;border:1px solid rgba(51,48,43,.1);border-left:5px solid var(--accent);border-radius:14px;padding:26px 30px;text-align:left;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.def-word{margin:0 0 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:22px;font-weight:800;color:var(--ink)}
+.def-yomi{font-size:13px;font-weight:600;color:rgba(51,48,43,.55);letter-spacing:.04em}
+.def-body{margin:0;font-size:14.5px;line-height:2;color:rgba(51,48,43,.82)}
+@media(max-width:640px){.def-box{padding:20px 20px}.def-word{font-size:19px;gap:10px}}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#diff,#types,#taiken,#flow,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
