@@ -18,7 +18,9 @@ const events = [
     desc: '展示で使用された絵画の複製画を競り落とす特別公演。しかし会場には、怪盗［カラス］の影が――。30分の推理劇の顛末を記録する。',
   },
   {
-    href: '/game/lost-frame/',
+    // ロスト・フレームのネタバレ記事は note 上で公開しているため、外部リンクで直接飛ばす。
+    href: 'https://note.com/kabuexlabs/n/ndab98d511651',
+    external: true,
     img: '/assets/events/lost-frame.webp',
     title: 'ロスト・フレーム',
     meta: '2026　周遊型アートイマーシブ × 謎解き',
@@ -43,14 +45,14 @@ const events = [
   <div class="cards">
     {events.map((ev) => (
       <article class="card">
-        <a class="posterbox frame" href={ev.href}>
+        <a class="posterbox frame" href={ev.href} target={ev.external ? '_blank' : undefined} rel={ev.external ? 'noopener' : undefined}>
           <img class="poster" src={ev.img} alt={ev.title} width="1080" height="1546" loading="lazy">
         </a>
         <div class="cardbody">
           <h2 class="ctitle">{ev.title.split(/\s+/).map((w, i) => <span class="nobr">{i > 0 ? '　' : ''}{w}</span>)}</h2>
           <div class="cmeta">{ev.meta}</div>
           <p class="cdesc">{ev.desc}</p>
-          <a class="btn" href={ev.href}>このイベントのネタバレを見る</a>
+          <a class="btn" href={ev.href} target={ev.external ? '_blank' : undefined} rel={ev.external ? 'noopener' : undefined}>{ev.external ? 'このイベントのネタバレを見る（note）' : 'このイベントのネタバレを見る'}</a>
         </div>
       </article>
     ))}
