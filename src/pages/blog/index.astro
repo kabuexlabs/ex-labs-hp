@@ -4,6 +4,7 @@ export const prerender = false;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import { getPostList, isMicrocmsConfigured } from '../../lib/microcms';
+import { BLOG_REDIRECTS } from '../../data/redirects';
 import { guideArticles } from '../../data/guides';
 
 const configured = isMicrocmsConfigured();
@@ -11,9 +12,11 @@ const PAGE_SIZE = 12;
 const page = Math.max(1, Number(Astro.url.searchParams.get('page') ?? '1') || 1);
 const offset = (page - 1) * PAGE_SIZE;
 
-const { contents, totalCount } = configured
+const { contents: rawContents, totalCount } = configured
   ? await getPostList(offset, PAGE_SIZE)
   : { contents: [], totalCount: 0 };
+// 解説記事へ統合（301）した記事は一覧に出さない
+const contents = rawContents.filter((p) => !BLOG_REDIRECTS[p.id]);
 
 const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
 

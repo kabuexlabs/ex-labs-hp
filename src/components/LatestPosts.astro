@@ -1,5 +1,6 @@
 ---
 import { getPostList, isMicrocmsConfigured, type PostCategory } from '../lib/microcms';
+import { BLOG_REDIRECTS } from '../data/redirects';
 import { guideArticles } from '../data/guides';
 
 export interface Props {
@@ -43,7 +44,7 @@ const guideItems: Item[] = guideArticles
   .filter((g) => g.href !== currentPath)
   .map((g) => ({ href: g.href, title: g.title, date: g.date, desc: g.desc, img: g.thumb }));
 
-const blogItems: Item[] = fetched.map((p) => ({
+const blogItems: Item[] = fetched.filter((p) => !BLOG_REDIRECTS[p.id]).map((p) => ({
   href: `/blog/${p.id}/`,
   title: p.title,
   // publishedAt が無い異常データでも枠ごと落とさない

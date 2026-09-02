@@ -5,6 +5,7 @@ import { getPostList, isMicrocmsConfigured } from '../lib/microcms';
 import { tmWorks } from '../data/toudaimurderWorks';
 import { tmNews } from '../data/toudaimurderNews';
 import { htPaths } from '../data/hacktale';
+import { BLOG_REDIRECTS } from '../data/redirects';
 
 // NOTE: keep every URL here in its canonical trailing-slash form, and
 // never list pages that carry noindex (unlisted LPs, private tools) —
@@ -156,6 +157,7 @@ export const GET: APIRoute = async ({ site }) => {
       total = totalCount;
       offset += contents.length;
       for (const post of contents) {
+        if (BLOG_REDIRECTS[post.id]) continue; // 統合済み記事は載せない
         urls.push({
           // canonical はスラッシュ付きに正規化しているので sitemap も揃える
           // （不一致だと Search Console で両方の URL が計上されてしまう）
