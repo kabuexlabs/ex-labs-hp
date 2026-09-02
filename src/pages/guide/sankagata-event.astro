@@ -8,7 +8,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'about', label: '参加型イベントとは' },
@@ -58,7 +61,7 @@ const definedTermLd = {
   inDefinedTermSet: {
     '@type': 'DefinedTermSet',
     name: '体験型エンターテインメント用語集',
-    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   },
   url: new URL('/guide/sankagata-event/', Astro.site).toString(),
 };
@@ -70,8 +73,8 @@ const articleLd = {
   about: '参加型イベントの意味・種類・企画方法',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/sankagata-event.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-13',
   dateModified: '2026-08-13',
   mainEntityOfPage: new URL('/guide/sankagata-event/', Astro.site).toString(),
@@ -168,6 +171,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントとは</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="shisetsu" />
 

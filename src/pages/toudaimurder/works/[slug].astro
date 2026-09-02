@@ -64,12 +64,15 @@ const crumbLd = {
     { '@type': 'ListItem', position: 3, name: work.title, item: pageUrl },
   ],
 };
+const metaDescFull = `${work.title}は、UNLIMITED MYSTERY（東大マーダーミステリーサークル）制作のマーダーミステリー（マダミス）作品。${work.specs.join('・')}。${cleanDesc ? cleanDesc.replace(/[。．.]+$/, '') + '。' : ''}貸切公演・オンライン公演のご予約受付中。`;
+// 検索結果で切れないよう150字前後に収める（specsまでは必ず残す）
+const metaDesc = metaDescFull.length <= 155 ? metaDescFull : `${work.title}は、UNLIMITED MYSTERY（東大マーダーミステリーサークル）制作のマーダーミステリー（マダミス）作品。${work.specs.join('・')}。貸切公演・オンライン公演のご予約受付中。`;
 ---
 
 <ToudaimurderLayout
   active="works"
   title={`${work.title}｜マーダーミステリー（マダミス）｜UNLIMITED MYSTERY`}
-  description={`${work.title}は、UNLIMITED MYSTERY（東大マーダーミステリーサークル）が制作したマーダーミステリー（マダミス）作品。${work.specs.join('・')}。${cleanDesc ? cleanDesc.replace(/[。．.]+$/, '') + '。' : ''}貸切公演・オンライン公演のご予約を受付中です。`}
+  description={metaDesc}
   ogImage={work.image}
 >
   <script type="application/ld+json" slot="head" set:html={jsonLd(workLd)} />

@@ -7,7 +7,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'about', label: '営業時間外の施設活用とは' },
@@ -58,8 +61,8 @@ const articleLd = {
   about: '施設の営業時間外・閉店後の活用（ナイトタイムエコノミー）',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/eigyo-jikangai.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
   dateModified: '2026-08-07',
   mainEntityOfPage: new URL('/guide/eigyo-jikangai/', Astro.site).toString(),
@@ -154,6 +157,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>／<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベント</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="shisetsu" />
 

@@ -8,7 +8,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'answer', label: '結論：イマーシブ＝VRではない' },
@@ -58,8 +61,8 @@ const articleLd = {
   about: 'イマーシブ体験とVR・メタバースの違い',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/immersive-vr.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-10',
   dateModified: '2026-08-10',
   mainEntityOfPage: new URL('/guide/immersive-vr/', Astro.site).toString(),
@@ -143,6 +146,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド</a>／<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>／<a href="/guide/immersive-making/" style="color:var(--accent)">イマーシブイベントの作り方</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="immersive" />
 

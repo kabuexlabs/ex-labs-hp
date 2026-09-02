@@ -8,7 +8,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'summary', label: 'プロジェクト概要' },
@@ -51,8 +54,8 @@ const articleLd = {
   about: '商業施設の施設一体型イマーシブイベントの制作事例',
   inLanguage: 'ja',
   image: [new URL('/assets/events/uwasabanashi-kv.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-11',
   dateModified: '2026-08-11',
   mainEntityOfPage: new URL('/guide/case-uwasabanashi/', Astro.site).toString(),
@@ -146,6 +149,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作とは（工程・体制の解説）</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例4選</a>／<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントとは</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="immersive" />
 

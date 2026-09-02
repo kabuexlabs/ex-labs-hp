@@ -8,7 +8,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'types', label: '頭脳戦ゲームの種類4タイプ' },
@@ -54,8 +57,8 @@ const articleLd = {
   about: '頭脳戦ゲーム・心理戦ゲーム・交渉ゲームの種類と選び方',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/zunousen-game.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-27',
   dateModified: '2026-08-27',
   mainEntityOfPage: new URL('/guide/zunousen-game/', Astro.site).toString(),
@@ -112,9 +115,9 @@ const articleLd = {
 <p class="eyebrow">HACKTALE</p><h2 class="h2 serif">HACKTALEのオリジナル頭脳戦</h2>
 <p class="lede">当社の頭脳戦専門レーベル<strong>HACKTALE</strong>は、市販ゲームでは味わえない「対人戦のために設計されたオリジナル頭脳戦」を制作・公演しています：</p>
 <ul class="bullets">
-<li><strong>プレゼント・ポーカー</strong>（交渉系）：贈り物をめぐる交渉と読み合い。</li>
-<li><strong>人狼定理</strong>（論理×心理戦）：正体隠匿の駆け引きを論理で切り崩すハイブリッド。</li>
-<li><strong>ダイスボックス</strong>（運×戦略系）：賭け方と引き際の判断を突き詰めたダイスゲーム。</li>
+<li><strong><a href="/hacktale/works/present-poker/" style="color:var(--accent)">プレゼント・ポーカー</a></strong>（交渉系）：贈り物をめぐる交渉と読み合い。</li>
+<li><strong><a href="/hacktale/works/werewolf-theorem/" style="color:var(--accent)">人狼定理</a></strong>（論理×心理戦）：正体隠匿の駆け引きを論理で切り崩すハイブリッド。</li>
+<li><strong><a href="/hacktale/works/dice-box/" style="color:var(--accent)">ダイスボックス</a></strong>（運×戦略系）：賭け方と引き際の判断を突き詰めたダイスゲーム。</li>
 </ul>
 <p class="vc-line"><a href="/hacktale/works/" style="color:var(--accent)">HACKTALEの作品一覧（貸切公演の予約可）→</a></p>
 </div></section>
@@ -147,6 +150,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは（完全ガイド）</a>／<a href="/guide/shinrisen/" style="color:var(--accent)">心理戦とは</a>／<a href="/hacktale/" style="color:var(--accent)">HACKTALE公式サイト</a>／<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア8選</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="zunou" />
 

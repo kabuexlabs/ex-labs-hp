@@ -9,7 +9,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'about', label: '頭脳戦とは' },
@@ -62,7 +65,7 @@ const definedTermLd = {
   inDefinedTermSet: {
     '@type': 'DefinedTermSet',
     name: '体験型エンターテインメント用語集',
-    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   },
   url: new URL('/guide/zunousen/', Astro.site).toString(),
 };
@@ -74,8 +77,8 @@ const articleLd = {
   about: '頭脳戦（閃き・論理・交渉・心理戦で競うゲーム・イベント）',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/zunousen.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-27',
   dateModified: '2026-08-27',
   mainEntityOfPage: new URL('/guide/zunousen/', Astro.site).toString(),
@@ -141,9 +144,9 @@ const articleLd = {
 <p class="eyebrow">GAMES</p><h2 class="h2 serif">頭脳戦ゲームの例</h2>
 <p class="lede">身近なところでは、ポーカーの駆け引き、人狼ゲームの正体の読み合い、交渉型ボードゲームなどが頭脳戦の代表例です。当社レーベル<strong>HACKTALE</strong>では、これらの面白さを凝縮したオリジナルの対人頭脳戦を制作・公演しています：</p>
 <ul class="bullets">
-<li><strong>プレゼント・ポーカー</strong>：贈り物をめぐる交渉と読み合いのゲーム。</li>
-<li><strong>人狼定理</strong>：正体隠匿の駆け引きを論理で切り崩すハイブリッド頭脳戦。</li>
-<li><strong>ダイスボックス</strong>：運と戦略の配合を突き詰めたダイスゲーム。</li>
+<li><strong><a href="/hacktale/works/present-poker/" style="color:var(--accent)">プレゼント・ポーカー</a></strong>：贈り物をめぐる交渉と読み合いのゲーム。</li>
+<li><strong><a href="/hacktale/works/werewolf-theorem/" style="color:var(--accent)">人狼定理</a></strong>：正体隠匿の駆け引きを論理で切り崩すハイブリッド頭脳戦。</li>
+<li><strong><a href="/hacktale/works/dice-box/" style="color:var(--accent)">ダイスボックス</a></strong>：運と戦略の配合を突き詰めたダイスゲーム。</li>
 <li><strong>東京都頭脳王決定戦 2026</strong>：都内4会場で「東京で最も頭の良い人間」を決める参加型リアルイベント。<strong>全公演チケット完売</strong>となりました。</li>
 </ul>
 <p class="vc-line"><a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類と選び方 →</a>／<a href="/guide/shinrisen/" style="color:var(--accent)">心理戦とは →</a>／<a href="/hacktale/works/" style="color:var(--accent)">HACKTALEの頭脳戦作品一覧 →</a>／<a href="/hacktale/event/zunouou/" style="color:var(--accent)">東京都頭脳王決定戦 2026 →</a></p>
@@ -176,6 +179,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作サービス</a>／<a href="/hacktale/" style="color:var(--accent)">HACKTALE公式サイト</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/sankagata-event/" style="color:var(--accent)">参加型イベントとは</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="zunou" />
 

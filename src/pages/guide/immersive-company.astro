@@ -7,7 +7,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'points', label: '制作会社を選ぶ5つの基準' },
@@ -57,8 +60,8 @@ const articleLd = {
   about: 'イマーシブ（没入型体験）制作会社の選び方',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/immersive-company.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
   dateModified: '2026-08-07',
   mainEntityOfPage: new URL('/guide/immersive-company/', Astro.site).toString(),
@@ -150,6 +153,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作の全体像ガイド</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド</a>／<a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブ制作の費用相場</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="immersive" />
 

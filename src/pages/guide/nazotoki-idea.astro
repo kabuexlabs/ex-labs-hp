@@ -8,7 +8,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'types', label: '謎解きイベントの種類（形式4タイプ）' },
@@ -54,8 +57,8 @@ const articleLd = {
   about: '謎解きイベントの企画アイデア・種類・目的別の選び方',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/nazotoki-idea.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-12',
   dateModified: '2026-08-12',
   mainEntityOfPage: new URL('/guide/nazotoki-idea/', Astro.site).toString(),
@@ -155,6 +158,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/nazotoki-event/" style="color:var(--accent)">謎解きイベントの企画・制作ガイド</a>／<a href="/guide/nazotoki-company/" style="color:var(--accent)">謎解き制作会社の選び方</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントとは</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="nazotoki" />
 

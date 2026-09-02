@@ -8,7 +8,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'about', label: 'イマーシブシアターとは' },
@@ -62,7 +65,7 @@ const definedTermLd = {
   inDefinedTermSet: {
     '@type': 'DefinedTermSet',
     name: '体験型エンターテインメント用語集',
-    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   },
   url: new URL('/guide/immersive-theater/', Astro.site).toString(),
 };
@@ -74,8 +77,8 @@ const articleLd = {
   about: 'イマーシブシアター（没入型演劇）',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/immersive-theater.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-01',
   dateModified: '2026-08-13',
   mainEntityOfPage: new URL('/guide/immersive-theater/', Astro.site).toString(),
@@ -180,6 +183,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="immersive" />
 

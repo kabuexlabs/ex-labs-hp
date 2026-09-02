@@ -5,6 +5,7 @@ import SiteGuard from '../components/SiteGuard.astro';
 // ページ固有のスタイルは各ページの scoped <style> に置き、ここには全ページ共通の
 // トークン・ヘッダー・ボタン・ユーティリティだけを定義する。
 import { htBase } from '../data/hacktale';
+import { jsonLd } from '../lib/microcms';
 
 export interface Props {
   title: string;
@@ -33,6 +34,19 @@ const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const canonical = new URL(Astro.url.pathname.replace(/([^/])$/, '$1/'), site);
 const ogImageAbs = new URL(ogImage, site);
 
+// パンくず構造化データ（サイトリンク表示・階層理解のため）。
+// トップ → （一覧） → 当ページ の順で、back があれば一覧を挟む。
+const crumbs = [
+  { name: 'HACKTALE（ハックテイル）', url: new URL(`${htBase}/`, site).toString() },
+  ...(back ? [{ name: back.href.includes('#event') ? 'イベント一覧' : back.href.includes('#works') ? '作品一覧' : back.label.replace(/^←\s*/, '').replace(/\s*(一覧)?へ戻る$/, ''), url: new URL(back.href, site).toString() }] : []),
+  ...(Astro.url.pathname.replace(/\/$/, '') !== htBase ? [{ name: title.split(/[｜|]/)[0].trim(), url: canonical.toString() }] : []),
+];
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: c.url })),
+};
+
 const nav = [
   { href: `${htBase}/#works`, en: 'WORKS', jp: '作品紹介' },
   { href: `${htBase}/#event`, en: 'EVENT', jp: 'イベント' },
@@ -51,6 +65,7 @@ const nav = [
 <meta name="description" content={description}>
 {noindex && <meta name="robots" content="noindex">}
 <link rel="canonical" href={canonical}>
+{crumbs.length > 1 && <script type="application/ld+json" set:html={jsonLd(breadcrumbLd)} />}
 <meta property="og:title" content={title}>
 <meta property="og:description" content={description}>
 <meta property="og:type" content="website">

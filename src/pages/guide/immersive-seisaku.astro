@@ -9,7 +9,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'about', label: 'イマーシブ制作とは' },
@@ -63,7 +66,7 @@ const definedTermLd = {
   inDefinedTermSet: {
     '@type': 'DefinedTermSet',
     name: '体験型エンターテインメント用語集',
-    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   },
   url: new URL('/guide/immersive-seisaku/', Astro.site).toString(),
 };
@@ -75,8 +78,8 @@ const articleLd = {
   about: 'イマーシブ制作（没入型体験の企画・制作）の全体像',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/immersive-seisaku.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-24',
   dateModified: '2026-08-24',
   mainEntityOfPage: new URL('/guide/immersive-seisaku/', Astro.site).toString(),
@@ -198,6 +201,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作の依頼・見積り</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは（完全ガイド）</a>／<a href="/guide/immersive-cost/" style="color:var(--accent)">制作の費用相場</a>／<a href="/guide/immersive-company/" style="color:var(--accent)">制作会社の選び方</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="immersive" />
 

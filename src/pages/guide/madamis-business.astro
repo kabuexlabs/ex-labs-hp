@@ -7,7 +7,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'why', label: 'なぜ企業がマダミスを使うのか' },
@@ -57,8 +60,8 @@ const articleLd = {
   about: 'マーダーミステリー（マダミス）の企業活用',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/madamis-business.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
   dateModified: '2026-08-07',
   mainEntityOfPage: new URL('/guide/madamis-business/', Astro.site).toString(),
@@ -153,6 +156,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは？完全ガイド</a>／<a href="/guide/madamis-company/" style="color:var(--accent)">マダミス制作会社の選び方</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作サービス</a>／<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="murder" />
 

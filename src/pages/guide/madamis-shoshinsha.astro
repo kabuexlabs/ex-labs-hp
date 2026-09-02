@@ -10,7 +10,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'fuan', label: '初心者の3大不安に答えます' },
@@ -61,8 +64,8 @@ const articleLd = {
   about: 'マダミス（マーダーミステリー）初心者向けの始め方ガイド',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/madamis-shoshinsha.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-09-01',
   dateModified: '2026-09-01',
   mainEntityOfPage: new URL('/guide/madamis-shoshinsha/', Astro.site).toString(),
@@ -164,6 +167,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは（完全ガイド）</a>／<a href="/guide/madamis-asobikata/" style="color:var(--accent)">マダミスの遊び方・ルール</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場</a>／<a href="/toudaimurder/" style="color:var(--accent)">東大マダミス公式サイト</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="murder" />
 

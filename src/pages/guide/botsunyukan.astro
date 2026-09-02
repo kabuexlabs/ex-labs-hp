@@ -8,7 +8,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'about', label: '没入感とは' },
@@ -57,7 +60,7 @@ const definedTermLd = {
   inDefinedTermSet: {
     '@type': 'DefinedTermSet',
     name: '体験型エンターテインメント用語集',
-    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   },
   url: new URL('/guide/botsunyukan/', Astro.site).toString(),
 };
@@ -69,8 +72,8 @@ const articleLd = {
   about: '没入感の意味・言い換え・高め方',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/botsunyukan.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-27',
   dateModified: '2026-08-27',
   mainEntityOfPage: new URL('/guide/botsunyukan/', Astro.site).toString(),
@@ -167,6 +170,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは（完全ガイド）</a>／<a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作とは</a>／<a href="/guide/immersive-vr/" style="color:var(--accent)">イマーシブとVRの違い</a>／<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブ</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="immersive" />
 

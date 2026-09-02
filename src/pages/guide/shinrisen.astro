@@ -9,7 +9,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'about', label: '心理戦とは' },
@@ -62,7 +65,7 @@ const definedTermLd = {
   inDefinedTermSet: {
     '@type': 'DefinedTermSet',
     name: '体験型エンターテインメント用語集',
-    publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   },
   url: new URL('/guide/shinrisen/', Astro.site).toString(),
 };
@@ -74,8 +77,8 @@ const articleLd = {
   about: '心理戦（相手の思考を読み合う対戦型ゲーム・イベント）',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/shinrisen.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-29',
   dateModified: '2026-08-29',
   mainEntityOfPage: new URL('/guide/shinrisen/', Astro.site).toString(),
@@ -146,7 +149,7 @@ const articleLd = {
 <ul class="bullets">
 <li><strong>ポーカー</strong>：ブラフと賭け方の読み合いの代名詞。手札の強さより「強く見せるか、弱く見せるか」が勝敗を分けます。</li>
 <li><strong>人狼ゲーム</strong>：正体隠匿系の代表格。嘘を見抜く側と、嘘を突き通す側の心理戦が議論の中で展開されます。</li>
-<li><strong>HACKTALEのオリジナル心理戦</strong>：当社の頭脳戦専門レーベルHACKTALEでは、対人の読み合いのために設計されたオリジナルゲームを制作・公演しています。正体隠匿の駆け引きを論理で切り崩す<strong>「人狼定理」</strong>、贈り物をめぐる交渉と読み合いの<strong>「プレゼント・ポーカー」</strong>など、ルール説明数分で心理戦の核心に触れられる作品群です。</li>
+<li><strong>HACKTALEのオリジナル心理戦</strong>：当社の頭脳戦専門レーベルHACKTALEでは、対人の読み合いのために設計されたオリジナルゲームを制作・公演しています。正体隠匿の駆け引きを論理で切り崩す<strong>「<a href="/hacktale/works/werewolf-theorem/" style="color:var(--accent)">人狼定理</a>」</strong>、贈り物をめぐる交渉と読み合いの<strong>「<a href="/hacktale/works/present-poker/" style="color:var(--accent)">プレゼント・ポーカー</a>」</strong>など、ルール説明数分で心理戦の核心に触れられる作品群です。</li>
 </ul>
 <p class="vc-line"><a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類4タイプと選び方 →</a>／<a href="/hacktale/works/" style="color:var(--accent)">HACKTALEの作品一覧 →</a></p>
 </div></section>
@@ -179,6 +182,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは（完全ガイド）</a>／<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類と選び方</a>／<a href="/hacktale/" style="color:var(--accent)">HACKTALE公式サイト</a>／<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア8選</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="zunou" />
 

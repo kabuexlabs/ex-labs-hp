@@ -9,7 +9,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'why', label: '季節イベントを「体験型」にする効果' },
@@ -55,8 +58,8 @@ const articleLd = {
   about: '商業施設のハロウィン・クリスマスなど季節イベントの体験型企画',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/kisetsu-event.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-24',
   dateModified: '2026-08-24',
   mainEntityOfPage: new URL('/guide/kisetsu-event/', Astro.site).toString(),
@@ -149,6 +152,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>／<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用アイデア</a>／<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">渋谷サクラステージの制作事例</a>／<a href="/guide/taikengata-company/" style="color:var(--accent)">制作会社の選び方</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="shisetsu" />
 

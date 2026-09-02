@@ -154,6 +154,12 @@ const orgLd = {
 <body>
 
 {showPreloader && (
+  <script is:inline>
+    /* 演出は同一セッションで1回だけ。2回目以降の訪問はすぐ本文を見せる */
+    try { if (sessionStorage.getItem('exl_pre')) { document.documentElement.classList.add('no-pre'); } else { sessionStorage.setItem('exl_pre', '1'); } } catch (e) {}
+  </script>
+)}
+{showPreloader && (
   <div class="preloader" aria-hidden="true">
     <p class="preloader-tagline serif">AI時代に、人間が作る面白さを追求する</p>
     <img class="preloader-logo" src="/assets/logo-white.png" alt="">

@@ -8,7 +8,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'summary', label: '費用の目安（結論）' },
@@ -59,8 +62,8 @@ const articleLd = {
   about: 'マーダーミステリー（マダミス）制作の費用',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/madamis-cost.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs' },
-  publisher: { '@type': 'Organization', name: '株式会社ex Labs' },
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-07-30',
   dateModified: '2026-07-30',
   mainEntityOfPage: new URL('/guide/madamis-cost/', Astro.site).toString(),
@@ -162,6 +165,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作サービス</a>／<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは？完全ガイド</a>／<a href="/toudaimurder/" style="color:var(--accent)">UNLIMITED MYSTERY（制作レーベル）</a></p>
 </div></section>
+
+<AuthorBox />
 
 <LatestPosts category="murder" />
 
