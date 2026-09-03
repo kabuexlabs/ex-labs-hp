@@ -7,6 +7,7 @@
 // 送信は fetch (AJAX) で行い、完了後は当サイトのサンクスページへ遷移する。
 // JS が無効な環境では通常 POST にフォールバックする (Formspree の完了画面経由)。
 import SourceField from './SourceField.astro';
+import { TB_X_URL } from '../data/taikenbizyutu';
 
 const FORM_ENDPOINT = '/api/contact';
 const thanksPath = '/taikenbizyutu/contact/thanks/';
@@ -46,7 +47,7 @@ const thanksPath = '/taikenbizyutu/contact/thanks/';
     <button class="bigx sendbtn" type="submit">送信する</button>
   </div>
   <p class="ferr note tc" hidden>送信に失敗しました。お手数ですが時間をおいて再度お試しいただくか、<a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> まで直接ご連絡ください。</p>
-  <p class="note tc" style="margin:20px 0 0">お急ぎの場合は<a href="https://x.com/taikenbizyutu" target="_blank" rel="noopener">公式X（@taikenbizyutu）</a>のDMもご利用いただけます。<br>ご入力いただいた情報は、お問い合わせへの回答のみに使用いたします。</p>
+  <p class="note tc" style="margin:20px 0 0">お急ぎの場合は<a href={TB_X_URL} target="_blank" rel="noopener">公式X（@taikenbizyutu）</a>のDMもご利用いただけます。<br>ご入力いただいた情報は、お問い合わせへの回答のみに使用いたします。</p>
 </form>
 
 <script>

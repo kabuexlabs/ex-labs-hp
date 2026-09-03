@@ -1,0 +1,84 @@
+---
+// お知らせ記事：『ロスト・フレーム』完売のご報告。
+// トップページの NEWS 欄 (src/data/taikenbizyutu.ts の TB_NEWS) からリンクされる。
+import TaikenbizyutuLayout from '../../../../layouts/TaikenbizyutuLayout.astro';
+import { jsonLd } from '../../../../lib/microcms';
+import { LOST_FRAME, TB_X_URL, TB_BASE } from '../../../../data/taikenbizyutu';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const published = '2026-09-03';
+const title = '『ロスト・フレーム』全公演 完売のお知らせ';
+const description =
+  '体験する美術館 第二弾『ロスト・フレーム』（東京・下北沢）は、おかげさまで全公演のチケットが完売いたしました。ご参加いただいた皆様、会場としてご協力いただいた下北沢の店舗の皆様に心より御礼申し上げます。';
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: title,
+  description,
+  datePublished: published,
+  dateModified: published,
+  image: new URL(LOST_FRAME.image, site).toString(),
+  mainEntityOfPage: new URL(Astro.url.pathname.replace(/([^/])$/, '$1/'), site).toString(),
+  author: { '@type': 'Organization', name: '体験する美術館', url: new URL(`${TB_BASE}/`, site).toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' },
+};
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '体験する美術館', item: new URL(`${TB_BASE}/`, site).toString() },
+    { '@type': 'ListItem', position: 2, name: 'お知らせ', item: new URL(`${TB_BASE}/#news`, site).toString() },
+    { '@type': 'ListItem', position: 3, name: title },
+  ],
+};
+---
+
+<TaikenbizyutuLayout title={`${title}｜体験する美術館`} description={description}>
+<Fragment slot="head">
+  <script type="application/ld+json" set:html={jsonLd(articleLd)} />
+  <script type="application/ld+json" set:html={jsonLd(breadcrumbLd)} />
+</Fragment>
+
+<article class="sec newsart" style="padding-top:150px">
+  <div class="wrapc" style="max-width:760px">
+    <nav class="crumbs" aria-label="パンくずリスト"><a href={`${TB_BASE}/`}>体験する美術館</a><span aria-hidden="true">／</span><a href={`${TB_BASE}/#news`}>お知らせ</a></nav>
+    <div class="kicker" style="margin-top:28px">News</div>
+    <time class="ndate en" datetime={published} style="display:block;margin-top:14px">2026.09.03</time>
+    <h1 class="h2" style="margin-top:10px">{title}</h1>
+
+    <div class="story" style="margin-top:44px">
+      <p class="m0">体験する美術館 第二弾『ロスト・フレーム』は、おかげさまで全公演のチケットが完売いたしました。</p>
+      <p>下北沢の街に散らばった絵画を探し、隠された物語を辿る——。街そのものを会場とした初めての試みでしたが、たくさんの方にご参加いただき、絵画と物語、そして登場人物との対話の時間を共有できましたこと、心より御礼申し上げます。</p>
+      <p>会場としてご協力いただいた下北沢の店舗の皆様、絵画を描き下ろしてくださったクリエイターの皆様、そして街を歩き、絵画の側から立ち上がる物語に立ち会ってくださったすべての参加者の皆様に、深く感謝いたします。</p>
+      <p>本公演の絵画作品と記録は、<a href={LOST_FRAME.spoilerPath}>公演記録ページ</a>（ネタバレを含みます）および<a href={LOST_FRAME.noteUrl} target="_blank" rel="noopener">noteの記事</a>にてご覧いただけます。</p>
+      <p>「体験する美術館」は、今後も様々なアーティストの皆様と提携し、美術館や街を舞台とした新たな公演を展開してまいります。次回公演の情報は、本サイトのNEWSおよび<a href={TB_X_URL} target="_blank" rel="noopener">公式X（@taikenbizyutu）</a>にてお知らせいたします。</p>
+      <p>引き続き、「体験する美術館」をよろしくお願いいたします。</p>
+    </div>
+
+    <figure class="artfig">
+      <img class="poster" src={LOST_FRAME.image} alt="ロスト・フレーム キービジュアル" width="900" height="1281" loading="lazy">
+      <figcaption class="note tc">『ロスト・フレーム』キービジュアル</figcaption>
+    </figure>
+
+    <p class="note" style="margin-top:48px">体験する美術館 運営（株式会社ex Labs）</p>
+
+    <div class="fx gap16 wrap" style="margin-top:56px">
+      <a class="bigx" href={LOST_FRAME.path}>『ロスト・フレーム』公演ページ</a>
+      <a class="bigx" href={`${TB_BASE}/#news`}>お知らせ一覧へ戻る</a>
+    </div>
+  </div>
+</article>
+
+<style>
+.crumbs{font-size:12px;letter-spacing:.14em;color:#8a8377}
+.crumbs span{margin:0 8px}
+.ndate{color:#b39a63;font-size:16px;letter-spacing:.08em}
+.newsart .h2{font-size:28px;line-height:1.7}
+.story{font-size:15.5px;letter-spacing:.06em;color:#d8d2c6}
+.story p{margin:20px 0 0}
+.artfig{margin:56px auto 0;max-width:360px}
+.artfig .note{margin:14px 0 0}
+@media (max-width:900px){.newsart .h2{font-size:22px}}
+</style>
+</TaikenbizyutuLayout>
