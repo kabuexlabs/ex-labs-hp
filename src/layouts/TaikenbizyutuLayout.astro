@@ -15,6 +15,8 @@ export interface Props {
   ogImage?: string;
   /** ヘッダー/フッターを持たない全幅ページ (ロスト・フレームLP) 用 */
   bare?: boolean;
+  /** トップページ用。ヒーローに大きなロゴを置くので、固定ヘッダーの小ロゴを出さない */
+  hero?: boolean;
 }
 
 // NOTE: 検索エンジン向けの SEO レイヤー（title / description / sr-only 見出し /
@@ -27,6 +29,7 @@ const {
     '「体験する美術館」は、下北沢など実在の街を舞台に、絵画と物語、街歩き型の謎解きを織り込んだ参加型アート／周遊型アートイマーシブのレーベルです。鑑賞するアートから体験するアートへ——第二弾『ロスト・フレーム』は全公演完売御礼。',
   ogImage = '/assets/taikenbizyutu/ogp.jpg',
   bare = false,
+  hero = false,
 } = Astro.props;
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
@@ -87,7 +90,7 @@ const orgLd = {
 <link rel="icon" type="image/png" href="/favicon-ex.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <noscript><style>.rv{opacity:1 !important;transform:none !important}.hero-el{opacity:1 !important;transform:none !important;animation:none !important}</style></noscript>
 <slot name="head" />
@@ -97,20 +100,18 @@ const orgLd = {
 <div class="page">
 {!bare && (
 <header class="hdr">
-  <div class="hdrin fx ac jb">
-    <a href={`${base}/`} aria-label="体験する美術館 トップページ"><img class="hlogo" src="/assets/taikenbizyutu/logo-white.webp" alt="体験する美術館" width="99" height="48"></a>
-    <nav class="hnav fx ac gap24" aria-label="メニュー">
-      {nav.map((item) => <a class="nlink" href={item.href}>{item.label}</a>)}
-    </nav>
-    <div class="fx ac gap12">
-      <a class="xbtn nowrap" href={TB_X_URL} target="_blank" rel="noopener">公式 X</a>
-      <button class="menub" id="menuBtn" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="mnav"><span></span><span></span><span></span></button>
-    </div>
-  </div>
+  {!hero && (
+    <a class="hbrand" href={`${base}/`} aria-label="体験する美術館 トップページ"><img src="/assets/taikenbizyutu/logo-white.webp" alt="体験する美術館" width="99" height="48"></a>
+  )}
+  <button class="menub" id="menuBtn" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="mnav"><span></span><span></span></button>
 </header>
+)}
+{!bare && (
 <nav class="mnav" id="mnav" aria-label="メニュー">
-  {nav.map((item) => <a class="mitem" href={item.href}>{item.label}</a>)}
-  <a class="mitem gold" href={TB_X_URL} target="_blank" rel="noopener">公式 X →</a>
+  <div class="mnav-in">
+    {nav.map((item) => <a class="mitem" href={item.href}><span class="mitem-en">{item.label}</span></a>)}
+    <a class="mitem gold" href={TB_X_URL} target="_blank" rel="noopener"><span class="mitem-en">OFFICIAL X ↗</span></a>
+  </div>
 </nav>
 )}
 <slot />
@@ -128,103 +129,112 @@ const orgLd = {
 </div>
 
 <style is:global>
-html{scroll-behavior:smooth;scroll-padding-top:84px;overflow-x:clip}
-/* キーボード操作のフォーカスリング（マウスでは出ない）。 */
-:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid #b39a63;outline-offset:3px}
-body{margin:0;background:#131110}
-a{color:#b39a63;text-decoration:none}
-a:hover{color:#d8c28c}
-.page{background:#131110;color:#ebe5da;font-family:'Shippori Mincho',serif;-webkit-font-smoothing:antialiased;line-height:1.9;min-height:100vh}
+/* ---- palette (川久ミュージアム風の色面構成) ---- */
+:root{
+  --char:#1c1c1c;   /* 墨 */
+  --mauve:#6c6069;  /* ヒーロー下部の灰紫 */
+  --navy:#1b2a57;   /* 藍 */
+  --plum:#3a2a37;   /* 葡萄 */
+  --cream:#f6efe8;  /* 生成り */
+  --grey:#8c8a8a;   /* 灰 */
+  --mat:#8a8288;    /* 額装マット */
+  --gold:#c9b98a;   /* 金 */
+  --fg:#ece7df; --fg2:#b9b2a7; --accent:#c9b98a; --line:rgba(236,231,223,.14);
+}
+html{scroll-behavior:smooth;scroll-padding-top:24px;overflow-x:clip}
+:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+body{margin:0;background:var(--char)}
+a{color:var(--accent);text-decoration:none}
+a:hover{opacity:.75}
+.page{background:var(--char);color:var(--fg);font-family:'Shippori Mincho',serif;-webkit-font-smoothing:antialiased;line-height:1.9;min-height:100vh}
 .en{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400}
-.gold{color:#b39a63}
-.muted{color:#9c9488}
-/* 画面には出さず、検索エンジン・スクリーンリーダーにだけ渡すSEO見出し用 */
+.gold{color:var(--gold)}
+.muted{color:var(--fg2)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.fx{display:flex}
-.col{display:flex;flex-direction:column}
-.ac{align-items:center}
-.jc{justify-content:center}
-.jb{justify-content:space-between}
-.wrap{flex-wrap:wrap}
-.tc{text-align:center}
-.nowrap{white-space:nowrap}
-.gap12{gap:12px}
-.gap16{gap:16px}
-.gap24{gap:24px}
-.m0{margin:0}
-.posrel{position:relative}
-.wrapc{max-width:1060px;margin:0 auto;padding:0 36px}
-.sec{padding:128px 0}
-.hairtop{border-top:1px solid rgba(235,229,218,.1)}
-.kicker{font-size:13px;letter-spacing:.3em;color:#b39a63;text-transform:uppercase;font-family:'Cormorant Garamond',serif;font-style:italic}
-.h2{font-size:32px;font-weight:500;letter-spacing:.18em;margin:14px 0 0;line-height:1.5}
-.lead{font-size:16px;letter-spacing:.08em}
-.hdr{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(19,17,16,.78);backdrop-filter:blur(10px);border-bottom:1px solid rgba(235,229,218,.08)}
-.hdrin{max-width:1200px;margin:0 auto;padding:0 32px;height:64px}
-.hlogo{height:26px;width:auto;display:block}
-.nlink{color:#cfc8bc;font-size:13px;letter-spacing:.18em;padding:6px 2px}
-.nlink:hover{color:#fff}
-.xbtn{border:1px solid rgba(179,154,99,.6);color:#b39a63;font-size:12px;letter-spacing:.22em;padding:8px 18px}
-.xbtn:hover{background:rgba(179,154,99,.12);color:#d8c28c}
-.menub{display:none;flex-direction:column;justify-content:center;gap:6px;width:42px;height:42px;padding:10px;background:transparent;border:1px solid rgba(235,229,218,.25);cursor:pointer;flex-shrink:0}
-.menub span{display:block;height:1px;background:#ebe5da;transition:transform .3s,opacity .3s}
-.menub.x span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.menub.x span:nth-child(2){opacity:0}
-.menub.x span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-.mnav{position:fixed;inset:0;z-index:49;background:rgba(19,17,16,.97);display:none;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:80px 24px}
-.mnav.open{display:flex}
+.fx{display:flex}.col{display:flex;flex-direction:column}.ac{align-items:center}.jc{justify-content:center}.jb{justify-content:space-between}
+.wrap{flex-wrap:wrap}.tc{text-align:center}.nowrap{white-space:nowrap}
+.gap12{gap:12px}.gap16{gap:16px}.gap24{gap:24px}.m0{margin:0}.posrel{position:relative}
+.wrapc{max-width:1120px;margin:0 auto;padding:0 36px}
+/* 色面セクション。--fg 等を切り替えるだけで内側のクラスが追従する */
+.sec{padding:120px 0;color:var(--fg);position:relative}
+.bg-char{background:var(--char);--fg:#ece7df;--fg2:#b9b2a7;--accent:#c9b98a;--line:rgba(236,231,223,.14)}
+.bg-navy{background:var(--navy);--fg:#ece7df;--fg2:#c3c6d6;--accent:#c9b98a;--line:rgba(236,231,223,.18)}
+.bg-plum{background:var(--plum);--fg:#ece7df;--fg2:#c9bfc4;--accent:#c9b98a;--line:rgba(236,231,223,.16)}
+.bg-cream{background:var(--cream);--fg:#2b2926;--fg2:#6f6862;--accent:#8a7a4e;--line:rgba(43,41,38,.16)}
+.bg-grey{background:var(--grey);--fg:#f4f1ee;--fg2:#e6e1dc;--accent:#fbf7f2;--line:rgba(255,255,255,.28)}
+.hairtop{border-top:1px solid var(--line)}
+.kicker{font-size:12px;letter-spacing:.3em;color:var(--accent);text-transform:uppercase;font-family:'Cormorant Garamond',serif;font-weight:500}
+.h2{font-size:30px;font-weight:400;letter-spacing:.16em;margin:14px 0 0;line-height:1.6;color:var(--fg)}
+/* 大判の英字見出し (OWNER'S COLLECTION 風) */
+.disp{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(48px,12.5vw,190px);line-height:.92;letter-spacing:-.01em;color:var(--gold);text-transform:uppercase;margin:0;text-wrap:balance}
+.lead{font-size:16px;letter-spacing:.08em;line-height:2.2}
+/* 3行を少しずつずらして組む見出し */
+.stag{font-size:clamp(22px,4.6vw,56px);font-weight:400;letter-spacing:.06em;line-height:1.45;color:var(--gold);margin:0}
+.stag span{display:block}
+.stag span:nth-child(2){padding-left:1.2em}
+.stag span:nth-child(3){padding-left:2.6em}
+/* 額装マット */
+.mat{background:var(--mat);padding:10%;display:block}
+.mat img{display:block;width:100%;height:auto}
+.mcap{font-size:13.5px;letter-spacing:.16em;line-height:2.1;text-align:center;margin:20px 0 0;color:var(--fg)}
+.mcap small{display:block;font-size:12px;color:var(--fg2);letter-spacing:.12em}
+/* コラージュ配置：2列で交互に段差、PCは3列 */
+.collage{display:grid;grid-template-columns:repeat(2,1fr);gap:40px 22px;align-items:start}
+.collage>:nth-child(even){margin-top:96px}
+@media (min-width:900px){
+  .collage{grid-template-columns:repeat(3,1fr);gap:64px 40px}
+  .collage>:nth-child(even){margin-top:0}
+  .collage>:nth-child(3n+2){margin-top:120px}
+}
+/* 円形のリンク (MORE) */
+.circ{display:inline-flex;align-items:center;justify-content:center;width:168px;height:168px;border:1px solid currentColor;border-radius:50%;font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:.14em;color:var(--fg);transition:background .3s,color .3s}
+.circ:hover{background:var(--fg);color:var(--navy);opacity:1}
+/* 固定ヘッダー：小ロゴ + 丸いメニューボタン */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;pointer-events:none}
+.hdr>*{pointer-events:auto}
+.hbrand img{height:26px;width:auto;display:block;filter:drop-shadow(0 1px 6px rgba(0,0,0,.5))}
+.menub{margin-left:auto;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px;width:56px;height:56px;border-radius:50%;background:rgba(28,28,28,.92);border:1px solid rgba(255,255,255,.08);cursor:pointer;padding:0;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+.menub span{display:block;width:22px;height:1px;background:#fff;transition:transform .3s,opacity .3s}
+.menub.x span:nth-child(1){transform:translateY(4px) rotate(45deg)}
+.menub.x span:nth-child(2){transform:translateY(-4px) rotate(-45deg)}
+.mnav{position:fixed;inset:0;z-index:49;background:rgba(28,28,28,.97);display:none;padding:96px 24px 48px;overflow-y:auto}
+.mnav.open{display:block}
+.mnav-in{max-width:520px;margin:0 auto;display:flex;flex-direction:column}
 body.noscroll{overflow:hidden}
-.mitem{display:block;color:#ebe5da;font-size:17px;letter-spacing:.3em;padding:13px 0;font-family:'Cormorant Garamond',serif;font-style:italic}
-.mitem.gold{color:#b39a63}
-.badge{border:1px solid rgba(179,154,99,.6);color:#b39a63;font-size:12px;letter-spacing:.3em;padding:5px 14px}
-.sold{border:1px solid #a5524a;color:#c9756b;font-size:12px;letter-spacing:.3em;padding:5px 14px}
-.poster{width:100%;height:auto;display:block;border:1px solid rgba(235,229,218,.14)}
+.mitem{display:block;color:#ece7df;padding:16px 0;border-bottom:1px solid rgba(236,231,223,.1)}
+.mitem-en{font-family:'Cormorant Garamond',serif;font-size:34px;letter-spacing:.08em;line-height:1.1}
+.mitem.gold{color:var(--gold)}
+.badge{display:inline-block;border:1px solid var(--accent);color:var(--accent);font-size:11px;letter-spacing:.3em;padding:5px 14px}
+.sold{display:inline-block;border:1px solid #b56a62;color:#d08a80;font-size:11px;letter-spacing:.3em;padding:5px 14px}
+.poster{width:100%;height:auto;display:block}
 .pshadow{box-shadow:0 12px 36px rgba(0,0,0,.35)}
-.note{font-size:12.5px;color:#8a8377;letter-spacing:.04em}
-.bigx{display:inline-block;border:1px solid #b39a63;color:#b39a63;font-size:14px;letter-spacing:.3em;padding:16px 46px}
-.bigx:hover{background:rgba(179,154,99,.14);color:#d8c28c}
-.card3{border-top:1px solid rgba(179,154,99,.4);padding-top:26px}
-.h3{font-size:19px;font-weight:500;letter-spacing:.1em;margin:16px 0 10px;line-height:1.7}
-.body14{font-size:14px;color:#b5aea2;letter-spacing:.04em}
-.ctitle{font-size:15px;letter-spacing:.2em;color:#ebe5da}
-.cdesc{font-size:13px;color:#9c9488;letter-spacing:.05em}
-.dark2{background:#1a1714}
-.ftr{border-top:1px solid rgba(235,229,218,.08);padding:56px 0 48px}
+.note{font-size:12.5px;color:var(--fg2);letter-spacing:.04em}
+.bigx{display:inline-block;border:1px solid var(--accent);color:var(--accent);font-size:13px;letter-spacing:.3em;padding:16px 42px}
+.bigx:hover{background:var(--accent);color:var(--char);opacity:1}
+.card3{border-top:1px solid var(--line);padding-top:26px}
+.h3{font-size:19px;font-weight:500;letter-spacing:.1em;margin:16px 0 10px;line-height:1.7;color:var(--fg)}
+.body14{font-size:14px;color:var(--fg2);letter-spacing:.04em}
+.ctitle{font-size:15px;letter-spacing:.2em;color:var(--fg)}
+.cdesc{font-size:13px;color:var(--fg2);letter-spacing:.05em}
+.ftr{background:var(--char);border-top:1px solid rgba(236,231,223,.1);padding:64px 0 56px;color:#ece7df}
 .flogo{height:30px;width:auto;opacity:.9}
-.fsmall{font-size:12px;color:#8a8377;letter-spacing:.1em}
-/* 横スクロール列 (WORKS / ART / スマホの ABOUT・MODEL)。
-   .scroller が枠、.hscroll が実際にスクロールする行。
-   右端のフェードと下のスワイプヒントで「まだ続きがある」ことを強調する。
-   ヒント/フェードは JS が overflow を検知したときだけ (.can-scroll) 表示する。 */
-.scroller{position:relative}
-.hscroll{display:grid;grid-auto-flow:column;gap:36px;overflow-x:auto;scroll-snap-type:x proximity;padding:4px 4px 22px;-webkit-overflow-scrolling:touch;scrollbar-color:rgba(179,154,99,.6) rgba(235,229,218,.08)}
-.hscroll>*{scroll-snap-align:start}
-.hscroll::-webkit-scrollbar{height:6px}
-.hscroll::-webkit-scrollbar-track{background:rgba(235,229,218,.08);border-radius:3px}
-.hscroll::-webkit-scrollbar-thumb{background:rgba(179,154,99,.55);border-radius:3px}
-/* 右端フェード — スクロール可能かつ末尾でないときだけ濃く出す */
-.scroller::after{content:"";position:absolute;top:0;right:0;bottom:22px;width:64px;pointer-events:none;opacity:0;transition:opacity .35s ease;background:linear-gradient(90deg,rgba(19,17,16,0),var(--fadecol,#131110))}
-.scroller.can-scroll::after{opacity:1}
-.scroller.can-scroll.at-end::after{opacity:0}
-/* スワイプ／ドラッグ誘導のヒント */
-.swipe{display:none;align-items:center;justify-content:center;gap:10px;margin:14px auto 0;width:max-content;max-width:100%;padding:6px 0;color:#9c9488;font-size:12px;letter-spacing:.14em}
-.scroller.can-scroll .swipe{display:flex}
-.scroller.can-scroll.at-end .swipe{opacity:.45}
-.swipe .ar{font-size:11px;color:#b39a63}
-/* スクロール連動フェードイン (全体アニメーション) */
+.fsmall{font-size:12px;color:#8f887e;letter-spacing:.1em}
+.ftr a{color:#c9b98a}
+/* スクロール連動フェードイン */
 .rv{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
 .rv.on{opacity:1;transform:none}
 .d1{transition-delay:.06s}.d2{transition-delay:.12s}.d3{transition-delay:.18s}.d4{transition-delay:.24s}
 @media (max-width:900px){
-  .hnav{display:none}
-  .menub{display:flex}
-  .sec{padding:88px 0}
-  .wrapc{padding:0 24px}
-  .hdrin{padding:0 18px}
-  .h2{font-size:25px;letter-spacing:.14em}
-  .kicker{font-size:12px}
+  .sec{padding:80px 0}
+  .wrapc{padding:0 22px}
+  .h2{font-size:24px;letter-spacing:.12em}
   .lead{font-size:15px}
-  .bigx{padding:14px 32px;letter-spacing:.22em;font-size:13px}
+  .bigx{padding:14px 30px;letter-spacing:.22em;font-size:12.5px}
+  .circ{width:132px;height:132px;font-size:17px}
+  .stag{letter-spacing:.02em}
+  .stag span:nth-child(2){padding-left:.5em}
+  .stag span:nth-child(3){padding-left:.9em}
+  .mitem-en{font-size:28px}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -248,24 +258,6 @@ const io = new IntersectionObserver(
   { threshold: 0, rootMargin: '0px 0px -8% 0px' },
 );
 document.querySelectorAll('.rv').forEach((el) => io.observe(el));
-
-// 横スクロール枠: overflow を検知したときだけヒント/フェードを出し、
-// 末尾まで来たら消す。リサイズ・画像読み込みでも再判定する。
-document.querySelectorAll('.scroller').forEach((sc) => {
-  const row = sc.querySelector('.hscroll');
-  if (!row) return;
-  const update = () => {
-    const can = row.scrollWidth - row.clientWidth > 8;
-    sc.classList.toggle('can-scroll', can);
-    sc.classList.toggle('at-end', can && row.scrollLeft >= row.scrollWidth - row.clientWidth - 8);
-  };
-  row.addEventListener('scroll', update, { passive: true });
-  window.addEventListener('resize', update);
-  row.querySelectorAll('img').forEach((img) => {
-    if (!img.complete) img.addEventListener('load', update, { once: true });
-  });
-  update();
-});
 
 // モバイルのハンバーガーメニュー
 const menuBtn = document.getElementById('menuBtn');
