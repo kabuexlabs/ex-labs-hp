@@ -57,12 +57,12 @@ export interface TbArt {
   height: number;
 }
 
-// 『ロスト・フレーム』で用いられた絵画。
+// 『ロスト・フレーム』で用いられた絵画。配列順 = 表示順（先頭が ART 列・記録ページの最初）。
 // TODO: 作品名・作者名が確定したら caption を「《作品名》 ─ ロスト・フレーム」に更新する。
 export const LOST_FRAME_ARTS: TbArt[] = [
+  { src: '/assets/taikenbizyutu/lf-art-3.webp', alt: '金箔の背景に線描の風景が浮かぶ、深紅の服を着た短髪の人物の肖像', caption: 'ロスト・フレーム', width: 1089, height: 1400 },
   { src: '/assets/taikenbizyutu/lf-art-1.webp', alt: 'ランタンが灯る青い石畳の回廊に立つ、帽子をかぶった人物の白いシルエット', caption: 'ロスト・フレーム', width: 949, height: 1140 },
   { src: '/assets/taikenbizyutu/lf-art-2.webp', alt: '白いヴェールをまとい、蝶に囲まれて祈るように手を組む少女。頭上には光を放つ小さな人影', caption: 'ロスト・フレーム', width: 1074, height: 1332 },
-  { src: '/assets/taikenbizyutu/lf-art-3.webp', alt: '金箔の背景に線描の風景が浮かぶ、深紅の服を着た短髪の人物の肖像', caption: 'ロスト・フレーム', width: 1089, height: 1400 },
   { src: '/assets/taikenbizyutu/lf-art-4.webp', alt: '青い背景に置かれた白い花瓶、赤いりんご、ぶどう、白い円盤の静物画', caption: 'ロスト・フレーム', width: 1400, height: 969 },
   { src: '/assets/taikenbizyutu/lf-art-5.webp', alt: '青と金の風船が並ぶ縁日の屋台に、白いシルエットの人物が駆け込むペン画', caption: 'ロスト・フレーム', width: 1400, height: 1091 },
 ];
