@@ -72,6 +72,7 @@ const STATIC_PATHS = [
   '/toudaimurder/contact/',
   '/taikenbizyutu/',
   '/taikenbizyutu/lostframe/',
+  '/taikenbizyutu/news/lostframe-soldout/',
   '/game/',
   '/game/null-arden/',
   '/game/auction/',
@@ -137,6 +138,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/taikenbizyutu/': '2026-09-03',
     '/taikenbizyutu/lostframe/': '2026-09-03',
     '/game/lost-frame/': '2026-09-03',
+    '/taikenbizyutu/news/lostframe-soldout/': '2026-09-03',
   };
   for (const [p, d] of Object.entries(STATIC_LASTMOD)) {
     const u = urls.find((x) => x.loc.endsWith(p));

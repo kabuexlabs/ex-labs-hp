@@ -6,7 +6,7 @@
 // 「公演の記録」セクション (id="record") に <p class="p"> / <figure class="fig"> で追記する。
 import GameLayout from '../../../layouts/GameLayout.astro';
 import { jsonLd } from '../../../lib/microcms';
-import { LOST_FRAME, LOST_FRAME_ARTS, CREATORS, TICKET_URL } from '../../../data/taikenbizyutu';
+import { LOST_FRAME, LOST_FRAME_ARTS, CREATORS } from '../../../data/taikenbizyutu';
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const breadcrumbLd = {
@@ -41,7 +41,7 @@ const breadcrumbLd = {
 
 <div class="gate" id="gate">
   <h2 class="gtitle">⚠ ネタバレ注意</h2>
-  <p class="gtext">この先には『ロスト・フレーム』で用いられた絵画と<br>公演の内容が記録されています。<br>本公演は現在も開催中です。<br>これからご参加予定の方はご注意ください。</p>
+  <p class="gtext">この先には『ロスト・フレーム』で用いられた絵画と<br>公演の内容が記録されています。<br>チケットは完売しましたが、<br>これからご参加予定の方はご注意ください。</p>
   <button class="btn gbtn" id="revealBtn" type="button">ネタバレを表示する</button>
   <p class="note" style="margin-top:24px"><a href={LOST_FRAME.path}>公演の紹介ページ（ネタバレなし）はこちら</a></p>
 </div>
@@ -69,7 +69,7 @@ const breadcrumbLd = {
 
 <h2 class="sec">クレジット</h2>
 <p class="cr">企画：株式会社ex Labs<br>ディレクター・デザイン・ストーリー制作：荒巻まりの<br>プロデューサー・図像設計：かるら<br>監修：御湯波ライト<br>絵画：{CREATORS.map((c) => c.name).join('／')}</p>
-<p class="p">本公演は現在も参加を受け付けています。<a href={TICKET_URL} target="_blank" rel="noopener">お申し込みページ（escape.id）</a>からご希望の日時をお選びください。</p>
+<p class="p">本公演のチケットは全公演完売しました。たくさんのご参加、誠にありがとうございました。</p>
 </article>
 
 <nav class="bottomnav">

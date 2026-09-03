@@ -10,6 +10,7 @@ import { TICKET_URL, LOST_FRAME, CREATORS, TB_NEWS, TB_FAQS, TB_X_URL, LOST_FRAM
 
 const assets = '/assets/taikenbizyutu';
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const soldOut = LOST_FRAME.status === 'soldout';
 
 // ART 列: 最新公演の絵画を先頭に、過去公演の絵画を続ける。
 const arts = [...LOST_FRAME_ARTS, ...NULL_ARDEN_ARTS];
@@ -50,7 +51,7 @@ const eventLd = {
     priceCurrency: 'JPY',
     lowPrice: Math.min(...LOST_FRAME.prices.map((x) => x.price)),
     highPrice: Math.max(...LOST_FRAME.prices.map((x) => x.price)),
-    availability: 'https://schema.org/InStock',
+    availability: soldOut ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
     validFrom: LOST_FRAME.startDate,
   },
 };
@@ -63,9 +64,8 @@ const eventLd = {
 </Fragment>
 
 <section id="top" class="hero fx col ac jc">
-  <div class="dust" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="fx col ac gap24" style="padding:120px 24px 140px;position:relative;z-index:1">
-    <div class="herox fx ac gap12 hero-el e0"><span>絵&nbsp;画</span><span class="xmark">×</span><span>参&nbsp;加</span><span class="xmark">×</span><span>読&nbsp;解</span></div>
+    <div class="herox fx ac gap12 hero-el e0"><span>絵&nbsp;画</span><span class="xmark">×</span><span>体&nbsp;験</span><span class="xmark">×</span><span>交&nbsp;流</span></div>
     <h1 class="heromark-h1"><img class="heromark hero-el e1" src={`${assets}/logo-white.webp`} alt="体験する美術館" width="1000" height="487"><span class="sr-only">体験する美術館｜下北沢の街を巡る参加型アート・周遊型アートイマーシブ｜絵画と物語、街歩き謎解きの体験</span></h1>
     <p class="herolead m0 hero-el e2">鑑賞するアートから、<wbr>体験するアートへ。</p>
     <p class="note tc m0 hero-el e3" style="letter-spacing:.14em">絵画と物語、観客の参加を編み込んだ<wbr>参加型芸術のレーベル</p>
@@ -84,7 +84,7 @@ const eventLd = {
       <a class="ewcard" href="/taikenbizyutu/lostframe/">
         <img class="poster" src={`${assets}/lost-frame.webp`} alt="ロスト・フレーム キービジュアル" width="900" height="1281" loading="lazy">
         <div class="ewbody">
-          <span class="badge">第二弾 ─ 受付中</span>
+          {soldOut ? <span class="sold">第二弾 ─ SOLD OUT</span> : <span class="badge">第二弾 ─ 受付中</span>}
           <p class="ewtitle">ロスト・フレーム</p>
           <p class="ewsub en m0">Lost Frame</p>
           <p class="cdesc" style="margin:14px 0 0">絵画と街が交差する、街を巡る参加型の絵画鑑賞。会場は東京・下北沢の街そのもの。</p>
@@ -136,7 +136,7 @@ const eventLd = {
     <div class="evgrid">
       <div class="posrel rv"><img class="poster pshadow" src={`${assets}/lost-frame.webp`} alt="ロスト・フレーム キービジュアル" width="900" height="1281" loading="lazy"></div>
       <div class="rv d1">
-        <span class="badge">最新公演 ─ 第二弾</span>
+        {soldOut ? <span class="sold">最新公演 ─ 第二弾 完売御礼</span> : <span class="badge">最新公演 ─ 第二弾</span>}
         <h2 class="evtitle">ロスト・フレーム</h2>
         <p class="evsub en">Lost Frame</p>
         <p class="lead" style="margin:28px 0 0">下北沢の街に散らばった絵画を探し、<wbr>隠された物語を辿る……<br>絵画と街が交差する、<wbr>街を巡る参加型の絵画鑑賞。</p>
@@ -151,10 +151,10 @@ const eventLd = {
           <div class="dlrow"><span class="dt">所要時間</span><span>{LOST_FRAME.duration}</span></div>
           <div class="dlrow"><span class="dt">定員</span><span>{LOST_FRAME.capacity}</span></div>
           <div class="dlrow"><span class="dt">参加費</span><span>{LOST_FRAME.prices.map((x) => `${x.price.toLocaleString('ja-JP')}円（${x.people}名参加）`).join(' ／ ')}<br><span class="note">※1人あたり</span></span></div>
-          <div class="dlrow"><span class="dt">参加のお申し込み</span><span><a href={TICKET_URL} target="_blank" rel="noopener">お申し込みページへ →</a></span></div>
+          <div class="dlrow"><span class="dt">参加のお申し込み</span><span>{soldOut ? <>全公演 完売しました（<a href={LOST_FRAME.soldoutNewsPath}>お知らせ</a>）</> : <a href={TICKET_URL} target="_blank" rel="noopener">お申し込みページへ →</a>}</span></div>
         </div>
         <div class="fx gap16 wrap" style="margin-top:32px">
-          <a class="bigx" href={TICKET_URL} target="_blank" rel="noopener">参加を申し込む</a>
+          {soldOut ? <span class="bigx soldbtn" aria-disabled="true">全公演 完売しました</span> : <a class="bigx" href={TICKET_URL} target="_blank" rel="noopener">参加を申し込む</a>}
           <a class="bigx" href="/taikenbizyutu/lostframe/">公演詳細を見る</a>
         </div>
       </div>
@@ -290,7 +290,7 @@ const eventLd = {
 </TaikenbizyutuLayout>
 
 <style>
-.hero{min-height:100vh;background:linear-gradient(180deg,#2b2620 0%,#1b1815 42%,#131110 78%);position:relative}
+.hero{min-height:100vh;background:#161412;position:relative}
 /* ロゴ画像がこのページの見出しそのものなので h1 で包む（alt が見出しテキスト
    になる）。見た目は変えないよう既定のマージン・行間をリセットする。 */
 .heromark-h1{margin:0;line-height:0;font-size:inherit;font-weight:inherit}
@@ -301,6 +301,7 @@ const eventLd = {
 .scrolly{position:absolute;bottom:0;left:50%;width:1px;height:88px;background:linear-gradient(180deg,rgba(179,154,99,0),#b39a63)}
 .newsrow{padding:20px 0;border-bottom:1px solid rgba(235,229,218,.1);font-size:14px;letter-spacing:.06em}
 .ndate{font-family:'Cormorant Garamond',serif;font-style:italic;color:#b39a63;font-size:15px;min-width:96px}
+.soldbtn{border-color:#a5524a;color:#c9756b;cursor:default}
 .evtitle{font-size:52px;font-weight:500;letter-spacing:.12em;margin:18px 0 0;line-height:1.3}
 .evsub{font-size:24px;color:#b39a63;letter-spacing:.06em;margin:2px 0 0}
 .story{font-size:15.5px;letter-spacing:.06em;color:#d8d2c6}
@@ -310,8 +311,7 @@ const eventLd = {
 .num{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:38px;color:#b39a63;line-height:1}
 /* 絵画クリエイター — 名前のみ表示 */
 .cnames{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.cnameplate{border-top:1px solid rgba(179,154,99,.42);padding:26px 8px;text-align:center;transition:background .3s,border-color .3s}
-.cnameplate:hover{background:rgba(179,154,99,.06);border-color:rgba(179,154,99,.75)}
+.cnameplate{border-top:1px solid rgba(179,154,99,.42);padding:26px 8px;text-align:center}
 .cnn{font-size:20px;letter-spacing:.2em;color:#ebe5da}
 .faqit{border-bottom:1px solid rgba(235,229,218,.1)}
 .faqq{cursor:pointer;list-style:none;padding:22px 2px;font-size:16px;letter-spacing:.08em;display:flex;gap:18px;align-items:baseline}
@@ -338,29 +338,11 @@ a.ewcard:hover{color:inherit;border-color:rgba(179,154,99,.5)}
 .hscroll.grid3{grid-auto-flow:row;grid-template-columns:repeat(3,1fr);grid-auto-columns:auto;gap:44px;overflow:visible;padding:0;scroll-snap-type:none}
 
 /* ヒーローの登場アニメーション */
-.hero-el{opacity:0;transform:translateY(24px);animation:heroUp 1s cubic-bezier(.22,.61,.36,1) both}
-.e0{animation-delay:.1s}.e1{animation-delay:.3s}.e2{animation-delay:.65s}.e3{animation-delay:.85s}.e4{animation-delay:1.05s}
+.hero-el{opacity:0;transform:translateY(10px);animation:heroUp .8s ease both}
+.e0{animation-delay:.05s}.e1{animation-delay:.15s}.e2{animation-delay:.3s}.e3{animation-delay:.4s}.e4{animation-delay:.5s}
 @keyframes heroUp{to{opacity:1;transform:none}}
-/* ヒーローに漂う金色の粒子 (寂しさ解消のための微アニメーション) */
-.dust{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
-.dust span{position:absolute;bottom:-12px;width:3px;height:3px;border-radius:50%;background:rgba(179,154,99,.55);opacity:0;animation:floatUp linear infinite}
-.dust span:nth-child(1){left:7%;animation-duration:15s;animation-delay:0s}
-.dust span:nth-child(2){left:19%;animation-duration:19s;animation-delay:2s;width:2px;height:2px}
-.dust span:nth-child(3){left:32%;animation-duration:13s;animation-delay:5s}
-.dust span:nth-child(4){left:44%;animation-duration:21s;animation-delay:1s;width:2px;height:2px}
-.dust span:nth-child(5){left:56%;animation-duration:17s;animation-delay:3.5s}
-.dust span:nth-child(6){left:66%;animation-duration:14s;animation-delay:6s;width:2px;height:2px}
-.dust span:nth-child(7){left:78%;animation-duration:20s;animation-delay:2.5s}
-.dust span:nth-child(8){left:88%;animation-duration:16s;animation-delay:4.5s;width:2px;height:2px}
-.dust span:nth-child(9){left:95%;animation-duration:18s;animation-delay:7s}
-@keyframes floatUp{0%{transform:translateY(0);opacity:0}12%{opacity:.75}85%{opacity:.45}100%{transform:translateY(-92vh);opacity:0}}
-/* スクロール誘導ラインに流れる光 */
-.scrolly{overflow:hidden}
-.scrolly::after{content:"";position:absolute;top:0;left:0;width:1px;height:34px;background:linear-gradient(180deg,rgba(216,194,140,0),#f0e4b6);animation:scrollrun 2.6s ease-in-out infinite}
-@keyframes scrollrun{0%{transform:translateY(-40px)}70%,100%{transform:translateY(92px)}}
 @media (prefers-reduced-motion:reduce){
   .hero-el{opacity:1;transform:none;animation:none}
-  .dust,.scrolly::after{display:none}
 }
 @media (max-width:900px){
   .evgrid{grid-template-columns:1fr;gap:44px}

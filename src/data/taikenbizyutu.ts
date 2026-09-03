@@ -12,6 +12,10 @@ export const TICKET_URL = 'https://escape.id/kyoukaiart-org/e-lost/';
 /** 『ロスト・フレーム』の公演情報。LP 画像 (lp-3) に焼き込まれた内容と揃える。 */
 export const LOST_FRAME = {
   name: 'ロスト・フレーム',
+  /** 販売状況。'soldout' にすると各ページの申込導線が「完売」表示に切り替わる */
+  status: 'soldout' as 'onsale' | 'soldout',
+  /** 完売のお知らせ記事 */
+  soldoutNewsPath: `${TB_BASE}/news/lostframe-soldout/`,
   nameEn: 'Lost Frame',
   path: `${TB_BASE}/lostframe/`,
   ticketUrl: TICKET_URL,
@@ -92,6 +96,12 @@ export interface TbNews {
 /** トップページ NEWS 欄。新しいものを上に追加する。 */
 export const TB_NEWS: TbNews[] = [
   {
+    date: '2026.09.03',
+    iso: '2026-09-03',
+    text: '『ロスト・フレーム』全公演が完売しました',
+    link: { href: `${TB_BASE}/news/lostframe-soldout/`, label: 'お知らせを読む' },
+  },
+  {
     // 日付は本サイトに導線を載せた日 (note 記事の公開日ではない)
     date: '2026.09.03',
     iso: '2026-09-03',
@@ -108,7 +118,6 @@ export const TB_NEWS: TbNews[] = [
     date: '2026.07',
     iso: '2026-07-01',
     text: '『ロスト・フレーム』の参加受付を開始しました',
-    link: { href: TICKET_URL, label: 'お申し込みはこちら', external: true },
   },
   {
     date: '2026.07',
@@ -154,7 +163,7 @@ export const TB_FAQS: TbFaq[] = [
   },
   {
     q: 'いつから参加できますか？',
-    a: '『ロスト・フレーム』は現在参加を受け付けています。お申し込みページ（escape.id）からご希望の日時をお選びください。最新情報は公式X（@taikenbizyutu）でもお知らせします。',
-    link: { href: TICKET_URL, label: 'お申し込みページへ', external: true },
+    a: '『ロスト・フレーム』は全公演が完売しました。次回公演の情報は、本サイトのNEWSおよび公式X（@taikenbizyutu）でお知らせします。',
+    link: { href: `${TB_BASE}/news/lostframe-soldout/`, label: '完売のお知らせを読む' },
   },
 ];
