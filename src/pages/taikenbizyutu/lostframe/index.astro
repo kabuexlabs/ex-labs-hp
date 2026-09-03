@@ -7,17 +7,63 @@
 //       「チケット」等の文字が焼き込まれている。画像内の文言は画像を作り直さない
 //       限り変えられないため、このページの SEO テキスト（title / description /
 //       sr-only 見出し / alt）は画像の内容とキーワードに合わせている。
+// 公演の数値情報 (料金・所要時間・申込URL) は src/data/taikenbizyutu.ts を参照する。
 import TaikenbizyutuLayout from '../../../layouts/TaikenbizyutuLayout.astro';
+import { jsonLd } from '../../../lib/microcms';
+import { TICKET_URL, LOST_FRAME } from '../../../data/taikenbizyutu';
 
-const TICKET_URL = 'https://escape.id/kyoukaiart-org/e-lost/';
 const assets = '/assets/taikenbizyutu';
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const title = 'ロスト・フレーム Lost Frame｜下北沢の周遊型アートイマーシブ・街歩き謎解き｜体験する美術館';
 const description =
   '下北沢の街に散らばった絵画を探し、隠された物語を辿る——絵画と街が交差する周遊型アートイマーシブ『ロスト・フレーム』。街歩き×謎解き×絵画による参加型アート体験。所要時間75分・1〜4名、下北沢エリア開催。';
+
+// 画像のみの LP なので、検索エンジンには構造化データで公演情報を渡す。
+const eventLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: `${LOST_FRAME.name}（${LOST_FRAME.nameEn}）`,
+  description: LOST_FRAME.description,
+  image: new URL(LOST_FRAME.image, site).toString(),
+  url: new URL(LOST_FRAME.path, site).toString(),
+  startDate: LOST_FRAME.startDate,
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  duration: LOST_FRAME.durationIso,
+  location: {
+    '@type': 'Place',
+    name: '東京・下北沢エリア各所',
+    address: { '@type': 'PostalAddress', addressLocality: '世田谷区', addressRegion: '東京都', addressCountry: 'JP' },
+  },
+  organizer: { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' },
+  performer: { '@type': 'Organization', name: '体験する美術館', url: new URL('/taikenbizyutu/', site).toString() },
+  offers: LOST_FRAME.prices.map((x) => ({
+    '@type': 'Offer',
+    name: `${x.people}名参加（1人あたり）`,
+    url: TICKET_URL,
+    price: x.price,
+    priceCurrency: 'JPY',
+    availability: 'https://schema.org/InStock',
+    validFrom: LOST_FRAME.startDate,
+  })),
+};
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '体験する美術館', item: new URL('/taikenbizyutu/', site).toString() },
+    { '@type': 'ListItem', position: 2, name: LOST_FRAME.name },
+  ],
+};
 ---
 
 <TaikenbizyutuLayout title={title} description={description} bare>
+<Fragment slot="head">
+  <script type="application/ld+json" set:html={jsonLd(eventLd)} />
+  <script type="application/ld+json" set:html={jsonLd(breadcrumbLd)} />
+</Fragment>
 
 <header class="lphdr fx ac jb">
   <a class="lpback" href="/taikenbizyutu/">← 体験する美術館</a>
@@ -35,6 +81,7 @@ const description =
   <div class="lpcta tc">
     <a class="lpbtn" href={TICKET_URL} target="_blank" rel="noopener">参加を申し込む <span class="arr">▶▶</span></a>
     <p class="lpnote">お申し込みページ（escape.id）へ移動します</p>
+    <p class="lpnote" style="margin-top:34px">公演の記録（ネタバレを含みます）は <a class="lpnote-link" href={LOST_FRAME.noteUrl} target="_blank" rel="noopener">note の記事</a> で公開しています。</p>
     <a class="lphome" href="/taikenbizyutu/">← 体験する美術館 トップへ戻る</a>
   </div>
 
@@ -60,6 +107,8 @@ const description =
 .lpbtn:hover{color:#1c1a12;transform:scale(1.05)}
 .arr{font-size:15px}
 .lpnote{font-size:12px;color:rgba(255,255,255,.65);letter-spacing:.1em;margin:18px 0 0}
+.lpnote-link{color:#fff;border-bottom:1px solid rgba(255,255,255,.4)}
+.lpnote-link:hover{color:#efe14a;border-color:#efe14a}
 .lphome{display:inline-block;color:#fff;font-size:13px;letter-spacing:.14em;margin-top:34px;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:2px}
 .lphome:hover{color:#efe14a;border-color:#efe14a}
 .lpftr{background:#2c242b;color:rgba(255,255,255,.55);font-size:11px;letter-spacing:.1em;padding:28px 24px 90px}

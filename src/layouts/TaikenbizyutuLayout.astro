@@ -6,6 +6,7 @@ import SiteGuard from '../components/SiteGuard.astro';
 // サブドメイン taikenbizyutu.kabuexlabs.com は vercel.json のリダイレクトで
 // /taikenbizyutu/ 配下へ転送される (toudaimurder と同じ方式)。
 import { jsonLd } from '../lib/microcms';
+import { TB_BASE, TB_X_URL } from '../data/taikenbizyutu';
 
 export interface Props {
   title?: string;
@@ -35,7 +36,7 @@ const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const canonical = new URL(Astro.url.pathname.replace(/([^/])$/, '$1/'), site);
 const ogImageAbs = new URL(ogImage, site);
 
-const base = '/taikenbizyutu';
+const base = TB_BASE;
 const nav = [
   { href: `${base}/lostframe/`, label: 'WORKS' },
   { href: `${base}/#news`, label: 'NEWS' },
@@ -53,7 +54,7 @@ const orgLd = {
   name: '体験する美術館',
   url: new URL(`${base}/`, site).toString(),
   logo: new URL('/assets/taikenbizyutu/logo-white.webp', site).toString(),
-  sameAs: ['https://x.com/taikenbizyutu'],
+  sameAs: [TB_X_URL],
   keywords:
     '参加型アート, 周遊型アートイマーシブ, イマーシブ, 街歩き 謎解き, 体験型アート, 下北沢 アートイベント, 絵画 展示',
   description:
@@ -102,14 +103,14 @@ const orgLd = {
       {nav.map((item) => <a class="nlink" href={item.href}>{item.label}</a>)}
     </nav>
     <div class="fx ac gap12">
-      <a class="xbtn nowrap" href="https://x.com/taikenbizyutu" target="_blank" rel="noopener">公式 X</a>
+      <a class="xbtn nowrap" href={TB_X_URL} target="_blank" rel="noopener">公式 X</a>
       <button class="menub" id="menuBtn" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="mnav"><span></span><span></span><span></span></button>
     </div>
   </div>
 </header>
 <nav class="mnav" id="mnav" aria-label="メニュー">
   {nav.map((item) => <a class="mitem" href={item.href}>{item.label}</a>)}
-  <a class="mitem gold" href="https://x.com/taikenbizyutu" target="_blank" rel="noopener">公式 X →</a>
+  <a class="mitem gold" href={TB_X_URL} target="_blank" rel="noopener">公式 X →</a>
 </nav>
 )}
 <slot />

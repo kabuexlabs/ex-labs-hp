@@ -2,18 +2,14 @@
 // 体験する美術館 トップページ。
 // Claude Design のハンドオフ (Taiken Bijutsukan Site.dc.html) を Astro に移植したもの。
 // WORKS / ART は横スクロール列、Lost Frame のカードと WORKS ナビは LP ページへ遷移する。
+// 公演情報・NEWS・FAQ・クリエイターは src/data/taikenbizyutu.ts に集約している。
 import TaikenbizyutuLayout from '../../layouts/TaikenbizyutuLayout.astro';
 import TaikenbizyutuContactForm from '../../components/TaikenbizyutuContactForm.astro';
+import { jsonLd } from '../../lib/microcms';
+import { TICKET_URL, LOST_FRAME, CREATORS, TB_NEWS, TB_FAQS, TB_X_URL } from '../../data/taikenbizyutu';
 
-const TICKET_URL = 'https://escape.id/kyoukaiart-org/e-lost/';
 const assets = '/assets/taikenbizyutu';
-
-const creators = [
-  { name: '荒巻まりの', role: '絵画' },
-  { name: '小島有貴', role: '絵画' },
-  { name: '中堀慎治', role: '絵画' },
-  { name: '山科ティナ', role: '絵画' },
-];
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const arts = [
   { src: `${assets}/art-hoshi-no-sakusha.webp`, alt: '星の作者', cap: '《星の作者》 ─ ヌル・アーデン' },
@@ -22,31 +18,53 @@ const arts = [
   { src: `${assets}/art-sayuu.webp`, alt: '左右', cap: '《左右》 ─ ヌル・アーデン' },
 ];
 
-const faqs = [
-  {
-    q: '参加型の公演は初めてですが、楽しめますか？',
-    a: 'はい。特別な知識や準備は必要ありません。会場や街を巡りながら、絵画と物語、そして絵画に埋め込まれた図像や作中言語の読解を、ご自身のペースでお楽しみいただけます。',
+// FAQ リッチリザルト用。回答末尾のリンクはテキストに含めない (本文と同一にする)。
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: TB_FAQS.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+// 開催中の公演 (Event)。詳細は LP 側にも同じものを置き、url は LP に向ける。
+const eventLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: `${LOST_FRAME.name}（${LOST_FRAME.nameEn}）`,
+  description: LOST_FRAME.description,
+  image: new URL(LOST_FRAME.image, site).toString(),
+  url: new URL(LOST_FRAME.path, site).toString(),
+  startDate: LOST_FRAME.startDate,
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  duration: LOST_FRAME.durationIso,
+  location: {
+    '@type': 'Place',
+    name: '東京・下北沢エリア各所',
+    address: { '@type': 'PostalAddress', addressLocality: '世田谷区', addressRegion: '東京都', addressCountry: 'JP' },
   },
-  {
-    q: 'どのような公演ですか？',
-    a: '公演ごとに会場は変わります。閉館後の美術館、使用されていない展示会場、そして街そのもの——。手描きの絵画と物語を軸に、観客が絵画の図像を読み解き、登場人物と実際に言葉を交わしながら、絵画の側から立ち上がる時間に立ち会っていただく参加型の公演です。',
+  organizer: { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' },
+  performer: { '@type': 'Organization', name: '体験する美術館', url: new URL('/taikenbizyutu/', site).toString() },
+  offers: {
+    '@type': 'AggregateOffer',
+    url: TICKET_URL,
+    priceCurrency: 'JPY',
+    lowPrice: Math.min(...LOST_FRAME.prices.map((x) => x.price)),
+    highPrice: Math.max(...LOST_FRAME.prices.map((x) => x.price)),
+    availability: 'https://schema.org/InStock',
+    validFrom: LOST_FRAME.startDate,
   },
-  {
-    q: '物語の結末は変わりますか？',
-    a: 'はい。観客の選択によって、物語は異なる結末へと分岐します。同じ絵画群が、観客の関わり方によって異なる意味を帯びていきます。',
-  },
-  {
-    q: '作品の売却の機会はありますか？',
-    a: '過去公演では、公演内で用いられた作品のオークションを終了後に開催しています。『ロスト・フレーム』における実施は未定です。',
-  },
-  {
-    q: 'いつから参加できますか？',
-    a: '『ロスト・フレーム』は公式サイトにて参加を受け付けています。最新情報は公式X（@taikenbizyutu）でもお知らせします。',
-  },
-];
+};
 ---
 
 <TaikenbizyutuLayout>
+<Fragment slot="head">
+  <script type="application/ld+json" set:html={jsonLd(faqLd)} />
+  <script type="application/ld+json" set:html={jsonLd(eventLd)} />
+</Fragment>
 
 <section id="top" class="hero fx col ac jc">
   <div class="dust" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
@@ -101,11 +119,19 @@ const faqs = [
     <div class="kicker rv">News</div>
     <h2 class="h2 rv d1">お知らせ</h2>
     <div style="margin-top:40px">
-      <div class="newsrow fx gap24 rv"><span class="ndate">2026.07</span><span>『ロスト・フレーム』の参加受付を開始しました（<a href={TICKET_URL} target="_blank" rel="noopener">お申し込みはこちら</a>）</span></div>
-      <div class="newsrow fx gap24 rv d1"><span class="ndate">2026.07</span><span>体験する美術館 第二弾『ロスト・フレーム』の開催が決定しました（東京・下北沢エリア）</span></div>
-      <div class="newsrow fx gap24 rv d2"><span class="ndate">2026.07</span><span>『ロスト・フレーム』ティザービジュアルを公開しました</span></div>
+      {TB_NEWS.map((n, i) => (
+        <div class={`newsrow fx gap24 rv${i > 0 ? ` d${Math.min(i, 4)}` : ''}`}>
+          <time class="ndate" datetime={n.iso}>{n.date}</time>
+          <span>
+            {n.text}
+            {n.link && (
+              <>（<a href={n.link.href} target={n.link.external ? '_blank' : undefined} rel={n.link.external ? 'noopener' : undefined}>{n.link.label}</a>）</>
+            )}
+          </span>
+        </div>
+      ))}
     </div>
-    <p class="note rv" style="margin-top:18px">最新情報は<a href="https://x.com/taikenbizyutu" target="_blank" rel="noopener">公式X（@taikenbizyutu）</a>にて随時お知らせします。</p>
+    <p class="note rv" style="margin-top:18px">最新情報は<a href={TB_X_URL} target="_blank" rel="noopener">公式X（@taikenbizyutu）</a>にて随時お知らせします。</p>
   </div>
 </section>
 
@@ -124,10 +150,11 @@ const faqs = [
           <p style="margin:16px 0 0">観客の選択によって、物語は異なる結末へと分岐します。</p>
         </div>
         <div class="dl" style="margin-top:36px">
-          <div class="dlrow"><span class="dt">エリア</span><span>東京・下北沢エリア各所（小田急線／京王井の頭線「下北沢駅」周辺）</span></div>
-          <div class="dlrow"><span class="dt">形式</span><span>街を巡る参加型の絵画鑑賞（絵画 × 物語 × 図像の読解）</span></div>
-          <div class="dlrow"><span class="dt">所要時間</span><span>75分</span></div>
-          <div class="dlrow"><span class="dt">定員</span><span>1〜4名</span></div>
+          <div class="dlrow"><span class="dt">エリア</span><span>{LOST_FRAME.area}</span></div>
+          <div class="dlrow"><span class="dt">形式</span><span>{LOST_FRAME.format}</span></div>
+          <div class="dlrow"><span class="dt">所要時間</span><span>{LOST_FRAME.duration}</span></div>
+          <div class="dlrow"><span class="dt">定員</span><span>{LOST_FRAME.capacity}</span></div>
+          <div class="dlrow"><span class="dt">参加費</span><span>{LOST_FRAME.prices.map((x) => `${x.price.toLocaleString('ja-JP')}円（${x.people}名参加）`).join(' ／ ')}<br><span class="note">※1人あたり</span></span></div>
           <div class="dlrow"><span class="dt">参加のお申し込み</span><span><a href={TICKET_URL} target="_blank" rel="noopener">お申し込みページへ →</a></span></div>
         </div>
         <div class="fx gap16 wrap" style="margin-top:32px">
@@ -201,7 +228,7 @@ const faqs = [
     <h2 class="h2 rv d1">絵画クリエイター</h2>
     <p class="lead muted rv d2" style="margin:28px 0 0;max-width:720px">本企画には、東京藝術大学出身者や漫画家など、多様なジャンルで活躍するクリエイターが絵画制作に参画しています。</p>
     <div class="cnames rv d2" style="margin-top:56px">
-      {creators.map((c) => (
+      {CREATORS.map((c) => (
         <div class="cnameplate">
           <span class="cnn">{c.name}</span>
         </div>
@@ -236,10 +263,15 @@ const faqs = [
     <div class="kicker rv">FAQ</div>
     <h2 class="h2 rv d1">よくある質問</h2>
     <div style="margin-top:44px">
-      {faqs.map((f) => (
+      {TB_FAQS.map((f) => (
         <details class="faqit rv">
           <summary class="faqq"><span class="qmark">Q</span>{f.q}</summary>
-          <p class="faqa">{f.a}</p>
+          <p class="faqa">
+            {f.a}
+            {f.link && (
+              <a class="faqlink" href={f.link.href} target={f.link.external ? '_blank' : undefined} rel={f.link.external ? 'noopener' : undefined}>→ {f.link.label}</a>
+            )}
+          </p>
         </details>
       ))}
     </div>
@@ -290,6 +322,7 @@ const faqs = [
 .faqq::-webkit-details-marker{display:none}
 .qmark{font-family:'Cormorant Garamond',serif;font-style:italic;color:#b39a63;font-size:20px}
 .faqa{padding:0 2px 24px 38px;font-size:14.5px;color:#b5aea2;letter-spacing:.05em;margin:0}
+.faqlink{display:inline-block;margin-left:10px;font-size:13.5px;letter-spacing:.1em;white-space:nowrap}
 .ccard{width:260px;text-align:left}
 .wcap{font-size:13px;color:#9c9488;letter-spacing:.14em;margin:14px 0 0;text-align:center}
 .ewrow{grid-auto-columns:min(440px,82vw)}
