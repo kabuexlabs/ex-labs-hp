@@ -60,6 +60,40 @@ function fmtDate(iso: string) {
   const d = new Date(iso);
   return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
+
+// --- 流入元の集計（受信一覧の上に表示） ------------------------------------
+// SourceField が記録した「参照元 / 最初に開いたページ / 送信したページ」を
+// 分解して、どの経路・どのページから問い合わせが来ているかを数える。
+function parseSource(src?: string) {
+  const get = (label: string) => (src?.split('\n').find((l) => l.startsWith(label + ': ')) ?? '').slice(label.length + 2).trim();
+  const ref = get('参照元');
+  const landing = get('最初に開いたページ');
+  const sent = get('送信したページ');
+  let channel = '記録なし';
+  if (src) {
+    if (!ref || ref.startsWith('(')) channel = '直接アクセス';
+    else if (/google\./.test(ref)) channel = 'Google検索';
+    else if (/bing\.com|yahoo\.co\.jp|duckduckgo/.test(ref)) channel = 'Google以外の検索';
+    else if (/kabuexlabs\.com/.test(ref)) channel = 'サイト内リンク';
+    else if (/prtimes|nazohiroba|note\.com|x\.com|twitter|instagram|facebook|lostproduct|apri-la-porta|yorozuyagakudan/.test(ref)) channel = '外部サイト：' + ref.replace(/^https?:\/\//, '').split('/')[0];
+    else channel = '外部サイト：' + ref.replace(/^https?:\/\//, '').split('/')[0];
+  }
+  const path = (u: string) => { try { return new URL(u).pathname; } catch { return u || '(不明)'; } };
+  return { channel, landing: landing ? path(landing) : '(不明)', sent: sent ? path(sent) : '(不明)', ref };
+}
+const stats = (() => {
+  const byChannel = new Map<string, number>();
+  const byLanding = new Map<string, number>();
+  let spamCount = 0;
+  for (const q of inquiries) {
+    if (q.spam) { spamCount++; continue; }
+    const p = parseSource(q.source);
+    byChannel.set(p.channel, (byChannel.get(p.channel) ?? 0) + 1);
+    byLanding.set(p.landing, (byLanding.get(p.landing) ?? 0) + 1);
+  }
+  const sorted = (m: Map<string, number>) => [...m.entries()].sort((a, b) => b[1] - a[1]);
+  return { byChannel: sorted(byChannel), byLanding: sorted(byLanding), spamCount, legit: inquiries.length - spamCount };
+})();
 ---
 <YoyakuLayout title="お問い合わせ受信箱｜ex Labs">
 <div class="yk-wrap">
@@ -106,6 +140,26 @@ function fmtDate(iso: string) {
     )}
   </section>
 
+  {inquiries.length > 0 && (
+    <section style="border:2px solid var(--ink);background:#fff;padding:16px 18px;margin:0 0 22px">
+      <h2 style="font-size:15px;margin:0 0 10px">流入元の集計（営業・スパム判定 {stats.spamCount}件を除く {stats.legit}件）</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;font-size:13.5px">
+        <div>
+          <p style="margin:0 0 6px;font-weight:700">どこから来たか（参照元）</p>
+          <ul style="margin:0;padding-left:1.2em;line-height:1.9">
+            {stats.byChannel.map(([k, n]) => <li>{k}：<strong>{n}件</strong></li>)}
+          </ul>
+        </div>
+        <div>
+          <p style="margin:0 0 6px;font-weight:700">最初に開いたページ（入口）</p>
+          <ul style="margin:0;padding-left:1.2em;line-height:1.9">
+            {stats.byLanding.map(([k, n]) => <li><code style="font-size:12.5px">{k}</code>：<strong>{n}件</strong></li>)}
+          </ul>
+        </div>
+      </div>
+      <p style="margin:10px 0 0;font-size:11.5px;color:#8a8378">※流入元の記録はフォームに自動記録を仕込んだ日（8月中旬）以降の問い合わせに付いています。それ以前は「記録なし」になります。</p>
+    </section>
+  )}
   <h2 style="font-size:15px;margin:0 0 14px">受信一覧（{inquiries.length}件）</h2>
   {inquiries.length === 0 ? (
     <p style="font-size:13.5px;color:#8a8378">記録はまだありません。{!status.kv && 'KVが未設定のため保存自体が行われていません。'}</p>
@@ -113,8 +167,17 @@ function fmtDate(iso: string) {
     <div style="display:flex;flex-direction:column;gap:14px">
       {inquiries.map((q) => (
         <details style="border:2px solid var(--ink);background:#fff;padding:14px 18px">
-          <summary style="cursor:pointer;font-size:13.5px;font-weight:700">{fmtDate(q.createdAt)}　{q.subject}　<span style="font-weight:500;color:#8a8378">{q.email}</span></summary>
+          <summary style="cursor:pointer;font-size:13.5px;font-weight:700">{fmtDate(q.createdAt)}　{q.subject}　<span style="font-weight:500;color:#8a8378">{q.email}</span>{q.spam && <span style="margin-left:8px;font-size:11px;font-weight:700;color:#fff;background:#b3261e;padding:2px 8px;border-radius:999px">営業・スパムの疑い</span>}<span style="margin-left:8px;font-size:11.5px;font-weight:600;color:var(--accent)">{parseSource(q.source).channel}</span></summary>
           <pre style="white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:13.5px;margin:12px 0 0;line-height:1.9">{q.fields}</pre>
+          {q.source ? (
+            <div style="margin:12px 0 0;padding:10px 12px;background:#f6f4ef;border-radius:8px;font-size:12.5px;line-height:1.8">
+              <p style="margin:0;font-weight:700">流入元：{parseSource(q.source).channel}</p>
+              <p style="margin:0">入口ページ: <code>{parseSource(q.source).landing}</code>　→　送信ページ: <code>{parseSource(q.source).sent}</code></p>
+              {parseSource(q.source).ref && !parseSource(q.source).ref.startsWith('(') && <p style="margin:0;overflow-wrap:anywhere">参照元URL: {parseSource(q.source).ref}</p>}
+            </div>
+          ) : (
+            <p style="margin:10px 0 0;font-size:12px;color:#8a8378">流入元: 記録なし（自動記録の導入前、またはJS無効）</p>
+          )}
           <p style="font-size:11.5px;color:#8a8378;margin:10px 0 0">返信先: <a href={`mailto:${q.email}`} style="color:var(--accent)">{q.email}</a>｜IP: {q.ip}</p>
         </details>
       ))}

@@ -11,6 +11,10 @@ export interface ContactRecord {
   ip: string;
   ua: string;
   createdAt: string;
+  /** 流入元（SourceField が記録：最初のランディングページ・参照元・UTM など） */
+  source?: string;
+  /** 営業・スパム自動判定でフラグが立った送信 */
+  spam?: boolean;
 }
 
 function readEnv(name: string): string | undefined {
