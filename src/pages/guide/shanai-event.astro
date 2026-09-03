@@ -15,7 +15,8 @@ const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'why', label: '社内イベントが「体験型」に向かう理由' },
-  { id: 'ideas', label: '体験型の社内イベント企画アイデア8選' },
+  { id: 'ideas', label: '体験型の社内イベント企画アイデア20選' },
+  { id: 'budget', label: '予算・人数別の目安' },
   { id: 'scene', label: 'シーン別の選び方（懇親会・総会・研修）' },
   { id: 'point', label: '失敗しない3つのポイント' },
   { id: 'faq', label: 'よくある質問' },
@@ -53,19 +54,19 @@ const faqLd = {
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: '社内イベントの企画アイデア8選｜体験型で盛り上がる懇親会・全社会',
+  headline: '社内イベントの企画アイデア20選｜体験型で盛り上がる懇親会・全社会・研修',
   about: '社内イベント・懇親会・全社総会の体験型企画アイデア',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/shanai-event.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-24',
-  dateModified: '2026-08-24',
+  dateModified: '2026-09-03',
   mainEntityOfPage: new URL('/guide/shanai-event/', Astro.site).toString(),
 };
 ---
 <BaseLayout
-  title="社内イベントの企画アイデア8選｜体験型で盛り上がる懇親会・全社会 - 株式会社ex Labs"
+  title="社内イベントの企画アイデア20選｜体験型で盛り上がる懇親会・全社会・研修 - 株式会社ex Labs"
   description="社内イベント・懇親会・全社総会の企画アイデアを体験型に絞って8つ紹介。謎解き・マダミス・頭脳戦など「全員が主役になる」形式の選び方、シーン別の使い分け、失敗しない3つのポイントを、体験型イベントの制作会社が解説します。"
   ogImage="/assets/guide/shanai-event.webp"
 >
@@ -79,8 +80,8 @@ const articleLd = {
 
 <section class="section" style="padding-top:40px"><div class="wrap">
 <p class="eyebrow">CORPORATE EVENT</p>
-<h1 class="h2 serif"><span class="nobr">社内イベントの</span><span class="nobr">企画アイデア8選</span><br><span class="nobr">体験型で盛り上がる</span><span class="nobr">懇親会・全社会</span></h1>
-<p class="lede">社内イベントの一番の失敗は、<strong>「参加者が受け身のまま終わる」</strong>こと。立食と歓談だけの懇親会、聞くだけの総会は、翌日には忘れられてしまいます。この記事では、<strong>全員が主役になる「体験型」の社内イベント企画</strong>に絞って、アイデア8選とシーン別の選び方を、体験型イベントの制作会社である株式会社ex Labsが解説します。</p>
+<h1 class="h2 serif"><span class="nobr">社内イベントの</span><span class="nobr">企画アイデア20選</span><br><span class="nobr">体験型で盛り上がる</span><span class="nobr">懇親会・全社会</span></h1>
+<p class="lede">社内イベントの一番の失敗は、<strong>「参加者が受け身のまま終わる」</strong>こと。立食と歓談だけの懇親会、聞くだけの総会は、翌日には忘れられてしまいます。この記事では、<strong>全員が主役になる「体験型」の社内イベント企画</strong>に絞って、アイデア20選とシーン別の選び方を、体験型イベントの制作会社である株式会社ex Labsが解説します。</p>
 
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
@@ -96,7 +97,8 @@ const articleLd = {
 </div></section>
 
 <section class="section" id="ideas"><div class="wrap narrow">
-<p class="eyebrow">8 IDEAS</p><h2 class="h2 serif">体験型の社内イベント企画アイデア8選</h2>
+<p class="eyebrow">20 IDEAS</p><h2 class="h2 serif">体験型の社内イベント企画アイデア20選</h2>
+<p class="h2sub">まず体験型の8企画、続いて定番・オンライン・季節ものまで20企画を目的別に紹介します。</p>
 <ul class="bullets">
 <li><strong>①チーム対抗の謎解きゲーム</strong>：協力必須の構造で交流を作る定番。数十〜数百名まで対応でき、会議室・宴会場でそのまま実施できます。<a href="/guide/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修とは →</a></li>
 <li><strong>②マダミス（マーダーミステリー）会</strong>：少人数でじっくり。演じて話すうちに、メンバーの意外な一面が見える相互理解の最強フォーマット。<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修とは →</a></li>
@@ -107,9 +109,40 @@ const articleLd = {
 <li><strong>⑦内定者・新人向けアイスブレイク企画</strong>：初対面同士でも「役割」があるから話せる。配属前の関係構築に。</li>
 <li><strong>⑧オンライン・多拠点同時開催</strong>：全国の拠点をつないで同じゲームに挑戦。リモートメンバーの疎外感を解消します。</li>
 </ul>
+<p class="lede" style="margin-top:28px"><strong>定番・軽量の企画（9〜14）</strong>：準備が少なく、懇親会や短時間の枠に入れやすいアイデアです。</p>
+<ul class="bullets">
+<li><strong>⑨部署対抗クイズ大会</strong>：会社ネタ・業界ネタを問題にすると、知識より「うちの会社らしさ」で盛り上がります。早押し形式にすると熱量が上がります。</li>
+<li><strong>⑩ビンゴ×社員紹介</strong>：数字の代わりに「◯◯な人」を探して埋めるヒューマンビンゴ。初対面の多い場で会話のきっかけを量産します。</li>
+<li><strong>⑪社員の「意外な特技」披露会</strong>：エントリー制で数組だけ。全員参加の圧をかけず、見る側も楽しめる構成にします。</li>
+<li><strong>⑫写真・動画コンテスト</strong>：期間中にテーマ写真を投稿し、当日に表彰。イベント前から社内が温まる「事前参加型」の企画です。</li>
+<li><strong>⑬ワークショップ（料理・クラフト・コーヒー）</strong>：手を動かす共同作業は会話が自然に生まれます。少人数チームに分けるのがコツ。</li>
+<li><strong>⑭表彰式＋サプライズ演出</strong>：MVP表彰に家族や取引先からのメッセージ動画を組み合わせると、定番が「記憶に残る回」になります。</li>
+</ul>
+<p class="lede" style="margin-top:28px"><strong>研修・組織づくり寄りの企画（15〜17）</strong>：楽しさの中に、振り返りや相互理解の設計を入れるアイデアです。</p>
+<ul class="bullets">
+<li><strong>⑮ボードゲーム・交渉ゲーム会</strong>：交渉・協力・裏切りの構造を持つゲームは、ビジネスの意思決定そのもの。振り返りをつけると研修になります。<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類と選び方 →</a></li>
+<li><strong>⑯部署シャッフルのランチ・ワールドカフェ</strong>：席替えを仕組み化するだけで横のつながりが増えます。テーマを1つ置くと会話が続きます。</li>
+<li><strong>⑰社内ハッカソン・アイデアソン</strong>：1日で企画を作って発表。事業と直結する熱量が生まれ、若手の抜擢の場にもなります。</li>
+</ul>
+<p class="lede" style="margin-top:28px"><strong>季節・規模で選ぶ企画（18〜20）</strong>：時期や会場を活かすアイデアです。</p>
+<ul class="bullets">
+<li><strong>⑱季節イベント（ハロウィン・忘年会）を物語仕立てに</strong>：仮装や乾杯だけで終わらせず、当日限定のミッションやストーリーを乗せると参加率が跳ね上がります。<a href="/guide/kisetsu-event/" style="color:var(--accent)">季節イベントの企画 →</a></li>
+<li><strong>⑲会場ごと借り切る貸切イベント</strong>：バー・劇場・イベントスペースを貸し切り、会社が舞台の一夜限りの物語に。周年記念や上場記念など「特別な回」に向きます。</li>
+<li><strong>⑳スポーツ大会・運動会</strong>：体を動かす定番。運営負荷が高いので、外部の運営会社に任せると担当者も楽しめます。</li>
+</ul>
 </div></section>
 
-<section class="section tinted" id="scene"><div class="wrap">
+<section class="section tinted" id="budget"><div class="wrap narrow">
+<p class="eyebrow">BUDGET</p><h2 class="h2 serif">予算・人数別の目安</h2>
+<ul class="bullets">
+<li><strong>〜30名・予算を抑えたい</strong>：⑥テーブル謎解き、⑨クイズ、⑩ヒューマンビンゴ、⑯シャッフルランチ。市販の謎解きキットなら1人あたり数百円〜。</li>
+<li><strong>30〜100名・懇親会の目玉に</strong>：①チーム対抗謎解き、③頭脳戦大会、⑭表彰式演出。進行役込みで外注すると、担当者が当日に走り回らずに済みます。</li>
+<li><strong>100名〜・総会や周年</strong>：④オフィス周遊型、⑤理念ストーリー体験、⑲会場貸切。オリジナル制作は企画から1〜2ヶ月が目安です。</li>
+</ul>
+<p class="lede">株式会社ex Labsでは、①②③④⑤⑲のような<strong>オリジナルの体験型企画を、企画・制作・当日運営まで一貫して</strong>お受けしています。<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修・社内イベントの制作 →</a></p>
+</div></section>
+
+<section class="section" id="scene"><div class="wrap">
 <p class="eyebrow">SCENE</p><h2 class="h2 serif">シーン別の選び方（懇親会・総会・研修）</h2>
 <div class="genre-grid">
 <div class="genre-cell"><span class="genre-t serif">懇親会・歓送迎会</span><span class="genre-d">食事と並行できる軽めの謎解き・テーブル対抗形式（⑥）。空気を壊さず一体感だけ足せます。</span></div>
@@ -119,7 +152,7 @@ const articleLd = {
 </div>
 </div></section>
 
-<section class="section" id="point"><div class="wrap narrow">
+<section class="section tinted" id="point"><div class="wrap narrow">
 <p class="eyebrow">POINT</p><h2 class="h2 serif">失敗しない3つのポイント</h2>
 <ul class="bullets">
 <li><strong>①「全員に役割」を最優先する</strong>：盛り上がるのは一部だけ、が最大の失敗。謎解きやマダミスは全員に見せ場が生まれる構造を最初から持っています。</li>
@@ -164,6 +197,6 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#why,#ideas,#scene,#point,#faq{scroll-margin-top:88px}
+#why,#ideas,#budget,#scene,#point,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>

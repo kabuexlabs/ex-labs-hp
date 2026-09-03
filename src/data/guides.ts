@@ -286,7 +286,7 @@ export const guideArticles: GuideArticle[] = [
   },
   {
     href: '/guide/shanai-event/',
-    title: '社内イベントの企画アイデア8選｜体験型で盛り上がる懇親会・全社会',
+    title: '社内イベントの企画アイデア20選｜体験型で盛り上がる懇親会・全社会',
     desc: '全員が主役になる体験型の企画8選と、懇親会・総会・研修などシーン別の選び方、失敗しない3つのポイント。',
     date: '2026-08-24',
     category: 'nazotoki',
