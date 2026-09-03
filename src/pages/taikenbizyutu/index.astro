@@ -17,8 +17,6 @@ const soldOut = LOST_FRAME.status === 'soldout';
 const arts = [...LOST_FRAME_ARTS, ...NULL_ARDEN_ARTS];
 // ヒーロー直下の帯に並べる3点
 const strip = LOST_FRAME_ARTS.slice(0, 3);
-// ABOUT の円形ブロックの背景に敷く絵画
-const aboutBg = LOST_FRAME_ARTS[1]?.src ?? LOST_FRAME_ARTS[0].src;
 
 const faqLd = {
   '@context': 'https://schema.org',
@@ -74,7 +72,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
     <div class="herox hero-el e0"><span>絵&nbsp;画</span><span class="xmark">×</span><span>体&nbsp;験</span><span class="xmark">×</span><span>交&nbsp;流</span></div>
     <h1 class="heromark-h1 hero-el e1"><img class="heromark" src={`${assets}/logo-white.webp`} alt="体験する美術館" width="1000" height="487"><span class="sr-only">体験する美術館｜下北沢の街を巡る参加型アート・周遊型アートイマーシブ｜絵画と物語、街歩き謎解きの体験</span></h1>
     <p class="herolead m0 hero-el e2">鑑賞するアートから、<wbr>体験するアートへ。</p>
-    <p class="note tc m0 hero-el e3" style="letter-spacing:.14em">絵画と物語、観客の参加を編み込んだ<wbr>参加型芸術のレーベル</p>
+    <p class="note tc m0 hero-el e3" style="letter-spacing:.14em">絵画が作る物語に没入する団体</p>
   </div>
   <div class="hero-kv hero-el e4">
     <a href={LOST_FRAME.path} aria-label="最新の公演『ロスト・フレーム』を見る"><img src={`${assets}/lost-frame.webp`} alt="ロスト・フレーム キービジュアル" width="900" height="1281"></a>
@@ -95,8 +93,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
   <div class="wrapc">
     <h2 class="stag rv"><span>鑑賞するアートから、</span><span>体験するアートへ。</span><span>絵画の側から立ち上がる時間。</span></h2>
     <div class="concept-body rv d1">
-      <p class="lead m0">「体験する美術館」は、“鑑賞するアート”を“体験するアート”へと問い直す、参加型芸術のレーベルです。ハプニングや参加型アート、関係性の美学の系譜では絵画は乗り越えの対象でしたが、本レーベルは逆に、絵画の側から上演性と時間を回復する試みに取り組んでいます。</p>
-      <p class="lead" style="margin:24px 0 0">閉館後の美術館、使用されていない展示会場、そして街そのもの——。公演ごとに会場を変えながら、絵画と物語、そして観客の参加による絵画鑑賞の場を立ち上げています。</p>
+      <p class="lead m0">体験する美術館は、<br><span class="nobr">『鑑賞するアート』を</span><span class="nobr">『体験するアート』へと再定義し、</span><br>閉館後の美術館、使用されていない展示会場、そして街そのもの——。公演ごとに会場を変えながら、絵画と物語、そして観客の参加による絵画鑑賞の場を立ち上げています。</p>
     </div>
     <div class="concept-more rv d2"><a class="circ" href="#about">MORE</a></div>
   </div>
@@ -167,7 +164,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
         {soldOut ? <span class="sold">最新公演 ─ 第二弾 完売御礼</span> : <span class="badge">最新公演 ─ 第二弾</span>}
         <h2 class="evtitle">ロスト・フレーム</h2>
         <p class="evsub en">Lost Frame</p>
-        <p class="lead" style="margin:28px 0 0">下北沢の街に散らばった絵画を探し、<wbr>隠された物語を辿る……<br>絵画と街が交差する、<wbr>街を巡る参加型の絵画鑑賞。</p>
+        <p class="lead" style="margin:28px 0 0"><span class="nobr">下北沢の街に散らばった絵画を探し、</span><span class="nobr">隠された物語を辿る……</span><br><span class="nobr">絵画と街が交差する、</span><span class="nobr">街を巡る参加型の絵画鑑賞。</span></p>
         <div class="story" style="margin-top:28px">
           <p class="m0">『ロスト・フレーム』は、街を巡りながら絵画と物語に出会い、絵画に埋め込まれた図像や作中言語を読み解いていく、参加型の絵画鑑賞の公演です。</p>
           <p style="margin:16px 0 0">下北沢エリアの店舗様との連携により、街に点在する場所を巡り、手描きの絵画と物語を軸にした鑑賞のなかで、登場人物と実際に言葉を交わす——観客の関わりによって絵画が意味を帯びていく、新しい絵画鑑賞のかたちに立ち会っていただきます。</p>
@@ -193,16 +190,16 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 {/* ---------- ABOUT（生成り）：リング状テキストの円形ブロック ---------- */}
 <section id="about" class="sec bg-cream about">
   <div class="wrapc">
-    <div class="ring rv" style={`background-image:url(${aboutBg})`}>
+    <div class="ring rv">
       <div class="disc">
         <svg class="ringtxt" viewBox="0 0 500 500" aria-hidden="true">
           <defs><path id="ringpath" d="M250,250 m-215,0 a215,215 0 1,1 430,0 a215,215 0 1,1 -430,0"/></defs>
-          <text><textPath href="#ringpath">{ringText}{ringText}</textPath></text>
+          <text textLength="1345" lengthAdjust="spacing"><textPath href="#ringpath" textLength="1345" lengthAdjust="spacing">{ringText}</textPath></text>
         </svg>
         <div class="disc-in">
           <p class="kicker">About</p>
           <h2 class="h2" style="margin-top:6px">『体験する美術館』とは</h2>
-          <p class="disc-lead">「体験する美術館」は、“鑑賞するアート”を“体験するアート”へと問い直す、参加型芸術のレーベルです。絵画の側から上演性と時間を回復する試みに取り組んでいます。</p>
+          <p class="disc-lead">体験する美術館は、<span class="nobr">『鑑賞するアート』を</span><span class="nobr">『体験するアート』へと再定義し、</span>絵画と物語、そして観客の参加による絵画鑑賞の場を立ち上げています。</p>
         </div>
       </div>
     </div>
@@ -231,7 +228,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 <section id="model" class="sec bg-grey">
   <div class="wrapc">
     <p class="kicker rv">Model</p>
-    <h2 class="h2 rv d1">地域とクリエイターをつなぐ、<wbr>新たなモデル</h2>
+    <h2 class="h2 rv d1"><span class="nobr">地域とクリエイターをつなぐ、</span><span class="nobr">新たなモデル</span></h2>
     <div class="grid3 rv d2" style="margin-top:56px">
       <div class="card3">
         <div class="num">舞台</div>
@@ -276,7 +273,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
       {arts.map((a) => (
         <figure class="m0">
           <span class="mat"><img src={a.src} alt={a.alt} width={a.width || undefined} height={a.height || undefined} loading="lazy"></span>
-          <figcaption class="mcap">{a.caption}</figcaption>
+          <figcaption class="mcap">{a.caption.includes(' ─ ') ? <><span>{a.caption.split(' ─ ')[0]}</span><small>{a.caption.split(' ─ ')[1]}</small></> : a.caption}</figcaption>
         </figure>
       ))}
     </div>
@@ -377,7 +374,7 @@ a.mat:hover{opacity:.9}
 .evgrid{display:grid;grid-template-columns:400px 1fr;gap:72px;align-items:start}
 
 /* ---- ABOUT（円形） ---- */
-.ring{background-size:cover;background-position:center;padding:clamp(24px,6vw,72px)}
+.ring{background:#101010;padding:clamp(24px,6vw,72px)}
 .disc{position:relative;width:min(760px,100%);aspect-ratio:1;margin:0 auto;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center}
 .ringtxt{position:absolute;inset:0;width:100%;height:100%}
 .ringtxt text{font-family:'Cormorant Garamond',serif;font-size:34px;letter-spacing:.1em;fill:#2b2926}
@@ -426,10 +423,11 @@ a.mat:hover{opacity:.9}
   .dlrow{grid-template-columns:92px 1fr;gap:12px;font-size:13px}
   .newsrow{flex-direction:column;gap:2px}
   .ndate{min-width:0}
-  .ringtxt text{font-size:38px}
-  .disc-in{padding:0 12%}
-  .disc-lead{font-size:12.5px;line-height:1.9;margin-top:14px}
-  .disc .h2{font-size:18px}
+  .ringtxt text{font-size:36px}
+  .disc-in{padding:0 13%}
+  .disc-lead{font-size:11.5px;line-height:1.85;margin-top:12px;letter-spacing:.02em}
+  .disc .h2{font-size:16px;letter-spacing:.08em}
+  .disc .kicker{font-size:10px}
   .grid3{grid-template-columns:1fr;gap:32px}
   .about .grid3{margin-top:56px}
   .cnames{grid-template-columns:repeat(2,1fr);gap:12px}
