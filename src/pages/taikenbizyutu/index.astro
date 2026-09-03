@@ -6,17 +6,13 @@
 import TaikenbizyutuLayout from '../../layouts/TaikenbizyutuLayout.astro';
 import TaikenbizyutuContactForm from '../../components/TaikenbizyutuContactForm.astro';
 import { jsonLd } from '../../lib/microcms';
-import { TICKET_URL, LOST_FRAME, CREATORS, TB_NEWS, TB_FAQS, TB_X_URL } from '../../data/taikenbizyutu';
+import { TICKET_URL, LOST_FRAME, CREATORS, TB_NEWS, TB_FAQS, TB_X_URL, LOST_FRAME_ARTS, NULL_ARDEN_ARTS } from '../../data/taikenbizyutu';
 
 const assets = '/assets/taikenbizyutu';
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
-const arts = [
-  { src: `${assets}/art-hoshi-no-sakusha.webp`, alt: '星の作者', cap: '《星の作者》 ─ ヌル・アーデン' },
-  { src: `${assets}/art-ao-no-uragawa.webp`, alt: '青の裏側', cap: '《青の裏側》 ─ ヌル・アーデン' },
-  { src: `${assets}/art-shita-kara-ai.webp`, alt: '下から藍', cap: '《下から藍》 ─ ヌル・アーデン' },
-  { src: `${assets}/art-sayuu.webp`, alt: '左右', cap: '《左右》 ─ ヌル・アーデン' },
-];
+// ART 列: 最新公演の絵画を先頭に、過去公演の絵画を続ける。
+const arts = [...LOST_FRAME_ARTS, ...NULL_ARDEN_ARTS];
 
 // FAQ リッチリザルト用。回答末尾のリンクはテキストに含めない (本文と同一にする)。
 const faqLd = {
@@ -247,14 +243,14 @@ const eventLd = {
     <div class="hscroll artrow">
       {arts.map((a) => (
         <div>
-          <div class="artframe fx ac jc"><img class="poster pshadow artimg" src={a.src} alt={a.alt} loading="lazy"></div>
-          <p class="wcap">{a.cap}</p>
+          <div class="artframe fx ac jc"><img class="poster pshadow artimg" src={a.src} alt={a.alt} width={a.width || undefined} height={a.height || undefined} loading="lazy"></div>
+          <p class="wcap">{a.caption}</p>
         </div>
       ))}
     </div>
     <div class="swipe"><span class="ar l">◀</span>スワイプで作品を見る<span class="ar r">▶</span></div>
     </div>
-    <p class="note tc rv" style="margin:40px 0 0">ここに掲載しているのは一部です。ほかにも多数の作品がございます。</p>
+    <p class="note tc rv" style="margin:40px 0 0">ここに掲載しているのは一部です。ほかにも多数の作品がございます。<br>『ロスト・フレーム』の絵画は<a href={LOST_FRAME.spoilerPath}>公演記録ページ</a>でも紹介しています（ネタバレを含みます）。</p>
   </div>
 </section>
 

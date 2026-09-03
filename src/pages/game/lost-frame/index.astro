@@ -1,0 +1,97 @@
+---
+// ネタバレ公開特設サイト：ロスト・フレーム 公演記録。
+// 公演で用いられた絵画と公演概要・クレジットを掲載する。
+// 物語の全容 (登場人物との対話・結末) は note 記事側に掲載しており、
+// 本ページからはそちらへ案内する。note の本文を本ページへ移植する場合は
+// 「公演の記録」セクション (id="record") に <p class="p"> / <figure class="fig"> で追記する。
+import GameLayout from '../../../layouts/GameLayout.astro';
+import { jsonLd } from '../../../lib/microcms';
+import { LOST_FRAME, LOST_FRAME_ARTS, CREATORS, TICKET_URL } from '../../../data/taikenbizyutu';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'ネタバレ公開特設サイト', item: new URL('/game/', site).toString() },
+    { '@type': 'ListItem', position: 2, name: LOST_FRAME.name },
+  ],
+};
+---
+
+<GameLayout
+  title="ロスト・フレーム 公演記録（ネタバレ）｜株式会社ex Labs"
+  description="「体験する美術館」第2回公演『ロスト・フレーム』の記録。下北沢の街を舞台にした周遊型アートイマーシブで用いられた絵画作品と、公演の概要・クレジットを掲載しています（ネタバレを含みます）。"
+  ogImage="/assets/events/lost-frame.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(breadcrumbLd)} slot="head" />
+<div data-screen-label="詳細：ロスト・フレーム">
+<header class="dhero">
+  <a class="back" href="/game/">← イベント一覧へ戻る</a>
+  <h1 class="dtitle">ロスト・フレーム</h1>
+  <div class="dsub">LOST FRAME</div>
+  <img class="dposter frame" src="/assets/events/lost-frame.webp" alt="ロスト・フレーム キービジュアル" width="800" height="1138">
+  <div class="meta">
+    <span class="chip">2026.7 –</span>
+    <span class="chip">体験する美術館 第2回公演</span>
+    <span class="chip">周遊型アートイマーシブ × 謎解き</span>
+    <span class="chip">東京・下北沢</span>
+  </div>
+</header>
+
+<div class="gate" id="gate">
+  <h2 class="gtitle">⚠ ネタバレ注意</h2>
+  <p class="gtext">この先には『ロスト・フレーム』で用いられた絵画と<br>公演の内容が記録されています。<br>本公演は現在も開催中です。<br>これからご参加予定の方はご注意ください。</p>
+  <button class="btn gbtn" id="revealBtn" type="button">ネタバレを表示する</button>
+  <p class="note" style="margin-top:24px"><a href={LOST_FRAME.path}>公演の紹介ページ（ネタバレなし）はこちら</a></p>
+</div>
+
+<article class="article" id="article" hidden>
+<p class="p">この記事は、「体験する美術館」第2回公演『ロスト・フレーム』の記録です。公演は東京・下北沢の街そのものを会場に、2026年7月より開催しています。</p>
+
+<h2 class="sec">公演概要</h2>
+<p class="p">『ロスト・フレーム』は、下北沢の街を実際に歩きながら、この公演のためだけに描かれた絵画と物語に出会い、絵画に埋め込まれた図像や作中言語を読み解いていく、参加型の絵画鑑賞の公演です。</p>
+<p class="p">古着と音楽、演劇とアート。多様な文化が調和する街、下北沢。しかし最近、奇妙な出来事が目撃されている——絵画のモチーフが、街にこぼれるように現れはじめたのだ。参加者は街に点在する場所を巡り、登場人物と実際に言葉を交わしながら、絵画の側から立ち上がる物語に立ち会います。観客の選択によって、物語は異なる結末へと分岐します。</p>
+<p class="li">・所要時間：{LOST_FRAME.duration}</p>
+<p class="li">・定員：1組{LOST_FRAME.capacity}</p>
+<p class="li">・エリア：{LOST_FRAME.area}</p>
+
+<h2 class="sec">公演で用いられた絵画</h2>
+<p class="p">街に散らばった「絵画」たち。いずれも本公演のために描き下ろされた手描きの作品です。</p>
+{LOST_FRAME_ARTS.map((a) => (
+  <figure class="fig m0"><img class="figimg" src={a.src} alt={a.alt} width={a.width} height={a.height} loading="lazy"><figcaption class="cap">{a.caption}</figcaption></figure>
+))}
+<p class="cr">絵画：{CREATORS.map((c) => c.name).join('／')}（敬称略・順不同）</p>
+
+<h2 class="sec" id="record">公演の記録</h2>
+<p class="p">登場人物との対話や物語の結末を含む公演の全記録は、note にて公開しています。</p>
+<p class="p" style="text-align:center"><a class="btn" href={LOST_FRAME.noteUrl} target="_blank" rel="noopener">note で公演の記録を読む ↗</a></p>
+
+<h2 class="sec">クレジット</h2>
+<p class="cr">企画：株式会社ex Labs<br>ディレクター・デザイン・ストーリー制作：荒巻まりの<br>プロデューサー・図像設計：かるら<br>監修：御湯波ライト<br>絵画：{CREATORS.map((c) => c.name).join('／')}</p>
+<p class="p">本公演は現在も参加を受け付けています。<a href={TICKET_URL} target="_blank" rel="noopener">お申し込みページ（escape.id）</a>からご希望の日時をお選びください。</p>
+</article>
+
+<nav class="bottomnav">
+  <a class="btn" href={LOST_FRAME.path}>『ロスト・フレーム』公演ページを見る</a>
+  <a class="btn" href="/game/null-arden/">第1回公演『ヌル・アーデン展』のネタバレを見る</a>
+  <a class="btn" href="/game/">イベント一覧へ戻る</a>
+</nav>
+</div>
+
+<script is:inline>
+  (function () {
+    var gate = document.getElementById('gate');
+    var article = document.getElementById('article');
+    var btn = document.getElementById('revealBtn');
+    if (btn && gate && article) {
+      btn.addEventListener('click', function () {
+        gate.hidden = true;
+        article.hidden = false;
+        window.scrollTo(0, 0);
+      });
+    }
+  })();
+</script>
+<noscript><style>#gate{display:none}#article{display:block !important}</style></noscript>
+</GameLayout>

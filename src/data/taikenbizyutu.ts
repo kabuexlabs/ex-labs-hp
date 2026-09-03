@@ -15,8 +15,10 @@ export const LOST_FRAME = {
   nameEn: 'Lost Frame',
   path: `${TB_BASE}/lostframe/`,
   ticketUrl: TICKET_URL,
-  /** ネタバレを含む公演記録 (note)。/game/ の一覧カードと同じ URL */
+  /** ネタバレを含む公演記録 (note)。本サイト内の記録ページ (/game/lost-frame/) からも案内する */
   noteUrl: 'https://note.com/kabuexlabs/n/ndab98d511651',
+  /** 本サイト内のネタバレ記録ページ */
+  spoilerPath: '/game/lost-frame/',
   /** PR TIMES のリリース記事 (2026-07-07 公開) */
   pressUrl: 'https://prtimes.jp/main/html/rd/p/000000001.000185770.html',
   /** 公開日。PR TIMES のリリース日 (リリース＝公演開始) を採用している */
@@ -38,6 +40,36 @@ export const LOST_FRAME = {
   description:
     '下北沢の街に散らばった絵画を探し、隠された物語を辿る——絵画と街が交差する、街を巡る参加型の絵画鑑賞。観客の選択によって物語は異なる結末へと分岐する。',
 } as const;
+
+/** ART セクション・ネタバレ記録ページに載せる絵画 */
+export interface TbArt {
+  src: string;
+  /** 画像の説明 (alt)。作品名が判明したら caption を作品名に置き換える */
+  alt: string;
+  /** 表示キャプション。例: '《星の作者》 ─ ヌル・アーデン' */
+  caption: string;
+  /** 画像の実寸 (レイアウトシフト防止用) */
+  width: number;
+  height: number;
+}
+
+// 『ロスト・フレーム』で用いられた絵画。
+// TODO: 作品名・作者名が確定したら caption を「《作品名》 ─ ロスト・フレーム」に更新する。
+export const LOST_FRAME_ARTS: TbArt[] = [
+  { src: '/assets/taikenbizyutu/lf-art-1.webp', alt: 'ランタンが灯る青い石畳の回廊に立つ、帽子をかぶった人物の白いシルエット', caption: 'ロスト・フレーム', width: 949, height: 1140 },
+  { src: '/assets/taikenbizyutu/lf-art-2.webp', alt: '白いヴェールをまとい、蝶に囲まれて祈るように手を組む少女。頭上には光を放つ小さな人影', caption: 'ロスト・フレーム', width: 1074, height: 1332 },
+  { src: '/assets/taikenbizyutu/lf-art-3.webp', alt: '金箔の背景に線描の風景が浮かぶ、深紅の服を着た短髪の人物の肖像', caption: 'ロスト・フレーム', width: 1089, height: 1400 },
+  { src: '/assets/taikenbizyutu/lf-art-4.webp', alt: '青い背景に置かれた白い花瓶、赤いりんご、ぶどう、白い円盤の静物画', caption: 'ロスト・フレーム', width: 1400, height: 969 },
+  { src: '/assets/taikenbizyutu/lf-art-5.webp', alt: '青と金の風船が並ぶ縁日の屋台に、白いシルエットの人物が駆け込むペン画', caption: 'ロスト・フレーム', width: 1400, height: 1091 },
+];
+
+/** 『ヌル・アーデン展』で用いられた絵画 */
+export const NULL_ARDEN_ARTS: TbArt[] = [
+  { src: '/assets/taikenbizyutu/art-hoshi-no-sakusha.webp', alt: '星の作者', caption: '《星の作者》 ─ ヌル・アーデン', width: 0, height: 0 },
+  { src: '/assets/taikenbizyutu/art-ao-no-uragawa.webp', alt: '青の裏側', caption: '《青の裏側》 ─ ヌル・アーデン', width: 0, height: 0 },
+  { src: '/assets/taikenbizyutu/art-shita-kara-ai.webp', alt: '下から藍', caption: '《下から藍》 ─ ヌル・アーデン', width: 0, height: 0 },
+  { src: '/assets/taikenbizyutu/art-sayuu.webp', alt: '左右', caption: '《左右》 ─ ヌル・アーデン', width: 0, height: 0 },
+];
 
 /** 絵画クリエイター (敬称略・順不同) */
 export const CREATORS = [

@@ -75,6 +75,7 @@ const STATIC_PATHS = [
   '/game/',
   '/game/null-arden/',
   '/game/auction/',
+  '/game/lost-frame/',
   '/uwasabanashi/',
   '/anator/',
   '/kaitou/',
@@ -135,6 +136,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/media/': '2026-08-07',
     '/taikenbizyutu/': '2026-09-03',
     '/taikenbizyutu/lostframe/': '2026-09-03',
+    '/game/lost-frame/': '2026-09-03',
   };
   for (const [p, d] of Object.entries(STATIC_LASTMOD)) {
     const u = urls.find((x) => x.loc.endsWith(p));
