@@ -66,7 +66,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
   <script type="application/ld+json" set:html={jsonLd(eventLd)} />
 </Fragment>
 
-{/* ---------- HERO：上半分は墨、下半分は灰紫。キービジュアルが境界をまたぐ ---------- */}
+{/* ---------- HERO：上半分は生成り、下半分は空色。キービジュアルが境界をまたぐ ---------- */}
 <section id="top" class="hero">
   <div class="hero-top">
     <div class="herox hero-el e0"><span>絵&nbsp;画</span><span class="xmark">×</span><span>体&nbsp;験</span><span class="xmark">×</span><span>交&nbsp;流</span></div>
@@ -88,8 +88,8 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
   </div>
 </div>
 
-{/* ---------- CONCEPT（藍）：ずらし組みの見出しとステートメント ---------- */}
-<section id="concept" class="sec bg-navy">
+{/* ---------- CONCEPT（松葉）：ずらし組みの見出しとステートメント ---------- */}
+<section id="concept" class="sec bg-moss">
   <div class="wrapc">
     <h2 class="stag rv"><span>鑑賞するアートから、</span><span>体験するアートへ。</span><span>絵画の側から立ち上がる時間。</span></h2>
     <div class="concept-body rv d1">
@@ -100,7 +100,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 </section>
 
 {/* ---------- WORKS（葡萄）：大判見出しと額装ポスターのコラージュ ---------- */}
-<section id="works" class="sec bg-plum">
+<section id="works" class="sec bg-rust">
   <div class="wrapc">
     <p class="kicker rv">Works</p>
     <h2 class="disp rv d1">Works</h2>
@@ -133,7 +133,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 </section>
 
 {/* ---------- NEWS（生成り） ---------- */}
-<section id="news" class="sec bg-cream">
+<section id="news" class="sec bg-paper">
   <div class="wrapc">
     <p class="kicker rv">News</p>
     <h2 class="disp rv d1">News</h2>
@@ -156,7 +156,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 </section>
 
 {/* ---------- 最新公演（墨） ---------- */}
-<section id="lostframe" class="sec bg-char">
+<section id="lostframe" class="sec bg-ink">
   <div class="wrapc">
     <div class="evgrid">
       <div class="rv"><span class="mat"><img src={`${assets}/lost-frame.webp`} alt="ロスト・フレーム キービジュアル" width="900" height="1281" loading="lazy"></span></div>
@@ -188,7 +188,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 </section>
 
 {/* ---------- ABOUT（生成り）：リング状テキストの円形ブロック ---------- */}
-<section id="about" class="sec bg-cream about">
+<section id="about" class="sec bg-paper about">
   <div class="wrapc">
     <div class="ring rv">
       <div class="disc">
@@ -225,7 +225,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 </section>
 
 {/* ---------- MODEL（灰）：テキスト主体の案内 ---------- */}
-<section id="model" class="sec bg-grey">
+<section id="model" class="sec bg-sand">
   <div class="wrapc">
     <p class="kicker rv">Model</p>
     <h2 class="h2 rv d1"><span class="nobr">地域とクリエイターをつなぐ、</span><span class="nobr">新たなモデル</span></h2>
@@ -250,7 +250,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 </section>
 
 {/* ---------- CREATORS ＋ ART（葡萄）：コレクション風のコラージュ ---------- */}
-<section id="creators" class="sec bg-plum" style="padding-bottom:0">
+<section id="creators" class="sec bg-rust" style="padding-bottom:0">
   <div class="wrapc">
     <p class="kicker rv">Creators</p>
     <h2 class="h2 rv d1">絵画クリエイター</h2>
@@ -264,7 +264,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
   </div>
 </section>
 
-<section id="art" class="sec bg-plum">
+<section id="art" class="sec bg-rust">
   <div class="wrapc">
     <p class="kicker rv">Art</p>
     <h2 class="disp rv d1">Art<br>Collection</h2>
@@ -282,7 +282,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 </section>
 
 {/* ---------- FAQ（生成り） ---------- */}
-<section id="faq" class="sec bg-cream">
+<section id="faq" class="sec bg-paper">
   <div class="wrapc" style="max-width:860px">
     <p class="kicker rv">FAQ</p>
     <h2 class="h2 rv d1">よくある質問</h2>
@@ -303,7 +303,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 </section>
 
 {/* ---------- CONTACT（墨） ---------- */}
-<section id="contact" class="sec bg-char">
+<section id="contact" class="sec bg-ink">
   <div class="wrapc tc">
     <p class="kicker rv">Contact</p>
     <h2 class="h2 rv d1">お問い合わせ</h2>
@@ -320,21 +320,21 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 
 <style>
 /* ---- HERO ---- */
-.hero{position:relative;background:var(--char);text-align:center;overflow:hidden}
-.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46%;background:var(--mauve);z-index:0}
+.hero{position:relative;background:var(--paper);text-align:center;overflow:hidden;--fg:#24262a;--fg2:#6b665c}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46%;background:var(--sky);z-index:0}
 .hero>*{position:relative;z-index:1}
 .hero-top{padding:128px 24px 48px}
 .heromark-h1{margin:0;line-height:0;font-size:inherit;font-weight:inherit}
-.heromark{width:min(420px,66vw);height:auto}
-.herox{font-size:14px;letter-spacing:.3em;color:#cfc8bc;display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:28px}
-.xmark{color:var(--gold);font-size:11px}
-.herolead{font-size:17px;letter-spacing:.24em;color:#ece7df;margin-top:32px !important}
+.heromark{width:min(420px,66vw);height:auto;filter:invert(1) brightness(.2)}
+.herox{font-size:14px;letter-spacing:.3em;color:#4d4a45;display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:28px}
+.xmark{color:var(--rust);font-size:11px}
+.herolead{font-size:17px;letter-spacing:.24em;color:#24262a;margin-top:32px !important}
 .hero .note{margin-top:10px !important}
 .hero-kv{padding:0 24px 56px}
-.hero-kv img{display:block;width:min(440px,78vw);height:auto;margin:0 auto;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.hero-kv img{display:block;width:min(440px,78vw);height:auto;margin:0 auto;box-shadow:0 18px 48px rgba(30,34,36,.35)}
 .hero-kv a:hover{opacity:1}
 /* 絵画3点の帯 */
-.strip{background:#c9c6c6;padding:26px 22px}
+.strip{background:var(--ink);padding:26px 22px}
 .strip-in{display:grid;grid-template-columns:repeat(3,1fr);gap:0;max-width:1120px;margin:0 auto}
 .strip-item{display:block;aspect-ratio:3/4;overflow:hidden}
 .strip-item img{width:100%;height:100%;object-fit:cover;display:block}
@@ -353,9 +353,9 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 .work-up{margin-top:-150px}
 .work-body{padding:26px 4px 4px}
 .ewtitle{font-size:26px;font-weight:500;letter-spacing:.14em;margin:16px 0 0;line-height:1.4;color:var(--fg)}
-.ewsub{font-size:17px;color:var(--gold);letter-spacing:.08em}
+.ewsub{font-size:17px;color:var(--accent);letter-spacing:.08em}
 .artlink{display:flex;gap:14px;align-items:baseline;padding:14px 2px;border-bottom:1px solid var(--line);font-size:14px;letter-spacing:.06em;color:var(--fg)}
-.arw{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold)}
+.arw{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--accent)}
 a.mat:hover{opacity:.9}
 
 /* ---- NEWS ---- */
@@ -366,7 +366,7 @@ a.mat:hover{opacity:.9}
 /* ---- 最新公演 ---- */
 .soldbtn{border-color:#b56a62;color:#d08a80;cursor:default}
 .evtitle{font-size:48px;font-weight:400;letter-spacing:.12em;margin:18px 0 0;line-height:1.3;color:var(--fg)}
-.evsub{font-size:24px;color:var(--gold);letter-spacing:.06em;margin:2px 0 0}
+.evsub{font-size:24px;color:var(--accent);letter-spacing:.06em;margin:2px 0 0}
 .story{font-size:15.5px;letter-spacing:.06em;color:#d8d2c6}
 .dl{border-top:1px solid var(--line)}
 .dlrow{display:grid;grid-template-columns:130px 1fr;gap:16px;padding:14px 2px;border-bottom:1px solid var(--line);font-size:14px;letter-spacing:.06em}
@@ -374,10 +374,10 @@ a.mat:hover{opacity:.9}
 .evgrid{display:grid;grid-template-columns:400px 1fr;gap:72px;align-items:start}
 
 /* ---- ABOUT（円形） ---- */
-.ring{background:#101010;padding:clamp(24px,6vw,72px)}
-.disc{position:relative;width:min(760px,100%);aspect-ratio:1;margin:0 auto;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center}
+.ring{background:var(--ink);padding:clamp(24px,6vw,72px)}
+.disc{position:relative;width:min(760px,100%);aspect-ratio:1;margin:0 auto;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center}
 .ringtxt{position:absolute;inset:0;width:100%;height:100%}
-.ringtxt text{font-family:'Cormorant Garamond',serif;font-size:34px;letter-spacing:.1em;fill:#2b2926}
+.ringtxt text{font-family:'Cormorant Garamond',serif;font-size:34px;letter-spacing:.1em;fill:#24262a}
 .disc-in{position:relative;text-align:center;padding:0 16%}
 .disc-lead{font-size:14.5px;letter-spacing:.06em;line-height:2.1;margin:22px 0 0;color:#3a3632}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:44px}

@@ -129,26 +129,26 @@ const orgLd = {
 </div>
 
 <style is:global>
-/* ---- palette (川久ミュージアム風の色面構成) ---- */
+/* ---- palette (体験する美術館の独自配色：生成り・青墨・松葉・弁柄・砂・真鍮) ---- */
 :root{
-  --char:#1c1c1c;   /* 墨 */
-  --mauve:#6c6069;  /* ヒーロー下部の灰紫 */
-  --navy:#1b2a57;   /* 藍 */
-  --plum:#3a2a37;   /* 葡萄 */
-  --cream:#f6efe8;  /* 生成り */
-  --grey:#8c8a8a;   /* 灰 */
-  --mat:#8a8288;    /* 額装マット */
-  --gold:#c9b98a;   /* 金 */
-  --fg:#ece7df; --fg2:#b9b2a7; --accent:#c9b98a; --line:rgba(236,231,223,.14);
+  --ink:#1e2224;    /* 青墨 */
+  --sky:#a9bfcb;    /* ロスト・フレームの空色 (ヒーロー下帯) */
+  --moss:#24413a;   /* 松葉 */
+  --rust:#7d3a2c;   /* 弁柄 */
+  --paper:#efe8da;  /* 生成り */
+  --sand:#cdbfa6;   /* 砂 */
+  --mat:#efe8da;    /* 額装マット (暗い面では生成り) */
+  --brass:#d4b878;  /* 真鍮 */
+  --fg:#ece7df; --fg2:#b3ada3; --accent:#d4b878; --line:rgba(236,231,223,.14); --onaccent:#1e2224;
 }
 html{scroll-behavior:smooth;scroll-padding-top:24px;overflow-x:clip}
-:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-body{margin:0;background:var(--char)}
+:where(a,button,input,textarea,select,summary):focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+body{margin:0;background:var(--ink)}
 a{color:var(--accent);text-decoration:none}
 a:hover{opacity:.75}
-.page{background:var(--char);color:var(--fg);font-family:'Shippori Mincho',serif;-webkit-font-smoothing:antialiased;line-height:1.9;min-height:100vh}
+.page{background:var(--ink);color:var(--fg);font-family:'Shippori Mincho',serif;-webkit-font-smoothing:antialiased;line-height:1.9;min-height:100vh}
 .en{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400}
-.gold{color:var(--gold)}
+.gold{color:var(--accent)}
 .muted{color:var(--fg2)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .fx{display:flex}.col{display:flex;flex-direction:column}.ac{align-items:center}.jc{justify-content:center}.jb{justify-content:space-between}
@@ -159,19 +159,19 @@ a:hover{opacity:.75}
 .wrapc{max-width:1120px;margin:0 auto;padding:0 36px}
 /* 色面セクション。--fg 等を切り替えるだけで内側のクラスが追従する */
 .sec{padding:120px 0;color:var(--fg);position:relative}
-.bg-char{background:var(--char);--fg:#ece7df;--fg2:#b9b2a7;--accent:#c9b98a;--line:rgba(236,231,223,.14)}
-.bg-navy{background:var(--navy);--fg:#ece7df;--fg2:#c3c6d6;--accent:#c9b98a;--line:rgba(236,231,223,.18)}
-.bg-plum{background:var(--plum);--fg:#ece7df;--fg2:#c9bfc4;--accent:#c9b98a;--line:rgba(236,231,223,.16)}
-.bg-cream{background:var(--cream);--fg:#2b2926;--fg2:#6f6862;--accent:#8a7a4e;--line:rgba(43,41,38,.16)}
-.bg-grey{background:var(--grey);--fg:#f4f1ee;--fg2:#e6e1dc;--accent:#fbf7f2;--line:rgba(255,255,255,.28)}
+.bg-ink{background:var(--ink);--fg:#ece7df;--fg2:#b3ada3;--accent:#d4b878;--line:rgba(236,231,223,.14);--onaccent:#1e2224;--mat:#efe8da}
+.bg-moss{background:var(--moss);--fg:#ece9de;--fg2:#b9c4bb;--accent:#d4b878;--line:rgba(236,233,222,.18);--onaccent:#24413a;--mat:#efe8da}
+.bg-rust{background:var(--rust);--fg:#f3e9dc;--fg2:#dcc8b8;--accent:#e8c98a;--line:rgba(243,233,220,.2);--onaccent:#7d3a2c;--mat:#efe8da}
+.bg-paper{background:var(--paper);--fg:#24262a;--fg2:#6b665c;--accent:#7d3a2c;--line:rgba(36,38,42,.16);--onaccent:#fff;--mat:#d9cfbb}
+.bg-sand{background:var(--sand);--fg:#2b2926;--fg2:#5c554b;--accent:#7d3a2c;--line:rgba(43,41,38,.22);--onaccent:#fff;--mat:#efe8da}
 .hairtop{border-top:1px solid var(--line)}
 .kicker{font-size:12px;letter-spacing:.3em;color:var(--accent);text-transform:uppercase;font-family:'Cormorant Garamond',serif;font-weight:500}
 .h2{font-size:30px;font-weight:400;letter-spacing:.16em;margin:14px 0 0;line-height:1.6;color:var(--fg)}
 /* 大判の英字見出し (OWNER'S COLLECTION 風) */
-.disp{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(48px,12.5vw,190px);line-height:.92;letter-spacing:-.01em;color:var(--gold);text-transform:uppercase;margin:0;text-wrap:balance}
+.disp{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(48px,12.5vw,190px);line-height:.92;letter-spacing:-.01em;color:var(--accent);text-transform:uppercase;margin:0;text-wrap:balance}
 .lead{font-size:16px;letter-spacing:.08em;line-height:2.2}
 /* 3行を少しずつずらして組む見出し */
-.stag{font-size:clamp(22px,4.6vw,56px);font-weight:400;letter-spacing:.06em;line-height:1.45;color:var(--gold);margin:0}
+.stag{font-size:clamp(22px,4.6vw,56px);font-weight:400;letter-spacing:.06em;line-height:1.45;color:var(--accent);margin:0}
 .stag span{display:block}
 .stag span:nth-child(2){padding-left:1.2em}
 .stag span:nth-child(3){padding-left:2.6em}
@@ -190,38 +190,39 @@ a:hover{opacity:.75}
 }
 /* 円形のリンク (MORE) */
 .circ{display:inline-flex;align-items:center;justify-content:center;width:168px;height:168px;border:1px solid currentColor;border-radius:50%;font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:.14em;color:var(--fg);transition:background .3s,color .3s}
-.circ:hover{background:var(--fg);color:var(--navy);opacity:1}
+.circ:hover{background:var(--fg);color:var(--moss);opacity:1}
 /* 固定ヘッダー：小ロゴ + 丸いメニューボタン */
 .hdr{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;pointer-events:none}
 .hdr>*{pointer-events:auto}
-.hbrand img{height:26px;width:auto;display:block;filter:drop-shadow(0 1px 6px rgba(0,0,0,.5))}
-.menub{margin-left:auto;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px;width:56px;height:56px;border-radius:50%;background:rgba(28,28,28,.92);border:1px solid rgba(255,255,255,.08);cursor:pointer;padding:0;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+.hbrand{display:block;background:rgba(30,34,36,.88);padding:9px 14px;border-radius:999px}
+.hbrand img{height:22px;width:auto;display:block}
+.menub{margin-left:auto;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px;width:56px;height:56px;border-radius:50%;background:rgba(30,34,36,.92);border:1px solid rgba(255,255,255,.08);cursor:pointer;padding:0;box-shadow:0 4px 18px rgba(0,0,0,.25)}
 .menub span{display:block;width:22px;height:1px;background:#fff;transition:transform .3s,opacity .3s}
 .menub.x span:nth-child(1){transform:translateY(4px) rotate(45deg)}
 .menub.x span:nth-child(2){transform:translateY(-4px) rotate(-45deg)}
-.mnav{position:fixed;inset:0;z-index:49;background:rgba(28,28,28,.97);display:none;padding:96px 24px 48px;overflow-y:auto}
+.mnav{position:fixed;inset:0;z-index:49;background:rgba(30,34,36,.97);display:none;padding:96px 24px 48px;overflow-y:auto}
 .mnav.open{display:block}
 .mnav-in{max-width:520px;margin:0 auto;display:flex;flex-direction:column}
 body.noscroll{overflow:hidden}
 .mitem{display:block;color:#ece7df;padding:16px 0;border-bottom:1px solid rgba(236,231,223,.1)}
 .mitem-en{font-family:'Cormorant Garamond',serif;font-size:34px;letter-spacing:.08em;line-height:1.1}
-.mitem.gold{color:var(--gold)}
+.mitem.gold{color:var(--brass)}
 .badge{display:inline-block;border:1px solid var(--accent);color:var(--accent);font-size:11px;letter-spacing:.3em;padding:5px 14px}
 .sold{display:inline-block;border:1px solid #b56a62;color:#d08a80;font-size:11px;letter-spacing:.3em;padding:5px 14px}
 .poster{width:100%;height:auto;display:block}
 .pshadow{box-shadow:0 12px 36px rgba(0,0,0,.35)}
 .note{font-size:12.5px;color:var(--fg2);letter-spacing:.04em}
 .bigx{display:inline-block;border:1px solid var(--accent);color:var(--accent);font-size:13px;letter-spacing:.3em;padding:16px 42px}
-.bigx:hover{background:var(--accent);color:var(--char);opacity:1}
+.bigx:hover{background:var(--accent);color:var(--onaccent);opacity:1}
 .card3{border-top:1px solid var(--line);padding-top:26px}
 .h3{font-size:19px;font-weight:500;letter-spacing:.1em;margin:16px 0 10px;line-height:1.7;color:var(--fg)}
 .body14{font-size:14px;color:var(--fg2);letter-spacing:.04em}
 .ctitle{font-size:15px;letter-spacing:.2em;color:var(--fg)}
 .cdesc{font-size:13px;color:var(--fg2);letter-spacing:.05em}
-.ftr{background:var(--char);border-top:1px solid rgba(236,231,223,.1);padding:64px 0 56px;color:#ece7df}
+.ftr{background:var(--ink);border-top:1px solid rgba(236,231,223,.1);padding:64px 0 56px;color:#ece7df}
 .flogo{height:30px;width:auto;opacity:.9}
 .fsmall{font-size:12px;color:#8f887e;letter-spacing:.1em}
-.ftr a{color:#c9b98a}
+.ftr a{color:var(--brass)}
 /* スクロール連動フェードイン */
 .rv{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
 .rv.on{opacity:1;transform:none}
