@@ -1,0 +1,190 @@
+---
+// 「ハロウィン イベント 企画」「商業施設 ハロウィン イベント」「ハロウィン 謎解き」
+// 「ハロウィン 社内イベント」系の季節需要（9〜10月）を先取りする施設活用スポーク。
+// 季節イベント記事（/guide/kisetsu-event/）が1.5位でクリックを取り始めているため、
+// ハロウィン単体の受け皿を新設し、施設活用サービスへ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+
+const toc = [
+  { id: 'why', label: 'ハロウィンイベントが「体験型」に向かう理由' },
+  { id: 'shisetsu', label: '商業施設・店舗向けの企画アイデア' },
+  { id: 'shanai', label: '社内・団体向けの企画アイデア' },
+  { id: 'schedule', label: '準備スケジュール（2026年版）' },
+  { id: 'point', label: '成功させる3つのポイント' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'ハロウィンイベントの企画はいつから準備すればいいですか？',
+    a: '10月末の開催なら、遅くとも9月中旬までに企画を確定するのが目安です。オリジナルの謎解きや物語体験を制作する場合は制作・テストプレイに1〜2ヶ月かかるため、8〜9月の着手が理想です。既存コンテンツをハロウィン仕様にする形なら、9月後半からでも間に合います。',
+  },
+  {
+    q: '商業施設のハロウィンイベントで集客に効く企画は？',
+    a: '装飾を「見る」だけでなく、館内を巡る周遊型の謎解きやミステリー体験など「参加する」企画が集客・回遊・滞在時間に効きます。仮装コンテストやフォトスポットと組み合わせると、家族層とSNS世代の両方を取り込めます。',
+  },
+  {
+    q: '費用を抑えてハロウィンイベントを開催できますか？',
+    a: '株式会社ex Labsは、チケット売上などに応じてお支払いいただくレベニューシェア型に対応しており、案件によっては施設側の初期費用0円または格安で開催できます。既存の装飾をそのまま「物語の舞台」として活用する設計なら、追加の造作費も抑えられます。',
+  },
+  {
+    q: '社内のハロウィンイベントを盛り上げるには？',
+    a: '仮装だけで終わらせず、当日限定のミッションやチーム対抗の謎解き・心理戦ゲームを乗せると参加率が上がります。全員に役割がある構造にするのがポイントで、部署を越えた交流も生まれます。',
+  },
+  {
+    q: 'ハロウィンイベントの企画・制作を依頼できますか？',
+    a: 'できます。商業施設・店舗・企業向けに、ハロウィンをテーマにした周遊型謎解き・イマーシブ体験・マダミス公演などを企画から運営まで一貫して制作しています。ご相談・お見積りは無料です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'ハロウィンイベントの企画アイデア12選【2026年】｜商業施設・店舗・社内で集客・盛り上がる体験型企画',
+  about: 'ハロウィンイベントの企画アイデア（商業施設・店舗・社内向け）',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/halloween-event.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-04',
+  dateModified: '2026-09-04',
+  mainEntityOfPage: new URL('/guide/halloween-event/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="ハロウィンイベントの企画アイデア12選【2026年】｜商業施設・店舗・社内で盛り上がる体験型企画 - 株式会社ex Labs"
+  description="【2026年版】ハロウィンイベントの企画アイデアを商業施設・店舗向け7つ、社内・団体向け5つの計12選で紹介。装飾を「見る」から「体験する」に変える周遊型謎解き・ミステリー・仮装企画、準備スケジュール、費用を抑える方法まで、施設一体型イベント（日経掲載）を手がける制作会社が解説します。"
+  ogImage="/assets/guide/halloween-event.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '施設活用イベントとは', href: '/guide/shisetsu-katsuyo/' },
+  { name: 'ハロウィンイベントの企画アイデア' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">HALLOWEEN 2026</p>
+<h1 class="h2 serif"><span class="nobr">ハロウィンイベントの</span><span class="nobr">企画アイデア12選【2026年】</span><br><span class="nobr">商業施設・店舗・社内で</span><span class="nobr">盛り上がる体験型企画</span></h1>
+<p class="lede"><strong>ハロウィンは、1年で最も「参加したい気分」が高まる季節</strong>です。仮装・お菓子・おばけ——参加者側にすでに「乗る準備」ができているため、ちょっとした仕掛けで大きく盛り上がります。この記事では、商業施設・店舗向けと社内・団体向けに分けて計12の企画アイデアと、2026年の準備スケジュール、費用を抑える方法を、渋谷サクラステージでの施設一体型イベント（日本経済新聞掲載）を手がけた株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="why"><div class="wrap narrow">
+<p class="eyebrow">WHY</p><h2 class="h2 serif">ハロウィンイベントが「体験型」に向かう理由</h2>
+<ul class="bullets">
+<li><strong>装飾だけでは差がつかない</strong>：かぼちゃ・おばけ・オレンジ色の装飾はどの施設にもあります。写真を撮って終わりでは、来館の決め手にも回遊にもなりません。</li>
+<li><strong>参加者が「乗る準備」をしている</strong>：ハロウィンは仮装や役割を演じることへの心理的ハードルが1年で最も低い時期。謎解き・ミステリー・イマーシブなど「物語に参加する企画」が最も受け入れられます。</li>
+<li><strong>毎年の定番資産にできる</strong>：「あの施設のハロウィン謎解き」が恒例になれば、季節が集客の予定表に組み込まれます。<a href="/guide/kisetsu-event/" style="color:var(--accent)">季節イベントを体験型にする効果 →</a></li>
+</ul>
+</div></section>
+
+<section class="section" id="shisetsu"><div class="wrap narrow">
+<p class="eyebrow">FOR FACILITIES</p><h2 class="h2 serif">商業施設・店舗向けの企画アイデア7選</h2>
+<ul class="bullets">
+<li><strong>①館内周遊×ハロウィンミステリー</strong>：「施設に現れたおばけの正体を追う」周遊型謎解き。手がかりを各フロア・各店舗に配置し、回遊とテナント送客を同時に設計します。<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントの仕組み →</a></li>
+<li><strong>②ナイトハロウィン（閉店後開催）</strong>：営業終了後の暗い館内を舞台にした特別公演。「普段は入れない時間の施設」という非日常性が、ハロウィンの雰囲気と最も相性の良い企画です。<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の活用 →</a></li>
+<li><strong>③仮装×ミッションラリー</strong>：仮装した参加者に「館内で◯◯を見つける」「店員さんに合言葉を言う」などのミッションを配布。仮装コンテストと組み合わせると家族層に強い企画になります。</li>
+<li><strong>④空き区画の「お化け屋敷型」体験拠点</strong>：空きテナント区画を物語の本部や屋敷に見立てた体験拠点に。遊休区画が期間限定の目的地に変わります。<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用 →</a></li>
+<li><strong>⑤ハロウィン限定マダミス公演</strong>：館内のカフェ・レストランを舞台にした短時間のマーダーミステリー。飲食とセットで客単価も伸ばせます。</li>
+<li><strong>⑥催事・ポップアップ枠の体験型化</strong>：物販のハロウィン催事に、参加型の謎やスタンプラリーを重ねる「ハイブリッド催事」。<a href="/guide/saiji/" style="color:var(--accent)">催事とは →</a>／<a href="/guide/popup-event/" style="color:var(--accent)">ポップアップイベントとは →</a></li>
+<li><strong>⑦SNS投稿ミッション</strong>：館内のフォトスポットでの撮影・投稿を物語のミッションに組み込み、参加者の投稿で認知を広げます。</li>
+</ul>
+<p class="vc-line"><a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベントアイデア10選 →</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談（無料）→</a></p>
+</div></section>
+
+<section class="section tinted" id="shanai"><div class="wrap narrow">
+<p class="eyebrow">FOR COMPANIES</p><h2 class="h2 serif">社内・団体向けの企画アイデア5選</h2>
+<ul class="bullets">
+<li><strong>⑧仮装＋当日限定ミッション</strong>：仮装だけで終わらせず、「他部署の人と写真を撮る」「◯◯な人を探す」などの小ミッションを配布。参加率が跳ね上がります。</li>
+<li><strong>⑨チーム対抗ハロウィン謎解き</strong>：会議室で実施できる短時間の謎解き。協力必須の構造で、部署を越えた会話が自然に生まれます。<a href="/guide/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修とは →</a></li>
+<li><strong>⑩心理戦・人狼系ゲーム大会</strong>：「正体を隠す」テーマはハロウィンと好相性。読み合いの熱狂で懇親会の目玉になります。<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類と選び方 →</a></li>
+<li><strong>⑪オフィスを舞台にしたストーリー体験</strong>：「オフィスに現れた怪異の正体を突き止める」など、自社を舞台にした物語で特別感を演出。</li>
+<li><strong>⑫オンライン・多拠点同時のハロウィン企画</strong>：全国の拠点をつないで同じミッションに挑戦。リモートメンバーの疎外感を解消します。<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア20選 →</a></li>
+</ul>
+</div></section>
+
+<section class="section" id="schedule"><div class="wrap narrow">
+<p class="eyebrow">SCHEDULE</p><h2 class="h2 serif">準備スケジュール（2026年版）</h2>
+<ul class="bullets">
+<li><strong>9月上旬〜中旬：企画確定</strong>：目的（集客・回遊・懇親）、規模、予算、形式を決めます。オリジナル制作はここが着手のデッドラインです。</li>
+<li><strong>9月下旬：制作・テストプレイ</strong>：謎・物語・ミッションの制作と試遊。既存コンテンツのハロウィン仕様化ならこの時期からでも間に合います。</li>
+<li><strong>10月上旬：告知開始</strong>：施設サイト・SNS・館内掲示で告知。装飾の設置と合わせて「体験できる」ことを前面に。</li>
+<li><strong>10月中旬〜31日：開催</strong>：週末を中心に、期間中は何度でも参加できる設計に。10月31日当日は仮装企画のピークです。</li>
+<li><strong>11月：振り返り</strong>：参加数・回遊データ・SNS反応をまとめ、来年の定番化とクリスマス企画への接続を設計。<a href="/guide/kisetsu-event/#christmas" style="color:var(--accent)">クリスマス〜年末年始の企画 →</a></li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="point"><div class="wrap narrow">
+<p class="eyebrow">POINT</p><h2 class="h2 serif">成功させる3つのポイント</h2>
+<ul class="bullets">
+<li><strong>①装飾を「舞台」に変える</strong>：すでにある装飾を物語の手がかりや舞台装置として使うと、追加の造作費なしで体験の密度が上がります。</li>
+<li><strong>②「参加のしやすさ」を最優先</strong>：仮装なし・予約なしでも参加できる入口を用意し、深く楽しみたい人向けの公演型を別に置く二段構えが効きます。</li>
+<li><strong>③運営を施設・担当者に背負わせない</strong>：企画・制作・当日運営まで一貫して外部に任せると、担当者は当日を楽しめます。株式会社ex Labsは<strong>レベニューシェア型（初期費用0円または格安）</strong>を含む柔軟な形で対応しています。</li>
+</ul>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">ハロウィンイベントの企画・制作のご相談はこちら（無料）</p>
+<a class="btn" href="/services/shisetsu-event/">施設活用イベントサービスを見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/kisetsu-event/" style="color:var(--accent)">商業施設の季節イベント企画</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベントアイデア10選</a>／<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア20選</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#why,#shisetsu,#shanai,#schedule,#point,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

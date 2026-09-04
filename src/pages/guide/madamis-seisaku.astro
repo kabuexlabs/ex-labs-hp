@@ -1,0 +1,224 @@
+---
+// 「マダミス制作」「マーダーミステリー 制作」「マダミス 制作 依頼」系の
+// 商用クエリの受け皿。イマーシブ制作で成功した「制作とは？」型の解説記事を
+// マダミスに横展開し、制作依頼のサービスページ（/services/murder-mystery/）へ
+// 票を集約する。実績は宿泊施設向け制作（新規予約20件超）・オンライン作品・
+// 東大マダミス作品など、サイト内で既に公開している事実のみを使う。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+
+const toc = [
+  { id: 'about', label: 'マダミス制作とは' },
+  { id: 'types', label: '制作の種類（目的別4タイプ）' },
+  { id: 'flow', label: '制作依頼の流れ7ステップ' },
+  { id: 'cost', label: '費用の目安と期間' },
+  { id: 'cases', label: 'マダミス制作の事例' },
+  { id: 'choose', label: '制作会社の選び方' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'マダミス制作とは何をすることですか？',
+    a: 'マーダーミステリー（マダミス）の作品を、企画・シナリオ執筆・キャラクター設計・証拠や小道具の制作・テストプレイ・進行（GM）マニュアル作成まで一貫して作ることです。店舗公演用、企業イベント用、動画企画用、宿泊施設のプラン用など、目的に合わせて形式を設計します。',
+  },
+  {
+    q: 'マダミス制作を依頼するといくらかかりますか？',
+    a: '形式と規模により幅がありますが、目安としてシナリオのみの制作で数十万円台から、キャラクター資料・小道具・GMマニュアル・テストプレイまで含むフルパッケージで100万円前後からが一般的です。店舗集客や宿泊プランなど収益が見込める形式では、チケット売上に応じたレベニューシェア型で初期費用を抑える方法もあります。',
+  },
+  {
+    q: '制作にはどのくらいの期間がかかりますか？',
+    a: '企画確定から完成まで2〜3ヶ月が目安です。テストプレイを複数回行って難易度と時間配分を調整するため、開催日の3ヶ月前までにご相談いただくと余裕を持って制作できます。',
+  },
+  {
+    q: '企業のプロモーションや研修向けにも制作できますか？',
+    a: 'できます。商品・サービスの世界観を物語に織り込んだプロモーション用作品、社内研修・懇親会向けの短時間作品、宿泊施設の体験付きプラン向け作品など、目的に合わせた制作実績があります。',
+  },
+  {
+    q: '制作したマダミスの権利はどうなりますか？',
+    a: '契約により、依頼主が自由に公演・配布できる買い切り型と、当社が権利を持ち公演ごとに使用料が発生する型のどちらも設計できます。継続して公演する予定があるかどうかでご提案します。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const definedTermLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: 'マダミス制作',
+  description:
+    'マダミス制作とは、マーダーミステリー（マダミス）作品を企画・シナリオ執筆・キャラクター設計・証拠や小道具の制作・テストプレイ・進行マニュアル作成まで一貫して作ること。店舗公演・企業イベント・動画企画・宿泊施設プランなど目的に応じて形式を設計する。',
+  inDefinedTermSet: {
+    '@type': 'DefinedTermSet',
+    name: '体験型エンターテインメント用語集',
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  },
+  url: new URL('/guide/madamis-seisaku/', Astro.site).toString(),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'マダミス制作とは？依頼の流れ・費用・制作事例まで完全ガイド',
+  about: 'マダミス（マーダーミステリー）制作の流れ・費用・事例・依頼方法',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/madamis-seisaku.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-04',
+  dateModified: '2026-09-04',
+  mainEntityOfPage: new URL('/guide/madamis-seisaku/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="マダミス制作とは？依頼の流れ・費用・制作事例まで完全ガイド - 株式会社ex Labs"
+  description="マダミス制作（マーダーミステリー制作）とは、企画・シナリオ・キャラクター設計・小道具・テストプレイ・GMマニュアルまでを一貫して作ること。目的別4タイプ、依頼の流れ7ステップ、費用と期間の目安、宿泊施設で新規予約20件超を生んだ制作事例、制作会社の選び方まで、マダミス制作会社が解説します。"
+  ogImage="/assets/guide/madamis-seisaku.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<script type="application/ld+json" set:html={jsonLd(definedTermLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'マダミスとは', href: '/guide/madamis/' },
+  { name: 'マダミス制作とは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">MADAMIS PRODUCTION GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">マダミス制作とは？</span><span class="nobr">依頼の流れ・費用・</span><span class="nobr">制作事例まで完全ガイド</span></h1>
+<div class="def-box">
+<p class="def-word"><span class="serif">マダミス制作</span><span class="def-yomi">マーダーミステリー制作</span></p>
+<p class="def-body">マーダーミステリー（マダミス）の作品を、<strong>企画・シナリオ執筆・キャラクター設計・証拠や小道具の制作・テストプレイ・進行（GM）マニュアル作成</strong>まで一貫して作ること。店舗公演・企業イベント・動画企画・宿泊施設のプランなど、<strong>目的に応じて形式を設計する</strong>のが特徴。</p>
+</div>
+<p class="lede">このページでは、マダミス制作の種類・依頼の流れ・費用と期間・制作事例・制作会社の選び方を、宿泊施設向け作品で新規宿泊予約20件超を生んだ<strong>マダミス制作会社・株式会社ex Labs</strong>が解説します。すでに依頼先を探している方は<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作依頼・お見積り（無料）のページ →</a>へどうぞ。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">マダミス制作とは</h2>
+<p class="lede">マダミス制作とは、<strong>「一度きりの推理体験」を設計する仕事</strong>です。参加者は配られた人物になりきり、会話と推理で真相に迫ります。全員に秘密と目的があり、真相が明かされた瞬間にすべてが繋がる——この体験は、シナリオの整合性・情報配分・時間設計が噛み合って初めて成立します。</p>
+<p class="lede">小説や映像の脚本と違うのは、<strong>「読者」ではなく「登場人物」を相手に書く</strong>こと。プレイヤーがどんな行動をとっても物語が破綻しないよう、証拠の出方・密談の設計・投票の分岐まで作り込む必要があります。だからこそ、<strong>テストプレイを重ねて調整する工程</strong>がマダミス制作の品質を決めます。</p>
+</div></section>
+
+<section class="section" id="types"><div class="wrap">
+<p class="eyebrow">TYPES</p><h2 class="h2 serif">制作の種類（目的別4タイプ）</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">公演型（店舗・イベント）</span><span class="genre-d">マダミス専門店やイベント会場でGM付きで公演する形式。物語性と没入感を最大化でき、リピート公演で収益化できます。</span></div>
+<div class="genre-cell"><span class="genre-t serif">企業・研修型</span><span class="genre-d">懇親会・研修・チームビルディング向けに、短時間（1〜2時間）で全員に見せ場がある構成に。理念や商品を物語に織り込むプロモーション型も。</span></div>
+<div class="genre-cell"><span class="genre-t serif">施設・宿泊プラン型</span><span class="genre-d">宿泊施設・商業施設の「体験付きプラン」として販売。施設の空間そのものを舞台にし、予約・来館の動機を作ります。</span></div>
+<div class="genre-cell"><span class="genre-t serif">動画・オンライン型</span><span class="genre-d">配信企画や動画コンテンツ向けに、視聴者が楽しめる展開と時間配分で設計。オンライン通話で遊べる作品も制作できます。</span></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">制作依頼の流れ7ステップ</h2>
+<ul class="bullets">
+<li><strong>①ヒアリング（無料）</strong>：目的（集客・研修・動画・プラン販売）、人数、時間、予算、開催場所を整理します。</li>
+<li><strong>②企画提案</strong>：世界観・物語の骨子・人数構成・所要時間・実施形式を提案。ここで方向性を固めます。</li>
+<li><strong>③シナリオ・キャラクター設計</strong>：真相から逆算して事件を組み立て、全員に秘密と目的を配ります。</li>
+<li><strong>④証拠・小道具・ハンドアウト制作</strong>：キャラクター資料、証拠カード、地図、小道具、GM（進行役）マニュアルを制作。</li>
+<li><strong>⑤テストプレイ（複数回）</strong>：実際に遊んで難易度・時間配分・情報の偏りを調整。品質を決める最重要工程です。</li>
+<li><strong>⑥納品・運営準備</strong>：印刷物・データ納品、GM研修、当日運営体制の構築。</li>
+<li><strong>⑦公演・実施・振り返り</strong>：初回公演の運営、参加者の反応をもとに微調整。継続公演やシリーズ化もここから。</li>
+</ul>
+<p class="lede">シナリオの書き方そのものは<a href="/guide/madamis-making/" style="color:var(--accent)">マダミスの作り方｜シナリオ制作の手順7ステップ →</a>で詳しく解説しています。</p>
+</div></section>
+
+<section class="section" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST &amp; SCHEDULE</p><h2 class="h2 serif">費用の目安と期間</h2>
+<ul class="bullets">
+<li><strong>シナリオのみ</strong>：数十万円台〜。既存の運営体制がある店舗・団体向け。</li>
+<li><strong>フルパッケージ</strong>：100万円前後〜。シナリオ＋キャラクター資料＋小道具＋GMマニュアル＋テストプレイ込み。</li>
+<li><strong>公演・運営込み</strong>：上記＋GM派遣・会場運営。企業イベントや施設イベントで多い形式。</li>
+<li><strong>レベニューシェア型</strong>：チケット売上や宿泊プラン売上に応じてお支払い。収益が見込める形式では<strong>初期費用0円または格安</strong>で始められます。</li>
+</ul>
+<p class="lede">期間は企画確定から<strong>2〜3ヶ月</strong>が目安。費用の内訳と抑え方は<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場 →</a>をどうぞ。</p>
+</div></section>
+
+<section class="section tinted" id="cases"><div class="wrap narrow">
+<p class="eyebrow">CASES</p><h2 class="h2 serif">マダミス制作の事例</h2>
+<ul class="bullets">
+<li><strong>①宿泊施設向けオリジナルマダミス（施設・宿泊プラン型）</strong>：宿泊施設「サーマルクライムスタジオ」様向けに、宿泊者が楽しむ物語体験を制作。体験付きプランとして販売し、<strong>新規宿泊予約20件以上の獲得</strong>につながりました。「体験」が予約動機そのものになることを実証した事例です。<a href="/guide/hotel-event/" style="color:var(--accent)">ホテル・宿泊施設の活用 →</a></li>
+<li><strong>②推理系マダミスの公演作品（公演型）</strong>：東京大学のマーダーミステリーサークルを母体とする当社レーベル「UNLIMITED MYSTERY（東大マダミス）」で、『フランケンシュタイン城の殺人』『あるマーダーミステリーについて』など複数の作品を制作・公演。店舗公演・オンライン公演の両方で展開しています。<a href="/toudaimurder/works/" style="color:var(--accent)">作品一覧 →</a></li>
+<li><strong>③オンライン・配信企画向け作品（動画・オンライン型）</strong>：オンラインで遊べる作品を複数制作。配信企画では「視聴者が推理に参加できる情報の出し方」を設計し、動画としての面白さと推理の公平性を両立させています。</li>
+</ul>
+<p class="lede">企業・店舗での活用シーンは<a href="/guide/madamis-business/" style="color:var(--accent)">企業・店舗のマダミス活用ガイド →</a>で6つ紹介しています。</p>
+</div></section>
+
+<section class="section" id="choose"><div class="wrap narrow">
+<p class="eyebrow">HOW TO CHOOSE</p><h2 class="h2 serif">制作会社の選び方</h2>
+<ul class="bullets">
+<li><strong>公演実績があるか</strong>：作って終わりではなく、実際に公演・運営した作品があるかが品質の証拠になります。</li>
+<li><strong>テストプレイ体制があるか</strong>：複数回のテストプレイを工程に含めているか。ここを省く制作は破綻リスクが高くなります。</li>
+<li><strong>目的から設計できるか</strong>：集客・研修・動画・プラン販売で最適な形式は違います。「マダミスを作れる」だけでなく「目的に合わせて設計できる」会社を選びましょう。</li>
+<li><strong>運営まで任せられるか</strong>：GM派遣・会場運営・集客まで一貫対応できると、担当者の負担が激減します。</li>
+</ul>
+<p class="vc-line"><a href="/guide/madamis-company/" style="color:var(--accent)">マダミス制作会社の選び方5つの基準 →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-murder">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">マダミス制作依頼・お見積りはこちら（無料）</p>
+<a class="btn" href="/services/murder-mystery/">マダミス制作依頼のページを見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは（完全ガイド）</a>／<a href="/guide/madamis-making/" style="color:var(--accent)">マダミスの作り方</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">制作の費用相場</a>／<a href="/guide/madamis-company/" style="color:var(--accent)">制作会社の選び方</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作サービス</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="murder" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.def-box{max-width:680px;margin:40px auto 26px;background:#fff;border:1px solid rgba(51,48,43,.1);border-left:5px solid var(--accent);border-radius:14px;padding:26px 30px;text-align:left;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.def-word{margin:0 0 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:22px;font-weight:800;color:var(--ink)}
+.def-yomi{font-size:13px;font-weight:600;color:rgba(51,48,43,.55);letter-spacing:.04em}
+.def-body{margin:0;font-size:14.5px;line-height:2;color:rgba(51,48,43,.82)}
+@media(max-width:640px){.def-box{padding:20px 20px}.def-word{font-size:19px;gap:10px}}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#types,#flow,#cost,#cases,#choose,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

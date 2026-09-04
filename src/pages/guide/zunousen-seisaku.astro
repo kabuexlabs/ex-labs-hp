@@ -1,0 +1,211 @@
+---
+// 「頭脳戦制作」「頭脳戦 ゲーム 作り方」「オリジナルゲーム 制作 依頼」系の
+// 商用クエリの受け皿。頭脳戦ピラーのスポークとして「制作とは？」型で解説し、
+// 日本唯一の頭脳戦専門制作団体であるサービスページ（/services/zunousen/）へ
+// 票を集約する。実績は東京都頭脳王決定戦（全公演完売）・HACKTALE作品など
+// サイト内で公開済みの事実のみを使う。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+
+const toc = [
+  { id: 'about', label: '頭脳戦制作とは' },
+  { id: 'design', label: '面白い頭脳戦を作る5つの設計原則' },
+  { id: 'flow', label: '制作の流れ6ステップ' },
+  { id: 'cases', label: '制作・開催の実績' },
+  { id: 'cost', label: '費用の目安と依頼方法' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '頭脳戦制作とは何をすることですか？',
+    a: '閃き・論理・交渉・心理の読み合いで勝敗が決まるオリジナルの対戦型ゲームを、ルール設計・勝利条件の設計・バランス調整・テストプレイ・大会運営の設計まで一貫して作ることです。イベントの目玉企画、社内対抗戦、施設の集客企画、プロモーションなど目的に合わせて設計します。',
+  },
+  {
+    q: '頭脳戦ゲームの制作を依頼できる会社はありますか？',
+    a: '謎解き制作会社は数多くありますが、交渉・心理戦・閃きの対人ゲームに特化した制作団体は国内では珍しく、株式会社ex Labs（頭脳戦レーベルHACKTALE）が専門的に手がけています。全公演チケット完売となった「東京都頭脳王決定戦 2026」の企画・運営実績があります。',
+  },
+  {
+    q: '大人数のイベントでも実施できますか？',
+    a: 'できます。少人数の卓上ゲーム形式から、予選・本戦のトーナメント形式で数百名が参加する大会型まで設計可能です。東京都頭脳王決定戦は都内4会場・全10公演で開催しました。',
+  },
+  {
+    q: '費用と期間はどのくらいですか？',
+    a: 'ゲームの規模と実施形式により異なりますが、既存作品を使った開催なら短期間・低予算から、完全オリジナルの制作は企画から1〜2ヶ月が目安です。チケット収益が見込める形式ではレベニューシェア型にも対応しています。まずは無料でご相談ください。',
+  },
+  {
+    q: '研修やプロモーションにも使えますか？',
+    a: '使えます。交渉・意思決定・情報の読み合いはビジネスに直結する要素なので研修コンテンツとして機能し、商品や世界観をルールに織り込めばプロモーション企画にもなります。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const definedTermLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: '頭脳戦制作',
+  description:
+    '頭脳戦制作とは、閃き・論理・交渉・心理の読み合いで勝敗が決まるオリジナルの対戦型ゲームを、ルール設計・勝利条件・バランス調整・テストプレイ・大会運営の設計まで一貫して作ること。イベント・研修・施設集客・プロモーションなど目的に応じて設計する。',
+  inDefinedTermSet: {
+    '@type': 'DefinedTermSet',
+    name: '体験型エンターテインメント用語集',
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  },
+  url: new URL('/guide/zunousen-seisaku/', Astro.site).toString(),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '頭脳戦制作とは？オリジナル頭脳戦ゲームの作り方・依頼の流れ・費用',
+  about: '頭脳戦ゲームの制作・作り方・制作依頼',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/zunousen-seisaku.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-04',
+  dateModified: '2026-09-04',
+  mainEntityOfPage: new URL('/guide/zunousen-seisaku/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="頭脳戦制作とは？オリジナル頭脳戦ゲームの作り方・依頼の流れ・費用 - 株式会社ex Labs"
+  description="頭脳戦制作とは、閃き・論理・交渉・心理戦で勝敗が決まるオリジナルの対戦型ゲームを、ルール設計からテストプレイ・大会運営まで一貫して作ること。面白い頭脳戦を作る5つの設計原則、制作の流れ6ステップ、全公演完売「東京都頭脳王決定戦」の実績、費用と依頼方法を、日本唯一の頭脳戦専門制作団体が解説します。"
+  ogImage="/assets/guide/zunousen-seisaku.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<script type="application/ld+json" set:html={jsonLd(definedTermLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '頭脳戦とは', href: '/guide/zunousen/' },
+  { name: '頭脳戦制作とは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">BRAIN BATTLE PRODUCTION</p>
+<h1 class="h2 serif"><span class="nobr">頭脳戦制作とは？</span><span class="nobr">オリジナル頭脳戦ゲームの</span><span class="nobr">作り方・依頼の流れ・費用</span></h1>
+<div class="def-box">
+<p class="def-word"><span class="serif">頭脳戦制作</span><span class="def-yomi">ずのうせんせいさく</span></p>
+<p class="def-body">閃き・論理・交渉・心理の読み合いで勝敗が決まる<strong>オリジナルの対戦型ゲーム</strong>を、ルール設計・勝利条件・バランス調整・テストプレイ・大会運営の設計まで<strong>一貫して作ること</strong>。イベントの目玉企画、社内対抗戦、施設の集客企画、プロモーションなど目的に応じて設計する。</p>
+</div>
+<p class="lede">このページでは、面白い頭脳戦を作る設計原則、制作の流れ、実績、費用と依頼方法を、全公演チケット完売の「東京都頭脳王決定戦 2026」を企画・運営した<strong>日本唯一の頭脳戦専門制作団体・株式会社ex Labs（HACKTALE）</strong>が解説します。制作をご検討中の方は<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作依頼・お見積り（無料）のページ →</a>へどうぞ。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">頭脳戦制作とは</h2>
+<p class="lede">頭脳戦制作は、<strong>「対人戦のためのルール」を設計する仕事</strong>です。謎解きの制作が「正解にたどり着く道筋」を作るのに対し、頭脳戦の制作には正解がありません。相手が変われば最善手が変わる——その<strong>読み合いが何度でも生まれる構造</strong>を作るのが仕事です。</p>
+<p class="lede">難しいのは、<strong>ルールがシンプルなのに深い</strong>という状態を作ること。説明に10分かかるゲームは会場が冷めますが、単純すぎるゲームは1回で飽きます。「1分で説明できて、100回遊んでも展開が変わる」が理想で、これはテストプレイを重ねてバランスを詰めることでしか到達できません。<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは？意味・種類 →</a></p>
+</div></section>
+
+<section class="section" id="design"><div class="wrap narrow">
+<p class="eyebrow">DESIGN</p><h2 class="h2 serif">面白い頭脳戦を作る5つの設計原則</h2>
+<ul class="bullets">
+<li><strong>①勝敗を明確にする</strong>：「なんとなく楽しかった」で終わらせない。誰が勝ったかが一目で分かる勝利条件が、対戦型の熱量の源です。</li>
+<li><strong>②知識を問わない</strong>：クイズと違い、事前知識で差がつく要素を排除します。その場の思考・交渉・読みだけで勝負が決まると、初参加でも番狂わせが起きます。</li>
+<li><strong>③「読み合い」の層を作る</strong>：相手の選択を読む→相手が自分の読みを読む→その裏をかく。2〜3層の読み合いが自然に生まれる選択肢の設計が心理戦の核です。<a href="/guide/shinrisen/" style="color:var(--accent)">心理戦とは →</a></li>
+<li><strong>④運の配合を決める</strong>：運ゼロだと実力差がそのまま出て場が固まり、運が強すぎると考える意味がなくなる。目的（大会か懇親会か）に合わせて配合を調整します。</li>
+<li><strong>⑤最後まで全員が絡める</strong>：序盤で脱落した人が観客になるゲームは会場が冷めます。逆転の余地や敗者復活、チーム戦化で「最後の一手まで全員に意味がある」構造にします。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">制作の流れ6ステップ</h2>
+<ul class="bullets">
+<li><strong>①目的とプレイ環境のヒアリング（無料）</strong>：大会・懇親会・研修・集客・プロモーションのどれか、人数、時間、会場、予算を整理します。</li>
+<li><strong>②コアメカニクスの設計</strong>：交渉系・心理戦系・論理系・運×戦略系のどのタイプを核にするかを決め、基本ルールと勝利条件を設計。<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類4タイプ →</a></li>
+<li><strong>③プロトタイプとテストプレイ</strong>：紙とカードで試作し、繰り返し遊んで「必勝法」や「詰み」を潰します。ここに最も時間をかけます。</li>
+<li><strong>④コンポーネント・演出の制作</strong>：カード・ボード・進行スライド・会場演出を制作。世界観やブランドをルールに織り込むのもこの段階です。</li>
+<li><strong>⑤運営設計</strong>：進行台本、審判ルール、トーナメント表、タイムテーブルを設計。大人数ほど運営設計が体験の質を左右します。</li>
+<li><strong>⑥開催・振り返り</strong>：当日運営と、参加者の反応をもとにした調整。シリーズ化・定期開催の設計もここから。</li>
+</ul>
+</div></section>
+
+<section class="section" id="cases"><div class="wrap narrow">
+<p class="eyebrow">CASES</p><h2 class="h2 serif">制作・開催の実績</h2>
+<ul class="bullets">
+<li><strong>東京都頭脳王決定戦 2026（大会型）</strong>：「東京で最も頭の良い人間」を決める参加型リアルイベント。都内4会場・全10公演で開催し、<strong>全公演チケット完売</strong>。本戦はセガサミーグループ様が運営するイベントスペース「TUNNEL TOKYO」（東京・大崎）で実施しました。<a href="/hacktale/event/zunouou/" style="color:var(--accent)">イベント詳細 →</a></li>
+<li><strong>HACKTALEのオリジナル作品（公演型）</strong>：交渉系の<a href="/hacktale/works/present-poker/" style="color:var(--accent)">プレゼント・ポーカー</a>（6人・180分）、論理×心理戦の<a href="/hacktale/works/werewolf-theorem/" style="color:var(--accent)">人狼定理</a>（8人・240分）、運×戦略系の<a href="/hacktale/works/dice-box/" style="color:var(--accent)">ダイスボックス</a>など、対人戦のために設計した作品を制作・公演しています。</li>
+<li><strong>企業・施設向けのオリジナル制作</strong>：社内対抗戦、懇親会の目玉企画、施設の集客イベントとして、既存作品のカスタマイズから完全オリジナルまで対応しています。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif">費用の目安と依頼方法</h2>
+<ul class="bullets">
+<li><strong>既存作品での開催</strong>：HACKTALE作品の貸切公演・出張開催。短期間・低予算で「対人頭脳戦の熱量」を体験できます。</li>
+<li><strong>カスタマイズ</strong>：既存作品に貴社の世界観・商品・テーマを織り込む形。企画から1ヶ月程度が目安。</li>
+<li><strong>完全オリジナル</strong>：ルール設計からの新規制作。企画から1〜2ヶ月、テストプレイ回数により変動します。</li>
+<li><strong>レベニューシェア型</strong>：チケット収益が見込める大会型・公演型では、売上に応じたお支払いで初期費用を抑える形も可能です。</li>
+</ul>
+<p class="lede">まずは目的と人数だけお知らせください。形式と費用感を無料でご提案します。</p>
+<p class="vc-line"><a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作依頼・お見積り（無料）→</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-zunou">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">頭脳戦制作依頼・大会イベントのご相談はこちら（無料）</p>
+<a class="btn" href="/services/zunousen/">頭脳戦制作依頼のページを見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは（完全ガイド）</a>／<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類と選び方</a>／<a href="/guide/shinrisen/" style="color:var(--accent)">心理戦とは</a>／<a href="/hacktale/" style="color:var(--accent)">HACKTALE公式サイト</a>／<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作サービス</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="zunou" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.def-box{max-width:680px;margin:40px auto 26px;background:#fff;border:1px solid rgba(51,48,43,.1);border-left:5px solid var(--accent);border-radius:14px;padding:26px 30px;text-align:left;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.def-word{margin:0 0 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:22px;font-weight:800;color:var(--ink)}
+.def-yomi{font-size:13px;font-weight:600;color:rgba(51,48,43,.55);letter-spacing:.04em}
+.def-body{margin:0;font-size:14.5px;line-height:2;color:rgba(51,48,43,.82)}
+@media(max-width:640px){.def-box{padding:20px 20px}.def-word{font-size:19px;gap:10px}}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#design,#flow,#cases,#cost,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
