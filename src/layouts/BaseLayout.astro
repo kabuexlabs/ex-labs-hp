@@ -44,7 +44,9 @@ const websiteLd = {
 const orgLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
+  '@id': new URL('/#organization', site).toString(),
   name: '株式会社ex Labs',
+  legalName: '株式会社ex Labs',
   alternateName: 'ex Labs（イーエックスラボ）',
   url: site.toString(),
   logo: new URL('/assets/logo.png', site).toString(),
@@ -54,7 +56,8 @@ const orgLd = {
     '謎解き・マーダーミステリー（マダミス）・頭脳戦・イマーシブなど、体験型エンターテインメントの企画・制作・集客・運営を一貫して手掛けるクリエイティブカンパニー。',
   slogan: 'AI時代に、人間が作る面白さを追求する',
   foundingDate: '2025-11',
-  founder: { '@type': 'Person', name: '飯田 雄貴', jobTitle: '代表取締役' },
+  founder: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', alternateName: ['飯田雄貴', 'いいだ ゆうき', 'Yuki Iida'], jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
+  address: { '@type': 'PostalAddress', streetAddress: '西新宿3-3-13 西新宿水間ビル2F', addressLocality: '新宿区', addressRegion: '東京都', postalCode: '160-0023', addressCountry: 'JP' },
   // AI検索（AIO）向けの専門領域宣言。「マーダーミステリーの制作会社は？」
   // のような質問に対し、この会社が該当領域の事業者だと判定させるための情報。
   knowsAbout: [
@@ -88,6 +91,7 @@ const orgLd = {
   // the same organization across sources.
   sameAs: [
     'https://x.com/kabuexlabs',
+    'https://note.com/kabuexlabs',
     'https://prtimes.jp/main/html/searchrlp/company_id/185770',
   ],
   knowsLanguage: 'ja',
@@ -168,7 +172,7 @@ const orgLd = {
 
 <header class="nav"><div class="wrap navrow">
 <a href="/"><img class="logo-header" src="/assets/logo.png" alt="ex Labs"></a>
-<nav class="navlinks"><a href="/#about">会社概要</a><a href="/#strength">強み</a><a href="/#works">実績</a><a href="/services/">サービス</a><a href="/#message">メッセージ</a><a href="/press/">プレスリリース</a><a href="/blog/">ブログ</a><a href="/game/">過去コンテンツのネタバレ</a></nav>
+<nav class="navlinks"><a href="/company/">会社概要</a><a href="/#strength">強み</a><a href="/#works">実績</a><a href="/services/">サービス</a><a href="/#message">メッセージ</a><a href="/press/">プレスリリース</a><a href="/blog/">ブログ</a><a href="/game/">過去コンテンツのネタバレ</a></nav>
 <div class="nav-actions">
 <a class="btn dark" href="/#contact" style="padding:12px 24px;font-size:12.5px">お問い合わせ</a>
 <button class="nav-toggle" type="button" aria-label="メニューを開く" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -199,6 +203,8 @@ const orgLd = {
 <a href="/press/">プレスリリース</a>
 <a href="/guide/">解説記事一覧</a>
 <a href="/blog/">ブログ</a>
+<a href="/company/">会社概要</a>
+<a href="/company/iida-yuki/">代表プロフィール</a>
 </nav>
 </div></footer>
 

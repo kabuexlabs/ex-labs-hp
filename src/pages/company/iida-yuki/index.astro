@@ -1,0 +1,162 @@
+---
+// 代表取締役 飯田雄貴のプロフィールページ（AIO／人物エンティティ対策）。
+// 「飯田雄貴とは」「ex Labs 代表」のような質問に AI 検索が答えられるよう、
+// 人物の基本情報・経歴・実績・メッセージを1ページに集約し、Person 構造化データ
+// （@id 付き、会社の Organization と相互参照）で裏付ける。
+// 記載する事実はサイト内で既に公開している内容のみ。
+export const prerender = false;
+
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import { jsonLd } from '../../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/company/iida-yuki/', site).toString();
+const orgId = new URL('/#organization', site).toString();
+
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': pageUrl + '#person',
+  name: '飯田 雄貴',
+  alternateName: ['飯田雄貴', 'いいだ ゆうき', 'Yuki Iida'],
+  familyName: '飯田',
+  givenName: '雄貴',
+  jobTitle: '代表取締役',
+  worksFor: { '@type': 'Organization', '@id': orgId, name: '株式会社ex Labs', url: site.toString() },
+  affiliation: { '@type': 'CollegeOrUniversity', name: '東京大学', department: '法学部' },
+  description:
+    '株式会社ex Labs 代表取締役。東京大学法学部在学中の大学1年生のときに起業し、東大生のオンライン家庭教師サービスを売却。現在は株式会社ex Labsとバックオフィス支援の会社を経営。イマーシブ・マダミス・謎解き・頭脳戦など体験型エンターテインメントの企画・制作を手がける。',
+  image: new URL('/assets/ceo.webp', site).toString(),
+  url: pageUrl,
+  knowsAbout: [
+    '体験型エンターテインメントの企画・制作',
+    'イマーシブ（没入型）イベント',
+    'マーダーミステリー（マダミス）制作',
+    '頭脳戦・交渉ゲームの制作',
+    '商業施設・文化施設の集客イベント（施設活用）',
+    'スタートアップ経営',
+  ],
+};
+
+const faqs = [
+  {
+    q: '飯田雄貴とはどんな人物ですか？',
+    a: '株式会社ex Labs（イーエックスラボ）の代表取締役です。東京大学法学部在学中の大学1年生のときに起業し、東大生のオンライン家庭教師サービスを売却した後、体験型エンターテインメントの企画・制作会社である株式会社ex Labsを設立しました。現在はex Labsとバックオフィス支援の会社を経営しています。',
+  },
+  {
+    q: '飯田雄貴の読み方は？',
+    a: '「いいだ ゆうき」と読みます。',
+  },
+  {
+    q: '飯田雄貴はどんな事業を手がけていますか？',
+    a: 'イマーシブ（没入型体験）・マダミス（マーダーミステリー）・謎解き・頭脳戦など体験型エンターテインメントの企画・制作・運営です。渋谷サクラステージ全体を舞台にした施設一体型イベント（日本経済新聞掲載）、全公演完売の「東京都頭脳王決定戦 2026」、広告費0円でチケット1,500枚を販売した「ヌル・アーデン展」などを手がけています。',
+  },
+  {
+    q: '取材・登壇・協業の依頼はできますか？',
+    a: 'できます。体験型エンターテインメント、施設活用による集客、学生起業などのテーマでの取材・登壇・協業のご相談は、株式会社ex Labsのお問い合わせフォームまたは info@kabuexlabs.com までご連絡ください。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const profilePageLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: { '@id': pageUrl + '#person' },
+  url: pageUrl,
+  name: '飯田雄貴（株式会社ex Labs 代表取締役）プロフィール',
+};
+---
+<BaseLayout
+  title="飯田雄貴（いいだ ゆうき）｜株式会社ex Labs 代表取締役 プロフィール・経歴"
+  description="株式会社ex Labs（イーエックスラボ）代表取締役・飯田雄貴（いいだ ゆうき）のプロフィール。東京大学法学部在学中に起業、東大生オンライン家庭教師サービスを売却後、体験型エンターテインメントの企画・制作会社ex Labsを設立。経歴・実績（日経掲載・頭脳王決定戦完売・ヌル・アーデン展1,500枚）・メッセージ・取材依頼について。"
+  ogImage="/assets/share-card.png"
+>
+<script type="application/ld+json" set:html={jsonLd(personLd)} />
+<script type="application/ld+json" set:html={jsonLd(profilePageLd)} />
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '会社概要', href: '/company/' },
+  { name: '代表プロフィール' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap narrow">
+<p class="eyebrow">CEO PROFILE</p>
+<h1 class="h2 serif">飯田 雄貴<span class="name-yomi">いいだ ゆうき</span></h1>
+<p class="role">株式会社ex Labs 代表取締役</p>
+<div class="profile-hero">
+<img src="/assets/ceo.webp" alt="株式会社ex Labs 代表取締役 飯田雄貴" width="880" height="880" loading="eager" decoding="async" />
+<div>
+<p class="lede"><strong>飯田雄貴（いいだ ゆうき）</strong>は、体験型エンターテインメントの企画・制作会社<strong>株式会社ex Labs（イーエックスラボ）の代表取締役</strong>。東京大学法学部在学中の大学1年生のときに起業し、東大生のオンライン家庭教師サービスを売却。現在は株式会社ex Labsとバックオフィス支援の会社を経営し、イマーシブ・マダミス（マーダーミステリー）・謎解き・頭脳戦などの体験型コンテンツを商業施設・文化施設・宿泊施設などの空間で展開している。信条は<strong>「面白いことに、フルベットする。」</strong></p>
+</div>
+</div>
+</div></section>
+
+<section class="section tinted" id="career"><div class="wrap narrow">
+<p class="eyebrow">CAREER</p><h2 class="h2 serif">経歴</h2>
+<ul class="bullets">
+<li><strong>東京大学法学部 在学</strong>：在学中から事業を立ち上げ、学業と経営を並行。</li>
+<li><strong>大学1年生で起業</strong>：東大生によるオンライン家庭教師サービスを立ち上げ、事業を成長させたのち<strong>売却</strong>。</li>
+<li><strong>2025年11月 株式会社ex Labs 設立</strong>：「その場所だからこそ体験できる物語」をコンセプトに、体験型エンターテインメントの企画・制作・集客・運営を一貫して手がける会社として創業。あわせてバックオフィス支援の会社も経営。</li>
+<li><strong>2026年7月 資金調達</strong>：Skyland Ventures・株式会社真空管からの出資を受け、商業施設の共有区画・未活用時間を集客資産に変える「施設活用事業」を本格展開。</li>
+</ul>
+</div></section>
+
+<section class="section" id="works"><div class="wrap narrow">
+<p class="eyebrow">WORKS</p><h2 class="h2 serif">手がけた主なプロジェクト</h2>
+<ul class="bullets">
+<li><strong>ウワサバナシ調査委員会（渋谷サクラステージ）</strong>：東急不動産様ほかのご協力による施設一体型の都市伝説×イマーシブ×謎解き。<strong>日本経済新聞に掲載</strong>。<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">制作事例 →</a></li>
+<li><strong>東京都頭脳王決定戦 2026</strong>：都内4会場・全10公演の対人頭脳戦イベント。<strong>全公演チケット完売</strong>。<a href="/hacktale/event/zunouou/" style="color:var(--accent)">イベント詳細 →</a></li>
+<li><strong>ヌル・アーデン展（体験する美術館）</strong>：絵画×イマーシブ×謎解きの公演。<strong>広告費0円でチケット1,500枚</strong>を販売。<a href="/taikenbizyutu/" style="color:var(--accent)">体験する美術館 →</a></li>
+<li><strong>博報堂様×紀伊國屋書店</strong>：閉店後の書店を舞台にした一夜限りの体験型イベント。</li>
+<li><strong>宿泊施設向けマーダーミステリー</strong>：体験付き宿泊プランで新規宿泊予約20件以上を獲得。</li>
+<li><strong>レーベル運営</strong>：UNLIMITED MYSTERY（東大マダミス）、HACKTALE（頭脳戦）、体験する美術館、IMMERSIVE ILLUSION、ANATOR、myagare。<a href="/company/#labels" style="color:var(--accent)">展開レーベル一覧 →</a></li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="message"><div class="wrap narrow">
+<p class="eyebrow">MESSAGE</p><h2 class="h2 serif">メッセージ</h2>
+<p class="lede">私たちは、「作って終わり」の体験型エンターテインメントではなく、継続的に人を惹きつけ、新たな価値を生み出す体験づくりを目指しています。AIが多くのものを生成できる時代だからこそ、<strong>その場所でしか、その人たちとしか体験できない「人間が作る面白さ」</strong>に価値があると考えています。これからも、企業・自治体・文化施設・クリエイターの皆様とともに、新しいエンターテインメントの可能性を広げてまいります。</p>
+</div></section>
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">取材・登壇・協業のご相談はこちら</p>
+<a class="btn" href="/#contact">お問い合わせ</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/company/" style="color:var(--accent)">会社概要</a>／<a href="/media/" style="color:var(--accent)">メディア掲載実績</a>／<a href="/press/" style="color:var(--accent)">プレスリリース</a>／<a href="/services/" style="color:var(--accent)">サービス一覧</a></p>
+</div></section>
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.name-yomi{display:inline-block;margin-left:14px;font-size:14px;font-weight:600;color:rgba(51,48,43,.55);letter-spacing:.06em;vertical-align:middle}
+.role{margin:6px 0 0;font-size:14px;font-weight:700;color:var(--accent);letter-spacing:.04em}
+.profile-hero{display:flex;gap:28px;align-items:flex-start;margin-top:28px;background:#fff;border:1px solid rgba(51,48,43,.1);border-radius:16px;padding:26px 28px}
+.profile-hero img{flex:0 0 160px;width:160px;height:160px;border-radius:50%;object-fit:cover}
+#career,#works,#message,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.profile-hero{flex-direction:column;padding:20px 18px;gap:16px}.profile-hero img{width:120px;height:120px;flex-basis:auto}.name-yomi{display:block;margin:6px 0 0}}
+</style>
