@@ -1,0 +1,233 @@
+---
+// 「体験型イベント 費用」「イベント 制作 費用 相場」「謎解きイベント 費用」
+// 「マダミス 制作 費用」「イマーシブ 制作 費用」を横断する費用ハブ。
+// ジャンル別の費用記事（immersive-cost / madamis-cost）は触らず、
+// 規模×ジャンルの一覧表と内訳・抑え方でまとめ、各記事とサービスへ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+
+const toc = [
+  { id: 'summary', label: '結論：費用は「規模」でほぼ決まる' },
+  { id: 'table', label: 'ジャンル×規模の費用相場一覧表' },
+  { id: 'breakdown', label: '費用の内訳（何にお金がかかるのか）' },
+  { id: 'genre', label: 'ジャンル別の費用の特徴' },
+  { id: 'save', label: '費用を抑える6つの方法' },
+  { id: 'zero', label: '初期費用0円で実施できるケース（レベニューシェア）' },
+  { id: 'flow', label: '見積り依頼の流れと準備しておくこと' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const rows = [
+  ['小規模（会議室・店舗1空間／〜50名）', '数十万円台〜', '数十万円台〜', '数十万円台〜', '数十万円台〜'],
+  ['中規模（施設1フロア・貸切公演／50〜300名）', '100万円前後〜', '100万円前後〜', '100万円前後〜', '100万円前後〜'],
+  ['大規模（施設全体・街周遊・複数会場／300名〜）', '100万円前後〜数百万円', '100万円前後〜数百万円', '数百万円規模', '数百万円規模'],
+];
+
+const faqs = [
+  {
+    q: '体験型イベントの費用は最低いくらから依頼できますか？',
+    a: '既存コンテンツを会議室や店舗の1空間で実施する形なら数十万円台から可能です。施設や会社に合わせたオリジナル制作は、企画・シナリオ・制作物・テストプレイを含めて100万円前後からが一般的な目安です。',
+  },
+  {
+    q: '見積りをもらう前に決めておくべきことは？',
+    a: '「目的（集客・回遊・懇親・研修・販促）」「想定人数」「会場（既存空間か貸切か）」「実施時期」「予算の上限または売上目標」の5つがあれば、精度の高い見積りが出せます。決まっていなくても、ヒアリングで一緒に整理できます。',
+  },
+  {
+    q: '費用に運営スタッフや当日の進行は含まれますか？',
+    a: '株式会社ex Labsでは、企画・制作から告知・集客・当日運営・振り返りまで一貫して対応しており、お見積りには当日運営を含めてご提案します。施設側の担当者が進行を抱える必要はありません。',
+  },
+  {
+    q: '初期費用0円というのは本当ですか？',
+    a: '集客型（チケット販売型）のイベントでは、チケット売上から費用をいただくレベニューシェア型（成果報酬型）に対応しており、案件によっては施設・企業側の初期費用0円または格安で実施できます。社内イベントなどチケット売上がない形式では通常の受託契約になります。',
+  },
+  {
+    q: '費用の相場より安い制作会社に頼んでも大丈夫ですか？',
+    a: '安さの理由を確認してください。テストプレイ回数が少ない、当日運営が含まれない、既存コンテンツの流用で施設に合っていない、といったケースがあります。体験型イベントはテストプレイと当日運営の質が満足度を左右するため、「何が含まれているか」を揃えて比較することが重要です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '体験型イベントの費用・料金相場｜謎解き・マダミス・イマーシブ・頭脳戦をジャンル別・規模別に解説',
+  about: '体験型イベントの制作費用と料金相場',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/event-hiyou.webp', site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-05',
+  dateModified: '2026-09-05',
+  mainEntityOfPage: new URL('/guide/event-hiyou/', site).toString(),
+};
+---
+<BaseLayout
+  title="体験型イベントの費用・料金相場｜謎解き・マダミス・イマーシブ・頭脳戦を規模別に解説 - 株式会社ex Labs"
+  description="体験型イベントの制作費用の相場を、謎解き・マダミス・イマーシブ・頭脳戦のジャンル別×小規模・中規模・大規模の規模別に一覧表で解説。費用の内訳、抑える6つの方法、初期費用0円で実施できるレベニューシェア型、見積り依頼の流れまで制作会社（日経掲載）がまとめました。"
+  ogImage="/assets/guide/event-hiyou.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '体験型イベントとは', href: '/guide/taikengata-event/' },
+  { name: '体験型イベントの費用相場' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">COST GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">体験型イベントの</span><span class="nobr">費用・料金相場</span><br><span class="nobr">謎解き・マダミス・イマーシブ・頭脳戦を</span><span class="nobr">規模別に解説</span></h1>
+<p class="lede"><strong>体験型イベントの費用</strong>は、ジャンルよりも「規模（人数・会場・期間）」と「既存コンテンツかオリジナル制作か」でほぼ決まります。この記事では、謎解き・マダミス・イマーシブ・頭脳戦の4ジャンルを規模別に一覧表で整理し、費用の内訳、抑える方法、初期費用0円で実施できるレベニューシェア型、見積り依頼の流れまでを、4ジャンルすべてを制作する株式会社ex Labs（渋谷サクラステージの施設一体型イベントが日本経済新聞に掲載）が解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="summary"><div class="wrap narrow">
+<p class="eyebrow">SUMMARY</p><h2 class="h2 serif">結論：費用は「規模」でほぼ決まる</h2>
+<ul class="bullets">
+<li><strong>小規模（数十万円台〜）</strong>：会議室・店舗の1空間で、既存コンテンツや軽量なオリジナルを実施。社内イベント、店舗の貸切公演など。</li>
+<li><strong>中規模（100万円前後〜）</strong>：施設1フロアや貸切公演で、企画・シナリオ・制作物・テストプレイ・当日運営まで含むフルパッケージ。商業施設の期間限定イベント、宿泊施設の体験プランなど。</li>
+<li><strong>大規模（数百万円規模）</strong>：施設全体・街全体・複数会場を舞台にした周遊型や大型公演。キャスト・会場数・公演回数に比例して増えます。</li>
+</ul>
+<p class="lede">同じジャンルでも規模で10倍以上の差が出るため、<strong>「どのジャンルか」より先に「何人を、どの空間で、どのくらいの期間」を決める</strong>のが、見積りを早く正確にする近道です。</p>
+</div></section>
+
+<section class="section" id="table"><div class="wrap">
+<p class="eyebrow">TABLE</p><h2 class="h2 serif">ジャンル×規模の費用相場一覧表</h2>
+<p class="h2sub">企画・制作・当日運営を含めた目安です。会場費・キャスト数・公演回数・制作物の量によって変動します。</p>
+<div class="cmp-wrap">
+<table class="cmp-table">
+<thead><tr><th>規模</th><th>謎解き</th><th>マダミス</th><th>イマーシブ</th><th>頭脳戦</th></tr></thead>
+<tbody>
+{rows.map((r) => (
+  <tr>{r.map((c, i) => (i === 0 ? <th scope="row">{c}</th> : <td>{c}</td>))}</tr>
+))}
+</tbody>
+</table>
+</div>
+<p class="vc-line" style="margin-top:20px">ジャンル別の詳しい費用：<a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブの制作費用</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミスの制作費用</a>／<a href="/guide/nazotoki-company/" style="color:var(--accent)">謎解き制作会社の選び方と相場</a>／<a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作の費用と流れ</a></p>
+</div></section>
+
+<section class="section tinted" id="breakdown"><div class="wrap narrow">
+<p class="eyebrow">BREAKDOWN</p><h2 class="h2 serif">費用の内訳（何にお金がかかるのか）</h2>
+<ul class="bullets">
+<li><strong>企画・シナリオ</strong>：目的のヒアリング、体験設計、物語・問題・ゲームルールの執筆。オリジナル制作で最も価値が乗る部分で、テストプレイによる調整もここに含まれます。</li>
+<li><strong>制作物・美術</strong>：手がかり・小道具・キット・サイン・装飾。周遊型は設置箇所が増えるほど、イマーシブは空間演出が濃いほど増えます。</li>
+<li><strong>キャスト・運営スタッフ</strong>：イマーシブの俳優、マダミスのGM（進行役）、受付・誘導。公演回数と同時開催数に比例します。</li>
+<li><strong>告知・集客</strong>：特設ページ、ビジュアル、SNS、チケット販売の手数料。集客型では欠かせない一方、社内イベントでは不要です。</li>
+<li><strong>会場費</strong>：自社施設・自社店舗で実施する場合は0円。施設側がイベントを主催するケースでは、会場費がかからないのが最大の強みです。</li>
+</ul>
+</div></section>
+
+<section class="section" id="genre"><div class="wrap narrow">
+<p class="eyebrow">BY GENRE</p><h2 class="h2 serif">ジャンル別の費用の特徴</h2>
+<ul class="bullets">
+<li><strong>謎解き</strong>：制作物（キット・手がかり）が中心で、参加人数が増えても1人あたりの費用が下がりやすい。大人数の集客・研修で最もコスト効率が良いジャンルです。<a href="/guide/nazotoki-event/" style="color:var(--accent)">謎解きイベントとは →</a></li>
+<li><strong>マダミス</strong>：シナリオとキャラクター設計が費用の中心。人数が作品ごとに固定されるため、大人数には複数卓・複数回公演で対応します。宿泊施設の体験プラン化で、新規宿泊予約20件以上を生んだ事例があります。<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミスの制作費用 →</a></li>
+<li><strong>イマーシブ</strong>：キャストと空間演出が費用の中心。1空間完結型は数十万円台〜、施設や街を舞台にした周遊型は数百万円規模になることもあります。話題化・ブランド体験の価値が最も高いジャンルです。<a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブの制作費用 →</a></li>
+<li><strong>頭脳戦</strong>：ゲーム設計とバランス調整（テストプレイ）が費用の中心。一度作れば何度でも開催できるため、定期開催や大会形式で費用対効果が高まります。<a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作とは →</a></li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="save"><div class="wrap narrow">
+<p class="eyebrow">SAVE</p><h2 class="h2 serif">費用を抑える6つの方法</h2>
+<ul class="bullets">
+<li><strong>既存の空間・装飾をそのまま舞台にする</strong>：造作費を抑える最大の方法。閉店後の店舗や既存の展示は、それ自体が非日常の舞台になります。<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の活用 →</a></li>
+<li><strong>既存コンテンツの貸切・導入から始める</strong>：オリジナル制作の前に、既存作品で反応を確かめる。2〜4週間で実施できます。</li>
+<li><strong>複数回・複数年で使える設計にする</strong>：季節イベントを毎年の定番資産に育てると、2年目以降の費用は大きく下がります。<a href="/guide/kisetsu-event/" style="color:var(--accent)">季節イベントの企画 →</a></li>
+<li><strong>周遊型で1人あたりの費用を下げる</strong>：手がかりを施設内に配置する形式は、人数が増えても運営コストが増えにくい構造です。<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントとは →</a></li>
+<li><strong>テナント・協賛と組む</strong>：物語の目的地になる店舗や、賞品を提供する協賛企業と組むと、費用を分担しつつ送客効果も生まれます。</li>
+<li><strong>レベニューシェア型にする</strong>：集客型なら、チケット売上から費用をいただく形で初期費用0円または格安にできるケースがあります（次項）。</li>
+</ul>
+</div></section>
+
+<section class="section" id="zero"><div class="wrap narrow">
+<p class="eyebrow">NO INITIAL COST</p><h2 class="h2 serif">初期費用0円で実施できるケース（レベニューシェア）</h2>
+<p class="lede">株式会社ex Labsは、チケット売上などから費用をいただく<strong>レベニューシェア型（成果報酬型）</strong>に対応しています。集客型のイベントで、施設側が会場を提供し、当社が企画・制作・集客・運営を担う形なら、<strong>案件によっては施設・企業側の初期費用0円または格安</strong>で実施できます。自社主催の「ヌル・アーデン展」では広告費0円でチケット1,500枚（4,000円）を販売しており、集客ノウハウを持っていることがこの形式を可能にしています。</p>
+<ul class="bullets">
+<li><strong>向いている案件</strong>：商業施設・宿泊施設・美術館など「人を集めたい空間」を持ち、チケット販売が成立する集客型イベント。</li>
+<li><strong>向いていない案件</strong>：社内イベント・研修・販促キャンペーンなど、参加者から料金をいただかない形式（通常の受託契約でご提案します）。</li>
+</ul>
+<p class="vc-line"><a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談（無料）→</a></p>
+</div></section>
+
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">見積り依頼の流れと準備しておくこと</h2>
+<ul class="bullets">
+<li><strong>①ヒアリング（無料）</strong>：目的・想定人数・会場・時期・予算感（または売上目標）の5点を共有。決まっていない項目は一緒に整理します。</li>
+<li><strong>②企画提案・概算見積り</strong>：ジャンル選定と体験設計、規模別の概算をご提示。ここでレベニューシェアの可否も判断します。</li>
+<li><strong>③制作・テストプレイ</strong>：企画確定から1〜3ヶ月。テストプレイの回数が品質を決めるため、余裕を持った日程をおすすめします。</li>
+<li><strong>④告知・集客・当日運営</strong>：集客型は特設ページとチケット販売を当社で用意。当日は進行・受付・トラブル対応まで対応します。</li>
+<li><strong>⑤振り返り</strong>：来場数・回遊・アンケートをもとに、次回や定番化に向けた改善案をご提案します。</li>
+</ul>
+<p class="vc-line"><a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベント制作会社の選び方 →</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧 →</a>／<a href="/services/" style="color:var(--accent)">サービス一覧・お見積り（無料）→</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">概算見積り・レベニューシェアの可否をご相談ください（無料）</p>
+<a class="btn" href="/#contact">制作について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/taikengata-idea/" style="color:var(--accent)">体験型イベントの企画アイデア15選</a>／<a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブの制作費用</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミスの制作費用</a>／<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミスと謎解きの違い</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+.cmp-wrap{overflow-x:auto;margin-top:28px;-webkit-overflow-scrolling:touch}
+.cmp-table{width:100%;min-width:720px;border-collapse:separate;border-spacing:0;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 6px 22px rgba(51,48,43,.06);font-size:13.5px;line-height:1.7}
+.cmp-table th,.cmp-table td{padding:14px 14px;border-bottom:1px solid rgba(51,48,43,.08);vertical-align:top;text-align:left}
+.cmp-table thead th{background:var(--ink);color:#fff;font-weight:800;font-size:13px;letter-spacing:.04em}
+.cmp-table tbody th{background:rgba(51,48,43,.04);font-weight:800;width:240px}
+.cmp-table tbody td{font-weight:700;font-variant-numeric:tabular-nums}
+.cmp-table tr:last-child th,.cmp-table tr:last-child td{border-bottom:0}
+#summary,#table,#breakdown,#genre,#save,#zero,#flow,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

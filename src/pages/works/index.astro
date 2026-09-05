@@ -1,0 +1,309 @@
+---
+// 制作事例一覧（/works/）。トップの #works は要約のみで「事例」系クエリ
+// （体験型イベント 事例／イマーシブ 事例／マダミス 事例／商業施設 イベント 事例）の
+// 受け皿がなかったため新設。軸ごとに実績を並べ、解説記事とサービスへ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+
+type Work = {
+  tag: 'immersive' | 'murder' | 'zunou' | 'nazotoki' | 'shisetsu';
+  tagLabel: string;
+  client: string;
+  name: string;
+  place: string;
+  desc: string;
+  result?: string;
+  href?: string;
+  hrefLabel?: string;
+};
+
+const groups: { key: string; label: string; eyebrow: string; desc: string; works: Work[] }[] = [
+  {
+    key: 'immersive',
+    label: 'イマーシブ・施設一体型イベント',
+    eyebrow: 'IMMERSIVE / FACILITY',
+    desc: '商業施設・書店・街全体を物語の舞台にした没入型イベント。回遊・滞在時間・話題化を同時に設計します。',
+    works: [
+      {
+        tag: 'immersive',
+        tagLabel: 'イマーシブ制作',
+        client: '渋谷サクラステージ',
+        name: 'ウワサバナシ調査委員会',
+        place: '東京・渋谷（商業施設）',
+        desc: '東急不動産株式会社様・404 Not Found様・TSUTAYA様のご協力のもと、渋谷サクラステージを周遊する都市伝説イマーシブ体験を企画・制作。施設一体型イベントとして日本経済新聞に掲載されました。',
+        result: '日本経済新聞掲載／施設全体を周遊する没入体験',
+        href: '/guide/case-uwasabanashi/',
+        hrefLabel: '制作事例の詳細を読む',
+      },
+      {
+        tag: 'immersive',
+        tagLabel: 'ミステリー原案',
+        client: '博報堂 × 紀伊國屋書店',
+        name: '月明かりの書店と呪われた原稿',
+        place: '東京（書店・閉店後）',
+        desc: '閉店後の紀伊國屋書店を舞台に開催された、一夜限りの体験型イベントの制作を担当。営業時間外の店舗を「入れない時間の特別な場所」として活用した事例です。',
+        result: '営業時間外の店舗活用／一夜限りの特別公演',
+        href: '/guide/eigyo-jikangai/',
+        hrefLabel: '営業時間外の活用について読む',
+      },
+      {
+        tag: 'immersive',
+        tagLabel: 'マジック×イマーシブ',
+        client: '六本木・会員制バー',
+        name: '怪盗と秘密の試験',
+        place: '東京・六本木（バー）',
+        desc: '日本一になった実績のあるマジシャン様とのコラボレーションによる、マジック×イマーシブ公演を六本木の会員制バーで企画・制作。小空間でも成立する高密度な没入体験です。',
+        result: '1空間完結型イマーシブ／店舗の夜間集客',
+        href: '/kaitou/',
+        hrefLabel: '公演特設サイト',
+      },
+      {
+        tag: 'shisetsu',
+        tagLabel: '街周遊型アートイマーシブ',
+        client: '下北沢（自社主催）',
+        name: 'ロスト・フレーム',
+        place: '東京・下北沢（街全体）',
+        desc: '下北沢の街に散らばった絵画を探し、隠された物語を辿る周遊型アートイマーシブ。街歩き×謎解き×絵画による参加型アート体験で、店舗を巡る回遊を生みました。',
+        result: '全公演完売／街全体の回遊設計',
+        href: '/taikenbizyutu/lostframe/',
+        hrefLabel: '公演ページを見る',
+      },
+    ],
+  },
+  {
+    key: 'murder',
+    label: 'マダミス（マーダーミステリー）',
+    eyebrow: 'MURDER MYSTERY',
+    desc: '施設・ブランドに合わせたオリジナルシナリオの制作から、公演運営まで。宿泊施設の「泊まる理由」づくりにも活用されています。',
+    works: [
+      {
+        tag: 'murder',
+        tagLabel: 'マーダーミステリー制作',
+        client: 'サーマルクライムスタジオ',
+        name: '宿泊者向けオリジナルマダミス',
+        place: '宿泊施設',
+        desc: '宿泊者向けのオリジナルマーダーミステリーを制作。宿泊とセットで体験できるコンテンツにすることで、施設に「泊まる理由」を作りました。',
+        result: '実施後、新規宿泊予約20件以上を獲得',
+        href: '/guide/hotel-event/',
+        hrefLabel: 'ホテル・宿泊施設の活用について読む',
+      },
+      {
+        tag: 'murder',
+        tagLabel: '自社レーベル',
+        client: 'UNLIMITED MYSTERY（東大マーダーミステリーサークル）',
+        name: '推理系マダミス作品群',
+        place: '公演・オンライン',
+        desc: '東大マーダーミステリーサークルによる推理系マダミスの制作・公演。ロジックを重視したシナリオ設計のノウハウを、企業・施設向けの制作にも活かしています。',
+        href: '/toudaimurder/works/',
+        hrefLabel: '作品一覧を見る',
+      },
+    ],
+  },
+  {
+    key: 'zunou',
+    label: '頭脳戦・心理戦',
+    eyebrow: 'BRAIN BATTLE',
+    desc: '日本で唯一の頭脳戦専門レーベル「HACKTALE（ハックテイル）」を運営。大会形式の大型イベントから、店舗向けの周遊型コンテンツまで制作します。',
+    works: [
+      {
+        tag: 'zunou',
+        tagLabel: '企画・制作・運営',
+        client: '自社主催',
+        name: '東京都頭脳王決定戦',
+        place: '東京都内4会場',
+        desc: '「東京都で最も頭の良い人を決める」をコンセプトに、都内4会場を同時に活用した大型の頭脳戦イベントを企画・運営。予選・本戦の大会形式で、リピート参加とコミュニティを生みました。',
+        result: '全公演チケット完売',
+        href: '/hacktale/event/zunouou/',
+        hrefLabel: '東京都頭脳王決定戦 2026',
+      },
+      {
+        tag: 'zunou',
+        tagLabel: 'コンテンツ制作',
+        client: 'カラオケ館',
+        name: '恣験',
+        place: '店舗（複数拠点）',
+        desc: '参加者が様々な試験へ挑戦する周遊型の頭脳戦コンテンツを制作。店舗を巡りながら挑戦する構造で、既存店舗の新しい来店動機を作りました。',
+        result: '店舗周遊型の頭脳戦コンテンツ',
+        href: '/services/zunousen/',
+        hrefLabel: '頭脳戦制作サービス',
+      },
+      {
+        tag: 'zunou',
+        tagLabel: '自社レーベル',
+        client: 'HACKTALE',
+        name: 'プレゼント・ポーカー／人狼定理／ダイスボックス ほか',
+        place: '一般公演',
+        desc: '交渉・ブラフ・論理を軸にしたオリジナル頭脳戦・心理戦ゲームを制作し、一般公演を展開。対人の読み合いのために設計された作品群です。',
+        href: '/hacktale/works/',
+        hrefLabel: 'HACKTALEの作品一覧',
+      },
+    ],
+  },
+  {
+    key: 'nazotoki',
+    label: '謎解き・アート体験',
+    eyebrow: 'PUZZLE / ART',
+    desc: 'アートと謎解きを融合した自社主催展や、企業・施設向けの謎解きイベント。広告費をかけずに集客した事例もあります。',
+    works: [
+      {
+        tag: 'nazotoki',
+        tagLabel: '企画・制作',
+        client: '自社主催',
+        name: 'ヌル・アーデン展',
+        place: '東京',
+        desc: '東京藝術大学出身アーティストとのコラボレーション企画。アートと謎解きを融合した体験型イベントを実施し、公演終了後には作品オークションも開催しました。',
+        result: '広告費0円でチケット1,500枚（4,000円）を販売',
+        href: '/game/null-arden/',
+        hrefLabel: 'ネタバレ記録を見る',
+      },
+    ],
+  },
+];
+
+const allWorks = groups.flatMap((g) => g.works);
+
+const listLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: '制作事例一覧｜体験型イベント・イマーシブ・マダミス・頭脳戦の実績',
+  description: '株式会社ex Labsが企画・制作した体験型イベントの実績一覧。',
+  url: new URL('/works/', site).toString(),
+  about: { '@id': new URL('/#organization', site).toString() },
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: allWorks.map((w, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: `${w.client}「${w.name}」`,
+      ...(w.href ? { url: new URL(w.href, site).toString() } : {}),
+    })),
+  },
+};
+
+const faqs = [
+  {
+    q: 'どのような業種・施設の実績がありますか？',
+    a: '商業施設（渋谷サクラステージ）、書店（紀伊國屋書店）、宿泊施設、カラオケ店、会員制バー、街全体（下北沢）など、空間を持つ企業・施設との実績が中心です。広告代理店（博報堂）と組んだ企画制作の実績もあります。',
+  },
+  {
+    q: '実績にある「新規宿泊予約20件以上」はどのような施策ですか？',
+    a: '宿泊施設向けにオリジナルのマーダーミステリーを制作し、宿泊とセットで体験できるプランにした事例です。コンテンツそのものが「泊まる理由」になるため、割引に頼らず新規予約を生みました。',
+  },
+  {
+    q: '自社の施設やブランドに合わせたオリジナル制作は可能ですか？',
+    a: '可能です。掲載している実績はすべて、場所・ブランド・参加者に合わせて企画から制作したものです。企画・シナリオ・制作物・集客・当日運営まで一貫して対応し、ご相談とお見積りは無料です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+<BaseLayout
+  title="制作事例一覧｜体験型イベント・イマーシブ・マダミス・頭脳戦の実績 - 株式会社ex Labs"
+  description="株式会社ex Labsの制作事例一覧。渋谷サクラステージの施設一体型イマーシブ（日経掲載）、紀伊國屋書店の閉店後イベント、宿泊施設向けマダミス（新規予約20件超）、都内4会場の頭脳戦大会（全公演完売）など、体験型イベントの実績をジャンル別に紹介します。"
+>
+<script type="application/ld+json" set:html={jsonLd(listLd)} />
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '制作事例一覧' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">WORKS</p>
+<h1 class="h2 serif"><span class="nobr">制作事例一覧</span></h1>
+<p class="lede">株式会社ex Labsが企画・制作した<strong>体験型イベントの実績</strong>を、イマーシブ・施設一体型／マダミス／頭脳戦・心理戦／謎解き・アートのジャンル別にまとめました。商業施設・書店・宿泊施設・店舗・街全体など、「場所」を舞台にした事例が中心です。制作のご相談は<a href="/services/" style="color:var(--accent)">サービス一覧</a>から、費用感は<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>をご覧ください。</p>
+<nav class="wk-jump" aria-label="ジャンルへ移動">
+{groups.map((g) => <a href={`#${g.key}`}>{g.label}</a>)}
+</nav>
+</div></section>
+
+{groups.map((g, gi) => (
+  <section class:list={['section', { tinted: gi % 2 === 0 }]} id={g.key}><div class="wrap">
+  <p class="eyebrow">{g.eyebrow}</p>
+  <h2 class="h2 serif">{g.label}</h2>
+  <p class="h2sub">{g.desc}</p>
+  <div class="wk-grid">
+  {g.works.map((w) => (
+    <article class={`wk-card tag-${w.tag}`}>
+      <p class="wk-tag">{w.tagLabel}</p>
+      <p class="wk-client">{w.client}</p>
+      <h3 class="wk-name serif">{w.name}</h3>
+      <p class="wk-place">{w.place}</p>
+      <p class="wk-desc">{w.desc}</p>
+      {w.result && <p class="wk-result"><span>成果</span>{w.result}</p>}
+      {w.href && <a class="wk-link" href={w.href}>{w.hrefLabel} →</a>}
+    </article>
+  ))}
+  </div>
+  </div></section>
+))}
+
+<section class="section"><div class="wrap narrow">
+<p class="eyebrow">MEDIA</p><h2 class="h2 serif">メディア掲載・受賞</h2>
+<p class="lede">渋谷サクラステージの施設一体型イベントは日本経済新聞に掲載されました。その他の掲載実績は<a href="/media/" style="color:var(--accent)">メディア掲載実績</a>、発表資料は<a href="/press/" style="color:var(--accent)">プレスリリース</a>をご覧ください。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">同じような事例を、貴社の場所・ブランドでも（相談無料）</p>
+<a class="btn" href="/#contact">制作について相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">制作のご依頼：<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作</a>／<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント</a><br>関連記事：<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/taikengata-idea/" style="color:var(--accent)">体験型イベントの企画アイデア15選</a>／<a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベント制作会社の選び方</a>／<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a></p>
+</div></section>
+
+<AuthorBox />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.wk-jump{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.wk-jump a{font-size:13px;font-weight:700;padding:8px 14px;border:1px solid rgba(51,48,43,.16);border-radius:999px;background:#fff;color:var(--ink);transition:border-color .2s,color .2s}
+.wk-jump a:hover{border-color:var(--accent);color:var(--accent)}
+.wk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-top:28px}
+.wk-card{position:relative;background:#fff;border-radius:var(--r-l);padding:26px 28px 24px;box-shadow:var(--shadow-1);display:flex;flex-direction:column;gap:8px}
+.wk-tag{margin:0;align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:.08em;color:#fff;background:var(--accent);padding:4px 10px;border-radius:999px}
+.wk-card.tag-murder .wk-tag{background:var(--tag-murder)}
+.wk-card.tag-zunou .wk-tag{background:var(--tag-zunou)}
+.wk-card.tag-shisetsu .wk-tag{background:var(--tag-shisetsu)}
+.wk-card.tag-immersive .wk-tag{background:var(--tag-immersive)}
+.wk-card.tag-nazotoki .wk-tag{background:var(--tag-nazotoki)}
+.wk-client{margin:6px 0 0;font-size:12.5px;font-weight:700;color:rgba(51,48,43,.55);letter-spacing:.04em}
+.wk-name{margin:0;font-size:20px;font-weight:800;line-height:1.5;color:var(--ink)}
+.wk-place{margin:0;font-size:12.5px;color:rgba(51,48,43,.6)}
+.wk-desc{margin:6px 0 0;font-size:14px;line-height:1.9;color:rgba(51,48,43,.8)}
+.wk-result{margin:8px 0 0;font-size:13.5px;font-weight:700;color:var(--ink);background:rgba(51,48,43,.05);border-radius:10px;padding:10px 14px;display:flex;gap:10px;align-items:baseline}
+.wk-result span{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--accent);flex:none}
+.wk-link{margin-top:auto;padding-top:10px;font-size:13.5px;font-weight:700;color:var(--accent);align-self:flex-start}
+#immersive,#murder,#zunou,#nazotoki,#faq{scroll-margin-top:88px}
+@media(max-width:760px){.wk-grid{grid-template-columns:1fr}.wk-card{padding:22px 20px 20px}}
+</style>

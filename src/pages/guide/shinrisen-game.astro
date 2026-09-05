@@ -1,0 +1,226 @@
+---
+// 「心理戦 ゲーム」「心理戦ゲーム おすすめ」「心理戦 イベント」の受け皿。
+// 心理戦とは（定義型）が押さえていない「ゲーム一覧・選び方・イベント企画」の
+// 意図を担当し、頭脳戦制作サービスへ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+
+const toc = [
+  { id: 'about', label: '心理戦ゲームとは' },
+  { id: 'types', label: '心理戦ゲームの4タイプ' },
+  { id: 'list', label: 'おすすめ心理戦ゲーム10選' },
+  { id: 'tips', label: '心理戦に強くなる5つのコツ' },
+  { id: 'event', label: 'イベント・研修で心理戦ゲームを使うには' },
+  { id: 'seisaku', label: 'オリジナル心理戦ゲームの制作依頼' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '心理戦ゲームと頭脳戦ゲームの違いは何ですか？',
+    a: '頭脳戦は論理・計算・記憶など「情報の処理」で勝負がつくゲーム、心理戦は「相手が何を考えているか」の読み合いで勝負がつくゲームです。実際には両方の要素を持つゲームが多く、ポーカーは確率計算（頭脳戦）とブラフ（心理戦）の両方で成り立っています。',
+  },
+  {
+    q: '初心者でも楽しめる心理戦ゲームはありますか？',
+    a: 'ルールが1分で説明できるものから始めるのがおすすめです。コヨーテ、インディアンポーカー、ごきぶりポーカー、ワンナイト人狼は、ルールが簡単で1回10〜15分で終わり、初対面でも盛り上がります。',
+  },
+  {
+    q: '心理戦ゲームは何人から遊べますか？',
+    a: '2人から遊べるもの（インディアンポーカー等）から、6〜10人向け（人狼、ワンナイト人狼）まで幅があります。イベントでは「4〜6人で1卓」を複数卓立てる形が、全員に発言機会が生まれて盛り上がりやすい構成です。',
+  },
+  {
+    q: '社内イベントや研修に心理戦ゲームは使えますか？',
+    a: '使えます。心理戦ゲームは「相手の立場で考える」「限られた情報で判断する」「交渉する」という仕事に直結するスキルを、遊びの中で自然に引き出します。勝敗が明確なので大会形式にしやすく、部署対抗戦や総会の目玉企画にも向きます。',
+  },
+  {
+    q: 'オリジナルの心理戦ゲームを制作してもらうことはできますか？',
+    a: 'できます。株式会社ex Labsは、日本で唯一の頭脳戦専門レーベル「HACKTALE（ハックテイル）」を運営し、交渉・ブラフ・正体隠匿を軸にしたオリジナルゲームを制作・公演しています。企業・施設・イベント向けに、テーマや人数、所要時間に合わせた心理戦コンテンツを企画から制作します。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const definedTermLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: '心理戦ゲーム',
+  description:
+    '心理戦ゲームとは、相手の思考や意図を読み、ブラフ（はったり）や正体の隠匿、交渉によって相手の裏をかくことで勝敗が決まるゲームのこと。ポーカー、人狼、コヨーテなどが代表例で、論理や計算力よりも「相手が何を考えているか」の読み合いが勝負を分ける。',
+  inDefinedTermSet: {
+    '@type': 'DefinedTermSet',
+    name: '体験型エンターテインメント用語集',
+    url: new URL('/guide/yougo/', site).toString(),
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  },
+  url: new URL('/guide/shinrisen-game/', site).toString(),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '心理戦ゲームとは？おすすめ10選と種類・選び方・イベントでの活かし方',
+  about: '心理戦ゲームの種類・おすすめ作品・イベント企画への活用',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/shinrisen-game.webp', site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-05',
+  dateModified: '2026-09-05',
+  mainEntityOfPage: new URL('/guide/shinrisen-game/', site).toString(),
+};
+---
+<BaseLayout
+  title="心理戦ゲームとは？おすすめ10選と種類・選び方・イベントでの活かし方 - 株式会社ex Labs"
+  description="心理戦ゲームとは、ブラフや正体の読み合いで勝敗が決まるゲームのこと。ポーカー・人狼・コヨーテなどおすすめ10選を4タイプに分けて紹介し、初心者向けの選び方、強くなるコツ、社内イベント・集客イベントでの活かし方、オリジナル制作の依頼まで頭脳戦専門レーベル運営の制作会社が解説。"
+  ogImage="/assets/guide/shinrisen-game.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(definedTermLd)} />
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '心理戦とは', href: '/guide/shinrisen/' },
+  { name: '心理戦ゲームとは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">MIND GAMES</p>
+<h1 class="h2 serif"><span class="nobr">心理戦ゲームとは？</span><br><span class="nobr">おすすめ10選と種類・選び方・</span><span class="nobr">イベントでの活かし方</span></h1>
+<div class="def-box">
+<p class="def-word"><span class="serif">心理戦ゲーム</span><span class="def-yomi">読み方：しんりせんげーむ</span></p>
+<p class="def-body">相手の思考や意図を読み、<strong>ブラフ（はったり）・正体の隠匿・交渉</strong>によって相手の裏をかくことで勝敗が決まるゲームのこと。ポーカー、人狼、コヨーテなどが代表例で、論理や計算力よりも<strong>「相手が何を考えているか」の読み合い</strong>が勝負を分ける。</p>
+</div>
+<p class="lede">このページでは、心理戦ゲームの4タイプとおすすめ10選、初心者向けの選び方、強くなるコツ、社内イベント・集客イベントでの活かし方までを、<strong>日本で唯一の頭脳戦専門レーベル「HACKTALE（ハックテイル）」</strong>を運営する株式会社ex Labsが解説します。「心理戦」という言葉の意味そのものは<a href="/guide/shinrisen/" style="color:var(--accent)">心理戦とは？意味・頭脳戦との違い →</a>をご覧ください。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">心理戦ゲームとは</h2>
+<p class="lede">心理戦ゲームの本質は、<strong>正解が「盤面」ではなく「相手の頭の中」にある</strong>ことです。将棋やパズルのように情報がすべて開示されているゲームは、計算が深い人が勝ちます。一方、心理戦ゲームでは情報が隠されており、「相手は嘘をついているか」「相手は自分をどう見ているか」を推測して行動を決めます。だから、経験や知識に差があっても勝負になり、初対面同士でも一気に距離が縮まります。</p>
+<p class="lede">頭脳戦ゲームとの違いを一言でいうと、<strong>頭脳戦は「情報を処理する力」、心理戦は「情報の裏を読む力」</strong>で勝つゲームです。実際には両方を含むゲームが多く、ポーカーは確率計算とブラフの両輪で成り立っています。<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類4タイプ →</a></p>
+</div></section>
+
+<section class="section" id="types"><div class="wrap narrow">
+<p class="eyebrow">TYPES</p><h2 class="h2 serif">心理戦ゲームの4タイプ</h2>
+<ul class="bullets">
+<li><strong>①ブラフ型</strong>：自分の手や状況を「強く見せる／弱く見せる」駆け引きで勝つ。ポーカー、ダウトなど。度胸と表情管理が問われます。</li>
+<li><strong>②正体隠匿型</strong>：誰が味方で誰が敵かが隠されており、議論の中で嘘を見抜く（または突き通す）。人狼、ワンナイト人狼など。大人数で盛り上がる定番です。</li>
+<li><strong>③交渉型</strong>：相手と取引・同盟・裏切りを繰り返し、最終的な利益で勝敗が決まる。プレイヤー同士の言葉のやりとりそのものがゲームになります。</li>
+<li><strong>④同時選択型</strong>：全員が同時に手を選び、相手の選択を予測した人が得をする。囚人のジレンマ型のゲームや「一番少ない数字を選んだ人が勝ち」系がこれにあたります。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="list"><div class="wrap narrow">
+<p class="eyebrow">10 PICKS</p><h2 class="h2 serif">おすすめ心理戦ゲーム10選</h2>
+<ul class="bullets">
+<li><strong>ポーカー（ブラフ型／2〜10人）</strong>：心理戦の代名詞。手札の強さより「強く見せるか、弱く見せるか」の賭け方で勝敗が動きます。ルールを覚えれば大人の集まりで最も汎用性の高い一本です。</li>
+<li><strong>インディアンポーカー（ブラフ型／2〜8人）</strong>：自分のカードだけが見えず、額に当てて相手のカードを見ながら賭ける。1分でルール説明が終わり、表情の読み合いがそのまま勝負になる入門向け。</li>
+<li><strong>コヨーテ（ブラフ型／3〜10人）</strong>：自分のカードを見ずに、場の合計値を順に宣言していく。「相手の宣言は本当か」を判断する構造がシンプルで、初対面でも即座に盛り上がります。</li>
+<li><strong>ごきぶりポーカー（ブラフ型／2〜6人）</strong>：伏せたカードを相手に渡し「これはゴキブリ」と宣言。受け取った側は本当か嘘かを当てる。嘘をつく側・見抜く側が明確で、心理戦の楽しさが最も分かりやすいゲームです。</li>
+<li><strong>スカル（ブラフ型／3〜6人）</strong>：花とドクロを伏せて、めくれる枚数を宣言し合う。持ち物は数枚のコインだけなのに読み合いは濃厚で、大人向けの夜の集まりに向きます。</li>
+<li><strong>ダウト（ブラフ型／3〜8人）</strong>：宣言した数字と違うカードを出しても、指摘されなければ通る。トランプ1組でできる心理戦の原点で、子どもから大人まで遊べます。</li>
+<li><strong>人狼ゲーム（正体隠匿型／6〜15人）</strong>：村人に紛れた人狼を議論で見つけ出す。嘘を突き通す側と見抜く側の心理戦が最も濃く、社内イベントや合宿の定番です。</li>
+<li><strong>ワンナイト人狼（正体隠匿型／3〜7人）</strong>：人狼を1晩・10分に凝縮した短縮版。脱落者が出ないため全員が最後まで参加でき、イベントの「複数卓同時進行」に最適です。</li>
+<li><strong>囚人のジレンマ型ゲーム（同時選択型／2人〜）</strong>：「協力」か「裏切り」かを同時に選び、組み合わせで得点が決まる。研修で「信頼と利益」を扱うときに、実感を伴う教材になります。</li>
+<li><strong>HACKTALEのオリジナル心理戦（交渉・正体隠匿型／6〜12人）</strong>：交渉と閃きで駆け引きを制する「プレゼント・ポーカー」、正体隠匿の駆け引きを論理で切り崩す「人狼定理」など、対人の読み合いのために設計された当社レーベルの作品群。一般公演のほか、イベント向けの貸切実施やオリジナル制作に対応しています。<a href="/hacktale/works/" style="color:var(--accent)">HACKTALEの作品一覧 →</a></li>
+</ul>
+</div></section>
+
+<section class="section" id="tips"><div class="wrap narrow">
+<p class="eyebrow">TIPS</p><h2 class="h2 serif">心理戦に強くなる5つのコツ</h2>
+<ul class="bullets">
+<li><strong>「自分がどう見えているか」から考える</strong>：相手を読む前に、相手が自分をどう読んでいるかを想像します。「弱そうに見えている」なら強気のブラフが通りやすい、という具合です。</li>
+<li><strong>普段の行動パターンを崩す</strong>：毎回同じ賭け方・同じ表情をしていると読まれます。あえて損な手を混ぜると、相手の読みが機能しなくなります。</li>
+<li><strong>言葉より行動を見る</strong>：発言は嘘をつけますが、賭け金の増減や発言のタイミングには本音が出ます。</li>
+<li><strong>「読めない」ときは確率に戻る</strong>：読み合いに迷ったら、期待値が高い方を選ぶ。心理戦の強者は、実は読まない判断も上手です。</li>
+<li><strong>負けを引きずらない</strong>：心理戦は運の要素があります。1回の負けで守りに入ると、その変化自体を読まれます。</li>
+</ul>
+<p class="vc-line"><a href="/guide/shinrisen/#strong" style="color:var(--accent)">心理戦に強い人の特徴 →</a></p>
+</div></section>
+
+<section class="section tinted" id="event"><div class="wrap narrow">
+<p class="eyebrow">FOR EVENTS</p><h2 class="h2 serif">イベント・研修で心理戦ゲームを使うには</h2>
+<ul class="bullets">
+<li><strong>社内イベント・懇親会</strong>：4〜6人で1卓の複数卓構成にすると全員に発言機会が生まれます。部署をシャッフルした卓割りで、普段話さない人同士の会話が自然に発生します。<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア →</a></li>
+<li><strong>研修・チームビルディング</strong>：心理戦ゲームは「相手の立場で考える」「限られた情報で決める」「交渉する」を遊びの中で引き出します。振り返りの時間をセットにすると学びが定着します。</li>
+<li><strong>集客イベント・大会</strong>：勝敗が明確なので予選・本戦のトーナメントにしやすく、リピート参加が生まれます。都内4会場・全公演完売の「東京都頭脳王決定戦」はその代表例です。<a href="/hacktale/event/zunouou/" style="color:var(--accent)">東京都頭脳王決定戦 →</a></li>
+<li><strong>店舗・施設の集客</strong>：バーや宿泊施設で「心理戦ナイト」のような定期開催にすると、来店動機とコミュニティが育ちます。</li>
+</ul>
+</div></section>
+
+<section class="section" id="seisaku"><div class="wrap narrow">
+<p class="eyebrow">ORDER</p><h2 class="h2 serif">オリジナル心理戦ゲームの制作依頼</h2>
+<p class="lede">既存ゲームでは「テーマに合わない」「人数が合わない」「毎年同じで飽きられる」という壁があります。株式会社ex Labsは、頭脳戦専門レーベルHACKTALEで培った設計ノウハウをもとに、<strong>企業・施設・イベントのテーマや人数、所要時間に合わせたオリジナルの心理戦・頭脳戦ゲーム</strong>を企画から制作します。カラオケ館様向けの周遊型頭脳戦コンテンツ「恣験」など、店舗と結びついた制作実績もあります。</p>
+<ul class="bullets">
+<li><strong>費用の目安</strong>：既存作品の貸切実施は数十万円台〜、オリジナル制作は企画・テストプレイ・制作物を含めて100万円前後〜が目安です。<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場 →</a></li>
+<li><strong>期間の目安</strong>：貸切実施は2〜4週間、オリジナル制作は企画確定から1〜3ヶ月。心理戦ゲームはバランス調整のテストプレイ回数が品質を決めます。</li>
+<li><strong>依頼の流れ</strong>：ヒアリング（無料）→ 企画提案 → 制作・テストプレイ → 当日運営 → 振り返り。<a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作とは？依頼の流れ →</a></li>
+</ul>
+<p class="vc-line"><a href="/services/zunousen/" style="color:var(--accent)">頭脳戦・心理戦コンテンツの制作依頼はこちら →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-zunou">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">心理戦・頭脳戦コンテンツの制作のご相談はこちら（無料）</p>
+<a class="btn" href="/services/zunousen/">頭脳戦制作サービスを見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/shinrisen/" style="color:var(--accent)">心理戦とは</a>／<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは</a>／<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類と選び方</a>／<a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作とは</a>／<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="zunou" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.def-box{max-width:680px;margin:40px auto 26px;background:#fff;border:1px solid rgba(51,48,43,.1);border-left:5px solid var(--accent);border-radius:14px;padding:26px 30px;text-align:left;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.def-word{margin:0 0 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:22px;font-weight:800;color:var(--ink)}
+.def-yomi{font-size:13px;font-weight:600;color:rgba(51,48,43,.55);letter-spacing:.04em}
+.def-body{margin:0;font-size:14.5px;line-height:2;color:rgba(51,48,43,.82)}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#types,#list,#tips,#event,#seisaku,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.def-box{padding:20px 20px}.def-word{font-size:19px;gap:10px}.toc{padding:22px 22px}}
+</style>

@@ -1,0 +1,224 @@
+---
+// 「マダミス 謎解き 違い」「マーダーミステリー 謎解き 違い」「マダミス 人狼 違い」
+// 「イマーシブ マダミス 違い」の比較意図の受け皿。マダミスとは（定義型）の本文は
+// 触らず、比較表で4ジャンル＋人狼を横断し、目的別の選び方から制作依頼へ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+
+const toc = [
+  { id: 'summary', label: '結論：マダミスと謎解きの違いは「答えの在りか」' },
+  { id: 'table', label: '5ジャンル比較表（マダミス・謎解き・イマーシブ・頭脳戦・人狼）' },
+  { id: 'madamis', label: 'マダミスの特徴' },
+  { id: 'nazotoki', label: '謎解きの特徴' },
+  { id: 'others', label: '人狼・イマーシブ・頭脳戦との違い' },
+  { id: 'choose', label: '目的別の選び方（イベント企画者向け）' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const rows = [
+  ['勝敗・ゴール', '犯人を当てる／自分の目的を達成する', '謎を解いて脱出・クリアする', '物語を体験すること自体が目的', '相手に勝つ', '人狼を全員追放する／村を全滅させる'],
+  ['答えの在りか', '他の参加者の頭の中（証言・嘘）', '出題者が用意した問題', '空間と物語の中', '相手の思考・盤面', '他の参加者の正体'],
+  ['人数', '4〜10人（作品ごとに固定）', '1人〜数百人', '数人〜数百人', '2〜12人', '5〜20人'],
+  ['所要時間', '2〜4時間', '30〜120分', '60〜180分', '30〜240分', '20〜60分'],
+  ['役割・演技', 'キャラクターを演じる', '基本なし', '観客＝参加者として振る舞う', '基本なし', '役職はあるが演技は薄い'],
+  ['リプレイ性', '同じ作品は1回のみ', '同じ作品は1回のみ', '再体験しやすい', '何度でも遊べる', '何度でも遊べる'],
+  ['向く場面', '少人数の懇親・研修・宿泊プラン', '大人数の集客・周遊・研修', 'ブランド体験・施設一体型イベント', '大会・社内対抗戦', '合宿・懇親会の定番'],
+];
+
+const faqs = [
+  {
+    q: 'マダミスと謎解きはどちらが初心者向けですか？',
+    a: '「気軽さ」なら謎解き、「深さ」ならマダミスです。謎解きは演技も長時間の拘束もなく、1人でも参加できます。マダミスはキャラクターを演じる抵抗感がある人もいますが、始まってしまえば物語に引き込まれ、初心者向けの作品も増えています。',
+  },
+  {
+    q: 'マーダーミステリーと人狼の違いは何ですか？',
+    a: '人狼は「正体」を隠し、ゲームごとに役職が変わる繰り返し型のゲームです。マーダーミステリーは固有のシナリオとキャラクターがあり、証言や証拠を集めて事件の真相を推理する一度きりの体験です。人狼は嘘を見抜く心理戦、マダミスは物語と推理が中心と言えます。',
+  },
+  {
+    q: 'イマーシブシアターとマダミスの違いは？',
+    a: 'イマーシブシアターは、俳優が演じる物語の中に観客が入り込む「観る」寄りの体験で、観客に明確な勝敗やゴールはありません。マダミスは参加者全員がキャラクターを演じ、推理と会話で結末を決める「遊ぶ」寄りの体験です。両方の要素を組み合わせた作品も増えています。',
+  },
+  {
+    q: '社内イベントにはマダミスと謎解きのどちらが向いていますか？',
+    a: '30名以上・部署横断・短時間なら謎解き、10名以下・相互理解・じっくりならマダミスが向きます。両方を組み合わせて、全体は謎解き、有志は別日にマダミスという構成もよく採用されます。',
+  },
+  {
+    q: 'オリジナルのマダミスや謎解きを制作依頼できますか？',
+    a: 'できます。株式会社ex Labsは謎解き・マダミス・イマーシブ・頭脳戦の4ジャンルを企画から制作・運営まで一貫して手がける制作会社です。目的や人数に合わせて最適なジャンルの選定からご提案します。ご相談・お見積りは無料です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'マダミスと謎解きの違いとは？イマーシブ・頭脳戦・人狼との比較表と目的別の選び方',
+  about: 'マダミス（マーダーミステリー）と謎解き・人狼・イマーシブ・頭脳戦の違い',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/madamis-nazotoki-chigai.webp', site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-05',
+  dateModified: '2026-09-05',
+  mainEntityOfPage: new URL('/guide/madamis-nazotoki-chigai/', site).toString(),
+};
+---
+<BaseLayout
+  title="マダミスと謎解きの違いとは？イマーシブ・頭脳戦・人狼との比較表と選び方 - 株式会社ex Labs"
+  description="マダミス（マーダーミステリー）と謎解きの違いを、ゴール・人数・所要時間・演技の有無・向く場面の5項目で比較。人狼・イマーシブシアター・頭脳戦との違いも一覧表で整理し、社内イベント・集客・研修など目的別の選び方を4ジャンルすべてを制作する会社が解説します。"
+  ogImage="/assets/guide/madamis-nazotoki-chigai.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'マダミスとは', href: '/guide/madamis/' },
+  { name: 'マダミスと謎解きの違い' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">COMPARISON</p>
+<h1 class="h2 serif"><span class="nobr">マダミスと謎解きの違いとは？</span><br><span class="nobr">イマーシブ・頭脳戦・人狼との</span><span class="nobr">比較表と目的別の選び方</span></h1>
+<p class="lede"><strong>マダミス（マーダーミステリー）</strong>と<strong>謎解き</strong>は、どちらも「推理」を扱う体験型コンテンツですが、答えの在りか・人数・所要時間・演技の有無がまったく違います。この記事では2つの違いを5項目で比較し、人狼・イマーシブシアター・頭脳戦との違いも一覧表に整理したうえで、社内イベント・集客・研修といった目的別の選び方を、4ジャンルすべてを制作する株式会社ex Labsが解説します。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="summary"><div class="wrap narrow">
+<p class="eyebrow">SUMMARY</p><h2 class="h2 serif">結論：違いは「答えの在りか」</h2>
+<p class="lede"><strong>謎解きの答えは「出題者が用意した問題」の中に、マダミスの答えは「他の参加者の頭の中」にあります。</strong>謎解きは問題を解けばゴールに辿り着ける一方、マダミスは他の参加者の証言や嘘を読み解かなければ真相に届きません。この違いが、人数（謎解きは何人でも／マダミスは作品ごとに固定）、所要時間（謎解きは短め／マダミスは2〜4時間）、演技の有無（謎解きは不要／マダミスはキャラクターを演じる）という差を生んでいます。</p>
+<ul class="bullets">
+<li><strong>謎解き</strong>：問題を解く体験。1人〜数百人、30〜120分、演技なし。集客・周遊・大人数研修に強い。<a href="/guide/nazotoki-event/" style="color:var(--accent)">謎解きイベントとは →</a></li>
+<li><strong>マダミス</strong>：物語の登場人物として推理し会話する体験。4〜10人、2〜4時間、演技あり。懇親・相互理解・宿泊プランに強い。<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは →</a></li>
+</ul>
+</div></section>
+
+<section class="section" id="table"><div class="wrap">
+<p class="eyebrow">TABLE</p><h2 class="h2 serif">5ジャンル比較表</h2>
+<p class="h2sub">マダミス・謎解き・イマーシブ・頭脳戦・人狼を、イベント企画で判断に使う7項目で比較しました。</p>
+<div class="cmp-wrap">
+<table class="cmp-table">
+<thead><tr><th>項目</th><th>マダミス</th><th>謎解き</th><th>イマーシブ</th><th>頭脳戦</th><th>人狼</th></tr></thead>
+<tbody>
+{rows.map((r) => (
+  <tr>{r.map((c, i) => (i === 0 ? <th scope="row">{c}</th> : <td>{c}</td>))}</tr>
+))}
+</tbody>
+</table>
+</div>
+<p class="vc-line" style="margin-top:20px">各ジャンルの詳細：<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは</a>／<a href="/guide/nazotoki-event/" style="color:var(--accent)">謎解きイベントとは</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは</a>／<a href="/guide/shinrisen-game/" style="color:var(--accent)">心理戦ゲームとは</a></p>
+</div></section>
+
+<section class="section tinted" id="madamis"><div class="wrap narrow">
+<p class="eyebrow">MURDER MYSTERY</p><h2 class="h2 serif">マダミスの特徴</h2>
+<ul class="bullets">
+<li><strong>参加者全員が登場人物</strong>：配られたキャラクターの設定と秘密を持ち、会話・証拠集め・投票で真相と結末を決めます。</li>
+<li><strong>一度きりの体験</strong>：真相を知ると同じ作品は遊べません。だからこそ体験の密度が高く、「あの作品をやった仲間」という共通体験が残ります。</li>
+<li><strong>相互理解に強い</strong>：役を演じるうちに、普段は見えないメンバーの判断力や意外な一面が見えます。研修・懇親会・宿泊施設の体験プランに向きます。</li>
+<li><strong>人数と時間が固定</strong>：作品ごとに人数が決まり、2〜4時間かかります。大人数を一度にさばく用途には向きません。</li>
+</ul>
+<p class="vc-line"><a href="/guide/madamis-asobikata/" style="color:var(--accent)">マダミスの遊び方 →</a>／<a href="/guide/madamis-shoshinsha/" style="color:var(--accent)">初心者ガイド →</a>／<a href="/guide/madamis-seisaku/" style="color:var(--accent)">マダミス制作とは →</a></p>
+</div></section>
+
+<section class="section" id="nazotoki"><div class="wrap narrow">
+<p class="eyebrow">PUZZLE</p><h2 class="h2 serif">謎解きの特徴</h2>
+<ul class="bullets">
+<li><strong>問題を解く快感が中心</strong>：ひらめき・観察・協力で答えに辿り着く。演技や長時間の拘束がなく、参加のハードルが最も低いジャンルです。</li>
+<li><strong>人数の自由度が高い</strong>：1人でも数百人でも同時に成立します。商業施設の周遊イベントや、全社研修のような大人数に向きます。</li>
+<li><strong>空間と相性がよい</strong>：館内・街なかに手がかりを配置する周遊型にすると、回遊・滞在時間・テナント送客が生まれます。<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントとは →</a></li>
+<li><strong>体験は短め</strong>：30〜120分が中心。物語への没入や参加者同士の深い会話は、マダミスやイマーシブに譲ります。</li>
+</ul>
+<p class="vc-line"><a href="/guide/nazotoki-idea/" style="color:var(--accent)">謎解きイベントのアイデア →</a>／<a href="/guide/nazotoki-company/" style="color:var(--accent)">謎解き制作会社の選び方 →</a></p>
+</div></section>
+
+<section class="section tinted" id="others"><div class="wrap narrow">
+<p class="eyebrow">OTHERS</p><h2 class="h2 serif">人狼・イマーシブ・頭脳戦との違い</h2>
+<ul class="bullets">
+<li><strong>人狼との違い</strong>：人狼は「正体」を隠す繰り返し型の心理戦で、固有の物語はありません。マダミスは固有のシナリオとキャラクターがあり、証拠を集めて事件を推理する一度きりの体験です。</li>
+<li><strong>イマーシブとの違い</strong>：イマーシブは俳優が演じる物語の中に観客が入り込む体験で、明確な勝敗やゴールがないことが多い。マダミス・謎解きには「真相」「正解」というゴールがあります。空間そのものをコンテンツにしたい施設・ブランド向けには、イマーシブが最も強いジャンルです。<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは →</a></li>
+<li><strong>頭脳戦との違い</strong>：頭脳戦は「相手に勝つ」対戦ゲームで、物語や謎はあっても勝敗が中心です。何度でも遊べるため、大会・社内対抗戦・定期開催に向きます。<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類 →</a></li>
+</ul>
+</div></section>
+
+<section class="section" id="choose"><div class="wrap narrow">
+<p class="eyebrow">HOW TO CHOOSE</p><h2 class="h2 serif">目的別の選び方（イベント企画者向け）</h2>
+<ul class="bullets">
+<li><strong>商業施設・街の集客、回遊を作りたい</strong> → 謎解き（周遊型）またはイマーシブ（施設一体型）。渋谷サクラステージの施設一体型イベントは日本経済新聞に掲載されました。<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベント →</a></li>
+<li><strong>社内の相互理解・少人数の懇親</strong> → マダミス。10名以下でじっくり。<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修 →</a></li>
+<li><strong>30名以上の全社イベント・研修</strong> → 謎解き（チーム対抗）。短時間で全員参加。<a href="/guide/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修 →</a></li>
+<li><strong>ブランドや商品の世界観を体験させたい</strong> → イマーシブ。<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの企業活用 →</a></li>
+<li><strong>宿泊施設で「泊まる理由」を作りたい</strong> → マダミス（宿泊セット）。新規宿泊予約20件以上の実績があります。<a href="/guide/hotel-event/" style="color:var(--accent)">ホテル・宿泊施設の活用 →</a></li>
+<li><strong>大会形式・毎年の定番にしたい</strong> → 頭脳戦。都内4会場・全公演完売の実績があります。<a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作とは →</a></li>
+</ul>
+<p class="lede">迷ったら、目的と人数を伝えていただければジャンル選定からご提案します。費用感は<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場 →</a>、実績は<a href="/works/" style="color:var(--accent)">制作事例一覧 →</a>をご覧ください。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-murder">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">ジャンル選びからご相談ください（無料）</p>
+<a class="btn" href="/services/">サービス一覧を見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは</a>／<a href="/guide/nazotoki-event/" style="color:var(--accent)">謎解きイベントとは</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="murder" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+.cmp-wrap{overflow-x:auto;margin-top:28px;-webkit-overflow-scrolling:touch}
+.cmp-table{width:100%;min-width:760px;border-collapse:separate;border-spacing:0;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 6px 22px rgba(51,48,43,.06);font-size:13.5px;line-height:1.7}
+.cmp-table th,.cmp-table td{padding:14px 14px;border-bottom:1px solid rgba(51,48,43,.08);vertical-align:top;text-align:left}
+.cmp-table thead th{background:var(--ink);color:#fff;font-weight:800;font-size:13px;letter-spacing:.04em}
+.cmp-table thead th:nth-child(2){background:var(--tag-murder)}
+.cmp-table tbody th{background:rgba(51,48,43,.04);font-weight:800;white-space:nowrap;width:120px}
+.cmp-table tbody td:first-of-type{background:rgba(231,85,147,.06);font-weight:700}
+.cmp-table tr:last-child th,.cmp-table tr:last-child td{border-bottom:0}
+#summary,#table,#madamis,#nazotoki,#others,#choose,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

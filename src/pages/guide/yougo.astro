@@ -1,0 +1,154 @@
+---
+// 体験型イベント用語集（/guide/yougo/）。各「〜とは」記事が個別に持つ DefinedTerm を
+// 1つの DefinedTermSet にまとめ、AI検索・生成AIが引用しやすい定義集にする。
+// 全ての軸ページへ内部リンクを配るハブでもある。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+
+type Term = { id: string; name: string; yomi?: string; def: string; href?: string; label?: string };
+const groups: { key: string; label: string; terms: Term[] }[] = [
+  {
+    key: 'genre',
+    label: 'ジャンル',
+    terms: [
+      { id: 'taikengata', name: '体験型イベント', yomi: 'たいけんがたいべんと', def: '参加者が「見る」のではなく、自分の行動で体験を進めるイベントの総称。謎解き・マダミス・イマーシブ・頭脳戦などが含まれる。', href: '/guide/taikengata-event/', label: '体験型イベントとは' },
+      { id: 'sankagata', name: '参加型イベント', yomi: 'さんかがたいべんと', def: '観客が受け身ではなく、投票・発言・行動などで内容に関与するイベント。体験型イベントとほぼ同義で使われる。', href: '/guide/sankagata-event/', label: '参加型イベントとは' },
+      { id: 'immersive', name: 'イマーシブ', yomi: 'いまーしぶ（immersive）', def: '「没入型の」という意味の英語。観客が物語や空間の中に入り込み、体験の一部になるエンターテインメントを指す。', href: '/guide/immersive/', label: 'イマーシブとは' },
+      { id: 'immersive-theater', name: 'イマーシブシアター', yomi: 'いまーしぶしあたー', def: '客席と舞台の区別がなく、観客が俳優と同じ空間を歩き回りながら物語を体験する演劇形式。', href: '/guide/immersive-theater/', label: 'イマーシブシアターとは' },
+      { id: 'botsunyukan', name: '没入感', yomi: 'ぼつにゅうかん', def: '作品や体験の世界に入り込み、現実を忘れるほど集中している感覚。イマーシブ体験の価値を表す言葉。', href: '/guide/botsunyukan/', label: '没入感とは' },
+      { id: 'madamis', name: 'マダミス（マーダーミステリー）', yomi: 'まだみす', def: '参加者が事件の登場人物を演じ、会話と推理で犯人や真相を探る体験型ゲーム。同じ作品は一度しか遊べない。', href: '/guide/madamis/', label: 'マダミスとは' },
+      { id: 'nazotoki', name: '謎解きイベント', yomi: 'なぞときいべんと', def: '出題された謎や暗号を解き、ゴールを目指すイベント。人数の自由度が高く、施設の周遊や研修に使われる。', href: '/guide/nazotoki-event/', label: '謎解きイベントとは' },
+      { id: 'zunousen', name: '頭脳戦', yomi: 'ずのうせん', def: '論理・推理・交渉・記憶など、知的な能力を使って相手と勝敗を競う戦い。対戦型の体験コンテンツのジャンル名としても使われる。', href: '/guide/zunousen/', label: '頭脳戦とは' },
+      { id: 'shinrisen', name: '心理戦', yomi: 'しんりせん', def: '相手の思考や意図を読み、自分の狙いを隠して裏をかくことで優位に立つ戦い方。ブラフや正体の読み合いで勝敗が決まる。', href: '/guide/shinrisen/', label: '心理戦とは' },
+      { id: 'shinrisen-game', name: '心理戦ゲーム', yomi: 'しんりせんげーむ', def: 'ブラフ・正体隠匿・交渉によって相手の裏をかくことで勝敗が決まるゲーム。ポーカー・人狼・コヨーテなどが代表例。', href: '/guide/shinrisen-game/', label: '心理戦ゲームとは' },
+      { id: 'jinro', name: '人狼ゲーム', yomi: 'じんろうげーむ', def: '村人に紛れた人狼を議論で見つけ出す正体隠匿型の心理戦ゲーム。役職はゲームごとに変わり、何度でも遊べる。', href: '/guide/madamis-nazotoki-chigai/', label: 'マダミス・人狼との違い' },
+    ],
+  },
+  {
+    key: 'format',
+    label: '形式・設計',
+    terms: [
+      { id: 'shuyu', name: '周遊型', yomi: 'しゅうゆうがた', def: '施設や街の複数地点に手がかりや目的地を配置し、参加者が移動しながら体験する形式。回遊と滞在時間を生む。', href: '/guide/shuyu-event/', label: '周遊型イベントとは' },
+      { id: 'kaiyu', name: '回遊', yomi: 'かいゆう', def: '来館者が施設内の複数のエリアや店舗を巡ること。商業施設では回遊率や滞在時間がイベントの成果指標になる。', href: '/guide/shuyu-event/', label: '回遊を生む仕組み' },
+      { id: 'shisetsu-ittai', name: '施設一体型イベント', yomi: 'しせついったいがた', def: '施設そのものを物語の舞台として使うイベント。渋谷サクラステージで実施した事例は日本経済新聞に掲載された。', href: '/guide/case-uwasabanashi/', label: '制作事例' },
+      { id: 'kashikiri', name: '貸切公演', yomi: 'かしきりこうえん', def: '企業や団体が既存の公演を貸し切って実施する形式。オリジナル制作より短期間・低予算で始められる。', href: '/guide/event-hiyou/', label: '費用相場' },
+      { id: 'ichiya', name: '一夜限り公演', yomi: 'いちやかぎりこうえん', def: '1日限定で開催する特別公演。閉店後の店舗など「普段は入れない時間・場所」と組み合わせると価値が高まる。', href: '/guide/eigyo-jikangai/', label: '営業時間外の活用' },
+      { id: 'testplay', name: 'テストプレイ', yomi: 'てすとぷれい', def: '本番前に実際に遊んで難易度・所要時間・バランスを検証する工程。体験型コンテンツの品質はテストプレイの回数で決まる。', href: '/guide/madamis-making/', label: 'マダミスの作り方' },
+      { id: 'gm', name: 'GM（ゲームマスター）', yomi: 'じーえむ', def: 'マダミスや頭脳戦の進行役。ルール説明・時間管理・エンディングの読み上げなどを担い、体験の質を左右する。', href: '/guide/madamis-asobikata/', label: 'マダミスの遊び方' },
+      { id: 'ho', name: 'HO（ハンドアウト）', yomi: 'えいちおー', def: 'マダミスで各参加者に配られる、キャラクターの設定・目的・秘密が書かれた資料。', href: '/guide/madamis-asobikata/', label: 'マダミスの遊び方' },
+      { id: 'shotai', name: '正体隠匿', yomi: 'しょうたいいんとく', def: '参加者の役割や陣営が他の参加者に隠されているゲームの構造。人狼やマダミスの基本要素。', href: '/guide/shinrisen-game/', label: '心理戦ゲームの種類' },
+      { id: 'bluff', name: 'ブラフ', yomi: 'ぶらふ', def: '実際より強く、または弱く見せるはったり。ポーカーをはじめとする心理戦ゲームの中心的な駆け引き。', href: '/guide/shinrisen/', label: '心理戦とは' },
+      { id: 'netabare', name: 'ネタバレ', yomi: 'ねたばれ', def: '謎の答えや物語の真相を明かすこと。マダミス・謎解きは一度きりの体験のため、参加前のネタバレは厳禁とされる。', href: '/game/', label: '過去コンテンツのネタバレ' },
+    ],
+  },
+  {
+    key: 'venue',
+    label: '施設・場所',
+    terms: [
+      { id: 'shisetsu-katsuyo', name: '施設活用イベント', yomi: 'しせつかつよういべんと', def: '商業施設・宿泊施設・文化施設などの空間を舞台にして集客や回遊を生むイベント。空間そのものをコンテンツにする考え方。', href: '/guide/shisetsu-katsuyo/', label: '施設活用イベントとは' },
+      { id: 'saiji', name: '催事', yomi: 'さいじ', def: '商業施設や百貨店で期間限定に行われる販売・展示・イベントの総称。ポップアップとの違いは主催と目的にある。', href: '/guide/saiji/', label: '催事とは' },
+      { id: 'popup', name: 'ポップアップ', yomi: 'ぽっぷあっぷ', def: '期間限定で出店・開催される店舗やイベント。体験型のポップアップは、物販だけでなく回遊や話題化を狙える。', href: '/guide/popup-event/', label: 'ポップアップイベントとは' },
+      { id: 'yukyu', name: '遊休区画', yomi: 'ゆうきゅうくかく', def: 'テナントが入っていない空き区画や使われていないスペース。体験型イベントの拠点にすると期間限定の目的地に変わる。', href: '/guide/yukyu-kukaku/', label: '遊休区画の活用' },
+      { id: 'eigyo', name: '営業時間外活用', yomi: 'えいぎょうじかんがいかつよう', def: '閉店後・開館前の施設を使ってイベントを行うこと。「普段は入れない時間」の非日常性が価値になる。', href: '/guide/eigyo-jikangai/', label: '営業時間外の活用' },
+      { id: 'shogyo', name: '商業施設イベント', yomi: 'しょうぎょうしせついべんと', def: 'ショッピングモールや駅ビルなどで行う集客イベント。回遊・滞在時間・テナント送客が成果指標になる。', href: '/guide/shogyoshisetsu-event/', label: '商業施設の集客イベント' },
+    ],
+  },
+  {
+    key: 'business',
+    label: '依頼・費用',
+    terms: [
+      { id: 'seisaku', name: '制作依頼', yomi: 'せいさくいらい', def: '施設・企業に合わせたオリジナルの体験型コンテンツを制作会社に依頼すること。企画・シナリオ・制作物・運営まで含むのが一般的。', href: '/services/', label: 'サービス一覧' },
+      { id: 'revenue', name: 'レベニューシェア', yomi: 'れべにゅーしぇあ', def: 'チケット売上などの成果に応じて費用を分配する契約形態。株式会社ex Labsは案件によって初期費用0円で対応する。', href: '/guide/event-hiyou/', label: '費用相場と初期費用0円の条件' },
+      { id: 'full', name: 'フルパッケージ', yomi: 'ふるぱっけーじ', def: '企画・シナリオ・制作物・集客・当日運営までを一括で請け負う依頼形態。100万円前後〜が一般的な目安。', href: '/guide/event-hiyou/', label: '費用相場' },
+      { id: 'kenshu', name: '体験型研修', yomi: 'たいけんがたけんしゅう', def: '謎解きやマダミスを使い、コミュニケーションや判断力を遊びの中で引き出す研修。チームビルディングに用いられる。', href: '/guide/madamis-kenshu/', label: 'マダミス研修とは' },
+      { id: 'ip', name: 'IP', yomi: 'あいぴー', def: '作品・キャラクター・ブランドなどの知的財産。IPの世界観を体験型イベントに落とし込む制作依頼が増えている。', href: '/services/immersive/', label: 'イマーシブ制作' },
+    ],
+  },
+];
+
+const allTerms = groups.flatMap((g) => g.terms);
+
+const setLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTermSet',
+  '@id': new URL('/guide/yougo/#set', site).toString(),
+  name: '体験型エンターテインメント用語集',
+  description: 'イマーシブ・マダミス・頭脳戦・心理戦・謎解き・施設活用イベントに関する用語の定義集。株式会社ex Labs編。',
+  url: new URL('/guide/yougo/', site).toString(),
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  hasDefinedTerm: allTerms.map((t) => ({
+    '@type': 'DefinedTerm',
+    '@id': new URL(`/guide/yougo/#${t.id}`, site).toString(),
+    name: t.name,
+    description: t.def,
+    ...(t.href ? { url: new URL(t.href, site).toString() } : {}),
+  })),
+};
+---
+<BaseLayout
+  title="体験型イベント用語集｜イマーシブ・マダミス・頭脳戦・心理戦・施設活用の用語解説 - 株式会社ex Labs"
+  description="体験型エンターテインメントの用語集。イマーシブ・没入感・マダミス・頭脳戦・心理戦・謎解き・周遊型・回遊・催事・遊休区画・レベニューシェアなど、イベント企画と制作依頼で使う用語を制作会社（日経掲載）がわかりやすく定義。各用語の詳しい解説記事へのリンク付き。"
+>
+<script type="application/ld+json" set:html={jsonLd(setLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '解説記事一覧', href: '/guide/' },
+  { name: '体験型イベント用語集' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">GLOSSARY</p>
+<h1 class="h2 serif"><span class="nobr">体験型イベント用語集</span></h1>
+<p class="lede">イマーシブ・マダミス・頭脳戦・心理戦・謎解き・施設活用イベントの企画や制作依頼で出てくる用語を、<strong>謎解き・マダミス・イマーシブ・頭脳戦の4ジャンルを制作する株式会社ex Labs</strong>がまとめました。各用語には詳しい解説記事へのリンクを付けています。</p>
+<nav class="yg-jump" aria-label="分類へ移動">
+{groups.map((g) => <a href={`#g-${g.key}`}>{g.label}</a>)}
+</nav>
+</div></section>
+
+{groups.map((g, gi) => (
+  <section class:list={['section', { tinted: gi % 2 === 0 }]} id={`g-${g.key}`}><div class="wrap narrow">
+  <h2 class="h2 serif">{g.label}</h2>
+  <dl class="yg-list">
+  {g.terms.map((t) => (
+    <div class="yg-item" id={t.id}>
+      <dt><span class="yg-name serif">{t.name}</span>{t.yomi && <span class="yg-yomi">{t.yomi}</span>}</dt>
+      <dd>{t.def}{t.href && <> <a class="yg-link" href={t.href}>{t.label ?? '詳しく読む'} →</a></>}</dd>
+    </div>
+  ))}
+  </dl>
+  </div></section>
+))}
+
+<section class="section"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">用語だけでなく、企画からご相談ください（無料）</p>
+<a class="btn" href="/services/">サービス一覧を見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/" style="color:var(--accent)">解説記事一覧</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧</a>／<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>／<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミスと謎解きの違い</a>／<a href="/company/" style="color:var(--accent)">会社概要</a></p>
+</div></section>
+
+<AuthorBox />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.yg-jump{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.yg-jump a{font-size:13px;font-weight:700;padding:8px 14px;border:1px solid rgba(51,48,43,.16);border-radius:999px;background:#fff;color:var(--ink);transition:border-color .2s,color .2s}
+.yg-jump a:hover{border-color:var(--accent);color:var(--accent)}
+.yg-list{margin:28px 0 0;display:flex;flex-direction:column;gap:14px}
+.yg-item{background:#fff;border:1px solid rgba(51,48,43,.08);border-left:4px solid var(--accent);border-radius:12px;padding:18px 22px;box-shadow:0 4px 16px rgba(51,48,43,.05);scroll-margin-top:88px}
+.yg-item dt{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:0 0 8px}
+.yg-name{font-size:18px;font-weight:800;color:var(--ink)}
+.yg-yomi{font-size:12.5px;font-weight:600;color:rgba(51,48,43,.55)}
+.yg-item dd{margin:0;font-size:14.5px;line-height:1.9;color:rgba(51,48,43,.82)}
+.yg-link{font-weight:700;color:var(--accent);white-space:nowrap}
+#g-genre,#g-format,#g-venue,#g-business{scroll-margin-top:88px}
+@media(max-width:640px){.yg-item{padding:16px 16px}}
+</style>

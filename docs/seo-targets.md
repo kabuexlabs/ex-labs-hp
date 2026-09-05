@@ -33,6 +33,7 @@
 | マダミス 企業 イベント / マダミス ビジネス | /guide/madamis-business/ |
 | マダミス 研修 | /guide/madamis-kenshu/ |
 | マダミス 初心者 / マダミス 遊び方 | /guide/madamis-shoshinsha/ /guide/madamis-asobikata/ |
+| マダミス 謎解き 違い / マーダーミステリー 人狼 違い / イマーシブ マダミス 違い | /guide/madamis-nazotoki-chigai/（2026-09-05 新設） |
 
 ## 軸3 頭脳戦
 | ワード | 担当ページ |
@@ -45,7 +46,7 @@
 | ワード | 担当ページ |
 |---|---|
 | 心理戦 / 心理戦とは / 頭脳戦 心理戦 違い / 心理戦 強い人 | /guide/shinrisen/ |
-| 心理戦 ゲーム / 心理戦 イベント 制作 | 未作成（候補） |
+| 心理戦 ゲーム / 心理戦ゲーム おすすめ / 心理戦 イベント | /guide/shinrisen-game/（2026-09-05 新設） |
 
 ## 軸5 施設活用
 | ワード | 担当ページ |
@@ -67,11 +68,18 @@
 | 体験型 イベント 会社 / 体験型 イベント 制作会社 | /guide/taikengata-company/ |
 | 参加型イベント / 参加型とは | /guide/sankagata-event/ |
 | 社内イベント 企画 | /guide/shanai-event/ |
+| 体験型イベント 費用 / イベント 制作 費用 相場 / 謎解きイベント 費用 | /guide/event-hiyou/（2026-09-05 新設） |
+| 体験型イベント 事例 / イマーシブ 事例 / マダミス 事例 / 制作事例 | /works/（2026-09-05 新設） |
 
 ## 軸7 周遊イベント（2026-09-05 追加）
 | ワード | 担当ページ |
 |---|---|
 | 周遊イベント / 周遊 イベント アイデア / 周遊型 謎解き / 回遊 施策 アイデア / 回遊 周遊 違い | /guide/shuyu-event/ |
+
+## 横断ハブ
+- 体験型イベント用語集（DefinedTermSet・AIO用） → /guide/yougo/
+- 制作事例一覧 → /works/
+- 費用相場 → /guide/event-hiyou/
 
 ## 季節
 - ハロウィン イベント 企画（先取り承認済み） → /guide/halloween-event/
