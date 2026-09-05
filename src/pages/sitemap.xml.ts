@@ -98,7 +98,7 @@ export const GET: APIRoute = async ({ site }) => {
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {
     '/guide/': '2026-08-10',
-    '/guide/madamis/': '2026-09-04',
+    '/guide/madamis/': '2026-09-05',
     '/guide/madamis-cost/': '2026-07-30',
     '/guide/madamis-making/': '2026-08-10',
     '/guide/madamis-company/': '2026-08-10',
@@ -114,7 +114,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/hotel-event/': '2026-08-10',
     '/guide/taikengata-event/': '2026-08-10',
     '/guide/sankagata-event/': '2026-08-13',
-    '/guide/taikengata-company/': '2026-08-19',
+    '/guide/taikengata-company/': '2026-09-05',
     '/guide/zunousen/': '2026-08-27',
     '/guide/zunousen-game/': '2026-08-27',
     '/guide/shinrisen/': '2026-08-29',
