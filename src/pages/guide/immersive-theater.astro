@@ -19,6 +19,7 @@ const toc = [
   { id: 'howto', label: '初めての楽しみ方' },
   { id: 'tokyo', label: '東京で体験できるイマーシブ' },
   { id: 'make', label: '企業・施設が制作するには' },
+  { id: 'koen', label: 'イマーシブ公演とは？イマーシブシアターとの違い' },
   { id: 'faq', label: 'よくある質問' },
 ];
 
@@ -42,6 +43,10 @@ const faqs = [
   {
     q: 'イマーシブシアターを自社の施設で開催してもらえますか？',
     a: '可能です。株式会社ex Labsでは、商業施設・文化施設・街を舞台にしたイマーシブ体験の企画・制作・運営を一貫して行っています。初期費用を抑えたレベニューシェア型のご提案にも対応しています。',
+  },
+  {
+    q: 'イマーシブ公演とイマーシブシアターは同じものですか？',
+    a: 'ほぼ同じ意味で使われています。イマーシブ公演は没入型の公演全般を指す広い言葉で、演劇のほかマジックや音楽と組み合わせた公演も含みます。イマーシブシアターはその中の演劇形式を指す呼び方です。商業施設や街全体を舞台にした期間限定のものは、イマーシブイベントと呼ばれることが多いです。',
   },
 ];
 
@@ -81,12 +86,12 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-01',
-  dateModified: '2026-09-03',
+  dateModified: '2026-09-06',
   mainEntityOfPage: new URL('/guide/immersive-theater/', Astro.site).toString(),
 };
 ---
 <BaseLayout
-  title="イマーシブシアターとは？演劇との違い・楽しみ方・東京の体験スポット - 株式会社ex Labs"
+  title="イマーシブシアター（イマーシブ公演）とは？演劇との違い・楽しみ方・東京の体験スポット - 株式会社ex Labs"
   description="イマーシブシアター（イマーシブ演劇）とは、観客が空間の中を歩き回りながら物語を体験する没入型の演劇のこと。普通の演劇との違い・初めての楽しみ方・服装・東京で体験できる公演まで、イマーシブ制作会社がわかりやすく解説します。"
   ogImage="/assets/guide/immersive-theater.webp"
 >
@@ -165,6 +170,17 @@ const articleLd = {
 <p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼はこちら →</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">企業のイマーシブイベント事例4選 →</a></p>
 </div></section>
 
+<section class="section tinted" id="koen"><div class="wrap narrow">
+<p class="eyebrow">TERMS</p><h2 class="h2 serif">イマーシブ公演とは？イマーシブシアターとの違い</h2>
+<p class="lede"><strong>イマーシブ公演</strong>とは、観客が物語の空間に入り込み、俳優と同じ場所で体験する「没入型の公演」全体を指す言葉です。<strong>イマーシブシアター</strong>はその中の演劇形式を指す呼び方で、実際には「イマーシブ公演」「イマーシブシアター」「没入型演劇」「体験型演劇」はほぼ同じ意味で使われています。チケットサイトや告知では「イマーシブ公演」、ジャンル名としては「イマーシブシアター」が使われる傾向があります。</p>
+<ul class="bullets">
+<li><strong>イマーシブ公演</strong>：没入型の公演全般。演劇だけでなく、マジックや音楽、展示と組み合わせた公演も含む広い言葉。六本木の会員制バーで制作した「怪盗と秘密の試験」はマジック×イマーシブ公演です。</li>
+<li><strong>イマーシブシアター</strong>：客席と舞台の区別をなくし、観客が歩き回りながら物語を体験する演劇形式。海外の「Sleep No More」が代表例としてよく挙げられます。</li>
+<li><strong>イマーシブイベント</strong>：商業施設や街全体を舞台にした期間限定の没入型イベント。渋谷サクラステージで開催した「ウワサバナシ調査委員会」がこの型で、日本経済新聞に掲載されました。</li>
+</ul>
+<p class="vc-line"><a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？意味・読み方 →</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントとは →</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集 →</a></p>
+</div></section>
+
 <ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
@@ -204,6 +220,6 @@ const articleLd = {
 .def-word{margin:0 0 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:22px;font-weight:800;color:var(--ink)}
 .def-en{font-size:14px;font-weight:700;color:var(--accent);letter-spacing:.06em}
 .def-body{margin:0;font-size:15px;line-height:2;color:rgba(51,48,43,.85)}
-#about,#diff,#howto,#tokyo,#make,#faq{scroll-margin-top:88px}
+#about,#diff,#howto,#tokyo,#make,#koen,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}.def-box{padding:20px 20px}.def-word{font-size:19px;gap:10px}}
 </style>

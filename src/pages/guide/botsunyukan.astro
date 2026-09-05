@@ -18,6 +18,7 @@ const toc = [
   { id: 'iikae', label: '没入感の言い換え・類語' },
   { id: 'reibun', label: '例文・使い方' },
   { id: 'takameru', label: '没入感を高める方法（体験設計の視点）' },
+  { id: 'botsunyu', label: '「没入」とは？没入するの意味・使い方' },
   { id: 'faq', label: 'よくある質問' },
 ];
 
@@ -49,6 +50,10 @@ const faqs = [
   {
     q: '没入感という言葉はビジネスや学習の文脈でも使えますか？',
     a: '使えます。「没入感のある研修」「没入して作業できる環境」のように、集中して対象に入り込んでいる状態を表せます。心理学でいう「フロー状態」に近い意味で用いられることもあります。',
+  },
+  {
+    q: '「没入」と「没入感」はどう違いますか？',
+    a: '「没入」は一つのことに深く入り込む行為や状態を指し、「没入する」と動詞で使います。「没入感」はその状態で体験者が得る感覚で、「没入感がある」「没入感が高い」のように作品や体験の評価に使います。英語では没入が immersion、没入感のある体験が immersive experience です。',
   },
 ];
 
@@ -88,7 +93,7 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-27',
-  dateModified: '2026-09-05',
+  dateModified: '2026-09-06',
   mainEntityOfPage: new URL('/guide/botsunyukan/', Astro.site).toString(),
 };
 ---
@@ -162,6 +167,20 @@ const articleLd = {
 <p class="vc-line"><a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作とは？工程・体制の完全ガイド →</a>／<a href="/guide/immersive-making/" style="color:var(--accent)">イマーシブイベントの作り方 →</a></p>
 </div></section>
 
+<section class="section tinted" id="botsunyu"><div class="wrap narrow">
+<p class="eyebrow">VERB</p><h2 class="h2 serif">「没入」とは？没入するの意味・使い方</h2>
+<div class="def-box">
+<p class="def-word"><span class="serif">没入</span><span class="def-yomi">読み方：ぼつにゅう</span></p>
+<p class="def-body">一つのことに心を奪われ、<strong>周囲を忘れるほど深く入り込むこと</strong>。「没入する」という動詞の形で使い、対象は作品・ゲーム・仕事・趣味など幅広い。「没入感」はこの「没入」している状態を、体験する側が感じる感覚として名詞化した言葉。</p>
+</div>
+<ul class="bullets">
+<li><strong>没入と没入感の違い</strong>：「没入」は行為や状態（没入する・没入している）、「没入感」はその状態で得られる感覚（没入感がある・没入感が高い）。作品を評価するときは「没入感」、人の状態を表すときは「没入」を使うと自然です。</li>
+<li><strong>使い方の例</strong>：「作業に没入して時間を忘れた」「物語の世界に没入できる演出」「没入型（イマーシブ）の展示」。</li>
+<li><strong>英語</strong>：動詞は immerse（immerse oneself in 〜 で「〜に没入する」）、名詞は immersion、形容詞は immersive。イマーシブシアター・イマーシブイベントの語源です。<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？意味・読み方 →</a></li>
+<li><strong>類語</strong>：没頭、夢中、熱中、集中。「没頭」は主に作業や仕事に対して、「没入」は作品や世界観に対しても使える点が違いです。</li>
+</ul>
+</div></section>
+
 <ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
@@ -203,6 +222,6 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#about,#iikae,#reibun,#takameru,#faq{scroll-margin-top:88px}
+#about,#iikae,#reibun,#takameru,#botsunyu,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>
