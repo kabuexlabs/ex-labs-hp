@@ -104,7 +104,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (lines.length === 0 || totalLen > 8000) return redirect();
 
   const baseSubject = (get('_subject') || '【ex Labs】サイトからのお問い合わせ').slice(0, 150);
-  const source = get('_source').slice(0, 600);
+  const source = get('_source').slice(0, 1500);
   const spam = spamCheck(`${baseSubject}\n${lines.join('\n')}`, source);
   const subject = spam ? `【営業・スパムの疑い】${baseSubject}` : baseSubject;
   const record = {

@@ -1,7 +1,8 @@
 ---
 // 全サイト共通の <head> 用スニペット。全レイアウト・独立ページに入れる。
-//  1) 流入元の先取り保存：セッション最初のページで参照元と着地URLを保持し、
-//     お問い合わせフォーム（SourceField）が送信時に添付する
+//  1) 流入元の先取り保存：セッション最初のページで参照元と着地URLを保持し（exl_src）、
+//     初回訪問の参照元・着地URL（exl_first、90日保持）と訪問回数（exl_n）も残す。
+//     お問い合わせフォーム（SourceField）が送信時にまとめて添付する
 //  2) Vercel Web Analytics：全ページの流入元・PVデータを取得
 //     （Vercelダッシュボードで Web Analytics を有効化すると動き出す。
 //       未有効の間はスクリプトが404になるだけで実害はない）
@@ -10,7 +11,7 @@
 ---
 <script is:inline defer src="/_vercel/insights/script.js"></script>
 <script is:inline>
-try{var k='exl_src';if(!sessionStorage.getItem(k))sessionStorage.setItem(k,JSON.stringify({r:document.referrer,l:location.href}))}catch(e){}
+try{var k='exl_src',F='exl_first',N='exl_n',now=Date.now();if(!sessionStorage.getItem(k)){sessionStorage.setItem(k,JSON.stringify({r:document.referrer,l:location.href,t:now}));try{localStorage.setItem(N,String((parseInt(localStorage.getItem(N)||'0',10)||0)+1))}catch(_){}}var f=null;try{f=JSON.parse(localStorage.getItem(F)||'null')}catch(_){}if(!f||!f.t||now-f.t>90*86400000)localStorage.setItem(F,JSON.stringify({r:document.referrer,l:location.href,t:now}))}catch(e){}
 document.addEventListener('copy',function(e){
   try{
     var sel=String(window.getSelection());

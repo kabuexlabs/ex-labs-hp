@@ -64,22 +64,35 @@ function fmtDate(iso: string) {
 // --- 流入元の集計（受信一覧の上に表示） ------------------------------------
 // SourceField が記録した「参照元 / 最初に開いたページ / 送信したページ」を
 // 分解して、どの経路・どのページから問い合わせが来ているかを数える。
+function channelOf(ref: string): string {
+  if (!ref || ref.startsWith('(')) return '直接アクセス';
+  if (/google\./.test(ref)) return 'Google検索';
+  if (/bing\.com|yahoo\.co\.jp|duckduckgo/.test(ref)) return 'Google以外の検索';
+  if (/chatgpt\.com|openai\.com|perplexity\.ai|gemini\.google|copilot\.microsoft|claude\.ai/.test(ref)) return 'AI検索：' + ref.replace(/^https?:\/\//, '').split('/')[0];
+  if (/kabuexlabs\.com/.test(ref)) return 'サイト内リンク';
+  return '外部サイト：' + ref.replace(/^https?:\/\//, '').split('/')[0];
+}
 function parseSource(src?: string) {
   const get = (label: string) => (src?.split('\n').find((l) => l.startsWith(label + ': ')) ?? '').slice(label.length + 2).trim();
   const ref = get('参照元');
   const landing = get('最初に開いたページ');
   const sent = get('送信したページ');
-  let channel = '記録なし';
-  if (src) {
-    if (!ref || ref.startsWith('(')) channel = '直接アクセス';
-    else if (/google\./.test(ref)) channel = 'Google検索';
-    else if (/bing\.com|yahoo\.co\.jp|duckduckgo/.test(ref)) channel = 'Google以外の検索';
-    else if (/kabuexlabs\.com/.test(ref)) channel = 'サイト内リンク';
-    else if (/prtimes|nazohiroba|note\.com|x\.com|twitter|instagram|facebook|lostproduct|apri-la-porta|yorozuyagakudan/.test(ref)) channel = '外部サイト：' + ref.replace(/^https?:\/\//, '').split('/')[0];
-    else channel = '外部サイト：' + ref.replace(/^https?:\/\//, '').split('/')[0];
-  }
-  const path = (u: string) => { try { return new URL(u).pathname; } catch { return u || '(不明)'; } };
-  return { channel, landing: landing ? path(landing) : '(不明)', sent: sent ? path(sent) : '(不明)', ref };
+  const firstRef = get('初回参照元');
+  const firstLanding = get('初回入口ページ');
+  const firstDate = get('初回訪問日');
+  const visits = get('訪問回数');
+  const path = (u: string) => { try { return new URL(u).pathname + (new URL(u).search || ''); } catch { return u || '(不明)'; } };
+  let channel = src ? channelOf(ref) : '記録なし';
+  const firstChannel = firstRef ? channelOf(firstRef) : '';
+  if (firstChannel && firstChannel !== channel) channel += `（初回: ${firstChannel}）`;
+  return {
+    channel, ref,
+    landing: landing ? path(landing) : '(不明)',
+    sent: sent ? path(sent) : '(不明)',
+    firstRef, firstChannel,
+    firstLanding: firstLanding ? path(firstLanding) : '',
+    firstDate, visits,
+  };
 }
 const stats = (() => {
   const byChannel = new Map<string, number>();
@@ -173,6 +186,8 @@ const stats = (() => {
             <div style="margin:12px 0 0;padding:10px 12px;background:#f6f4ef;border-radius:8px;font-size:12.5px;line-height:1.8">
               <p style="margin:0;font-weight:700">流入元：{parseSource(q.source).channel}</p>
               <p style="margin:0">入口ページ: <code>{parseSource(q.source).landing}</code>　→　送信ページ: <code>{parseSource(q.source).sent}</code></p>
+              {parseSource(q.source).firstLanding && <p style="margin:0">初回訪問: {parseSource(q.source).firstDate || '(不明)'}　{parseSource(q.source).firstChannel}　入口 <code>{parseSource(q.source).firstLanding}</code>{parseSource(q.source).visits && <>　訪問回数 {parseSource(q.source).visits}</>}</p>}
+              {parseSource(q.source).firstRef && !parseSource(q.source).firstRef.startsWith('(') && parseSource(q.source).firstRef !== parseSource(q.source).ref && <p style="margin:0;overflow-wrap:anywhere">初回参照元URL: {parseSource(q.source).firstRef}</p>}
               {parseSource(q.source).ref && !parseSource(q.source).ref.startsWith('(') && <p style="margin:0;overflow-wrap:anywhere">参照元URL: {parseSource(q.source).ref}</p>}
             </div>
           ) : (

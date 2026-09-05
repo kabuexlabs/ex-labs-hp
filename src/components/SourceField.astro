@@ -1,23 +1,28 @@
 ---
 // お問い合わせの「流入元」を送信内容に添付する hidden フィールド。
-// セッション最初のページで document.referrer と着地URLを sessionStorage に
-// 保存し（BaseLayout でも同じキーを先取り保存）、送信時に _source として
-// POST する。/api/contact 側で管理者通知メールにのみ記載され、
+// BaseLayout が全ページで sessionStorage（今回の訪問）と localStorage（初回訪問・
+// 90日保持）に参照元と着地URLを記録しており、ここでは両方を読んで _source として
+// POST する。/api/contact 側で管理者通知メールと受信箱にのみ記載され、
 // お客様への控えメールには載せない。
 ---
 <input type="hidden" name="_source" value="">
 
 <script>
 try {
-  const KEY = 'exl_src';
-  if (!sessionStorage.getItem(KEY)) {
-    sessionStorage.setItem(KEY, JSON.stringify({ r: document.referrer, l: location.href }));
-  }
-  const d = JSON.parse(sessionStorage.getItem(KEY) || '{}');
+  const rd = (st: Storage, k: string) => { try { return JSON.parse(st.getItem(k) || '{}'); } catch { return {}; } };
+  const s = rd(sessionStorage, 'exl_src');
+  const f = rd(localStorage, 'exl_first');
+  const n = (() => { try { return localStorage.getItem('exl_n') || ''; } catch { return ''; } })();
+  const day = (t?: number) => (t ? new Date(t).toISOString().slice(0, 10) : '');
+  const none = '(なし＝直接アクセス・アプリ内ブラウザなど)';
   const v = [
-    `参照元: ${d.r || '(なし＝直接アクセス・アプリ内ブラウザなど)'}`,
-    `最初に開いたページ: ${d.l || '(不明)'}`,
+    `参照元: ${s.r || none}`,
+    `最初に開いたページ: ${s.l || '(不明)'}`,
     `送信したページ: ${location.href}`,
+    `初回訪問日: ${day(f.t) || '(不明)'}`,
+    `初回参照元: ${f.r || none}`,
+    `初回入口ページ: ${f.l || '(不明)'}`,
+    `訪問回数: ${n || '(不明)'}`,
   ].join('\n');
   document.querySelectorAll<HTMLInputElement>('input[name="_source"]').forEach((el) => {
     el.value = v;
