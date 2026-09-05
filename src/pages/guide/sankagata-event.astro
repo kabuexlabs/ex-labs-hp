@@ -39,6 +39,18 @@ const faqs = [
     q: '参加型イベントの企画を依頼できますか？',
     a: '可能です。株式会社ex Labsは謎解き・マダミス・イマーシブ・頭脳戦など参加型コンテンツの専門制作会社として、企画から体験設計・集客・当日運営まで一貫して対応します。相談・お見積りは無料です。',
   },
+  {
+    q: '参加型イベントの企画アイデアにはどんなものがありますか？',
+    a: '館内を巡る周遊型の謎解き、参加者が登場人物になるマダミス、施設全体を舞台にしたイマーシブ、チーム対抗の頭脳戦大会などが代表例です。目的別の企画例は「体験型イベントの企画アイデア15選」にまとめています。',
+  },
+  {
+    q: '観客参加型とはどういう意味ですか？',
+    a: '舞台や公演で、観客が投票・発言・移動などで物語の進行に関わる形式のことです。客席から観るだけの従来型に対して、観客の選択で結末が変わるイマーシブシアターや参加型公演がこれにあたります。',
+  },
+  {
+    q: '参加型イベントを盛り上げるコツは？',
+    a: '①全員に役割や見せ場がある構造にする、②その場所・その人たちでしかできない題材にする、③進行やトラブル対応を参加者や担当者に背負わせない、の3点です。この3条件を満たすと、初対面同士や大人数でも盛り上がります。',
+  },
 ];
 
 const faqLd = {
@@ -77,13 +89,13 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-13',
-  dateModified: '2026-08-13',
+  dateModified: '2026-09-05',
   mainEntityOfPage: new URL('/guide/sankagata-event/', Astro.site).toString(),
 };
 ---
 <BaseLayout
-  title="参加型イベントとは?体験型との違い・種類・実例・企画の方法 - 株式会社ex Labs"
-  description="参加型イベントとは、観客が進行に関わる「受け身にさせない」イベントの総称。体験型イベントとの違い、種類（謎解き・マダミス・イマーシブ・参加型公演）、企業・施設での実例、企画の方法までを、参加型コンテンツの制作会社が解説します。"
+  title="参加型イベントとは？体験型との違い・種類・企業の実例・盛り上がる企画の方法を制作会社が解説 - 株式会社ex Labs"
+  description="参加型イベントとは、観客が進行に関わる「受け身にさせない」イベントの総称。体験型イベントとの違い、観客参加型・周遊型などの種類、謎解き・マダミス・イマーシブの企業・施設での実例、盛り上がる企画のコツと費用までを、日経掲載の施設一体型イベントを制作した会社が解説します。"
   ogImage="/assets/guide/sankagata-event.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />

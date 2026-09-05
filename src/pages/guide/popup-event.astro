@@ -39,6 +39,18 @@ const faqs = [
     q: '開催までにどのくらいの期間が必要ですか？',
     a: '既存コンテンツを活用する場合は1〜2ヶ月、オリジナル制作の場合は2〜4ヶ月が目安です。会期・区画の条件が決まっていれば、それに合わせた企画をご提案します。',
   },
+  {
+    q: 'ポップアップイベントの費用はどのくらいかかりますか？',
+    a: '空き区画をそのまま使う小規模な体験型なら数十万円台から、施設フロアを使う企画で100万円前後からが目安です。集客型なら、チケット売上から費用をいただくレベニューシェア型で施設側の初期費用0円または格安にできるケースもあります。',
+  },
+  {
+    q: 'ポップアップイベントの開催期間はどのくらいが最適ですか？',
+    a: '体験型の場合は2週間〜1ヶ月程度が多く、口コミが広がる時間と「期間限定」の希少性のバランスが取れます。1日限りの特別公演として希少性を最大化する形もあります。',
+  },
+  {
+    q: '体験型ポップアップの事例はありますか？',
+    a: '渋谷サクラステージで施設全体を周遊する都市伝説イマーシブ体験を開催し、日本経済新聞に掲載されました。また下北沢では街全体を舞台にした周遊型アートイマーシブを実施し、全公演完売となっています。',
+  },
 ];
 
 const faqLd = {
@@ -76,13 +88,13 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-27',
-  dateModified: '2026-08-27',
+  dateModified: '2026-09-05',
   mainEntityOfPage: new URL('/guide/popup-event/', Astro.site).toString(),
 };
 ---
 <BaseLayout
-  title="ポップアップイベントとは？体験型で空き区画を集客に変える方法 - 株式会社ex Labs"
-  description="ポップアップイベントとは、空き区画・催事スペースで期間限定開催されるイベントのこと。物販型ポップアップストアとの違い、施設側・出店側のメリット、謎解き・イマーシブを使った体験型ポップアップの企画例、開催までの流れと費用を解説。"
+  title="ポップアップイベントとは？種類・メリット・空き区画を集客に変える体験型の企画例【事例あり】 - 株式会社ex Labs"
+  description="ポップアップイベントとは、空き区画・催事スペースで期間限定開催されるイベントのこと。物販型ポップアップストアとの違い、施設側・出店側のメリット、費用と期間の目安、謎解き・イマーシブなど体験型ポップアップの企画例と事例を、施設一体型イベントを制作する会社（日経掲載）が解説します。"
   ogImage="/assets/guide/popup-event.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />

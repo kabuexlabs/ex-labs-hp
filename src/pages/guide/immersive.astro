@@ -61,6 +61,18 @@ const faqs = [
     q: 'オリジナルのイマーシブ体験を制作してもらえますか？',
     a: '可能です。株式会社ex Labsでは、実在する街・空間・香り・アートを物語に組み込んだイマーシブコンテンツを、企画から体験設計・運営まで一貫して制作しています。',
   },
+  {
+    q: 'イマーシブ体験とはどんな体験ですか？',
+    a: '観客席から「観る」のではなく、物語や空間の中に自分が入り込み、その一部として行動する体験です。イマーシブシアター、施設全体を舞台にしたイマーシブイベント、VRによる没入体験などが代表例です。',
+  },
+  {
+    q: 'イマーシブの反対語・対義語は何ですか？',
+    a: '決まった対義語はありませんが、「受動的な（passive）」「観覧型・鑑賞型」が反対の概念として使われます。舞台と客席が分かれた従来型の演劇や展示は、イマーシブに対して「観覧型」と表現されます。',
+  },
+  {
+    q: 'イマーシブ体験は東京のどこでできますか？',
+    a: '常設のイマーシブシアターのほか、商業施設や街全体を舞台にした期間限定のイマーシブイベントが東京では継続的に開催されています。当社が制作した渋谷サクラステージの施設一体型イベントもその一つです。最新の探し方は「イマーシブ体験 東京」の記事にまとめています。',
+  },
 ];
 
 const faqLd = {
@@ -100,13 +112,13 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
-  dateModified: '2026-09-04',
+  dateModified: '2026-09-05',
   mainEntityOfPage: new URL('/guide/immersive/', Astro.site).toString(),
 };
 ---
 <BaseLayout
-  title="イマーシブ（immersive）とは？意味を1分で解説｜読み方・例文・使い方 - 株式会社ex Labs"
-  description="イマーシブ（immersive）とは「没入型の」という意味の英語。読み方は「イマーシブ」。意味が1分でわかる解説に加え、例文・使い方・「イマーシブル」との違い・類語、イマーシブシアターなど体験の種類・企業活用まで、イマーシブ制作会社が実例つきでまとめました。"
+  title="イマーシブ（immersive）とは？意味を1分で解説｜読み方・例文・体験事例【制作会社が紹介】 - 株式会社ex Labs"
+  description="イマーシブ（immersive）とは「没入型の」という意味の英語で、読み方は「イマーシブ」。意味が1分でわかる解説に加え、例文・使い方・「イマーシブル」との違い・類語、イマーシブシアターやイマーシブイベントの体験事例、企業での活用までを、日経掲載の施設一体型イマーシブを制作した会社が紹介します。"
   ogImage="/assets/guide/immersive.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />

@@ -44,6 +44,18 @@ const faqs = [
     q: '催事の企画・制作を依頼できますか？',
     a: 'できます。株式会社ex Labsは商業施設での施設一体型イベント（渋谷サクラステージ・日経掲載）をはじめ、体験型催事の企画・制作・集客・運営を一貫して手がけています。ご相談・お見積りは無料です。',
   },
+  {
+    q: '催事の読み方は？',
+    a: '「さいじ」と読みます。「催し（もよおし）」に「事」を付けた言葉で、商業施設や百貨店の業界用語として定着しています。',
+  },
+  {
+    q: '催事場とはどんな場所ですか？',
+    a: '商業施設や百貨店の中に設けられた、期間限定の催事を行うための専用スペースです。最上階や特設会場に設けられることが多く、空いている期間の活用が施設側の課題になっています。',
+  },
+  {
+    q: '催事販売とは何ですか？',
+    a: '催事場や空き区画を借りて期間限定で商品を販売することです。常設店舗を持たずに販路を広げられる一方、近年は物販だけでなく、謎解きやイマーシブなどの体験を組み合わせた「体験型催事」で集客する事例が増えています。',
+  },
 ];
 
 const faqLd = {
@@ -81,13 +93,13 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-09-01',
-  dateModified: '2026-09-01',
+  dateModified: '2026-09-05',
   mainEntityOfPage: new URL('/guide/saiji/', Astro.site).toString(),
 };
 ---
 <BaseLayout
-  title="催事とは？意味・ポップアップストアとの違い・体験型催事の企画例まで解説 - 株式会社ex Labs"
-  description="催事とは、商業施設や百貨店で期間限定に開催される販売会・イベントのこと。読み方、ポップアップストア・物産展との違い、催事の種類3タイプ、いま注目される「体験型催事」の企画例と費用まで、施設一体型イベント（日経掲載）を手がける制作会社が解説します。"
+  title="催事とは？意味・読み方・ポップアップとの違い・集客できる体験型催事の企画例【2026年版】 - 株式会社ex Labs"
+  description="催事とは、商業施設や百貨店で期間限定に開催される販売会・イベントのこと。読み方（さいじ）、催事場・催事販売の意味、ポップアップストア・物産展との違い、催事の種類3タイプ、空き催事枠を集客に変える体験型催事の企画例と費用までを、施設一体型イベントを制作する会社（日経掲載）が解説します。"
   ogImage="/assets/guide/saiji.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />

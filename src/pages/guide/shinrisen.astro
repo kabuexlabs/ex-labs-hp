@@ -44,6 +44,18 @@ const faqs = [
     q: 'オリジナルの心理戦ゲームを制作してもらえますか？',
     a: '可能です。株式会社ex Labsは交渉・心理戦・閃きのゲームに特化した頭脳戦制作を行っており、イベント・プロモーション・研修向けのオリジナル心理戦を企画から運営まで一貫して制作します。',
   },
+  {
+    q: '心理戦の言い換えにはどんな言葉がありますか？',
+    a: '「駆け引き」「読み合い」「腹の探り合い」「化かし合い」などが近い言葉です。ビジネス文脈では「交渉」「心理的な駆け引き」、ゲームでは「ブラフの応酬」と表現されることもあります。',
+  },
+  {
+    q: '心理戦の反対語・対義語は何ですか？',
+    a: '決まった対義語はありませんが、「正攻法」「真っ向勝負」「力押し」が反対の概念として使われます。相手の心を読まず、実力や物量で押し切る戦い方を指します。',
+  },
+  {
+    q: '心理戦を鍛える方法はありますか？',
+    a: 'ブラフや正体隠匿のあるゲーム（ポーカー、人狼、コヨーテなど）を繰り返し遊ぶのが最も手軽です。「自分が相手からどう見えているか」を毎回言語化する習慣をつけると、読み合いの精度が上がります。',
+  },
 ];
 
 const faqLd = {
@@ -81,13 +93,13 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-29',
-  dateModified: '2026-08-29',
+  dateModified: '2026-09-05',
   mainEntityOfPage: new URL('/guide/shinrisen/', Astro.site).toString(),
 };
 ---
 <BaseLayout
-  title="心理戦とは？意味・頭脳戦との違い・強い人の特徴・ゲーム例まで解説 - 株式会社ex Labs"
-  description="心理戦とは、相手の思考を読み、自分の狙いを隠して裏をかくことで優位に立つ戦い方のこと。頭脳戦との違い、心理戦に強い人の特徴、代表的なゲーム例、リアルイベントでの体験方法まで、日本で唯一の頭脳戦専門レーベル「HACKTALE」を運営する制作会社が解説します。"
+  title="心理戦とは？意味・頭脳戦との違い・強い人の特徴・おすすめゲームを頭脳戦専門レーベルが解説 - 株式会社ex Labs"
+  description="心理戦とは、相手の思考を読み、自分の狙いを隠して裏をかくことで優位に立つ戦い方のこと。頭脳戦との違い、言い換え、心理戦に強い人の特徴、ポーカー・人狼などおすすめゲーム、リアルイベントでの体験方法までを、日本で唯一の頭脳戦専門レーベルを運営する会社が解説します。"
   ogImage="/assets/guide/shinrisen.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
