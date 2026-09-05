@@ -157,6 +157,22 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/hotel-event.webp',
   },
   {
+    href: '/guide/madamis-rekishi/',
+    title: 'マーダーミステリーの歴史とは？起源・海外との違い・日本での広がりと2026年の動向',
+    desc: '英米のマーダーミステリー・パーティーに始まり、中国での大流行を経て2019年ごろ日本へ。海外と日本の違い、店舗・オンライン・企業活用が進む2026年の動向。',
+    date: '2026-09-06',
+    category: 'murder',
+    thumb: '/assets/guide/madamis-rekishi.webp',
+  },
+  {
+    href: '/guide/zunousen-sakuhin/',
+    title: '頭脳戦・心理戦が面白い漫画・アニメ・映画おすすめ15選｜リアルで体験する方法も',
+    desc: 'デスノート・ライアーゲーム・カイジ・嘘喰い・今際の国のアリスなど15作品を論理型・心理型・デスゲーム型に分けて紹介。作品のような頭脳戦をリアルで体験する方法も。',
+    date: '2026-09-06',
+    category: 'zunou',
+    thumb: '/assets/guide/zunousen-sakuhin.webp',
+  },
+  {
     href: '/guide/shinrisen-game/',
     title: '心理戦ゲームとは？おすすめ10選と種類・選び方・イベントでの活かし方',
     desc: 'ブラフ型・正体隠匿型・交渉型・同時選択型の4タイプ、ポーカー・人狼・コヨーテなど10選、強くなるコツ、社内イベント・大会での使い方、オリジナル制作の依頼まで。',

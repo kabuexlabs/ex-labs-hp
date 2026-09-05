@@ -1,0 +1,194 @@
+---
+// 「マーダーミステリー 歴史」「マーダーミステリー 起源」「マダミス 発祥」「マーダーミステリー 海外」
+// の受け皿。マダミス（マーダーミステリー）ピラーの本文は触らず、歴史・海外との違い・日本での
+// 広がりという別意図でトピッククラスターを厚くし、「マーダーミステリー」ヘッド語の評価を支える。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+
+const toc = [
+  { id: 'summary', label: '結論：3つの流れが合流して今のマダミスになった' },
+  { id: 'origin', label: '起源：欧米の「マーダーミステリー・パーティー」' },
+  { id: 'china', label: '中国での大流行と「一度きりのシナリオ体験」への進化' },
+  { id: 'japan', label: '日本での広がり（2019年〜）' },
+  { id: 'diff', label: '海外と日本のマーダーミステリーの違い' },
+  { id: 'now', label: '2026年の動向：店舗・オンライン・企業活用' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'マーダーミステリーはどこの国で生まれましたか？',
+    a: '原型は1930年代前後の英米で遊ばれた「マーダーミステリー・パーティー（推理パーティーゲーム）」です。参加者が容疑者を演じ、食事をしながら犯人を推理する娯楽で、ホスト用のキットも販売されていました。現在の日本のマダミスの直接のルーツは、2010年代に中国で大流行した「一度きりのシナリオを演じて推理する」形式です。',
+  },
+  {
+    q: '日本でマダミスが流行り始めたのはいつですか？',
+    a: '2019年ごろからです。中国発の形式を翻訳・輸入した作品が話題になり、専門店やボードゲームカフェでの公演、国産シナリオの制作が急増しました。2020年以降はオンライン公演も広がり、2020年代半ばには企業研修や宿泊施設の体験プランなど、遊び以外の場面でも使われるようになっています。',
+  },
+  {
+    q: '「マダミス」という略称はいつから使われていますか？',
+    a: '日本での流行と同時期の2019〜2020年ごろからSNSやプレイヤーの間で定着した略称です。海外では「murder mystery game」「murder mystery party」と呼ばれ、「マダミス」という略し方は日本独自のものです。',
+  },
+  {
+    q: '海外のマーダーミステリーと日本のマダミスは同じものですか？',
+    a: '大枠は同じですが、日本のマダミスは「作品ごとに固有のシナリオとキャラクター」「GM（進行役）の存在」「同じ作品は一度しか遊べない」という点が強く、物語体験としての完成度が重視されます。欧米のパーティー型は、参加者が自由に演じながら食事を楽しむ社交の側面が大きいのが特徴です。',
+  },
+  {
+    q: '企業や施設がマーダーミステリーを活用する事例はありますか？',
+    a: 'あります。株式会社ex Labsでは、宿泊施設向けにオリジナルのマーダーミステリーを制作し、宿泊とセットにすることで新規宿泊予約20件以上を獲得した事例があります。社内研修・懇親会向けのマダミス研修や、商業施設のイベントとしての活用も広がっています。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'マーダーミステリーの歴史とは？起源・海外との違い・日本での広がりと2026年の動向',
+  about: 'マーダーミステリー（マダミス）の歴史・起源・日本での広がり',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/madamis-rekishi.webp', site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-06',
+  dateModified: '2026-09-06',
+  mainEntityOfPage: new URL('/guide/madamis-rekishi/', site).toString(),
+};
+---
+<BaseLayout
+  title="マーダーミステリーの歴史とは？起源・海外との違い・日本での広がりと2026年の動向 - 株式会社ex Labs"
+  description="マーダーミステリー（マダミス）の歴史を解説。1930年代の英米のマーダーミステリー・パーティーに始まり、中国での大流行を経て2019年ごろ日本に広がった流れ、海外と日本の違い、店舗・オンライン・企業活用が進む2026年の動向まで、マダミスを制作する会社がまとめました。"
+  ogImage="/assets/guide/madamis-rekishi.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'マダミスとは', href: '/guide/madamis/' },
+  { name: 'マーダーミステリーの歴史' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">HISTORY</p>
+<h1 class="h2 serif"><span class="nobr">マーダーミステリーの歴史とは？</span><br><span class="nobr">起源・海外との違い・</span><span class="nobr">日本での広がりと2026年の動向</span></h1>
+<p class="lede"><strong>マーダーミステリー（マダミス）</strong>は、いまでは専門店やオンライン公演、企業研修まで広がっていますが、その歴史は意外と知られていません。この記事では、欧米のパーティーゲームとしての起源、中国での大流行、2019年ごろからの日本での広がり、海外と日本の違い、そして2026年の最新動向までを、オリジナルマダミスを制作する株式会社ex Labsが整理します。「マダミスとは何か」の基本は<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは？意味・遊び方・費用 →</a>をご覧ください。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="summary"><div class="wrap narrow">
+<p class="eyebrow">SUMMARY</p><h2 class="h2 serif">結論：3つの流れが合流して今のマダミスになった</h2>
+<ul class="bullets">
+<li><strong>①欧米のマーダーミステリー・パーティー（1930年代〜）</strong>：容疑者を演じながら食事と推理を楽しむ社交ゲーム。「役を演じて犯人を探す」という骨格はここで生まれました。</li>
+<li><strong>②中国での大流行（2010年代）</strong>：固有のシナリオとキャラクターを持ち、GM（進行役）が進行し、同じ作品は一度しか遊べない「物語体験」として進化。専門店が都市部に急増しました。</li>
+<li><strong>③日本での広がり（2019年〜）</strong>：中国発の形式が翻訳・輸入され、「マダミス」の略称とともに定着。国産シナリオ、専門店、オンライン公演、そして企業・施設での活用へと広がりました。</li>
+</ul>
+</div></section>
+
+<section class="section" id="origin"><div class="wrap narrow">
+<p class="eyebrow">ORIGIN</p><h2 class="h2 serif">起源：欧米の「マーダーミステリー・パーティー」</h2>
+<p class="lede">推理小説が黄金期を迎えた1930年代前後の英米で、<strong>参加者が容疑者を演じ、食事をしながら犯人を推理するパーティーゲーム</strong>が流行しました。ホストが配役と手がかりを配るためのキットが商品として販売され、家庭やホテルのディナーで遊ばれていました。1980年代以降も「ディナー付きの推理劇」として定番化し、現在も英語圏では murder mystery party、murder mystery dinner という言葉で親しまれています。</p>
+<p class="lede">この時点で「全員が役を持つ」「会話から真相を探る」という骨格はできていましたが、現在の日本のマダミスに比べると、<strong>物語の完成度より社交と演技の楽しさに重心</strong>がありました。</p>
+</div></section>
+
+<section class="section tinted" id="china"><div class="wrap narrow">
+<p class="eyebrow">CHINA</p><h2 class="h2 serif">中国での大流行と「一度きりのシナリオ体験」への進化</h2>
+<p class="lede">2010年代の中国で、この形式が<strong>「剧本杀（ジュベンシャ）」</strong>と呼ばれる娯楽として爆発的に広がりました。テレビの推理バラエティ番組が人気を集めたことをきっかけに、専門店が都市部に急増し、作家が書き下ろす固有のシナリオ、進行役（GM）による演出、衣装や個室を使った没入感の演出が発達しました。</p>
+<ul class="bullets">
+<li><strong>固有のシナリオとキャラクター</strong>：作品ごとに事件・登場人物・秘密が用意され、体験は一度きりに。</li>
+<li><strong>GM（進行役）の定着</strong>：ルール説明、時間管理、結末の読み上げを担い、体験の質を担保。</li>
+<li><strong>専門店という業態</strong>：個室・衣装・小道具を備え、「行けば遊べる」場所が生まれた。</li>
+</ul>
+<p class="lede">この「物語体験としての完成度」を持った形式が、日本のマダミスの直接のルーツです。</p>
+</div></section>
+
+<section class="section" id="japan"><div class="wrap narrow">
+<p class="eyebrow">JAPAN</p><h2 class="h2 serif">日本での広がり（2019年〜）</h2>
+<ul class="bullets">
+<li><strong>2019年：輸入と話題化</strong>：中国発の作品が翻訳・輸入され、ボードゲーム愛好者やミステリーファンの間で話題に。「マダミス」という略称もこの頃から定着しました。</li>
+<li><strong>2020〜2021年：オンライン公演と国産作品</strong>：外出制限を背景にオンラインで遊べる作品が急増。同時に国産シナリオの制作が活発になり、作家・制作チームが次々に登場しました。</li>
+<li><strong>2022〜2024年：専門店と公演型の拡大</strong>：都市部にマダミス専門店が増え、俳優が演じる公演型やイマーシブ演劇との融合作品も登場。<a href="/toudaimurder/" style="color:var(--accent)">東大マーダーミステリーサークル（UNLIMITED MYSTERY）</a>のように、推理重視の作品を制作する団体も育ちました。</li>
+<li><strong>2025〜2026年：遊び以外への広がり</strong>：企業研修・懇親会、宿泊施設の体験プラン、商業施設のイベントなど、<strong>「人を集める・関係を深める道具」</strong>としての活用が本格化しています。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="diff"><div class="wrap narrow">
+<p class="eyebrow">DIFFERENCE</p><h2 class="h2 serif">海外と日本のマーダーミステリーの違い</h2>
+<ul class="bullets">
+<li><strong>欧米型（パーティー）</strong>：食事と社交が主役。配役は大まかで、参加者が自由に演じる。同じキットを別のメンバーで繰り返し遊ぶことも多い。</li>
+<li><strong>中国型（専門店）</strong>：没入感と演出が主役。衣装・個室・GMの演技で物語を盛り上げる。長時間・大人数の作品も多い。</li>
+<li><strong>日本型（マダミス）</strong>：推理と会話のバランスが主役。ハンドアウト（HO）で各キャラクターの秘密と目的が細かく設計され、論理的に真相へ辿り着ける作りが好まれる。2〜4時間・4〜10人の作品が中心。</li>
+</ul>
+<p class="vc-line"><a href="/guide/madamis-asobikata/" style="color:var(--accent)">マダミスの遊び方（当日の流れ・HO・GM）→</a>／<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミスと謎解き・人狼・イマーシブの違い →</a></p>
+</div></section>
+
+<section class="section" id="now"><div class="wrap narrow">
+<p class="eyebrow">2026</p><h2 class="h2 serif">2026年の動向：店舗・オンライン・企業活用</h2>
+<ul class="bullets">
+<li><strong>初心者層の拡大</strong>：2〜3時間で終わる短編や、演技の負担が軽い作品が増え、「初めての1本」を選びやすくなりました。<a href="/guide/madamis-shoshinsha/" style="color:var(--accent)">初心者ガイド →</a></li>
+<li><strong>場所と結びついたオリジナル制作</strong>：宿泊施設・商業施設・店舗の空間そのものを舞台にした一点物の作品が増加。株式会社ex Labsが宿泊施設向けに制作した作品は、新規宿泊予約20件以上につながりました。<a href="/guide/hotel-event/" style="color:var(--accent)">ホテル・宿泊施設の活用 →</a></li>
+<li><strong>研修・チームビルディング</strong>：役を演じる中でメンバーの判断や意外な一面が見えることから、相互理解の研修として採用が広がっています。<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修とは →</a></li>
+<li><strong>イマーシブとの融合</strong>：俳優が演じる空間に参加者が入り込むイマーシブ演劇の手法と組み合わせた作品が増え、「観る」と「遊ぶ」の境界が薄れています。<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは →</a></li>
+</ul>
+<p class="lede">歴史を踏まえると、マダミスは「遊び」から「場所や組織の課題を解く道具」へ役割を広げている段階にあります。オリジナル制作の流れや費用は<a href="/guide/madamis-seisaku/" style="color:var(--accent)">マダミス制作とは →</a>、<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミスの制作費用 →</a>をご覧ください。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-murder">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">オリジナルマーダーミステリーの制作のご相談はこちら（無料）</p>
+<a class="btn" href="/services/murder-mystery/">マーダーミステリー制作サービスを見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは</a>／<a href="/guide/madamis-asobikata/" style="color:var(--accent)">マダミスの遊び方</a>／<a href="/guide/madamis-shoshinsha/" style="color:var(--accent)">初心者ガイド</a>／<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミスと謎解きの違い</a>／<a href="/guide/madamis-seisaku/" style="color:var(--accent)">マダミス制作とは</a>／<a href="/guide/yougo/" style="color:var(--accent)">用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="murder" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#summary,#origin,#china,#japan,#diff,#now,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

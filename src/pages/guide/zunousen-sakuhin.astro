@@ -1,0 +1,208 @@
+---
+// 「頭脳戦 漫画」「頭脳戦 アニメ」「心理戦 漫画」「頭脳戦 映画」の受け皿。
+// 「頭脳戦」「心理戦」のヘッド語は検索結果の多くが作品紹介の意図で占められているため、
+// この意図を自社サイト内で満たし、頭脳戦とは／心理戦とは（ピラー）へ内部リンクで評価を集める。
+// 最後は「作品の頭脳戦をリアルで体験する」→ HACKTALE・制作依頼へ送客。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+
+const toc = [
+  { id: 'point', label: '頭脳戦・心理戦が「面白い」作品の3条件' },
+  { id: 'manga', label: '漫画・アニメおすすめ12選' },
+  { id: 'movie', label: 'ドラマ・映画おすすめ3選' },
+  { id: 'type', label: '頭脳戦タイプ別の選び方（論理型・心理型・デスゲーム型）' },
+  { id: 'real', label: '作品の頭脳戦をリアルで体験する方法' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const works = [
+  ['DEATH NOTE（デスノート）', '漫画・アニメ', '論理型', '名前を書くと人が死ぬノートを手にした夜神月と、世界一の探偵Lの推理と駆け引き。「相手が自分をどこまで読んでいるか」を読み合う心理戦の教科書的作品。'],
+  ['LIAR GAME（ライアーゲーム）', '漫画・ドラマ', '心理型', '巨額の賞金を騙し合いで奪い合うゲーム。少数決や密輸ゲームなど、ルールの裏をかく戦略と裏切りの心理戦が続き、「心理戦ゲーム」という言葉を広めた作品。'],
+  ['賭博黙示録カイジ', '漫画・アニメ', '心理型', '限定ジャンケン、Eカード、鉄骨渡り。命懸けのギャンブルで、確率と人間心理の両方を読む頭脳戦が描かれる。追い詰められた状況での判断が見どころ。'],
+  ['嘘喰い', '漫画', '論理型', '命を賭けた賭博で、ルールの穴を突き、相手の思考の一手先を読む超高密度の頭脳戦。ロジックの積み上げが最も濃い作品の一つ。'],
+  ['賭ケグルイ', '漫画・アニメ', '心理型', 'ギャンブルで序列が決まる学園を舞台に、イカサマの読み合いとブラフが交錯する。1話単位で完結するゲームが多く、頭脳戦入門として読みやすい。'],
+  ['今際の国のアリス', '漫画・ドラマ', 'デスゲーム型', 'トランプのマークごとに種類の違う「げぇむ」に挑む。♠は体力、♣はチーム戦、♦は知力、♥は心理戦と、頭脳戦の型が整理されているのが特徴。'],
+  ['トモダチゲーム', '漫画・アニメ', '心理型', '友情を担保に借金を返すゲームで、仲間を疑うか信じるかを迫られる。「信頼」そのものを賭けの対象にした心理戦。'],
+  ['ノーゲーム・ノーライフ', 'ライトノベル・アニメ', '論理型', 'あらゆる争いがゲームで決まる世界で、天才ゲーマー兄妹が国を賭けて戦う。ルールを読み切る論理と相手の癖を突く心理の両面が描かれる。'],
+  ['コードギアス 反逆のルルーシュ', 'アニメ', '論理型', '「絶対遵守」の力を持つルルーシュが、軍事・政治・人間関係を盤面として戦略を巡らせる。集団戦の頭脳戦として完成度が高い。'],
+  ['ジョーカー・ゲーム', '小説・アニメ', '心理型', '戦前のスパイ養成機関「D機関」の諜報員たちが、嘘と観察で相手を操る。表情や言葉の裏を読む「静かな心理戦」の代表作。'],
+  ['約束のネバーランド', '漫画・アニメ', '論理型', '孤児院の真実を知った子どもたちが、監視者の目をかいくぐって脱出計画を練る。情報の隠し方と読まれ方をめぐる心理戦が序盤の核。'],
+  ['HUNTER×HUNTER', '漫画・アニメ', '論理型', '能力バトルの中に「相手の能力を推理し、条件を読み切る」頭脳戦が織り込まれている。制約とルールを利用する戦略性が魅力。'],
+];
+const films = [
+  ['イカゲーム', 'ドラマ', 'デスゲーム型', '借金を抱えた参加者が子どもの遊びを命懸けで競う。ルールが単純な分、参加者同士の結託と裏切りの心理戦が際立つ。'],
+  ['12人の怒れる男', '映画', '心理型', '陪審員12人が密室で有罪か無罪かを議論する。1人の疑問が11人を動かしていく「説得」の心理戦。会話だけで成立する頭脳戦の原点。'],
+  ['インシテミル 7日間のデス・ゲーム', '映画・小説', 'デスゲーム型', '閉鎖空間で高額報酬を賭けたゲームに参加した10人が、疑心暗鬼の中で推理と裏切りを繰り返す。マーダーミステリーに近い構造を持つ作品。'],
+];
+
+const faqs = [
+  {
+    q: '頭脳戦と心理戦の作品はどう違いますか？',
+    a: '頭脳戦作品は、ルールや情報を論理的に読み切って勝つ過程が見どころで、デスノートや嘘喰いが代表です。心理戦作品は、相手の感情や思考を読み、ブラフや裏切りで優位に立つ過程が中心で、ライアーゲームやカイジが代表です。多くの作品は両方の要素を持っています。',
+  },
+  {
+    q: '初めて頭脳戦ジャンルを読むなら何がおすすめですか？',
+    a: '1話ごとにゲームが完結して読みやすい「賭ケグルイ」、テレビドラマ版もあり入りやすい「ライアーゲーム」、頭脳戦の型が整理されている「今際の国のアリス」が入りやすいです。じっくり読むなら「デスノート」が定番です。',
+  },
+  {
+    q: '作品のような頭脳戦をリアルで体験できますか？',
+    a: 'できます。株式会社ex Labsが運営する頭脳戦専門レーベル「HACKTALE（ハックテイル）」では、交渉・ブラフ・正体隠匿を軸にしたオリジナルの対人頭脳戦を一般公演しています。都内4会場・全公演完売の「東京都頭脳王決定戦」のような大会形式もあります。',
+  },
+  {
+    q: '頭脳戦をテーマにしたイベントを企業や施設で開催できますか？',
+    a: 'できます。社内対抗戦、商業施設の集客イベント、店舗の定期開催など、テーマ・人数・所要時間に合わせたオリジナルの頭脳戦・心理戦コンテンツを企画から制作します。カラオケ館様向けの周遊型頭脳戦コンテンツなどの制作実績があります。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const listLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: '頭脳戦・心理戦が面白い漫画・アニメ・映画おすすめ15選',
+  itemListElement: [...works, ...films].map((w, i) => ({ '@type': 'ListItem', position: i + 1, name: w[0] })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '頭脳戦・心理戦が面白い漫画・アニメ・映画おすすめ15選｜リアルで体験する方法も',
+  about: '頭脳戦・心理戦をテーマにした漫画・アニメ・映画の紹介',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/zunousen-sakuhin.webp', site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-06',
+  dateModified: '2026-09-06',
+  mainEntityOfPage: new URL('/guide/zunousen-sakuhin/', site).toString(),
+};
+---
+<BaseLayout
+  title="頭脳戦・心理戦が面白い漫画・アニメ・映画おすすめ15選｜リアルで体験する方法も - 株式会社ex Labs"
+  description="頭脳戦・心理戦が面白い漫画・アニメ・映画を15作品厳選。デスノート・ライアーゲーム・カイジ・嘘喰い・賭ケグルイ・今際の国のアリスなどを論理型・心理型・デスゲーム型に分けて紹介し、初心者向けの選び方と、作品のような頭脳戦をリアルで体験する方法まで、頭脳戦専門レーベルを運営する会社が解説。"
+  ogImage="/assets/guide/zunousen-sakuhin.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(listLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '頭脳戦とは', href: '/guide/zunousen/' },
+  { name: '頭脳戦・心理戦が面白い作品15選' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">WORKS GUIDE</p>
+<h1 class="h2 serif"><span class="nobr">頭脳戦・心理戦が面白い</span><br><span class="nobr">漫画・アニメ・映画おすすめ15選</span></h1>
+<p class="lede"><strong>頭脳戦</strong>や<strong>心理戦</strong>が面白い作品には、共通する「型」があります。この記事では、漫画・アニメ12作とドラマ・映画3作を論理型・心理型・デスゲーム型に分けて紹介し、初めて読む人向けの選び方と、作品のような頭脳戦を<strong>リアルで体験する方法</strong>までを、日本で唯一の頭脳戦専門レーベル「HACKTALE（ハックテイル）」を運営する株式会社ex Labsがまとめました。言葉の意味から知りたい方は<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは →</a>／<a href="/guide/shinrisen/" style="color:var(--accent)">心理戦とは →</a>をどうぞ。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="point"><div class="wrap narrow">
+<p class="eyebrow">POINT</p><h2 class="h2 serif">頭脳戦・心理戦が「面白い」作品の3条件</h2>
+<ul class="bullets">
+<li><strong>①ルールが読者にも開示されている</strong>：ゲームのルールと手持ちの情報が読者にも見えているから、「自分ならどうするか」を考えながら読める。後出しの能力や偶然で決着する作品は頭脳戦として物足りなくなります。</li>
+<li><strong>②相手の思考が描かれる</strong>：主人公だけでなく敵側の読みも見せることで、「読み合い」が立体的になる。デスノートの月とLはこの典型です。</li>
+<li><strong>③賭けているものが重い</strong>：命・友情・人生を賭けるからこそ、一手の判断に緊張が生まれる。デスゲーム型が人気なのはこのためです。</li>
+</ul>
+<p class="lede">この3条件は、当社がリアルの頭脳戦ゲームを設計するときにも使っている基準です。<a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作とは？作り方の考え方 →</a></p>
+</div></section>
+
+<section class="section" id="manga"><div class="wrap narrow">
+<p class="eyebrow">MANGA / ANIME</p><h2 class="h2 serif">漫画・アニメおすすめ12選</h2>
+<ul class="bullets">
+{works.map((w) => (
+  <li><strong>{w[0]}</strong>（{w[1]}／{w[2]}）：{w[3]}</li>
+))}
+</ul>
+</div></section>
+
+<section class="section tinted" id="movie"><div class="wrap narrow">
+<p class="eyebrow">DRAMA / FILM</p><h2 class="h2 serif">ドラマ・映画おすすめ3選</h2>
+<ul class="bullets">
+{films.map((w) => (
+  <li><strong>{w[0]}</strong>（{w[1]}／{w[2]}）：{w[3]}</li>
+))}
+</ul>
+</div></section>
+
+<section class="section" id="type"><div class="wrap narrow">
+<p class="eyebrow">TYPES</p><h2 class="h2 serif">頭脳戦タイプ別の選び方</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">論理型</span><span class="genre-d">ルールと情報を読み切る快感。デスノート、嘘喰い、コードギアス、約束のネバーランド。パズルや推理が好きな人向け。<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類 →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">心理型</span><span class="genre-d">ブラフと裏切りの読み合い。ライアーゲーム、カイジ、賭ケグルイ、ジョーカー・ゲーム。人狼やポーカーが好きな人向け。<a href="/guide/shinrisen-game/" style="color:var(--accent)">心理戦ゲームおすすめ10選 →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">デスゲーム型</span><span class="genre-d">命懸けの極限状況で判断力が試される。今際の国のアリス、イカゲーム、インシテミル。緊張感と一気読みを求める人向け。<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミス・人狼との違い →</a></span></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="real"><div class="wrap narrow">
+<p class="eyebrow">REAL EVENT</p><h2 class="h2 serif">作品の頭脳戦をリアルで体験する方法</h2>
+<ul class="bullets">
+<li><strong>対人頭脳戦の公演に参加する</strong>：当社の頭脳戦専門レーベル<a href="/hacktale/" style="color:var(--accent)">HACKTALE（ハックテイル）</a>では、交渉と閃きで駆け引きを制する「プレゼント・ポーカー」、正体隠匿を論理で切り崩す「人狼定理」など、作品の読み合いをそのまま自分で体験できる対人ゲームを公演しています。<a href="/hacktale/works/" style="color:var(--accent)">作品一覧 →</a></li>
+<li><strong>大会に出る</strong>：「東京都で最も頭の良い人を決める」をコンセプトにした<a href="/hacktale/event/zunouou/" style="color:var(--accent)">東京都頭脳王決定戦</a>は、都内4会場・全公演完売。予選から本戦へ進む大会形式で、作品の主人公の気分を味わえます。</li>
+<li><strong>マダミスで「一度きりの事件」を演じる</strong>：登場人物を演じて証言と嘘を読み解くマーダーミステリーは、インシテミルや今際の国のアリスの構造に最も近いリアル体験です。<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは →</a></li>
+<li><strong>自分のイベントとして開催する</strong>：社内対抗戦や店舗の定期イベント、商業施設の集客企画として、オリジナルの頭脳戦・心理戦コンテンツを制作できます。<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作の依頼 →</a></li>
+</ul>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-zunou">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">頭脳戦・心理戦コンテンツの制作のご相談はこちら（無料）</p>
+<a class="btn" href="/services/zunousen/">頭脳戦制作サービスを見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは</a>／<a href="/guide/shinrisen/" style="color:var(--accent)">心理戦とは</a>／<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類</a>／<a href="/guide/shinrisen-game/" style="color:var(--accent)">心理戦ゲームおすすめ10選</a>／<a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作とは</a>／<a href="/hacktale/" style="color:var(--accent)">HACKTALE</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="zunou" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#point,#manga,#movie,#type,#real,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
