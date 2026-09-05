@@ -1,0 +1,202 @@
+---
+// 「体験型 イベント 企画」「体験型 イベント アイデア」「周遊 イベント アイデア」
+// 「盛り上がる イベント 企画」系（9/5 GSC で 11〜25位に新出）の受け皿。
+// 既存の「体験型イベントとは」（定義型）とは意図が違う「企画アイデア一覧」型で、
+// 目的別×ジャンル別に15企画を整理し、制作会社の選び方・サービスへ送客する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+
+const toc = [
+  { id: 'point', label: '盛り上がる体験型企画に共通する3つの条件' },
+  { id: 'shisetsu', label: '商業施設・店舗の集客向けアイデア5選' },
+  { id: 'shanai', label: '社内イベント・懇親会向けアイデア5選' },
+  { id: 'promo', label: '販促・プロモーション・地域向けアイデア5選' },
+  { id: 'genre', label: 'ジャンル別の向き不向き（謎解き・マダミス・イマーシブ・頭脳戦）' },
+  { id: 'cost', label: '費用の目安と依頼の流れ' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '体験型イベントの企画で、まず何から決めればいいですか？',
+    a: '「誰に・何をしてもらいたいか」を先に決めます。来館者に館内を回遊してほしいのか、社員同士に会話してほしいのか、商品に触れてほしいのか——目的が決まると、周遊型・対抗戦型・物語型などの形式と、謎解き・マダミス・イマーシブ・頭脳戦のどのジャンルが合うかが自然に決まります。',
+  },
+  {
+    q: '少ない予算でも体験型イベントはできますか？',
+    a: 'できます。会議室で実施できるテーブル型の謎解きや、既存の装飾・空間をそのまま舞台にする設計なら追加の造作費を抑えられます。集客型のイベントでは、株式会社ex Labsがチケット売上に応じたレベニューシェア型（初期費用0円または格安）に対応しています。',
+  },
+  {
+    q: '盛り上がる体験型イベントと、盛り上がらないイベントの違いは？',
+    a: '最大の違いは「全員に役割があるか」です。一部の人だけが活躍する企画は場が冷めます。謎解き・マダミス・頭脳戦は構造上、参加者全員に見せ場や判断が生まれるため、初対面同士や大人数でも盛り上がりやすいのが特徴です。',
+  },
+  {
+    q: '準備期間はどのくらい必要ですか？',
+    a: '既存コンテンツを使う形なら2〜4週間、施設や会社に合わせたオリジナル制作なら企画確定から1〜3ヶ月が目安です。テストプレイの回数で品質が決まるため、余裕を持ったスケジュールをおすすめします。',
+  },
+  {
+    q: '体験型イベントの企画・制作を依頼できますか？',
+    a: 'できます。株式会社ex Labsは謎解き・マダミス・イマーシブ・頭脳戦の4ジャンルを、企画・制作・集客・当日運営まで一貫して手がける制作会社です。商業施設・企業・自治体・文化施設向けの実績があり、ご相談・お見積りは無料です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '体験型イベントの企画アイデア15選｜盛り上がる・集客できる企画を目的別に解説',
+  about: '体験型イベントの企画アイデア（商業施設・社内・販促向け）',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/taikengata-idea.webp', Astro.site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-05',
+  dateModified: '2026-09-05',
+  mainEntityOfPage: new URL('/guide/taikengata-idea/', Astro.site).toString(),
+};
+---
+<BaseLayout
+  title="体験型イベントの企画アイデア15選｜盛り上がる・集客できる企画を目的別に解説 - 株式会社ex Labs"
+  description="体験型イベントの企画アイデアを、商業施設の集客・社内イベント・販促プロモーションの目的別に15選で紹介。盛り上がる企画の3条件、謎解き・マダミス・イマーシブ・頭脳戦の向き不向き、費用の目安と依頼の流れまで制作会社（日経掲載）が解説。"
+  ogImage="/assets/guide/taikengata-idea.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '体験型イベントとは', href: '/guide/taikengata-event/' },
+  { name: '体験型イベントの企画アイデア' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">EVENT IDEAS</p>
+<h1 class="h2 serif"><span class="nobr">体験型イベントの</span><span class="nobr">企画アイデア15選</span><br><span class="nobr">盛り上がる・集客できる企画を</span><span class="nobr">目的別に解説</span></h1>
+<p class="lede"><strong>体験型イベント</strong>とは、参加者が「見る」のではなく「参加して、自分の行動で体験を進める」イベントのこと。この記事では、商業施設の集客・社内イベント・販促プロモーションの目的別に15の企画アイデアと、盛り上がる企画に共通する条件、ジャンル別の向き不向き、費用と依頼の流れを、謎解き・マダミス・イマーシブ・頭脳戦を制作する株式会社ex Labs（渋谷サクラステージの施設一体型イベントが日本経済新聞に掲載）が解説します。「体験型イベントとは何か」から知りたい方は<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは？種類・事例・費用 →</a>をどうぞ。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="point"><div class="wrap narrow">
+<p class="eyebrow">POINT</p><h2 class="h2 serif">盛り上がる体験型企画に共通する3つの条件</h2>
+<ul class="bullets">
+<li><strong>①全員に役割がある</strong>：一部の人だけが活躍し、他は見ているだけ——これが「盛り上がらない」最大の原因です。謎解き・マダミス・頭脳戦は、参加者全員に判断や見せ場が生まれる構造を最初から持っています。</li>
+<li><strong>②「その場所・その人たち」でしかできない</strong>：どこでもできる企画は記憶に残りません。施設の空間、会社の歴史、街の風景を舞台や題材にすると、体験の密度が一気に上がります。</li>
+<li><strong>③運営を参加者や担当者に背負わせない</strong>：進行・説明・トラブル対応を担当者が抱えると、その人だけ楽しめず、場の熱も下がります。進行込みで設計する（または外部に任せる）ことが、盛り上がりの土台です。</li>
+</ul>
+</div></section>
+
+<section class="section" id="shisetsu"><div class="wrap narrow">
+<p class="eyebrow">FOR FACILITIES</p><h2 class="h2 serif">商業施設・店舗の集客向けアイデア5選</h2>
+<ul class="bullets">
+<li><strong>①館内周遊型の謎解き・ミステリー</strong>：手がかりを各フロア・各店舗に配置し、参加者が自然に館内を巡る定番形式。回遊・滞在時間・テナント送客に直結します。<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントの仕組み →</a></li>
+<li><strong>②施設一体型イマーシブ</strong>：施設全体を物語の舞台にする没入体験。渋谷サクラステージで開催した「ウワサバナシ調査委員会」は日本経済新聞に掲載されました。<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">制作事例 →</a></li>
+<li><strong>③閉店後のナイトイベント</strong>：営業時間外の暗い館内・書店・美術館を舞台にした特別公演。「普段は入れない時間」の非日常性が最大の付加価値です。<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の活用 →</a></li>
+<li><strong>④空き区画・催事枠の体験拠点化</strong>：空きテナント区画や催事スペースを物語の「本部」や展示空間に。遊休スペースが期間限定の目的地に変わります。<a href="/guide/saiji/" style="color:var(--accent)">催事とは →</a>／<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用 →</a></li>
+<li><strong>⑤季節イベントの物語化</strong>：ハロウィン・クリスマスの装飾を「見る」から「体験する」に変え、毎年の定番資産に育てます。<a href="/guide/halloween-event/" style="color:var(--accent)">ハロウィンイベントの企画アイデア12選 →</a></li>
+</ul>
+<p class="vc-line"><a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベントアイデア10選 →</a></p>
+</div></section>
+
+<section class="section tinted" id="shanai"><div class="wrap narrow">
+<p class="eyebrow">FOR COMPANIES</p><h2 class="h2 serif">社内イベント・懇親会向けアイデア5選</h2>
+<ul class="bullets">
+<li><strong>⑥チーム対抗の謎解きゲーム</strong>：協力必須の構造で部署・役職を越えた会話が生まれる定番。会議室・宴会場でそのまま実施でき、数十〜数百名まで対応。<a href="/guide/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修とは →</a></li>
+<li><strong>⑦マダミス（マーダーミステリー）会</strong>：少人数でじっくり。役を演じて話すうちにメンバーの意外な一面が見える、相互理解の最強フォーマット。<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修とは →</a></li>
+<li><strong>⑧頭脳戦・心理戦の大会</strong>：明確な勝敗が生む熱狂。トーナメント形式は総会・キックオフの目玉企画になります。<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類と選び方 →</a></li>
+<li><strong>⑨会社の歴史・理念を織り込んだ物語体験</strong>：創業エピソードやバリューを物語に変換し、理念浸透を「読む」から「体験する」へ。周年記念に向きます。</li>
+<li><strong>⑩懇親会×テーブル謎解き</strong>：食事・歓談と並行できる軽量形式。乾杯後の中だるみをチーム戦で盛り上げます。<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア20選 →</a></li>
+</ul>
+</div></section>
+
+<section class="section" id="promo"><div class="wrap narrow">
+<p class="eyebrow">FOR PROMOTION</p><h2 class="h2 serif">販促・プロモーション・地域向けアイデア5選</h2>
+<ul class="bullets">
+<li><strong>⑪商品・ブランドの世界観を舞台にしたイマーシブ</strong>：商品を「説明する」のではなく、その世界に参加者を入れる。体験そのものが記憶に残る広告になります。<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの企業活用事例 →</a></li>
+<li><strong>⑫宿泊施設の体験付きプラン</strong>：宿泊とセットのマーダーミステリーや謎解きで「泊まる理由」を作る。新規宿泊予約20件以上を獲得した実績があります。<a href="/guide/hotel-event/" style="color:var(--accent)">ホテル・宿泊施設の活用 →</a></li>
+<li><strong>⑬街なか周遊型のアートイマーシブ</strong>：商店街や街全体を舞台に、店舗を巡りながら物語を体験。下北沢の「ロスト・フレーム」のように、地域の回遊と店舗送客を同時に設計できます。</li>
+<li><strong>⑭美術館・博物館・水族館の展示×謎解き</strong>：展示を「見る」から「読み解く」に変え、新規来館層を作る。広告費0円でチケット1,500枚を販売した「ヌル・アーデン展」が代表例です。<a href="/guide/museum-event/" style="color:var(--accent)">美術館・博物館の集客イベント →</a></li>
+<li><strong>⑮参加型の大会・トーナメントイベント</strong>：都内4会場・全10公演で全公演完売した「東京都頭脳王決定戦」のように、予選・本戦の大会形式はリピート参加とコミュニティを生みます。<a href="/hacktale/event/zunouou/" style="color:var(--accent)">東京都頭脳王決定戦 2026 →</a></li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="genre"><div class="wrap">
+<p class="eyebrow">GENRE</p><h2 class="h2 serif">ジャンル別の向き不向き</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">謎解き</span><span class="genre-d">大人数・家族層・短時間に強い。回遊設計がしやすく、集客イベントと研修の両方で定番。<a href="/guide/nazotoki-event/" style="color:var(--accent)">謎解きイベントとは →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">マダミス</span><span class="genre-d">少人数・相互理解・物語性に強い。懇親会・研修・宿泊プランと相性が良い。<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">イマーシブ</span><span class="genre-d">話題化・ブランド体験・施設一体型に強い。空間そのものをコンテンツにできる。<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">頭脳戦</span><span class="genre-d">明確な勝敗・熱狂・大会形式に強い。社内対抗戦や集客型トーナメントに向く。<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは →</a></span></div>
+</div>
+</div></section>
+
+<section class="section" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST &amp; FLOW</p><h2 class="h2 serif">費用の目安と依頼の流れ</h2>
+<ul class="bullets">
+<li><strong>既存コンテンツの導入</strong>：短期間・低予算から。テーブル型謎解きや貸切公演など、2〜4週間で実施できます。</li>
+<li><strong>オリジナル制作</strong>：施設・会社に合わせた企画から制作まで、企画確定から1〜3ヶ月。テストプレイの回数で品質が決まります。</li>
+<li><strong>レベニューシェア型</strong>：集客型のイベントでは、チケット売上に応じたお支払いで<strong>初期費用0円または格安</strong>で始められます。</li>
+<li><strong>依頼の流れ</strong>：ヒアリング（無料）→ 企画提案 → 制作・テストプレイ → 告知・集客 → 当日運営 → 振り返り。株式会社ex Labsは全工程を一貫して対応します。</li>
+</ul>
+<p class="vc-line"><a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベント制作会社の選び方 →</a>／<a href="/services/" style="color:var(--accent)">サービス一覧・制作のご相談（無料）→</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">体験型イベントの企画・制作のご相談はこちら（無料）</p>
+<a class="btn" href="/services/">サービス一覧を見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベント制作会社の選び方</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベントアイデア10選</a>／<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア20選</a>／<a href="/guide/sankagata-event/" style="color:var(--accent)">参加型イベントとは</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#point,#shisetsu,#shanai,#promo,#genre,#cost,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

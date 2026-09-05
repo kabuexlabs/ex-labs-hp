@@ -157,6 +157,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/hotel-event.webp',
   },
   {
+    href: '/guide/taikengata-idea/',
+    title: '体験型イベントの企画アイデア15選｜盛り上がる・集客できる企画を目的別に',
+    desc: '商業施設・社内イベント・販促の目的別に15のアイデアを紹介。周遊謎解き、宿泊マダミス、頭脳戦大会など、費用感と成功のコツも解説。',
+    date: '2026-09-05',
+    category: 'shisetsu',
+    thumb: '/assets/guide/taikengata-idea.webp',
+  },
+  {
     href: '/guide/taikengata-event/',
     title: '体験型イベントとは？種類・企業の活用事例・費用まで解説',
     desc: '謎解き・マダミス・イマーシブ・頭脳戦の4種類と選び方、集客に効く理由、事例と費用を網羅したハブ記事。',
