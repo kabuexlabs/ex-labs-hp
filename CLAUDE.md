@@ -22,6 +22,9 @@
 - **サブブランドのページを触る前に `git log -- <file>` を見る**。ユーザーが別セッションで意図的に変えている（例：kaitou は PR #115 で運営会社表記を外した）。勝手に戻さない。
 - 「追記のみ」の編集でも dateModified と sitemap lastmod を同日に更新する（監査が不一致を警告する）。
 - 問い合わせ判定を変えたら `scripts/spam-test.mjs` に実サンプルを追加してから反映する。
+- 記事を追加・更新したら `npm run llms:full` で public/llms-full.txt を再生成して commit する（AI 向け全文）。
+- `npm run seo:crawl`（dev サーバー起動が必要）で全ページの canonical/title 重複/h1/noindex を確認できる。
+- IndexNow（Bing・ChatGPT検索向け）は main への push 後に GitHub Actions（.github/workflows/indexnow.yml）が自動送信する。キーは public/8368774548070170873c1a14b2b37dfb.txt。この環境からは api.indexnow.org に到達できない。
 
 ## 記事を追加するときのチェックリスト
 1. `src/pages/guide/<slug>.astro`（`export const prerender = false`、BaseLayout、Breadcrumb、def-box、FAQPage/Article LD（reviewedBy 飯田雄貴）、TOC、ZeroCostBanner、関連ページ、AuthorBox、LatestPosts、`const site = Astro.site ?? new URL('https://kabuexlabs.com')`）

@@ -1,0 +1,19 @@
+# main へ push（＝Vercel 本番デプロイ）後に、sitemap の全 URL を IndexNow（Bing 等）へ通知する。
+# この実行環境からは api.indexnow.org に到達できないため、GitHub Actions 側で送る。
+name: IndexNow
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Vercel のデプロイ完了を待つ
+        run: sleep 180
+      - name: IndexNow へ送信
+        run: node scripts/indexnow.mjs
