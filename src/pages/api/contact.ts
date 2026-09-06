@@ -42,15 +42,23 @@ const SPAM_STRONG: RegExp[] = [
   /SEO(?:対策|コンサル)(?:の)?(?:ご案内|ご提案|サービス)|検索順位を(?:上げ|改善)/i,
   // 一斉配信メールの常套句（通常の問い合わせには絶対に現れない）
   /配信(?:の)?(?:停止|解除)|受信を希望(?:され)?ない|一斉(?:送信|配信)/,
+  // フォーム自動投稿 bot の定型文（サイトの見出しをそのまま貼り付けてくる）
+  /詳しい情報を希望します|メールでご連絡ください\s*[—–‐-]/,
+  /体験型イベントを実施しませんか/,
 ];
 const SPAM_WEAK: RegExp[] = [
   /補助金|助成金/,
   /貴社(?:の)?(?:ホームページ|ＨＰ|HP|サイト)を拝見/i,
   /無料(?:診断|トライアル)/,
 ];
-function spamCheck(text: string, source: string): boolean {
+// bot の送信元に多いフリーメールドメイン（日本の法人問い合わせにはまず現れない）
+const BOT_MAIL_RE = /@(?:[a-z0-9-]+\.)?(?:mail\.ru|list\.ru|bk\.ru|inbox\.ru|yandex\.(?:ru|com)|rambler\.ru|gmx\.(?:com|de|net)|proton\.me|protonmail\.com|tutanota\.com)$/i;
+function spamCheck(text: string, source: string, email: string, bodyLen: number): boolean {
   const strong = SPAM_STRONG.some((re) => re.test(text));
-  const weak = SPAM_WEAK.filter((re) => re.test(text)).length;
+  let weak = SPAM_WEAK.filter((re) => re.test(text)).length;
+  if (BOT_MAIL_RE.test(email)) weak += 1;
+  // 本文が極端に短く、かつ流入元の記録が無い（JSを経由していない）のは bot の典型
+  if (!source && bodyLen < 120) weak += 1;
   // _source が空＝ブラウザのJSを経由していない直POSTの可能性が高い。
   // 単独では判定せず、弱シグナルと組み合わせたときだけ効かせる。
   return strong || weak >= 2 || (weak >= 1 && !source);
@@ -105,7 +113,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   const baseSubject = (get('_subject') || '【ex Labs】サイトからのお問い合わせ').slice(0, 150);
   const source = get('_source').slice(0, 1500);
-  const spam = spamCheck(`${baseSubject}\n${lines.join('\n')}`, source);
+  const spam = spamCheck(`${baseSubject}\n${lines.join('\n')}`, source, email, totalLen);
   const subject = spam ? `【営業・スパムの疑い】${baseSubject}` : baseSubject;
   const record = {
     id: crypto.randomUUID(),
