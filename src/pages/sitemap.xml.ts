@@ -133,7 +133,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/shinrisen/': '2026-09-05',
     '/guide/sankagata-event/': '2026-09-05',
     '/guide/taikengata-company/': '2026-09-05',
-    '/guide/zunousen/': '2026-08-27',
+    '/guide/zunousen/': '2026-09-06',
     '/guide/zunousen-game/': '2026-08-27',
     '/guide/shinrisen/': '2026-09-05',
     '/guide/saiji/': '2026-09-05',

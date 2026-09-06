@@ -20,6 +20,8 @@ const toc = [
   { id: 'why', label: 'なぜ頭脳戦は面白いのか' },
   { id: 'games', label: '頭脳戦ゲームの例' },
   { id: 'biz', label: 'イベント・研修での活用' },
+  { id: 'iikae', label: '頭脳戦の言い換え・英語表現' },
+  { id: 'works', label: '頭脳戦を味わえる作品と、リアルで体験する方法' },
   { id: 'faq', label: 'よくある質問' },
 ];
 
@@ -43,6 +45,10 @@ const faqs = [
   {
     q: 'オリジナルの頭脳戦コンテンツを制作してもらえますか？',
     a: '可能です。株式会社ex Labsは交渉・心理戦・閃きのゲームに特化した頭脳戦制作を行っており、イベント・プロモーション・研修向けに企画から運営まで一貫して対応します。',
+  },
+  {
+    q: '頭脳戦の言い換えや英語表現は？',
+    a: '言い換えは「知恵比べ」「駆け引き」「読み合い」「知略戦」など。相手の心を読む面を強調するなら「心理戦」、交渉が中心なら「交渉戦」です。英語では battle of wits、mind game、strategy game と表現し、「頭脳戦で出し抜く」は outwit を使います。',
   },
 ];
 
@@ -81,7 +87,7 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-27',
-  dateModified: '2026-08-27',
+  dateModified: '2026-09-06',
   mainEntityOfPage: new URL('/guide/zunousen/', Astro.site).toString(),
 };
 ---
@@ -159,6 +165,21 @@ const articleLd = {
 <p class="vc-line"><a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作とは？作り方・依頼の流れ →</a>／<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作サービスの詳細 →</a>／<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア8選 →</a></p>
 </div></section>
 
+<section class="section tinted" id="iikae"><div class="wrap narrow">
+<p class="eyebrow">SYNONYMS</p><h2 class="h2 serif">頭脳戦の言い換え・英語表現</h2>
+<ul class="bullets">
+<li><strong>言い換え</strong>：知恵比べ、駆け引き、読み合い、策略戦、知略戦、頭脳バトル。「相手の心を読む」側面を強調するときは<a href="/guide/shinrisen/" style="color:var(--accent)">心理戦</a>、交渉が中心なら「交渉戦」と使い分けます。</li>
+<li><strong>対義語</strong>：力比べ、体力勝負、真っ向勝負、力押し。頭脳戦は「情報と判断」で勝敗が決まる点が対照的です。</li>
+<li><strong>英語</strong>：battle of wits（知恵比べ）、mind game（心理的な駆け引き）、strategy game（戦略ゲーム）。「頭脳戦を制する」は outwit（出し抜く）で表せます。</li>
+</ul>
+</div></section>
+
+<section class="section" id="works"><div class="wrap narrow">
+<p class="eyebrow">WORKS &amp; REAL</p><h2 class="h2 serif">頭脳戦を味わえる作品と、リアルで体験する方法</h2>
+<p class="lede">頭脳戦の面白さは、デスノート・ライアーゲーム・カイジ・今際の国のアリスなどの作品で広く知られています。作品の頭脳戦を論理型・心理型・デスゲーム型に整理したおすすめ15選は<a href="/guide/zunousen-sakuhin/" style="color:var(--accent)">頭脳戦・心理戦が面白い漫画・アニメ・映画15選 →</a>にまとめました。</p>
+<p class="lede">作品の読み合いを自分で体験するなら、当社の頭脳戦専門レーベル<a href="/hacktale/" style="color:var(--accent)">HACKTALE（ハックテイル）</a>の対人頭脳戦公演や、都内4会場・全公演完売の<a href="/hacktale/event/zunouou/" style="color:var(--accent)">東京都頭脳王決定戦</a>が入口になります。企業や施設で開催する場合は<a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作とは →</a>をご覧ください。</p>
+</div></section>
+
 <ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
@@ -199,6 +220,6 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#about,#types,#why,#games,#biz,#faq{scroll-margin-top:88px}
+#about,#types,#why,#games,#biz,#iikae,#works,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>
