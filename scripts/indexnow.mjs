@@ -13,4 +13,6 @@ const res = await fetch('https://api.indexnow.org/indexnow', {
   method: 'POST', headers: { 'Content-Type': 'application/json; charset=utf-8' },
   body: JSON.stringify({ host: HOST, key: KEY, keyLocation: `https://${HOST}/${KEY}.txt`, urlList: urls }),
 });
-console.log(`IndexNow: ${urls.length} URL 送信 → HTTP ${res.status} ${res.status === 200 || res.status === 202 ? 'OK' : await res.text()}`);
+const ok = res.status === 200 || res.status === 202;
+console.log(`IndexNow: ${urls.length} URL 送信 → HTTP ${res.status} ${ok ? 'OK' : await res.text()}`);
+if (!ok) process.exit(1); // 失敗を GitHub Actions の赤で見えるようにする

@@ -95,6 +95,7 @@
 - 新記事: /guide/madamis-rekishi/、/guide/zunousen-sakuhin/
 - お問い合わせ: bot 判定ルール追加、流入元の初回訪問記録
 - 仕組み化: scripts/seo-audit.mjs、scripts/gsc_report.py、scripts/spam-test.mjs、docs/title-history.md
+- 夜の総点検: 全101URLのクロール監査（問題なし・CLS 0）、Organization LD に knowsAbout/contactPoint、llms-full.txt 生成、頭脳戦とは に言い換え・作品節、トップ/サービス一覧/記事一覧の title 補強、IndexNow を GitHub Actions で自動送信、被リンク依頼リスト docs/link-outreach.md
 
 ### 施策（9/5）
 - 新記事: taikengata-idea / works / shinrisen-game / madamis-nazotoki-chigai / event-hiyou / yougo
