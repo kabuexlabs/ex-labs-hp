@@ -1,0 +1,26 @@
+---
+// 怪盗と秘密の試験（/kaitou/ 配下）専用の <head> スニペット。
+// SiteGuard と同等の機能を持つが、コピー時の出典表記を公演名にしている
+// （公演サイトには運営会社名を出さない方針のため、SiteGuard は使わない）。
+//  1) 流入元の先取り保存（お問い合わせの流入元集計用）
+//  2) Vercel Web Analytics
+//  3) コピー抑止：長文コピーに出典を自動付与＋画像の右クリック/ドラッグ保存を抑止
+---
+<script is:inline defer src="/_vercel/insights/script.js"></script>
+<script is:inline>
+try{var k='exl_src';if(!sessionStorage.getItem(k))sessionStorage.setItem(k,JSON.stringify({r:document.referrer,l:location.href}))}catch(e){}
+document.addEventListener('copy',function(e){
+  try{
+    var sel=String(window.getSelection());
+    if(sel.length<80||!e.clipboardData)return;
+    e.clipboardData.setData('text/plain',sel+'\n\n出典: 怪盗と秘密の試験 公式サイト '+location.origin+location.pathname);
+    e.preventDefault();
+  }catch(_){}
+});
+document.addEventListener('contextmenu',function(e){
+  var t=e.target;if(t&&t.tagName==='IMG')e.preventDefault();
+});
+document.addEventListener('dragstart',function(e){
+  var t=e.target;if(t&&t.tagName==='IMG')e.preventDefault();
+});
+</script>
