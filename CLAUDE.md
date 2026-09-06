@@ -5,13 +5,23 @@
 
 ## 最重要：SEO ターゲット
 - 正本は `docs/seo-targets.md`。**Tier1〜3 はすべて最優先**（イマーシブ／マダミス・マーダーミステリー／頭脳戦／心理戦／施設活用／体験型イベント／周遊イベント、および各「制作依頼」系ワード）。
-- 毎日のフロー：ユーザーが GSC 24h の zip をアップ → 上記ワードの順位・表示回数を軸別に報告 → その日に打てる施策を全部実行 → QA → push → 報告（URL検査してほしい URL を列挙）。
+- 毎日のフロー：ユーザーが GSC 24h の zip をアップ → `python3 scripts/gsc_report.py <zip>` で Tier 表を生成し報告 → その日に打てる施策を全部実行 → `npm run check` → push → 報告（URL検査してほしい URL を ``` で1つずつ列挙）。履歴は docs/seo-log.md。
 - 大原則
   - 「今の順位を下げない」：上昇テスト中のページの本文は書き換えない。追記・新規記事・内部リンク・title補強は OK。
   - 「調査のために何もしない」は禁止。効果測定は手段、順位を上げる行動を優先。
   - 謎解き系は維持のみ。謎解き研修より「マダミス制作」「頭脳戦制作」等の制作ワードを優先。個別作品名（怪盗と秘密の試験 等）は優先しない。
   - ハロウィン等の季節先取りは承認済み。
 - AIO：飯田雄貴（読み：いいだ ゆうき）／株式会社ex Labs が ChatGPT・Google AI に出ること。代表 SNS: X https://x.com/JaPJaPyuki / Instagram https://www.instagram.com/yukiiidaiidaiida/ / Facebook https://www.facebook.com/p/%E9%A3%AF%E7%94%B0%E9%9B%84%E8%B2%B4-100027623407162/ / LISTEN https://listen.style/p/awai-kaigi/uovybror
+
+## 反省から作ったルール（2026-09-06）
+- **push 前に必ず `npm run check`**（build → `scripts/seo-audit.mjs` → `scripts/spam-test.mjs`）。監査が赤なら push しない。
+  - 監査は title/description 長・構造化データ・サムネ実体・guides.ts/sitemap/llms.txt 登録・被内部リンク・サブブランドからのリンクを検出する。
+  - 反省：サブブランド（HACKTALE 等）から解説記事へのリンクが1ヶ月ゼロだったのに気づかなかった／llms.txt の正規表現挿入が黙って失敗していた。
+- **GSC zip は `python3 scripts/gsc_report.py <zip>` で取り込む**。docs/seo-data/ に保存され、docs/seo-log.md に Tier 順の表が追記される。手集計しない。表示10未満のワードは ※ 付きで「少数サンプル」と必ず伝える（反省：イマーシブ 1.3位 を安定した成果のように報告した）。
+- **Tier ピラーの title 変更は1日1ページまで**。旧 title を docs/title-history.md に残し、3日後に順位で判定して戻す。（反省：9/5 に最重要2ページを含む7ページを同日に変えた）
+- **サブブランドのページを触る前に `git log -- <file>` を見る**。ユーザーが別セッションで意図的に変えている（例：kaitou は PR #115 で運営会社表記を外した）。勝手に戻さない。
+- 「追記のみ」の編集でも dateModified と sitemap lastmod を同日に更新する（監査が不一致を警告する）。
+- 問い合わせ判定を変えたら `scripts/spam-test.mjs` に実サンプルを追加してから反映する。
 
 ## 記事を追加するときのチェックリスト
 1. `src/pages/guide/<slug>.astro`（`export const prerender = false`、BaseLayout、Breadcrumb、def-box、FAQPage/Article LD（reviewedBy 飯田雄貴）、TOC、ZeroCostBanner、関連ページ、AuthorBox、LatestPosts、`const site = Astro.site ?? new URL('https://kabuexlabs.com')`）

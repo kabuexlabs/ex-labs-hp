@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "seo:audit": "node scripts/seo-audit.mjs --warn",
+    "seo:report": "python3 scripts/gsc_report.py",
+    "test:spam": "node --experimental-strip-types scripts/spam-test.mjs",
+    "check": "npm run build && node scripts/seo-audit.mjs && npm run test:spam"
   },
   "dependencies": {
     "@astrojs/vercel": "^11.0.2",
