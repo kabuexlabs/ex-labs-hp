@@ -158,7 +158,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/madamis-kenshu/': '2026-08-10',
     '/guide/immersive-making/': '2026-08-10',
     '/guide/immersive-vr/': '2026-08-10',
-    '/guide/case-uwasabanashi/': '2026-08-11',
+    '/guide/case-uwasabanashi/': '2026-09-07',
     '/services/immersive/': '2026-08-10',
     '/guide/immersive-event/': '2026-07-31',
     '/guide/immersive-theater/': '2026-09-06',

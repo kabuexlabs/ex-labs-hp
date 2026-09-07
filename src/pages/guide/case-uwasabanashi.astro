@@ -19,6 +19,7 @@ const toc = [
   { id: 'concept', label: '企画：なぜ「都市伝説」だったのか' },
   { id: 'design', label: '体験設計の工夫3つ' },
   { id: 'media', label: '成果：日本経済新聞・電ファミニコゲーマー掲載' },
+  { id: 'kpi', label: '企画の目的・現時点の実績・今後測る項目' },
   { id: 'faq', label: 'よくある質問' },
 ];
 
@@ -58,7 +59,7 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-11',
-  dateModified: '2026-08-11',
+  dateModified: '2026-09-07',
   mainEntityOfPage: new URL('/guide/case-uwasabanashi/', Astro.site).toString(),
 };
 ---
@@ -126,7 +127,18 @@ const articleLd = {
 <section class="section tinted" id="media"><div class="wrap narrow">
 <p class="eyebrow">MEDIA</p><h2 class="h2 serif">成果：日本経済新聞・電ファミニコゲーマー掲載</h2>
 <p class="lede">本取り組みは、開催に先立ち<strong>日本経済新聞に「渋谷サクラステージで周遊型ミステリ体験」として掲載</strong>され、ゲーム・エンタメメディアの<strong>電ファミニコゲーマーでも紹介</strong>されました。施設の未活用空間を集客資産に変えるモデルとして、経済メディアからも注目を集めています。</p>
-<p class="vc-line"><a href="/media/" style="color:var(--accent)">メディア掲載実績の一覧 →</a>／<a href="/uwasabanashi/" style="color:var(--accent)">公演の特設サイト →</a></p>
+<p class="vc-line">掲載記事：<a href="https://www.nikkei.com/article/DGXZQOUC222NG0S6A720C2000000/" target="_blank" rel="noopener" style="color:var(--accent)">日本経済新聞（2026.07.31）</a>／<a href="https://news.denfaminicogamer.jp/news/2608032x" target="_blank" rel="noopener" style="color:var(--accent)">電ファミニコゲーマー（2026.08.03）</a>／<a href="/media/" style="color:var(--accent)">メディア掲載実績の一覧 →</a>／<a href="/uwasabanashi/" style="color:var(--accent)">公演の特設サイト →</a></p>
+</div></section>
+
+<section class="section" id="kpi"><div class="wrap narrow">
+<p class="eyebrow">KPI</p><h2 class="h2 serif">企画の目的・現時点の実績・今後測る項目</h2>
+<p class="lede">メディア掲載は広報の成果であり、施設側が知りたい「回遊・滞在・消費」の成果とは別物です。本件は2026年9月19日〜10月4日の開催のため、ここでは目的・現時点の実績・開催後に測る項目を分けて記載します。</p>
+<ul class="bullets">
+<li><strong>企画の目的</strong>：施設の共有区画を「目的地」に変え、館内の回遊と滞在時間を伸ばすこと。協力テナント（404 Not Found・TSUTAYA）への送客を物語の導線に組み込むこと。</li>
+<li><strong>現時点の実績（開催前）</strong>：日本経済新聞・電ファミニコゲーマーでの掲載、東急不動産株式会社と施設内テナントとの協働体制、当社担当範囲は企画・脚本・制作物・告知・チケット販売・当日運営。</li>
+<li><strong>開催後に測る項目</strong>：参加者数（チケット販売数）、参加者の館内滞在時間と訪問フロア数（アンケート）、協力テナントへの送客数、SNS投稿数、施設側アンケート。集計方法と期間を明記したうえで本ページに追記します。</li>
+<li><strong>この事例から言えること・言えないこと</strong>：施設一体型イベントが報道価値を持ち、施設・テナントの協働を引き出せることは言えます。回遊や消費への効果は開催後の数字で示します。</li>
+</ul>
 </div></section>
 
 <ZeroCostBanner />
@@ -164,6 +176,6 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#summary,#background,#concept,#design,#media,#faq{scroll-margin-top:88px}
+#summary,#background,#concept,#design,#media,#kpi,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>

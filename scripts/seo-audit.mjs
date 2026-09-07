@@ -50,8 +50,9 @@ for (const f of guideFiles) {
   else if (core.length > 45) warns.push(`${href} title ${core.length}字（45字以内推奨）`);
   if (desc.length < 90 || desc.length > 160) errors.push(`${href} description ${desc.length}字（90〜160字）`);
   if (!NO_ARTICLE_LD.has(slug)) {
-    if (!/'FAQPage'/.test(s)) errors.push(`${href} FAQPage 構造化データなし`);
-    if (!/'Article'/.test(s)) errors.push(`${href} Article 構造化データなし`);
+    // FAQ リッチリザルトは 2026-06 以降表示されないため必須ではない（読者向け FAQ 本文は推奨）
+    if (!/'FAQPage'/.test(s)) warns.push(`${href} FAQPage 構造化データなし（必須ではない）`);
+    if (!/'Article'/.test(s)) warns.push(`${href} Article 構造化データなし`);
     if (!/reviewedBy/.test(s)) warns.push(`${href} 監修者(reviewedBy)なし`);
     if (og && !exists(`public${og}`)) errors.push(`${href} ogImage の実体がない: ${og}`);
     if (!og) warns.push(`${href} ogImage 未指定`);

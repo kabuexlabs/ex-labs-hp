@@ -15,7 +15,17 @@ export interface ContactRecord {
   source?: string;
   /** 営業・スパム自動判定でフラグが立った送信 */
   spam?: boolean;
+  /** 商談ステータス（管理画面で手動更新）。SEO・AI 経由の相談が有効商談になったかを追う */
+  status?: InquiryStatus;
+  /** ステータスのメモ（例：初回打合せ 9/12） */
+  statusNote?: string;
+  statusUpdatedAt?: string;
 }
+
+export type InquiryStatus = 'new' | 'replied' | 'meeting' | 'won' | 'lost' | 'spam';
+export const INQUIRY_STATUS_LABEL: Record<InquiryStatus, string> = {
+  new: '未対応', replied: '返信済み', meeting: '商談中', won: '受注', lost: '失注', spam: 'スパム',
+};
 
 function readEnv(name: string): string | undefined {
   const v = (import.meta.env as Record<string, string | undefined>)[name] ?? process.env[name];
@@ -75,6 +85,23 @@ export async function listInquiries(limit = 50): Promise<ContactRecord[]> {
     }
   }
   return out;
+}
+
+/** 問い合わせの商談ステータスを更新する（LRANGE で位置を探し LSET で置き換え）。 */
+export async function setInquiryStatus(id: string, status: InquiryStatus, note: string): Promise<boolean> {
+  const raw = await contactRedis('LRANGE', CONTACT_LOG_KEY, '0', '-1');
+  if (!Array.isArray(raw)) return false;
+  for (let i = 0; i < raw.length; i++) {
+    let rec: ContactRecord;
+    try { rec = JSON.parse(String(raw[i])) as ContactRecord; } catch { continue; }
+    if (rec.id !== id) continue;
+    rec.status = status;
+    rec.statusNote = note.slice(0, 200);
+    rec.statusUpdatedAt = new Date().toISOString();
+    const r = await contactRedis('LSET', CONTACT_LOG_KEY, String(i), JSON.stringify(rec));
+    return r !== null;
+  }
+  return false;
 }
 
 /** 設定の有無（値そのものは絶対に返さない）。診断表示用。 */

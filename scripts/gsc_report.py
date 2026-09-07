@@ -85,6 +85,15 @@ def main():
         sys.exit('データがありません。zip を渡してください。')
     show = dates[-4:]
     data = {d: load(d) for d in show}
+    # 表示回数で加重した直近7日の平均順位（日別順位の単純平均は使わない）
+    last7 = dates[-7:]
+    d7 = {d: load(d)[0] for d in last7}
+    def wavg(w):
+        imp = sum(int(d7[d][w]['表示回数']) for d in last7 if w in d7[d])
+        if imp == 0:
+            return '-'
+        pos = sum(float(d7[d][w]['掲載順位']) * int(d7[d][w]['表示回数']) for d in last7 if w in d7[d]) / imp
+        return f"{pos:.1f}{'※' if imp < 30 else ''}"
     latest = show[-1]
     q, p = data[latest]
     qprev, pprev = data[show[-2]] if len(show) > 1 else ({}, {})
@@ -94,17 +103,17 @@ def main():
     pc = sum(int(r['クリック数']) for r in qprev.values()); pi = sum(int(r['表示回数']) for r in qprev.values())
     out.append(f'## {latest}')
     out.append('')
-    out.append(f'全体：クリック {tot_c}（前日 {pc}）・表示 {tot_i}（前日 {pi}）。※＝表示10未満の少数サンプル。')
+    out.append(f'全体：クリック {tot_c}（前日 {pc}）・表示 {tot_i}（前日 {pi}）。※＝表示10未満（7日加重は30未満）の少数サンプル。掲載順位は「表示された時の平均」で、表示条件が変わると評価が同じでも動く。日次の上下で判断せず、変更の評価は14〜28日の観察で行う。')
     out.append('')
-    out.append('| 軸 | ワード | ' + ' | '.join(d[5:] for d in show) + ' | 表示 | クリック | 担当ページ |')
-    out.append('|---|---|' + '---|' * len(show) + '---|---|---|')
+    out.append('| 軸 | ワード | ' + ' | '.join(d[5:] for d in show) + ' | 7日加重平均 | 表示 | クリック | 担当ページ |')
+    out.append('|---|---|' + '---|' * len(show) + '---|---|---|---|')
     for ax, words in TARGETS:
         for w, page in words:
             cells = [pos(data[d][0], w) for d in show]
             if all(c == '-' for c in cells):
                 continue
             r = q.get(w)
-            out.append(f"| {ax.split(' ')[0]} | {w} | " + ' | '.join(cells) + f" | {r['表示回数'] if r else '-'} | {r['クリック数'] if r else '-'} | {page} |")
+            out.append(f"| {ax.split(' ')[0]} | {w} | " + ' | '.join(cells) + f" | {wavg(w)} | {r['表示回数'] if r else '-'} | {r['クリック数'] if r else '-'} | {page} |")
     out.append('')
     out.append('### CTR ウォッチ（title 変更ページ・表示上位）')
     out.append('| ページ | 表示 | クリック | CTR | 順位 | 前日 CTR | 前日 順位 |')
