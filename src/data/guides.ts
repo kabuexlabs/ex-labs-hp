@@ -157,6 +157,22 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/hotel-event.webp',
   },
   {
+    href: '/guide/madamis-tokyo/',
+    title: '東京でマダミスを遊ぶには？店舗・公演・オンラインの探し方と初心者の選び方【2026年版】',
+    desc: '専門店・カフェ・公演型・オンラインの4種類、料金と所要時間、一人参加、初心者の選び方5つ、推理重視の東大マダミスと提携店舗の紹介。',
+    date: '2026-09-07',
+    category: 'murder',
+    thumb: '/assets/guide/madamis-tokyo.webp',
+  },
+  {
+    href: '/guide/immersive-taiken/',
+    title: 'イマーシブ体験とは？種類・事例・楽しみ方と、企業・施設での活かし方',
+    desc: 'イマーシブシアター・施設一体型・街歩き型・没入型展示・VRの5種類、日経掲載の事例、料金と所要時間、初めての楽しみ方、企業・施設での作り方。',
+    date: '2026-09-07',
+    category: 'immersive',
+    thumb: '/assets/guide/immersive-taiken.webp',
+  },
+  {
     href: '/guide/madamis-rekishi/',
     title: 'マーダーミステリーの歴史とは？起源・海外との違い・日本での広がりと2026年の動向',
     desc: '英米のマーダーミステリー・パーティーに始まり、中国での大流行を経て2019年ごろ日本へ。海外と日本の違い、店舗・オンライン・企業活用が進む2026年の動向。',

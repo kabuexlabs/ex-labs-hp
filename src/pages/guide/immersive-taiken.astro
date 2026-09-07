@@ -1,0 +1,215 @@
+---
+// 「イマーシブ体験」「イマーシブ体験とは」「没入体験 とは」の受け皿。
+// イマーシブとは（意味・語源のピラー）、東京イマーシブ体験（東京の探し方）、
+// イマーシブイベント（企業活用）とは意図を分け、「体験としてのイマーシブの種類・事例・
+// 楽しみ方」を担当する。ピラーは触らず、内部リンクで評価を集める。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+
+const toc = [
+  { id: 'about', label: 'イマーシブ体験とは' },
+  { id: 'types', label: 'イマーシブ体験の5つの種類' },
+  { id: 'examples', label: '事例：施設一体型・マジック×イマーシブ・街歩きアート' },
+  { id: 'enjoy', label: '初めての楽しみ方と選び方' },
+  { id: 'why', label: 'なぜ今イマーシブ体験が求められるのか' },
+  { id: 'biz', label: '企業・施設がイマーシブ体験を作るには' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'イマーシブ体験とはどんな体験ですか？',
+    a: '客席から「観る」のではなく、物語や空間の中に自分が入り込み、その一部として見て・歩いて・選ぶ体験です。俳優と同じ空間を歩き回るイマーシブシアター、商業施設や街全体を舞台にしたイマーシブイベント、VRによる没入体験などが代表例です。',
+  },
+  {
+    q: 'イマーシブ体験とイマーシブシアターは同じですか？',
+    a: 'イマーシブシアターはイマーシブ体験の一種で、演劇形式のものを指します。イマーシブ体験はより広い言葉で、演劇のほか、施設を周遊するイベント、展示、飲食、VRなど「没入して参加する体験」全般を含みます。',
+  },
+  {
+    q: 'イマーシブ体験は一人でも楽しめますか？',
+    a: '楽しめます。多くの公演・イベントは個人参加を前提に設計されており、一人の方が物語に集中しやすいという声も多いです。周遊型のイベントは友人や家族と手がかりを分担して回る楽しみ方もあります。',
+  },
+  {
+    q: '料金や所要時間の目安は？',
+    a: '常設のイマーシブシアターは1人5,000円〜1万円台、期間限定のイマーシブイベントは無料〜3,000円台、街歩き型は1,500〜3,000円程度が目安です。所要時間は60〜120分が中心で、施設全体を巡る周遊型は自由時間を含めて半日楽しめるものもあります。',
+  },
+  {
+    q: '自社の施設やブランドでイマーシブ体験を作れますか？',
+    a: '作れます。株式会社ex Labsは、渋谷サクラステージの施設一体型イマーシブ（日本経済新聞掲載）、六本木の会員制バーでのマジック×イマーシブ公演、下北沢の街全体を舞台にした周遊型アートイマーシブなどを企画・制作しています。集客型はレベニューシェア（初期費用0円）にも対応し、ご相談は無料です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+
+const definedTermLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: 'イマーシブ体験',
+  description: 'イマーシブ体験とは、観客が客席から「観る」のではなく、物語や空間の中に入り込み、その一部として見て・歩いて・選ぶ没入型の体験のこと。イマーシブシアター、施設や街を舞台にしたイマーシブイベント、没入型の展示やVRなどを含む。',
+  inDefinedTermSet: {
+    '@type': 'DefinedTermSet',
+    name: '体験型エンターテインメント用語集',
+    url: new URL('/guide/yougo/', site).toString(),
+    publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  },
+  url: new URL('/guide/immersive-taiken/', site).toString(),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'イマーシブ体験とは？種類・事例・楽しみ方と、企業・施設での活かし方',
+  about: 'イマーシブ体験（没入型体験）の種類・事例・楽しみ方',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/immersive-taiken.webp', site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-07',
+  dateModified: '2026-09-07',
+  mainEntityOfPage: new URL('/guide/immersive-taiken/', site).toString(),
+};
+---
+<BaseLayout
+  title="イマーシブ体験とは？種類・事例・楽しみ方と、企業・施設での活かし方 - 株式会社ex Labs"
+  description="イマーシブ体験とは、物語や空間の中に入り込み、その一部として参加する没入型の体験のこと。イマーシブシアター・施設一体型イベント・没入型展示・イマーシブダイニング・VRの5種類、日経掲載の渋谷サクラステージなどの事例、料金と所要時間、初めての楽しみ方、企業・施設での作り方を制作会社が解説。"
+  ogImage="/assets/guide/immersive-taiken.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(definedTermLd)} />
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'イマーシブとは', href: '/guide/immersive/' },
+  { name: 'イマーシブ体験とは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">IMMERSIVE EXPERIENCE</p>
+<h1 class="h2 serif"><span class="nobr">イマーシブ体験とは？</span><br><span class="nobr">種類・事例・楽しみ方と、</span><span class="nobr">企業・施設での活かし方</span></h1>
+<div class="def-box">
+<p class="def-word"><span class="serif">イマーシブ体験</span><span class="def-yomi">読み方：いまーしぶたいけん（immersive experience）</span></p>
+<p class="def-body">観客が客席から「観る」のではなく、<strong>物語や空間の中に入り込み、その一部として見て・歩いて・選ぶ</strong>没入型の体験のこと。イマーシブシアター、施設や街を舞台にしたイマーシブイベント、没入型の展示や飲食、VR などを含む広い言葉。</p>
+</div>
+<p class="lede">このページでは、イマーシブ体験の5つの種類、実際の事例、料金と所要時間、初めての人の楽しみ方、そして企業や施設がイマーシブ体験を作る方法までを、渋谷サクラステージの施設一体型イマーシブ（日本経済新聞掲載）を制作した株式会社ex Labsが解説します。「イマーシブ」という言葉の意味・読み方は<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？意味を1分で解説 →</a>、東京で今体験できる公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京のイマーシブ体験まとめ →</a>をどうぞ。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="about"><div class="wrap narrow">
+<p class="eyebrow">ABOUT</p><h2 class="h2 serif">イマーシブ体験とは</h2>
+<p class="lede">イマーシブ（immersive）は「没入型の」という意味の英語です。イマーシブ体験の核は<strong>「観客」と「舞台」の境界がないこと</strong>にあります。参加者は座って眺めるのではなく、空間を歩き、登場人物に話しかけ、どの部屋に入るか・誰を追うかを自分で選びます。だから同じ公演でも、人によって見えるものが違い、「自分だけの体験」として記憶に残ります。</p>
+<p class="lede">映画や演劇との違いは「視点の主導権」が参加者にあること、テーマパークとの違いは「物語の当事者になること」、謎解きやマダミスとの違いは「明確な勝敗やゴールがなくてもよいこと」です。<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミス・謎解き・イマーシブ・頭脳戦の違い →</a></p>
+</div></section>
+
+<section class="section" id="types"><div class="wrap">
+<p class="eyebrow">TYPES</p><h2 class="h2 serif">イマーシブ体験の5つの種類</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">①イマーシブシアター</span><span class="genre-d">客席のない演劇。俳優と同じ空間を歩き回り、追う人物を自分で選ぶ。常設劇場型と期間限定公演がある。<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">②施設一体型イマーシブイベント</span><span class="genre-d">商業施設・書店・ホテルなど施設全体を物語の舞台にする。館内を巡るため回遊・滞在時間が伸び、施設の集客企画として広がっている。<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントとは →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">③街歩き型・周遊型</span><span class="genre-d">商店街や街区に物語と手がかりを点在させ、店舗を巡りながら体験する。地域の回遊と店舗送客を同時に生む。<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントとは →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">④没入型の展示・ダイニング</span><span class="genre-d">映像・音・香りで空間ごと世界観に変える展示や、物語仕立ての食事体験。「観る」寄りだが空間に包まれる没入感が高い。</span></div>
+<div class="genre-cell"><span class="genre-t serif">⑤VR・デジタル没入体験</span><span class="genre-d">ヘッドセットや大型映像で仮想空間に入る。身体的な没入感は高いが、他の参加者との会話や偶然性はリアル型に譲る。<a href="/guide/immersive-vr/" style="color:var(--accent)">イマーシブとVRの違い →</a></span></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="examples"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLES</p><h2 class="h2 serif">事例：施設一体型・マジック×イマーシブ・街歩きアート</h2>
+<ul class="bullets">
+<li><strong>ウワサバナシ調査委員会（渋谷サクラステージ）</strong>：施設全体を周遊しながら都市伝説の真相に迫るイマーシブ体験。東急不動産・404 Not Found・TSUTAYAの協力のもと開催し、日本経済新聞に掲載されました。<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">制作事例 →</a></li>
+<li><strong>怪盗と秘密の試験（六本木・会員制バー）</strong>：日本一の実績を持つマジシャンとのコラボによる、マジック×イマーシブ公演。1空間でも成立する高密度の没入体験です。<a href="/kaitou/" style="color:var(--accent)">公演特設サイト →</a></li>
+<li><strong>ロスト・フレーム（下北沢）</strong>：街に散らばった絵画を探し、物語を辿る周遊型アートイマーシブ。全公演完売。<a href="/taikenbizyutu/lostframe/" style="color:var(--accent)">公演ページ →</a></li>
+<li><strong>月明かりの書店と呪われた原稿（紀伊國屋書店）</strong>：閉店後の書店を舞台にした一夜限りの体験型イベント。「普段は入れない時間」を舞台にした施設活用の例です。<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の活用 →</a></li>
+</ul>
+<p class="vc-line"><a href="/works/" style="color:var(--accent)">制作事例一覧 →</a></p>
+</div></section>
+
+<section class="section" id="enjoy"><div class="wrap narrow">
+<p class="eyebrow">HOW TO ENJOY</p><h2 class="h2 serif">初めての楽しみ方と選び方</h2>
+<ul class="bullets">
+<li><strong>「全部見ようとしない」</strong>：イマーシブ体験は一度で全てを見られない設計が多い。気になった人物や部屋を追い、見えなかった部分は終演後に他の参加者と交換するのが醍醐味です。</li>
+<li><strong>話しかけられたら乗る</strong>：登場人物からの問いかけは、物語に入る入口。正解を探すより、その場の役として反応すると没入感が跳ね上がります。</li>
+<li><strong>動きやすい服装・荷物は最小限</strong>：歩く・階段を上る・立って観る場面が多い。荷物預かりの有無を事前に確認。</li>
+<li><strong>初回は60〜120分・少人数の公演から</strong>：長時間・大人数の公演は慣れてから。料金は期間限定イベントで無料〜3,000円台、常設シアターで5,000円〜1万円台が目安です。</li>
+<li><strong>東京で探すなら</strong>：常設型から期間限定の周遊型まで、いま体験できる公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京のイマーシブ体験まとめ【2026】→</a>で更新しています。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="why"><div class="wrap narrow">
+<p class="eyebrow">WHY NOW</p><h2 class="h2 serif">なぜ今イマーシブ体験が求められるのか</h2>
+<ul class="bullets">
+<li><strong>「見る」コンテンツが飽和した</strong>：映像・文章は生成AIで量産される時代に、人が同じ空間に集まり、自分の行動で進む体験の価値が上がっています。</li>
+<li><strong>SNSで「自分の体験」が共有される</strong>：同じ公演でも人によって見えるものが違うため、感想が語りたくなり、口コミが広がりやすい。</li>
+<li><strong>施設側の課題と噛み合う</strong>：商業施設・宿泊施設・文化施設が求める回遊・滞在時間・話題化を、空間そのものをコンテンツにするイマーシブ体験が同時に満たします。<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは →</a></li>
+</ul>
+</div></section>
+
+<section class="section" id="biz"><div class="wrap narrow">
+<p class="eyebrow">FOR BUSINESS</p><h2 class="h2 serif">企業・施設がイマーシブ体験を作るには</h2>
+<ul class="bullets">
+<li><strong>目的から形式を決める</strong>：回遊なら施設一体型・周遊型、ブランド体験なら1空間完結型、話題化なら一夜限りの特別公演。</li>
+<li><strong>空間そのものを舞台にする</strong>：既存の装飾・閉店後の店舗・空き区画を使えば、造作費を抑えながら非日常性を最大化できます。</li>
+<li><strong>費用と期間</strong>：1空間完結型は数十万円台〜、施設や街を舞台にした周遊型は100万円前後〜数百万円規模。企画確定から1〜3ヶ月。集客型はレベニューシェア（初期費用0円）にも対応。<a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブの制作費用 →</a></li>
+<li><strong>依頼の流れ</strong>：ヒアリング（無料）→ 企画提案 → 制作・テストプレイ → 告知・集客 → 当日運営。<a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作とは →</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作のご相談 →</a></li>
+</ul>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">イマーシブ体験の企画・制作のご相談はこちら（無料）</p>
+<a class="btn" href="/services/immersive/">イマーシブ制作サービスを見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京のイマーシブ体験まとめ</a>／<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントとは</a>／<a href="/guide/botsunyukan/" style="color:var(--accent)">没入感とは</a>／<a href="/guide/yougo/" style="color:var(--accent)">用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.def-box{max-width:680px;margin:40px auto 26px;background:#fff;border:1px solid rgba(51,48,43,.1);border-left:5px solid var(--accent);border-radius:14px;padding:26px 30px;text-align:left;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.def-word{margin:0 0 12px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-size:22px;font-weight:800;color:var(--ink)}
+.def-yomi{font-size:13px;font-weight:600;color:rgba(51,48,43,.55);letter-spacing:.04em}
+.def-body{margin:0;font-size:14.5px;line-height:2;color:rgba(51,48,43,.82)}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#about,#types,#examples,#enjoy,#why,#biz,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.def-box{padding:20px 20px}.def-word{font-size:19px;gap:10px}.toc{padding:22px 22px}}
+</style>

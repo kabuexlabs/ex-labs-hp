@@ -1,0 +1,189 @@
+---
+// 「マダミス 東京」「マダミス 店舗」「マダミス 公演 東京」「マダミス どこで遊べる」の受け皿。
+// サイトで最もクリックされている「東京のイマーシブ体験」記事（CTR 15%）と同じ
+// 「東京で体験する」型を、マダミス軸に横展開する。ピラー（マダミスとは）は触らず、
+// 提携店舗・UNLIMITED MYSTERY・初心者ガイドへ送客しつつ、マダミスとは へ内部リンクを集める。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import MadamisPartners from '../../components/MadamisPartners.astro';
+import { jsonLd } from '../../lib/microcms';
+import { tmWorks } from '../../data/toudaimurderWorks';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const works = tmWorks.slice(0, 6);
+
+const toc = [
+  { id: 'where', label: '東京でマダミスを遊べる場所は4種類' },
+  { id: 'choose', label: '初めてでも失敗しない選び方5つ' },
+  { id: 'um', label: '推理重視なら「UNLIMITED MYSTERY（東大マダミス）」' },
+  { id: 'partners', label: '提携マダミス店舗' },
+  { id: 'price', label: '料金・所要時間・予約の目安' },
+  { id: 'biz', label: '企業・施設で開催したい方へ' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: '東京でマダミスを遊ぶには、どこに行けばいいですか？',
+    a: 'マダミス専門店の公演に申し込むのが一般的です。ほかに、ボードゲームカフェの定期公演、俳優が演じる公演型、自宅から参加できるオンライン公演があります。初めての方は、GM（進行役）付きで初心者向け作品を用意している専門店か、推理重視の公演を選ぶと入りやすいです。',
+  },
+  {
+    q: 'マダミスの料金はいくらくらいですか？',
+    a: '東京の店舗公演では1人あたり3,000〜6,000円程度が目安です（作品の長さ・演出・食事の有無で変わります）。オンライン公演は数百円〜3,000円程度と安めです。貸切や企業向けの実施は別途お見積りになります。',
+  },
+  {
+    q: '一人でも参加できますか？',
+    a: 'できます。多くの店舗公演は「相席」で参加者を募っており、一人参加が半数以上という公演も珍しくありません。人数が作品ごとに固定されているため、むしろ一人参加の方が予約しやすいこともあります。',
+  },
+  {
+    q: '初心者におすすめの作品の選び方は？',
+    a: '①所要時間2〜3時間、②人数5〜7人、③GM付き、④「初心者向け」「推理重視」と明記されている作品、の4条件を満たすものから始めるのがおすすめです。演技への不安がある方は、演技より推理の比重が高い作品を選ぶと安心です。',
+  },
+  {
+    q: '会社の懇親会や施設のイベントとしてマダミスを開催できますか？',
+    a: 'できます。株式会社ex Labsは、企業の懇親会・研修向けの貸切実施や、施設・店舗の空間に合わせたオリジナルマダミスの制作を行っています。宿泊施設向けに制作した作品は新規宿泊予約20件以上につながりました。ご相談・お見積りは無料です。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '東京でマダミスを遊ぶには？店舗・公演・オンラインの探し方と初心者の選び方【2026年版】',
+  about: '東京でマーダーミステリー（マダミス）を体験できる場所と選び方',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/madamis-tokyo.webp', site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-07',
+  dateModified: '2026-09-07',
+  mainEntityOfPage: new URL('/guide/madamis-tokyo/', site).toString(),
+};
+---
+<BaseLayout
+  title="東京でマダミスを遊ぶには？店舗・公演・オンラインの探し方と初心者の選び方【2026年版】 - 株式会社ex Labs"
+  description="東京でマダミス（マーダーミステリー）を遊べる場所を、専門店・ボードゲームカフェ・公演型・オンラインの4種類で整理。料金と所要時間の目安、一人参加の可否、初心者が失敗しない作品の選び方5つ、推理重視の東大マダミス（UNLIMITED MYSTERY）と提携店舗の紹介まで、マダミスを制作する会社が解説します。"
+  ogImage="/assets/guide/madamis-tokyo.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'マダミスとは', href: '/guide/madamis/' },
+  { name: '東京でマダミスを遊ぶには' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">MURDER MYSTERY IN TOKYO</p>
+<h1 class="h2 serif"><span class="nobr">東京でマダミスを遊ぶには？</span><br><span class="nobr">店舗・公演・オンラインの探し方と</span><span class="nobr">初心者の選び方【2026年版】</span></h1>
+<p class="lede"><strong>マダミス（マーダーミステリー）</strong>は、東京なら専門店・カフェ・公演型・オンラインと選択肢が多く、初めての人ほど「どこで、何を選べばいいか」で迷います。この記事では、遊べる場所の4種類、料金と所要時間の目安、一人参加の可否、初心者が失敗しない作品の選び方を、推理重視のマダミスを制作・公演する<strong>UNLIMITED MYSTERY（東大マーダーミステリーサークル）</strong>を運営する株式会社ex Labsが解説します。マダミスそのものの意味やルールは<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは？意味・遊び方・種類・費用 →</a>をご覧ください。</p>
+
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="where"><div class="wrap">
+<p class="eyebrow">WHERE</p><h2 class="h2 serif">東京でマダミスを遊べる場所は4種類</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">①マダミス専門店</span><span class="genre-d">個室・GM（進行役）・作品ラインアップが揃った定番。初心者向け公演や相席参加が多く、最初の1回に最も向く。都心部を中心に増えている。</span></div>
+<div class="genre-cell"><span class="genre-t serif">②ボードゲームカフェの公演</span><span class="genre-d">週末を中心に定期公演を行うカフェ。作品数は専門店より少ないが、ボードゲームとセットで気軽に。飲食しながら遊べる店も。</span></div>
+<div class="genre-cell"><span class="genre-t serif">③公演型・イマーシブ型</span><span class="genre-d">俳優が演じる中に参加者が入る形式。物語への没入感が高く、演技が苦手でも「観客兼参加者」として楽しめる。<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">④オンライン公演</span><span class="genre-d">自宅からビデオ通話で参加。料金が安く、地方や遠方の友人とも遊べる。表情が読みにくい分、推理重視の作品が向く。</span></div>
+</div>
+<p class="vc-line" style="margin-top:24px">東京は専門店・公演型の選択肢が最も多い都市で、平日夜と週末に公演が集中しています。まず①か③で1回体験し、好みが分かってから作品を選ぶ流れが失敗しにくいです。</p>
+</div></section>
+
+<section class="section" id="choose"><div class="wrap narrow">
+<p class="eyebrow">HOW TO CHOOSE</p><h2 class="h2 serif">初めてでも失敗しない選び方5つ</h2>
+<ul class="bullets">
+<li><strong>①所要時間は2〜3時間の作品から</strong>：4時間超の長編は集中力が切れやすい。初回は短めで「もう一度やりたい」と思える体験に。<a href="/guide/madamis-asobikata/" style="color:var(--accent)">所要時間の目安 →</a></li>
+<li><strong>②GM（進行役）付きを選ぶ</strong>：ルール説明・時間管理・結末の読み上げを任せられ、初心者同士でも成立する。</li>
+<li><strong>③「初心者向け」「推理重視」の表記を確認</strong>：演技の比重が高い作品は慣れてから。推理重視なら、人見知りでも証拠と論理で参加できる。</li>
+<li><strong>④人数5〜7人の作品</strong>：全員に発言機会があり、待ち時間が少ない。10人超は上級者向け。</li>
+<li><strong>⑤ネタバレを見ない</strong>：マダミスは同じ作品を一度しか遊べない。作品名で検索すると感想に真相が混ざることがあるので、公式の紹介文だけを見て選ぶ。</li>
+</ul>
+<p class="vc-line"><a href="/guide/madamis-shoshinsha/" style="color:var(--accent)">マダミス初心者ガイド（恥ずかしい？何時間？の不安解消）→</a>／<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミスと謎解き・人狼の違い →</a></p>
+</div></section>
+
+<section class="section tinted" id="um"><div class="wrap">
+<p class="eyebrow">UNLIMITED MYSTERY</p><h2 class="h2 serif">推理重視なら「UNLIMITED MYSTERY（東大マダミス）」</h2>
+<p class="h2sub">東大マーダーミステリーサークルから生まれた、ロジックで真相にたどり着ける推理重視のマダミスレーベル。株式会社ex Labsが運営しています。</p>
+<div class="genre-grid">
+{works.map((w) => (
+  <div class="genre-cell"><span class="genre-t serif">{w.title}</span><span class="genre-d"><a href={`/toudaimurder/works/${w.slug}/`} style="color:var(--accent)">作品ページを見る →</a></span></div>
+))}
+</div>
+<p class="vc-line" style="margin-top:24px"><a href="/toudaimurder/works/" style="color:var(--accent)">作品一覧 →</a>／<a href="/toudaimurder/news/" style="color:var(--accent)">公演情報 →</a>／<a href="/toudaimurder/" style="color:var(--accent)">UNLIMITED MYSTERY 公式サイト →</a></p>
+</div></section>
+
+<MadamisPartners />
+
+<section class="section tinted" id="price"><div class="wrap narrow">
+<p class="eyebrow">PRICE &amp; TIME</p><h2 class="h2 serif">料金・所要時間・予約の目安</h2>
+<ul class="bullets">
+<li><strong>料金</strong>：店舗公演で1人 3,000〜6,000円程度が目安。長編や食事付き、俳優が出演する公演型は高め。オンラインは数百円〜3,000円程度。</li>
+<li><strong>所要時間</strong>：2〜4時間が中心。受付・説明・エンディング後の感想戦を含めると、案内時間より30分ほど長く見ておくと安心。</li>
+<li><strong>予約</strong>：人数が作品ごとに固定されるため、人気公演は1〜2週間前に埋まる。相席参加なら1人でも予約しやすい。</li>
+<li><strong>持ち物</strong>：基本は手ぶらでOK。メモ用の筆記具は店で用意されることが多い。<a href="/guide/madamis-asobikata/#items" style="color:var(--accent)">必要なもの →</a></li>
+</ul>
+</div></section>
+
+<section class="section" id="biz"><div class="wrap narrow">
+<p class="eyebrow">FOR BUSINESS</p><h2 class="h2 serif">企業・施設で開催したい方へ</h2>
+<p class="lede">懇親会・研修での貸切実施や、宿泊施設・商業施設・店舗の空間に合わせたオリジナルマダミスの制作も行っています。宿泊施設向けに制作した作品は<strong>新規宿泊予約20件以上</strong>につながりました。集客型のイベントは、チケット売上から費用をいただくレベニューシェア型（初期費用0円）にも対応しています。</p>
+<p class="vc-line"><a href="/guide/madamis-seisaku/" style="color:var(--accent)">マダミス制作とは？依頼の流れ・費用 →</a>／<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修とは →</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作のご相談（無料）→</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-murder">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">マダミスの貸切・オリジナル制作のご相談はこちら（無料）</p>
+<a class="btn" href="/services/murder-mystery/">マーダーミステリー制作サービスを見る</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは</a>／<a href="/guide/madamis-shoshinsha/" style="color:var(--accent)">初心者ガイド</a>／<a href="/guide/madamis-asobikata/" style="color:var(--accent)">遊び方</a>／<a href="/guide/madamis-rekishi/" style="color:var(--accent)">マーダーミステリーの歴史</a>／<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブ</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="murder" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#where,#choose,#um,#partners,#price,#biz,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

@@ -117,6 +117,7 @@
 - shuyu-event: 「回遊型イベント（回遊型）とは」節（定義ボックス）＋FAQ（新出「回遊型とは」6.3位）
 - shanai-event: FAQ 3問（社内イベント ハロウィン／食事／盛り上がる の新出クエリ）
 - saiji: 「催事の種類一覧表」節＋FAQ（113表示・10位停滞の打開策）／taikengata-event: 「2026年のトレンド」節／代表プロフィール: 「飯田ゆうき」表記ゆれを alternateName に追加（6表示・8位）
+- 攻め（新規スポーク2本）: /guide/madamis-tokyo/（東京でマダミスを遊ぶには：CTR15%の東京イマーシブ記事の型を横展開）、/guide/immersive-taiken/（イマーシブ体験とは：DefinedTerm付き）。ピラーは関連ページ行への内部リンク追加のみ
 - 新規ページの初表示: works 23.6位、event-hiyou 23.8位、zunousen-sakuhin 7.7位、/company/ 6.7位、/media/ 8.6位
 
 ## 2026-09-06
