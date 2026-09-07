@@ -27,9 +27,8 @@ export const LOST_FRAME = {
   pressUrl: 'https://prtimes.jp/main/html/rd/p/000000001.000185770.html',
   /** 公開日。PR TIMES のリリース日 (リリース＝公演開始) を採用している */
   startDate: '2026-07-07',
-  /** 公演終了日（Search Console の Event 構造化データ警告「endDate がありません」対応）。
-   *  2026-09-03 に全公演完売。実際の千秋楽日が分かり次第この値を更新すること。 */
-  endDate: '2026-09-30',
+  /** 千秋楽（最終公演日）。Event 構造化データの endDate に使う */
+  endDate: '2026-08-31',
   area: '東京・下北沢エリア各所（小田急線／京王井の頭線「下北沢駅」周辺）',
   format: '街を巡る参加型の絵画鑑賞（絵画 × 物語 × 図像の読解）',
   duration: '75分',
