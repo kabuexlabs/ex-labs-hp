@@ -15,6 +15,7 @@ const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const toc = [
   { id: 'about', label: '周遊型イベントとは' },
   { id: 'why', label: 'なぜ「回遊」が生まれるのか' },
+  { id: 'kaiyu', label: '回遊型イベント（回遊型）とは' },
   { id: 'types', label: '周遊型イベントの形式4タイプ' },
   { id: 'examples', label: '事例：渋谷サクラステージ・下北沢' },
   { id: 'making', label: '作り方のポイントと費用' },
@@ -42,6 +43,10 @@ const faqs = [
   {
     q: '費用はどのくらいかかりますか？',
     a: '規模により数十万円台〜数百万円規模まで。株式会社ex Labsではレベニューシェア型（成果報酬型）に対応しており、案件によっては施設側の初期費用0円または格安で開催できます。',
+  },
+  {
+    q: '回遊型イベントとは何ですか？',
+    a: '来館者が施設内や街の複数の場所を巡る（回遊する）ことを目的に設計されたイベントです。周遊型イベントとほぼ同義で、施設側の指標である回遊率や滞在時間の向上を狙って、館内周遊型の謎解きや施設一体型のイマーシブイベントとして実施されます。',
   },
 ];
 
@@ -81,7 +86,7 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-10',
-  dateModified: '2026-09-05',
+  dateModified: '2026-09-07',
   mainEntityOfPage: new URL('/guide/shuyu-event/', Astro.site).toString(),
 };
 ---
@@ -124,6 +129,19 @@ const articleLd = {
 <section class="section" id="why"><div class="wrap narrow">
 <p class="eyebrow">WHY</p><h2 class="h2 serif">なぜ「回遊」が生まれるのか</h2>
 <p class="lede">周遊型イベントでは、<strong>次に行く場所を決めるのは運営ではなく物語</strong>です。「この手がかりの続きはあの場所にある」という構造が、参加者を普段通らないフロア・エリアへ自然に導きます。結果として、<strong>滞在時間の延長・普段接点のない店舗の前の通過・館内全体のにぎわい</strong>が同時に生まれます。単なるスタンプラリーとの違いは、移動の理由が「作業」ではなく<strong>「物語の続きを知りたい」という動機</strong>になっている点です。</p>
+</div></section>
+
+<section class="section tinted" id="kaiyu"><div class="wrap narrow">
+<p class="eyebrow">TERMS</p><h2 class="h2 serif">回遊型イベント（回遊型）とは</h2>
+<div class="def-box">
+<p class="def-word"><span class="serif">回遊型イベント</span><span class="def-yomi">読み方：かいゆうがたいべんと</span></p>
+<p class="def-body">来館者が施設内や街の<strong>複数の場所を巡ること（回遊）を目的に設計されたイベント</strong>。周遊型イベントとほぼ同じ意味で使われるが、「周遊」は参加者が巡る体験そのもの、「回遊」は施設側から見た人の流れ（回遊率・滞在時間）を指す言葉として使い分けられることが多い。</p>
+</div>
+<ul class="bullets">
+<li><strong>回遊率</strong>：来館者のうち、複数のフロアやエリアを訪れた人の割合。商業施設の集客イベントで最も重視される指標の一つです。</li>
+<li><strong>回遊施策</strong>：回遊率を上げるための取り組み全般。スタンプラリー、館内周遊型の謎解き、施設一体型のイマーシブイベントなどが代表例です。<a href="#ideas" style="color:var(--accent)">回遊施策のアイデア8選 →</a></li>
+<li><strong>周遊型との違い</strong>：企画書では「周遊型イベント」、効果測定では「回遊」と書くのが実務上の慣例です。意味の違いで迷う必要はありません。</li>
+</ul>
 </div></section>
 
 <section class="section tinted" id="types"><div class="wrap">
@@ -213,6 +231,6 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#about,#why,#types,#examples,#making,#ideas,#faq{scroll-margin-top:88px}
+#about,#why,#kaiyu,#types,#examples,#making,#ideas,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>
