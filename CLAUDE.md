@@ -18,7 +18,8 @@
   - 監査は title/description 長・構造化データ・サムネ実体・guides.ts/sitemap/llms.txt 登録・被内部リンク・サブブランドからのリンクを検出する。
   - 反省：サブブランド（HACKTALE 等）から解説記事へのリンクが1ヶ月ゼロだったのに気づかなかった／llms.txt の正規表現挿入が黙って失敗していた。
 - **GSC zip は `python3 scripts/gsc_report.py <zip>` で取り込む**。docs/seo-data/ に保存され、docs/seo-log.md に Tier 順の表が追記される。手集計しない。表示10未満のワードは ※ 付きで「少数サンプル」と必ず伝える（反省：イマーシブ 1.3位 を安定した成果のように報告した）。
-- **Tier ピラーの title 変更は1日1ページまで**。旧 title を docs/title-history.md に残し、3日後に順位で判定して戻す。（反省：9/5 に最重要2ページを含む7ページを同日に変えた）
+- **Tier ピラー（immersive / madamis / zunousen / shinrisen / shisetsu-katsuyo / taikengata-event / shuyu-event / botsunyukan / saiji）の title・h1・description・既存本文は 2026-09-21 まで凍結**。変更できるのは「ページ下部への追記」「内部リンク」「構造化データ」のみ。凍結解除後も title 変更は1日1ページ・旧値を docs/title-history.md に記録・3日判定。（反省：9/5 に最重要ページを含む7ページの title を同日に変え、マダミスとは 3.8→10.7 と下げた。ユーザーの最優先は「既存ページの順位を下げない」）
+- ヘッド語（マダミス／イマーシブ）は日次で1〜5位動く。日次の上下で施策を打たず、7日移動平均と表示回数で判断する。
 - **サブブランドのページを触る前に `git log -- <file>` を見る**。ユーザーが別セッションで意図的に変えている（例：kaitou は PR #115 で運営会社表記を外した）。勝手に戻さない。
 - 「追記のみ」の編集でも dateModified と sitemap lastmod を同日に更新する（監査が不一致を警告する）。
 - 問い合わせ判定を変えたら `scripts/spam-test.mjs` に実サンプルを追加してから反映する。
