@@ -101,7 +101,12 @@
 | /blog/d15in02dr/（頭脳戦制作） | zunousen-seisaku / services/zunousen | 9/5 表示9・9.3位。同上 |
 | /blog/znpa6h6q_-gn（イマーシブ 意味） | /guide/immersive/ | 301 統合済み |
 
-## 被リンクの現状（2026-09-07）
-- 確認済み：電ファミニコゲーマー2記事（ウワサバナシ／怪盗）→ 公演ページと会社サイトへ直接リンク、PR TIMES、note、日本経済新聞掲載（リンク有無は未確認）。
-- 未確認：量・評価の十分性、どのページに集まっているか。GSC のリンクレポートで確認する（ユーザー作業）。
-- 方針：公演ページに集まっているなら、そこから関連事例・法人向けサービスへ自然な導線を置く（実施済み：公演ページのフッター）。
+## 被リンクの現状（GSC リンクレポート 2026-09-07、docs/seo-data/links-2026-09-07/）
+- リンク先の集まり方：/uwasabanashi/ 188本・25サイト、/ 56本・34サイト、/kaitou/ 14本・3サイト、/toudaimurder/ 9本・2サイト、/toudaimurder/works/ 3本、/anator/ 1本、/toudaimurder/works/frankenstein/ 1本。**/guide/・/services/・/works/・/company/ への外部リンクは0本。**
+- リンク元の性質：nazohiroba.com が148本（イベント情報サイトの一覧ページ群、1本あたりの価値は小さいが数が多い）、x.com 28本、mdms.jp 7本（マダミス作品DB → 東大マダミス作品）、PR TIMES 配信系（prtimes / jiji / sankei / infoseek / mapion / excite / cinemacafe / traicy / iza / rbbtoday / nicovideo / zaikei 等）が /（トップ）に集中、編集記事は denfaminicogamer・pia（ure）・entamerush・getnews・mezamashi・michill・straightpress・livedoor・docomo、施設テナントの 404shibuya.tokyo（イベントページ）、投資家・DB系（skyland.vc / initial / startup-db / pitchbook / dealroom）。
+- 読み取り：評価は公演ページとトップに集まっている。法人向けページはサイト内リンク経由でしか評価を受けていない。PR TIMES は1回の配信で10〜15サイトに転載され、すべてトップへのリンクになっている。
+- 方針：
+  1. **プレスリリース本文に、トップだけでなく該当ページの URL（制作事例・サービス・解説記事）を入れる。** 転載先すべてがそのページへリンクする。次回のリリース（ウワサバナシ開催報告、頭脳王、新公演）から実施。
+  2. なぞひろば・escape.id・mdms.jp などの情報サイトに、公演ごとに登録する（怪盗・ロスト・フレーム・HACKTALE公演・東大マダミス作品）。1公演ごとに数十本のリンクになる。
+  3. 404shibuya.tokyo のイベントページのように、施設・テナントの公式サイトに企画紹介ページを作ってもらう（渋谷サクラステージ本体、サーマルクライム、紀伊國屋）。リンク先は公演ページと制作事例ページの両方。
+  4. 公演ページ（/uwasabanashi/ /kaitou/ /toudaimurder/）から法人向けページへの導線は実装済み。今後の公演ページにも「企画・制作：株式会社ex Labs → 制作事例／サービス」を必ず置く。
