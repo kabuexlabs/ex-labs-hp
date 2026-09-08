@@ -199,7 +199,7 @@ export const guideArticles: GuideArticle[] = [
   {
     href: '/guide/museum-event/',
     title: '美術館・博物館・水族館の集客イベント｜展示×体験型',
-    desc: '展示空間×謎解き・イマーシブで新規来館層を作る方法。広告費0円でチケット1,500枚のヌル・アーデン展の実績も。',
+    desc: '展示空間×謎解き・イマーシブで新規来館層を作る方法。広告費0円でチケット約1,000枚のヌル・アーデン展の実績も。',
     date: '2026-08-07',
     category: 'shisetsu',
     thumb: '/assets/guide/museum-event.webp',

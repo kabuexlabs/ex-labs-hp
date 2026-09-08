@@ -236,3 +236,6 @@
 - 監修表記なし（author=Organization @id）。datePublished=2026-09-08。
 - 親ページからのリンク：zunousen-seisaku／zunousen-game／services/zunousen → 01・02、shuyu-event／shogyoshisetsu-event／services/shisetsu-event → 03、madamis-business／madamis-seisaku／services/murder-mystery → 04、immersive-seisaku／services/immersive → 05、taikengata-company／event-hiyou／services/ → 06、shisetsu-katsuyo／event-hiyou／services/shisetsu-event#revenue → 07
 - 観察：公開後7日・28日に表示クエリ・掲載URL・クリック・相談導線を確認。既存記事との入れ替わりは確認するが、複数表示だけで失敗と判断しない。
+
+## 2026-09-09 実績表記の修正
+- ヌル・アーデン展のチケット販売枚数を「1,500枚」→「約1,000枚」に全ページ統一（ユーザー指示）。トップの数値ブロック、会社概要、代表プロフィール、works、関連ガイド10本、guides.ts、llms.txt／llms-full.txt。「売り切った」表現は「販売した」に変更。
