@@ -1,0 +1,133 @@
+---
+// 動画・配信用マダミスの制作依頼｜視聴者も楽しめる企画と準備
+// 発注前の疑問（STREAMING GUIDE）に答える記事。既存の意味・作り方・会社選びの記事では
+// 説明していない判断材料を置き、/services/murder-mystery/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/madamis-haishin/', site).toString();
+
+const toc = [{"id": "format", "label": "ライブ配信と収録動画で設計を変える"}, {"id": "info", "label": "出演者と視聴者に見せる情報を整理する"}, {"id": "time", "label": "出演人数と使える時間から作品を組み立てる"}, {"id": "roles", "label": "シナリオ制作と映像制作の担当を明確にする"}, {"id": "rehearsal", "label": "リハーサルでは技術面と物語の進行を分けて確認する"}, {"id": "rights", "label": "配信・アーカイブ・切り抜きの範囲を確認する"}, {"id": "brief", "label": "相談時に伝えたいこと"}];
+
+const faqs = [];
+
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '動画・配信用マダミスの制作依頼｜視聴者も楽しめる企画と準備',
+  description: '動画やライブ配信に使うマダミス制作を、出演者・視聴者の情報設計、収録時間、画面素材、進行、配信・アーカイブの公開範囲から解説。シナリオ制作と映像制作の分担、リハーサルの確認事項を、マダミス制作会社の株式会社ex Labsが整理します。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/madamis-haishin.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-08',
+  dateModified: '2026-09-08',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="動画・配信用マダミスの制作依頼｜視聴者も楽しめる企画と準備 - 株式会社ex Labs"
+  description="動画やライブ配信に使うマダミス制作を、出演者・視聴者の情報設計、収録時間、画面素材、進行、配信・アーカイブの公開範囲から解説。シナリオ制作と映像制作の分担、リハーサルの確認事項を、マダミス制作会社の株式会社ex Labsが整理します。"
+  ogImage="/assets/guide/madamis-haishin.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '企業・店舗のマダミス活用', href: '/guide/madamis-business/' },
+  { name: '動画・配信用マダミスの制作依頼' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">STREAMING GUIDE</p>
+<h1 class="h2 serif">動画・配信用マダミスの制作依頼<br>視聴者も楽しめる企画と準備</h1>
+<p class="lede">動画・配信用のマーダーミステリーでは、出演者が推理を楽しめることに加えて、視聴者が状況を理解し、会話や選択を追えることが大切です。プレイヤーだけが読める資料や密談が多い作品では、その情報を画面にどう伝えるかによって見え方が変わります。</p>
+<p class="lede">制作を依頼するときは、シナリオ、進行、画面素材、撮影・配信の分担を整理します。ここでは、配信者、番組・動画制作担当者、企業のコンテンツ担当者向けに、企画の進め方を解説します。</p>
+<p class="pub-date">公開日：2026年9月8日</p>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="format"><div class="wrap narrow">
+<p class="eyebrow">FORMAT</p><h2 class="h2 serif">ライブ配信と収録動画で設計を変える</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>形式</th><th>制作時に重視すること</th><th>事前に決めること</th></tr></thead><tbody><tr><th scope="row">ライブ配信</th><td>その場で状況を理解できる説明と進行</td><td>長引いた場合の進行、画面切替、コメントの扱い</td></tr><tr><th scope="row">収録・編集動画</th><td>編集後も推理と会話の流れが伝わること</td><td>収録時間、公開尺、補足テロップ、分割公開</td></tr><tr><th scope="row">出演者ごとの視点配信</th><td>視点ごとに見える情報の違い</td><td>画面に映してよい資料、音声、情報の公開時点</td></tr></tbody></table></div>
+<p class="lede">収録動画であっても、推理の前提になる会話を大きく省くと、視聴者にとって結論が唐突になることがあります。撮影前から、物語を理解するうえで必要な情報と、編集で短くできる部分を分けておきましょう。</p>
+</div></section>
+<section class="section" id="info"><div class="wrap narrow">
+<p class="eyebrow">INFORMATION</p><h2 class="h2 serif">出演者と視聴者に見せる情報を整理する</h2>
+<p class="lede">マダミスでは、登場人物ごとに異なる情報を持つことが物語を動かします。配信企画では、情報の持たせ方に加えて「いつ、誰に、どの画面で見せるか」を決めます。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>情報</th><th>出演者への渡し方</th><th>視聴者向けの検討事項</th></tr></thead><tbody><tr><th scope="row">世界観・事件の概要</th><td>全員に共通の説明</td><td>人物関係と事件の前提を短く把握できるか</td></tr><tr><th scope="row">各人物の秘密</th><td>個別資料として共有</td><td>視聴者にも公開するか、結末まで伏せるか</td></tr><tr><th scope="row">新しい証拠</th><td>ゲームの進行に合わせて提示</td><td>文字サイズ、表示時間、読み上げが適切か</td></tr><tr><th scope="row">密談・個別行動</th><td>決められた相手だけで進める</td><td>見せる視点と、他の出演者への情報漏れをどう扱うか</td></tr><tr><th scope="row">真相・結末</th><td>推理や投票後に明かす</td><td>判断の根拠と各人物の行動を振り返れるか</td></tr></tbody></table></div>
+<p class="lede">視聴者も一緒に犯人を考える形式と、秘密を知ったうえで出演者の駆け引きを見る形式では、適切な情報公開の順番が異なります。企画段階で、どちらの楽しみ方を目指すかを共有してください。</p>
+</div></section>
+<section class="section tinted" id="time"><div class="wrap narrow">
+<p class="eyebrow">TIME</p><h2 class="h2 serif">出演人数と使える時間から作品を組み立てる</h2>
+<p class="lede">出演者の人数、読み込みに使える時間、本番の時間、休憩、終了後の感想トークを分けて考えます。プレイ時間だけで収録枠を決めると、事前説明や音声確認、資料配布が収まらないことがあります。</p>
+<p class="lede">配信終了時刻が決まっている場合は、議論が長引いたときの進行や、全員が話せる順番も検討対象です。説明を途中で省略する前提で作らず、限られた時間でも成立する人物数・情報量・構成を選びましょう。</p>
+</div></section>
+<section class="section" id="roles"><div class="wrap narrow">
+<p class="eyebrow">ROLES</p><h2 class="h2 serif">シナリオ制作と映像制作の担当を明確にする</h2>
+<p class="lede">シナリオを納品する契約と、撮影・編集・配信まで行う契約は別の範囲です。必要な成果物と担当者を決めておくと、収録直前の抜け漏れを減らせます。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>作業</th><th>担当を決めておきたい内容</th></tr></thead><tbody><tr><th scope="row">ゲーム制作</th><td>シナリオ、人物資料、証拠、テストプレイ</td></tr><tr><th scope="row">本番進行</th><td>GM・進行役、読み上げ、時間管理、質問対応</td></tr><tr><th scope="row">画面用素材</th><td>人物紹介、相関図、証拠画像、投票・結果画面</td></tr><tr><th scope="row">収録・配信</th><td>カメラ、マイク、配信画面、録画、通信環境</td></tr><tr><th scope="row">編集・公開</th><td>カット編集、字幕、サムネイル、公開順、告知</td></tr></tbody></table></div>
+<p class="lede">ゲーム用の資料を、そのまま配信画面で読めるとは限りません。縦長の人物資料や細かい文字は、視聴画面に合わせた再構成が必要になることがあります。画面素材を誰が作るかも見積もり時に確認します。</p>
+</div></section>
+<section class="section tinted" id="rehearsal"><div class="wrap narrow">
+<p class="eyebrow">REHEARSAL</p><h2 class="h2 serif">リハーサルでは技術面と物語の進行を分けて確認する</h2>
+<p class="lede">音声、画面共有、個別資料の受け渡し、投票結果の表示などは、本番と同じ機材・環境で確認します。一方、出演者に真相を知らせたくない場合は、別のテスト参加者で物語を検証し、出演者には操作方法や配信上の約束を確認する方法が考えられます。</p>
+<p class="lede">既存作品を使う場合は、出演者が過去に体験していないかも確認事項です。ライブ配信では、コメントから未公開情報が伝わらないよう、出演者がコメントを見るタイミングも決めておきましょう。</p>
+</div></section>
+<section class="section" id="rights"><div class="wrap narrow">
+<p class="eyebrow">RIGHTS</p><h2 class="h2 serif">配信・アーカイブ・切り抜きの範囲を確認する</h2>
+<p class="lede">既存作品を使う場合は、配信の可否に加え、収益化、アーカイブ、切り抜き、複数チャンネルでの公開、資料画像の表示等について、作品の利用条件を確認します。オリジナル制作でも、納品後にどこまで公開・再利用できるかを合意しておく必要があります。</p>
+<p class="lede">著作物の利用は、許諾された方法や条件の範囲によります。公演で利用できることと、映像として公開できることを同じ扱いにせず、予定する使い方を具体的に伝えましょう。<a href="https://www.bunka.go.jp/chosakuken/keiyaku_manual/1_1_2.html" target="_blank" rel="noopener" style="color:var(--accent)">文化庁の著作権契約マニュアル</a></p>
+</div></section>
+<section class="section tinted" id="brief"><div class="wrap narrow">
+<p class="eyebrow">BRIEF</p><h2 class="h2 serif">相談時に伝えたいこと</h2>
+<p class="lede">出演人数、ライブか収録か、公開媒体、希望する公開尺・収録時間、企画のテーマ、配信技術と編集の担当、予定している公開範囲をお知らせください。既存作品の利用とオリジナル制作のどちらがよいか分からない段階でも、条件を比較しながら検討できます。</p>
+<p class="lede">株式会社ex Labsでは、動画・配信企画を含むマダミスの企画・シナリオ制作について相談を受け付けています。<a href="/services/murder-mystery/" style="color:var(--accent)">動画・配信用マダミスの制作を相談する</a></p>
+<p class="lede">その他の活用方法は、<a href="/guide/madamis-business/" style="color:var(--accent)">企業・店舗向けマダミス活用ガイド</a>をご覧ください。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section tinted"><div class="wrap">
+
+<div class="cta-mini">
+<p class="cta-mini-title serif">動画・配信用マダミスの制作を相談する</p>
+<a class="btn" href="/?c=madamis#contact">動画・配信用マダミスの制作を相談する（無料）</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。条件・参考価格は<a href="/services/murder-mystery/" style="color:var(--accent)">サービスページ</a>をご覧ください。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/madamis-business/" style="color:var(--accent)">企業・店舗のマダミス活用</a>／<a href="/guide/madamis-seisaku/" style="color:var(--accent)">マダミス制作とは</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場</a>／<a href="/guide/event-original-or-existing/" style="color:var(--accent)">オリジナル制作か既存導入か</a>／<a href="/guide/madamis-making/" style="color:var(--accent)">マダミスの作り方</a>／<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="murder" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#format,#info,#time,#roles,#rehearsal,#rights,#brief{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>

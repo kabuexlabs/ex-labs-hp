@@ -1,0 +1,161 @@
+---
+// 頭脳戦・心理戦ゲームの制作費用｜見積もりの内訳と依頼範囲
+// 発注前の疑問（COST GUIDE）に答える記事。既存の意味・作り方・会社選びの記事では
+// 説明していない判断材料を置き、/services/zunousen/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/zunousen-cost/', site).toString();
+
+const toc = [{"id": "price", "label": "参考価格の見方"}, {"id": "items", "label": "制作費を構成する主な項目"}, {"id": "factors", "label": "人数以外にも費用を変える要素がある"}, {"id": "adjust", "label": "予算を調整するときに検討したい順番"}, {"id": "brief", "label": "見積もり依頼で伝える情報"}, {"id": "faq", "label": "よくある質問"}];
+
+const faqs = [
+  {
+    "q": "ルール設計だけの依頼もできますか？",
+    "a": "株式会社ex Labsでは、ルール設計から制作物・運営まで、工程ごとの相談を受け付けています。自社で担当する範囲と、制作会社に任せる範囲をお知らせください。"
+  },
+  {
+    "q": "参加人数が増えると、費用も同じ割合で増えますか？",
+    "a": "一律ではありません。共通のルールを使う場合も、キット数、進行担当、会場、集計方法の追加が必要になることがあります。何人増えるかと、どの形式で実施するかを合わせて判断します。"
+  },
+  {
+    "q": "ゲームの内容が決まっていなくても相談できますか？",
+    "a": "目的、想定人数、希望時期から相談できます。具体的なルールがなくても、既存作品の導入とオリジナル制作を比較しながら検討できます。"
+  }
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '頭脳戦・心理戦ゲームの制作費用｜見積もりの内訳と依頼範囲',
+  description: '頭脳戦・心理戦ゲームの制作費用を、企画・ルール設計・テストプレイ・制作物・当日運営に分けて解説。既存作品の導入との違い、人数以外に費用を変える要素、見積もり依頼で伝える情報を、頭脳戦レーベルHACKTALEを運営する株式会社ex Labsが整理します。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/zunousen-cost.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-08',
+  dateModified: '2026-09-08',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="頭脳戦・心理戦ゲームの制作費用｜見積もりの内訳と依頼範囲 - 株式会社ex Labs"
+  description="頭脳戦・心理戦ゲームの制作費用を、企画・ルール設計・テストプレイ・制作物・当日運営に分けて解説。既存作品の導入との違い、人数以外に費用を変える要素、見積もり依頼で伝える情報を、頭脳戦レーベルHACKTALEを運営する株式会社ex Labsが整理します。"
+  ogImage="/assets/guide/zunousen-cost.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '頭脳戦制作とは', href: '/guide/zunousen-seisaku/' },
+  { name: '頭脳戦・心理戦ゲームの制作費用' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">COST GUIDE</p>
+<h1 class="h2 serif">頭脳戦・心理戦ゲームの制作費用<br>見積もりの内訳と依頼範囲</h1>
+<p class="lede">頭脳戦・心理戦ゲームの制作費用は、ルールを新しく作るか、カードや進行キットまで用意するか、当日の運営まで依頼するかによって変わります。同じ参加人数でも、既存作品の貸切と、企業や施設に合わせたオリジナル制作では必要な工程が異なります。</p>
+<p class="lede">予算を検討するときは、総額とあわせて「何が納品され、何を自分たちで担当するのか」を確認しましょう。この記事では、見積もりの内訳と、条件をそろえて比較する方法を整理します。</p>
+<p class="pub-date">公開日：2026年9月8日</p>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="price"><div class="wrap narrow">
+<p class="eyebrow">PRICE</p><h2 class="h2 serif">参考価格の見方</h2>
+<p class="lede">株式会社ex Labsでは、既存作品の貸切・出張実施は数十万円台から、テストプレイを含むオリジナルの頭脳戦・心理戦ゲーム制作は100万円前後からを参考価格として案内しています。複数会場の大会は、会場数や開催回数に応じた個別見積もりです。</p>
+<p class="lede">これは当社への依頼を検討するための目安であり、業界全体の相場や、すべての制作物・会場費を含む一律料金ではありません。対応範囲や費用の条件は、<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作サービス</a>でご確認ください。</p>
+</div></section>
+<section class="section" id="items"><div class="wrap narrow">
+<p class="eyebrow">BREAKDOWN</p><h2 class="h2 serif">制作費を構成する主な項目</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>項目</th><th>主な作業</th><th>見積もりで確認すること</th></tr></thead><tbody><tr><th scope="row">企画・要件整理</th><td>目的、対象者、人数、時間、実施形式を決める</td><td>企画提案と要件整理が含まれるか</td></tr><tr><th scope="row">ルール・シナリオ設計</th><td>勝利条件、交渉、情報の持たせ方を設計する</td><td>何種類のゲームを作るか</td></tr><tr><th scope="row">テストプレイ・調整</th><td>有利不利、説明の分かりやすさ、進行時間を確かめる</td><td>テストと修正の範囲はどこまでか</td></tr><tr><th scope="row">制作物</th><td>カード、盤面、チップ、資料等を用意する</td><td>デザイン、印刷、予備部材の扱い</td></tr><tr><th scope="row">進行資料</th><td>進行台本、裁定基準、得点集計表を作る</td><td>自社スタッフで再現できる資料があるか</td></tr><tr><th scope="row">当日運営</th><td>司会、進行、審判、集計等を担当する</td><td>担当人数、拘束時間、交通費の扱い</td></tr><tr><th scope="row">継続利用</th><td>再演、改変、別会場、配信等の条件を決める</td><td>初回以外に発生する費用は何か</td></tr></tbody></table></div>
+<p class="lede">ゲーム設計を依頼しても、印刷されたキットや当日の司会まで含まれるとは限りません。逆に運営込みの見積もりを、シナリオだけの価格と比べても適切に判断できません。</p>
+</div></section>
+<section class="section tinted" id="factors"><div class="wrap narrow">
+<p class="eyebrow">FACTORS</p><h2 class="h2 serif">人数以外にも費用を変える要素がある</h2>
+
+<h3 class="sub-h serif">同じゲームを繰り返すか、複数のゲームを作るか</h3>
+<p class="lede">少人数のゲームを複数卓で実施する場合は、共通のルールを使いながら、キットや進行体制を増やす構成が考えられます。一方、予選・本戦・決勝で別の種目を用意する大会は、種目ごとの設計と検証が必要です。</p>
+<p class="lede">見積もり依頼では、参加人数だけでなく「何卓で同時に進めるか」「何種類のゲームが必要か」を伝えると、必要な制作範囲を整理しやすくなります。</p>
+<h3 class="sub-h serif">初心者向けの交流か、競技性の高い大会か</h3>
+<p class="lede">交流イベントでは、ルールを短時間で理解でき、参加者全員が行動できることが大切です。競技性を重視する大会では、それに加えて同点時の扱い、裁定の統一、得点の確認方法などを詰める必要があります。</p>
+<p class="lede">「難しいゲームにしたい」だけでは判断が分かれます。経験者向けなのか、初対面の参加者にも楽しんでもらいたいのかを先に共有しましょう。</p>
+<h3 class="sub-h serif">1回限りか、繰り返し使うか</h3>
+<p class="lede">初回の制作費が同じでも、再演時に必要な進行スタッフ、消耗品、利用料、改修費は変わります。継続開催を予定している場合は、初回費用と2回目以降の費用を分けて確認します。</p>
+<p class="lede">繰り返し使うなら、運営マニュアル、予備部材、スタッフへの説明、ルール更新の方法も見積もりの対象です。</p>
+</div></section>
+<section class="section" id="adjust"><div class="wrap narrow">
+<p class="eyebrow">ADJUST</p><h2 class="h2 serif">予算を調整するときに検討したい順番</h2>
+<p class="lede">最初に、必ずオリジナルにしたい部分を決めます。企業のテーマを体験に組み込みたいのか、人数や時間に合わせたいのか、他にはない対戦ルールを作りたいのかによって、必要な制作が変わります。</p>
+<p class="lede">そのうえで、ゲームの種類数、印刷物や装飾の仕様、開催回数、主催者側で担当できる業務を調整します。既存作品が目的に合う場合は、貸切・出張実施も候補になります。</p>
+<p class="lede">テストや進行資料を削る場合は、当日に何が未検証になるかまで確認してください。初期費用を下げても、当日の混乱や運営負担が増える可能性があるためです。</p>
+</div></section>
+<section class="section tinted" id="brief"><div class="wrap narrow">
+<p class="eyebrow">BRIEF</p><h2 class="h2 serif">見積もり依頼で伝える情報</h2>
+<p class="lede">相談時には、次の情報があると制作範囲をすり合わせやすくなります。未定の項目は未定のまま相談できます。</p>
+<ul class="bullets"><li>開催目的：交流、集客、大会、配信企画など。</li><li>対象者：人数、年齢層、ゲームの経験。</li><li>時間：イベント全体の時間と、ゲームに使える時間。</li><li>会場：卓数、使える設備、複数会場の有無。</li><li>依頼範囲：設計、制作物、運営のどこまで必要か。</li><li>利用予定：開催回数、再演、配信、別会場への展開。</li><li>予算と希望日：確定値がなければ検討中の範囲。</li></ul>
+<p class="lede">見積書が届いたら、上記の条件が反映されているかを確認しましょう。特に、印刷・会場・交通費・追加修正・再演時の条件が明確だと、総予算を把握しやすくなります。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-zunou">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="lede">株式会社ex Labsは、頭脳戦レーベルHACKTALEを運営し、対人ゲームの企画・制作を行っています。<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦・心理戦ゲームの制作を相談する</a></p><p class="lede">制作の全体像は、<a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作のガイド</a>をご覧ください。</p>
+<div class="cta-mini">
+<p class="cta-mini-title serif">頭脳戦・心理戦ゲームの制作を相談する</p>
+<a class="btn" href="/?c=zunousen#contact">頭脳戦・心理戦ゲームの制作を相談する（無料）</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。条件・参考価格は<a href="/services/zunousen/" style="color:var(--accent)">サービスページ</a>をご覧ください。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作とは</a>／<a href="/guide/zunousen-tournament/" style="color:var(--accent)">大人数の頭脳戦イベント・大会の企画方法</a>／<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>／<a href="/guide/event-original-or-existing/" style="color:var(--accent)">オリジナル制作か既存導入か</a>／<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは</a>／<a href="/guide/shinrisen/" style="color:var(--accent)">心理戦とは</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="zunou" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#price,#items,#factors,#adjust,#brief,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>

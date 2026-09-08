@@ -13,6 +13,13 @@ import { BLOG_REDIRECTS } from '../data/redirects';
 // Console as "excluded / not indexed" noise.
 const STATIC_PATHS = [
   '/',
+  '/guide/zunousen-cost/',
+  '/guide/zunousen-tournament/',
+  '/guide/shuyu-event-seisaku/',
+  '/guide/madamis-haishin/',
+  '/guide/ip-event/',
+  '/guide/event-original-or-existing/',
+  '/guide/event-revenue-share/',
   '/blog/',
   '/press/',
   '/media/',
@@ -107,6 +114,13 @@ export const GET: APIRoute = async ({ site }) => {
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {
+    '/guide/zunousen-cost/': '2026-09-08',
+    '/guide/zunousen-tournament/': '2026-09-08',
+    '/guide/shuyu-event-seisaku/': '2026-09-08',
+    '/guide/madamis-haishin/': '2026-09-08',
+    '/guide/ip-event/': '2026-09-08',
+    '/guide/event-original-or-existing/': '2026-09-08',
+    '/guide/event-revenue-share/': '2026-09-08',
     '/guide/': '2026-08-10',
     '/guide/madamis/': '2026-09-08',
     '/guide/madamis-cost/': '2026-07-30',

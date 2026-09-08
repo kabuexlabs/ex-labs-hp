@@ -1,0 +1,156 @@
+---
+// 大人数の頭脳戦イベント・大会の企画方法｜対戦形式と運営の設計
+// 発注前の疑問（TOURNAMENT GUIDE）に答える記事。既存の意味・作り方・会社選びの記事では
+// 説明していない判断材料を置き、/services/zunousen/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/zunousen-tournament/', site).toString();
+
+const toc = [{"id": "format", "label": "目的に合わせて対戦形式を選ぶ"}, {"id": "example", "label": "48名・90分で行う場合の構成例"}, {"id": "scoring", "label": "複数卓の得点をそのまま比べられるか確認する"}, {"id": "roles", "label": "進行・審判・集計の役割を分ける"}, {"id": "waiting", "label": "大人数ならではの待ち時間と情報共有を考える"}, {"id": "brief", "label": "制作会社への依頼で決めること"}, {"id": "faq", "label": "よくある質問"}];
+
+const faqs = [
+  {
+    "q": "初心者だけでも頭脳戦イベントはできますか？",
+    "a": "初心者を想定した説明、練習、対戦時間を組み込んで設計します。難しいルールを多く覚える形式よりも、少ないルールの中で選択や読み合いが生まれる形式を検討できます。"
+  },
+  {
+    "q": "オンラインと会場参加を同じ大会にできますか？",
+    "a": "検討はできますが、通信遅延、見える情報、相談方法が異なるため、同じ条件で対戦できるかの検証が必要です。会場内の大会とは別の設計課題として、初期の相談時に伝えてください。"
+  }
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '大人数の頭脳戦イベント・大会の企画方法｜対戦形式と運営の設計',
+  description: '大人数で頭脳戦・心理戦イベントを開催するための対戦形式、予選・決勝、進行・審判・集計の設計を解説。仮の48名・90分構成、複数卓の得点比較、待ち時間の扱い、制作会社へ伝える条件を、東京都頭脳王決定戦を運営する株式会社ex Labsが紹介します。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/zunousen-tournament.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-08',
+  dateModified: '2026-09-08',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="大人数の頭脳戦イベント・大会の企画方法｜対戦形式と運営の設計 - 株式会社ex Labs"
+  description="大人数で頭脳戦・心理戦イベントを開催するための対戦形式、予選・決勝、進行・審判・集計の設計を解説。仮の48名・90分構成、複数卓の得点比較、待ち時間の扱い、制作会社へ伝える条件を、東京都頭脳王決定戦を運営する株式会社ex Labsが紹介します。"
+  ogImage="/assets/guide/zunousen-tournament.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '頭脳戦とは', href: '/guide/zunousen/' },
+  { name: '大人数の頭脳戦イベント・大会の企画方法' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">TOURNAMENT GUIDE</p>
+<h1 class="h2 serif">大人数の頭脳戦イベント・大会の企画方法<br>対戦形式と運営の設計</h1>
+<p class="lede">大人数の頭脳戦イベントでは、ゲームのルールと同時に「誰と対戦するか」「結果をどう集計するか」「勝敗が決まった人が何をするか」を設計します。少人数向けの作品を人数分だけ用意しても、受付、説明、卓移動、順位発表の流れが決まっていなければ、全体を進行できません。</p>
+<p class="lede">企業の交流企画、施設の集客イベント、競技性を重視した大会では、向いている対戦形式が異なります。まず開催目的から構成を選びましょう。</p>
+<p class="pub-date">公開日：2026年9月8日</p>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="format"><div class="wrap narrow">
+<p class="eyebrow">FORMAT</p><h2 class="h2 serif">目的に合わせて対戦形式を選ぶ</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>形式</th><th>向いている目的</th><th>設計上の注意点</th></tr></thead><tbody><tr><th scope="row">複数卓での個人戦</th><td>多くの人が同時にゲームを体験する</td><td>卓ごとの説明・裁定・得点条件をそろえる</td></tr><tr><th scope="row">チーム対抗戦</th><td>相談や役割分担を通じて交流する</td><td>一人だけが判断し続けない役割を用意する</td></tr><tr><th scope="row">予選・決勝</th><td>勝ち上がりや表彰で大会を構成する</td><td>敗退者の体験と観戦方法を決める</td></tr><tr><th scope="row">複数種目の総合戦</th><td>論理、交渉、読み合い等を組み合わせる</td><td>種目間の得点配分と移動時間を調整する</td></tr></tbody></table></div>
+<p class="lede">初対面の人が多い交流会で、長い待ち時間を伴う勝ち抜き戦を採用すると、対話の機会が減ることがあります。交流が目的なら、全員が複数回参加できる形式を先に検討します。</p>
+<p class="lede">競技性を重視する場合は、同点時の順位、制限時間、ルール違反、裁定への確認方法を事前に明確にします。</p>
+</div></section>
+<section class="section" id="example"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLE</p><h2 class="h2 serif">48名・90分で行う場合の構成例</h2>
+<p class="lede">以下は、短時間用のゲームを用意する場合の仮の設計例です。ex Labsの既存商品の仕様や、実施済みイベントの記録ではありません。</p>
+<p class="lede">48名を6名ずつ8卓に分け、2回の予選から決勝へ進む形式を想定します。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>内容</th><th>時間</th><th>主な確認事項</th></tr></thead><tbody><tr><th scope="row">全体説明・練習</th><td style="text-align:right;white-space:nowrap">10分</td><td>説明だけでなく、実際の操作を試せるか</td></tr><tr><th scope="row">予選1回目</th><td style="text-align:right;white-space:nowrap">20分</td><td>同じ条件で開始・終了できるか</td></tr><tr><th scope="row">卓移動</th><td style="text-align:right;white-space:nowrap">5分</td><td>座席表と移動の案内があるか</td></tr><tr><th scope="row">予選2回目</th><td style="text-align:right;white-space:nowrap">20分</td><td>対戦相手が変わっても条件がそろうか</td></tr><tr><th scope="row">集計・結果確認</th><td style="text-align:right;white-space:nowrap">10分</td><td>記入漏れや同点処理を確認できるか</td></tr><tr><th scope="row">決勝・並行する参加企画</th><td style="text-align:right;white-space:nowrap">15分</td><td>決勝進出者以外も参加・観戦できるか</td></tr><tr><th scope="row">結果発表・終了</th><td style="text-align:right;white-space:nowrap">10分</td><td>表彰と退出案内まで収まるか</td></tr><tr><th scope="row">合計</th><td style="text-align:right;white-space:nowrap">90分</td><td>受付・設営・撤収は別枠</td></tr></tbody></table></div>
+<p class="lede">この構成を実施するには、20分・15分の枠で決着するゲームと、短時間で説明できるルールが必要です。既存の長時間作品を、そのまま短縮できるという意味ではありません。時間が不足する場合は、種目数や対戦形式から見直します。</p>
+</div></section>
+<section class="section tinted" id="scoring"><div class="wrap narrow">
+<p class="eyebrow">SCORING</p><h2 class="h2 serif">複数卓の得点をそのまま比べられるか確認する</h2>
+<p class="lede">卓ごとの得点に差が出るゲームでは、得点の単純合計が公平な比較にならないことがあります。例えば、相手との交渉で得点総量が変わるゲームでは、対戦した卓の状況が順位に影響します。</p>
+<p class="lede">卓内順位を大会用の点数に変える、対戦相手を入れ替える、決勝進出条件を複数設けるなどの方法を検討します。どの方法が適切かはゲームの性質次第です。方式は開催後に変更せず、事前のテストで確認します。</p>
+</div></section>
+<section class="section" id="roles"><div class="wrap narrow">
+<p class="eyebrow">ROLES</p><h2 class="h2 serif">進行・審判・集計の役割を分ける</h2>
+<p class="lede">全体司会は時間管理と案内を担当し、ゲームの質問対応、得点の入力、結果確認には別の役割を設けます。兼任できるかは、卓数、ゲームの複雑さ、参加者の経験によって変わります。</p>
+<p class="lede">各卓に進行役が必要な作品なのか、共通説明後は参加者だけで進められるのかでも体制は異なります。「参加者が何人だからスタッフは何人」と決めず、同時に発生する業務から必要な体制を組み立てましょう。</p>
+<p class="lede">得点の記録は、入力者だけでなく確認者も決めておくと、発表後の訂正を減らしやすくなります。紙・表計算・専用システムのいずれでも、記録の所在と修正手順が分かることが大切です。</p>
+</div></section>
+<section class="section tinted" id="waiting"><div class="wrap narrow">
+<p class="eyebrow">WAITING</p><h2 class="h2 serif">大人数ならではの待ち時間と情報共有を考える</h2>
+<p class="lede">早く終わった卓、決勝に進まなかった参加者、進行が遅れた卓が出た場合の過ごし方を用意します。観戦、別の対戦、振り返りなど、イベントの目的に合う形を選びます。</p>
+<p class="lede">また、同じゲームを時間差で開催する場合は、先に参加した人から内容が伝わる可能性があります。参加者への案内、待機場所、結果公開の時期などを含めて設計します。</p>
+</div></section>
+<section class="section" id="brief"><div class="wrap narrow">
+<p class="eyebrow">BRIEF</p><h2 class="h2 serif">制作会社への依頼で決めること</h2>
+<p class="lede">依頼時には、参加人数と予算に加えて、全員にどのような体験をしてほしいかを伝えてください。「全員に2回は対戦してほしい」「優勝者を決めたい」「初対面でも話せるようにしたい」など、優先順位があると構成を選びやすくなります。</p>
+<p class="lede">あわせて、会場の卓配置、使える時間、音響・映像設備、受付担当、賞品の有無、主催者側で担当できる作業を整理します。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-zunou">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="lede">株式会社ex Labsは、頭脳戦レーベルHACKTALEや「東京都頭脳王決定戦」の企画・運営に取り組んでいます。参加人数と目的に合わせた構成は、<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦イベントの制作サービス</a>からご相談ください。</p><p class="lede">ゲーム形式の違いは、<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類と選び方</a>でも解説しています。</p>
+<div class="cta-mini">
+<p class="cta-mini-title serif">頭脳戦イベントの制作を相談する</p>
+<a class="btn" href="/?c=zunousen#contact">頭脳戦イベントの制作を相談する（無料）</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。条件・参考価格は<a href="/services/zunousen/" style="color:var(--accent)">サービスページ</a>をご覧ください。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類と選び方</a>／<a href="/guide/zunousen-cost/" style="color:var(--accent)">頭脳戦・心理戦ゲームの制作費用</a>／<a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作とは</a>／<a href="/guide/shinrisen-game/" style="color:var(--accent)">心理戦ゲームとは</a>／<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア</a>／<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="zunou" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#format,#example,#scoring,#roles,#waiting,#brief,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>

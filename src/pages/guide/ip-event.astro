@@ -1,0 +1,139 @@
+---
+// IP・キャラクターの体験型イベント制作｜企画・監修・運営の進め方
+// 発注前の疑問（IP EXPERIENCE）に答える記事。既存の意味・作り方・会社選びの記事では
+// 説明していない判断材料を置き、/services/immersive/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/ip-event/', site).toString();
+
+const toc = [{"id": "role", "label": "最初に決めるのは、来場者の立場"}, {"id": "audience", "label": "原作ファンと初めて触れる人の両方を考える"}, {"id": "example", "label": "体験化の企画例"}, {"id": "process", "label": "企画・監修・制作を進める順番"}, {"id": "supervision", "label": "監修で確認するのは文章や画像だけではない"}, {"id": "rights", "label": "利用範囲は、媒体と実施方法まで具体化する"}, {"id": "cost", "label": "費用とスケジュールを左右すること"}, {"id": "order", "label": "イマーシブ・体験型イベントとしての制作相談"}];
+
+const faqs = [];
+
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'IP・キャラクターの体験型イベント制作｜企画・監修・運営の進め方',
+  description: '作品やキャラクターの世界観を、来場者が参加する体験型イベントへ変える方法を解説。来場者の役割設計、体験化の企画例、企画・監修・制作の順番、利用範囲の具体化、制作会社への依頼事項を、イマーシブ制作会社の株式会社ex Labsが整理します。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/ip-event.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-08',
+  dateModified: '2026-09-08',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="IP・キャラクターの体験型イベント制作｜企画・監修・運営の進め方 - 株式会社ex Labs"
+  description="作品やキャラクターの世界観を、来場者が参加する体験型イベントへ変える方法を解説。来場者の役割設計、体験化の企画例、企画・監修・制作の順番、利用範囲の具体化、制作会社への依頼事項を、イマーシブ制作会社の株式会社ex Labsが整理します。"
+  ogImage="/assets/guide/ip-event.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'イマーシブ制作とは', href: '/guide/immersive-seisaku/' },
+  { name: 'IP・キャラクターの体験型イベント制作' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">IP EXPERIENCE</p>
+<h1 class="h2 serif">IP・キャラクターの体験型イベント制作<br>企画・監修・運営の進め方</h1>
+<p class="lede">作品やキャラクターを使った体験型イベントでは、来場者がその世界で「何をする人なのか」を決めることが企画の出発点になります。登場人物の協力者になる、施設に残された記録を調べる、物語の中で選択をするなど、参加者の行動と世界観がつながる構成を考えます。</p>
+<p class="lede">ここでは、作品の権利元、広告代理店、ブランド・施設の担当者に向けて、体験化の考え方と、企画・監修・制作の進め方を整理します。</p>
+<p class="pub-date">公開日：2026年9月8日</p>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="role"><div class="wrap narrow">
+<p class="eyebrow">ROLE</p><h2 class="h2 serif">最初に決めるのは、来場者の立場</h2>
+<p class="lede">物語を体験するために、全員が既存キャラクターを演じる必要はありません。原作の登場人物との関係を保ちながら、新しい役割を用意する方法もあります。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>来場者の役割</th><th>体験の例</th><th>検討すること</th></tr></thead><tbody><tr><th scope="row">調査の協力者</th><td>情報を集め、依頼された問いを解く</td><td>どこまで原作の秘密に触れるか</td></tr><tr><th scope="row">世界の一員</th><td>入隊、入学、審査、仕事等を体験する</td><td>初めての人にも役割が伝わるか</td></tr><tr><th scope="row">出来事の目撃者</th><td>登場人物の行動を追い、判断する</td><td>観察と参加の割合をどうするか</td></tr><tr><th scope="row">分岐に関わる参加者</th><td>選択や投票で体験の展開を変える</td><td>変更可能な展開と守る設定は何か</td></tr></tbody></table></div>
+<p class="lede">「どのキャラクターを出すか」と同時に、「来場者が何をして、その行動が物語の中でどう意味を持つか」を説明できると、企画と演出を結びつけやすくなります。</p>
+</div></section>
+<section class="section" id="audience"><div class="wrap narrow">
+<p class="eyebrow">AUDIENCE</p><h2 class="h2 serif">原作ファンと初めて触れる人の両方を考える</h2>
+<p class="lede">ファン向けの企画では、作品を知っているからこそ気づける表現が魅力になります。一方、原作知識がないと進めない構成にすると、同行者や施設の一般来館者が参加しづらくなることがあります。</p>
+<p class="lede">参加に必要な知識は会場で伝え、詳しい人には追加の気づきがある構成など、入口と深さを分ける方法を検討します。対象を原作ファンに絞る場合は、その前提を告知や予約案内でも明確にしましょう。</p>
+</div></section>
+<section class="section tinted" id="example"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLE</p><h2 class="h2 serif">体験化の企画例</h2>
+<p class="lede">例えば「不思議な品を管理する架空の資料館」を題材にする場合、来場者は臨時職員として館内を巡り、品物の記録を読み、担当者へ報告する体験を作れます。</p>
+<p class="lede">体験の中心が資料の比較なら探索・推理、担当者との対話なら演者との交流、複数の判断から行き先を選ぶなら物語の分岐、といった形で構成を変えられます。</p>
+<p class="lede">これは企画方法を説明するための架空例です。実在の作品との提携や開催実績を示すものではありません。</p>
+</div></section>
+<section class="section" id="process"><div class="wrap narrow">
+<p class="eyebrow">PROCESS</p><h2 class="h2 serif">企画・監修・制作を進める順番</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>段階</th><th>主に決める内容</th><th>確認の目的</th></tr></thead><tbody><tr><th scope="row">利用条件の整理</th><td>使える設定・素材、期間、場所、媒体</td><td>企画できる範囲をそろえる</td></tr><tr><th scope="row">体験の骨格</th><td>来場者の役割、目的、所要時間、形式</td><td>世界観と参加行動が合うか確認する</td></tr><tr><th scope="row">シナリオ・動線</th><td>場面、台詞、見せる情報、移動</td><td>物語と会場条件を両立する</td></tr><tr><th scope="row">制作物・告知</th><td>デザイン、映像、音声、販売・予約案内</td><td>媒体ごとに確認を完了する</td></tr><tr><th scope="row">テスト・稽古</th><td>実際の体験、進行、演者の対応</td><td>想定外の参加行動にも対応できるか確かめる</td></tr><tr><th scope="row">実施・振り返り</th><td>現場運営、反応、改善点</td><td>次回の継続や展開を検討する</td></tr></tbody></table></div>
+<p class="lede">設定の確認が終わる前に大量の印刷や造作を進めると、修正の影響が大きくなります。確認を依頼する順番と、誰の判断で次の工程へ進むかを決めておきましょう。</p>
+</div></section>
+<section class="section tinted" id="supervision"><div class="wrap narrow">
+<p class="eyebrow">SUPERVISION</p><h2 class="h2 serif">監修で確認するのは文章や画像だけではない</h2>
+<p class="lede">体験型イベントでは、来場者の行動によって場面が変わります。登場人物へ予想外の質問をする、予定と違う場所へ進む、判断を迷うといった場面もあります。</p>
+<p class="lede">キャストのアドリブで扱える範囲、答えられない質問への対応、体験が遅れた場合の案内を共有すると、現場で設定と運営を両立しやすくなります。会場の通常スタッフとキャストを見分けられる案内も検討事項です。</p>
+</div></section>
+<section class="section" id="rights"><div class="wrap narrow">
+<p class="eyebrow">RIGHTS</p><h2 class="h2 serif">利用範囲は、媒体と実施方法まで具体化する</h2>
+<p class="lede">会場での公演、告知画像、チケットページ、配信、物販、記録映像では、利用する素材や方法が異なります。開催期間、場所、使用するキャラクター・素材、改変の範囲、再演や他会場への展開も含めて確認します。</p>
+<p class="lede">著作物の利用許諾は、契約で定めた方法・条件の範囲内で行うものです。会場利用の了解だけで告知・配信等も含まれると推測せず、予定する用途を共有してください。<a href="https://www.bunka.go.jp/chosakuken/keiyaku_manual/1_1_2.html" target="_blank" rel="noopener" style="color:var(--accent)">文化庁の著作権契約マニュアル</a></p>
+<p class="lede">制作会社への相談では、権利元との連絡をどちらが担当するか、確認用資料を誰が作るかも整理します。</p>
+</div></section>
+<section class="section tinted" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST & SCHEDULE</p><h2 class="h2 serif">費用とスケジュールを左右すること</h2>
+<p class="lede">体験の長さ、会場数、キャスト、制作物、稽古、開催回数に加え、素材制作と監修の進め方が工程に影響します。権利元への確認期間を制作会社だけで短縮できるとは限りません。</p>
+<p class="lede">まずは開催目的、会場、希望時期、使いたい作品・素材、現在の許諾・調整状況を伝えましょう。設定資料や使用可能素材の一覧がある場合は、共有できる範囲を確認したうえで提示します。</p>
+</div></section>
+<section class="section" id="order"><div class="wrap narrow">
+<p class="eyebrow">ORDER</p><h2 class="h2 serif">イマーシブ・体験型イベントとしての制作相談</h2>
+<p class="lede">株式会社ex Labsは、物語と実在の空間を組み合わせたイマーシブ体験の企画・制作を行っています。IPやキャラクターを活用する企画では、利用条件と対応可能な制作範囲を確認しながら検討します。</p>
+<p class="lede"><a href="/services/immersive/" style="color:var(--accent)">IP・ブランドを活用した体験づくりを相談する</a></p>
+<p class="lede">制作全体の工程は、<a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作ガイド</a>をご覧ください。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section tinted"><div class="wrap">
+
+<div class="cta-mini">
+<p class="cta-mini-title serif">IP・ブランドを活用した体験づくりを相談する</p>
+<a class="btn" href="/?c=immersive#contact">IP・ブランドを活用した体験づくりを相談する（無料）</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。条件・参考価格は<a href="/services/immersive/" style="color:var(--accent)">サービスページ</a>をご覧ください。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作とは</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの企業活用事例</a>／<a href="/guide/event-original-or-existing/" style="color:var(--accent)">オリジナル制作か既存導入か</a>／<a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブ制作の費用相場</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#role,#audience,#example,#process,#supervision,#rights,#cost,#order{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>

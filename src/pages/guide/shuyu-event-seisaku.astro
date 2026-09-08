@@ -1,0 +1,135 @@
+---
+// 周遊イベントの制作依頼｜費用・スケジュール・施設側の準備
+// 発注前の疑問（PRODUCTION GUIDE）に答える記事。既存の意味・作り方・会社選びの記事では
+// 説明していない判断材料を置き、/services/shisetsu-event/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/shuyu-event-seisaku/', site).toString();
+
+const toc = [{"id": "purpose", "label": "最初に決めたい3つの目的"}, {"id": "prepare", "label": "依頼前に用意するとよい情報"}, {"id": "process", "label": "制作の進め方"}, {"id": "cost", "label": "費用は初期制作と開催中の運営に分ける"}, {"id": "capacity", "label": "受け入れられる人数と、集客の見込みは分ける"}, {"id": "operation", "label": "運営中の変更と問い合わせ先を決める"}, {"id": "order", "label": "ex Labsへの制作相談"}];
+
+const faqs = [];
+
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '周遊イベントの制作依頼｜費用・スケジュール・施設側の準備',
+  description: '商業施設や商店街で周遊イベントを制作依頼する際の費用項目、進行工程、動線、受入人数の計算、施設と制作会社の役割分担を解説。見積もり依頼に必要な情報を、渋谷サクラステージの施設一体型イベントを手がけた株式会社ex Labsがまとめます。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/shuyu-event-seisaku.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-08',
+  dateModified: '2026-09-08',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="周遊イベントの制作依頼｜費用・スケジュール・施設側の準備 - 株式会社ex Labs"
+  description="商業施設や商店街で周遊イベントを制作依頼する際の費用項目、進行工程、動線、受入人数の計算、施設と制作会社の役割分担を解説。見積もり依頼に必要な情報を、渋谷サクラステージの施設一体型イベントを手がけた株式会社ex Labsがまとめます。"
+  ogImage="/assets/guide/shuyu-event-seisaku.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '周遊イベントとは', href: '/guide/shuyu-event/' },
+  { name: '周遊イベントの制作依頼' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">PRODUCTION GUIDE</p>
+<h1 class="h2 serif">周遊イベントの制作依頼<br>費用・スケジュール・施設側の準備</h1>
+<p class="lede">周遊イベントの制作を依頼するときは、巡る場所の数より先に「どこへ来てもらいたいか」「そこで何を体験してほしいか」を整理します。来館者を増やす企画と、既存の来館者を別のフロアへ案内する企画では、動線も告知方法も異なります。</p>
+<p class="lede">商業施設、商店街、観光エリアでの実施に向けて、費用の内訳、準備の順番、主催者と制作会社の役割をまとめます。</p>
+<p class="pub-date">公開日：2026年9月8日</p>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="purpose"><div class="wrap narrow">
+<p class="eyebrow">PURPOSE</p><h2 class="h2 serif">最初に決めたい3つの目的</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>主な目的</th><th>企画で検討すること</th><th>確認したい結果の例</th></tr></thead><tbody><tr><th scope="row">新しい来訪理由を作る</th><td>誰に向けた体験か、どう告知するか</td><td>参加者数、初回来訪の割合</td></tr><tr><th scope="row">施設・街の中を巡ってもらう</th><td>行ってほしい場所と体験の配置</td><td>訪問スポット、途中離脱</td></tr><tr><th scope="row">店舗や展示との接点を作る</th><td>その場所で行う行動と体験の関係</td><td>店舗訪問、特典利用、アンケート</td></tr></tbody></table></div>
+<p class="lede">結果の確認方法も企画時に決めます。チェックポイントへの到達記録は、そのまま店舗での購入実績を示すものではありません。参加者数、回遊、購買は分けて考えましょう。</p>
+</div></section>
+<section class="section" id="prepare"><div class="wrap narrow">
+<p class="eyebrow">PREPARE</p><h2 class="h2 serif">依頼前に用意するとよい情報</h2>
+<p class="lede">図面や施設案内があれば、使用可能な場所と時間帯を書き込んで共有します。全条件が決まっていなくても、避けたい場所、営業上使えない時間、相談窓口が分かると検討を進めやすくなります。</p>
+<ul class="bullets"><li>開催目的と、体験してほしい対象者。</li><li>使用可能な区画、通路、店舗、屋内・屋外の範囲。</li><li>開催期間、1日の実施時間、設営・撤収に使える時間。</li><li>想定参加人数と、予約制・当日受付の希望。</li><li>掲示物、音、演者の配置、備品に関する施設条件。</li><li>告知に使える媒体と、テナントへの連絡窓口。</li><li>予算、チケットの有料・無料、費用分担の希望。</li></ul>
+<p class="lede">参加者数は「1組の人数」「1日の人数」「期間合計」を分けて伝えてください。同じ総人数でも、一度に来場するか、何日かに分散するかで必要な体制が変わります。</p>
+</div></section>
+<section class="section tinted" id="process"><div class="wrap narrow">
+<p class="eyebrow">PROCESS</p><h2 class="h2 serif">制作の進め方</h2>
+<p class="lede">まず目的と使える場所を確認し、企画の方向性を決めます。次に、参加者が巡る順番と各地点で行う行動を設計し、その動線に物語やゲームを組み込みます。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>工程</th><th>制作会社側の主な作業</th><th>施設・主催者側の確認</th></tr></thead><tbody><tr><th scope="row">企画・現地確認</th><td>目的、対象、体験形式の提案</td><td>使用場所と営業条件</td></tr><tr><th scope="row">動線・体験設計</th><td>巡る順番、滞在、受付・終了地点の設計</td><td>通行、店舗との調整</td></tr><tr><th scope="row">コンテンツ制作</th><td>物語、謎、演出、必要な制作物</td><td>表現、施設情報、設置内容</td></tr><tr><th scope="row">実地テスト</th><td>移動時間、混雑、案内の分かりやすさを確認</td><td>当日の営業との両立</td></tr><tr><th scope="row">運営準備</th><td>スタッフ資料、受付、問い合わせ対応を準備</td><td>連絡窓口、告知、備品</td></tr><tr><th scope="row">実施・振り返り</th><td>運営、記録、改善点の整理</td><td>施設側の結果・意見の共有</td></tr></tbody></table></div>
+<p class="lede">必要な期間は、施設との調整、制作する内容、キャストの有無、確認の回数によって変わります。開催希望日だけでなく、現地下見と施設内確認に使える時期も共有しましょう。</p>
+</div></section>
+<section class="section" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif">費用は初期制作と開催中の運営に分ける</h2>
+<p class="lede">初期制作には、企画、物語・ゲーム、動線設計、掲示物やキット、テスト、運営資料などが含まれます。開催中には、受付、演者、案内スタッフ、消耗品、問い合わせ対応、日々の設営・撤収等の費用が生じます。</p>
+<p class="lede">チェックポイントを増やすと、制作物に加えて移動・点検・運営が増えることがあります。演者を配置する形式は、配役、交代、稽古、進行連絡も検討対象です。</p>
+<p class="lede">見積もりでは、広告費、会場費、施設側の追加対応、印刷物の補充まで含むかを確認してください。総合的な費用の考え方は、<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用ガイド</a>をご覧ください。</p>
+</div></section>
+<section class="section tinted" id="capacity"><div class="wrap narrow">
+<p class="eyebrow">CAPACITY</p><h2 class="h2 serif">受け入れられる人数と、集客の見込みは分ける</h2>
+<p class="lede">仮に1組4名、1日12組、10日間開催する場合、受入枠は最大480名です。</p>
+<p class="lede"><strong>4名 × 12組 × 10日 ＝ 480名</strong></p>
+<p class="lede">これは仮の条件で枠数を計算した例であり、集客予測や販売実績ではありません。実際には、途中の滞在時間、受付能力、演者との接触、通路の混雑等を確認して枠数を決めます。</p>
+<p class="lede">特定の場所で参加者が滞留する場合、出発枠だけ増やしても受入人数を増やせないことがあります。実地テストでは、最も混雑しやすい地点と、一般来館者の動線が重ならないかを確認します。</p>
+</div></section>
+<section class="section" id="operation"><div class="wrap narrow">
+<p class="eyebrow">OPERATION</p><h2 class="h2 serif">運営中の変更と問い合わせ先を決める</h2>
+<p class="lede">屋外を使うなら天候、店舗を使うなら営業時間や臨時休業、長期開催なら掲示物の破損や消耗品の不足を想定します。変更する条件と、その判断者を事前に決めておくと、現場での対応がそろいます。</p>
+<p class="lede">また、参加者からの質問を店舗スタッフが受けるのか、イベント窓口へ案内するのかを明確にします。施設内で実施するからこそ、通常営業の担当者にどこまで協力をお願いするかを共有しましょう。</p>
+</div></section>
+<section class="section tinted" id="order"><div class="wrap narrow">
+<p class="eyebrow">ORDER</p><h2 class="h2 serif">ex Labsへの制作相談</h2>
+<p class="lede">株式会社ex Labsは、渋谷サクラステージの施設一体型企画や、下北沢の街を舞台にした体験型企画を手がけています。<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">渋谷サクラステージの制作事例</a>では、施設と体験を組み合わせる考え方を紹介しています。</p>
+<p class="lede">企画内容が未定の場合も、施設の課題と使える場所からご相談いただけます。<a href="/services/shisetsu-event/" style="color:var(--accent)">周遊・施設活用イベントの制作を相談する</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section tinted"><div class="wrap">
+
+<div class="cta-mini">
+<p class="cta-mini-title serif">周遊・施設活用イベントの制作を相談する</p>
+<a class="btn" href="/?c=shisetsu#contact">周遊・施設活用イベントの制作を相談する（無料）</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。条件・参考価格は<a href="/services/shisetsu-event/" style="color:var(--accent)">サービスページ</a>をご覧ください。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊イベントとは</a>／<a href="/guide/event-revenue-share/" style="color:var(--accent)">施設イベントのレベニューシェアとは</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベント</a>／<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">渋谷サクラステージの制作事例</a>／<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#purpose,#prepare,#process,#cost,#capacity,#operation,#order{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>

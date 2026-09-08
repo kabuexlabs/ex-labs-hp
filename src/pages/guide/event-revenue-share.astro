@@ -1,0 +1,140 @@
+---
+// 施設イベントのレベニューシェアとは｜費用回収・売上分配・負担を解説
+// 発注前の疑問（REVENUE SHARE）に答える記事。既存の意味・作り方・会社選びの記事では
+// 説明していない判断材料を置き、/services/shisetsu-event/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/event-revenue-share/', site).toString();
+
+const toc = [{"id": "types", "label": "受託型・レベニューシェア型・併用型の違い"}, {"id": "percent", "label": "「売上の何％」だけでは取り分は分からない"}, {"id": "example", "label": "仮の数字で見る、原価回収後に分配する例"}, {"id": "cooperation", "label": "初期費用0円でも、施設側の協力内容は決める"}, {"id": "feasibility", "label": "導入可能性は、場所と事業条件の組み合わせで判断する"}, {"id": "checklist", "label": "契約・実施前に確認したいこと"}, {"id": "order", "label": "ex Labsの施設活用イベント"}];
+
+const faqs = [];
+
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '施設イベントのレベニューシェアとは｜費用回収・売上分配・負担を解説',
+  description: '施設イベントのレベニューシェアを、受託型との違い、原価回収、売上分配の順序、施設側の協力内容から解説。仮の数字による計算例と、契約・実施前の確認事項を、初期費用0円のレベニューシェア型に対応する株式会社ex Labsが紹介します。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/event-revenue-share.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-08',
+  dateModified: '2026-09-08',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="施設イベントのレベニューシェアとは｜費用回収・売上分配・負担を解説 - 株式会社ex Labs"
+  description="施設イベントのレベニューシェアを、受託型との違い、原価回収、売上分配の順序、施設側の協力内容から解説。仮の数字による計算例と、契約・実施前の確認事項を、初期費用0円のレベニューシェア型に対応する株式会社ex Labsが紹介します。"
+  ogImage="/assets/guide/event-revenue-share.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '施設活用イベントとは', href: '/guide/shisetsu-katsuyo/' },
+  { name: '施設イベントのレベニューシェアとは' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">REVENUE SHARE</p>
+<h1 class="h2 serif">施設イベントのレベニューシェアとは<br>費用回収・売上分配・負担を解説</h1>
+<p class="lede">施設イベントのレベニューシェアとは、チケット売上などの収益を、施設と企画・運営側で分ける実施方法です。施設が制作費を先に支払う受託型とは、費用の回収方法と役割分担が異なります。</p>
+<p class="lede">「初期費用0円」という案内を見るときは、最初の支払いだけでなく、施設側が用意するもの、何を売上として扱うか、いつから分配されるかまで確認することが大切です。</p>
+<p class="pub-date">公開日：2026年9月8日</p>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="types"><div class="wrap narrow">
+<p class="eyebrow">TYPES</p><h2 class="h2 serif">受託型・レベニューシェア型・併用型の違い</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>方式</th><th>主な費用の考え方</th><th>導入時に確認すること</th></tr></thead><tbody><tr><th scope="row">受託型</th><td>主催者が制作・運営を発注する</td><td>制作範囲、総額、追加費用、成果物</td></tr><tr><th scope="row">レベニューシェア型</th><td>売上をもとに費用を回収し、収益を分ける</td><td>回収対象、分配対象、分配順序、売上不足時の扱い</td></tr><tr><th scope="row">併用型</th><td>一部を発注費等で負担し、残りを売上から回収する</td><td>負担する費用と売上から回収する費用の区別</td></tr></tbody></table></div>
+<p class="lede">無料の来館促進企画など、チケット収入がないイベントは、別の収入源や費用負担がなければ同じ仕組みで回収できません。有料イベントか、無料施策か、協賛等を含むかを最初に整理します。</p>
+</div></section>
+<section class="section" id="percent"><div class="wrap narrow">
+<p class="eyebrow">PERCENT</p><h2 class="h2 serif">「売上の何％」だけでは取り分は分からない</h2>
+<p class="lede">売上を最初から一定割合で分ける方法と、制作・運営の原価を先に回収してから分ける方法では、同じ割合でも実際の受取額が変わります。</p>
+<p class="lede">確認したいのは、次の3点です。</p>
+<ul class="bullets"><li>分配の対象：チケット売上全体か、所定の費用を控除した金額か。</li><li>回収する費用：制作、運営、広告、手数料など、どこまで含むか。</li><li>分配の順番：販売開始から分けるか、原価回収後に分けるか。</li></ul>
+<p class="lede">税込・税別、返金、決済手数料、値引き、招待枠などの扱いも、計算の前提をそろえておきます。同じ費用を売上控除と原価の両方に入れないよう、費目を整理してください。</p>
+</div></section>
+<section class="section tinted" id="example"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLE</p><h2 class="h2 serif">仮の数字で見る、原価回収後に分配する例</h2>
+<p class="lede">以下は計算方法を説明する仮の例です。ex Labsの固定料金、標準の分配率、実績、集客予測ではありません。説明を簡単にするため、税・手数料・返金等を省略し、同じ金額基準で計算します。</p>
+<p class="lede">仮の条件を次のように置きます。</p>
+<ul class="bullets"><li>回収対象となる原価：100万円。</li><li>その原価は企画・運営側が負担する。</li><li>売上から原価を先に回収する。</li><li>回収後に残った金額を、企画・運営側70%、施設側30%で分ける。</li><li>この例では最低保証や、集客不足による施設への追加請求はないものとする。</li></ul>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>売上</th><th>原価回収後に分ける金額</th><th>施設側の受取額</th><th>企画・運営側の受取額</th><th>企画・運営側の原価差引後</th></tr></thead><tbody><tr><th scope="row">80万円</th><td style="text-align:right;white-space:nowrap">0円</td><td style="text-align:right;white-space:nowrap">0円</td><td style="text-align:right;white-space:nowrap">80万円</td><td style="text-align:right;white-space:nowrap">−20万円</td></tr><tr><th scope="row">100万円</th><td style="text-align:right;white-space:nowrap">0円</td><td style="text-align:right;white-space:nowrap">0円</td><td style="text-align:right;white-space:nowrap">100万円</td><td style="text-align:right;white-space:nowrap">0円</td></tr><tr><th scope="row">150万円</th><td style="text-align:right;white-space:nowrap">50万円</td><td style="text-align:right;white-space:nowrap">15万円</td><td style="text-align:right;white-space:nowrap">135万円</td><td style="text-align:right;white-space:nowrap">35万円</td></tr></tbody></table></div>
+<p class="lede">売上150万円の場合、先に100万円を原価回収へ充て、残り50万円を分けます。施設側は50万円の30%で15万円、企画・運営側は回収分100万円と分配分35万円の合計135万円を受け取ります。</p>
+<p class="lede">この例では、売上150万円の30%である45万円が施設側に入るわけではありません。実際の負担や分配は契約条件によるため、割合と合わせて計算順序を確認しましょう。</p>
+<p class="lede">株式会社ex Labsが公開している分配の目安（原価回収後に当社8：施設様2から5：5までの範囲で、施設側の広報協力や場所の提供条件により変動）は、<a href="/services/shisetsu-event/#revenue" style="color:var(--accent)">初期費用0円の適用条件</a>に記載しています。上の7：3はその範囲内で計算を説明するために置いた仮の数字です。</p>
+</div></section>
+<section class="section" id="cooperation"><div class="wrap narrow">
+<p class="eyebrow">COOPERATION</p><h2 class="h2 serif">初期費用0円でも、施設側の協力内容は決める</h2>
+<p class="lede">制作費の初期支払いがなくても、場所や時間の提供、館内告知、施設担当者との調整、テナントへの連絡等が必要になることがあります。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>確認する項目</th><th>具体例</th></tr></thead><tbody><tr><th scope="row">使用する場所と時間</th><td>受付、体験区画、設営・撤収、営業時間外の利用</td></tr><tr><th scope="row">現場で必要なもの</th><td>電源、備品、制作物の保管場所、スタッフの待機場所</td></tr><tr><th scope="row">告知の協力</th><td>施設サイト、館内掲示、サイネージ、SNS</td></tr><tr><th scope="row">施設側との調整</th><td>使用申請、営業部門・店舗との連絡窓口</td></tr><tr><th scope="row">追加費用の扱い</th><td>延長対応、特別な設備、追加広告、変更による制作</td></tr></tbody></table></div>
+<p class="lede">一律にすべての設備を必須とするのではなく、企画に応じて必要なものを決めます。追加の対応が発生する場合は、誰が判断し、どちらが費用を負担するかも確認します。</p>
+</div></section>
+<section class="section tinted" id="feasibility"><div class="wrap narrow">
+<p class="eyebrow">FEASIBILITY</p><h2 class="h2 serif">導入可能性は、場所と事業条件の組み合わせで判断する</h2>
+<p class="lede">有料で体験したい人に届く企画か、適切な開催期間を確保できるか、受入人数と運営費が合うか、告知手段を用意できるかを検討します。</p>
+<p class="lede">来館者数が多くても、参加者の動線や体験時間が施設に合わなければ、成立するとは限りません。逆に、条件が限られている場合でも、開催日や規模、方式を調整する余地があります。</p>
+<p class="lede">売上の見込みと受入上限は分け、参加人数を複数のケースで試算しておくと、費用負担について話し合いやすくなります。</p>
+</div></section>
+<section class="section" id="checklist"><div class="wrap narrow">
+<p class="eyebrow">CHECKLIST</p><h2 class="h2 serif">契約・実施前に確認したいこと</h2>
+<p class="lede">回収対象の費目と金額、追加費用の承認方法、売上の報告、分配の時期、開催変更・中止・返金時の扱いを整理します。再演や期間延長を行う場合に、どの費用が再び発生するかも確認事項です。</p>
+<p class="lede">「施設の負担なし」という案内がある場合は、どの負担を指しているかまで確認すると、実施後の認識違いを防ぎやすくなります。</p>
+</div></section>
+<section class="section tinted" id="order"><div class="wrap narrow">
+<p class="eyebrow">ORDER</p><h2 class="h2 serif">ex Labsの施設活用イベント</h2>
+<p class="lede">株式会社ex Labsでは、受託型、レベニューシェア型、併用型について、施設と企画の条件に応じた相談を受け付けています。原価回収と分配の考え方、施設側にお願いする協力は、個別の条件を確認して決めます。</p>
+<p class="lede"><a href="/services/shisetsu-event/" style="color:var(--accent)">初期費用・費用分担を含めて施設活用イベントを相談する</a></p>
+<p class="lede">企画の種類と活用方法は、<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントのガイド</a>をご覧ください。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section tinted"><div class="wrap">
+
+<div class="cta-mini">
+<p class="cta-mini-title serif">初期費用・費用分担を含めて施設活用イベントを相談する</p>
+<a class="btn" href="/?c=shisetsu#contact">初期費用・費用分担を含めて施設活用イベントを相談する（無料）</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。条件・参考価格は<a href="/services/shisetsu-event/" style="color:var(--accent)">サービスページ</a>をご覧ください。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>／<a href="/services/shisetsu-event/#revenue" style="color:var(--accent)">初期費用0円の適用条件（サービスページ）</a>／<a href="/guide/shuyu-event-seisaku/" style="color:var(--accent)">周遊イベントの制作依頼</a>／<a href="/guide/event-original-or-existing/" style="color:var(--accent)">オリジナル制作か既存導入か</a>／<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>／<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#types,#percent,#example,#cooperation,#feasibility,#checklist,#order{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>

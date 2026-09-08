@@ -227,3 +227,12 @@
 - 未検証・保留：AI 掲載の実測（docs/aio-check.md に手順）、本番 CDN でのクローラー応答、第三者サイトの表記確認、代表の在学状況（現在も在学中かは未確認）、頭脳王の完売公演数の時点。
 
 観察：公開後7日（9/15）・28日（10/6）に、制作語群の表示・クリック、保護対象（immersive-tokyo／kaitou／uwasabanashi）のクリック、単独語の順位を同条件で比較。7日で断定しない。
+
+## 2026-09-08 記事7本パッケージの実装
+
+判断：7テーマすべて新設（既存記事は意味・作り方・会社選びが主で、発注前の内訳・大会設計・発注準備・配信設計・IP監修・方式比較・分配計算は独立した疑問のため）。03 は周遊総合ガイドが凍結中でもあり分離、07 は施設活用の説明と計算例が独立するため分離。
+- /guide/zunousen-cost/（01）／/guide/zunousen-tournament/（02）／/guide/shuyu-event-seisaku/（03）／/guide/madamis-haishin/（04）／/guide/ip-event/（05）／/guide/event-original-or-existing/（06）／/guide/event-revenue-share/（07）
+- 価格：01 は /services/zunousen/ の条件表と一致（既存 数十万円台〜／オリジナル 100万円前後〜／大会 別途）。07 の 7:3 は仮の例と明示し、公開済みの目安（8:2〜5:5）へのリンクを追加。02 の 48名90分、03 の 480名は仮の例と明示。
+- 監修表記なし（author=Organization @id）。datePublished=2026-09-08。
+- 親ページからのリンク：zunousen-seisaku／zunousen-game／services/zunousen → 01・02、shuyu-event／shogyoshisetsu-event／services/shisetsu-event → 03、madamis-business／madamis-seisaku／services/murder-mystery → 04、immersive-seisaku／services/immersive → 05、taikengata-company／event-hiyou／services/ → 06、shisetsu-katsuyo／event-hiyou／services/shisetsu-event#revenue → 07
+- 観察：公開後7日・28日に表示クエリ・掲載URL・クリック・相談導線を確認。既存記事との入れ替わりは確認するが、複数表示だけで失敗と判断しない。

@@ -1,0 +1,134 @@
+---
+// 体験型イベントはオリジナル制作か既存導入か｜費用・納期・自由度を比較
+// 発注前の疑問（DECISION GUIDE）に答える記事。既存の意味・作り方・会社選びの記事では
+// 説明していない判断材料を置き、/services/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/event-original-or-existing/', site).toString();
+
+const toc = [{"id": "compare", "label": "3つの方法を比較する"}, {"id": "original", "label": "オリジナル制作が向いているケース"}, {"id": "existing", "label": "既存作品の導入が向いているケース"}, {"id": "adjust", "label": "部分調整は「小さな変更」で済むかを確認する"}, {"id": "cost", "label": "初回費用と継続費用を分けて比較する"}, {"id": "questions", "label": "選び方を整理する5つの質問"}, {"id": "order", "label": "依頼時は、方式を決めきらなくてもよい"}];
+
+const faqs = [];
+
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '体験型イベントはオリジナル制作か既存導入か｜費用・納期・自由度を比較',
+  description: '体験型イベントの新規制作、既存コンテンツの導入・貸切、部分的な調整の3つを、目的・費用・納期・自由度・運営・再演の条件から比較。向いているケースと、選び方を整理する5つの質問を、イマーシブ・マダミス・頭脳戦の制作会社である株式会社ex Labsが解説します。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/event-original-or-existing.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-08',
+  dateModified: '2026-09-08',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="体験型イベントはオリジナル制作か既存導入か｜費用・納期・自由度を比較 - 株式会社ex Labs"
+  description="体験型イベントの新規制作、既存コンテンツの導入・貸切、部分的な調整の3つを、目的・費用・納期・自由度・運営・再演の条件から比較。向いているケースと、選び方を整理する5つの質問を、イマーシブ・マダミス・頭脳戦の制作会社である株式会社ex Labsが解説します。"
+  ogImage="/assets/guide/event-original-or-existing.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '体験型イベント制作会社の選び方', href: '/guide/taikengata-company/' },
+  { name: '体験型イベントはオリジナル制作か既存導入か' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">DECISION GUIDE</p>
+<h1 class="h2 serif">体験型イベントはオリジナル制作か既存導入か<br>費用・納期・自由度を比較</h1>
+<p class="lede">体験型イベントを開催する方法には、新しい作品を作るオリジナル制作、既存作品を使う導入・貸切、既存の仕組みを使いながら一部を調整する方法があります。</p>
+<p class="lede">選ぶ基準は、「今回の目的のために、どこを変える必要があるか」です。会社名やテーマが異なるだけなのか、参加人数・会場・体験の流れまで変える必要があるのかを整理すると、必要な制作範囲が見えてきます。</p>
+<p class="pub-date">公開日：2026年9月8日</p>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="compare"><div class="wrap narrow">
+<p class="eyebrow">COMPARE</p><h2 class="h2 serif">3つの方法を比較する</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>比較項目</th><th>オリジナル制作</th><th>既存作品の導入・貸切</th><th>既存作品の部分調整</th></tr></thead><tbody><tr><th scope="row">主な目的</th><td>固有の場所・ブランド・課題に合わせる</td><td>条件に合う作品を開催する</td><td>既存の仕組みを生かして一部を合わせる</td></tr><tr><th scope="row">制作するもの</th><td>企画、ルール・物語、制作物等</td><td>既存作品と開催に必要な準備</td><td>合意した変更箇所と関連物</td></tr><tr><th scope="row">費用を決める要因</th><td>新規制作の範囲、テスト、運営</td><td>利用条件、人数、運営、キット等</td><td>変更の影響、追加テスト、制作物</td></tr><tr><th scope="row">スケジュール</th><td>新規設計と確認の工程が必要</td><td>会場・運営準備と空き状況を確認</td><td>変更範囲によって変動</td></tr><tr><th scope="row">自由度</th><td>条件に合わせて設計できる範囲が広い</td><td>元の仕様・利用条件が基本</td><td>変更可能な範囲に制限がある</td></tr><tr><th scope="row">継続利用</th><td>再演や更新の条件を契約で決める</td><td>作品ごとの利用条件を確認する</td><td>調整版の利用条件も確認する</td></tr></tbody></table></div>
+<p class="lede">既存作品を使う方法でも、会場、運営、開催回数によって総額は変わります。オリジナル制作だから必ず最も高い、既存作品だから必ずすぐ開催できる、と一律には判断できません。</p>
+</div></section>
+<section class="section" id="original"><div class="wrap narrow">
+<p class="eyebrow">ORIGINAL</p><h2 class="h2 serif">オリジナル制作が向いているケース</h2>
+<p class="lede">特定の施設を順番に巡ってほしい、ブランドの考え方を参加者の選択に組み込みたい、独自の対戦ルールを作りたい場合は、オリジナル制作を検討します。</p>
+<p class="lede">例えば、館内の展示や店舗そのものが手がかりになる体験では、一般的な会場向け作品を置くだけでは目的を満たせないことがあります。場所と物語を一緒に設計することで、実施したい行動を体験に組み込めます。</p>
+<p class="lede">一方、新たに決める内容が増えるため、企画・制作・テスト・確認に使える時間と、発注側の意思決定の体制を確保します。</p>
+</div></section>
+<section class="section tinted" id="existing"><div class="wrap narrow">
+<p class="eyebrow">EXISTING</p><h2 class="h2 serif">既存作品の導入が向いているケース</h2>
+<p class="lede">作品の人数、時間、会場条件が開催目的に合う場合は、既存作品の導入が候補です。まず参加者に体験してもらいたい、開催可能性を確かめたい、継続企画の初回を実施したい場合にも検討できます。</p>
+<p class="lede">ただし、既存作品を選ぶときは、参加対象が過去にその作品を遊んでいないか、今回の会場で必要な動きができるか、主催者側のスタッフで運営できるかを確認します。作品が完成していても、開催準備が不要になるわけではありません。</p>
+</div></section>
+<section class="section" id="adjust"><div class="wrap narrow">
+<p class="eyebrow">ADJUST</p><h2 class="h2 serif">部分調整は「小さな変更」で済むかを確認する</h2>
+<p class="lede">名称や告知デザインの変更と、人数・制限時間・勝利条件の変更では、ゲームへの影響が異なります。例えば人物を減らすと、その人物が持つ情報や役割も見直す必要があるため、人数の調整だけでも大きな制作になる場合があります。</p>
+<p class="lede">既存作品の一部を変えたいときは、変更したい内容と、変更できない条件を共有してください。利用許諾や作品設計の都合で、調整できないこともあります。</p>
+</div></section>
+<section class="section tinted" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif">初回費用と継続費用を分けて比較する</h2>
+<p class="lede">単発開催なら、今回必要な総額を比較します。複数回使うなら、初回制作、各回の運営、消耗品、利用料、更新・改修を分けます。</p>
+<p class="lede">企画を継続する場合でも、同じ参加者が再び楽しめるかは別の問題です。内容を知ると体験が変わる作品では、新しい参加者向けに開催するのか、別の内容を用意するのかを決めます。</p>
+<p class="lede">再演を想定している場合は、会場変更、出演者の交代、ルールや資料の修正を誰が担当するかも確認しましょう。</p>
+</div></section>
+<section class="section" id="questions"><div class="wrap narrow">
+<p class="eyebrow">5 QUESTIONS</p><h2 class="h2 serif">選び方を整理する5つの質問</h2>
+<ul class="bullets"><li>今回の施設・ブランドに合わせて、必ず変えたいものは何か。</li><li>既存作品の人数・時間・会場条件で目的を満たせるか。</li><li>開催までに、制作と確認へどの程度の時間を使えるか。</li><li>当日の運営はどこまで自分たちで担当できるか。</li><li>1回限りか、再演や他会場への展開も予定しているか。</li></ul>
+<p class="lede">例えば「既存作品で参加者の反応を確かめ、その後に施設向けの新作を作る」という進め方も考えられます。ただし、初回と新作で対象者や告知方法が異なれば、初回の結果がそのまま新作の集客予測になるわけではありません。何を確かめる開催なのかを決めておくことが大切です。</p>
+</div></section>
+<section class="section tinted" id="order"><div class="wrap narrow">
+<p class="eyebrow">ORDER</p><h2 class="h2 serif">依頼時は、方式を決めきらなくてもよい</h2>
+<p class="lede">「オリジナルにしたい」と考えていても、実際には既存作品で目的を満たせる場合があります。逆に、既存作品を探していても、会場や人数の制約から新規設計が必要になる場合があります。</p>
+<p class="lede">相談時には、方式よりも開催目的、想定人数、会場、希望時期、変更したい条件を伝えてください。見積もりは同じ条件で比較し、運営や利用範囲が含まれるかを確認します。</p>
+<p class="lede">株式会社ex Labsは、イマーシブ、マダミス、頭脳戦、施設活用イベントの制作相談を受け付けています。<a href="/services/" style="color:var(--accent)">目的に合う制作サービスを確認する</a></p>
+<p class="lede">費用項目の考え方は、<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用ガイド</a>をご覧ください。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section tinted"><div class="wrap">
+
+<div class="cta-mini">
+<p class="cta-mini-title serif">目的に合う制作サービスを確認する</p>
+<a class="btn" href="/?c=taikengata#contact">目的に合う制作サービスを確認する</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。条件・参考価格は<a href="/services/" style="color:var(--accent)">サービスページ</a>をご覧ください。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベント制作会社の選び方</a>／<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>／<a href="/guide/zunousen-cost/" style="color:var(--accent)">頭脳戦・心理戦ゲームの制作費用</a>／<a href="/guide/event-revenue-share/" style="color:var(--accent)">施設イベントのレベニューシェアとは</a>／<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミス・謎解き・イマーシブ・頭脳戦の違い</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#compare,#original,#existing,#adjust,#cost,#questions,#order{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>
