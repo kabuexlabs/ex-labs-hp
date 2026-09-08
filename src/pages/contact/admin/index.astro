@@ -19,6 +19,7 @@ import {
   setInquiryStatus,
   INQUIRY_STATUS_LABEL,
   type InquiryStatus,
+  readMetrics,
 } from '../../../lib/contact';
 
 Astro.response.headers.set('Cache-Control', 'no-store');
@@ -63,6 +64,19 @@ if (Astro.request.method === 'POST') {
 const authed = checkAdminKey(key);
 const status = contactConfigStatus();
 const inquiries: ContactRecord[] = authed ? await listInquiries(50) : [];
+// 問い合わせ導線の計測（直近28日）：フォーム表示・相談CTAクリック・送信成功
+const metrics = authed ? await readMetrics(28) : { rows: [], from: '', to: '' };
+const mSum = (e: string) => metrics.rows.filter((r) => r.event === e).reduce((a, r) => a + r.count, 0);
+const mByPage = (e: string) => {
+  const m = new Map<string, number>();
+  for (const r of metrics.rows) if (r.event === e) m.set(r.page, (m.get(r.page) ?? 0) + r.count);
+  return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12);
+};
+const mByCat = (e: string) => {
+  const m = new Map<string, number>();
+  for (const r of metrics.rows) if (r.event === e) m.set(r.category || '(未選択)', (m.get(r.category || '(未選択)') ?? 0) + r.count);
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+};
 
 function fmtDate(iso: string) {
   const d = new Date(iso);
@@ -190,6 +204,25 @@ const stats = (() => {
       <p style="margin:10px 0 0;font-size:11.5px;color:#8a8378">※流入元の記録はフォームに自動記録を仕込んだ日（8月中旬）以降の問い合わせに付いています。それ以前は「記録なし」になります。</p>
     </section>
   )}
+  <section style="border:2px solid var(--ink);background:#fff;padding:16px 18px;margin:0 0 22px">
+    <h2 style="font-size:15px;margin:0 0 10px">問い合わせ導線の計測（{metrics.from}〜{metrics.to}・個人情報なし）</h2>
+    <p style="margin:0 0 10px;font-size:13.5px">相談CTAクリック <strong>{mSum('cta')}</strong> → フォーム表示 <strong>{mSum('view')}</strong> → 送信成功 <strong>{mSum('submit')}</strong>（スパム判定を除く）</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;font-size:13px">
+      <div>
+        <p style="margin:0 0 6px;font-weight:700">CTAをクリックしたページ</p>
+        <ul style="margin:0;padding-left:1.2em;line-height:1.9">{mByPage('cta').map(([k, n]) => <li><code style="font-size:12px">{k}</code>：<strong>{n}</strong></li>)}</ul>
+      </div>
+      <div>
+        <p style="margin:0 0 6px;font-weight:700">送信時に選ばれた「ご相談の種類」</p>
+        <ul style="margin:0;padding-left:1.2em;line-height:1.9">{mByCat('submit').map(([k, n]) => <li>{k}：<strong>{n}</strong></li>)}</ul>
+      </div>
+      <div>
+        <p style="margin:0 0 6px;font-weight:700">送信したページ</p>
+        <ul style="margin:0;padding-left:1.2em;line-height:1.9">{mByPage('submit').map(([k, n]) => <li><code style="font-size:12px">{k}</code>：<strong>{n}</strong></li>)}</ul>
+      </div>
+    </div>
+    <p style="margin:10px 0 0;font-size:11.5px;color:#8a8378">※計測を入れた日（2026-09-08）以降のみ。CTA＝「#contact」へのリンクのクリック。送信の記録には送信者情報を含めません。</p>
+  </section>
   <h2 style="font-size:15px;margin:0 0 14px">受信一覧（{inquiries.length}件）</h2>
   {inquiries.length === 0 ? (
     <p style="font-size:13.5px;color:#8a8378">記録はまだありません。{!status.kv && 'KVが未設定のため保存自体が行われていません。'}</p>

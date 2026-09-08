@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     q: '初期費用はどのくらいかかりますか？',
-    a: '高額な初期制作費をいただくのではなく、イベントの集客・運営を通じて収益を回収するモデルを採用しています。案件によっては初期費用を抑えたご提案やレベニューシェア型での実施にも対応可能です。',
+    a: '有料チケット型のイベントであれば、チケット売上から費用を回収するレベニューシェア型（施設側の初期費用0円）を選べます。必須条件は「参加者から料金をいただく形式であること」で、来館者数や開催期間は成立しやすさの目安です。無料の販促企画や社内向けは受託（数十万円台〜）でのご提案になります。適用条件と分配の考え方は本ページの「初期費用0円の適用条件」に掲載しています。',
   },
   {
     q: '企画だけでなく集客や運営もお願いできますか？',
@@ -25,6 +25,18 @@ const faqs = [
   {
     q: '閑散期やオフシーズンの集客施策として使えますか？',
     a: '体験型イベントは開催期間・時間帯を柔軟に設計できるため、閑散期・オフピーク時間帯の集客施策としても有効です。施設の稼働状況に合わせてご提案します。',
+  },
+  {
+    q: '閉館後・営業時間外だけで実施できますか？',
+    a: 'できます。閉店後の紀伊國屋書店を舞台にした一夜限りの体験型イベント（博報堂様との企画）の制作実績があります。営業時間外は通常の来館者動線と切り離せるため、通常営業との両立がしやすく、搬入・撤収の時間も確保しやすい形式です。詳しくは営業時間外の施設活用の解説をご覧ください。',
+  },
+  {
+    q: '施設内の回遊や商店街の周遊イベントも依頼できますか？',
+    a: 'できます。商業施設の複数フロアを巡る施設一体型（渋谷サクラステージ「ウワサバナシ調査委員会」）、街全体を歩く周遊型（下北沢「ロスト・フレーム」）、店舗を巡る周遊型（カラオケ館様「恣験」）の制作実績があります。回遊させる導線の設計と、店舗送客の仕組み（店内でしか手に入らない手がかり等）をセットで設計します。',
+  },
+  {
+    q: '施設活用イベントの相談は、何から始めればいいですか？',
+    a: 'お問い合わせフォームで「商業施設・店舗・宿泊施設でのイベント（施設活用）」を選び、施設の種類・使える区画や時間帯・目的（来館促進・館内回遊・閉館後活用・空き区画活用）・希望時期をお知らせください。予算や企画内容が未定でも構いません。現地を拝見したうえで、成立する形式（受託・レベニューシェア・併用）と概算をご提案します。',
   },
 ];
 
@@ -43,15 +55,17 @@ const serviceLd = {
   '@type': 'Service',
   serviceType: '施設活用イベント',
   name: '施設活用イベントの企画・制作',
-  description: '商業施設・文化施設・観光施設・宿泊施設などの空間を活かした体験型イベントの企画・制作',
-  provider: { '@type': 'Organization', name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
+  alternateName: ['商業施設の集客イベント企画', '商業施設の回遊イベント制作', '周遊イベントの企画・制作', '閉館後・営業時間外の施設活用イベント'],
+  description: '商業施設・文化施設・観光施設・宿泊施設などの空間を活かした体験型イベントの企画・制作・集客・運営。来館促進・館内回遊・閉館後活用・空き区画活用の目的別に、受託またはレベニューシェア（初期費用0円）で実施',
+  provider: { '@type': 'Organization', '@id': new URL('/#organization', Astro.site).toString(), name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
+  audience: { '@type': 'BusinessAudience', name: '商業施設・ショッピングモール・書店・宿泊施設・文化施設・観光施設・商店街の担当者' },
   areaServed: 'JP',
   url: new URL('/services/shisetsu-event/', Astro.site).toString(),
 };
 ---
 <BaseLayout
-  title="施設活用イベントの企画・制作｜商業施設・観光施設の集客なら - 株式会社ex Labs"
-  description="施設を活用した体験型イベントの企画・制作なら株式会社ex Labs。水族館・書店・カラオケ店・宿泊施設・商店街での実績多数。「その場所だからこそ体験できる物語」で新規集客と滞在価値向上を実現。初期費用を抑えたレベニューシェア型にも対応。"
+  title="施設活用イベントの企画・制作｜商業施設の集客・回遊施策 - 株式会社ex Labs"
+  description="商業施設・書店・宿泊施設・商店街の集客イベントを企画・制作する株式会社ex Labs。来館促進・館内回遊・閉館後の活用・空き区画の活用を目的別にご提案。渋谷サクラステージの施設一体型イベント（日経掲載）など実績多数。有料チケット型は初期費用0円のレベニューシェアにも対応。"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(serviceLd)} />
@@ -68,9 +82,10 @@ const serviceLd = {
 <h1 class="hero-title serif"><span class="hl">初期費用0円で施設の集客に繋がる</span><br><span class="hl">イベントを実施しませんか？</span></h1>
 <p class="hero-sub">Facility Experience Event — ex Labs Inc.</p>
 <div class="hero-actions">
-<a class="btn" href="/#contact">相談してみる</a>
-<a class="btn ghost" href="#works">実績を見る</a>
+<a class="btn" href="/?c=shisetsu#contact">施設で実施できる企画を相談する</a>
+<a class="btn ghost" href="#revenue">初期費用0円の条件を見る</a>
 </div>
+<p class="hero-note">※初期費用0円は有料チケット型のイベントで成立する形式です。受託・併用のプランもあります。</p>
 </div>
 <HeroWorksMarquee />
 </section>
@@ -78,11 +93,53 @@ const serviceLd = {
 <section class="section" style="padding-top:56px"><div class="wrap">
 <p class="eyebrow">SERVICE</p>
 <h2 class="h2 serif">施設活用イベントの企画・制作</h2>
-<p class="lede">株式会社ex Labsは、商業施設・文化施設・観光施設・宿泊施設などの<strong>空間を活かした体験型イベント</strong>を企画・制作しています。「<strong>その場所だからこそ体験できる物語</strong>」をコンセプトに、施設の魅力を最大限に引き出す集客コンテンツをお届けします。</p>
-<p class="lede" style="margin-top:20px"><strong>回遊型（周遊型）イベント</strong>とは、来場者が謎解きや物語を手がかりに、施設内や街なかの複数のスポットを巡りながら楽しむイベント形式です。滞在時間の延長や、普段立ち寄られにくいエリア・売場への送客に直結するため、商業施設・観光施設の集客施策として注目されています。<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは？仕組み・事例・費用の解説はこちら →</a></p>
+<p class="lede">株式会社ex Labsは、商業施設・文化施設・観光施設・宿泊施設などの<strong>空間を活かした体験型イベント</strong>を企画・制作しています。「<strong>その場所だからこそ体験できる物語</strong>」をコンセプトに、施設の魅力を最大限に引き出す集客コンテンツをお届けします。<strong>企画のご相談・お見積りは無料</strong>です。</p>
+<div class="svc-sum" id="summary">
+<div class="svc-sum-cell"><p class="svc-sum-k">依頼できる内容</p><p class="svc-sum-v">企画・コンテンツ制作・制作物・告知集客・チケット販売・当日運営・実施後レポートまで一貫。謎解き（周遊型）・マダミス・イマーシブ・頭脳戦のいずれのジャンルでも制作します。</p></div>
+<div class="svc-sum-cell"><p class="svc-sum-k">想定する依頼者</p><p class="svc-sum-v">商業施設・ショッピングモール、書店・カラオケ店などの店舗、宿泊施設、文化施設・観光施設、商店街・エリアマネジメント団体の集客・販促担当者。</p></div>
+<div class="svc-sum-cell"><p class="svc-sum-k">対応する目的</p><p class="svc-sum-v">来館促進／館内回遊・テナント送客／閉館後・営業時間外の活用／空き区画・遊休スペースの活用／商店街・街の周遊。費用は受託・レベニューシェア（初期費用0円）・併用から選べます。</p></div>
+<div class="svc-sum-cell"><p class="svc-sum-k">根拠になる実績</p><p class="svc-sum-v">渋谷サクラステージ「ウワサバナシ調査委員会」（東急不動産様ほか協力、日本経済新聞掲載）、閉店後の紀伊國屋書店（博報堂様）、下北沢の街全体「ロスト・フレーム」（全公演完売）、カラオケ館様「恣験」。</p></div>
+</div>
+<nav class="svc-jump" aria-label="ページ内の移動"><a href="#purpose">目的別の対応</a><a href="#shuyu">周遊イベント制作</a><a href="#works">事例</a><a href="#terms">条件・費用</a><a href="#revenue">初期費用0円の条件</a><a href="/?c=shisetsu#contact" class="is-cta">相談する（無料）</a></nav>
+<p class="lede" style="margin-top:36px"><strong>回遊型（周遊型）イベント</strong>とは、来場者が謎解きや物語を手がかりに、施設内や街なかの複数のスポットを巡りながら楽しむイベント形式です。滞在時間の延長や、普段立ち寄られにくいエリア・売場への送客に直結するため、商業施設・観光施設の集客施策として注目されています。用語や仕組みの解説は<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>をご覧ください。</p>
 </div></section>
 
-<section class="section tinted"><div class="wrap">
+<section class="section" id="purpose"><div class="wrap">
+<p class="eyebrow">PURPOSE</p>
+<h2 class="h2 serif">目的別：来館促進・館内回遊・閉館後活用・空き区画活用</h2>
+<p class="h2sub">施設担当者の目的ごとに、向いている形式・実績・費用の考え方を分けて示します。「回遊させる仕掛け」と「回遊率が上がった実測」は区別し、確認できる結果だけを掲載しています。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>目的</th><th>向いている形式</th><th>実績（確認できる結果）</th><th>費用の考え方</th><th>関連解説</th></tr></thead><tbody>
+<tr><th scope="row">来館促進</th><td>期間限定の有料チケット型イベント。「この施設でしか体験できない」物語で来館理由を作る</td><td>下北沢「ロスト・フレーム」：全公演完売（2026年7月7日〜8月31日）</td><td>有料チケット型ならレベニューシェア（初期費用0円）が成立しやすい</td><td><a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベント</a></td></tr>
+<tr><th scope="row">館内回遊・テナント送客</th><td>共有区画と複数フロアを巡る施設一体型。店内でしか手に入らない手がかりで店舗送客を設計</td><td>渋谷サクラステージ「ウワサバナシ調査委員会」：施設側の初期費用負担なしで実施、日本経済新聞・電ファミニコゲーマー掲載。回遊率などの数値は開催後に集計</td><td>レベニューシェアまたは併用</td><td><a href="/guide/case-uwasabanashi/" style="color:var(--accent)">制作事例の詳細</a>／<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊イベントとは</a></td></tr>
+<tr><th scope="row">閉館後・営業時間外の活用</th><td>閉店後の売場をそのまま舞台にする一夜限り〜数日の公演型。通常営業と切り離して実施</td><td>閉店後の紀伊國屋書店「月明かりの書店と呪われた原稿」（博報堂様との企画）</td><td>受託が中心。有料公演として販売する場合は併用も可</td><td><a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外・閉店後の施設活用</a></td></tr>
+<tr><th scope="row">空き区画・遊休スペースの活用</th><td>空き区画を受付・展示・体験の拠点にし、館内へ回遊させる。既存コンテンツの導入なら2〜4週間で開始</td><td>商業施設の共有区画を体験の目的地に転換した設計（渋谷サクラステージ）</td><td>受託（数十万円台〜）またはレベニューシェア</td><td><a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用</a>／<a href="/guide/popup-event/" style="color:var(--accent)">ポップアップイベント</a></td></tr>
+<tr><th scope="row">宿泊施設の「泊まる理由」</th><td>宿泊プランに組み込むマーダーミステリー・体験コンテンツ</td><td>宿泊施設向けオリジナルマダミス：新規宿泊予約20件以上（告知はXのみ）</td><td>受託またはプラン売上からの回収</td><td><a href="/guide/hotel-event/" style="color:var(--accent)">宿泊施設の集客イベント</a></td></tr>
+</tbody></table></div>
+<p class="cmp-note">美術館・文化施設・観光施設・商店街でも同じ設計で実施できますが、掲載している実績は実施済みの案件のみです。商談中・未発表の案件は実績に含めていません。</p>
+</div></section>
+
+<section class="section tinted" id="shuyu"><div class="wrap">
+<p class="eyebrow">WALK-AROUND</p>
+<h2 class="h2 serif">周遊イベント・回遊イベントの企画・制作</h2>
+<p class="h2sub">施設内の複数フロアを巡る施設一体型、商店街や街全体を歩く街周遊型、店舗を巡る店舗周遊型。いずれも「回遊の導線」と「送客の仕組み」を先に設計します。</p>
+<div class="str-grid tag-shisetsu">
+<div class="str-card"><p class="str-num">01</p><h3 class="str-title">回遊導線の設計</h3>
+<p class="str-lead">チェックポイントの数と配置、所要時間、混雑を避ける順路を、施設の動線図をもとに決めます。</p>
+<ul class="feature-points"><li>共有区画・普段立ち寄られにくいフロアを目的地にする</li><li>60〜120分で回れる距離と、休憩・飲食の立ち寄り点を組み込む</li></ul></div>
+<div class="str-card"><p class="str-num">02</p><h3 class="str-title">店舗送客の仕組み</h3>
+<p class="str-lead">店内でしか手に入らない手がかり、購入者向けの追加要素など、テナント・協力店舗に人が入る理由を物語に組み込みます。</p>
+<ul class="feature-points"><li>参加店舗の負担は「掲示物の設置と声かけ」程度に抑える</li><li>参加者数・回遊・アンケートを実施後レポートで共有</li></ul></div>
+<div class="str-card"><p class="str-num">03</p><h3 class="str-title">施設・街に合わせた物語</h3>
+<p class="str-lead">都市伝説（渋谷サクラステージ）、街に散らばった絵画（下北沢）、試験（カラオケ館）など、場所の文脈から題材を決めます。</p>
+<ul class="feature-points"><li>施設一体型：ウワサバナシ調査委員会</li><li>街周遊型：ロスト・フレーム／店舗周遊型：恣験</li></ul></div>
+<div class="str-card"><p class="str-num">04</p><h3 class="str-title">会期・費用の設計</h3>
+<p class="str-lead">2週間〜1ヶ月以上の会期で「何度も来る理由」を作り、有料チケット型ならレベニューシェアで施設側の初期費用を0円にします。</p>
+<ul class="feature-points"><li>受託の場合：フロア横断の周遊型（2〜4週間）で100万円前後〜</li><li>商店街・エリア単位：協力店舗数と会期により別途お見積り</li></ul></div>
+</div>
+<p class="vc-line" style="margin-top:32px">用語の解説：<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊イベントとは</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>／制作の相談：<a href="/?c=shisetsu#contact" style="color:var(--accent)">周遊イベントの企画を相談する（無料）→</a></p>
+</div></section>
+
+<section class="section"><div class="wrap">
 <p class="eyebrow">ISSUES</p>
 <h2 class="h2 serif">こんな施設様におすすめです</h2>
 <ul class="bullets">
@@ -95,7 +152,7 @@ const serviceLd = {
 <p class="lede">周遊型の体験イベントは、来場者が施設内を巡りながら楽しむ構造のため、滞在時間の延長・施設全体の回遊・普段接点のない売場やエリアへの誘導につながります。</p>
 </div></section>
 
-<section class="section" id="works"><div class="wrap">
+<section class="section tinted" id="works"><div class="wrap">
 <p class="eyebrow">WORKS</p>
 <h2 class="h2 serif">施設活用イベントの実績</h2>
 <div class="str-grid tag-shisetsu">
@@ -112,10 +169,10 @@ const serviceLd = {
 <p class="str-lead">周遊型頭脳戦コンテンツ「恣験」を制作。</p>
 <ul class="feature-points"><li>参加者が様々な試験へ挑戦する内容</li><li>店舗空間を活かし、新しい利用動機を創出</li></ul></div>
 </div>
-<p class="vc-line" style="margin-top:32px">現在も、大手不動産会社様や植物園様をはじめ、様々な企業・団体とのプロジェクトが進行しております。<a href="/#works" style="color:var(--accent)">実績一覧を見る</a></p>
+<p class="vc-line" style="margin-top:32px">施設の課題・担当範囲・開催条件・確認できる結果を項目ごとに整理した事例は<a href="/works/" style="color:var(--accent)">制作事例一覧</a>をご覧ください。</p>
 </div></section>
 
-<section class="section tinted"><div class="wrap">
+<section class="section"><div class="wrap">
 <p class="eyebrow">GALLERY</p>
 <h2 class="h2 serif">空間を活かした体験の一部</h2>
 <div class="hero-works" style="max-width:900px;margin:0 auto">
@@ -133,7 +190,7 @@ const serviceLd = {
 </div>
 </div></section>
 
-<section class="section"><div class="wrap">
+<section class="section tinted"><div class="wrap">
 <p class="eyebrow">FLOW</p>
 <h2 class="h2 serif">施設活用イベント 導入までの流れ</h2>
 <div class="flow-row">
@@ -149,7 +206,7 @@ const serviceLd = {
 <h2 class="h2 serif">ご依頼の条件（対応範囲・参考価格・納期・施設側のご準備）</h2>
 <p class="h2sub">施設様が判断に必要な「対応範囲・費用の回収方法・準備」を先にお伝えします。</p>
 <div class="svc-wrap"><table class="svc-table"><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><th scope="row">対応範囲</th><td>企画・コンテンツ制作・制作物・告知集客・チケット販売・当日運営・実施後レポートまで一貫。謎解き（周遊型）・マダミス・イマーシブ・頭脳戦のいずれのジャンルも対応</td></tr><tr><th scope="row">費用の回収方法</th><td>A：受託（施設様が制作費・運営費を負担）／B：レベニューシェア（有料チケットの売上から費用を回収、施設様の初期費用0円）／C：併用（一部を施設様負担、残りを売上から回収）。どれが成立するかは下記の適用条件で判断します</td></tr><tr><th scope="row">参考価格（受託の場合）</th><td>空き区画・催事枠を使う小規模企画：数十万円台〜／フロア横断の周遊型（2〜4週間）：100万円前後〜／施設全体・複数施設：数百万円規模</td></tr><tr><th scope="row">納期</th><td>既存コンテンツの導入：2〜4週間／施設に合わせたオリジナル：最短1ヶ月、標準1〜3ヶ月。日程はご相談に応じます。ハロウィン・年末など季節企画は3ヶ月前までのご相談を推奨</td></tr><tr><th scope="row">納品物</th><td>企画書、体験設計図（動線・設置場所）、制作物、告知用ビジュアル、運営マニュアル、実施後レポート（参加者数・回遊・アンケート）</td></tr><tr><th scope="row">施設側のご準備</th><td>使用できる区画・時間帯、館内の告知面（サイネージ・SNS・館内放送）、電源・控室・備品置き場、テナントへの協力依頼の窓口</td></tr></tbody></table></div>
-<p class="svc-note">参考価格は当社の過去案件をもとにした目安で、人数・時間・制作物の量・公演回数・会場条件で変わります。正式なお見積りは、ヒアリング（無料）後に前提条件を明記してご提示します。</p>
+<p class="svc-note">参考価格は当社の過去案件をもとにした目安で、人数・時間・制作物の量・公演回数・会場条件で変わります。正式なお見積りは、ヒアリング（無料）後に前提条件（制作のみか運営・キャスト・会場・印刷を含むか、税込・税別）を明記してご提示します。</p>
 </div></section>
 
 <section class="section tinted" id="revenue"><div class="wrap narrow">
@@ -157,14 +214,14 @@ const serviceLd = {
 <h2 class="h2 serif">初期費用0円（レベニューシェア）の適用条件</h2>
 <p class="h2sub">「うちの施設でも対象か」「施設側に何の負担があるか」「収益をどう分けるか」に先にお答えします。</p>
 <ul class="bullets">
-<li><strong>対象となる形式</strong>：参加者から料金をいただく有料チケット型のイベント（周遊型謎解き、施設一体型イマーシブ、公演型マダミスなど）。社内イベント・研修・無料の販促キャンペーンは売上が発生しないため、受託（有償）でのご提案になります。</li>
-<li><strong>成立しやすい施設の条件</strong>：一定の来館者数がある商業施設・宿泊施設・文化施設で、2週間〜1ヶ月以上の開催期間を確保でき、館内の告知面を使えること。当社の集客ノウハウと施設の来館者数を掛け合わせて成立させます。</li>
+<li><strong>必須条件（これだけ）</strong>：参加者から料金をいただく有料チケット型のイベントであること（周遊型謎解き、施設一体型イマーシブ、公演型マダミスなど）。社内イベント・研修・無料の販促キャンペーンは売上が発生しないため、受託（有償）でのご提案になります。</li>
+<li><strong>成立しやすい施設の条件（目安であり、受付条件ではありません）</strong>：一定の来館者数がある商業施設・宿泊施設・文化施設で、2週間〜1ヶ月以上の開催期間を確保でき、館内の告知面を使えること。満たしていなくてもご相談いただけます。当社の集客ノウハウと施設の来館者数を掛け合わせて成立するかを個別に判断します。</li>
 <li><strong>施設側にお願いすること</strong>：会場となる区画・時間帯の提供、館内告知（サイネージ・SNS・館内放送）への協力、テナント連携の窓口。費用のご負担は原則ありません。</li>
 <li><strong>費用の回収と分配の考え方</strong>：チケット売上のうち、制作費・運営費などの原価を回収するまでは当社の取り分とし、回収後の売上を施設様と分配します。分配の目安は当社8：施設様2から5：5までの範囲で、施設様の広報協力（館内告知・SNS・館内放送）や場所の提供条件（区画の広さ・使用時間・営業時間外の利用可否）によって大きく変わります。契約前に数字で提示します。</li>
 <li><strong>別途費用が生じ得る項目</strong>：施設様が追加を希望される造作・装飾、館外広告、通常の運営枠を超える延長・増席。事前にお見積りし、合意なく発生させません。</li>
 <li><strong>初期費用0円が難しい場合</strong>：来館者数や期間の条件で成立しないと判断した場合は、受託プラン（数十万円台〜）や、一部を施設様にご負担いただく併用プランをご提案します。「難しい」と判断した理由もお伝えします。</li>
 </ul>
-<p class="vc-line"><a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場 →</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧 →</a>／<a href="/#contact" style="color:var(--accent)">適用できるか相談する（無料）→</a></p>
+<p class="vc-line"><a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場 →</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧 →</a>／<a href="/?c=shisetsu#contact" style="color:var(--accent)">適用できるか相談する（無料）→</a></p>
 </div></section>
 
 <section class="section tinted"><div class="wrap">
@@ -182,8 +239,9 @@ const serviceLd = {
 
 <section class="section"><div class="wrap">
 <div class="cta-mini">
-<p class="cta-mini-title serif"><span class="nobr">初期費用0円からの</span><span class="nobr">施設活用イベント、</span><span class="nobr">まずはご相談ください</span></p>
-<a class="btn" href="/#contact">施設活用イベントを相談する</a>
+<p class="cta-mini-title serif"><span class="nobr">施設で実施できる企画の</span><span class="nobr">ご相談・お見積り（無料）</span></p>
+<a class="btn" href="/?c=shisetsu#contact">施設で実施できる企画を相談する</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。フォームで「商業施設・店舗・宿泊施設でのイベント（施設活用）」を選ぶと、施設の種類・区画・目的の確認からスムーズに進みます。</p>
 </div>
 <p class="vc-line" style="margin-top:48px">関連サービス：<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作</a>／<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作</a></p>
 </div></section>
@@ -203,5 +261,6 @@ const serviceLd = {
 .svc-table tr:last-child th,.svc-table tr:last-child td{border-bottom:0}
 .svc-note{margin:16px 0 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62)}
 #terms,#revenue{scroll-margin-top:88px}
+.hero-note{margin:14px 0 0;font-size:12.5px;line-height:1.7;color:rgba(51,48,43,.6);text-align:center}
 @media(max-width:640px){.svc-table thead{display:none}.svc-table tr,.svc-table th,.svc-table td{display:block;width:auto}.svc-table tbody th{border-bottom:0;padding:14px 16px 4px}.svc-table td{padding:0 16px 14px}}
 </style>

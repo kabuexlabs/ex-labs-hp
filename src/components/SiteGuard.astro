@@ -12,6 +12,19 @@
 <script is:inline defer src="/_vercel/insights/script.js"></script>
 <script is:inline>
 try{var k='exl_src',F='exl_first',N='exl_n',now=Date.now();if(!sessionStorage.getItem(k)){sessionStorage.setItem(k,JSON.stringify({r:document.referrer,l:location.href,t:now}));try{localStorage.setItem(N,String((parseInt(localStorage.getItem(N)||'0',10)||0)+1))}catch(_){}}var f=null;try{f=JSON.parse(localStorage.getItem(F)||'null')}catch(_){}if(!f||!f.t||now-f.t>90*86400000)localStorage.setItem(F,JSON.stringify({r:document.referrer,l:location.href,t:now}))}catch(e){}
+// 問い合わせ導線の計測（個人情報なし）：相談CTAのクリックとフォームの表示を
+// /api/track に数える。送信成功は /api/contact 側で数える。
+(function(){
+  var send=function(e,c){try{var b=JSON.stringify({e:e,p:location.pathname,c:c||''});if(navigator.sendBeacon){navigator.sendBeacon('/api/track',new Blob([b],{type:'application/json'}))}else{fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},body:b,keepalive:true})}}catch(_){}};
+  var cat=function(h){var m=/[?&]c=([a-z0-9-]{1,40})/.exec(h||'');return m?m[1]:''};
+  document.addEventListener('click',function(e){
+    var a=e.target&&e.target.closest?e.target.closest('a[href]'):null;if(!a)return;
+    var h=a.getAttribute('href')||'';
+    if(/#contact(\b|$)/.test(h)||a.hasAttribute('data-cta'))send('cta',cat(h)||a.getAttribute('data-cta')||'');
+  },true);
+  var seen=false,f=document.getElementById('contact');
+  if(f&&'IntersectionObserver' in window){var io=new IntersectionObserver(function(en){if(seen)return;for(var i=0;i<en.length;i++){if(en[i].isIntersecting){seen=true;send('view',cat(location.search));io.disconnect();break}}},{threshold:.2});io.observe(f)}
+})();
 document.addEventListener('copy',function(e){
   try{
     var sel=String(window.getSelection());

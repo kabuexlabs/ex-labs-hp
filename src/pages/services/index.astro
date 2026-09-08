@@ -5,10 +5,10 @@ import { jsonLd } from '../../lib/microcms';
 
 const services = [
   {
-    href: '/services/nazotoki-kenshu/',
-    title: '謎解き研修',
-    desc: '謎解きを活用した体験型チームビルディング研修。参加者が自然と協力し合う「体験」で、コミュニケーション活性化と相互理解を促進します。',
-    tag: 'nazotoki',
+    href: '/services/immersive/',
+    title: 'イマーシブ制作',
+    desc: '実在する街・空間・ブランドを舞台にした没入型（イマーシブ）体験を企画・制作。施設一体型・街歩き周遊型・1空間公演型のリアル体験に対応します。',
+    tag: 'immersive',
   },
   {
     href: '/services/murder-mystery/',
@@ -23,17 +23,26 @@ const services = [
     tag: 'shisetsu',
   },
   {
-    href: '/services/immersive/',
-    title: 'イマーシブ制作',
-    desc: '実在する街・空間・ブランドを舞台にした没入型（イマーシブ）体験を企画・制作。アート×体験、香り×体験など複数のレーベルで制作実績があります。',
-    tag: 'immersive',
-  },
-  {
     href: '/services/zunousen/',
     title: '頭脳戦制作',
-    desc: 'ライアーゲームのような交渉・心理戦・閃きのゲームに特化した、日本で唯一の専門制作団体。オリジナルの頭脳戦コンテンツを企画・制作します。',
+    desc: 'ライアーゲームのような交渉・心理戦・閃きのゲームに特化したレーベル「HACKTALE」を運営。ルール設計からバランス調整・運営まで、オリジナルの頭脳戦コンテンツを企画・制作します。',
     tag: 'zunou',
   },
+  {
+    href: '/services/nazotoki-kenshu/',
+    title: '謎解き研修',
+    desc: '謎解きを活用した体験型チームビルディング研修。参加者が自然と協力し合う「体験」で、コミュニケーション活性化と相互理解を促進します。',
+    tag: 'nazotoki',
+  },
+];
+
+// 「何を作りたいか」→ サービスの対応表（比較・選択の入口）
+const chooser = [
+  { want: '物語・没入体験を作りたい', to: 'イマーシブ制作', href: '/services/immersive/', ex: '商業施設・街・店舗を舞台にした没入型イベント。施設一体型／街歩き周遊型／1空間公演型', proof: '渋谷サクラステージ（日経掲載）、下北沢（全公演完売）' },
+  { want: '登場人物として推理するコンテンツを作りたい', to: 'マーダーミステリー制作', href: '/services/murder-mystery/', ex: 'オリジナルのシナリオ制作、既存作品の貸切導入、宿泊プラン・配信向け', proof: '宿泊施設向け作品で新規宿泊予約20件以上' },
+  { want: '交渉・読み合いの対戦企画を作りたい', to: '頭脳戦制作', href: '/services/zunousen/', ex: 'ルール設計・バランス調整・制作物・進行審判・大会運営', proof: '東京都頭脳王決定戦 2026（全公演完売）' },
+  { want: '施設の集客・回遊・未活用時間を改善したい', to: '施設活用イベント', href: '/services/shisetsu-event/', ex: '来館促進・館内回遊・閉館後活用・空き区画活用。有料チケット型は初期費用0円も', proof: '渋谷サクラステージ、閉店後の紀伊國屋書店' },
+  { want: '社内のチームビルディングをしたい', to: '謎解き研修', href: '/services/nazotoki-kenshu/', ex: '謎解きを使った体験型研修・社内イベント', proof: '法人向け研修プログラム' },
 ];
 
 // サービス一覧の ItemList 構造化データ（検索エンジンの一覧理解を補助）
@@ -52,7 +61,7 @@ const itemListLd = {
 ---
 <BaseLayout
   title="サービス一覧｜イマーシブ・マダミス・頭脳戦・施設活用イベントの制作依頼 - 株式会社ex Labs"
-  description="株式会社ex Labsの法人向けサービス一覧。謎解き研修・マーダーミステリー制作・施設活用イベントなど、体験型エンターテインメントの企画・制作・集客・運営を一貫してご支援します。"
+  description="体験型イベントの企画・制作会社 株式会社ex Labsのサービス一覧。イマーシブ制作・マーダーミステリー制作・頭脳戦制作・施設活用イベント・謎解き研修を「何を作りたいか」から選べます。企画・制作・集客・運営まで一貫対応、ご相談・お見積りは無料。"
 >
 <script type="application/ld+json" set:html={jsonLd(itemListLd)} />
 <Breadcrumb items={[
@@ -62,9 +71,15 @@ const itemListLd = {
 
 <section class="section" style="padding-top:56px"><div class="wrap">
 <p class="eyebrow">SERVICE</p>
-<h1 class="h2 serif">サービス一覧</h1>
-<p class="h2sub">体験型エンターテインメントの企画・制作・集客・運営を一貫してご支援します。</p>
-<div class="svc-grid">
+<h1 class="h2 serif">サービス一覧｜体験型イベントの企画・制作</h1>
+<p class="h2sub">株式会社ex Labsは、体験型イベント・体験型コンテンツの企画・制作会社です。イマーシブ・マダミス・頭脳戦・施設活用イベントの4つの制作サービスと謎解き研修を、企画から制作・集客・運営まで一貫してご支援します。制作に関するご相談・お見積りは無料です。</p>
+<div class="cmp-wrap" style="margin-top:0"><table class="cmp-table"><thead><tr><th>作りたいもの・解決したいこと</th><th>対応するサービス</th><th>依頼できる内容</th><th>根拠になる実績</th></tr></thead><tbody>
+{chooser.map((c) => (
+  <tr><th scope="row">{c.want}</th><td><a href={c.href} style="color:var(--accent);font-weight:800">{c.to} →</a></td><td>{c.ex}</td><td>{c.proof}</td></tr>
+))}
+</tbody></table></div>
+<p class="cmp-note">ジャンルが決まっていない場合は、<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミス・謎解き・イマーシブ・頭脳戦の違い</a>で選び方を確認するか、そのまま<a href="/?c=taikengata#contact" style="color:var(--accent)">「体験型イベント全般」として相談</a>してください。目的と場所を伺ったうえで形式をご提案します。</p>
+<div class="svc-grid" style="margin-top:48px">
 {services.map((s) => (
   <div class={`svc-card tag-${s.tag}`}>
     <h2 class="svc-title"><a href={s.href}>{s.title}</a></h2>
@@ -77,8 +92,9 @@ const itemListLd = {
 
 <section class="section" style="padding-top:0"><div class="wrap">
 <div class="cta-mini">
-<p class="cta-mini-title serif">サービスに関するご相談はこちら</p>
-<a class="btn" href="/#contact">お問い合わせ</a>
+<p class="cta-mini-title serif">制作のご相談・お見積り（無料）</p>
+<a class="btn" href="/?c=taikengata#contact">体験型イベントの制作を相談する</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。フォームで「ご相談の種類」を選ぶと、目的・場所・時期の確認からスムーズに進みます。</p>
 </div>
 <p class="vc-line" style="margin-top:48px">はじめての方へ：<a href="/works/" style="color:var(--accent)">制作事例一覧</a>／<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>／<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミス・謎解き・イマーシブ・頭脳戦の違い</a>／<a href="/guide/taikengata-company/" style="color:var(--accent)">制作会社の選び方</a>／<a href="/guide/yougo/" style="color:var(--accent)">用語集</a></p>
 </div></section>

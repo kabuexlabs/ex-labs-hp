@@ -401,7 +401,7 @@ const marqueeItems = Array(2).fill(groups).flat();
 </a>
 <a class="genre-cell" href="/services/zunousen/">
 <span class="genre-t serif">頭脳戦</span>
-<span class="genre-d"><span class="nobr">交渉・心理戦・閃きを軸にした</span><span class="nobr">対戦型ゲーム。</span><span class="nobr">日本で唯一の特化制作団体です。</span></span>
+<span class="genre-d"><span class="nobr">交渉・心理戦・閃きを軸にした</span><span class="nobr">対戦型ゲーム。</span><span class="nobr">頭脳戦に特化したレーベル「HACKTALE」を運営しています。</span></span>
 <span class="genre-arrow">→</span>
 </a>
 <a class="genre-cell" href="/services/immersive/">
@@ -457,7 +457,7 @@ const marqueeItems = Array(2).fill(groups).flat();
 <a class="svc-row" href="/services/zunousen/">
 <span class="svc-no">05</span>
 <div class="svc-row-body"><h3 class="svc-row-title">頭脳戦制作</h3>
-<p class="svc-row-desc">交渉・心理戦・閃きのゲームに特化した、日本で唯一の専門制作団体によるオリジナル頭脳戦コンテンツ。</p></div>
+<p class="svc-row-desc">交渉・心理戦・閃きのゲームに特化したレーベル「HACKTALE」を運営。ルール設計からバランス調整・運営までオリジナル頭脳戦コンテンツを制作。</p></div>
 <span class="svc-row-arrow">→</span>
 </a>
 </div>
@@ -493,7 +493,7 @@ const marqueeItems = Array(2).fill(groups).flat();
 
 <section class="cta section" id="contact"><div class="wrap">
 <h2 class="cta-title serif">まずは、お気軽にご相談ください</h2>
-<p class="cta-sub"><span class="nobr">お問い合わせ内容をご入力のうえ</span><wbr><span class="nobr">送信してください。</span><wbr><span class="nobr">2〜3営業日以内に</span><span class="nobr">ご連絡を差し上げます。</span></p>
+<p class="cta-sub"><span class="nobr">お問い合わせ内容をご入力のうえ</span><wbr><span class="nobr">送信してください。</span><wbr><span class="nobr">2〜3営業日以内に</span><span class="nobr">ご連絡を差し上げます。</span><br><span class="nobr">予算・企画内容が未定の段階でも</span><wbr><span class="nobr">ご相談いただけます。</span><wbr><span class="nobr">制作に関するご相談・お見積りは無料です。</span></p>
 <form class="contact-form" action="/api/contact" method="POST">
 <input type="hidden" name="_next" value="/contact/thanks/">
 {/* ハニーポット：botだけが埋める不可視フィールド */}
@@ -507,8 +507,24 @@ const marqueeItems = Array(2).fill(groups).flat();
 <label><span class="label-cap">メールアドレス<span class="req">必須</span></span><input type="email" name="email" required></label>
 <label><span class="label-cap">電話番号</span><input type="tel" name="phone"></label>
 </div>
-<label><span class="label-cap">お問い合わせ内容<span class="req">必須</span></span><textarea name="message" rows="5" required></textarea></label>
+<label><span class="label-cap">ご相談の種類</span><select name="category" id="contact-category">
+<option value="">選択してください（未定でも構いません）</option>
+<option value="immersive">イマーシブ（没入型体験）の制作</option>
+<option value="madamis">マダミス（マーダーミステリー）の制作</option>
+<option value="zunousen">頭脳戦・心理戦ゲームの制作</option>
+<option value="shisetsu">商業施設・店舗・宿泊施設でのイベント（施設活用）</option>
+<option value="taikengata">体験型イベント全般（ジャンル未定）</option>
+<option value="kenshu">謎解き研修・社内イベント</option>
+<option value="media">取材・登壇・協業</option>
+<option value="other">その他</option>
+</select></label>
+<label><span class="label-cap">お問い合わせ内容<span class="req">必須</span></span><textarea name="message" rows="5" required placeholder="目的（集客・話題化・研修など）／舞台にしたい場所／希望時期／おおよその人数。予算や企画内容が未定でも構いません。"></textarea></label>
 <input type="hidden" name="_subject" value="【ex Labs HP】お問い合わせ">
+<script is:inline>
+// サービスページの「◯◯を相談する」から来た場合（/?c=immersive#contact）、
+// ご相談の種類を先に選んでおく。
+try{var m=/[?&]c=([a-z0-9-]{1,40})/.exec(location.search);var sel=document.getElementById('contact-category');if(m&&sel){var map={immersive:'immersive',madamis:'madamis',murder:'madamis',zunousen:'zunousen',shinrisen:'zunousen',shisetsu:'shisetsu',shuyu:'shisetsu',taikengata:'taikengata',kenshu:'kenshu',media:'media'};var v=map[m[1]];if(v)sel.value=v}}catch(_){}
+</script>
 <button type="submit" class="btn">送信する</button>
 </form>
 <p class="cta-hint">メールでのお問い合わせ：<a href="mailto:info@kabuexlabs.com" style="text-decoration:underline">info@kabuexlabs.com</a></p>

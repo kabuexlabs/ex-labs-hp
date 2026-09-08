@@ -214,3 +214,16 @@
 - 新記事: taikengata-idea / works / shinrisen-game / madamis-nazotoki-chigai / event-hiyou / yougo
 - とは7ページ（没入感・マダミス・イマーシブ・催事・心理戦・ポップアップ・参加型）の title/description 変更＋FAQ3問追記 → CTR を 9/7〜9/9 で判定、順位が明確に落ちたものは docs/title-history.md の旧 title に戻す
 
+
+## 2026-09-08 指示書（exlabs_claude_seo_aio_instructions.md）に基づく改修
+
+実装（詳細は git d83ac45 以降のコミット）：
+- サービス4本：上部に発注判断サマリー（依頼できる内容／依頼者／形式／根拠実績）＋ページ内ジャンプ、固有CTA（/?c=◯◯#contact）、「制作に関するご相談・お見積りは無料」に明確化、納期・価格の前提を FAQ と条件表で整合。immersive: 形式の選び方表（VR・映像単体は主業務外を明記）。murder-mystery: 新規／既存・シナリオのみ／運営込みの比較表。zunousen: 工程表＋テスト確認項目、「日本唯一」を事実表現へ（サイト全体で修正。HACKTALE サブサイトの自称タグラインのみ未変更）。shisetsu-event: 目的別表（来館促進・館内回遊・閉館後・空き区画・宿泊）、周遊イベント制作の節、必須条件と成立しやすい条件を区別、title を「商業施設の集客・回遊施策」に局所変更。
+- /services/：「作りたいもの→サービス」比較表、h1 に総称「体験型イベントの企画・制作」。
+- ガイド：immersive／madamis／zunousen／shinrisen の下部に「制作現場の知見」節（凍結ルールに従い下部追加のみ）。shisetsu-katsuyo／shuyu-event／shogyoshisetsu-event に文脈リンク追加。納期の 2〜4ヶ月表記に条件を補記（immersive-seisaku, madamis-seisaku, nazotoki-company, taikengata-company）。
+- 事例：case-uwasabanashi／eigyo-jikangai／hotel-event に共通7項目の発注者向け表。
+- 会社・代表：Person sameAs からポッドキャスト出演回を除外（出演実績として表示）、起業時期の文言整理、「東京大学発」の意味を明記、日経・電ファミ・PR TIMES への原典リンク、AuthorBox の「監修」を「発行責任者」に。Service.provider を Organization @id 参照に統一。
+- 計測：フォームに「ご相談の種類」select（URL ?c= で事前選択）、/api/track（CTAクリック・フォーム表示）＋送信成功を KV に日別集計、管理画面に表示。
+- 未検証・保留：AI 掲載の実測（docs/aio-check.md に手順）、本番 CDN でのクローラー応答、第三者サイトの表記確認、代表の在学状況（現在も在学中かは未確認）、頭脳王の完売公演数の時点。
+
+観察：公開後7日（9/15）・28日（10/6）に、制作語群の表示・クリック、保護対象（immersive-tokyo／kaitou／uwasabanashi）のクリック、単独語の順位を同条件で比較。7日で断定しない。

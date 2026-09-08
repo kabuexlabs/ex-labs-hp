@@ -9,7 +9,13 @@ export const prerender = false;
 // 各サイトのフォームは action を差し替えるだけで移行できる。
 import type { APIRoute } from 'astro';
 import { sendMail, adminEmail } from '../../lib/yoyaku';
-import { contactRedis as redis, CONTACT_LOG_KEY } from '../../lib/contact';
+import { contactRedis as redis, CONTACT_LOG_KEY, recordMetric } from '../../lib/contact';
+
+// フォームの「ご相談の種類」→ 件名に付ける表示名
+const CATEGORY_LABEL: Record<string, string> = {
+  immersive: 'イマーシブ制作', madamis: 'マダミス制作', zunousen: '頭脳戦制作', shisetsu: '施設活用イベント',
+  taikengata: '体験型イベント全般', kenshu: '謎解き研修', media: '取材・協業', other: 'その他',
+};
 
 // リダイレクト先はサイト内パスか kabuexlabs.com のみ許可
 // （open redirect 防止）。
@@ -76,7 +82,9 @@ export const POST: APIRoute = async ({ request }) => {
   }
   if (lines.length === 0 || totalLen > 8000) return redirect();
 
-  const baseSubject = (get('_subject') || '【ex Labs】サイトからのお問い合わせ').slice(0, 150);
+  const category = get('category');
+  const catLabel = CATEGORY_LABEL[category] ?? '';
+  const baseSubject = ((get('_subject') || '【ex Labs】サイトからのお問い合わせ') + (catLabel ? `（${catLabel}）` : '')).slice(0, 150);
   const source = get('_source').slice(0, 1500);
   const spam = spamCheck(`${baseSubject}\n${lines.join('\n')}`, source, email, totalLen);
   const subject = spam ? `【営業・スパムの疑い】${baseSubject}` : baseSubject;
@@ -123,6 +131,12 @@ export const POST: APIRoute = async ({ request }) => {
       `お急ぎの場合は info@kabuexlabs.com までご連絡ください。\n\n` +
       `株式会社ex Labs\nhttps://kabuexlabs.com/`;
     await sendMail(email, 'お問い合わせを受け付けました｜株式会社ex Labs', receipt);
+  }
+
+  // 送信成功の計測（個人情報なし：送信ページのパスとカテゴリのみ）
+  if (!spam && (stored || mailed)) {
+    const sentFrom = (/送信したページ: (\S+)/.exec(source)?.[1] ?? '').replace(/^https?:\/\/[^/]+/, '').split('?')[0].split('#')[0] || '/';
+    await recordMetric('submit', sentFrom.slice(0, 120), /^[a-z][a-z0-9-]{0,39}$/.test(category) ? category : '');
   }
 
   if (!stored && !mailed) {

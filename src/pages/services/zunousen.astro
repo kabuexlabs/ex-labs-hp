@@ -18,7 +18,7 @@ const faqs = [
   },
   {
     q: '謎解きとは何が違うのですか？',
-    a: '謎解きは「参加者全員で協力して謎を解く」形式ですが、頭脳戦は参加者同士が交渉・裏切り・駆け引きを行う対戦形式です。謎解きに特化した制作団体は増えていますが、この対人交渉型ゲームに特化した制作団体は国内でも他に例がなく、ex Labsが唯一の専門集団です。',
+    a: '謎解きは「参加者全員で協力して謎を解く」形式ですが、頭脳戦は参加者同士が交渉・裏切り・駆け引きを行う対戦形式です。当社は頭脳戦に特化した制作・公演レーベル「HACKTALE（ハックテイル）」を運営しており、対人ゲーム特有のルール設計とバランス調整を専門に行っています。',
   },
   {
     q: '何人から実施できますか？',
@@ -27,6 +27,14 @@ const faqs = [
   {
     q: 'オリジナル作品の制作も依頼できますか？',
     a: 'はい。プレゼント・ポーカー、人狼定理、ダイスボックスなど複数の頭脳戦コンテンツを制作してきた実績をもとに、貴社のご要望に合わせたオリジナルゲームを企画・制作します。',
+  },
+  {
+    q: 'ルール設計だけ、運営だけといった部分的な依頼はできますか？',
+    a: 'できます。工程を「ルール・シナリオ設計」「バランス調整（テストプレイ）」「制作物」「進行・審判」「当日運営」に分けており、必要な工程だけをご依頼いただけます。参考価格は本ページの「ご依頼の条件」に前提つきで掲載しています。',
+  },
+  {
+    q: '頭脳戦制作の依頼は、何から始めればいいですか？',
+    a: 'お問い合わせフォームで「頭脳戦・心理戦ゲームの制作」を選び、目的（社内対抗戦・店舗の定期開催・集客型大会など）・想定人数・希望時期をお知らせください。予算や企画内容が未定でも構いません。内容を伺ったうえで、ゲームの方向性と概算お見積りを無料でご提案します。',
   },
 ];
 
@@ -45,15 +53,17 @@ const serviceLd = {
   '@type': 'Service',
   serviceType: '頭脳戦制作・交渉戦制作',
   name: '頭脳戦制作・交渉戦制作',
-  description: 'ライアーゲームのような交渉ゲーム・心理戦・閃きのゲームに特化したオリジナル頭脳戦コンテンツの企画・制作',
-  provider: { '@type': 'Organization', name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
+  alternateName: ['頭脳戦制作依頼', '心理戦ゲーム制作', '交渉ゲーム制作', 'オリジナル頭脳戦ゲーム制作'],
+  description: 'ライアーゲームのような交渉ゲーム・心理戦・閃きのゲームに特化したオリジナル頭脳戦コンテンツの企画・制作。ルール設計・バランス調整・制作物・進行審判・当日運営の工程ごとに依頼可能',
+  provider: { '@type': 'Organization', '@id': new URL('/#organization', Astro.site).toString(), name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
+  audience: { '@type': 'BusinessAudience', name: '企業の社内イベント担当・店舗・商業施設・イベント主催者・番組や配信の企画者' },
   areaServed: 'JP',
   url: new URL('/services/zunousen/', Astro.site).toString(),
 };
 ---
 <BaseLayout
   title="頭脳戦制作・交渉戦制作｜交渉ゲーム・心理戦コンテンツ - 株式会社ex Labs"
-  description="頭脳戦制作・交渉戦制作なら株式会社ex Labs。ライアーゲームのような交渉ゲーム・心理戦・閃きのゲームに特化した、日本唯一の専門制作団体。東京都頭脳王決定戦の実績をもとに、オリジナルの頭脳戦・交渉戦コンテンツを企画・制作します。"
+  description="頭脳戦制作・交渉戦制作なら株式会社ex Labs。ライアーゲームのような交渉ゲーム・心理戦・閃きのゲームに特化したレーベル「HACKTALE」を運営。全公演完売の東京都頭脳王決定戦の実績をもとに、ルール設計・バランス調整・制作物・進行・運営までオリジナルの頭脳戦・交渉戦コンテンツを企画・制作します。"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(serviceLd)} />
@@ -67,11 +77,11 @@ const serviceLd = {
 <div class="hero-overlay"></div>
 <div class="wrap hero-center" style="padding-top:36px;padding-bottom:44px">
 <img class="hero-logo" src="/assets/logo.png" alt="株式会社 ex Labs" width="2048" height="520" loading="eager" decoding="async" style="width:min(220px,46vw);margin-bottom:26px">
-<h1 class="hero-title serif"><span class="hl">日本で唯一の頭脳戦制作団体に</span><br><span class="hl">頭脳戦を制作依頼しませんか？</span></h1>
+<h1 class="hero-title serif"><span class="hl">頭脳戦に特化したレーベルを運営する</span><br><span class="hl">ex Labsに頭脳戦を制作依頼しませんか？</span></h1>
 <p class="hero-sub">Mind Battle Production — ex Labs Inc.</p>
 <div class="hero-actions">
-<a class="btn" href="/#contact">相談してみる</a>
-<a class="btn ghost" href="#works">実績を見る</a>
+<a class="btn" href="/?c=zunousen#contact">頭脳戦ゲームの制作を相談する</a>
+<a class="btn ghost" href="#terms">条件・価格を見る</a>
 </div>
 </div>
 <HeroWorksMarquee />
@@ -80,8 +90,29 @@ const serviceLd = {
 <section class="section" style="padding-top:56px"><div class="wrap">
 <p class="eyebrow">SERVICE</p>
 <h2 class="h2 serif">頭脳戦制作・交渉戦制作｜交渉ゲーム・心理戦コンテンツ</h2>
-<p class="lede">株式会社ex Labsは、<strong>ライアーゲームのような交渉ゲーム・交渉戦・閃きのゲーム</strong>を制作可能な、<strong>日本で唯一の頭脳戦特化制作団体</strong>を保有しています。謎解きに特化した制作団体は複数存在しますが、対人交渉・心理戦を軸にしたこの手のゲームに特化した団体は他に例がありません。</p>
-<p class="lede" style="margin-top:20px"><strong>頭脳戦とは</strong>、交渉・推理・駆け引きといった「頭脳」を武器に、参加者同士が勝敗を競う対戦型ゲームの総称です。相手の思考を読み合う<strong>心理戦</strong>はその中核要素にあたり、「頭脳戦＝ルールと論理を使った戦い全体」「心理戦＝相手の心を読み合う駆け引き」という関係にあります。</p>
+<p class="lede">株式会社ex Labsは、<strong>ライアーゲームのような交渉ゲーム・交渉戦・閃きのゲーム</strong>を制作する、<strong>頭脳戦に特化したレーベル「HACKTALE（ハックテイル）」</strong>を運営しています。謎解きが「協力して解く」形式なのに対し、頭脳戦は参加者同士の対戦です。対人ゲーム特有のルール設計とバランス調整を専門に行っています。<strong>制作に関するご相談・お見積りは無料</strong>です。</p>
+<div class="svc-sum" id="summary">
+<div class="svc-sum-cell"><p class="svc-sum-k">依頼できる制作内容</p><p class="svc-sum-v">ルール・シナリオ設計、バランス調整（テストプレイ）、カード・盤面・進行キットの制作、進行台本・審判マニュアル、MC進行・複数会場の当日運営。工程ごとの部分依頼も可能です。</p></div>
+<div class="svc-sum-cell"><p class="svc-sum-k">想定する依頼者</p><p class="svc-sum-v">企業の社内イベント・研修担当、店舗・商業施設の集客担当、集客型大会・トーナメントの主催者、番組・配信の企画者。</p></div>
+<div class="svc-sum-cell"><p class="svc-sum-k">対応形式</p><p class="svc-sum-v">少人数の卓上ゲーム（6〜12人）から、店舗を巡る周遊型、都内4会場同時開催の大会形式まで。既存作品（HACKTALE）の貸切・出張実施にも対応します。</p></div>
+<div class="svc-sum-cell"><p class="svc-sum-k">根拠になる実績</p><p class="svc-sum-v">「東京都頭脳王決定戦 2026」（都内4会場・全10公演、全公演チケット完売）、カラオケ館様向け周遊型頭脳戦「恣験」、HACKTALEでの一般公演（プレゼント・ポーカー、人狼定理、ダイスボックス）。</p></div>
+</div>
+<nav class="svc-jump" aria-label="ページ内の移動"><a href="#process">依頼できる工程</a><a href="#works">事例・作品</a><a href="#terms">条件・価格・納期</a><a href="/?c=zunousen#contact" class="is-cta">相談する（無料）</a></nav>
+<p class="lede" style="margin-top:36px"><strong>頭脳戦とは</strong>、交渉・推理・駆け引きといった「頭脳」を武器に、参加者同士が勝敗を競う対戦型ゲームの総称です。相手の思考を読み合う<strong>心理戦</strong>はその中核要素にあたり、「頭脳戦＝ルールと論理を使った戦い全体」「心理戦＝相手の心を読み合う駆け引き」という関係にあります。用語の解説は<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは</a>・<a href="/guide/shinrisen/" style="color:var(--accent)">心理戦とは</a>をご覧ください。</p>
+</div></section>
+
+<section class="section" id="process"><div class="wrap">
+<p class="eyebrow">PROCESS</p>
+<h2 class="h2 serif">依頼できる工程：ルール設計・バランス調整・制作物・進行審判・運営</h2>
+<p class="h2sub">対人ゲームは「ルールを書く」だけでは成立しません。工程ごとに何をするか、どこから依頼できるかを分けて示します。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>工程</th><th>内容</th><th>成果物</th><th>依頼範囲との対応</th></tr></thead><tbody>
+<tr><th scope="row">① ルール・シナリオ設計</th><td>勝利条件・情報の非対称・交渉の余地・制限時間を決め、目的（社内対抗戦／集客大会／店舗常設）に合わせて人数と所要時間を設計</td><td>ルールブック（案）、進行フロー</td><td>設計のみのご依頼に対応</td></tr>
+<tr><th scope="row">② バランス調整</th><td>テストプレイを繰り返し、「最善手が一つに固まらないか」「序盤で脱落した人に逆転の余地があるか」「時間内に決着するか」を確認して修正</td><td>調整済みルール、想定される裁定集</td><td>①とセットが基本</td></tr>
+<tr><th scope="row">③ 制作物</th><td>カード・盤面・チップ・進行キット・掲示物のデザインと印刷データ</td><td>印刷データ、キット</td><td>制作物込みプラン</td></tr>
+<tr><th scope="row">④ 進行・審判</th><td>進行台本・審判（GM）マニュアル、ルール質問への裁定基準、集計方法</td><td>進行台本、審判マニュアル、集計シート</td><td>自社スタッフで進行する場合はここまで</td></tr>
+<tr><th scope="row">⑤ 当日運営</th><td>MC進行、審判・集計、受付、複数会場の同時運営、大会の予選・本戦の切り替え</td><td>運営体制、実施後の振り返り</td><td>運営込みプラン</td></tr>
+</tbody></table></div>
+<p class="cmp-note">テストプレイで当社が確認している項目：初見の参加者がルール説明から10分程度で遊び始められるか／勝ち筋が複数あり、交渉や読み合いの結果で順位が入れ替わるか／脱落者が出ても最後まで参加できる仕組みがあるか／制限時間内に必ず決着するか／進行役の裁定が必要になる場面を事前に洗い出せているか。公開中の作品はいずれも一般公演での実施を経てから、企業・施設向けにご提供しています。</p>
 </div></section>
 
 <section class="section tinted"><div class="wrap">
@@ -97,13 +128,13 @@ const serviceLd = {
 <p class="lede">頭脳戦は「協力すれば解ける」謎解きとは異なり、<strong>読み合い・裏切り・逆転</strong>が生まれる対戦構造が魅力です。正解が一つに定まらないからこそ、プレイするたびに違うドラマが生まれます。</p>
 </div></section>
 
-<section class="section"><div class="wrap">
+<section class="section tinted"><div class="wrap">
 <p class="eyebrow">FEATURES</p>
 <h2 class="h2 serif">ex Labsの頭脳戦制作が選ばれる理由</h2>
 <div class="str-grid tag-zunou">
-<div class="str-card"><p class="str-num">01</p><h3 class="str-title">日本で唯一の頭脳戦特化団体</h3>
-<p class="str-lead">交渉・心理戦・閃きを軸にした頭脳戦コンテンツに特化した制作団体は、ex Labs以外に例がありません。</p>
-<ul class="feature-points"><li>謎解き団体は数多くあるが、頭脳戦特化は国内唯一</li><li>特化しているからこそのゲームバランス設計力</li></ul></div>
+<div class="str-card"><p class="str-num">01</p><h3 class="str-title">頭脳戦に特化したレーベルを自社運営</h3>
+<p class="str-lead">交渉・心理戦・閃きを軸にした頭脳戦コンテンツに特化したレーベル「HACKTALE（ハックテイル）」を運営し、一般公演で作品を磨いています。</p>
+<ul class="feature-points"><li>対人ゲーム特有のルール設計・バランス調整を専門に担当</li><li>公演で検証済みの作品を、企業・施設向けにも提供</li></ul></div>
 <div class="str-card"><p class="str-num">02</p><h3 class="str-title">大型イベントでの実施実績</h3>
 <p class="str-lead">自社主催「東京都頭脳王決定戦」を企画・運営し、ご好評をいただきました。</p>
 <ul class="feature-points"><li>東京都内4会場を同時に活用した大型イベント</li><li>「東京都で最も頭の良い人を決める」というコンセプト</li><li>本戦は、セガサミーグループ様が運営するイベントスペース「TUNNEL TOKYO」（東京・大崎）にて開催</li></ul></div>
@@ -114,7 +145,7 @@ const serviceLd = {
 </figure>
 </div></section>
 
-<section class="section tinted" id="works"><div class="wrap">
+<section class="section" id="works"><div class="wrap">
 <p class="eyebrow">TITLES</p>
 <h2 class="h2 serif">頭脳戦の制作作品例</h2>
 <p class="h2sub">これまでに手がけた頭脳戦コンテンツの一部をご紹介します。</p>
@@ -136,7 +167,7 @@ const serviceLd = {
 <p class="vc-line" style="margin-top:12px">これらの頭脳戦作品は、自社レーベル「HACKTALE（ハックテイル）」で一般公演を展開しています。<a href="/hacktale/" style="color:var(--accent)">HACKTALE公式サイトを見る</a>。全公演チケット完売の<a href="/hacktale/event/zunouou/" style="color:var(--accent)">「東京都頭脳王決定戦 2026」</a>や<a href="/hacktale/works/" style="color:var(--accent)">頭脳戦作品一覧</a>もご覧いただけます</p>
 </div></section>
 
-<section class="section"><div class="wrap">
+<section class="section tinted"><div class="wrap">
 <p class="eyebrow">FLOW</p>
 <h2 class="h2 serif">頭脳戦制作の流れ</h2>
 <div class="flow-row">
@@ -154,7 +185,7 @@ const serviceLd = {
 <h2 class="h2 serif">ご依頼の条件（対応範囲・参考価格・納期・納品物）</h2>
 <p class="h2sub">「何を、いくらで、どこまで頼めるか」を先にお伝えします。相場記事ではなく、当社にご依頼いただく場合の目安です。</p>
 <div class="svc-wrap"><table class="svc-table"><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><th scope="row">対応範囲</th><td>①ゲームルール・シナリオ設計のみ／②制作物（カード・盤面・進行キット）込み／③大会・イベントの進行・運営込み。社内対抗戦、店舗の定期開催、集客型トーナメントに対応</td></tr><tr><th scope="row">参考価格（前提つき）</th><td>既存作品（HACKTALE）の貸切・出張実施：数十万円台〜／オリジナルの頭脳戦・心理戦・交渉ゲーム制作（テストプレイ込み）：100万円前後〜／複数会場の大会形式：会場数・回数により別途お見積り</td></tr><tr><th scope="row">納期</th><td>既存作品の貸切：2〜4週間／オリジナル制作：最短1ヶ月、標準1〜3ヶ月。日程はご相談に応じますが、対人ゲームはテストプレイ回数が品質を決めるため余裕をもった日程を推奨</td></tr><tr><th scope="row">納品物</th><td>ルールブック、進行台本、カード・盤面等の印刷データ、審判・GM用マニュアル、（大会の場合）予選・本戦の進行表と集計シート</td></tr><tr><th scope="row">利用条件</th><td>継続開催・他会場での実施・ルールの改変・配信の扱いは契約時に個別に取り決めます</td></tr><tr><th scope="row">ご準備いただくもの</th><td>会場（テーブル数・人数に応じた広さ）、実施日程、参加者数の見込み、賞品や協賛の有無、当日の受付（運営込みプランでは不要）</td></tr></tbody></table></div>
-<p class="svc-note">参考価格は当社の過去案件をもとにした目安で、人数・時間・制作物の量・公演回数・会場条件で変わります。正式なお見積りは、ヒアリング（無料）後に前提条件を明記してご提示します。</p>
+<p class="svc-note">参考価格は当社の過去案件をもとにした目安で、人数・時間・制作物の量・公演回数・会場条件で変わります。正式なお見積りは、ヒアリング（無料）後に前提条件（制作のみか運営・キャスト・会場・印刷を含むか、税込・税別）を明記してご提示します。</p>
 </div></section>
 
 <section class="section tinted"><div class="wrap">
@@ -172,8 +203,9 @@ const serviceLd = {
 
 <section class="section"><div class="wrap">
 <div class="cta-mini">
-<p class="cta-mini-title serif">頭脳戦制作のご相談はこちら</p>
-<a class="btn" href="/#contact">頭脳戦制作について相談する</a>
+<p class="cta-mini-title serif">頭脳戦ゲーム制作のご相談・お見積り（無料）</p>
+<a class="btn" href="/?c=zunousen#contact">頭脳戦ゲームの制作を相談する</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。フォームで「頭脳戦・心理戦ゲームの制作」を選ぶと、目的・人数・時期の確認からスムーズに進みます。</p>
 </div>
 <p class="vc-line" style="margin-top:48px">関連記事：<a href="/guide/zunousen-sakuhin/" style="color:var(--accent)">頭脳戦・心理戦が面白い作品15選</a>／<a href="/guide/shinrisen-game/" style="color:var(--accent)">心理戦ゲームとは？おすすめ10選</a>／<a href="/guide/zunousen/" style="color:var(--accent)">頭脳戦とは？意味・種類・ゲーム例</a>／<a href="/guide/zunousen-seisaku/" style="color:var(--accent)">頭脳戦制作とは？作り方・依頼の流れ</a>／<a href="/guide/shinrisen/" style="color:var(--accent)">心理戦とは</a>／<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類と選び方</a>／<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア8選</a><br>関連サービス：<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作</a></p>
 </div></section>

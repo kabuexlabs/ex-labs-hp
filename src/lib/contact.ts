@@ -181,3 +181,50 @@ export async function testMailSend(to: string): Promise<{ ok: boolean; detail: s
     return { ok: false, detail: `送信リクエスト自体が失敗: ${String(e).slice(0, 300)}` };
   }
 }
+
+// --- 問い合わせ導線の計測（個人情報なし・KV のみ） --------------------------
+// 「フォーム表示」「相談CTAクリック」「送信成功」を日別ハッシュに数える。
+// 外部の解析アカウントは使わず、既存の Upstash KV に
+//   contact:m:YYYY-MM-DD → { "cta|/services/immersive/|immersive": 3, ... }
+// の形で 400 日保持する。値はページパスとカテゴリだけで、送信者を特定する
+// 情報は一切含めない。
+export type MetricEvent = 'view' | 'cta' | 'submit';
+export const METRIC_EVENTS: MetricEvent[] = ['view', 'cta', 'submit'];
+
+function metricKey(day: string): string {
+  return `contact:m:${day}`;
+}
+export function metricDay(d = new Date()): string {
+  // 日本時間の日付で集計する（管理画面の見え方と合わせる）
+  const jst = new Date(d.getTime() + 9 * 3600 * 1000);
+  return jst.toISOString().slice(0, 10);
+}
+export async function recordMetric(event: MetricEvent, page: string, category = ''): Promise<void> {
+  const field = `${event}|${page}|${category}`;
+  const key = metricKey(metricDay());
+  const n = await contactRedis('HINCRBY', key, field, '1');
+  if (n === 1) await contactRedis('EXPIRE', key, String(400 * 86400));
+}
+export interface MetricRow { event: MetricEvent; page: string; category: string; count: number }
+export async function readMetrics(days = 28): Promise<{ rows: MetricRow[]; from: string; to: string }> {
+  const rows = new Map<string, MetricRow>();
+  const now = new Date();
+  const to = metricDay(now);
+  let from = to;
+  for (let i = 0; i < days; i++) {
+    const day = metricDay(new Date(now.getTime() - i * 86400000));
+    from = day;
+    const raw = await contactRedis('HGETALL', metricKey(day));
+    if (!Array.isArray(raw)) continue;
+    for (let j = 0; j + 1 < raw.length; j += 2) {
+      const [event, page = '', category = ''] = String(raw[j]).split('|');
+      if (!METRIC_EVENTS.includes(event as MetricEvent)) continue;
+      const count = parseInt(String(raw[j + 1]), 10) || 0;
+      const k = `${event}|${page}|${category}`;
+      const cur = rows.get(k) ?? { event: event as MetricEvent, page, category, count: 0 };
+      cur.count += count;
+      rows.set(k, cur);
+    }
+  }
+  return { rows: [...rows.values()].sort((a, b) => b.count - a.count), from, to };
+}

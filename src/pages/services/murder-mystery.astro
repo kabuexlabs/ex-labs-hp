@@ -17,7 +17,7 @@ const faqs = [
   },
   {
     q: 'マーダーミステリー（マダミス）の制作期間はどのくらいですか？',
-    a: '作品の規模・形式により異なりますが、企画確定からシナリオ制作・デバッグ・リリース準備まで一貫した制作フローで進行します。案件内容によっては短期間での制作にも柔軟に対応しますので、希望時期をご相談ください。',
+    a: '既存作品の貸切実施は2〜4週間、オリジナル制作は最短1ヶ月・標準1〜3ヶ月が目安です（テストプレイ2回以上を含む）。解説記事で「2〜3ヶ月」と案内しているのは、6〜8人・2〜3時間の標準的なオリジナル作品の場合です。希望時期が決まっていればお伝えください。',
   },
   {
     q: 'オンライン向けの作品も制作できますか？',
@@ -29,11 +29,15 @@ const faqs = [
   },
   {
     q: '費用はどのくらいかかりますか？',
-    a: '作品の形式・規模・利用範囲により異なります。案件によっては初期費用を抑えたご提案やレベニューシェア型での実施にも対応しておりますので、まずはご相談ください。',
+    a: 'シナリオのみなら数十万円台〜、制作物込みで100万円前後まで、施設向けオリジナル＋当日運営で100万円前後〜が目安です。前提条件つきの参考価格を本ページの「ご依頼の条件」に掲載しています。有料チケット型の公演は、初期費用0円のレベニューシェア型も選べます。',
+  },
+  {
+    q: '新しく作るのと、既存の作品を使うのはどちらが良いですか？',
+    a: '施設・ブランドの世界観を体験にしたい、宿泊や店舗の「ここでしかできない理由」を作りたい場合はオリジナル制作が向きます。まず小さく試したい、開催まで1ヶ月を切っている場合は、東大マーダーミステリーサークルの既存作品を貸切で実施する方法が早く、費用も抑えられます。',
   },
   {
     q: 'マダミスの制作依頼は、何から始めればいいですか？',
-    a: 'お問い合わせフォームから「目的（動画企画・店舗集客・イベント・研修など）・おおよその人数・希望時期」をお知らせください。内容を伺ったうえで、構成の方向性と概算お見積りを無料でご提案します。',
+    a: 'お問い合わせフォームで「マダミスの制作」を選び、目的（動画企画・店舗集客・イベント・研修など）・おおよその人数・希望時期をお知らせください。予算や企画内容が未定でも構いません。内容を伺ったうえで、構成の方向性と概算お見積りを無料でご提案します。',
   },
   {
     q: 'マーダーミステリーの制作を依頼する場合、どのような流れになりますか？',
@@ -56,9 +60,10 @@ const serviceLd = {
   '@type': 'Service',
   serviceType: 'マーダーミステリー制作',
   name: 'マーダーミステリー（マダミス）制作',
-  alternateName: ['マダミス制作', 'マダミス制作依頼', 'マーダーミステリー制作依頼'],
-  description: 'オンライン・オフライン問わず、目的に合わせたオリジナルのマーダーミステリー（マダミス）作品の企画・シナリオ制作',
-  provider: { '@type': 'Organization', name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
+  alternateName: ['マダミス制作', 'マダミス制作依頼', 'マーダーミステリー制作依頼', 'マーダーミステリーのシナリオ制作', 'オリジナルマダミス制作'],
+  description: 'オンライン・オフライン問わず、目的に合わせたオリジナルのマーダーミステリー（マダミス）作品の企画・シナリオ制作・運営。新規オリジナル制作と既存作品の貸切導入、シナリオのみと運営込みのいずれにも対応',
+  provider: { '@type': 'Organization', '@id': new URL('/#organization', Astro.site).toString(), name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
+  audience: { '@type': 'BusinessAudience', name: '店舗・宿泊施設・商業施設・動画配信者・イベント主催者・企業の研修担当' },
   areaServed: 'JP',
   url: new URL('/services/murder-mystery/', Astro.site).toString(),
 };
@@ -82,8 +87,8 @@ const serviceLd = {
 <h1 class="hero-title serif"><span class="hl">マーダーミステリーの制作なら</span><br><span class="hl">制作実績のあるex Labsに！</span></h1>
 <p class="hero-sub">Murder Mystery Production — ex Labs Inc.</p>
 <div class="hero-actions">
-<a class="btn" href="/#contact">相談してみる</a>
-<a class="btn ghost" href="#works">実績を見る</a>
+<a class="btn" href="/?c=madamis#contact">マダミスの制作条件を相談する</a>
+<a class="btn ghost" href="#terms">条件・価格を見る</a>
 </div>
 </div>
 <HeroWorksMarquee />
@@ -93,7 +98,27 @@ const serviceLd = {
 <p class="eyebrow">SERVICE</p>
 <h2 class="h2 serif"><span class="nobr">マーダーミステリー</span><span class="nobr">（マダミス）</span><span class="nobr">制作のご依頼</span></h2>
 <p class="lede">株式会社ex Labsは、オンライン・オフラインを問わず<strong>マーダーミステリー作品の企画・シナリオ制作</strong>を承っています。物語への没入と推理の面白さを両立させた、<strong>目的に合わせたオリジナル作品</strong>をお届けします。</p>
-<p class="lede" style="margin-top:20px"><strong>マダミス</strong>とは<strong>マーダーミステリー</strong>の略称・通称で、参加者が物語の登場人物になりきり、会話と推理を通じて事件の犯人を突き止める体験型ゲームです。当社では、この<strong>マダミスの制作依頼・シナリオ依頼</strong>を、動画企画から店舗集客・イベントまで目的に応じてお受けしています。<strong>制作依頼・お見積りは無料</strong>です。<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは？完全ガイドはこちら →</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">制作費用の相場はこちら →</a>／<a href="/guide/madamis-making/" style="color:var(--accent)">マダミスの作り方はこちら →</a></p>
+<div class="svc-sum" id="summary">
+<div class="svc-sum-cell"><p class="svc-sum-k">依頼できる制作内容</p><p class="svc-sum-v">オリジナルのシナリオ・キャラクター資料・GM進行台本・証拠カード等の制作物・告知素材・当日運営。既存作品の貸切実施にも対応します。</p></div>
+<div class="svc-sum-cell"><p class="svc-sum-k">想定する依頼者</p><p class="svc-sum-v">店舗・宿泊施設・商業施設の集客担当、動画・配信の企画者、イベント主催者、企業の研修・社内イベント担当。</p></div>
+<div class="svc-sum-cell"><p class="svc-sum-k">対応形式</p><p class="svc-sum-v">対面（店舗・施設・イベント会場）、オンライン・配信、宿泊プラン組み込み型。新規オリジナル制作と既存作品導入、シナリオのみと運営込みを選べます。</p></div>
+<div class="svc-sum-cell"><p class="svc-sum-k">根拠になる実績</p><p class="svc-sum-v">宿泊施設向けオリジナル作品（新規宿泊予約20件以上、告知はXのみ）、評価サイト「毎月マダミスアンケート」3か月連続1位の作品、20作品以上の制作。</p></div>
+</div>
+<nav class="svc-jump" aria-label="ページ内の移動"><a href="#compare">依頼の選び方</a><a href="#works">事例・作品</a><a href="#terms">条件・価格・納期</a><a href="/?c=madamis#contact" class="is-cta">相談する（無料）</a></nav>
+<p class="lede" style="margin-top:36px"><strong>マダミス</strong>とは<strong>マーダーミステリー</strong>の略称・通称で、参加者が物語の登場人物になりきり、会話と推理を通じて事件の犯人を突き止める体験型ゲームです。当社では、この<strong>マダミスの制作依頼・シナリオ依頼</strong>を、動画企画から店舗集客・イベントまで目的に応じてお受けしています。<strong>制作に関するご相談・お見積りは無料</strong>です。用語の解説は<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは？完全ガイド</a>をご覧ください。</p>
+</div></section>
+
+<section class="section" id="compare"><div class="wrap">
+<p class="eyebrow">COMPARE</p>
+<h2 class="h2 serif">新規オリジナル制作と既存作品導入、シナリオのみと運営込みの選び方</h2>
+<p class="h2sub">発注前に決めるのは「作品を新しく作るか」と「どこまで任せるか」の2つです。目的と開催までの期間で選べます。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>選択肢</th><th>向いているケース</th><th>参考価格・納期（前提つき）</th><th>対応する実績</th></tr></thead><tbody>
+<tr><th scope="row">新規オリジナル制作</th><td>施設・ブランドの世界観を体験にしたい／宿泊・店舗の「ここでしかできない理由」を作りたい／配信・動画企画で独自の作品が必要</td><td>6〜8人・2〜3時間の1作品で数十万円台〜／最短1ヶ月、標準1〜3ヶ月</td><td>サーマルクライムスタジオ様向け宿泊者向け作品</td></tr>
+<tr><th scope="row">既存作品の貸切導入</th><td>まず小さく試したい／開催まで1ヶ月を切っている／作品の評価が確認できているものを使いたい</td><td>公演回数・人数により見積り／2〜4週間</td><td>東大マーダーミステリーサークルの作品群（「あるマーダーミステリーについて」ほか20作品以上）</td></tr>
+<tr><th scope="row">シナリオ・制作物のみ</th><td>自社スタッフでGM（進行役）を務める／店舗で継続的に回したい</td><td>シナリオのみ数十万円台〜、印刷データ・小道具込みで100万円前後まで</td><td>店舗・配信向けの納品</td></tr>
+<tr><th scope="row">運営込み（フルパッケージ）</th><td>GM・受付・進行を任せたい／宿泊プラン・イベントとして一体で提供したい</td><td>施設向けオリジナル＋当日運営で100万円前後〜（公演回数・キャスト有無で変動）</td><td>宿泊施設・イベント公演</td></tr>
+</tbody></table></div>
+<p class="cmp-note">用途別の対応：<strong>配信・動画企画</strong>にはオンラインでプレイできる作品（「ブルーダイヤの不在証明」など）の制作経験を活かします。<strong>宿泊施設</strong>には宿泊プランに組み込む形式（<a href="/guide/hotel-event/" style="color:var(--accent)">宿泊施設の事例</a>）、<strong>イベント・店舗</strong>には公演型・貸切型で対応します。参考価格は制作のみ・運営込みで異なります。税の扱い（税込・税別）は正式なお見積りに明記します。</p>
 </div></section>
 
 <section class="section tinted"><div class="wrap">
@@ -153,7 +178,7 @@ const serviceLd = {
 <h2 class="h2 serif">ご依頼の条件（対応範囲・参考価格・納期・納品物）</h2>
 <p class="h2sub">「何を、いくらで、どこまで頼めるか」を先にお伝えします。相場記事ではなく、当社にご依頼いただく場合の目安です。</p>
 <div class="svc-wrap"><table class="svc-table"><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><th scope="row">対応範囲</th><td>①シナリオ・キャラクター資料のみ／②制作物込み（印刷データ・小道具・GM進行台本）／③集客・当日運営込み（フルパッケージ）。企業・施設向けのオリジナル制作と、既存作品の貸切実施の両方に対応</td></tr><tr><th scope="row">参考価格（前提つき）</th><td>①6〜8人・2〜3時間の1作品で数十万円台〜／②①に制作物を含めて100万円前後まで／③施設・宿泊施設向けオリジナル＋当日運営で100万円前後〜（公演回数・キャスト有無で変動）。集客型（有料チケット）はレベニューシェア（初期費用0円）も選択可</td></tr><tr><th scope="row">納期</th><td>既存作品の貸切実施：2〜4週間／オリジナル制作：最短1ヶ月、標準1〜3ヶ月（テストプレイ2回以上を含む）。日程はご相談に応じます</td></tr><tr><th scope="row">納品物</th><td>シナリオ、各キャラクターのハンドアウト（HO）、GM進行台本、証拠カード等の印刷データ、運営マニュアル、必要に応じて告知用ビジュアル</td></tr><tr><th scope="row">利用条件</th><td>継続公演・再演・改変・動画配信・他会場での再利用の扱いは契約時に個別に取り決めます。参加者の個人情報や施設の機密は当社が保護します</td></tr><tr><th scope="row">ご準備いただくもの</th><td>会場（個室または区画）、実施日程、想定人数・参加者層、当日の受付・誘導（運営込みプランでは不要）、施設内での告知協力</td></tr></tbody></table></div>
-<p class="svc-note">参考価格は当社の過去案件をもとにした目安で、人数・時間・制作物の量・公演回数・会場条件で変わります。正式なお見積りは、ヒアリング（無料）後に前提条件を明記してご提示します。</p>
+<p class="svc-note">参考価格は当社の過去案件をもとにした目安で、人数・時間・制作物の量・公演回数・会場条件で変わります。正式なお見積りは、ヒアリング（無料）後に前提条件（制作のみか運営・キャスト・会場・印刷を含むか、税込・税別）を明記してご提示します。</p>
 </div></section>
 
 <section class="section"><div class="wrap">
@@ -171,8 +196,9 @@ const serviceLd = {
 
 <section class="section"><div class="wrap">
 <div class="cta-mini">
-<p class="cta-mini-title serif">マダミスの制作依頼・無料見積りはこちら</p>
-<a class="btn" href="/#contact">マーダーミステリー制作について相談する</a>
+<p class="cta-mini-title serif">マダミス制作のご相談・お見積り（無料）</p>
+<a class="btn" href="/?c=madamis#contact">マダミスの制作条件を相談する</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。フォームで「マダミスの制作」を選ぶと、目的・人数・時期の確認からスムーズに進みます。</p>
 </div>
 <p class="vc-line" style="margin-top:48px">関連サービス：<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作</a>／<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作</a></p>
 </div></section>

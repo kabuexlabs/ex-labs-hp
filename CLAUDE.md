@@ -61,3 +61,10 @@
 - Bing Webmaster 登録 + IndexNow キー共有（受領後にキーファイルと通知を実装）
 - ネタバレ記事（note の本文をユーザーが貼り付けたら展開）
 - microCMS ブログ title 一覧（カニバリ整理用）
+
+## 2026-09-08 指示書対応後のルール
+- お問い合わせフォームは `category`（ご相談の種類）を持つ。サービスページからの CTA は `/?c=immersive|madamis|zunousen|shisetsu|taikengata#contact` で事前選択。件名にカテゴリが付く。
+- 計測：/api/track（cta / view）と /api/contact（submit）が KV `contact:m:YYYY-MM-DD` に日別集計。個人情報は含めない。管理画面 /contact/admin/ の「問い合わせ導線の計測」で確認。
+- 「日本唯一」「他に例がない」等の断定はサイト本体では使わない（事実表現「頭脳戦に特化したレーベル HACKTALE を運営」）。HACKTALE サブサイトのタグラインのみユーザー判断待ち。
+- 制作期間の表記：サービスページの条件表が正本（既存 2〜4週間／オリジナル 最短1ヶ月・標準1〜3ヶ月）。ガイドで 2〜4ヶ月と書く場合は「施設調整を含む大型企画」と条件を添える。
+- AIO の実測は docs/aio-check.md の質問6問で月1回、新規会話で記録する。
