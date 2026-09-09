@@ -34,7 +34,7 @@ html{scroll-behavior:smooth;overflow-x:clip}
 /* "palt" tightens Japanese punctuation/kana spacing for an editorial,
    typeset look; the slight tracking keeps body text from feeling
    cramped after the squeeze. */
-body{margin:0;background-color:var(--paper);color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1;letter-spacing:.03em}
+body{margin:0;background-color:var(--paper);color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1;letter-spacing:.06em;font-weight:400}
 ::selection{background:var(--yellow);color:var(--ink)}
 strong{font-weight:700}
 .lede strong,.str-body strong{color:var(--ink)}
@@ -68,10 +68,10 @@ img{max-width:100%;display:block}
    太い墨のアンダーバー。日本語タイトルはその下のサブタイトルとして
    ゴシック太字で置く。中央揃え・明朝ラベルはやめ、印刷物の
    「章扉」のリズムで組む。 */
-.eyebrow{font-family:var(--font-en);font-weight:700;font-size:clamp(30px,3.6vw,46px);letter-spacing:.14em;line-height:1.1;color:var(--ink);margin:0 0 14px;text-align:left;text-transform:uppercase}
+.eyebrow{font-family:var(--font-en);font-weight:700;font-size:clamp(30px,3.6vw,46px);letter-spacing:.18em;line-height:1.1;color:var(--ink);margin:0 0 14px;text-align:left;text-transform:uppercase}
 .eyebrow::after{content:none}
-.h2{font-family:'Noto Sans JP',sans-serif;font-size:clamp(19px,1.9vw,24px);line-height:1.6;font-weight:700;letter-spacing:.08em;margin:0 0 12px;text-align:left;color:var(--ink)}
-.h2sub{font-size:15px;color:rgba(29,29,31,.62);margin:0 0 56px;font-weight:500;text-align:left;max-width:720px;line-height:1.9}
+.h2{font-family:'Noto Sans JP',sans-serif;font-size:clamp(19px,1.9vw,24px);line-height:1.7;font-weight:700;letter-spacing:.14em;margin:0 0 12px;text-align:left;color:var(--ink)}
+.h2sub{font-size:15px;color:rgba(29,29,31,.7);margin:0 0 56px;font-weight:400;text-align:left;max-width:720px;line-height:2.1;letter-spacing:.08em}
 /* 青・グレーの帯（実績数字・メッセージ・お問い合わせ）は中央揃え */
 .perf .eyebrow,.perf .h2,.perf .h2sub,.msg-sec .eyebrow,.msg-sec .h2,.msg-sec .h2sub,.cta .eyebrow,.cta .h2{text-align:center}
 .perf .h2sub,.msg-sec .h2sub{margin-left:auto;margin-right:auto}
@@ -82,7 +82,7 @@ img{max-width:100%;display:block}
 @media(max-width:640px){
   .h2+.str-grid,.h2+.bullets,.h2+.faq-list,.h2+.works-grid,.h2+.blog-grid,.h2+.press-list,.h2+.svc-rows,.h2+.event-row,.h2+.genre-grid,.h2+.flow-row,.h2+.style-grid,.h2+.voice-marquee,.h2+.info-grid,.h2+.stat-row,.h2+.about-grid,.h2+.lede,.h2+.ceo-arch{margin-top:34px}
 }
-.lede{font-size:16px;line-height:2;color:rgba(51,48,43,.82);max-width:680px;margin-left:auto;margin-right:auto}
+.lede{font-size:15.5px;line-height:2.15;letter-spacing:.08em;color:rgba(29,29,31,.85);max-width:680px;margin-left:auto;margin-right:auto}
 .rule{width:40px;height:3px;background:var(--accent);margin:28px auto;border-radius:2px}
 .breadcrumb{padding:104px 0 0}
 .breadcrumb ol{display:flex;flex-wrap:wrap;list-style:none;margin:0;padding:0;font-size:12.5px;letter-spacing:.01em}
@@ -107,7 +107,7 @@ img{max-width:100%;display:block}
 header.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,0,0,.06)}
 .navrow{height:76px;display:flex;align-items:center;justify-content:space-between}
 .navlinks{display:flex;align-items:center;gap:26px}
-.navlinks a{font-size:12.5px;font-weight:700;letter-spacing:.14em;color:var(--ink)}
+.navlinks a{font-size:12.5px;font-weight:700;letter-spacing:.18em;color:var(--ink)}
 .navlinks a:hover{color:var(--accent)}
 .logo-header{width:130px;height:36px;object-fit:contain}
 .nav-actions{display:flex;align-items:center;gap:12px}
@@ -126,7 +126,7 @@ header.nav.open .nav-toggle span:nth-child(3){transform:translateY(-7.5px) rotat
 .hero-overlay{display:none}
 .hero-center{position:relative;z-index:2;text-align:center;padding-top:150px;padding-bottom:64px}
 .hero-logo{width:min(400px,64vw);height:auto;margin:0 auto 40px;animation:hero-in .9s cubic-bezier(.22,1,.36,1) both}
-.hero-title{font-size:clamp(22px,2.7vw,34px);line-height:1.6;letter-spacing:.06em;font-weight:800;margin:0 0 22px;color:var(--ink);animation:hero-in .9s cubic-bezier(.22,1,.36,1) .18s both}
+.hero-title{font-size:clamp(22px,2.7vw,34px);line-height:1.6;letter-spacing:.12em;font-weight:800;margin:0 0 22px;color:var(--ink);animation:hero-in .9s cubic-bezier(.22,1,.36,1) .18s both}
 /* Headline lines sit on orange blocks, white type — richer than bare
    text on the ground. */
 .hero-title .hl{display:inline-block;background:#fff;color:var(--ink);padding:8px 22px;margin:5px 0;border:none;box-shadow:0 6px 20px rgba(20,30,60,.08)}
@@ -378,11 +378,12 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 }
 
 .blog-grid{display:grid;gap:32px;grid-template-columns:repeat(3,1fr)}
-.blog-card{display:flex;flex-direction:column;background:#fff;border-radius:var(--r-l);padding:16px 16px 24px;box-shadow:var(--shadow-1);transition:transform .3s,box-shadow .3s}
+.blog-card{display:flex;flex-direction:column;background:#fff;border-radius:var(--r-l);padding:22px 22px 26px;box-shadow:var(--shadow-1);transition:transform .3s,box-shadow .3s}
 .blog-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-2)}
-.blog-img{width:100%;height:auto;aspect-ratio:16/9;border-radius:var(--r-m);background:var(--cream);object-fit:cover;transition:opacity .25s}
+/* 記事カードのサムネイルは出さない（2026-09-09 指示）。display:none の lazy 画像は読み込まれない */
+.blog-img{display:none}
 a:hover>.blog-img{opacity:.88}
-.blog-date{font-size:11px;font-weight:800;color:#fff;background:var(--accent);letter-spacing:.04em;margin:16px 0 10px;align-self:flex-start;padding:4px 12px;border-radius:999px}
+.blog-date{font-size:11px;font-weight:800;color:#fff;background:var(--accent);letter-spacing:.04em;margin:0 0 10px;align-self:flex-start;padding:4px 12px;border-radius:999px}
 .blog-title{font-size:18px;font-weight:800;margin:0 0 8px}
 .blog-title a:hover{color:var(--accent)}
 .blog-excerpt{font-size:14px;line-height:1.75;color:rgba(51,48,43,.72)}
