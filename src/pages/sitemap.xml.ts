@@ -13,6 +13,8 @@ import { BLOG_REDIRECTS } from '../data/redirects';
 // Console as "excluded / not indexed" noise.
 const STATIC_PATHS = [
   '/',
+  '/guide/immersive-preparation/',
+  '/guide/magic-show-immersive-chigai/',
   '/guide/zunousen-cost/',
   '/guide/zunousen-tournament/',
   '/guide/shuyu-event-seisaku/',
@@ -114,6 +116,8 @@ export const GET: APIRoute = async ({ site }) => {
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {
+    '/guide/immersive-preparation/': '2026-09-09',
+    '/guide/magic-show-immersive-chigai/': '2026-09-09',
     '/guide/zunousen-cost/': '2026-09-08',
     '/guide/zunousen-tournament/': '2026-09-08',
     '/guide/shuyu-event-seisaku/': '2026-09-08',
@@ -129,7 +133,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/madamis-business/': '2026-08-07',
     '/guide/immersive-cost/': '2026-08-07',
     '/guide/immersive-company/': '2026-08-07',
-    '/guide/immersive-tokyo/': '2026-09-04',
+    '/guide/immersive-tokyo/': '2026-09-09',
     '/guide/shisetsu-katsuyo/': '2026-09-08',
     '/guide/shogyoshisetsu-event/': '2026-09-08',
     '/guide/yukyu-kukaku/': '2026-08-07',

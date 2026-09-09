@@ -221,7 +221,17 @@ const stats = (() => {
         <ul style="margin:0;padding-left:1.2em;line-height:1.9">{mByPage('submit').map(([k, n]) => <li><code style="font-size:12px">{k}</code>：<strong>{n}</strong></li>)}</ul>
       </div>
     </div>
-    <p style="margin:10px 0 0;font-size:11.5px;color:#8a8378">※計測を入れた日（2026-09-08）以降のみ。CTA＝「#contact」へのリンクのクリック。送信の記録には送信者情報を含めません。</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;font-size:13px;margin-top:14px;padding-top:12px;border-top:1px dotted rgba(51,48,43,.25)">
+      <div>
+        <p style="margin:0 0 6px;font-weight:700">公演チケットサイトへのクリック <strong>{mSum('ticket')}</strong>（公演-掲載箇所）</p>
+        <ul style="margin:0;padding-left:1.2em;line-height:1.9">{mByCat('ticket').map(([k, n]) => <li>{k}：<strong>{n}</strong></li>)}</ul>
+      </div>
+      <div>
+        <p style="margin:0 0 6px;font-weight:700">公演詳細ページへのクリック <strong>{mSum('show')}</strong>（公演-掲載箇所）</p>
+        <ul style="margin:0;padding-left:1.2em;line-height:1.9">{mByCat('show').map(([k, n]) => <li>{k}：<strong>{n}</strong></li>)}</ul>
+      </div>
+    </div>
+    <p style="margin:10px 0 0;font-size:11.5px;color:#8a8378">※計測を入れた日（2026-09-08、公演クリックは 2026-09-09）以降のみ。CTA＝「#contact」へのリンクのクリック。チケットサイトへのクリックは購入完了ではありません。送信の記録には送信者情報を含めません。</p>
   </section>
   <h2 style="font-size:15px;margin:0 0 14px">受信一覧（{inquiries.length}件）</h2>
   {inquiries.length === 0 ? (

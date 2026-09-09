@@ -188,8 +188,9 @@ export async function testMailSend(to: string): Promise<{ ok: boolean; detail: s
 //   contact:m:YYYY-MM-DD → { "cta|/services/immersive/|immersive": 3, ... }
 // の形で 400 日保持する。値はページパスとカテゴリだけで、送信者を特定する
 // 情報は一切含めない。
-export type MetricEvent = 'view' | 'cta' | 'submit';
-export const METRIC_EVENTS: MetricEvent[] = ['view', 'cta', 'submit'];
+export type MetricEvent = 'view' | 'cta' | 'submit' | 'ticket' | 'show';
+// ticket＝外部チケットサイトへのクリック、show＝自社の公演詳細へのクリック（購入完了ではない）
+export const METRIC_EVENTS: MetricEvent[] = ['view', 'cta', 'submit', 'ticket', 'show'];
 
 function metricKey(day: string): string {
   return `contact:m:${day}`;

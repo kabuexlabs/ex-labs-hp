@@ -9,11 +9,23 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
+import { shows } from '../../data/shows';
+import { thisWeekShows, nextOccurrence, weekRange, fmtDateJa, fmtDateShort, fmtVerified, jstDateString, addDays } from '../../lib/thisWeek';
+
+// 「今週遊べる」欄：リクエスト時刻（日本時間）で評価する。データの正本は src/data/shows.ts
+const now = new Date();
+const week = weekRange(now);
+const weekLast = addDays(week.end, -1); // 表示用：週の最終日（日曜）
+const weekShows = thisWeekShows(shows, now);
+const upcoming = shows.filter((s) => s.published && !weekShows.some((w) => w.show.id === s.id)).map((s) => ({ show: s, next: nextOccurrence(s, now) })).filter((x) => x.next);
+const latestVerified = shows.filter((s) => s.published).map((s) => s.verifiedAt).sort().pop() ?? '';
+const anyStale = weekShows.some((w) => w.stale);
 import { jsonLd } from '../../lib/microcms';
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
+  { id: 'this-week', label: '今週遊べる東京のイマーシブイベント（ex Labsの開催予定）' },
   { id: 'types', label: '東京のイマーシブ体験の種類' },
   { id: 'trend2026', label: '2026年の東京イマーシブ動向' },
   { id: 'now', label: 'ex Labsの東京イマーシブ体験' },
@@ -96,6 +108,77 @@ const articleLd = {
 </nav>
 </div></section>
 
+<section class="section" id="this-week" data-week-end={week.end} data-today={jstDateString(now)}><div class="wrap">
+<p class="eyebrow">THIS WEEK</p><h2 class="h2 serif">今週遊べる東京のイマーシブイベント｜ex Labsの開催予定</h2>
+<p class="lede">今週、東京でイマーシブ体験を探している方へ。<strong>株式会社ex Labsが企画・制作する公演</strong>のうち、今週（{fmtDateJa(week.start)}〜{fmtDateJa(weekLast)}、日本時間）の開催予定を確認できたものをご紹介します。第三者のランキングではなく自社公演の案内です。参加人数や所要時間を比較して、気になる公演の日時・空席はチケットサイトでご確認ください。</p>
+<p class="tw-meta">開催情報の最終確認：{fmtVerified(latestVerified)}（自社公式ページで確認。開演時刻・空席はチケットサイトで確認してください）{anyStale && <strong>。確認から2週間以上経過しているため、最新情報はチケットサイトを優先してください</strong>}</p>
+{weekShows.length === 0 ? (
+  <div class="tw-empty">
+    <p class="tw-empty-t serif">今週の開催予定は確認できていません</p>
+    <p class="tw-empty-d">今週開催なしと断定するものではありません。次回の開催日は各公演ページ・チケットサイトでご確認ください。</p>
+  </div>
+) : (
+  <div class="tw-grid">
+  {weekShows.map((w) => (
+    <article class="tw-card" data-show={w.show.id}>
+      <p class="tw-area">{w.show.area}</p>
+      <h3 class="tw-name serif">{w.show.name}</h3>
+      <p class="tw-feature">{w.show.feature}</p>
+      <div class="tw-dates">
+        <p class="tw-k">今週の開催日</p>
+        <ul class="tw-chips">
+        {w.occurrences.map((o) => (
+          <li class={`tw-chip is-${o.state}`} data-date={o.date} data-time={o.time ?? ''}>{fmtDateShort(o.date)}{o.time ? ` ${o.time}開演` : ' 開演時刻はチケットサイトで確認'}{o.state === 'soldout' ? '（完売）' : ''}{o.state === 'started' ? '（開演済み）' : ''}{o.isWeekend ? <span class="tw-we">今週末</span> : null}</li>
+        ))}
+        </ul>
+        <p class="tw-stock">{w.bookable ? (w.stale ? '開催予定は確認済みですが確認から時間が経っています。空席・最新の日時はチケットサイトでご確認ください' : '開催予定は確認済み。空席はチケットサイトでご確認ください') : '今週の回は完売または開演済みです。予約可能な公演としてはご案内していません'}</p>
+      </div>
+      <dl class="tw-dl">
+        <div><dt>所要時間</dt><dd>{w.show.duration}</dd></div>
+        <div><dt>参加人数</dt><dd>{w.show.capacity}</dd></div>
+        <div><dt>年齢条件</dt><dd>{w.show.age}</dd></div>
+        <div><dt>料金（{w.show.price.unit}）</dt><dd>{w.show.price.text}<br><span class="tw-note">{w.show.price.note}</span></dd></div>
+      </dl>
+      <p class="tw-k">参加前に確認したい条件</p>
+      <ul class="tw-cond">{w.show.conditions.map((c) => <li>{c}</li>)}</ul>
+      <div class="tw-actions">
+        {w.bookable
+          ? <a class="btn tw-btn" href={w.show.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={w.show.id} data-place="this-week">開催日時・空席を確認する（{w.show.ticketSite}）</a>
+          : <a class="btn tw-btn ghost" href={w.show.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={w.show.id} data-place="this-week">次回以降の日程を確認する（{w.show.ticketSite}）</a>}
+        <a class="tw-sub" href={w.show.url} data-track="show" data-show={w.show.id} data-place="this-week">公演内容を見る →</a>
+      </div>
+    </article>
+  ))}
+  </div>
+)}
+{upcoming.length > 0 && (
+  <div class="tw-next">
+    <p class="tw-k">次回の開催日を確認する（今週は開催予定なし）</p>
+    <ul class="tw-next-list">
+    {upcoming.map((u) => (
+      <li><strong>{u.show.name}</strong>（{u.show.area}）：次回 {fmtDateJa(u.next!.date)}{u.next!.time ? ` ${u.next!.time}開演` : ''}。<a href={u.show.url} data-track="show" data-show={u.show.id} data-place="this-week-next">公演内容 →</a>／<a href={u.show.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={u.show.id} data-place="this-week-next">日程・空席を確認（{u.show.ticketSite}）→</a></li>
+    ))}
+    </ul>
+  </div>
+)}
+<p class="tw-meta">過去の公演（下北沢「ロスト・フレーム」など）は<a href="/works/" style="color:var(--accent)">制作事例</a>としてご覧ください。参加前の服装・持ち物は<a href="/guide/immersive-preparation/" style="color:var(--accent)">イマーシブ体験の服装・持ち物</a>、観るマジックショーとの違いは<a href="/guide/magic-show-immersive-chigai/" style="color:var(--accent)">マジックショーとイマーシブ体験の違い</a>で整理しています。</p>
+<script is:inline>
+// 開いたまま日付が変わった場合のフォールバック：日本時間の今日より前の回を非表示にし、
+// 残る回がないカードは予約導線を「次回以降の日程を確認する」に切り替える。
+(function(){try{
+  var sec=document.getElementById('this-week');if(!sec)return;
+  var today=new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  if(today===sec.getAttribute('data-today'))return;
+  var stale=today>=sec.getAttribute('data-week-end');
+  sec.querySelectorAll('.tw-card').forEach(function(card){
+    var left=0;card.querySelectorAll('.tw-chip').forEach(function(c){var d=c.getAttribute('data-date');if(stale||d<today){c.style.display='none'}else{left++}});
+    if(!left){var s=card.querySelector('.tw-stock');if(s)s.textContent='この週の回は終了しました。次回以降の日程はチケットサイトでご確認ください';var b=card.querySelector('.tw-btn');if(b){b.textContent='次回以降の日程を確認する';b.classList.add('ghost')}}
+  });
+  var m=sec.querySelector('.tw-meta');if(m&&stale){m.insertAdjacentHTML('afterbegin','<strong>表示している週は終了しています。最新の開催予定はチケットサイトでご確認ください。</strong> ')}
+}catch(e){}})();
+</script>
+</div></section>
+
 <section class="section tinted" id="types"><div class="wrap">
 <p class="eyebrow">TYPES</p><h2 class="h2 serif">東京のイマーシブ体験の種類</h2>
 <div class="genre-grid">
@@ -135,6 +218,7 @@ const articleLd = {
 <li><strong>誰と行くかで選ぶ</strong>：友人・家族となら周遊型、デートなら少人数の店舗型、一人参加OKの公演も増えています。</li>
 <li><strong>エリアで選ぶ</strong>：渋谷・六本木・下北沢・神田など、街の個性と物語の相性も楽しみのひとつです。</li>
 </ul>
+<p class="vc-line">参加前の準備：<a href="/guide/immersive-preparation/" style="color:var(--accent)">イマーシブ体験の服装・持ち物（公演別チェック表つき）→</a>／観るショーとの違い：<a href="/guide/magic-show-immersive-chigai/" style="color:var(--accent)">マジックショーとイマーシブ体験の違い →</a></p>
 </div></section>
 
 <section class="section tinted" id="biz"><div class="wrap narrow">
@@ -181,4 +265,34 @@ const articleLd = {
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
 #types,#trend2026,#now,#choose,#biz,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
+.tw-meta{max-width:920px;margin:18px auto 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62)}
+.tw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:22px;max-width:920px;margin:32px auto 0}
+.tw-card{background:#fff;border:2px solid var(--ink);box-shadow:6px 6px 0 -1px #fff,6px 6px 0 1px var(--ink);padding:26px 26px 24px;display:flex;flex-direction:column;gap:12px;text-align:left}
+.tw-area{margin:0;font-size:11.5px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.tw-name{margin:0;font-size:22px;font-weight:800;color:var(--ink);line-height:1.5}
+.tw-feature{margin:0;font-size:13.5px;line-height:1.85;color:rgba(51,48,43,.82)}
+.tw-k{margin:8px 0 0;font-size:12px;font-weight:800;letter-spacing:.08em;color:rgba(51,48,43,.6)}
+.tw-chips{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.tw-chip{font-size:13.5px;font-weight:700;color:var(--ink);background:rgba(51,48,43,.05);padding:8px 12px;border-left:4px solid var(--tag-immersive)}
+.tw-chip.is-soldout,.tw-chip.is-started{color:rgba(51,48,43,.55);border-left-color:rgba(51,48,43,.3)}
+.tw-we{display:inline-block;margin-left:8px;font-size:11px;font-weight:800;color:#fff;background:var(--tag-immersive);padding:2px 8px;vertical-align:middle}
+.tw-stock{margin:8px 0 0;font-size:12.5px;line-height:1.7;color:rgba(51,48,43,.7)}
+.tw-dl{margin:6px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.tw-dl div{background:rgba(51,48,43,.03);padding:10px 12px}
+.tw-dl dt{font-size:11px;font-weight:800;color:rgba(51,48,43,.55);letter-spacing:.06em}
+.tw-dl dd{margin:4px 0 0;font-size:13.5px;line-height:1.6;color:var(--ink);font-weight:700}
+.tw-note{font-size:11.5px;font-weight:500;color:rgba(51,48,43,.6)}
+.tw-cond{margin:4px 0 0;padding-left:1.2em;font-size:13px;line-height:1.8;color:rgba(51,48,43,.8)}
+.tw-actions{margin-top:auto;padding-top:12px;display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.tw-btn{font-size:14px;padding:14px 22px}
+.tw-btn.ghost{background:#fff;color:var(--ink)}
+.tw-sub{font-size:13.5px;font-weight:700;color:var(--accent)}
+.tw-empty{max-width:680px;margin:32px auto 0;background:#fff;border:2px solid var(--ink);padding:26px 28px;text-align:center}
+.tw-empty-t{margin:0 0 8px;font-size:20px;font-weight:800;color:var(--ink)}
+.tw-empty-d{margin:0;font-size:13.5px;line-height:1.8;color:rgba(51,48,43,.75)}
+.tw-next{max-width:920px;margin:28px auto 0;background:rgba(255,255,255,.7);border:1px dashed rgba(51,48,43,.35);padding:18px 22px;text-align:left}
+.tw-next-list{margin:8px 0 0;padding-left:1.2em;font-size:13.5px;line-height:1.9}
+.tw-next-list a{color:var(--accent);font-weight:700}
+#this-week{scroll-margin-top:88px}
+@media(max-width:640px){.tw-card{padding:20px 18px}.tw-name{font-size:19px}.tw-dl{grid-template-columns:1fr}.tw-btn{width:100%;text-align:center}}
 </style>

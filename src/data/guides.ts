@@ -21,6 +21,22 @@ export interface GuideArticle {
 
 export const guideArticles: GuideArticle[] = [
   {
+    href: '/guide/immersive-preparation/',
+    title: 'イマーシブ体験の服装・持ち物｜初めて参加する前に確認したいこと',
+    desc: '形式による動きの違い、服装と靴、スマホ・イヤホン・水分、荷物、人数・年齢・遅刻の条件を、自社2公演の公開案内による公演別チェック表で整理。',
+    date: '2026-09-09',
+    category: 'immersive',
+    thumb: '/assets/guide/immersive-preparation.webp',
+  },
+  {
+    href: '/guide/magic-show-immersive-chigai/',
+    title: 'マジックショーとイマーシブ体験の違い｜参加の仕方と公演の選び方',
+    desc: '観劇型・参加型のマジックショーとイマーシブ体験を「自分が何をするか」で比較。初参加時の確認点と「怪盗と秘密の試験」の公開情報による具体例。',
+    date: '2026-09-09',
+    category: 'immersive',
+    thumb: '/assets/guide/magic-show-immersive-chigai.webp',
+  },
+  {
     href: '/guide/zunousen-cost/',
     title: '頭脳戦・心理戦ゲームの制作費用｜見積もりの内訳と依頼範囲',
     desc: '制作費を構成する項目、人数以外に費用を変える要素、予算調整の順番、見積もり依頼で伝える情報を発注者向けに整理。',

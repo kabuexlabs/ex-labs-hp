@@ -20,6 +20,7 @@ try{var k='exl_src',F='exl_first',N='exl_n',now=Date.now();if(!sessionStorage.ge
   document.addEventListener('click',function(e){
     var a=e.target&&e.target.closest?e.target.closest('a[href]'):null;if(!a)return;
     var h=a.getAttribute('href')||'';
+    if(a.hasAttribute('data-track')){send(a.getAttribute('data-track'),(a.getAttribute('data-show')||'')+'-'+(a.getAttribute('data-place')||''));return}
     if(/#contact(\b|$)/.test(h)||a.hasAttribute('data-cta'))send('cta',cat(h)||a.getAttribute('data-cta')||'');
   },true);
   var seen=false,f=document.getElementById('contact');

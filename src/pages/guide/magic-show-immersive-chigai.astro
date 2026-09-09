@@ -1,0 +1,123 @@
+---
+// マジックショーとイマーシブ体験の違い｜参加の仕方と公演の選び方
+// 発注前の疑問（MAGIC × IMMERSIVE）に答える記事。既存の意味・作り方・会社選びの記事では
+// 説明していない判断材料を置き、/guide/immersive-tokyo/#this-week へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/magic-show-immersive-chigai/', site).toString();
+
+const toc = [{"id": "compare", "label": "比較表：観るショーと、参加する体験"}, {"id": "role", "label": "物語への参加とキャストとの会話"}, {"id": "magic", "label": "マジックと物語の組み合わせ"}, {"id": "check", "label": "初参加のときに確認したいこと"}, {"id": "example", "label": "「怪盗と秘密の試験」の公開情報から見る具体例"}, {"id": "order", "label": "開催予定を確認する"}];
+
+const faqs = [];
+
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: 'マジックショーとイマーシブ体験の違い｜参加の仕方と公演の選び方',
+  description: '観るマジックショーと、物語の一員として参加するイマーシブ体験の違いを比較表で整理。自分の立場、キャストとの会話、マジックの位置づけ、人数・年齢・持ち物の確認点を、マジック×イマーシブ公演「怪盗と秘密の試験」の公開情報を例に、運営会社の株式会社ex Labsが解説します。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/magic-show-immersive-chigai.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-09',
+  dateModified: '2026-09-09',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="マジックショーとイマーシブ体験の違い｜参加の仕方と公演の選び方 - 株式会社ex Labs"
+  description="観るマジックショーと、物語の一員として参加するイマーシブ体験の違いを比較表で整理。自分の立場、キャストとの会話、マジックの位置づけ、人数・年齢・持ち物の確認点を、マジック×イマーシブ公演「怪盗と秘密の試験」の公開情報を例に、運営会社の株式会社ex Labsが解説します。"
+  ogImage="/assets/guide/magic-show-immersive-chigai.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '東京で体験できるイマーシブイベント', href: '/guide/immersive-tokyo/' },
+  { name: 'マジックショーとイマーシブ体験の違い' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">MAGIC × IMMERSIVE</p>
+<h1 class="h2 serif">マジックショーとイマーシブ体験の違い<br>参加の仕方と公演の選び方</h1>
+<p class="lede">マジックを楽しむ公演にも、席から演技を楽しむものや、物語の一員として参加するものがあります。何をする体験なのかを比較し、自分に合う公演を選ぶためのポイントを紹介します。</p>
+<p class="lede">この記事は、マジック×イマーシブ公演「怪盗と秘密の試験」を企画・制作している株式会社ex Labsによる案内です。マジックショーにも観客が舞台に上がる参加型があるため、「マジックショーは必ず観るだけ」とは言えません。ここでは「自分が何をするか」で違いを整理します。</p>
+<p class="pub-date">公開日：2026年9月9日</p>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="compare"><div class="wrap narrow">
+<p class="eyebrow">COMPARE</p><h2 class="h2 serif">比較表：観るショーと、参加する体験</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>比較項目</th><th>マジックショー（観劇型）</th><th>参加型のマジックショー</th><th>イマーシブ体験（マジックを含む）</th></tr></thead><tbody><tr><th scope="row">自分の立場</th><td>観客</td><td>観客。指名されると舞台に上がる</td><td>物語の登場人物（役割がある）</td></tr><tr><th scope="row">時間の使い方</th><td>席で演技を観る</td><td>観る時間が中心</td><td>会話・移動・選択をしながら進む</td></tr><tr><th scope="row">マジックの位置づけ</th><td>演目そのもの</td><td>演目そのもの</td><td>物語の中の出来事として起きる</td></tr><tr><th scope="row">人数</th><td>数十〜数百人</td><td>数十〜数百人</td><td>少人数（例：怪盗と秘密の試験は各回2〜4名）</td></tr><tr><th scope="row">事前に必要な準備</th><td>特になし</td><td>特になし</td><td>持ち物や移動、年齢条件を確認する</td></tr><tr><th scope="row">向いている人</th><td>技を集中して観たい</td><td>舞台に上がる可能性も楽しみたい</td><td>自分が動いて物語に関わりたい</td></tr></tbody></table></div>
+<p class="lede">どちらが優れているかではなく、「観る時間を楽しみたいか」「自分が動く時間を楽しみたいか」で選ぶのが分かりやすい基準です。</p>
+</div></section>
+<section class="section" id="role"><div class="wrap narrow">
+<p class="eyebrow">ROLE</p><h2 class="h2 serif">物語への参加とキャストとの会話</h2>
+<p class="lede">イマーシブ体験では、参加者に役割が与えられます。「怪盗と秘密の試験」では、参加者は義賊組織「レイヴン怪盗団」の団員候補として会員制バーに入り、登場人物との会話や仲間との協力を通じて試験に挑みます。</p>
+<p class="lede">観客席がないため、キャストから話しかけられたり、参加者同士で相談したりする場面があります。演技の得意・不得意は問われませんが、「話しかけられるのは苦手」という方は、観劇型のショーのほうが落ち着いて楽しめるかもしれません。</p>
+</div></section>
+<section class="section tinted" id="magic"><div class="wrap narrow">
+<p class="eyebrow">MAGIC IN STORY</p><h2 class="h2 serif">マジックと物語の組み合わせ</h2>
+<p class="lede">観劇型のショーでは、マジックそのものが演目です。イマーシブ体験では、マジックは物語の中で「起きる出来事」として現れます。「怪盗と秘密の試験」では、試験の中で本格的なイリュージョンが目の前で行われ、参加者はそれを物語の一部として体験します。</p>
+<p class="lede">この違いは、余韻の残り方にも表れます。観劇型は「あの技がすごかった」という記憶、参加型は「自分があの場にいた」という記憶が中心になります。</p>
+</div></section>
+<section class="section" id="check"><div class="wrap narrow">
+<p class="eyebrow">CHECK</p><h2 class="h2 serif">初参加のときに確認したいこと</h2>
+<ul class="bullets"><li>人数条件：少人数制の公演は1人で申し込めない場合があります。「怪盗と秘密の試験」は各回2〜4名で、1名での申込はできません。</li><li>年齢条件：「怪盗と秘密の試験」は18歳以上が対象です。</li><li>持ち物：スマートフォンとイヤホンを体験の進行に使う公演があります。同公演では水分も必須と案内しています。</li><li>移動：受付場所から会場まで徒歩での移動がある公演があります。</li><li>撮影と種明かし：会場内の撮影・録音は許可がない限りできません。仕掛けや結末をSNSに書かないことも、参加者への案内に含まれています。</li><li>お酒：「怪盗と秘密の試験」は会員制バーが舞台ですが、お酒の提供はありません。</li></ul>
+<p class="lede">服装・持ち物の詳しい確認項目は、<a href="/guide/immersive-preparation/" style="color:var(--accent)">イマーシブ体験の服装・持ち物</a>にまとめています。</p>
+</div></section>
+<section class="section tinted" id="example"><div class="wrap narrow">
+<p class="eyebrow">EXAMPLE</p><h2 class="h2 serif">「怪盗と秘密の試験」の公開情報から見る具体例</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>項目</th><th>公開されている内容</th></tr></thead><tbody><tr><th scope="row">形式</th><td>会員制バーを舞台にしたマジック×イマーシブ公演。参加者は団員候補として物語に参加</td></tr><tr><th scope="row">人数</th><td>各回2〜4名（1名での申込不可）</td></tr><tr><th scope="row">年齢</th><td>18歳以上</td></tr><tr><th scope="row">料金</th><td>2人 ¥13,000／3人 ¥16,500／4人 ¥19,600（1組あたり・税込。別途手数料がかかる場合あり）</td></tr><tr><th scope="row">所要時間</th><td>チケットページで確認（表記の確認中）</td></tr><tr><th scope="row">会場</th><td>東京・六本木エリアの会員制バー。集合場所はチケットの最新案内を確認</td></tr><tr><th scope="row">進行</th><td>日本語。受付時間に遅れると参加不可</td></tr></tbody></table></div>
+<p class="lede">この表は公演ページの公開情報をもとにしています。体験の感想やネタバレは載せていません。最新の開催日・時刻・空席はチケットサイトでご確認ください。</p>
+</div></section>
+<section class="section" id="order"><div class="wrap narrow">
+<p class="eyebrow">THIS WEEK</p><h2 class="h2 serif">開催予定を確認する</h2>
+<p class="lede">今週の東京での開催予定は、<a href="/guide/immersive-tokyo/#this-week" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>の「今週遊べる」欄で確認できます。「怪盗と秘密の試験」の公演内容は<a href="/kaitou/" style="color:var(--accent)">公演サイト</a>をご覧ください。</p>
+<p class="lede">イマーシブ体験そのものの意味や種類は、<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>、<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>で解説しています。</p>
+</div></section>
+
+
+<section class="section tinted"><div class="wrap">
+
+<div class="cta-mini">
+<p class="cta-mini-title serif">今週の東京公演を確認する</p>
+<a class="btn" href="/guide/immersive-tokyo/#this-week" data-track="show" data-show="this-week" data-place="magic-show-immersive-chigai">今週の東京公演を確認する</a>
+<p class="svc-cta-sub">開催日は自社公式で確認したものだけを掲載し、空席・開演時刻はチケットサイトでご確認いただく形です。公演の主催・制作に関するご相談は<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a>へ。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/immersive-preparation/" style="color:var(--accent)">イマーシブ体験の服装・持ち物</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>／<a href="/guide/immersive-taiken/" style="color:var(--accent)">イマーシブ体験とは</a>／<a href="/kaitou/" style="color:var(--accent)">怪盗と秘密の試験</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#compare,#role,#magic,#check,#example,#order{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>
