@@ -34,7 +34,7 @@ html{scroll-behavior:smooth;overflow-x:clip}
 /* "palt" tightens Japanese punctuation/kana spacing for an editorial,
    typeset look; the slight tracking keeps body text from feeling
    cramped after the squeeze. */
-body{margin:0;background-color:var(--paper);color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1;letter-spacing:.015em}
+body{margin:0;background-color:var(--paper);color:var(--ink);font-family:'Noto Sans JP',sans-serif;-webkit-font-smoothing:antialiased;font-feature-settings:"palt" 1;letter-spacing:.03em}
 ::selection{background:var(--yellow);color:var(--ink)}
 strong{font-weight:700}
 .lede strong,.str-body strong{color:var(--ink)}
@@ -68,10 +68,13 @@ img{max-width:100%;display:block}
    太い墨のアンダーバー。日本語タイトルはその下のサブタイトルとして
    ゴシック太字で置く。中央揃え・明朝ラベルはやめ、印刷物の
    「章扉」のリズムで組む。 */
-.eyebrow{font-family:var(--font-en);font-weight:700;font-size:clamp(30px,3.6vw,46px);letter-spacing:.14em;line-height:1.1;color:var(--ink);margin:0 0 14px;text-align:center;text-transform:uppercase}
+.eyebrow{font-family:var(--font-en);font-weight:700;font-size:clamp(30px,3.6vw,46px);letter-spacing:.14em;line-height:1.1;color:var(--ink);margin:0 0 14px;text-align:left;text-transform:uppercase}
 .eyebrow::after{content:none}
-.h2{font-family:'Noto Sans JP',sans-serif;font-size:clamp(19px,1.9vw,24px);line-height:1.6;font-weight:700;letter-spacing:.08em;margin:0 0 12px;text-align:center;color:var(--ink)}
-.h2sub{font-size:15px;color:rgba(29,29,31,.62);margin:0 auto 56px;font-weight:500;text-align:center;max-width:720px;line-height:1.9}
+.h2{font-family:'Noto Sans JP',sans-serif;font-size:clamp(19px,1.9vw,24px);line-height:1.6;font-weight:700;letter-spacing:.08em;margin:0 0 12px;text-align:left;color:var(--ink)}
+.h2sub{font-size:15px;color:rgba(29,29,31,.62);margin:0 0 56px;font-weight:500;text-align:left;max-width:720px;line-height:1.9}
+/* 青・グレーの帯（実績数字・メッセージ・お問い合わせ）は中央揃え */
+.perf .eyebrow,.perf .h2,.perf .h2sub,.msg-sec .eyebrow,.msg-sec .h2,.msg-sec .h2sub,.cta .eyebrow,.cta .h2{text-align:center}
+.perf .h2sub,.msg-sec .h2sub{margin-left:auto;margin-right:auto}
 /* Uniform gap between a section heading and its first content block
    when there is no .h2sub in between — some pages (notably the
    zunousen LP) had cards starting 10px under the heading. */
@@ -98,13 +101,13 @@ img{max-width:100%;display:block}
 .btn.ghost:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
 .btn.dark{background:#fff;color:var(--ink);border-color:var(--ink)}
 .btn.dark:hover{background:var(--ink);color:#fff}
-.btn.pill{padding:10px 22px;font-size:12.5px;background:#fff;color:var(--ink);border-color:var(--ink)}
+.btn.pill{padding:12px 26px;font-size:12.5px;letter-spacing:.14em;background:#fff;color:var(--ink);border-color:var(--ink)}
 .btn.pill:hover{background:var(--ink);color:#fff}
 
 header.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,0,0,.06)}
 .navrow{height:76px;display:flex;align-items:center;justify-content:space-between}
 .navlinks{display:flex;align-items:center;gap:26px}
-.navlinks a{font-size:13px;font-weight:700;letter-spacing:.12em;color:var(--ink)}
+.navlinks a{font-size:12.5px;font-weight:700;letter-spacing:.14em;color:var(--ink)}
 .navlinks a:hover{color:var(--accent)}
 .logo-header{width:130px;height:36px;object-fit:contain}
 .nav-actions{display:flex;align-items:center;gap:12px}
@@ -322,21 +325,19 @@ section.section.is-visible .flow-row>*{opacity:1;transform:none}
 .mark.no{background:rgba(51,48,43,.08);color:rgba(51,48,43,.35)}
 
 .works-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:56px;text-align:left}
-.works-more{font-size:14px;font-weight:700;color:var(--accent);white-space:nowrap;padding-bottom:6px}
+.works-more{display:inline-flex;align-items:center;gap:14px;font-size:13.5px;font-weight:700;letter-spacing:.12em;color:var(--ink);white-space:nowrap;padding-bottom:6px}
+.works-more::before{content:'›';flex:none;width:46px;height:46px;border-radius:50%;background:var(--accent);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:22px;line-height:1;transition:transform .2s}
+.works-more:hover::before{transform:translateX(3px)}
 .works-grid{display:grid;gap:32px;grid-template-columns:repeat(3,1fr)}
-.work-card{display:flex;flex-direction:column;background:#fff;border-radius:var(--r-l);padding:18px 18px 26px;box-shadow:var(--shadow-1);transition:transform .3s,box-shadow .3s}
-.work-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-2)}
+.work-card{display:flex;flex-direction:column;background:transparent;border:none;border-radius:0;padding:0;box-shadow:none;transition:opacity .3s}
+.work-card:hover{opacity:.88}
 /* height:auto so width/height HTML attributes (kept for CLS) never win
    over the responsive layout. */
-.work-img{width:100%;height:auto;aspect-ratio:4/5;border-radius:var(--r-m);background:var(--cream);padding:14px;object-fit:contain;transition:transform .4s cubic-bezier(.22,1,.36,1)}
-.work-card:hover .work-img{transform:scale(1.035)}
-.work-tag{font-size:11px;font-weight:800;color:#fff;background:var(--accent);letter-spacing:.04em;margin:18px 0 10px;align-self:flex-start;padding:5px 14px;border-radius:999px}
-.work-card.tag-nazotoki .work-tag{background:var(--tag-nazotoki)}
-.work-card.tag-murder .work-tag{background:var(--tag-murder)}
-.work-card.tag-zunou .work-tag{background:var(--tag-zunou)}
-.work-card.tag-shisetsu .work-tag{background:var(--tag-shisetsu)}
-.work-card.tag-immersive .work-tag{background:var(--tag-immersive)}
-.work-name{font-size:19px;font-weight:800;margin:0 0 4px}
+.work-img{width:100%;height:auto;aspect-ratio:auto;border-radius:6px;background:var(--cream);padding:0}
+/* 参考デザインの「クライアント｜日付」行のように、区分は小さなグレー文字で */
+.work-tag{font-size:12px;font-weight:700;color:rgba(29,29,31,.66);background:none;letter-spacing:.06em;margin:16px 0 4px;align-self:flex-start;padding:0;border-radius:0}
+.work-card.tag-nazotoki .work-tag,.work-card.tag-murder .work-tag,.work-card.tag-zunou .work-tag,.work-card.tag-shisetsu .work-tag,.work-card.tag-immersive .work-tag{background:none}
+.work-name{font-size:18px;font-weight:800;margin:0 0 4px;letter-spacing:.04em}
 .work-sub{font-size:13.5px;color:rgba(29,29,31,.66);margin:0 0 10px;font-weight:500}
 .work-desc{font-size:14px;line-height:1.75;color:rgba(51,48,43,.72)}
 /* 過去コンテンツのネタバレ導線ボックス (WORKS セクション末尾)。/game/ へ遷移する。 */
@@ -502,8 +503,8 @@ a:hover>.blog-img{opacity:.88}
 @media (prefers-reduced-motion: reduce){.voice-track{animation:none}}
 @media(max-width:640px){.voice-card{height:220px}}
 
-.foot-links{display:flex;gap:12px 24px;flex-wrap:wrap;margin-top:32px;padding-top:24px;border-top:1px solid rgba(0,0,0,.08)}
-.foot-links a{font-size:12.5px;letter-spacing:.04em;color:rgba(29,29,31,.7)}
+.foot-links{display:grid;grid-template-columns:repeat(3,auto);gap:10px 32px;justify-content:end;margin:0;padding:0;border-top:none;text-align:left}
+.foot-links a{font-size:12.5px;font-weight:700;letter-spacing:.06em;color:var(--ink)}
 .foot-links a:hover{color:var(--accent)}
 
 /* 塗りセクションは装飾の浮遊円やスクープ角を持たない——面そのもので語る。 */
@@ -586,7 +587,7 @@ a.genre-cell:hover{transform:translateY(-3px);box-shadow:var(--shadow-2)}
 .info-grid dt{font-family:'Noto Sans JP',sans-serif;color:var(--accent);font-weight:700;letter-spacing:.1em;margin:0}
 .info-grid dd{margin:0;font-weight:500}
 
-.cta{background-color:#e6e7ea;background-image:none;color:var(--ink);text-align:center;position:relative;overflow:hidden}
+.cta{background-color:#dcdde0;background-image:none;color:var(--ink);text-align:center;position:relative;overflow:hidden}
 .cta .wrap{position:relative;z-index:1}
 .cta-title{font-size:32px;font-weight:800;margin:0 0 18px;line-height:1.5}
 .cta-sub{font-size:14.5px;color:rgba(29,29,31,.75);margin:0 0 40px}
@@ -606,11 +607,15 @@ a.genre-cell:hover{transform:translateY(-3px);box-shadow:var(--shadow-2)}
 /* Footer: フラットな墨色の面＋アクセント1本の締め罫。 */
 footer{padding:72px 0 44px;background:#fff;color:var(--ink);position:relative;border-top:1px solid rgba(0,0,0,.08)}
 footer::before{content:none}
-.foot-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
-.foot-name{font-family:'Noto Sans JP',sans-serif;font-weight:800;font-size:17px;letter-spacing:.05em;margin:0 0 6px;color:var(--ink)}
+/* フッター：左に会社情報（.foot-row）、右にリンク一覧（.foot-links）。HTML は変えず .wrap をグリッドにする */
+footer .wrap{display:grid;grid-template-columns:minmax(0,440px) auto;justify-content:space-between;align-items:start;column-gap:48px}
+.foot-row{display:block}
+.foot-row>.foot-copy{margin:0}
+.foot-row>.foot-copy:nth-of-type(1){margin-top:28px}
+.foot-name{font-family:'Noto Sans JP',sans-serif;font-weight:800;font-size:20px;letter-spacing:.06em;margin:0 0 10px;color:var(--ink)}
 .foot-tag{font-size:12px;color:rgba(29,29,31,.7);margin:0 0 6px}
 .foot-addr{font-size:12.5px;color:rgba(29,29,31,.7);margin:0}
-.foot-copy{font-size:12px;color:rgba(29,29,31,.66)}
+.foot-copy{font-size:12px;color:rgba(29,29,31,.66);letter-spacing:.06em}
 
 #about,#strength,#works,#flow,#message,#contact{scroll-margin-top:76px}
 
@@ -675,9 +680,9 @@ footer::before{content:none}
   .str-title{font-size:19px}
   .str-body,.style-row{font-size:13.5px}
   .works-grid{grid-template-columns:1fr 1fr;gap:16px 12px}
-  .work-card{padding:10px 10px 18px;border-radius:var(--r-m)}
-  .work-img{padding:8px;border-radius:var(--r-s)}
-  .work-tag{font-size:9.5px;margin:10px 0 6px;padding:4px 10px}
+  .work-card{padding:0;border-radius:0}
+  .work-img{padding:0;border-radius:6px}
+  .work-tag{font-size:11px;margin:10px 0 4px;padding:0}
   .work-name{font-size:14.5px}
   .work-sub{font-size:11.5px;margin-bottom:6px}
   .work-desc{font-size:12px;line-height:1.65}
@@ -729,7 +734,8 @@ footer::before{content:none}
   .svc-row-desc{font-size:12.5px;line-height:1.8}
   .svc-row-arrow{width:36px;height:36px;font-size:13px}
   .article-body{font-size:14.5px}
-  .foot-row{flex-direction:column;align-items:flex-start;gap:12px}
+  footer .wrap{grid-template-columns:1fr;row-gap:28px}
+  .foot-links{grid-template-columns:repeat(2,1fr);justify-content:start;width:100%}
 }
 
 /* ── スマホの横スワイプ・カルーセル ─────────────────────────
@@ -750,9 +756,9 @@ footer::before{content:none}
   .flow-step:not(:last-child)::after{top:34px;bottom:auto;left:auto;right:-27px;transform:none;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:15px solid var(--accent);border-right:none}
   /* 主な実績：2列グリッドだと文字が極小になるため、1枚を大きく
      見せる横スワイプに。文字サイズも読める大きさへ戻す。 */
-  .work-card{flex:0 0 72%;scroll-snap-align:center;padding:14px 14px 20px;border-radius:var(--r-m)}
-  .work-img{padding:12px;border-radius:var(--r-s)}
-  .work-tag{font-size:10.5px;margin:14px 0 8px;padding:4px 12px}
+  .work-card{flex:0 0 72%;scroll-snap-align:center;padding:0;border-radius:0}
+  .work-img{padding:0;border-radius:6px}
+  .work-tag{font-size:11.5px;margin:12px 0 4px;padding:0}
   .work-name{font-size:16.5px}
   .work-sub{font-size:12.5px;margin-bottom:8px}
   .work-desc{font-size:13px;line-height:1.8}
