@@ -70,3 +70,4 @@
 - AIO の実測は docs/aio-check.md の質問6問で月1回、新規会話で記録する。
 - 「今週遊べる」欄（/guide/immersive-tokyo/#this-week）の正本は src/data/shows.ts。開催日は自社公式で確認した回だけを入れ、時刻未確認なら time を省く。完売＝status:'soldout'、中止＝'cancelled'。更新時は verifiedAt も更新する（14日超で要再確認表示）。判定ロジックの変更後は `npm run test:week`。
 - 公演クリック計測：チケットサイト＝data-track="ticket"、公演詳細＝data-track="show"（data-show=公演ID、data-place=掲載箇所）。購入完了は数えない。内部リンクに UTM を付けない。
+- デザイン（2026-09-09〜）：配色トークンは global.css の :root（濃紺 #0b47b5、淡青ハイライト --yellow）。ハードなオフセット影・墨フチ・方眼紙の地は廃止。新規スタイルは var(--shadow-1)/var(--bd)/var(--r-*) を参照する。デザイン変更の前後比較は `node scripts/seo-snapshot.mjs <dir>` → `node scripts/seo-snapshot-diff.mjs <before> <after>`（playwright は scratchpad の node_modules を NODE_PATH ではなく symlink で解決）。

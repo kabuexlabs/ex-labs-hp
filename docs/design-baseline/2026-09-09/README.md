@@ -52,4 +52,5 @@
 
 ## 公開記録
 
-PUBLISH_RECORD
+- 公開コミット：455e580（main）。push 2026-09-09 08:49 UTC（17:49 JST）。Vercel Production デプロイ成功 2026-09-09 08:49 UTC。
+- 公開後の確認予定：Search Console で主要URL（/、/services/immersive/、/works/、/guide/immersive-tokyo/、/company/）の URL 検査（読み取り・インデックス状況）。検索実績は 9/16 以降に前7日 vs 後7日でページ別・クエリ別に比較。
