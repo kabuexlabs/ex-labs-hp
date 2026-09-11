@@ -75,6 +75,30 @@ const groups: { key: string; label: string; terms: Term[] }[] = [
 
 const allTerms = groups.flatMap((g) => g.terms);
 
+const faqs = [
+  {
+    q: 'この用語集はどう使えばいいですか？',
+    a: '企画書や相談時に出てくる言葉の意味を確認する用途と、似た言葉（イマーシブと没入型、マダミスとマーダーミステリー、周遊と回遊）の違いを整理する用途に使えます。各用語の詳しい解説記事へのリンクも載せています。',
+  },
+  {
+    q: '同じ意味で使われる言葉はありますか？',
+    a: '「イマーシブ」と「没入型」、「マダミス」と「マーダーミステリー」は同じ意味です。「周遊」と「回遊」は、周遊が「巡ること」、回遊が「回って戻ること・館内を回ること」の意味で使い分けられます。',
+  },
+  {
+    q: '用語だけでなく企画の相談もできますか？',
+    a: 'できます。株式会社ex Labsはイマーシブ・マダミス・頭脳戦・施設活用イベントの企画・制作会社です。目的・場所・時期が未定の段階でもご相談いただけます（相談・お見積りは無料）。',
+  },
+  {
+    q: 'どのジャンル（イマーシブ・マダミス・謎解き・頭脳戦）を選べばよいですか？',
+    a: '物語や世界観の没入を見せたいならイマーシブ、登場人物として推理させたいならマダミス、幅広い年齢層に気軽に参加してもらいたいなら謎解き、交渉や読み合いの対戦を見せたいなら頭脳戦が向いています。違いの詳細は「マダミス・謎解き・イマーシブ・頭脳戦の違い」の記事で比較しています。',
+  },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+
 const setLd = {
   '@context': 'https://schema.org',
   '@type': 'DefinedTermSet',
@@ -96,6 +120,7 @@ const setLd = {
   title="体験型イベント用語集｜イマーシブ・マダミス・頭脳戦・心理戦・施設活用の用語解説 - 株式会社ex Labs"
   description="体験型エンターテインメントの用語集。イマーシブ・没入感・マダミス・頭脳戦・心理戦・謎解き・周遊型・回遊・催事・遊休区画・レベニューシェアなど、イベント企画と制作依頼で使う用語を制作会社（日経掲載）がわかりやすく定義。各用語の詳しい解説記事へのリンク付き。"
 >
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(setLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
@@ -107,6 +132,7 @@ const setLd = {
 <p class="eyebrow">GLOSSARY</p>
 <h1 class="h2 serif"><span class="nobr">体験型イベント用語集</span></h1>
 <p class="lede">イマーシブ・マダミス・頭脳戦・心理戦・謎解き・施設活用イベントの企画や制作依頼で出てくる用語を、<strong>謎解き・マダミス・イマーシブ・頭脳戦の4ジャンルを制作する株式会社ex Labs</strong>がまとめました。各用語には詳しい解説記事へのリンクを付けています。</p>
+<div class="key-points"><p class="key-points-h">この用語集の要点</p><ul><li>イマーシブ・没入感・マダミス・頭脳戦・心理戦・謎解き・周遊型・回遊・催事・遊休区画・レベニューシェアなど、体験型イベントの企画と制作依頼で使う用語を分類別に定義しています。</li><li>各用語には読み方と、詳しい解説記事へのリンクを付けています（ページ内の検索はブラウザの検索機能をご利用ください）。</li><li>編集は、謎解き・マダミス・イマーシブ・頭脳戦の4ジャンルを企画・制作する株式会社ex Labs（日経掲載）が行っています。</li></ul></div>
 <nav class="yg-jump" aria-label="分類へ移動">
 {groups.map((g) => <a href={`#g-${g.key}`}>{g.label}</a>)}
 </nav>
@@ -125,6 +151,18 @@ const setLd = {
   </dl>
   </div></section>
 ))}
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
 
 <section class="section"><div class="wrap">
 <div class="cta-mini">

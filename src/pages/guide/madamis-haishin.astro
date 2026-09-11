@@ -16,8 +16,30 @@ const pageUrl = new URL('/guide/madamis-haishin/', site).toString();
 
 const toc = [{"id": "format", "label": "ライブ配信と収録動画で設計を変える"}, {"id": "info", "label": "出演者と視聴者に見せる情報を整理する"}, {"id": "time", "label": "出演人数と使える時間から作品を組み立てる"}, {"id": "roles", "label": "シナリオ制作と映像制作の担当を明確にする"}, {"id": "rehearsal", "label": "リハーサルでは技術面と物語の進行を分けて確認する"}, {"id": "rights", "label": "配信・アーカイブ・切り抜きの範囲を確認する"}, {"id": "brief", "label": "相談時に伝えたいこと"}];
 
-const faqs = [];
 
+const faqs = [
+  {
+    q: '配信用マダミスの制作費用の目安は？',
+    a: 'シナリオ・キャラクター資料のみなら数十万円台〜、画面用素材や進行台本を含めると内容に応じて加算されます（株式会社ex Labsの目安）。撮影・編集・配信技術は標準提供ではなく、分担を決めたうえで見積ります。',
+  },
+  {
+    q: '出演人数と収録時間の目安は？',
+    a: 'オンライン・配信向けには4人用作品（例：当社の「ブルーダイヤの不在証明」）から6〜8人用まであり、プレイ時間は2〜3時間が主流です。事前説明・音声確認・感想トークを含めて収録枠を決めてください。',
+  },
+  {
+    q: '撮影や編集まで依頼できますか？',
+    a: '当社が担当するのはシナリオ・進行・画面用素材の制作です。撮影・編集・配信技術は、ご依頼側の制作チームや映像会社との分担を相談時に決めます。',
+  },
+  {
+    q: 'マダミス配信はどんな目的・チャンネルに向いていますか？',
+    a: '出演者同士の会話や表情を見せられるため、タレント・VTuber・配信者のコラボ企画、番組やチャンネルの視聴者参加型企画、ゲーム・作品のプロモーションに向いています。逆に、1回あたりの尺が短い企画や出演者の準備時間が取れない企画には向きません。',
+  },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 
 const articleLd = {
   '@context': 'https://schema.org',
@@ -38,6 +60,7 @@ const articleLd = {
   description="動画やライブ配信に使うマダミス制作を、出演者・視聴者の情報設計、収録時間、画面素材、進行、配信・アーカイブの公開範囲から解説。シナリオ制作と映像制作の分担、リハーサルの確認事項を、マダミス制作会社の株式会社ex Labsが整理します。"
   ogImage="/assets/guide/madamis-haishin.webp"
 >
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
@@ -51,10 +74,12 @@ const articleLd = {
 <p class="lede">動画・配信用のマーダーミステリーでは、出演者が推理を楽しめることに加えて、視聴者が状況を理解し、会話や選択を追えることが大切です。プレイヤーだけが読める資料や密談が多い作品では、その情報を画面にどう伝えるかによって見え方が変わります。</p>
 <p class="lede">制作を依頼するときは、シナリオ、進行、画面素材、撮影・配信の分担を整理します。ここでは、配信者、番組・動画制作担当者、企業のコンテンツ担当者向けに、企画の進め方を解説します。</p>
 <p class="pub-date">公開日：2026年9月8日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>配信用マダミスとは、動画やライブ配信で視聴者に見せることを前提に、出演者と視聴者の情報の見せ方まで設計したマーダーミステリーを指します。</li><li>動画やライブ配信に使うマダミス制作を、出演者・視聴者の情報設計、収録時間、画面素材、進行、配信・アーカイブの公開範囲から解説。</li></ul></div>
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
 <ol>
 {toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+<li><a href="#faq">よくある質問</a></li>
 </ol>
 </nav>
 </div></section>
@@ -100,6 +125,18 @@ const articleLd = {
 </div></section>
 
 <ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
 
 <section class="section tinted"><div class="wrap">
 

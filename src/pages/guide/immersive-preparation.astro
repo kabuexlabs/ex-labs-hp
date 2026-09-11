@@ -15,8 +15,30 @@ const pageUrl = new URL('/guide/immersive-preparation/', site).toString();
 
 const toc = [{"id": "format", "label": "形式によって「動く量」が違う"}, {"id": "clothes", "label": "服装と靴"}, {"id": "items", "label": "スマートフォン・イヤホンなどの持ち物"}, {"id": "luggage", "label": "荷物・休憩・トイレ"}, {"id": "conditions", "label": "人数・年齢・遅刻の条件"}, {"id": "checklist", "label": "公演別チェック表"}, {"id": "order", "label": "今週の開催予定を確認する"}];
 
-const faqs = [];
 
+const faqs = [
+  {
+    q: '服装の指定はありますか？',
+    a: '当社の2公演では指定はありません。「怪盗と秘密の試験」は会員制バーの雰囲気に合わせた服装を案内し、「ウワサバナシ調査委員会」は体験中に一時的に靴を脱ぐ可能性があるため、脱ぎ履きしやすく歩きやすい靴が向きます。',
+  },
+  {
+    q: '参加費はいくらですか？',
+    a: '「ウワサバナシ調査委員会」は1名4,000円（税込、別途手数料）、「怪盗と秘密の試験」は1組あたり2人13,000円・3人16,500円・4人19,600円（税込、別途手数料がかかる場合あり）です。最新の料金はチケットサイトでご確認ください。',
+  },
+  {
+    q: '一人でも参加できますか？',
+    a: '「ウワサバナシ調査委員会」はチケット1枚につき1名なので一人で参加できます。「怪盗と秘密の試験」は各回2〜4名での参加のため、1名での申込はできません。',
+  },
+  {
+    q: 'イマーシブイベントの参加に費用はどのくらいかかりますか？制作を依頼する場合は？',
+    a: '参加者としてのチケット代は公演ごとに異なるため、各公演の案内をご確認ください。企業として制作を依頼する場合は、費用は1空間完結型で数十万円台〜、施設一体型で100万円前後〜、街全体の周遊型で数百万円規模が目安です（株式会社ex Labsにご依頼いただく場合）。既存公演の貸切・出張実施なら数十万円台から検討できます。詳しくは費用相場の記事をご覧ください。',
+  },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 
 const articleLd = {
   '@context': 'https://schema.org',
@@ -37,6 +59,7 @@ const articleLd = {
   description="初めてイマーシブ体験に参加する前に確認したい服装・靴・持ち物・荷物・人数・年齢・遅刻の条件を、公演の形式別に整理。渋谷「ウワサバナシ調査委員会」と六本木「怪盗と秘密の試験」の公開案内をもとにした公演別チェック表つき。運営会社の株式会社ex Labsが解説します。"
   ogImage="/assets/guide/immersive-preparation.webp"
 >
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
@@ -50,10 +73,12 @@ const articleLd = {
 <p class="lede">初めてのイマーシブ体験では、内容だけでなく、歩く時間や持ち物を確認しておくと参加しやすくなります。公演によって異なる点と、予約前に確認したい項目を整理します。</p>
 <p class="lede">この記事は、イマーシブ公演を企画・制作している株式会社ex Labsが、自社2公演（渋谷「ウワサバナシ調査委員会」、六本木「怪盗と秘密の試験」）の公開している案内をもとにまとめた運営会社による案内です。一般的な傾向と、各公演に限ったルールは分けて書いています。</p>
 <p class="pub-date">公開日：2026年9月9日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>イマーシブ体験の準備とは、服装・靴・持ち物・荷物・人数・年齢・集合時間など、公演の案内で参加前に確認する項目を指します。</li><li>初めてイマーシブ体験に参加する前に確認したい服装・靴・持ち物・荷物・人数・年齢・遅刻の条件を、公演の形式別に整理。</li><li>渋谷「ウワサバナシ調査委員会」と六本木「怪盗と秘密の試験」の公開案内をもとにした公演別チェック表つき。</li></ul></div>
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
 <ol>
 {toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+<li><a href="#faq">よくある質問</a></li>
 </ol>
 </nav>
 </div></section>
@@ -100,6 +125,18 @@ const articleLd = {
 <p class="lede">公演の詳細は、<a href="/uwasabanashi/" style="color:var(--accent)">ウワサバナシ調査委員会</a>、<a href="/kaitou/" style="color:var(--accent)">怪盗と秘密の試験</a>の各ページをご覧ください。</p>
 </div></section>
 
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
 
 <section class="section tinted"><div class="wrap">
 

@@ -16,8 +16,30 @@ const pageUrl = new URL('/guide/shuyu-event-seisaku/', site).toString();
 
 const toc = [{"id": "purpose", "label": "最初に決めたい3つの目的"}, {"id": "prepare", "label": "依頼前に用意するとよい情報"}, {"id": "process", "label": "制作の進め方"}, {"id": "cost", "label": "費用は初期制作と開催中の運営に分ける"}, {"id": "capacity", "label": "受け入れられる人数と、集客の見込みは分ける"}, {"id": "operation", "label": "運営中の変更と問い合わせ先を決める"}, {"id": "order", "label": "ex Labsへの制作相談"}];
 
-const faqs = [];
 
+const faqs = [
+  {
+    q: '周遊イベントの制作費用の目安は？',
+    a: '受託の場合、フロア横断の周遊型（2〜4週間の会期）で100万円前後〜、街全体・複数施設は数百万円規模（株式会社ex Labsの目安）。有料チケット型なら初期費用0円のレベニューシェア型も選べます。',
+  },
+  {
+    q: '制作期間と会期の目安は？',
+    a: '既存コンテンツの導入なら2〜4週間、オリジナル制作は最短1ヶ月・標準1〜3ヶ月です。会期は2週間〜1ヶ月以上あると「何度も来る理由」を作りやすくなります。',
+  },
+  {
+    q: '周遊イベントの制作実績はありますか？',
+    a: '渋谷サクラステージ全体を周遊する「ウワサバナシ調査委員会」（東急不動産様ほか協力、日本経済新聞掲載）、下北沢の街を歩く「ロスト・フレーム」（2026年7月〜8月31日、全公演完売）、カラオケ館様向けの店舗周遊型「恣験」があります。',
+  },
+  {
+    q: '周遊イベントの制作はどんな施設・目的に向いていますか？',
+    a: '複数のフロアや店舗、街区を回ってもらいたい商業施設・商店街・観光エリア、滞在時間と回遊率を上げたい施設、会期中に何度も来てもらう理由を作りたい施設に向いています。1か所で完結させたい場合や短時間で大量の来場者をさばきたい場合は、1空間公演型や配布型の企画のほうが適しています。',
+  },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 
 const articleLd = {
   '@context': 'https://schema.org',
@@ -38,6 +60,7 @@ const articleLd = {
   description="商業施設や商店街で周遊イベントを制作依頼する際の費用項目、進行工程、動線、受入人数の計算、施設と制作会社の役割分担を解説。見積もり依頼に必要な情報を、渋谷サクラステージの施設一体型イベントを手がけた株式会社ex Labsがまとめます。"
   ogImage="/assets/guide/shuyu-event-seisaku.webp"
 >
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
@@ -51,10 +74,12 @@ const articleLd = {
 <p class="lede">周遊イベントの制作を依頼するときは、巡る場所の数より先に「どこへ来てもらいたいか」「そこで何を体験してほしいか」を整理します。来館者を増やす企画と、既存の来館者を別のフロアへ案内する企画では、動線も告知方法も異なります。</p>
 <p class="lede">商業施設、商店街、観光エリアでの実施に向けて、費用の内訳、準備の順番、主催者と制作会社の役割をまとめます。</p>
 <p class="pub-date">公開日：2026年9月8日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>周遊イベントの制作依頼とは、商業施設や商店街の複数スポットを巡る体験型イベントを、企画・動線設計・制作物・運営まで制作会社に発注することを指します。</li><li>商業施設や商店街で周遊イベントを制作依頼する際の費用項目、進行工程、動線、受入人数の計算、施設と制作会社の役割分担を解説。</li></ul></div>
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
 <ol>
 {toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+<li><a href="#faq">よくある質問</a></li>
 </ol>
 </nav>
 </div></section>
@@ -101,6 +126,18 @@ const articleLd = {
 </div></section>
 
 <ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
 
 <section class="section tinted"><div class="wrap">
 

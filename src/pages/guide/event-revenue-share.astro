@@ -16,8 +16,30 @@ const pageUrl = new URL('/guide/event-revenue-share/', site).toString();
 
 const toc = [{"id": "types", "label": "受託型・レベニューシェア型・併用型の違い"}, {"id": "percent", "label": "「売上の何％」だけでは取り分は分からない"}, {"id": "example", "label": "仮の数字で見る、原価回収後に分配する例"}, {"id": "cooperation", "label": "初期費用0円でも、施設側の協力内容は決める"}, {"id": "feasibility", "label": "導入可能性は、場所と事業条件の組み合わせで判断する"}, {"id": "checklist", "label": "契約・実施前に確認したいこと"}, {"id": "order", "label": "ex Labsの施設活用イベント"}];
 
-const faqs = [];
 
+const faqs = [
+  {
+    q: '施設側の初期費用は本当に0円ですか？',
+    a: '必須条件は「参加者から料金をいただく有料チケット型のイベントであること」です。この条件を満たす場合、制作費・運営費の初期支払いは不要で、チケット売上から回収します。施設様が追加を希望する造作・館外広告・延長などは事前にお見積りし、合意なく発生させません。',
+  },
+  {
+    q: '売上の分配の目安は？',
+    a: 'チケット売上から制作費・運営費などの原価を回収するまでは当社の取り分とし、回収後の売上を施設様と分配します。目安は当社8：施設様2から5：5の範囲で、施設様の広報協力や場所の提供条件で変わります。契約前に数字で提示します。',
+  },
+  {
+    q: 'レベニューシェア型の実績はありますか？',
+    a: '渋谷サクラステージの施設一体型イベント「ウワサバナシ調査委員会」は、施設側の初期費用負担なしで当社が企画・制作・集客・運営を担うモデルで実施し、日本経済新聞に掲載されました。',
+  },
+  {
+    q: 'レベニューシェア型イベントの会期と参加人数の目安は？',
+    a: '会期は2週間〜1ヶ月以上を推奨します。原価回収後に分配する仕組み上、来場者が「何度も来る理由」を作れる会期が必要だからです。参加人数は、空き区画を使う小規模企画で1日数十名、フロア横断の周遊型で1日数十〜数百名を受付枠と回数で設計します。準備期間は既存コンテンツの導入で2〜4週間、オリジナル制作で最短1ヶ月・標準1〜3ヶ月が目安です。',
+  },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 
 const articleLd = {
   '@context': 'https://schema.org',
@@ -38,6 +60,7 @@ const articleLd = {
   description="施設イベントのレベニューシェアを、受託型との違い、原価回収、売上分配の順序、施設側の協力内容から解説。仮の数字による計算例と、契約・実施前の確認事項を、初期費用0円のレベニューシェア型に対応する株式会社ex Labsが紹介します。"
   ogImage="/assets/guide/event-revenue-share.webp"
 >
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
@@ -51,10 +74,12 @@ const articleLd = {
 <p class="lede">施設イベントのレベニューシェアとは、チケット売上などの収益を、施設と企画・運営側で分ける実施方法です。施設が制作費を先に支払う受託型とは、費用の回収方法と役割分担が異なります。</p>
 <p class="lede">「初期費用0円」という案内を見るときは、最初の支払いだけでなく、施設側が用意するもの、何を売上として扱うか、いつから分配されるかまで確認することが大切です。</p>
 <p class="pub-date">公開日：2026年9月8日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>レベニューシェアとは、チケット売上などの収益を施設と企画・運営側で分ける実施方法で、施設が制作費を先に支払う受託型とは費用回収と役割分担が異なります。</li><li>「売上の何％」だけでは取り分は決まらず、原価回収の有無・分配の順序・何を売上として扱うかで実際の受取額が変わります。</li><li>初期費用0円でも、会場・告知・スタッフなど施設側の協力内容を契約前に決めておくことが重要です。</li><li>導入できるかは場所と事業条件（会期・受入人数・単価）の組み合わせで判断し、株式会社ex Labsは有料チケット型でレベニューシェア（初期費用0円）に対応しています。</li></ul></div>
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
 <ol>
 {toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+<li><a href="#faq">よくある質問</a></li>
 </ol>
 </nav>
 </div></section>
@@ -106,6 +131,18 @@ const articleLd = {
 </div></section>
 
 <ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
 
 <section class="section tinted"><div class="wrap">
 

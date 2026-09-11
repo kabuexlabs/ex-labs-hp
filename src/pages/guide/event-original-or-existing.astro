@@ -16,8 +16,30 @@ const pageUrl = new URL('/guide/event-original-or-existing/', site).toString();
 
 const toc = [{"id": "compare", "label": "3つの方法を比較する"}, {"id": "original", "label": "オリジナル制作が向いているケース"}, {"id": "existing", "label": "既存作品の導入が向いているケース"}, {"id": "adjust", "label": "部分調整は「小さな変更」で済むかを確認する"}, {"id": "cost", "label": "初回費用と継続費用を分けて比較する"}, {"id": "questions", "label": "選び方を整理する5つの質問"}, {"id": "order", "label": "依頼時は、方式を決めきらなくてもよい"}];
 
-const faqs = [];
 
+const faqs = [
+  {
+    q: 'オリジナル制作と既存導入は、どちらが安いですか？',
+    a: '一概には言えません。既存作品の導入は制作費を抑えられ2〜4週間で開催できますが、会場・運営・開催回数で総額は変わります。オリジナル制作は数十万円台〜100万円前後〜（株式会社ex Labsの目安）で、施設やブランドに合わせた体験を作れます。同じ条件（人数・回数・運営の範囲）で見積りを取って比べてください。',
+  },
+  {
+    q: '納期の目安はどのくらいですか？',
+    a: '既存作品の導入は2〜4週間、オリジナル制作は最短1ヶ月・標準1〜3ヶ月、施設との調整を含む大型企画は2〜4ヶ月が目安です。',
+  },
+  {
+    q: '制作会社の実績はどこで確認できますか？',
+    a: '株式会社ex Labsが公開している実績は、渋谷サクラステージの施設一体型イベント「ウワサバナシ調査委員会」（日本経済新聞・電ファミニコゲーマー掲載）、都内4会場・全10公演の「東京都頭脳王決定戦 2026」（全公演チケット完売）、宿泊施設向けマーダーミステリー（新規宿泊予約20件以上、告知はXのみ）、自社主催「ヌル・アーデン展」（広告費0円・告知はXのみでチケット約1,000枚）です。詳細は制作事例一覧に掲載しています。',
+  },
+  {
+    q: 'オリジナル制作と既存導入で、期間と受入人数はどう違いますか？',
+    a: '既存作品の導入は2〜4週間で実施でき、参加人数は作品の設計（1空間型で各回2〜10名程度）に従います。オリジナル制作は最短1ヶ月・標準1〜3ヶ月かかりますが、会場の広さや動線に合わせて1日数十〜数百名の受入設計ができます。',
+  },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 
 const articleLd = {
   '@context': 'https://schema.org',
@@ -38,6 +60,7 @@ const articleLd = {
   description="体験型イベントの新規制作、既存コンテンツの導入・貸切、部分的な調整の3つを、目的・費用・納期・自由度・運営・再演の条件から比較。向いているケースと、選び方を整理する5つの質問を、イマーシブ・マダミス・頭脳戦の制作会社である株式会社ex Labsが解説します。"
   ogImage="/assets/guide/event-original-or-existing.webp"
 >
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
@@ -51,10 +74,12 @@ const articleLd = {
 <p class="lede">体験型イベントを開催する方法には、新しい作品を作るオリジナル制作、既存作品を使う導入・貸切、既存の仕組みを使いながら一部を調整する方法があります。</p>
 <p class="lede">選ぶ基準は、「今回の目的のために、どこを変える必要があるか」です。会社名やテーマが異なるだけなのか、参加人数・会場・体験の流れまで変える必要があるのかを整理すると、必要な制作範囲が見えてきます。</p>
 <p class="pub-date">公開日：2026年9月8日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>体験型イベントの「オリジナル制作」とは施設やブランドに合わせて作品を新しく作ること、「既存導入」とは完成済みの作品を貸切や導入で開催することを指します。</li><li>体験型イベントの新規制作、既存コンテンツの導入・貸切、部分的な調整の3つを、目的・費用・納期・自由度・運営・再演の条件から比較。</li></ul></div>
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
 <ol>
 {toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+<li><a href="#faq">よくある質問</a></li>
 </ol>
 </nav>
 </div></section>
@@ -100,6 +125,18 @@ const articleLd = {
 </div></section>
 
 <ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
 
 <section class="section tinted"><div class="wrap">
 

@@ -16,8 +16,26 @@ const pageUrl = new URL('/guide/ip-event/', site).toString();
 
 const toc = [{"id": "role", "label": "最初に決めるのは、来場者の立場"}, {"id": "audience", "label": "原作ファンと初めて触れる人の両方を考える"}, {"id": "example", "label": "体験化の企画例"}, {"id": "process", "label": "企画・監修・制作を進める順番"}, {"id": "supervision", "label": "監修で確認するのは文章や画像だけではない"}, {"id": "rights", "label": "利用範囲は、媒体と実施方法まで具体化する"}, {"id": "cost", "label": "費用とスケジュールを左右すること"}, {"id": "order", "label": "イマーシブ・体験型イベントとしての制作相談"}];
 
-const faqs = [];
 
+const faqs = [
+  {
+    q: 'IPを使った体験型イベントの費用と期間の目安は？',
+    a: '制作費はイマーシブ制作と同じく、1空間公演型で数十万円台〜、施設一体型で100万円前後〜、街周遊型で数百万円規模（株式会社ex Labsの目安）。期間は最短1ヶ月・標準1〜3ヶ月ですが、権利元の監修期間は制作会社だけで短縮できないため、余裕を持って計画してください。',
+  },
+  {
+    q: '参加人数の目安は？',
+    a: '1空間公演型は各回2〜10名程度の少人数制、施設一体型・周遊型は1日数十〜数百名を受付枠と回数で設計します。',
+  },
+  {
+    q: '権利元との許諾は代行してもらえますか？',
+    a: '権利元との連絡をどちらが担当するか、確認用資料を誰が作るかを相談時に整理します。当社は利用条件と対応可能な制作範囲を確認しながら企画しますが、特定IPの許諾取得を保証するものではありません。',
+  },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 
 const articleLd = {
   '@context': 'https://schema.org',
@@ -38,6 +56,7 @@ const articleLd = {
   description="作品やキャラクターの世界観を、来場者が参加する体験型イベントへ変える方法を解説。来場者の役割設計、体験化の企画例、企画・監修・制作の順番、利用範囲の具体化、制作会社への依頼事項を、イマーシブ制作会社の株式会社ex Labsが整理します。"
   ogImage="/assets/guide/ip-event.webp"
 >
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
@@ -51,10 +70,12 @@ const articleLd = {
 <p class="lede">作品やキャラクターを使った体験型イベントでは、来場者がその世界で「何をする人なのか」を決めることが企画の出発点になります。登場人物の協力者になる、施設に残された記録を調べる、物語の中で選択をするなど、参加者の行動と世界観がつながる構成を考えます。</p>
 <p class="lede">ここでは、作品の権利元、広告代理店、ブランド・施設の担当者に向けて、体験化の考え方と、企画・監修・制作の進め方を整理します。</p>
 <p class="pub-date">公開日：2026年9月8日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>IP・キャラクターの体験型イベントとは、作品やキャラクターの世界観を、来場者が役割を持って参加する体験に変えたイベントを指します。</li><li>作品やキャラクターの世界観を、来場者が参加する体験型イベントへ変える方法を解説。</li></ul></div>
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
 <ol>
 {toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+<li><a href="#faq">よくある質問</a></li>
 </ol>
 </nav>
 </div></section>
@@ -105,6 +126,18 @@ const articleLd = {
 </div></section>
 
 <ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
 
 <section class="section tinted"><div class="wrap">
 

@@ -15,8 +15,30 @@ const pageUrl = new URL('/guide/magic-show-immersive-chigai/', site).toString();
 
 const toc = [{"id": "compare", "label": "比較表：観るショーと、参加する体験"}, {"id": "role", "label": "物語への参加とキャストとの会話"}, {"id": "magic", "label": "マジックと物語の組み合わせ"}, {"id": "check", "label": "初参加のときに確認したいこと"}, {"id": "example", "label": "「怪盗と秘密の試験」の公開情報から見る具体例"}, {"id": "order", "label": "開催予定を確認する"}];
 
-const faqs = [];
 
+const faqs = [
+  {
+    q: '「怪盗と秘密の試験」の料金は？',
+    a: '1組あたり2人13,000円・3人16,500円・4人19,600円（税込、別途手数料がかかる場合あり）です。各回2〜4名、18歳以上が対象です。',
+  },
+  {
+    q: '所要時間はどのくらいですか？',
+    a: '所要時間はチケットページの表記をご確認ください（自社公式とチケットサイトの表記を確認中のため、本記事では断定していません）。受付時間に遅れると参加できません。',
+  },
+  {
+    q: 'マジックもイマーシブも初めてでも楽しめますか？',
+    a: '特別な知識や経験は必要ありません。体験中は登場人物やスタッフが必要に応じて進行をサポートします。話しかけられるのが苦手な方は、観劇型のマジックショーのほうが落ち着いて楽しめる場合があります。',
+  },
+  {
+    q: 'イマーシブ公演の制作を依頼する場合の費用は？',
+    a: '費用は1空間完結型で数十万円台〜、施設一体型で100万円前後〜、街全体の周遊型で数百万円規模が目安です（株式会社ex Labsにご依頼いただく場合）。既存公演の貸切・出張実施なら数十万円台から検討できます。詳しくは費用相場の記事をご覧ください。',
+  },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 
 const articleLd = {
   '@context': 'https://schema.org',
@@ -37,6 +59,7 @@ const articleLd = {
   description="観るマジックショーと、物語の一員として参加するイマーシブ体験の違いを比較表で整理。自分の立場、キャストとの会話、マジックの位置づけ、人数・年齢・持ち物の確認点を、マジック×イマーシブ公演「怪盗と秘密の試験」の公開情報を例に、運営会社の株式会社ex Labsが解説します。"
   ogImage="/assets/guide/magic-show-immersive-chigai.webp"
 >
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
@@ -50,10 +73,12 @@ const articleLd = {
 <p class="lede">マジックを楽しむ公演にも、席から演技を楽しむものや、物語の一員として参加するものがあります。何をする体験なのかを比較し、自分に合う公演を選ぶためのポイントを紹介します。</p>
 <p class="lede">この記事は、マジック×イマーシブ公演「怪盗と秘密の試験」を企画・制作している株式会社ex Labsによる案内です。マジックショーにも観客が舞台に上がる参加型があるため、「マジックショーは必ず観るだけ」とは言えません。ここでは「自分が何をするか」で違いを整理します。</p>
 <p class="pub-date">公開日：2026年9月9日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>マジックショーとイマーシブ体験の違いとは、「客席から観る」か「物語の登場人物として参加する」かという、参加者の立場の違いを指します。</li><li>観るマジックショーと、物語の一員として参加するイマーシブ体験の違いを比較表で整理。</li></ul></div>
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
 <ol>
 {toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+<li><a href="#faq">よくある質問</a></li>
 </ol>
 </nav>
 </div></section>
@@ -89,6 +114,18 @@ const articleLd = {
 <p class="lede">イマーシブ体験そのものの意味や種類は、<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>、<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>で解説しています。</p>
 </div></section>
 
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
 
 <section class="section tinted"><div class="wrap">
 
