@@ -11,6 +11,7 @@ import EventCard from '../../components/EventCard.astro';
 import ListingCard from '../../components/ListingCard.astro';
 import '../../styles/events.css';
 import { eventsData, EVENTS_CONTACT, LIST_DAYS } from '../../data/events/index';
+import { kvPublishedListings } from '../../lib/events-store';
 import { AREAS, GENRES, REGIONS, areaName } from '../../data/events/areas';
 import { sourceSites, SITE_KIND_LABEL, SITE_GENRE_LABEL, type SiteKind } from '../../data/events/sourceSites';
 const siteKinds: SiteKind[] = ['ticket', 'store', 'portal', 'community'];
@@ -22,7 +23,9 @@ const today = jstDateString(now);
 const c = parseCriteria(Astro.url.searchParams);
 const limit = addDays(today, LIST_DAYS);
 const own = resolveAll(eventsData, now).filter((r) => r.row.date <= limit);
-const ext = resolveListings(eventsData, now).filter((r) => r.row.date <= limit);
+// 外部サイト掲載：データファイル分＋管理画面（/contact/admin/events/）で公開した KV 分
+const kvListings = await kvPublishedListings();
+const ext = resolveListings({ ...eventsData, listings: [...eventsData.listings, ...kvListings] }, now).filter((r) => r.row.date <= limit);
 // 自社の回と外部サイト掲載を同じ並び（日付→時刻）で1つの結果にする。主催者による優先はしない
 const all: AnyResolved[] = [...own, ...ext].sort((a, b) => compareRows(a.row, b.row));
 const upcomingExt = ext.filter((r) => !['ended', 'cancelled'].includes(r.eventState));

@@ -446,9 +446,16 @@ export function validateDataset(ds: EventsDataset): string[] {
     }
     if (o.test && o.published) errs.push(`${L}: テストデータ（test:true）が published`);
   }
-  const siteIds = new Set((ds.sites ?? []).map((x) => x.id));
+  errs.push(...validateListings(ds.listings ?? [], new Set((ds.sites ?? []).map((x) => x.id))));
+  return errs;
+}
+
+/** 外部サイト掲載（listings）の検証。KV から読む行にも同じ検証を使う */
+export function validateListings(listings: Listing[], siteIds: Set<string>): string[] {
+  const errs: string[] = [];
+  const isIso = (s: string) => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/.test(s) && !Number.isNaN(Date.parse(s));
   const dupL = new Set<string>();
-  for (const l of ds.listings ?? []) {
+  for (const l of listings) {
     const L = `listing ${l.id}`;
     if (!l.title || !l.organizerName) errs.push(`${L}: title/organizerName が不足`);
     if (!siteIds.has(l.siteId)) errs.push(`${L}: siteId ${l.siteId} が sourceSites に無い`);

@@ -562,3 +562,4 @@
 - 未確認：escape.id の開演時刻・受付状況・空席（表示は「未確認」）。運用手順は docs/events-setup.md。
 - 同日追加：/events/ に「ほかのサイトで探す」外部リンク集（マダミス専門店・チケットプラットフォーム・情報ポータル・当日募集の 42 サイト、rel=nofollow、外部クリックを ev-ext で計測）。登録簿 src/data/events/sourceSites.ts、調査 docs/events-sources.md。利用条件は全件未確認のため自動取得は無し。
 - 同日追加：外部サイト掲載の公演（listings）を検索結果とサイト別一覧に並べる仕組み（src/data/events/listings.ts、ListingCard）。初期データはゼロ（この環境から各サイトへ到達できず未確認のため）。登録手順は docs/events-setup.md。
+- 同日追加：外部サイト掲載の公演を管理画面 /contact/admin/events/ から取り込める仕組み（URL 指定でその1ページを取得→JSON-LD Event／本文推定で候補→確認して公開→KV 保存→/events/ に表示）。定期再確認 /api/events/refresh は利用条件確認済みサイトの行だけ対象（初期ゼロ）。公開ページは noindex の管理画面と API のみ追加。

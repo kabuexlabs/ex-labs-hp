@@ -215,6 +215,12 @@ export interface Listing {
   checkedBy: string;
   published: boolean;
   test?: boolean;
+  /** 取得元ページ（管理画面の取り込み・再確認に使う） */
+  sourceUrl?: string;
+  /** 取り込み方法：jsonld＝構造化データ、text＝本文推定、manual＝手入力 */
+  fetchedVia?: 'jsonld' | 'text' | 'manual';
+  /** 定期再確認の対象（掲載元の利用条件を確認したサイトだけ true にする） */
+  autoRefresh?: boolean;
 }
 
 export interface EventsDataset {

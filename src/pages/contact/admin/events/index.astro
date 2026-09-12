@@ -1,0 +1,225 @@
+---
+// 外部サイト掲載の公演の取り込み（社内用）。認証は /contact/admin/ と同じ（YOYAKU_ADMIN_KEY、Cookie contact_admin）。
+// 使い方：URL（またはページの文字）を入れる → 候補が出る → 確認・修正して「公開」→ /events/ に並ぶ。
+// 取得はその場の1ページだけ。無人の定期再確認（autoRefresh）は、掲載元の利用条件を確認したサイト（terms: 'confirmed'）だけ。
+export const prerender = false;
+
+import YoyakuLayout from '../../../../layouts/YoyakuLayout.astro';
+import { checkAdminKey } from '../../../../lib/yoyaku';
+import { loginAllowed, recordLoginFailure, contactConfigStatus } from '../../../../lib/contact';
+import { fetchPage, extractCandidates, extractFromText, candidateToListing, type Candidate } from '../../../../lib/events-import';
+import { kvListListings, kvUpsertListing, kvDeleteListing, kvGetListing } from '../../../../lib/events-store';
+import { validateListings } from '../../../../lib/events';
+import { sourceSites } from '../../../../data/events/sourceSites';
+import { AREAS, GENRES } from '../../../../data/events/areas';
+import type { Genre, Listing } from '../../../../data/events/types';
+import { fmtVerified, jstDateString } from '../../../../lib/thisWeek';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+
+const COOKIE = 'contact_admin';
+let key = Astro.cookies.get(COOKIE)?.value ?? '';
+let loginFailed = false;
+let message = '';
+let candidates: Candidate[] = [];
+let fetchInfo = '';
+let form: FormData | null = null;
+const now = new Date();
+
+if (Astro.request.method === 'POST') {
+  form = await Astro.request.formData();
+  const action = String(form.get('action') ?? '');
+  if (action === 'login') {
+    const ip = (Astro.request.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
+    const entered = String(form.get('key') ?? '').trim();
+    if (!(await loginAllowed(ip))) loginFailed = true;
+    else if (checkAdminKey(entered)) {
+      Astro.cookies.set(COOKIE, entered, { httpOnly: true, secure: true, sameSite: 'lax', path: '/contact/admin' });
+      return Astro.redirect(Astro.url.pathname, 303);
+    } else { await recordLoginFailure(ip); loginFailed = true; }
+  } else if (checkAdminKey(key)) {
+    if (action === 'fetch') {
+      const url = String(form.get('url') ?? '').trim();
+      const pasted = String(form.get('text') ?? '').trim();
+      if (pasted) {
+        candidates = extractFromText(pasted, now, url || undefined);
+        fetchInfo = `貼り付けた文字から ${candidates.length} 件の候補（本文推定・要確認）`;
+      } else if (url) {
+        const r = await fetchPage(url);
+        if (!r.ok) fetchInfo = `取得できませんでした：${r.error ?? ''}。ページの文字を下の欄に貼ってください`;
+        else {
+          const ex = extractCandidates(r.body, url, now);
+          candidates = ex.candidates;
+          fetchInfo = ex.via === 'jsonld' ? `構造化データ（JSON-LD）から ${candidates.length} 件` : ex.via === 'text' ? `本文の推定で ${candidates.length} 件（作品名・料金単位は必ず確認）` : '公演回らしき記述が見つかりませんでした。ページの文字を下の欄に貼ってください';
+        }
+      }
+    } else if (action === 'publish') {
+      const n = parseInt(String(form.get('n') ?? '0'), 10) || 0;
+      const errs: string[] = [];
+      let saved = 0;
+      const siteIds = new Set(sourceSites.map((s) => s.id));
+      for (let i = 0; i < n; i++) {
+        if (!form.get(`pick_${i}`)) continue;
+        const g = (k: string) => String(form.get(`${k}_${i}`) ?? '').trim();
+        const amount = parseInt(g('amount'), 10);
+        const pmin = parseInt(g('pmin'), 10);
+        const pmax = parseInt(g('pmax'), 10);
+        const dur = parseInt(g('dur'), 10);
+        const site = sourceSites.find((s) => s.id === g('site'));
+        const l: Listing = {
+          id: g('id') || `${g('site')}-${g('date')}-${(g('start') || 'na').replace(':', '')}-${Math.random().toString(36).slice(2, 6)}`,
+          title: g('title'), siteId: g('site'), organizerName: g('org') || site?.name || '', url: g('url'),
+          genres: [g('genre') as Genre], regionId: AREAS.find((a) => a.id === g('area'))?.regionId ?? 'tokyo', areaId: g('area'), venueName: g('venue') || undefined,
+          date: g('date'), startTime: g('start') || undefined, endTime: g('end') || undefined, durationMinutes: dur > 0 ? dur : undefined,
+          priceText: g('price') || undefined, priceUnit: (g('unit') || undefined) as Listing['priceUnit'], amount: Number.isFinite(amount) && amount > 0 ? amount : undefined,
+          party: pmin > 0 ? { min: pmin, max: pmax > 0 ? pmax : undefined, text: g('ptext') || undefined } : undefined,
+          status: (g('status') || 'unknown') as Listing['status'], remainingText: g('rem') || undefined,
+          checkedAt: new Date(now.getTime() + 9 * 3600000).toISOString().replace(/\.\d{3}Z$/, '+09:00'), checkedBy: g('by') || '管理者',
+          published: true, sourceUrl: g('src') || g('url'), fetchedVia: (g('via') || 'manual') as Listing['fetchedVia'],
+          autoRefresh: !!form.get(`auto_${i}`) && site?.terms === 'confirmed',
+        };
+        if (l.amount !== undefined && l.priceUnit !== 'per-person') l.amount = undefined;
+        const e = validateListings([l], siteIds);
+        if (e.length) { errs.push(`${l.title || `候補${i + 1}`}：${e.join('／')}`); continue; }
+        if (await kvUpsertListing(l)) saved++; else errs.push(`${l.title}：KV に保存できません（KV 未設定）`);
+      }
+      message = `${saved} 件を公開しました。${errs.length ? '保存できなかった候補：' + errs.join(' ｜ ') : ''}`;
+    } else if (action === 'toggle' || action === 'delete' || action === 'recheck') {
+      const id = String(form.get('id') ?? '');
+      const cur = await kvGetListing(id);
+      if (cur) {
+        if (action === 'delete') await kvDeleteListing(id);
+        else if (action === 'toggle') await kvUpsertListing({ ...cur, published: !cur.published });
+        else if (action === 'recheck') {
+          // 同じページを再取得して募集状況・残席だけ更新。取れなければ「掲載元で確認」に戻す
+          const r = cur.sourceUrl ? await fetchPage(cur.sourceUrl) : null;
+          let updated = false;
+          if (r?.ok) {
+            const ex = extractCandidates(r.body, cur.sourceUrl!, now);
+            const hit = ex.candidates.find((c) => c.date === cur.date && (c.startTime ?? '') === (cur.startTime ?? '') && c.title === cur.title) ?? ex.candidates.find((c) => c.date === cur.date && (c.startTime ?? '') === (cur.startTime ?? ''));
+            if (hit) { await kvUpsertListing({ ...cur, status: hit.status, remainingText: hit.remainingText, checkedAt: new Date(now.getTime() + 9 * 3600000).toISOString().replace(/\.\d{3}Z$/, '+09:00'), checkedBy: '再確認（管理画面）' }); updated = true; }
+          }
+          if (!updated) await kvUpsertListing({ ...cur, status: 'unknown', remainingText: undefined, checkedAt: new Date(now.getTime() + 9 * 3600000).toISOString().replace(/\.\d{3}Z$/, '+09:00'), checkedBy: '再確認できず（管理画面）' });
+          message = updated ? `${cur.title} の募集状況を更新しました` : `${cur.title} は再取得できなかったため「募集状況は掲載元で確認」に戻しました`;
+        }
+      }
+      if (action !== 'recheck') return Astro.redirect(Astro.url.pathname + '#list', 303);
+    }
+  }
+}
+
+const authed = checkAdminKey(key);
+const status = contactConfigStatus();
+const existing: Listing[] = authed ? await kvListListings() : [];
+const today = jstDateString(now);
+const siteOf = (id: string) => sourceSites.find((s) => s.id === id);
+const defSite = String(form?.get('site') ?? '');
+const defUrl = String(form?.get('url') ?? '');
+const defBy = String(form?.get('by') ?? '');
+---
+<YoyakuLayout title="公演の取り込み（社内用）">
+<div style="max-width:1100px;margin:0 auto;padding:24px 16px 80px;font-size:14px;line-height:1.7">
+<p style="margin:0 0 6px"><a href="/contact/admin/" style="color:var(--accent)">← 問い合わせ管理へ</a>　<a href="/events/" style="color:var(--accent)">公演を探す（公開ページ）</a></p>
+<h1 style="font-size:20px;margin:0 0 14px">外部サイト掲載の公演を取り込む</h1>
+{!authed ? (
+  <form method="post" style="max-width:360px">
+    <input type="hidden" name="action" value="login">
+    <label>合言葉<br><input type="password" name="key" required style="width:100%;padding:8px;font-size:15px"></label>
+    {loginFailed && <p style="color:#b00;margin:6px 0 0">合言葉が違うか、失敗が多すぎます</p>}
+    <button type="submit" style="margin-top:10px;padding:10px 18px;font-weight:700">ログイン</button>
+  </form>
+) : (
+<>
+{!status.kv && <p style="background:#fff3cd;border:1px solid #e0c060;padding:10px 12px">KV（Redis）が未設定のため、公開しても保存されません。Vercel の KV_REST_API_URL / TOKEN を設定してください。</p>}
+{message && <p style="background:#e8f4ea;border:1px solid #9ccfa4;padding:10px 12px">{message}</p>}
+
+<section style="border:2px solid var(--ink);background:#fff;padding:16px 18px;margin:0 0 22px">
+<h2 style="font-size:16px;margin:0 0 8px">1. ページを取得して候補を出す</h2>
+<p style="margin:0 0 10px;font-size:13px;color:#555">掲載元の公演ページ（店舗の公演一覧、マダミス.jp の店舗ページ、TwiPla のイベント等）の URL を入れてください。その1ページだけをその場で取得します。取得できないサイトは、ページの文字をコピーして下の欄に貼れば同じように候補が出ます。</p>
+<form method="post">
+  <input type="hidden" name="action" value="fetch">
+  <div style="display:grid;grid-template-columns:1fr 220px;gap:10px;align-items:end">
+    <label>URL<br><input type="url" name="url" value={defUrl} placeholder="https://…" style="width:100%;padding:8px;font-size:14px"></label>
+    <label>掲載元サイト<br><select name="site" style="width:100%;padding:8px;font-size:14px">{sourceSites.map((s) => <option value={s.id} selected={defSite === s.id}>{s.name}</option>)}</select></label>
+  </div>
+  <label style="display:block;margin-top:10px">ページの文字（URL で取れない時）<br><textarea name="text" rows="5" style="width:100%;padding:8px;font-size:13px" placeholder="スケジュール画面の文字をそのまま貼る（例：9/20(土) 19:00〜 黒い森の獣 ¥5,000 🈳2）"></textarea></label>
+  <label style="display:block;margin-top:10px;max-width:260px">確認者<br><input type="text" name="by" value={defBy} placeholder="例：飯田" style="width:100%;padding:8px;font-size:14px"></label>
+  <button type="submit" style="margin-top:10px;padding:10px 18px;font-weight:700">取得して候補を出す</button>
+</form>
+{fetchInfo && <p style="margin:12px 0 0;font-weight:700">{fetchInfo}</p>}
+</section>
+
+{candidates.length > 0 && (
+<section style="border:2px solid var(--ink);background:#fff;padding:16px 18px;margin:0 0 22px">
+<h2 style="font-size:16px;margin:0 0 8px">2. 確認して公開する</h2>
+<p style="margin:0 0 10px;font-size:13px;color:#555">公開する回にチェック。作品名・日付・時刻・料金の単位（1人／1組／貸切）・エリア・ジャンルは必ず確認してください。「本文推定」の候補は作品名が違うことがあります。1人あたりの金額は、1人料金が確定している時だけ入れてください（予算絞り込みに使います）。</p>
+<form method="post">
+  <input type="hidden" name="action" value="publish">
+  <input type="hidden" name="n" value={String(candidates.length)}>
+  <div style="display:flex;flex-direction:column;gap:14px">
+  {candidates.map((c, i) => (
+    <fieldset style="border:1px solid #ccc;padding:10px 12px">
+      <legend style="font-weight:700"><label><input type="checkbox" name={`pick_${i}`} checked={c.via === 'jsonld'}> 候補{i + 1}（{c.via === 'jsonld' ? '構造化データ' : '本文推定'}）</label></legend>
+      <p style="margin:0 0 8px;font-size:12px;color:#777">根拠：{c.evidence}</p>
+      <input type="hidden" name={`site_${i}`} value={defSite || sourceSites[0].id}>
+      <input type="hidden" name={`via_${i}`} value={c.via}>
+      <input type="hidden" name={`src_${i}`} value={defUrl}>
+      <input type="hidden" name={`by_${i}`} value={defBy}>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;font-size:12.5px">
+        <label style="grid-column:1/-1">作品名<br><input name={`title_${i}`} value={c.title} style="width:100%;padding:6px"></label>
+        <label>主催・店舗名<br><input name={`org_${i}`} value={c.organizerName ?? siteOf(defSite)?.name ?? ''} style="width:100%;padding:6px"></label>
+        <label>会場名<br><input name={`venue_${i}`} value={c.venueName ?? ''} style="width:100%;padding:6px"></label>
+        <label>日付<br><input type="date" name={`date_${i}`} value={c.date ?? ''} style="width:100%;padding:6px"></label>
+        <label>開演<br><input type="time" name={`start_${i}`} value={c.startTime ?? ''} style="width:100%;padding:6px"></label>
+        <label>終了<br><input type="time" name={`end_${i}`} value={c.endTime ?? ''} style="width:100%;padding:6px"></label>
+        <label>所要（分）<br><input type="number" name={`dur_${i}`} value={c.durationMinutes ?? ''} style="width:100%;padding:6px"></label>
+        <label>料金の表示<br><input name={`price_${i}`} value={c.priceText ?? ''} placeholder="¥4,500（1人）" style="width:100%;padding:6px"></label>
+        <label>料金の単位<br><select name={`unit_${i}`} style="width:100%;padding:6px"><option value="">（料金なし）</option><option value="per-person" selected={c.priceUnit === 'per-person'}>1人あたり</option><option value="per-group">1組あたり</option><option value="charter">貸切総額</option></select></label>
+        <label>1人あたり金額（円）<br><input type="number" name={`amount_${i}`} value={c.amount ?? ''} style="width:100%;padding:6px"></label>
+        <label>人数 最小<br><input type="number" name={`pmin_${i}`} placeholder="未確認なら空" style="width:100%;padding:6px"></label>
+        <label>人数 最大<br><input type="number" name={`pmax_${i}`} placeholder="未確認なら空" style="width:100%;padding:6px"></label>
+        <label>人数の表示<br><input name={`ptext_${i}`} placeholder="例：1名から相席" style="width:100%;padding:6px"></label>
+        <label>募集状況<br><select name={`status_${i}`} style="width:100%;padding:6px"><option value="unknown" selected={c.status === 'unknown'}>掲載元で確認</option><option value="open" selected={c.status === 'open'}>募集中</option><option value="soldout" selected={c.status === 'soldout'}>満席</option><option value="cancelled" selected={c.status === 'cancelled'}>中止</option></select></label>
+        <label>残席の表示<br><input name={`rem_${i}`} value={c.remainingText ?? ''} placeholder="例：残り2席" style="width:100%;padding:6px"></label>
+        <label>エリア<br><select name={`area_${i}`} style="width:100%;padding:6px">{AREAS.map((a) => <option value={a.id}>{a.name}</option>)}</select></label>
+        <label>ジャンル<br><select name={`genre_${i}`} style="width:100%;padding:6px">{GENRES.map((g) => <option value={g.id} selected={g.id === 'murder-mystery'}>{g.name}</option>)}</select></label>
+        <label style="grid-column:1/-1">遷移先 URL（掲載元の該当ページ）<br><input type="url" name={`url_${i}`} value={c.url ?? defUrl} style="width:100%;padding:6px"></label>
+        {siteOf(defSite)?.terms === 'confirmed' && <label><input type="checkbox" name={`auto_${i}`}> 毎日自動で募集状況を再確認する（利用条件確認済みのサイト）</label>}
+      </div>
+    </fieldset>
+  ))}
+  </div>
+  <button type="submit" style="margin-top:12px;padding:10px 18px;font-weight:700">チェックした回を公開する</button>
+</form>
+</section>
+)}
+
+<section id="list" style="border:2px solid var(--ink);background:#fff;padding:16px 18px">
+<h2 style="font-size:16px;margin:0 0 8px">3. 公開中・非公開の一覧（{existing.length}件、KV 保存分）</h2>
+<p style="margin:0 0 10px;font-size:13px;color:#555">「再確認」は同じページをもう一度取得して募集状況と残席だけ更新します。取得できなければ「掲載元で確認」に戻ります。データファイル（listings.ts）の分はここに出ません。</p>
+{existing.length === 0 ? <p style="color:#777">まだありません。</p> : (
+<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;font-size:12.5px">
+<thead><tr style="background:#f3f0ea"><th style="padding:6px;text-align:left">日付・時刻</th><th style="padding:6px;text-align:left">作品名／掲載元</th><th style="padding:6px;text-align:left">料金／人数</th><th style="padding:6px;text-align:left">募集状況（確認日時）</th><th style="padding:6px;text-align:left">状態</th><th style="padding:6px"></th></tr></thead>
+<tbody>
+{existing.map((l) => (
+  <tr style={`border-top:1px solid #ddd;${l.date < today ? 'color:#999' : ''}`}>
+    <td style="padding:6px;white-space:nowrap">{l.date}{l.startTime ? ` ${l.startTime}` : ''}{l.date < today ? '（終了）' : ''}</td>
+    <td style="padding:6px"><strong>{l.title}</strong><br><a href={l.url} target="_blank" rel="noopener" style="color:var(--accent)">{siteOf(l.siteId)?.name ?? l.siteId}</a>／{l.organizerName}</td>
+    <td style="padding:6px">{l.priceText ?? '—'}{l.priceUnit ? `（${l.priceUnit === 'per-person' ? '1人' : l.priceUnit === 'per-group' ? '1組' : '貸切'}）` : ''}<br>{l.party?.text ?? (l.party ? `${l.party.min}〜${l.party.max ?? ''}名` : '人数未確認')}</td>
+    <td style="padding:6px">{l.status === 'open' ? '募集中' : l.status === 'soldout' ? '満席' : l.status === 'cancelled' ? '中止' : '掲載元で確認'}{l.remainingText ? `（${l.remainingText}）` : ''}<br><span style="color:#777">{fmtVerified(l.checkedAt)}・{l.checkedBy}{l.autoRefresh ? '・毎日再確認' : ''}</span></td>
+    <td style="padding:6px">{l.published ? '公開' : '非公開'}</td>
+    <td style="padding:6px;white-space:nowrap">
+      <form method="post" style="display:inline"><input type="hidden" name="action" value="toggle"><input type="hidden" name="id" value={l.id}><button type="submit">{l.published ? '非公開にする' : '公開する'}</button></form>
+      <form method="post" style="display:inline"><input type="hidden" name="action" value="recheck"><input type="hidden" name="id" value={l.id}><button type="submit">再確認</button></form>
+      <form method="post" style="display:inline" onsubmit="return confirm('削除しますか？')"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value={l.id}><button type="submit">削除</button></form>
+    </td>
+  </tr>
+))}
+</tbody></table></div>
+)}
+</section>
+</>
+)}
+</div>
+</YoyakuLayout>
