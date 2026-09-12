@@ -1,0 +1,142 @@
+---
+// 作品の詳細ページ（/events/<slug>/）。公開作品ごとに1枚（検索条件や日付別のページは作らない）。
+// 終了した作品もページは残し「終了」を明示して、開催中の公演一覧へ案内する。
+// 構造化データ（Event）は、実際に表示している確認済みの回だけを1回ずつ出す。受付状況・空席が
+// 未確認の回には offers を付けない（予約可能に見せない）。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import EventCard from '../../components/EventCard.astro';
+import '../../styles/events.css';
+import { eventsData, EVENTS_CONTACT } from '../../data/events/index';
+import { genreName, areaName, regionName } from '../../data/events/areas';
+import { resolveAll, FORMAT_LABEL, perPerson, fmtYen, EVENT_STATUS_LABEL } from '../../lib/events';
+import { fmtDateJa, fmtDateShort, fmtVerified, jstDateString } from '../../lib/thisWeek';
+import { jsonLd } from '../../lib/microcms';
+
+const { slug } = Astro.params;
+const work = eventsData.works.find((w) => w.slug === slug && w.published);
+if (!work) return new Response(null, { status: 404 });
+
+const now = new Date();
+const today = jstDateString(now);
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const all = resolveAll(eventsData, now).filter((r) => r.work.id === work.id);
+const upcoming = all.filter((r) => !['ended', 'cancelled'].includes(r.eventState));
+const past = all.filter((r) => r.eventState === 'ended');
+const cancelled = all.filter((r) => r.eventState === 'cancelled');
+const isOver = upcoming.length === 0 && all.length > 0;
+const organizer = eventsData.organizers.find((o) => o.id === work.organizerId)!;
+const venues = [...new Set(all.map((r) => r.venue.id))].map((id) => eventsData.venues.find((v) => v.id === id)!);
+const own = organizer.relation === 'ex-labs';
+const sources = work.sourceIds.map((id) => eventsData.sources.find((s) => s.id === id)!).filter(Boolean);
+const others = resolveAll(eventsData, now).filter((r) => r.work.id !== work.id && !['ended', 'cancelled'].includes(r.eventState));
+const otherWorks = [...new Map(others.map((r) => [r.work.id, r])).values()];
+const areaText = venues.map((v) => `${regionName(v.regionId)}・${areaName(v.areaId)}`).filter((x, i, a) => a.indexOf(x) === i).join('／');
+const priceUnit = work.price.unit === 'per-person' ? '1人あたり' : work.price.unit === 'per-group' ? '1組あたり' : '貸切総額';
+const ppList = work.price.unit === 'per-group' && work.price.tiers ? work.price.tiers.map((t) => `${t.party}人参加 ${fmtYen(perPerson(work.price, t.party)!)}`).join('／') : '';
+const title = `${work.title}｜開催日程・料金・予約先（${areaText}） - 株式会社ex Labs`;
+const desc = `${work.title}（${work.genres.map(genreName).join('・')}、${areaText}）の開催日程・料金・申込人数・参加条件と公式予約ページ。${isOver ? 'この公演は終了しました。' : '開催・販売・空席の確認状況を分けて掲載しています。'}${own ? '株式会社ex Labs が企画・制作。' : ''}`.slice(0, 158);
+
+const eventLd = upcoming.concat(cancelled).map((r) => {
+  const o = r.occ;
+  const v = r.venue;
+  const ld: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: work.title,
+    description: work.summary,
+    startDate: o.startTime ? `${o.date}T${o.startTime}:00+09:00` : o.date,
+    ...(o.endTime ? { endDate: `${o.date}T${o.endTime}:00+09:00` } : {}),
+    eventStatus: o.eventStatus === 'cancelled' ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    location: { '@type': 'Place', name: v.name, ...(v.address ? { address: v.address } : { address: { '@type': 'PostalAddress', addressRegion: '東京都', addressCountry: 'JP' } }) },
+    organizer: { '@type': 'Organization', name: organizer.name, ...(organizer.url ? { url: organizer.url } : {}) },
+    url: new URL(`/events/${work.slug}/`, site).toString(),
+    inLanguage: 'ja',
+  };
+  // 受付中と確認できた回だけ offers を付ける。空席は確認済みの場合のみ availability を出す
+  if (r.salesState === 'open' && o.sales.channels[0]) {
+    const offer: Record<string, unknown> = { '@type': 'Offer', url: o.sales.channels[0].url, priceCurrency: 'JPY', validFrom: o.sales.checkedAt };
+    if (work.price.unit === 'per-person' && work.price.amount !== undefined) offer.price = work.price.amount;
+    if (r.seatState === 'available') offer.availability = 'https://schema.org/InStock';
+    if (r.seatState === 'soldout') offer.availability = 'https://schema.org/SoldOut';
+    ld.offers = offer;
+  }
+  return ld;
+});
+---
+<BaseLayout title={title} description={desc} ogType="article">
+{eventLd.length > 0 && <script type="application/ld+json" set:html={jsonLd(eventLd)} />}
+<Breadcrumb items={[{ name: 'ホーム', href: '/' }, { name: '公演を探す', href: '/events/' }, { name: work.title }]} />
+
+<section class="section ev-hero"><div class="wrap">
+<p class="eyebrow">EVENT</p>
+<h1 class="ev-detail-h1 serif">{work.title}</h1>
+<ul class="ev-tags">
+  {work.genres.map((g) => <li>{genreName(g)}</li>)}
+  <li>{areaText}</li>
+  <li class:list={{ own }}>{organizer.relationLabel}</li>
+  {isOver && <li>終了</li>}
+</ul>
+{isOver && (
+  <p class="ev-notice"><strong>この公演は終了しました。</strong>掲載している日程・料金は開催当時の記録です。いま参加できる公演は<a href="/events/" style="color:var(--accent);text-decoration:underline">公演を探す</a>からご覧ください。</p>
+)}
+<div class="ev-body">
+  <p><strong>{work.summary}</strong></p>
+  {work.description.map((p) => <p>{p}</p>)}
+</div>
+<dl class="ev-facts">
+  <div><dt>会場・エリア</dt><dd>{venues.map((v) => <>{regionName(v.regionId)}・{areaName(v.areaId)}／{v.name}{v.address ? `（${v.address}）` : ''}{v.access ? <><br><span class="ev-note">{v.access}</span></> : null}{v.setting ? <><br><span class="ev-note">{v.setting === 'indoor' ? '屋内' : v.setting === 'outdoor' ? '屋外' : '屋内・屋外の両方'}</span></> : null}</>)}</dd></div>
+  <div><dt>所要時間</dt><dd>{work.duration.text}</dd></div>
+  <div><dt>料金（{priceUnit}）</dt><dd>{work.price.text}<br><span class="ev-note">{work.price.feeNote}</span>{ppList && <><br><span class="ev-note">1人あたりの目安：{ppList}（手数料別）</span></>}</dd></div>
+  <div><dt>申込可能な人数・参加形式</dt><dd>{work.party.text}<br><span class="ev-note">{work.party.soloAllowed ? '1人参加可' : '1人での申込不可'}{work.party.soloRuns !== undefined ? `・${work.party.soloRuns ? '1人でも開催成立' : '1人では開催成立せず（相席）'}` : ''}・{FORMAT_LABEL[work.party.format]}</span></dd></div>
+  {work.info.beginner && <div><dt>初心者向けの説明</dt><dd>{work.info.beginner}</dd></div>}
+  {work.info.participation && <div><dt>会話・演技への参加度</dt><dd>{work.info.participation}</dd></div>}
+  {work.info.actorInteraction !== undefined && <div><dt>俳優・キャストとの交流</dt><dd>{work.info.actorInteraction ? 'あり' : 'なし'}</dd></div>}
+  {work.info.scary && <div><dt>怖さ・ホラー要素</dt><dd>{work.info.scary}</dd></div>}
+  {work.info.ageRule && <div><dt>年齢条件</dt><dd>{work.info.ageRule}</dd></div>}
+  {work.info.language && <div><dt>使用言語</dt><dd>{work.info.language}</dd></div>}
+  {work.info.walking && <div><dt>歩行・移動</dt><dd>{work.info.walking}</dd></div>}
+  {work.info.requirements?.length ? <div><dt>持ち物・参加条件</dt><dd><ul>{work.info.requirements.map((x) => <li>{x}</li>)}</ul></dd></div> : null}
+  <div><dt>公式ページ</dt><dd><a href={work.officialUrl} style="color:var(--accent);text-decoration:underline" target={work.officialUrl.startsWith('http') ? '_blank' : undefined} rel={work.officialUrl.startsWith('http') ? 'noopener' : undefined} data-track="show" data-show={work.id} data-place={`detail-official-${own ? 'own' : '3rd'}`}>{work.officialUrl.startsWith('http') ? work.officialUrl : new URL(work.officialUrl, site).toString()}</a></dd></div>
+</dl>
+</div></section>
+
+<section class="section tinted ev-results" id="dates"><div class="wrap">
+<h2 class="ev-res-h">開催日程と予約先 <small>（{today} 時点・日本時間）</small></h2>
+<p class="ev-meta">開催情報の最終確認：{fmtVerified(work.verified.at)}（{work.verified.by}）。販売・空席の状況は公式ページが正で、ここでは確認できた状態と確認日時だけを表示します。</p>
+{upcoming.length > 0 ? (
+  <ul class="ev-list">{upcoming.map((r) => <li><EventCard r={r} place="detail" compact /></li>)}</ul>
+) : (
+  <div class="ev-zero"><p class="ev-zero-t">これから開催予定の回は確認できていません</p><p>今後の日程は公式ページでご確認ください。</p></div>
+)}
+{cancelled.length > 0 && (
+  <><p class="ev-res-h" style="margin-top:26px;font-size:15px">中止になった回</p><ul class="ev-past">{cancelled.map((r) => <li>{fmtDateShort(r.occ.date)}{r.occ.startTime ? ` ${r.occ.startTime}` : ''} 中止</li>)}</ul></>
+)}
+{past.length > 0 && (
+  <><p class="ev-res-h" style="margin-top:26px;font-size:15px">終了した回</p><ul class="ev-past">{past.map((r) => <li>{fmtDateShort(r.occ.date)}{r.occ.startTime ? ` ${r.occ.startTime}` : ''} {EVENT_STATUS_LABEL[r.occ.eventStatus] === '中止' ? '中止' : '終了'}</li>)}</ul></>
+)}
+<p class="ev-src" style="margin-top:22px">情報源：{sources.map((s, i) => <>{i > 0 && '／'}{s.url ? <a href={s.url} target="_blank" rel="noopener">{s.label}</a> : s.label}（{fmtVerified(s.checkedAt)}確認）</>)}。掲載内容の修正・掲載停止のご依頼は <a href={`mailto:${EVENTS_CONTACT}`}>{EVENTS_CONTACT}</a> へ。</p>
+</div></section>
+
+{otherWorks.length > 0 && (
+  <section class="section ev-links"><div class="wrap">
+  <h2 class="h2 serif">ほかに開催予定のある公演</h2>
+  <ul>{otherWorks.map((r) => <li><a href={`/events/${r.work.slug}/`} data-track="show" data-show={r.work.id} data-place={`detail-related-${r.organizer.relation === 'ex-labs' ? 'own' : '3rd'}`}>{r.work.title}<span>{r.work.genres.map(genreName).join('・')}｜{regionName(r.venue.regionId)}・{areaName(r.venue.areaId)}｜次回 {fmtDateJa(r.occ.date)}</span></a></li>)}</ul>
+  <p class="ev-lede" style="margin-top:16px"><a href="/events/" style="color:var(--accent);text-decoration:underline">日付・人数から公演を探す →</a>　選び方は<a href="/guide/immersive-tokyo/" style="color:var(--accent);text-decoration:underline">東京のイマーシブ体験ガイド</a>／<a href="/guide/madamis-tokyo/" style="color:var(--accent);text-decoration:underline">東京でマダミスを遊ぶには</a></p>
+  </div></section>
+)}
+
+<section class="section ev-biz"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">施設・企業向け：イベント制作のご相談（無料）</p>
+<a class="btn" href="/services/" data-cta="events-biz">法人向けサービスを見る</a>
+</div>
+</div></section>
+<script is:inline define:vars={{ evViewCat: `${work.id}-${own ? 'own' : '3rd'}` }}>
+// 公演詳細の閲覧を数える（個人情報なし。値は 作品ID-own|3rd）
+(function(){try{var b=JSON.stringify({e:'ev-view',p:location.pathname,c:evViewCat});if(navigator.sendBeacon){navigator.sendBeacon('/api/track',new Blob([b],{type:'application/json'}))}else{fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},body:b,keepalive:true})}}catch(e){}})();
+</script>
+</BaseLayout>

@@ -73,3 +73,10 @@
 - デザイン（2026-09-09〜）：配色トークンは global.css の :root（濃紺 #0b47b5、淡青ハイライト --yellow）。ハードなオフセット影・墨フチ・方眼紙の地は廃止。新規スタイルは var(--shadow-1)/var(--bd)/var(--r-*) を参照する。デザイン変更の前後比較は `node scripts/seo-snapshot.mjs <dir>` → `node scripts/seo-snapshot-diff.mjs <before> <after>`（playwright は scratchpad の node_modules を NODE_PATH ではなく symlink で解決）。
 - クエリファンアウト対応（docs/query-fanout-map.md）：記事は①曖昧さ ②潜在ニーズ ③深掘り ④証拠 ⑤エンティティ ⑥関連 のサブクエリに1段落ずつ答える。冒頭の「要点」ボックス（.key-points、3行）を非凍結記事に置く。GSC の複合語で順位10位以下のものは「答えの段落」を用意する候補。
 - 【恒久ルール／2026-09-11】クエリファンアウト全記事必須：ガイド記事・サービスページの**全ページ**で、①定義（「〜とは」）＋用語ページは読み方・英語、②目的別・向き不向き、③費用（万円）・期間・人数の具体値、④実績・出典（日経掲載／全公演完売／20件など既出の事実のみ）、⑤株式会社ex Labs の自己言及＋AuthorBox/svc-sum、⑥関連内部リンク3本以上、要点ボックス（.key-points／.def-box／.svc-sum）、FAQ（faqLd 付き）を揃える。`npm run seo:fanout`（scripts/fanout-audit.mjs、`npm run check` に含む・警告扱い）で確認し、**新規記事は公開前に不足0**、既存記事の改修時も不足を残さない。凍結中の柱記事は FAQ 追加のみで対応し、凍結解除（2026-09-21）後に要点ボックスを追加する（残：guide/madamis）。費用・期間・人数の標準文は event-hiyou／immersive-cost／madamis-cost／zunousen-cost の数値（数十万円台〜／100万円前後〜／数百万円規模、2〜4週間／最短1ヶ月・標準1〜3ヶ月、各回2〜10名／1日数十〜数百名、卓上6〜12人）と揃え、新しい数字を作らない。適用外（歴史・作品紹介・語彙・VR比較・消費者向け公演一覧）は fanout-audit.mjs の NO_COST／NO_TERM／PROTECTED で明示する。
+
+## 公演検索サービス /events/（2026-09-13〜）
+- 正本は `src/data/events/`（主催者・作品・会場・公演回・販売先・情報源を分けて管理）。運用手順と公開前の不足は `docs/events-setup.md`。`src/data/shows.ts` は変換層なので手で編集しない。
+- 不明な情報は推測で埋めない（開演時刻・上限人数・販売状態・空席は未確認のまま `unknown`／省略）。開催予定があるだけで「予約する」にしない。空席には `checkedAt` と `expiresAt` が必須。
+- テストデータは `fixtures.ts` のみ。公開ページから import しない。`npm run test:events` と `npm run events:validate` は `npm run check` に含まれる。
+- 絞り込み状態のページ・日付別ページは作らない。検索対象は /events/ と作品詳細だけ。
+- 他社の画像・紹介文は利用条件を確認できたものだけ。escape.id 等の自動取得はしない。hub.escape.id は未確認のため未接続。

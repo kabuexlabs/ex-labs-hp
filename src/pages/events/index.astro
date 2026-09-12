@@ -1,0 +1,235 @@
+---
+// 公演検索サービス「今日・明日・今週末に遊べるマダミス・イマーシブ公演」（/events/）。
+// SSR で毎リクエスト評価（日本時間）。絞り込みはクエリ文字列（GET）で動き、JS があれば同じ判定関数で即時反映する。
+// 検索対象にする固定ページはこの1枚と作品詳細（/events/<slug>/）だけ。絞り込み状態は canonical で /events/ に集約する
+// （BaseLayout の canonical はクエリを含まない）。データの正本は src/data/events/、判定は src/lib/events.ts。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import EventCard from '../../components/EventCard.astro';
+import '../../styles/events.css';
+import { eventsData, EVENTS_CONTACT, LIST_DAYS } from '../../data/events/index';
+import { AREAS, GENRES, REGIONS, areaName } from '../../data/events/areas';
+import { parseCriteria, criteriaToQuery, resolveAll, search, nextAvailableDate, BUDGET_OPTIONS, END_BY_OPTIONS, PARTY_MAX, fmtYen } from '../../lib/events';
+import { jstDateString, addDays, weekRange, fmtDateShort, fmtDateJa, fmtVerified } from '../../lib/thisWeek';
+
+const now = new Date();
+const today = jstDateString(now);
+const c = parseCriteria(Astro.url.searchParams);
+const all = resolveAll(eventsData, now).filter((r) => r.row.date <= addDays(today, LIST_DAYS));
+const result = search(all, c, now);
+const nextDate = result.matched.length === 0 ? nextAvailableDate(all, c, now) : null;
+const weekend = weekRange(now).weekend.filter((d) => d >= today);
+const weekendLabel = weekend.map(fmtDateShort).join('・');
+const windowLabel = result.window ? result.window.map(fmtDateJa).join('・') : `これから${LIST_DAYS}日以内`;
+// 掲載データがある地域・エリアだけを選択肢にする（空の地域ページは作らない）
+const dataAreas = new Set(all.map((r) => r.venue.areaId));
+const dataRegions = new Set(all.map((r) => r.venue.regionId));
+const areaOptions = AREAS.filter((a) => dataAreas.has(a.id));
+const regionOptions = REGIONS.filter((r) => dataRegions.has(r.id));
+const latestVerified = eventsData.works.filter((w) => w.published).map((w) => w.verified.at).sort().pop() ?? '';
+const anyStale = all.some((r) => r.stale);
+const pageTitle = '今日・明日・今週末に遊べるマダミス・イマーシブ公演を探す（東京） - 株式会社ex Labs';
+const pageDesc = '東京で今日・明日・今週末に参加できるマーダーミステリー・イマーシブシアター・周遊型の物語体験を、日付・人数・エリア・ジャンル・予算から探せる無料の公演情報サービス。開催・販売・空席の確認状況を分けて表示し、予約は公式販売ページへ案内します。';
+const relax: { label: string; q: string }[] = [];
+if (c.party) relax.push({ label: '人数の指定を外す', q: criteriaToQuery({ ...c, party: undefined }) });
+if (c.when !== 'all') relax.push({ label: `日付の指定を外す（これから${LIST_DAYS}日）`, q: criteriaToQuery({ ...c, when: 'all', date: undefined }) });
+if (c.area || c.region) relax.push({ label: 'エリアの指定を外す', q: criteriaToQuery({ ...c, area: undefined, region: undefined }) });
+if (c.genre) relax.push({ label: 'ジャンルの指定を外す', q: criteriaToQuery({ ...c, genre: '' }) });
+if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時刻・予算の指定を外す', q: criteriaToQuery({ ...c, start: '', endBy: undefined, budget: undefined }) });
+---
+<BaseLayout title={pageTitle} description={pageDesc}>
+<Breadcrumb items={[{ name: 'ホーム', href: '/' }, { name: '公演を探す' }]} />
+
+<section class="section ev-hero" data-today={today}><div class="wrap">
+<p class="eyebrow">EVENTS</p>
+<h1 class="h2 serif">今日・明日・今週末に遊べる<br class="sponly">マダミス・イマーシブ公演を探す</h1>
+<p class="ev-lede">遊びたい日と人数から、東京で参加できるマーダーミステリー・イマーシブシアター・周遊型の物語体験を探せます。株式会社ex Labs が運営する無料の公演情報サービスで、他社の公演も掲載条件を確認できたものを紹介します。予約・決済は各公演の公式販売ページで行ってください。</p>
+
+<form class="ev-form" id="ev-form" method="get" action="/events/" aria-label="公演の検索条件">
+  <fieldset>
+    <legend>いつ遊ぶ？</legend>
+    <div class="ev-chips" id="ev-when">
+      <label class="ev-chip"><input type="radio" name="when" value="today" checked={c.when === 'today'}><span>今日 <small data-when-label="today">{fmtDateShort(today)}</small></span></label>
+      <label class="ev-chip"><input type="radio" name="when" value="tomorrow" checked={c.when === 'tomorrow'}><span>明日 <small data-when-label="tomorrow">{fmtDateShort(addDays(today, 1))}</small></span></label>
+      <label class="ev-chip"><input type="radio" name="when" value="weekend" checked={c.when === 'weekend'}><span>今週末 <small data-when-label="weekend">{weekendLabel}</small></span></label>
+      <label class="ev-chip"><input type="radio" name="when" value="date" checked={c.when === 'date'}><span>日付を指定</span></label>
+      <label class="ev-chip"><input type="radio" name="when" value="all" checked={c.when === 'all'}><span>これから{LIST_DAYS}日</span></label>
+    </div>
+    <div class="ev-date-in">
+      <label for="ev-date" class="lbl" style="margin:0">日付</label>
+      <input type="date" id="ev-date" name="date" value={c.date ?? ''} min={today} max={addDays(today, LIST_DAYS)} style="width:auto">
+    </div>
+  </fieldset>
+  <div class="ev-grid">
+    <div><label class="lbl" for="ev-party">申込人数</label>
+      <select id="ev-party" name="party"><option value="">指定なし</option>{Array.from({ length: PARTY_MAX }, (_, i) => i + 1).map((n) => <option value={n} selected={c.party === n}>{n}人</option>)}</select></div>
+    <div><label class="lbl" for="ev-area">エリア</label>
+      <select id="ev-area" name="area"><option value="">{regionOptions.map((r) => r.name).join('・') || '東京'}すべて</option>{areaOptions.map((a) => <option value={a.id} selected={c.area === a.id}>{a.name}</option>)}</select></div>
+    <div><label class="lbl" for="ev-genre">ジャンル</label>
+      <select id="ev-genre" name="genre"><option value="">すべて</option>{GENRES.map((g) => <option value={g.id} selected={c.genre === g.id}>{g.name}</option>)}</select></div>
+  </div>
+  <details open={!!(c.start || c.endBy || c.budget)}>
+    <summary>時間帯・終了時刻・予算で絞り込む</summary>
+    <div class="ev-grid ev-adv">
+      <div><label class="lbl" for="ev-start">開始時間帯</label>
+        <select id="ev-start" name="start"><option value="">指定なし</option><option value="morning" selected={c.start === 'morning'}>午前（〜12:00）</option><option value="afternoon" selected={c.start === 'afternoon'}>午後（12:00〜17:00）</option><option value="evening" selected={c.start === 'evening'}>夜（17:00〜）</option></select></div>
+      <div><label class="lbl" for="ev-end">終了時刻の上限</label>
+        <select id="ev-end" name="end"><option value="">指定なし</option>{END_BY_OPTIONS.map((t) => <option value={t} selected={c.endBy === t}>{t}までに終わる</option>)}</select></div>
+      <div><label class="lbl" for="ev-budget">1人あたり予算（手数料別）</label>
+        <select id="ev-budget" name="budget"><option value="">指定なし</option>{BUDGET_OPTIONS.map((b) => <option value={b} selected={c.budget === b}>{fmtYen(b)}以内</option>)}</select></div>
+    </div>
+    <p class="ev-note" style="margin:8px 0 0">開演時刻・終了時刻・上限人数が未確認の公演は、これらの条件に「合う」とは扱わず、結果の下に「条件を判定できない公演」として分けて表示します。</p>
+  </details>
+  <div class="ev-submit">
+    <button class="btn" type="submit">この条件で探す</button>
+    <a class="ev-reset" href="/events/">条件をリセット</a>
+  </div>
+</form>
+</div></section>
+
+<section class="section tinted ev-results" id="results" aria-live="polite"><div class="wrap">
+<h2 class="ev-res-h"><span data-window-label>{windowLabel}</span>の公演回 <span data-count>{result.matched.length}</span>件 <small>（開催日時順。主催者による優先表示はしていません）</small></h2>
+<p class="ev-meta">開催情報の最終確認：{latestVerified ? fmtVerified(latestVerified) : '—'}。{anyStale && <strong>確認から2週間以上経過した公演があります。</strong>}販売・空席の状況は各公演の公式ページが正で、このページの表示は確認時点のものです。掲載基準と修正依頼は<a href="/events/about/">サービスについて</a>をご覧ください。</p>
+
+<div id="ev-zero" class="ev-zero" hidden={result.matched.length > 0}>
+  <p class="ev-zero-t">この条件に合う公演回は見つかりませんでした</p>
+  <p>条件に合わない公演は表示していません。日付や人数を変えるか、次の候補日をお試しください。</p>
+  <ul>
+    <li hidden={!nextDate}><a href={nextDate ? `/events/${criteriaToQuery({ ...c, when: 'date', date: nextDate })}#results` : '/events/'} data-next-date>{nextDate ? `次に候補がある日：${fmtDateJa(nextDate)}` : ''}</a></li>
+    {relax.map((x) => <li><a href={`/events/${x.q}#results`}>{x.label}</a></li>)}
+    <li><a href="/guide/immersive-tokyo/">東京のイマーシブ体験の選び方を読む</a>／<a href="/guide/madamis-tokyo/">東京でマダミスを遊ぶには</a></li>
+  </ul>
+</div>
+
+<ul class="ev-list" id="ev-matched">
+  {result.matched.map((r) => <li><EventCard r={r} place="events" /></li>)}
+</ul>
+
+<details class="ev-unknown" id="ev-unknown" hidden={result.unknown.length === 0} open={result.matched.length === 0 && result.unknown.length > 0}>
+  <summary>条件を判定できない公演回 <span data-unknown-count>{result.unknown.length}</span>件（開演時刻・終了時刻・上限人数・開催の確認が取れていないため、条件に合うとは限りません）</summary>
+  <ul class="ev-list" id="ev-unknown-list">
+    {result.unknown.map((r) => <li><EventCard r={r} place="events-unknown" /></li>)}
+  </ul>
+</details>
+{/* 条件に合わなかった回もブラウザ側の再判定に使う（hidden のまま） */}
+<ul class="ev-list" id="ev-rest" hidden>
+  {all.filter((r) => !result.matched.includes(r) && !result.unknown.includes(r) && !['ended', 'cancelled'].includes(r.eventState)).map((r) => <li><EventCard r={r} place="events" /></li>)}
+</ul>
+</div></section>
+
+<section class="section ev-links"><div class="wrap">
+<h2 class="h2 serif">選び方・基礎知識</h2>
+<p class="ev-lede">初めての方は、公演を選ぶ前に形式の違いと参加の準備を確認しておくと失敗しません。</p>
+<ul>
+  <li><a href="/guide/immersive-tokyo/">東京で体験できるイマーシブイベント<span>種類・2026年の動向・初めての選び方</span></a></li>
+  <li><a href="/guide/madamis-tokyo/">東京でマダミスを遊ぶには<span>店舗・公演・オンラインの探し方と初心者の選び方</span></a></li>
+  <li><a href="/guide/madamis-shoshinsha/">マダミス初心者ガイド<span>はじめての作品選びと当日の流れ</span></a></li>
+  <li><a href="/guide/immersive-preparation/">イマーシブ体験の服装・持ち物<span>公演別チェック表つき</span></a></li>
+  <li><a href="/guide/immersive-theater/">イマーシブシアターとは<span>演劇との違い</span></a></li>
+  <li><a href="/guide/madamis-asobikata/">マダミスの遊び方<span>ルールと進行の基本</span></a></li>
+</ul>
+</div></section>
+
+<section class="section tinted ev-about" id="about"><div class="wrap">
+<h2 class="h2 serif">このサービスについて</h2>
+<p>「公演を探す」は、株式会社ex Labs が運営する、マダミス・イマーシブ公演の発見と集客を支援する無料の公演情報サービスです。自社の公演だけでなく、掲載条件を確認できた他社の公演も無料で紹介します。掲載料・予約手数料・利用料はいただいておらず、予約と決済は各公演の公式販売ページで行います。</p>
+<p>検索結果は利用者の条件への適合と開催日時の順に並び、ex Labs の公演を無条件で上位にすることはありません。ex Labs が関わる公演には「ex Labs 企画・制作」と表示しています。将来、広告枠を設ける場合は「広告」「PR」と明示し、検索条件や空席情報と混同しない形で表示します。</p>
+<p>掲載内容の修正・掲載停止のご依頼、公演の掲載のご相談（無料）は <a href={`mailto:${EVENTS_CONTACT}`}>{EVENTS_CONTACT}</a> または<a href="/?c=events#contact">お問い合わせフォーム</a>へ。確認後、速やかに対応します。掲載基準の詳細は<a href="/events/about/">サービスについて（掲載基準・運営者・修正依頼）</a>をご覧ください。</p>
+</div></section>
+
+<section class="section ev-biz"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">施設・企業向け：イベント制作のご相談（無料）</p>
+<p class="ev-lede" style="margin:0 auto 16px;text-align:center">商業施設・店舗・観光施設を舞台にしたマダミス・イマーシブ・周遊イベントの企画から運営まで、株式会社ex Labs が制作します。</p>
+<a class="btn" href="/services/" data-cta="events-biz">法人向けサービスを見る</a>
+</div>
+</div></section>
+
+<script>
+  // 絞り込みの即時反映（サーバーと同じ判定関数）。JS が無い場合はフォーム送信（GET）で同じ結果になる。
+  import { parseCriteria, criteriaToQuery, matchCriteria, dateWindow, eventState } from '../../lib/events';
+  import { jstDateString, addDays, weekRange, fmtDateShort, fmtDateJa } from '../../lib/thisWeek';
+  const form = document.getElementById('ev-form') as HTMLFormElement | null;
+  const matched = document.getElementById('ev-matched');
+  const unknownList = document.getElementById('ev-unknown-list');
+  const unknownBox = document.getElementById('ev-unknown') as HTMLDetailsElement | null;
+  const rest = document.getElementById('ev-rest');
+  const zero = document.getElementById('ev-zero');
+  const LIST_DAYS = 90;
+  if (form && matched && unknownList && unknownBox && rest && zero) {
+    const beacon = (e: string, c: string) => {
+      try {
+        const b = JSON.stringify({ e, p: location.pathname, c });
+        if (navigator.sendBeacon) navigator.sendBeacon('/api/track', new Blob([b], { type: 'application/json' }));
+        else fetch('/api/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: b, keepalive: true });
+      } catch (_) { /* 計測失敗は無視 */ }
+    };
+    const cat = (c: ReturnType<typeof parseCriteria>) => `${c.when}-p${c.party ?? 0}-${c.area || c.region || 'all'}-${c.genre || 'all'}`.slice(0, 40);
+    const items = () => Array.from(document.querySelectorAll<HTMLLIElement>('#ev-matched > li, #ev-unknown-list > li, #ev-rest > li'));
+    const apply = (fromUser: boolean) => {
+      const now = new Date();
+      const c = parseCriteria(new URLSearchParams(new FormData(form) as unknown as Record<string, string>));
+      const today = jstDateString(now);
+      const win = dateWindow(c, now);
+      let nMatch = 0, nUnknown = 0;
+      const nextDates: string[] = [];
+      for (const li of items()) {
+        const card = li.querySelector<HTMLElement>('.ev-card');
+        if (!card) continue;
+        let row: any;
+        try { row = JSON.parse(card.dataset.row || ''); } catch { continue; }
+        const es = eventState(row, now);
+        if (es === 'ended' || es === 'cancelled') { li.remove(); continue; }
+        const m = matchCriteria(row, c, now, win);
+        if (m === 'match') { matched.appendChild(li); nMatch++; }
+        else if (m === 'unknown') { unknownList.appendChild(li); nUnknown++; }
+        else { rest.appendChild(li); if (row.date >= today && matchCriteria(row, { ...c, when: 'all', date: undefined }, now, null) === 'match') nextDates.push(row.date); }
+      }
+      // 日付順に並べ直す（appendChild で順番が崩れないよう data-row の date/start で再ソート）
+      for (const ul of [matched, unknownList]) {
+        Array.from(ul.children).sort((a, b) => {
+          const ra = JSON.parse((a.querySelector('.ev-card') as HTMLElement).dataset.row || '{}');
+          const rb = JSON.parse((b.querySelector('.ev-card') as HTMLElement).dataset.row || '{}');
+          return ra.date !== rb.date ? (ra.date < rb.date ? -1 : 1) : (ra.start ?? 1e9) - (rb.start ?? 1e9);
+        }).forEach((el) => ul.appendChild(el));
+      }
+      const count = document.querySelector('[data-count]'); if (count) count.textContent = String(nMatch);
+      const uc = document.querySelector('[data-unknown-count]'); if (uc) uc.textContent = String(nUnknown);
+      const wl = document.querySelector('[data-window-label]'); if (wl) wl.textContent = win ? win.map(fmtDateJa).join('・') : `これから${LIST_DAYS}日以内`;
+      zero.hidden = nMatch > 0;
+      unknownBox.hidden = nUnknown === 0;
+      if (nMatch === 0 && nUnknown > 0) unknownBox.open = true;
+      const after = win && win.length ? win[win.length - 1] : today;
+      const nd = nextDates.filter((d) => d > after).sort()[0];
+      const ndA = zero.querySelector<HTMLAnchorElement>('[data-next-date]');
+      if (ndA) { if (nd) { ndA.textContent = `次に候補がある日：${fmtDateJa(nd)}`; ndA.href = `/events/${criteriaToQuery({ ...c, when: 'date', date: nd })}#results`; ndA.parentElement!.hidden = false; } else ndA.parentElement!.hidden = true; }
+      // 今日・明日・今週末のラベルを現在の日付で更新（開いたまま日付が変わった場合）
+      const wk = weekRange(now).weekend.filter((d) => d >= today);
+      const lab: Record<string, string> = { today: fmtDateShort(today), tomorrow: fmtDateShort(addDays(today, 1)), weekend: wk.map(fmtDateShort).join('・') };
+      form.querySelectorAll<HTMLElement>('[data-when-label]').forEach((el) => { el.textContent = lab[el.dataset.whenLabel || ''] || ''; });
+      const q = criteriaToQuery(c);
+      if (fromUser) {
+        history.replaceState(null, '', `/events/${q}#results`);
+        beacon('ev-search', cat(c));
+        if (nMatch === 0) beacon('ev-zero', cat(c));
+      }
+    };
+    form.addEventListener('submit', (e) => { e.preventDefault(); apply(true); document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+    form.addEventListener('change', (e) => {
+      const t = e.target as HTMLInputElement;
+      if (t.name === 'date' && t.value) (form.querySelector('input[name=when][value=date]') as HTMLInputElement).checked = true;
+      if (t.name === 'when' && t.value === 'date') { const d = document.getElementById('ev-date') as HTMLInputElement; d.focus(); if (!d.value) return; }
+      apply(true);
+    });
+    // 開いたまま日付が変わった場合に備え、初回と1分ごとに再判定（計測は送らない）
+    if (document.body.dataset.evInit !== '1') { document.body.dataset.evInit = '1'; apply(false); setInterval(() => apply(false), 60000); }
+  }
+</script>
+</BaseLayout>
+
+<style>
+.sponly{display:none}
+@media(max-width:640px){.sponly{display:block}}
+</style>

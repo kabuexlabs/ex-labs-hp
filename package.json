@@ -11,11 +11,13 @@
     "seo:fanout": "node scripts/fanout-audit.mjs",
     "seo:report": "python3 scripts/gsc_report.py",
     "test:spam": "node --experimental-strip-types scripts/spam-test.mjs",
-    "check": "npm run build && node scripts/seo-audit.mjs && npm run test:spam && npm run test:week && node scripts/fanout-audit.mjs",
+    "check": "npm run build && node scripts/seo-audit.mjs && npm run test:spam && npm run test:week && npm run test:events && npm run events:validate && node scripts/fanout-audit.mjs",
     "llms:full": "node scripts/build-llms-full.mjs",
     "seo:crawl": "node scripts/crawl-audit.mjs --warn",
     "indexnow": "node scripts/indexnow.mjs",
-    "test:week": "node --experimental-strip-types scripts/this-week-test.mjs"
+    "test:week": "node --experimental-strip-types scripts/this-week-test.mjs",
+    "test:events": "node --experimental-strip-types scripts/events-test.mjs",
+    "events:validate": "node --experimental-strip-types scripts/events-validate.mjs"
   },
   "dependencies": {
     "@astrojs/vercel": "^11.0.2",

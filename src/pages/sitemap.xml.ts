@@ -6,6 +6,7 @@ import { tmWorks } from '../data/toudaimurderWorks';
 import { tmNews } from '../data/toudaimurderNews';
 import { htPaths } from '../data/hacktale';
 import { BLOG_REDIRECTS } from '../data/redirects';
+import { eventsData } from '../data/events/index';
 
 // NOTE: keep every URL here in its canonical trailing-slash form, and
 // never list pages that carry noindex (unlisted LPs, private tools) —
@@ -28,6 +29,8 @@ const STATIC_PATHS = [
   '/guide/ip-event/',
   '/guide/event-original-or-existing/',
   '/guide/event-revenue-share/',
+  '/events/',
+  '/events/about/',
   '/blog/',
   '/press/',
   '/media/',
@@ -122,6 +125,8 @@ export const GET: APIRoute = async ({ site }) => {
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {
+    '/events/': '2026-09-13',
+    '/events/about/': '2026-09-13',
     '/guide/taiken-marketing/': '2026-09-12',
     '/guide/madamis-tenpo/': '2026-09-12',
     '/guide/zunousen-douga/': '2026-09-12',
@@ -145,7 +150,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/madamis-business/': '2026-09-12',
     '/guide/immersive-cost/': '2026-08-07',
     '/guide/immersive-company/': '2026-08-07',
-    '/guide/immersive-tokyo/': '2026-09-09',
+    '/guide/immersive-tokyo/': '2026-09-13',
     '/guide/shisetsu-katsuyo/': '2026-09-08',
     '/guide/shogyoshisetsu-event/': '2026-09-12',
     '/guide/yukyu-kukaku/': '2026-08-07',
@@ -156,7 +161,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/taikengata-idea/': '2026-09-12',
     '/guide/event-hiyou/': '2026-09-12',
     '/guide/madamis-rekishi/': '2026-09-06',
-    '/guide/madamis-tokyo/': '2026-09-07',
+    '/guide/madamis-tokyo/': '2026-09-13',
     '/guide/immersive-taiken/': '2026-09-07',
     '/guide/zunousen-sakuhin/': '2026-09-08',
     '/guide/shinrisen-game/': '2026-09-08',
@@ -205,6 +210,11 @@ export const GET: APIRoute = async ({ site }) => {
     '/services/zunousen/': '2026-09-08',
     '/services/shisetsu-event/': '2026-09-08',
   };
+  // 公演検索サービスの作品詳細（公開作品のみ。テストデータ・非公開は src/data/events/index が除外済み）。
+  // 日付別・条件別のページは作らない（一覧 /events/ と作品詳細だけを検索対象にする）。
+  for (const w of eventsData.works) {
+    if (w.published) urls.push({ loc: new URL(`/events/${w.slug}/`, base).toString(), lastmod: w.updatedAt });
+  }
   for (const [p, d] of Object.entries(STATIC_LASTMOD)) {
     const u = urls.find((x) => x.loc.endsWith(p));
     if (u) u.lastmod = d;

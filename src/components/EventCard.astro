@@ -1,0 +1,68 @@
+---
+// 公演回1件のカード（/events/ 一覧・作品詳細で共用）。
+// 「開催」「販売」「空席」を別々に表示し、開催予定があるだけでは予約ボタンを「予約する」にしない。
+// 色だけに頼らず文言で状態を示す。data-row はブラウザ側の絞り込み用（個人情報なし）。
+import type { Resolved } from '../lib/events';
+import { CTA_LABEL, EVENT_LABEL, EVENT_STATUS_LABEL, SALES_LABEL, SEAT_LABEL, FORMAT_LABEL, fmtYen, perPerson, minToHhmm } from '../lib/events';
+import { fmtDateShort, fmtVerified } from '../lib/thisWeek';
+import { genreName, areaName, regionName } from '../data/events/areas';
+
+export interface Props {
+  r: Resolved;
+  /** 計測用の掲載箇所 */
+  place: string;
+  /** 作品名・紹介を省く（作品詳細ページ内） */
+  compact?: boolean;
+}
+const { r, place, compact = false } = Astro.props;
+const { occ, work, venue, organizer, row } = r;
+const channel = occ.sales.channels[0];
+const own = organizer.relation === 'ex-labs';
+const track = `${place}-${own ? 'own' : '3rd'}`;
+const timeText = row.start !== undefined
+  ? `${minToHhmm(row.start)}開演${row.end !== undefined ? `〜${minToHhmm(row.end)}${occ.endTime ? '' : '終了予定'}` : ''}`
+  : '開演時刻は公式ページで確認';
+const showCta = !['ended', 'cancelled'].includes(r.cta);
+const ppList = work.price.unit === 'per-group' && work.price.tiers
+  ? work.price.tiers.map((t) => `${t.party}人 ${fmtYen(perPerson(work.price, t.party)!)}`).join('／')
+  : work.price.unit === 'charter' && work.price.amount !== undefined && work.party.max
+    ? `${work.party.max}人参加で ${fmtYen(perPerson(work.price, work.party.max)!)}`
+    : '';
+const priceUnit = work.price.unit === 'per-person' ? '1人あたり' : work.price.unit === 'per-group' ? '1組あたり' : '貸切総額';
+const seatText = r.seatState === 'available' && occ.seats.remaining !== undefined
+  ? `確認時点で残り${occ.seats.remaining}席（${fmtVerified(occ.seats.checkedAt!)}確認）`
+  : r.seatState !== 'unknown' && occ.seats.checkedAt ? `${SEAT_LABEL[r.seatState]}（${fmtVerified(occ.seats.checkedAt)}確認）` : SEAT_LABEL[r.seatState];
+const eventText = r.eventState === 'upcoming' ? EVENT_STATUS_LABEL[occ.eventStatus] : EVENT_LABEL[r.eventState];
+---
+<article class={`ev-card is-${r.cta}${own ? ' is-own' : ''}`} data-row={JSON.stringify(row)} data-occ={occ.id}>
+  <div class="ev-head">
+    <p class="ev-date"><time datetime={occ.date}>{fmtDateShort(occ.date)}</time> <span class="ev-time">{timeText}</span></p>
+    <p class="ev-org">{organizer.relationLabel}</p>
+  </div>
+  {!compact && (
+    <>
+      <h3 class="ev-title"><a href={`/events/${work.slug}/`} data-track="show" data-show={work.id} data-place={track}>{work.title}</a></h3>
+      <p class="ev-sub">{work.genres.map(genreName).join('・')}｜{regionName(venue.regionId)}・{areaName(venue.areaId)}／{venue.name}</p>
+      <p class="ev-summary">{work.summary}</p>
+    </>
+  )}
+  <dl class="ev-dl">
+    <div><dt>所要時間</dt><dd>{work.duration.text}</dd></div>
+    <div><dt>料金（{priceUnit}）</dt><dd>{work.price.text}{ppList && <><br><span class="ev-note">1人あたりの目安：{ppList}（手数料別）</span></>}<br><span class="ev-note">{work.price.feeNote}</span></dd></div>
+    <div><dt>申込可能な人数</dt><dd>{work.party.text}<br><span class="ev-note">{work.party.soloAllowed ? '1人参加可' : '1人での申込不可'}{work.party.soloRuns !== undefined ? `・${work.party.soloRuns ? '1人でも開催成立' : '1人では開催成立せず（相席）'}` : ''}</span></dd></div>
+    <div><dt>参加形式</dt><dd>{FORMAT_LABEL[work.party.format]}</dd></div>
+  </dl>
+  <ul class="ev-status" aria-label="開催・販売・空席の確認状況">
+    <li class={`st st-ev-${r.eventState}`}><span class="st-k">開催</span>{eventText}<span class="ev-note">（{fmtVerified(occ.eventCheckedAt)}確認）</span></li>
+    <li class={`st st-sa-${r.salesState}`}><span class="st-k">販売</span>{SALES_LABEL[r.salesState]}{occ.sales.closesAt && r.salesState === 'open' ? <span class="ev-note">（締切 {fmtVerified(occ.sales.closesAt)}）</span> : null}</li>
+    <li class={`st st-se-${r.seatState}`}><span class="st-k">空席</span>{seatText}</li>
+  </ul>
+  <div class="ev-actions">
+    {showCta && channel ? (
+      <a class={`btn ev-btn${r.cta === 'book' ? '' : ' ghost'}`} href={channel.url} target="_blank" rel="noopener" data-track="ticket" data-show={work.id} data-place={track}>{CTA_LABEL[r.cta]}</a>
+    ) : (
+      <span class="ev-ended">{CTA_LABEL[r.cta]}</span>
+    )}
+    {!compact && <a class="ev-more" href={`/events/${work.slug}/`} data-track="show" data-show={work.id} data-place={track}>詳細・ほかの日程 →</a>}
+  </div>
+</article>

@@ -1,12 +1,9 @@
-// 自社公演の開催データ（「今週遊べる東京のイマーシブイベント」欄の唯一の正本）。
-// ルール：
-//  - occurrences には「開催を確認できた回」だけを入れる。開催期間（9〜10月）だけから
-//    日付を推定して入れない。時刻が未確認なら time を省く（当日の予約可否は断定しない）。
-//  - status は 'scheduled'（開催予定）／'soldout'（完売を確認）／'cancelled'（中止）。
-//  - verifiedAt / verifiedFrom は実際に確認した日時と情報源。日付だけ差し替えて
-//    「最新」に見せない。verifyTtlDays を過ぎると表示側は確認日を明示し、今週の
-//    開催を断定しない文言に切り替わる。
-//  - 開催の確認と空席の確認は別。在庫が不明なら「空席はチケットサイトで確認」。
+// 「今週遊べる東京のイマーシブイベント」欄（/guide/immersive-tokyo/#this-week）向けの互換データ。
+// 2026-09-13 から正本は src/data/events/（公演検索サービス /events/ と共通）に移り、
+// このファイルは events データから同じ形（Show）に変換するだけ。手で編集しない。
+// 変換ルール：
+//  - status：中止→'cancelled'、確認時点で満席（確認日時あり）→'soldout'、それ以外→'scheduled'
+//  - verifiedAt は作品の開催情報の最終確認日時。空席の確認とは別（events 側で管理）
 export type OccurrenceStatus = 'scheduled' | 'soldout' | 'cancelled';
 
 export interface ShowOccurrence {
@@ -49,70 +46,36 @@ export interface Show {
   published: boolean;
 }
 
-export const shows: Show[] = [
-  {
-    id: 'kaitou',
-    name: '怪盗と秘密の試験',
-    area: '東京・六本木／会員制バー',
-    feature: '義賊組織「レイヴン怪盗団」の団員候補として、会員制バーで試験に挑むマジック×イマーシブ公演。物語の中で本格イリュージョンが目の前で行われます。',
-    url: '/kaitou/',
-    ticketUrl: 'https://escape.id/ImmersiveIllusion-org/e-kaitou/',
-    ticketSite: 'escape.id',
-    duration: '詳細はチケットページで確認',
-    capacity: '各回2〜4名（1名での申込不可）',
-    age: '18歳以上',
-    price: { text: '2人 ¥13,000／3人 ¥16,500／4人 ¥19,600', unit: '1組あたり', note: '税込。表示価格のほか、別途手数料がかかる場合があります' },
-    conditions: [
-      '受付後、会場へ徒歩での移動があります（水分必須と案内）',
-      'スマートフォンとイヤホンを必ず持参（体験の進行に使用）',
-      '会場にクロークなし。大きな荷物は駅周辺のロッカーへ',
-      '受付時間に遅れると参加不可。日本語で進行',
-      '服装の指定なし',
-    ],
-    occurrences: [
-      { date: '2026-09-06', status: 'scheduled' },
-      { date: '2026-09-13', status: 'scheduled' },
-      { date: '2026-09-26', status: 'scheduled' },
-      { date: '2026-09-27', status: 'scheduled' },
-      { date: '2026-10-03', status: 'scheduled' },
-      { date: '2026-10-04', status: 'scheduled' },
-      { date: '2026-10-11', status: 'scheduled' },
-    ],
-    verifiedAt: '2026-09-09T10:30:00+09:00',
-    verifiedFrom: ['自社公式 https://kabuexlabs.com/kaitou/（開催日・料金・人数・年齢・注意事項）', 'チケットサイト escape.id は実装環境から取得できず、開演時刻・在庫・所要時間（60分／70分の不一致）は未確認'],
-    verifyTtlDays: 14,
-    published: true,
-  },
-  {
-    id: 'uwasabanashi',
-    name: 'ウワサバナシ調査委員会',
-    area: '東京・渋谷／渋谷サクラステージ',
-    feature: '渋谷サクラステージ全体を周遊する、都市伝説×イマーシブ×謎解き。集めた証言と手がかりを整理して真相にたどり着く、選択で展開が変わる体験です。',
-    url: '/uwasabanashi/',
-    ticketUrl: 'https://escape.id/uwasabanashi-org/e-case1/',
-    ticketSite: 'escape.id',
-    duration: '約70分（自社公式の案内）',
-    capacity: 'チケット1枚につき1名。複数人参加可（途中で一時的に離れる場合あり）',
-    age: '15歳以上',
-    price: { text: '¥4,000', unit: '1人あたり', note: '税込。表示価格のほか別途手数料がかかります' },
-    conditions: [
-      '商業施設内の複数スポットを歩いて巡ります',
-      '体験中、一時的に靴を脱ぐ可能性があります',
-      'スマートフォン・イヤホン・水分を必ず持参',
-      '開演時刻を過ぎると入場不可（5分前集合）',
-      '心臓疾患・血圧異常・妊娠中などの方は参加不可（詳細は公演ページ）',
-    ],
-    occurrences: [
-      { date: '2026-09-19', status: 'scheduled' },
-      { date: '2026-09-20', status: 'scheduled' },
-      { date: '2026-09-26', status: 'scheduled' },
-      { date: '2026-09-27', status: 'scheduled' },
-      { date: '2026-10-03', status: 'scheduled' },
-      { date: '2026-10-04', status: 'scheduled' },
-    ],
-    verifiedAt: '2026-09-09T10:30:00+09:00',
-    verifiedFrom: ['自社公式 https://kabuexlabs.com/uwasabanashi/（開催日・料金・年齢・注意事項）', 'チケットサイト escape.id は実装環境から取得できず、開演時刻・在庫は未確認'],
-    verifyTtlDays: 14,
-    published: true,
-  },
-];
+import { eventsData } from './events/index.ts';
+import { regionName, areaName } from './events/areas.ts';
+
+export const shows: Show[] = eventsData.works.map((w) => {
+  const occ = eventsData.occurrences.filter((o) => o.workId === w.id && o.published && !o.test).sort((a, b) => (a.date + (a.startTime ?? '')).localeCompare(b.date + (b.startTime ?? '')));
+  const venue = eventsData.venues.find((v) => v.id === occ[0]?.venueId) ?? eventsData.venues[0];
+  const ch = occ[0]?.sales.channels[0];
+  const channel = eventsData.channels.find((c) => c.id === ch?.channelId);
+  const srcs = w.sourceIds.map((id) => eventsData.sources.find((s) => s.id === id)).filter(Boolean);
+  return {
+    id: w.id,
+    name: w.title,
+    area: `${regionName(venue.regionId)}・${areaName(venue.areaId)}／${venue.listName ?? venue.name}`,
+    feature: w.summary,
+    url: w.officialUrl,
+    ticketUrl: ch?.url ?? w.officialUrl,
+    ticketSite: channel?.name ?? '公式ページ',
+    duration: w.duration.text,
+    capacity: w.party.text,
+    age: w.info.ageRule ?? '年齢条件は公式ページで確認',
+    price: { text: w.price.text, unit: w.price.unit === 'per-person' ? '1人あたり' : '1組あたり', note: w.price.feeNote },
+    conditions: [...(w.info.walking ? [w.info.walking] : []), ...(w.info.requirements ?? [])],
+    occurrences: occ.map((o) => ({
+      date: o.date,
+      ...(o.startTime ? { time: o.startTime } : {}),
+      status: o.eventStatus === 'cancelled' ? 'cancelled' : o.seats.status === 'soldout' && o.seats.checkedAt ? 'soldout' : 'scheduled',
+    })),
+    verifiedAt: w.verified.at,
+    verifiedFrom: srcs.map((s) => `${s!.label}${s!.url ? ' ' + s!.url : ''}（${s!.terms}）`),
+    verifyTtlDays: w.verifyTtlDays,
+    published: w.published,
+  };
+});

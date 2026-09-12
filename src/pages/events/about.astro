@@ -1,0 +1,47 @@
+---
+// 公演情報サービスの掲載基準・運営者・修正依頼（/events/about/）。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import '../../styles/events.css';
+import { EVENTS_CONTACT } from '../../data/events/index';
+import { GENRES, REGIONS } from '../../data/events/areas';
+---
+<BaseLayout
+  title="公演情報サービスについて｜掲載基準・運営者・修正依頼 - 株式会社ex Labs"
+  description="「公演を探す」は株式会社ex Labs が運営する、マダミス・イマーシブ公演の発見と集客を支援する無料の公演情報サービスです。掲載の対象と基準、開催・販売・空席の確認方法、画像や紹介文の扱い、修正・掲載停止の依頼先、自社公演と将来の広告の方針を説明します。"
+>
+<Breadcrumb items={[{ name: 'ホーム', href: '/' }, { name: '公演を探す', href: '/events/' }, { name: 'サービスについて' }]} />
+
+<section class="section ev-hero"><div class="wrap">
+<p class="eyebrow">ABOUT</p>
+<h1 class="h2 serif">公演情報サービスについて</h1>
+<p class="ev-lede">「<a href="/events/" style="color:var(--accent);text-decoration:underline">公演を探す</a>」は、遊びたい日と人数から参加できるマダミス・イマーシブ公演を見つけやすくし、業界全体の発見と集客を支援するための無料の公演情報サービスです。</p>
+</div></section>
+
+<section class="section tinted ev-about"><div class="wrap">
+<h2 class="h2 serif">運営者</h2>
+<p>運営：<a href="/company/">株式会社ex Labs</a>（東京都新宿区）。イマーシブ・マダミス・頭脳戦などの体験型エンターテインメントを企画・制作している会社です。自社の公演と、掲載条件を確認できた他社の公演を同じ基準で掲載します。</p>
+<h2 class="h2 serif" style="margin-top:32px">料金と予約</h2>
+<p>現在、掲載料・予約手数料・利用料はいただいていません。決済機能はなく、予約は各公演の公式販売ページで行います。利用にあたって会員登録は不要です。</p>
+<h2 class="h2 serif" style="margin-top:32px">掲載の対象と基準</h2>
+<p>対象地域：{REGIONS.map((r) => r.name).join('・')}のリアル公演（今後、掲載できる情報が揃った地域から追加します）。対象ジャンル：{GENRES.map((g) => g.name).join('、')}。</p>
+<p>掲載するのは、公式サイトや主催者から事実を確認できた公演だけです。未確認の公演、架空の公演、古い空席情報で件数を増やすことはしません。掲載する事実ごとに情報源と確認日時を記録し、確認から2週間以上経過した情報にはその旨を表示します。</p>
+<h2 class="h2 serif" style="margin-top:32px">開催・販売・空席は別々に確認します</h2>
+<p>各公演回について「開催状態（開催予定・開催確定・中止・終了・未確認）」「販売状態（発売前・受付中・受付終了・未確認）」「空席状態（確認時点で空席あり・確認時点で満席・未確認）」を分けて表示します。開催予定があるだけでは「予約可能」とは表示せず、受付中かつ確認時点で空席ありの回だけ「予約する」ボタンにします。残席数は取得と再掲載の条件を確認でき、鮮度を管理できる場合だけ表示し、それ以外は「空席は公式サイトで確認」とします。空席情報には有効期限があり、期限切れや連携の失敗時は「未確認」に戻します。</p>
+<h2 class="h2 serif" style="margin-top:32px">画像・紹介文の扱い</h2>
+<p>他社の画像・写真・ロゴ・紹介文は、利用許諾または明示された利用条件を確認できたものだけを使います。出典リンクを付けただけで転載してよいとは判断しません。許諾済みの素材がない公演は文字中心で掲載します。「公式」「公認」「提携」などの表示は、実際に確認できた場合だけ使います。予約サイト全体の自動取得や、規約に反する継続取得は行いません。</p>
+<h2 class="h2 serif" style="margin-top:32px">自社公演と広告について</h2>
+<p>検索結果は利用者の条件への適合と開催日時の順に並び、ex Labs の公演を無条件で上位にすることはありません。ex Labs が関わる公演には「ex Labs 企画・制作」と関係性を表示します。将来、企業からの広告出稿を受け付ける場合は「広告」「PR」と明示し、検索条件や空席情報と混同しない形で表示します。</p>
+<h2 class="h2 serif" style="margin-top:32px">掲載・修正・掲載停止のご依頼</h2>
+<p>主催者の方の掲載のご相談（無料）、掲載内容の修正、掲載停止のご依頼は <a href={`mailto:${EVENTS_CONTACT}`}>{EVENTS_CONTACT}</a> または<a href="/?c=events#contact">お問い合わせフォーム</a>からご連絡ください。確認後、速やかに非公開または修正します。掲載にあたっては、公式の日程・料金・申込条件・販売ページのURLと、画像を使う場合はその利用条件をお知らせください。</p>
+</div></section>
+
+<section class="section ev-biz"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">施設・企業向け：イベント制作のご相談（無料）</p>
+<a class="btn" href="/services/" data-cta="events-biz">法人向けサービスを見る</a>
+</div>
+</div></section>
+</BaseLayout>
