@@ -12,11 +12,19 @@ import { channels } from '../src/data/events/channels.ts';
 import { works } from '../src/data/events/works.ts';
 import { occurrences } from '../src/data/events/occurrences.ts';
 import { AREAS, REGIONS } from '../src/data/events/areas.ts';
+import { sourceSites } from '../src/data/events/sourceSites.ts';
 
 const errors = validateDataset({ sources, organizers, venues, channels, works, occurrences });
 for (const v of venues) {
   if (!REGIONS.some((r) => r.id === v.regionId)) errors.push(`venue ${v.id}: regionId ${v.regionId} が areas.ts に無い`);
   if (!AREAS.some((a) => a.id === v.areaId && a.regionId === v.regionId)) errors.push(`venue ${v.id}: areaId ${v.areaId} が areas.ts に無い（地域と不一致）`);
+}
+const siteIds = new Set();
+for (const x of sourceSites) {
+  if (siteIds.has(x.id)) errors.push(`sourceSites: id が重複 ${x.id}`); siteIds.add(x.id);
+  for (const u of [x.url, ...(x.links ?? []).map((l) => l.url)]) if (!/^https:\/\/[^\s"'<>]+$/.test(u)) errors.push(`sourceSites ${x.id}: URL が不正 ${u}`);
+  if (!x.name || !x.what || !x.checkedAt) errors.push(`sourceSites ${x.id}: name/what/checkedAt が不足`);
+  if (!['unverified', 'confirmed', 'denied'].includes(x.terms)) errors.push(`sourceSites ${x.id}: terms が不正`);
 }
 for (const w of works) if (w.image && !fs.existsSync(path.join('public', w.image.path))) errors.push(`work ${w.id}: 画像の実体が無い ${w.image.path}`);
 
@@ -34,6 +42,7 @@ for (const w of works) {
 const soon = occurrences.filter((o) => o.published && !o.test && o.sales.status === 'unknown' && (Date.parse(o.date + 'T00:00:00+09:00') - now) / 86400000 < 7 && Date.parse(o.date + 'T23:59:59+09:00') > now);
 if (soon.length) warns.push(`7日以内の回 ${soon.length} 件が受付状況「未確認」のまま（${soon.map((o) => o.id).join(', ')}）`);
 
+console.log(`外部サイト登録簿: ${sourceSites.length} 件（利用条件 confirmed ${sourceSites.filter((x) => x.terms === 'confirmed').length} 件）`);
 console.log(`公演データ: 作品 ${works.filter((w) => w.published).length}／回 ${occurrences.filter((o) => o.published && !o.test).length}（公開）`);
 for (const w of warns) console.log('  ! ' + w);
 if (errors.length) { console.log(`\nエラー ${errors.length} 件`); for (const e of errors) console.log('  ✗ ' + e); process.exit(1); }

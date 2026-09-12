@@ -11,6 +11,8 @@ import EventCard from '../../components/EventCard.astro';
 import '../../styles/events.css';
 import { eventsData, EVENTS_CONTACT, LIST_DAYS } from '../../data/events/index';
 import { AREAS, GENRES, REGIONS, areaName } from '../../data/events/areas';
+import { sourceSites, SITE_KIND_LABEL, SITE_GENRE_LABEL, type SiteKind } from '../../data/events/sourceSites';
+const siteKinds: SiteKind[] = ['ticket', 'store', 'portal', 'community'];
 import { parseCriteria, criteriaToQuery, resolveAll, search, nextAvailableDate, BUDGET_OPTIONS, END_BY_OPTIONS, PARTY_MAX, fmtYen } from '../../lib/events';
 import { jstDateString, addDays, weekRange, fmtDateShort, fmtDateJa, fmtVerified } from '../../lib/thisWeek';
 
@@ -99,6 +101,7 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
   <ul>
     <li hidden={!nextDate}><a href={nextDate ? `/events/${criteriaToQuery({ ...c, when: 'date', date: nextDate })}#results` : '/events/'} data-next-date>{nextDate ? `次に候補がある日：${fmtDateJa(nextDate)}` : ''}</a></li>
     {relax.map((x) => <li><a href={`/events/${x.q}#results`}>{x.label}</a></li>)}
+    <li><a href="#other-sites">ほかのサイトで探す（マダミス専門店・チケットサイト・当日募集）</a></li>
     <li><a href="/guide/immersive-tokyo/">東京のイマーシブ体験の選び方を読む</a>／<a href="/guide/madamis-tokyo/">東京でマダミスを遊ぶには</a></li>
   </ul>
 </div>
@@ -117,6 +120,24 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 <ul class="ev-list" id="ev-rest" hidden>
   {all.filter((r) => !result.matched.includes(r) && !result.unknown.includes(r) && !['ended', 'cancelled'].includes(r.eventState)).map((r) => <li><EventCard r={r} place="events" /></li>)}
 </ul>
+</div></section>
+
+<section class="section ev-links" id="other-sites"><div class="wrap">
+<h2 class="h2 serif">ほかのサイトで探す（外部リンク）</h2>
+<p class="ev-lede">このページに載っていない公演は、各店舗・チケットサイト・情報サイト・当日募集のコミュニティで探せます。いずれも外部サイトで、掲載内容は各サイトが正です。店舗の X（旧Twitter）や「#マダミス募集」には、直前の空席（🈳）や当日募集が投稿されます。</p>
+{siteKinds.map((k) => (
+  <div class="ev-sites">
+    <h3 class="ev-sites-h">{SITE_KIND_LABEL[k]}</h3>
+    <ul>
+      {sourceSites.filter((x) => x.kind === k).map((x) => (
+        <li><a href={x.url} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={x.id} data-place="events">{x.name}<span>{SITE_GENRE_LABEL[x.genre]}{x.sameDay ? '・当日募集や空席情報あり' : ''}｜{x.what}</span></a>
+          {x.links?.length ? <p class="ev-sites-sub">{x.links.map((l, i) => <>{i > 0 && '／'}<a href={l.url} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={x.id} data-place="events-sub">{l.label}</a></>)}</p> : null}
+        </li>
+      ))}
+    </ul>
+  </div>
+))}
+<p class="ev-note" style="margin-top:14px">掲載サイトの追加・削除のご要望は <a href={`mailto:${EVENTS_CONTACT}`}>{EVENTS_CONTACT}</a> へ。外部サイトの情報を自動取得して転載することはしていません（<a href="/events/about/">掲載基準</a>）。</p>
 </div></section>
 
 <section class="section ev-links"><div class="wrap">

@@ -244,6 +244,10 @@ const stats = (() => {
         <p style="margin:0 0 6px;font-weight:700">公演詳細の閲覧 <strong>{mSum('ev-view')}</strong>（作品-own＝自社／3rd＝他社）</p>
         <ul style="margin:0;padding-left:1.2em;line-height:1.9">{mByCat('ev-view').map(([k, n]) => <li>{k}：<strong>{n}</strong></li>)}</ul>
       </div>
+      <div>
+        <p style="margin:0 0 6px;font-weight:700">外部サイト（他で探す）へのクリック <strong>{mSum('ev-ext')}</strong>（サイト-掲載箇所）</p>
+        <ul style="margin:0;padding-left:1.2em;line-height:1.9">{mByCat('ev-ext').map(([k, n]) => <li>{k}：<strong>{n}</strong></li>)}</ul>
+      </div>
     </div>
     <p style="margin:10px 0 0;font-size:11.5px;color:#8a8378">※公演検索の計測は 2026-09-13 以降。チケットサイトへのクリックの「掲載箇所」が events-own／events-3rd／detail-own／detail-3rd のものは公演検索サービス経由で、own＝自社公演・3rd＝他社公演の送客です。購入完了は数えていません。</p>
     <p style="margin:10px 0 0;font-size:11.5px;color:#8a8378">※計測を入れた日（2026-09-08、公演クリックは 2026-09-09）以降のみ。CTA＝「#contact」へのリンクのクリック。チケットサイトへのクリックは購入完了ではありません。送信の記録には送信者情報を含めません。</p>

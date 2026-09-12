@@ -80,3 +80,4 @@
 - テストデータは `fixtures.ts` のみ。公開ページから import しない。`npm run test:events` と `npm run events:validate` は `npm run check` に含まれる。
 - 絞り込み状態のページ・日付別ページは作らない。検索対象は /events/ と作品詳細だけ。
 - 他社の画像・紹介文は利用条件を確認できたものだけ。escape.id 等の自動取得はしない。hub.escape.id は未確認のため未接続。
+- 外部サイトの登録簿は `src/data/events/sourceSites.ts`（/events/#other-sites に表示）。調査メモは `docs/events-sources.md`。リンク掲載＝取得許可ではない。取り込みは `terms: 'confirmed'` にしてから。
