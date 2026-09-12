@@ -3,10 +3,6 @@
     {
       "path": "/api/yoyaku/reminder",
       "schedule": "0 0 * * *"
-    },
-    {
-      "path": "/api/events/refresh",
-      "schedule": "0 21 * * *"
     }
   ],
   "redirects": [
@@ -122,19 +118,6 @@
     },
     {
       "source": "/api/shimokita/(.*)",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow, noarchive"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        }
-      ]
-    },
-    {
-      "source": "/api/events/(.*)",
       "headers": [
         {
           "key": "X-Robots-Tag",

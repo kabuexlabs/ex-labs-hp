@@ -1,49 +1,79 @@
 ---
-// 公演検索サービス「今日・明日・今週末に遊べるマダミス・イマーシブ公演」（/events/）。
-// SSR で毎リクエスト評価（日本時間）。絞り込みはクエリ文字列（GET）で動き、JS があれば同じ判定関数で即時反映する。
-// 検索対象にする固定ページはこの1枚と作品詳細（/events/<slug>/）だけ。絞り込み状態は canonical で /events/ に集約する
-// （BaseLayout の canonical はクエリを含まない）。データの正本は src/data/events/、判定は src/lib/events.ts。
+// 「今日できるイマーシブ」「今日 イマーシブ 東京」「今週末 マダミス 東京」の受け皿（/events/）。
+// SSR で毎リクエスト日本時間で判定し、今日・明日・今週末の開催を見出し付きの本文として出す（検索エンジンに日付と作品名が見える）。
+// 絞り込みはクエリ文字列（GET）で動き、JS があれば同じ判定関数で即時反映。絞り込み状態は canonical で /events/ に集約
+// （BaseLayout の canonical はクエリを含まない）。掲載は株式会社ex Labs が確認した公演のみ（データ正本 src/data/events/）。
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import EventCard from '../../components/EventCard.astro';
 import ListingCard from '../../components/ListingCard.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
 import '../../styles/events.css';
 import { eventsData, EVENTS_CONTACT, LIST_DAYS } from '../../data/events/index';
-import { kvPublishedListings } from '../../lib/events-store';
-import { AREAS, GENRES, REGIONS, areaName } from '../../data/events/areas';
-import { sourceSites, SITE_KIND_LABEL, SITE_GENRE_LABEL, type SiteKind } from '../../data/events/sourceSites';
-const siteKinds: SiteKind[] = ['ticket', 'store', 'portal', 'community'];
-import { parseCriteria, criteriaToQuery, resolveAll, resolveListings, isListing, search, nextAvailableDate, compareRows, BUDGET_OPTIONS, END_BY_OPTIONS, PARTY_MAX, fmtYen, minToHhmm, type AnyResolved } from '../../lib/events';
+import { AREAS, GENRES, REGIONS, areaName, regionName } from '../../data/events/areas';
+import { parseCriteria, criteriaToQuery, resolveAll, resolveListings, isListing, search, nextAvailableDate, compareRows, BUDGET_OPTIONS, END_BY_OPTIONS, PARTY_MAX, fmtYen, minToHhmm, type AnyResolved, type Criteria } from '../../lib/events';
 import { jstDateString, addDays, weekRange, fmtDateShort, fmtDateJa, fmtVerified } from '../../lib/thisWeek';
+import { jsonLd } from '../../lib/microcms';
 
 const now = new Date();
 const today = jstDateString(now);
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const c = parseCriteria(Astro.url.searchParams);
 const limit = addDays(today, LIST_DAYS);
 const own = resolveAll(eventsData, now).filter((r) => r.row.date <= limit);
-// 外部サイト掲載：データファイル分＋管理画面（/contact/admin/events/）で公開した KV 分
-const kvListings = await kvPublishedListings();
-const ext = resolveListings({ ...eventsData, listings: [...eventsData.listings, ...kvListings] }, now).filter((r) => r.row.date <= limit);
-// 自社の回と外部サイト掲載を同じ並び（日付→時刻）で1つの結果にする。主催者による優先はしない
+const ext = resolveListings(eventsData, now).filter((r) => r.row.date <= limit);
 const all: AnyResolved[] = [...own, ...ext].sort((a, b) => compareRows(a.row, b.row));
-const upcomingExt = ext.filter((r) => !['ended', 'cancelled'].includes(r.eventState));
-const listingsBySite = (id: string) => upcomingExt.filter((r) => r.site.id === id);
 const result = search(all, c, now);
 const nextDate = result.matched.length === 0 ? nextAvailableDate(all, c, now) : null;
 const weekend = weekRange(now).weekend.filter((d) => d >= today);
 const weekendLabel = weekend.map(fmtDateShort).join('・');
 const windowLabel = result.window ? result.window.map(fmtDateJa).join('・') : `これから${LIST_DAYS}日以内`;
-// 掲載データがある地域・エリアだけを選択肢にする（空の地域ページは作らない）
 const dataAreas = new Set(all.map((r) => r.row.area));
 const dataRegions = new Set(all.map((r) => r.row.region));
 const areaOptions = AREAS.filter((a) => dataAreas.has(a.id));
 const regionOptions = REGIONS.filter((r) => dataRegions.has(r.id));
 const latestVerified = eventsData.works.filter((w) => w.published).map((w) => w.verified.at).sort().pop() ?? '';
 const anyStale = own.some((r) => r.stale);
-const pageTitle = '今日・明日・今週末に遊べるマダミス・イマーシブ公演を探す（東京） - 株式会社ex Labs';
-const pageDesc = '東京で今日・明日・今週末に参加できるマーダーミステリー・イマーシブシアター・周遊型の物語体験を、日付・人数・エリア・ジャンル・予算から探せる無料の公演情報サービス。開催・販売・空席の確認状況を分けて表示し、予約は公式販売ページへ案内します。';
+
+// 今日・明日・今週末の要約（検索エンジンにも見える静的な本文。カードは下の結果に1回だけ出す）
+const sumFor = (when: Criteria['when']) => search(all, { when }, now).matched;
+const todayRows = sumFor('today');
+const tomorrowRows = sumFor('tomorrow');
+const weekendRows = sumFor('weekend');
+const nextAny = todayRows.length === 0 ? nextAvailableDate(all, { when: 'today' }, now) : null;
+const label = (r: AnyResolved) => isListing(r) ? r.listing.title : r.work.title;
+const place = (r: AnyResolved) => isListing(r) ? `${regionName(r.listing.regionId)}・${areaName(r.listing.areaId)}` : `${regionName(r.venue.regionId)}・${areaName(r.venue.areaId)}`;
+const timeOf = (r: AnyResolved) => r.row.start !== undefined ? `${minToHhmm(r.row.start)}開演` : '開演時刻は公式で確認';
+const ctaOf = (r: AnyResolved) => r.cta === 'book' ? '予約可（確認時点）' : r.cta === 'soldout' ? '満席（確認時点）' : r.cta === 'started' ? '開演済み' : '空席は公式で確認';
+const worksUpcoming = [...new Map(own.filter((r) => !['ended', 'cancelled'].includes(r.eventState)).map((r) => [r.work.id, r])).values()];
+
+const pageTitle = '今日できるイマーシブ｜東京で今日・明日・今週末に参加できる公演を探す - 株式会社ex Labs';
+const pageDesc = `今日できるイマーシブ体験・マダミスを東京で探すページ。今日（${fmtDateShort(today)}）・明日・今週末（${weekendLabel}）に参加できる公演を日本時間で毎日更新し、人数・エリア・予算でも絞り込めます。開催・販売・空席の確認状況を分けて表示し、予約は公式販売ページへ。`.slice(0, 160);
+
+const faqs = [
+  { q: '今日、東京でイマーシブ体験に参加できますか？', a: `このページの「今日」の欄に、今日（${fmtDateJa(today)}）に開催予定として確認できた公演を表示しています。参加できるかどうかは各公演の公式販売ページの空席次第です。開催予定があるだけでは予約可能と表示せず、受付中かつ確認時点で空席ありの回だけ「予約する」ボタンにしています。` },
+  { q: '予約なしで当日参加できるイマーシブはありますか？', a: '当サイトで掲載している公演は、公式販売ページでの事前予約が基本です。当日券の有無は公演ごとに異なるため、公式ページの案内を確認してください。ページ上の「販売」「空席」の表示は確認時点のもので、当日の状況を保証するものではありません。' },
+  { q: '一人でも参加できますか？', a: '作品によります。「ウワサバナシ調査委員会」はチケット1枚につき1名で1人から参加できます。「怪盗と秘密の試験」は各回2〜4名の1組での参加で、1人での申込はできません。各カードの「申込可能な人数」で確認できます。' },
+  { q: '料金はいくらくらいですか？', a: '掲載中の公演では、周遊型の「ウワサバナシ調査委員会」が1人¥4,000（税込・手数料別）、少人数型の「怪盗と秘密の試験」が1組¥13,000〜（2人参加・税込・手数料別）です。東京のマダミス店舗公演は1人3,000〜6,000円程度が目安です。1組料金は人数に応じた1人あたりの目安も表示しています。' },
+  { q: '所要時間はどのくらいですか？', a: '周遊型で60〜120分程度、公演型で1〜3時間程度が一般的です。掲載中の「ウワサバナシ調査委員会」は約70分です。終了時刻の上限（例：19時までに終わる）で絞り込むこともできますが、開演時刻が未確認の公演は条件に合うとは扱わず、別枠で表示します。' },
+  { q: '初めてでも楽しめますか？服装や持ち物は？', a: '多くのイマーシブ体験は演技の経験がなくても参加できます。周遊型は歩きやすい靴、スマートフォンとイヤホン、水分を持参するよう案内されることが多く、各公演の「持ち物・参加条件」に確認できた内容を載せています。詳しくはイマーシブ体験の服装・持ち物ガイドをご覧ください。' },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const pageLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: '今日できるイマーシブ｜東京で今日・明日・今週末に参加できる公演',
+  url: new URL('/events/', site).toString(),
+  inLanguage: 'ja',
+  description: pageDesc,
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  dateModified: today,
+  mainEntity: { '@type': 'ItemList', itemListElement: worksUpcoming.map((r, i) => ({ '@type': 'ListItem', position: i + 1, name: r.work.title, url: new URL(`/events/${r.work.slug}/`, site).toString() })) },
+};
+
 const relax: { label: string; q: string }[] = [];
 if (c.party) relax.push({ label: '人数の指定を外す', q: criteriaToQuery({ ...c, party: undefined }) });
 if (c.when !== 'all') relax.push({ label: `日付の指定を外す（これから${LIST_DAYS}日）`, q: criteriaToQuery({ ...c, when: 'all', date: undefined }) });
@@ -52,12 +82,23 @@ if (c.genre) relax.push({ label: 'ジャンルの指定を外す', q: criteriaTo
 if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時刻・予算の指定を外す', q: criteriaToQuery({ ...c, start: '', endBy: undefined, budget: undefined }) });
 ---
 <BaseLayout title={pageTitle} description={pageDesc}>
-<Breadcrumb items={[{ name: 'ホーム', href: '/' }, { name: '公演を探す' }]} />
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(pageLd)} />
+<Breadcrumb items={[{ name: 'ホーム', href: '/' }, { name: '今日できるイマーシブ（公演を探す）' }]} />
 
 <section class="section ev-hero" data-today={today}><div class="wrap">
-<p class="eyebrow">EVENTS</p>
-<h1 class="h2 serif">今日・明日・今週末に遊べる<br class="sponly">マダミス・イマーシブ公演を探す</h1>
-<p class="ev-lede">遊びたい日と人数から、東京で参加できるマーダーミステリー・イマーシブシアター・周遊型の物語体験を探せます。株式会社ex Labs が運営する無料の公演情報サービスで、他社の公演も掲載条件を確認できたものを紹介します。予約・決済は各公演の公式販売ページで行ってください。</p>
+<p class="eyebrow">TODAY'S IMMERSIVE</p>
+<h1 class="h2 serif">今日できるイマーシブを探す<br class="sponly">｜東京の今日・明日・今週末の公演</h1>
+<p class="ev-lede"><strong>今日（{fmtDateJa(today)}）、東京で参加できるイマーシブ体験・マダミスは{todayRows.length}件</strong>を確認しています（日本時間で毎日更新）。遊びたい日と人数を選ぶと、参加できる公演回だけが並びます。掲載は株式会社ex Labs が公式情報で確認した公演で、予約と決済は各公演の公式販売ページで行います。</p>
+
+<div class="key-points">
+<p class="key-points-h">要点</p>
+<ul>
+<li>「今日できるイマーシブ」＝当日または直近の日程で参加できる没入型の公演・周遊イベント・マダミス。予約制が基本で、当日枠は公式販売ページの空席次第です。</li>
+<li>今日 {todayRows.length}件／明日 {tomorrowRows.length}件／今週末（{weekendLabel}）{weekendRows.length}件。開催・販売・空席の確認状況を分けて表示し、開催予定があるだけでは「予約可」と出しません。</li>
+<li>費用の目安は1人¥4,000（周遊型）〜1組¥13,000（少人数型・2人）。所要時間は周遊型60〜120分、公演型1〜3時間が一般的です。</li>
+</ul>
+</div>
 
 <form class="ev-form" id="ev-form" method="get" action="/events/" aria-label="公演の検索条件">
   <fieldset>
@@ -71,7 +112,7 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
     </div>
     <div class="ev-date-in">
       <label for="ev-date" class="lbl" style="margin:0">日付</label>
-      <input type="date" id="ev-date" name="date" value={c.date ?? ''} min={today} max={addDays(today, LIST_DAYS)} style="width:auto">
+      <input type="date" id="ev-date" name="date" value={c.date ?? ''} min={today} max={limit} style="width:auto">
     </div>
   </fieldset>
   <div class="ev-grid">
@@ -101,9 +142,23 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 </form>
 </div></section>
 
-<section class="section tinted ev-results" id="results" aria-live="polite"><div class="wrap">
-<h2 class="ev-res-h"><span data-window-label>{windowLabel}</span>の公演回 <span data-count>{result.matched.length}</span>件 <small>（開催日時順。自社の公演と外部サイト掲載の公演を同じ基準で並べ、主催者による優先表示はしていません）</small></h2>
-<p class="ev-meta">開催情報の最終確認：{latestVerified ? fmtVerified(latestVerified) : '—'}。{anyStale && <strong>確認から2週間以上経過した公演があります。</strong>}販売・空席の状況は各公演の公式ページが正で、このページの表示は確認時点のものです。掲載基準と修正依頼は<a href="/events/about/">サービスについて</a>をご覧ください。</p>
+<section class="section tinted ev-today" id="today"><div class="wrap">
+<h2 class="h2 serif">今日（{fmtDateJa(today)}）できるイマーシブ・マダミス（東京）</h2>
+{todayRows.length > 0 ? (
+  <ul class="ev-sum">{todayRows.map((r) => <li><strong>{label(r)}</strong>（{place(r)}）：{timeOf(r)}・{ctaOf(r)} <a href="/events/?when=today#results">今日の公演回を見る →</a></li>)}</ul>
+) : (
+  <p class="ev-sum-none">今日の開催は確認できていません（今日開催なしと断定するものではありません）。{nextAny ? <>次に開催を確認できている日は<strong>{fmtDateJa(nextAny)}</strong>です。<a href={`/events/?when=date&date=${nextAny}#results`}>その日の公演回を見る →</a></> : null}</p>
+)}
+<h3 class="ev-sum-h">明日（{fmtDateJa(addDays(today, 1))}）</h3>
+{tomorrowRows.length > 0 ? <ul class="ev-sum">{tomorrowRows.map((r) => <li><strong>{label(r)}</strong>（{place(r)}）：{timeOf(r)}・{ctaOf(r)} <a href="/events/?when=tomorrow#results">明日の公演回を見る →</a></li>)}</ul> : <p class="ev-sum-none">明日の開催は確認できていません。</p>}
+<h3 class="ev-sum-h">今週末（{weekend.map(fmtDateJa).join('・')}）</h3>
+{weekendRows.length > 0 ? <ul class="ev-sum">{weekendRows.map((r) => <li><strong>{fmtDateShort(r.row.date)} {label(r)}</strong>（{place(r)}）：{timeOf(r)}・{ctaOf(r)} <a href="/events/?when=weekend#results">今週末の公演回を見る →</a></li>)}</ul> : <p class="ev-sum-none">今週末の開催は確認できていません。</p>}
+<p class="ev-meta" style="margin-top:14px">開催情報の最終確認：{latestVerified ? fmtVerified(latestVerified) : '—'}。{anyStale && <strong>確認から2週間以上経過した公演があります。</strong>}販売・空席は各公演の公式ページが正で、表示は確認時点のものです。</p>
+</div></section>
+
+<section class="section ev-results" id="results" aria-live="polite"><div class="wrap">
+<h2 class="ev-res-h"><span data-window-label>{windowLabel}</span>の公演回 <span data-count>{result.matched.length}</span>件 <small>（開催日時順。主催者による優先表示はしていません）</small></h2>
+<p class="ev-meta">掲載基準と修正依頼は<a href="/events/about/">サービスについて</a>をご覧ください。</p>
 
 <div id="ev-zero" class="ev-zero" hidden={result.matched.length > 0}>
   <p class="ev-zero-t">この条件に合う公演回は見つかりませんでした</p>
@@ -111,7 +166,6 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
   <ul>
     <li hidden={!nextDate}><a href={nextDate ? `/events/${criteriaToQuery({ ...c, when: 'date', date: nextDate })}#results` : '/events/'} data-next-date>{nextDate ? `次に候補がある日：${fmtDateJa(nextDate)}` : ''}</a></li>
     {relax.map((x) => <li><a href={`/events/${x.q}#results`}>{x.label}</a></li>)}
-    <li><a href="#other-sites">ほかのサイトに掲載中の公演を見る（マダミス専門店・チケットサイト・当日募集）</a></li>
     <li><a href="/guide/immersive-tokyo/">東京のイマーシブ体験の選び方を読む</a>／<a href="/guide/madamis-tokyo/">東京でマダミスを遊ぶには</a></li>
   </ul>
 </div>
@@ -126,36 +180,17 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
     {result.unknown.map((r) => <li>{isListing(r) ? <ListingCard r={r} place="events-unknown" /> : <EventCard r={r} place="events-unknown" />}</li>)}
   </ul>
 </details>
-{/* 条件に合わなかった回もブラウザ側の再判定に使う（hidden のまま） */}
 <ul class="ev-list" id="ev-rest" hidden>
   {all.filter((r) => !result.matched.includes(r) && !result.unknown.includes(r) && !['ended', 'cancelled'].includes(r.eventState)).map((r) => <li>{isListing(r) ? <ListingCard r={r} place="events" /> : <EventCard r={r} place="events" />}</li>)}
 </ul>
 </div></section>
 
-<section class="section ev-links" id="other-sites"><div class="wrap">
-<h2 class="h2 serif">ほかのサイトに掲載中の公演</h2>
-<p class="ev-lede">各店舗・チケットサイト・情報サイト・当日募集のコミュニティに掲載中の公演を、確認できたものから作品名・日時つきで並べています（<span data-ext-count>{upcomingExt.length}</span>件）。気になる公演はそのサイトの該当ページへ進んで予約してください。サイトの情報を自動取得して転載することはせず、掲載元で確認した時点の内容を確認日時つきで載せています。店舗の X（旧Twitter）や「#マダミス募集」には、直前の空席（🈳）や当日募集が投稿されます。</p>
-{siteKinds.map((k) => (
-  <div class="ev-sites">
-    <h3 class="ev-sites-h">{SITE_KIND_LABEL[k]}</h3>
-    <ul>
-      {sourceSites.filter((x) => x.kind === k).map((x) => (
-        <li><a href={x.url} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={x.id} data-place="events">{x.name}<span>{SITE_GENRE_LABEL[x.genre]}{x.sameDay ? '・当日募集や空席情報あり' : ''}｜{x.what}</span></a>
-          {listingsBySite(x.id).length > 0 ? (
-            <ul class="ev-site-list">
-              {listingsBySite(x.id).slice(0, 6).map((r) => (
-                <li><a href={r.listing.url} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={x.id} data-place="events-site-listing"><time datetime={r.listing.date}>{fmtDateShort(r.listing.date)}</time>{r.row.start !== undefined ? ` ${minToHhmm(r.row.start)}` : ''} <strong>{r.listing.title}</strong>{r.listing.priceText ? `｜${r.listing.priceText}` : ''}{r.listing.status === 'soldout' ? '｜満席（確認時点）' : r.listing.remainingText ? `｜${r.listing.remainingText}（確認時点）` : ''}</a></li>
-              ))}
-              {listingsBySite(x.id).length > 6 && <li class="ev-note">ほか{listingsBySite(x.id).length - 6}件は上の検索結果に表示されます</li>}
-            </ul>
-          ) : null}
-          {x.links?.length ? <p class="ev-sites-sub">{x.links.map((l, i) => <>{i > 0 && '／'}<a href={l.url} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={x.id} data-place="events-sub">{l.label}</a></>)}</p> : null}
-        </li>
-      ))}
-    </ul>
-  </div>
-))}
-<p class="ev-note" style="margin-top:14px">掲載サイトの追加・削除のご要望は <a href={`mailto:${EVENTS_CONTACT}`}>{EVENTS_CONTACT}</a> へ。外部サイトの情報を自動取得して転載することはしていません（<a href="/events/about/">掲載基準</a>）。</p>
+<section class="section tinted ev-about" id="guide"><div class="wrap">
+<h2 class="h2 serif">「今日できるイマーシブ」の探し方と選び方</h2>
+<p><strong>今日できるイマーシブとは</strong>、当日または直近の日程で参加できるイマーシブ体験（没入型の公演・街や施設を歩く周遊型イベント・キャストと会話する物語体験・マーダーミステリー）のことです。東京では期間限定の少人数公演が主流で、当日参加できるかは各回の空席で決まります。当サイトでは「開催予定」「受付中」「確認時点で空席あり」を分けて表示し、開催予定があるだけでは予約可能と表示しません。</p>
+<p><strong>目的別の選び方</strong>：一人で参加するなら1人参加可の周遊型（<a href="/events/?party=1#results">1人で参加できる公演</a>）、デートや友人となら少人数の物語体験（<a href="/events/?party=2#results">2人で参加できる公演</a>）、初めてなら謎解き要素のある周遊型が入りやすい形式です。仕事帰りなら<a href="/events/?start=evening#results">夜開演の公演</a>、早く帰りたい日は「終了時刻の上限」で絞り込めます。</p>
+<p><strong>費用・所要時間・人数の目安</strong>：掲載中の公演は1人¥4,000（周遊型「ウワサバナシ調査委員会」、約70分、1人から）と1組¥13,000〜（少人数型「怪盗と秘密の試験」、各回2〜4名）で、いずれも税込・手数料別です。東京のマダミス店舗公演は1人3,000〜6,000円程度、所要時間は周遊型60〜120分、公演型1〜3時間が一般的です。</p>
+<p><strong>掲載している公演について</strong>：株式会社ex Labs が企画・制作するイマーシブ公演を、公式情報で確認したうえで掲載しています。渋谷サクラステージを舞台にした「ウワサバナシ調査委員会」は日本経済新聞で紹介され、「怪盗と秘密の試験」は電ファミニコゲーマーで紹介されました。他社の公演は掲載条件を確認できたものから順次追加します（<a href="/events/about/">掲載基準</a>）。</p>
 </div></section>
 
 <section class="section ev-links"><div class="wrap">
@@ -164,18 +199,24 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 <ul>
   <li><a href="/guide/immersive-tokyo/">東京で体験できるイマーシブイベント<span>種類・2026年の動向・初めての選び方</span></a></li>
   <li><a href="/guide/madamis-tokyo/">東京でマダミスを遊ぶには<span>店舗・公演・オンラインの探し方と初心者の選び方</span></a></li>
-  <li><a href="/guide/madamis-shoshinsha/">マダミス初心者ガイド<span>はじめての作品選びと当日の流れ</span></a></li>
   <li><a href="/guide/immersive-preparation/">イマーシブ体験の服装・持ち物<span>公演別チェック表つき</span></a></li>
+  <li><a href="/guide/immersive-taiken/">イマーシブ体験とは<span>没入型体験の基本</span></a></li>
   <li><a href="/guide/immersive-theater/">イマーシブシアターとは<span>演劇との違い</span></a></li>
-  <li><a href="/guide/madamis-asobikata/">マダミスの遊び方<span>ルールと進行の基本</span></a></li>
+  <li><a href="/guide/madamis-shoshinsha/">マダミス初心者ガイド<span>はじめての作品選びと当日の流れ</span></a></li>
 </ul>
 </div></section>
 
-<section class="section tinted ev-about" id="about"><div class="wrap">
+<section class="section tinted" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => <div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>)}
+</div>
+</div></section>
+
+<section class="section ev-about" id="about"><div class="wrap">
 <h2 class="h2 serif">このサービスについて</h2>
-<p>「公演を探す」は、株式会社ex Labs が運営する、マダミス・イマーシブ公演の発見と集客を支援する無料の公演情報サービスです。自社の公演だけでなく、掲載条件を確認できた他社の公演も無料で紹介します。掲載料・予約手数料・利用料はいただいておらず、予約と決済は各公演の公式販売ページで行います。</p>
-<p>検索結果は利用者の条件への適合と開催日時の順に並び、ex Labs の公演を無条件で上位にすることはありません。ex Labs が関わる公演には「ex Labs 企画・制作」と表示しています。将来、広告枠を設ける場合は「広告」「PR」と明示し、検索条件や空席情報と混同しない形で表示します。</p>
-<p>掲載内容の修正・掲載停止のご依頼、公演の掲載のご相談（無料）は <a href={`mailto:${EVENTS_CONTACT}`}>{EVENTS_CONTACT}</a> または<a href="/?c=events#contact">お問い合わせフォーム</a>へ。確認後、速やかに対応します。掲載基準の詳細は<a href="/events/about/">サービスについて（掲載基準・運営者・修正依頼）</a>をご覧ください。</p>
+<p>「公演を探す」は、株式会社ex Labs が運営する、マダミス・イマーシブ公演の発見と集客を支援する無料の公演情報サービスです。掲載料・予約手数料・利用料はいただいておらず、予約と決済は各公演の公式販売ページで行います。検索結果は利用者の条件への適合と開催日時の順に並び、ex Labs の公演には「ex Labs 企画・制作」と表示しています。将来、広告枠を設ける場合は「広告」「PR」と明示します。</p>
+<p>掲載内容の修正・掲載停止のご依頼、公演の掲載のご相談（無料）は <a href={`mailto:${EVENTS_CONTACT}`}>{EVENTS_CONTACT}</a> または<a href="/?c=events#contact">お問い合わせフォーム</a>へ。詳細は<a href="/events/about/">サービスについて（掲載基準・運営者・修正依頼）</a>。</p>
 </div></section>
 
 <section class="section ev-biz"><div class="wrap">
@@ -185,6 +226,9 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 <a class="btn" href="/services/" data-cta="events-biz">法人向けサービスを見る</a>
 </div>
 </div></section>
+
+<AuthorBox />
+<LatestPosts category="immersive" />
 
 <script>
   // 絞り込みの即時反映（サーバーと同じ判定関数）。JS が無い場合はフォーム送信（GET）で同じ結果になる。
@@ -226,7 +270,6 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
         else if (m === 'unknown') { unknownList.appendChild(li); nUnknown++; }
         else { rest.appendChild(li); if (row.date >= today && matchCriteria(row, { ...c, when: 'all', date: undefined }, now, null) === 'match') nextDates.push(row.date); }
       }
-      // 日付順に並べ直す（appendChild で順番が崩れないよう data-row の date/start で再ソート）
       for (const ul of [matched, unknownList]) {
         Array.from(ul.children).sort((a, b) => {
           const ra = JSON.parse((a.querySelector('.ev-card') as HTMLElement).dataset.row || '{}');
@@ -244,7 +287,6 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
       const nd = nextDates.filter((d) => d > after).sort()[0];
       const ndA = zero.querySelector<HTMLAnchorElement>('[data-next-date]');
       if (ndA) { if (nd) { ndA.textContent = `次に候補がある日：${fmtDateJa(nd)}`; ndA.href = `/events/${criteriaToQuery({ ...c, when: 'date', date: nd })}#results`; ndA.parentElement!.hidden = false; } else ndA.parentElement!.hidden = true; }
-      // 今日・明日・今週末のラベルを現在の日付で更新（開いたまま日付が変わった場合）
       const wk = weekRange(now).weekend.filter((d) => d >= today);
       const lab: Record<string, string> = { today: fmtDateShort(today), tomorrow: fmtDateShort(addDays(today, 1)), weekend: wk.map(fmtDateShort).join('・') };
       form.querySelectorAll<HTMLElement>('[data-when-label]').forEach((el) => { el.textContent = lab[el.dataset.whenLabel || ''] || ''; });
@@ -262,7 +304,6 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
       if (t.name === 'when' && t.value === 'date') { const d = document.getElementById('ev-date') as HTMLInputElement; d.focus(); if (!d.value) return; }
       apply(true);
     });
-    // 開いたまま日付が変わった場合に備え、初回と1分ごとに再判定（計測は送らない）
     if (document.body.dataset.evInit !== '1') { document.body.dataset.evInit = '1'; apply(false); setInterval(() => apply(false), 60000); }
   }
 </script>
@@ -271,4 +312,12 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 <style>
 .sponly{display:none}
 @media(max-width:640px){.sponly{display:block}}
+.ev-today{padding:44px 0}
+.ev-today .h2{font-size:clamp(18px,2vw,22px)}
+.ev-sum{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ev-sum li{background:#fff;border:var(--bd);border-left:4px solid var(--tag-immersive);border-radius:var(--r-s);padding:10px 14px;font-size:14px;line-height:1.8}
+.ev-sum li a,.ev-sum-none a{color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.ev-sum-h{font-size:15px;font-weight:800;margin:22px 0 0;color:var(--ink)}
+.ev-sum-none{margin:10px 0 0;font-size:14px;line-height:1.85;color:rgba(29,29,31,.8)}
+.ev-about p strong{color:var(--ink)}
 </style>

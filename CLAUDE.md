@@ -81,4 +81,5 @@
 - 絞り込み状態のページ・日付別ページは作らない。検索対象は /events/ と作品詳細だけ。
 - 他社の画像・紹介文は利用条件を確認できたものだけ。escape.id 等の自動取得はしない。hub.escape.id は未確認のため未接続。
 - 外部サイトの登録簿は `src/data/events/sourceSites.ts`（/events/#other-sites に表示）。調査メモは `docs/events-sources.md`。リンク掲載＝取得許可ではない。取り込みは `terms: 'confirmed'` にしてから。
-- 他社公演は `src/data/events/listings.ts`（外部サイト掲載の簡易掲載）。掲載元を実際に開いて確認した回だけ入れ、url は掲載元の該当ページ。管理画面 /contact/admin/events/ で URL から候補を出して公開できる（その1ページだけをその場で取得、JSON-LD 優先、KV 保存）。無人の定期再確認は `terms: 'confirmed'` のサイトの `autoRefresh` 行だけ（初期はゼロ）。
+- 2026-09-13 ユーザー判断：当面は自社公演のみ。他社公演の自動取得はしない（管理画面・定期取得は撤去済み）。他社を載せる時は `src/data/events/listings.ts` に手入力（掲載元を実際に開いて確認した回だけ）。
+- /events/ の SEO ターゲットは「今日できるイマーシブ」「今日 イマーシブ 東京」「今週末 イマーシブ 東京」。title・h1・冒頭の件数文・今日／明日／今週末の要約はこのクエリ向け。日付は日本時間で毎日変わる。
