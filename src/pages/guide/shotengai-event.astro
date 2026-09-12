@@ -1,0 +1,174 @@
+---
+// 商店街・街全体を使う回遊イベントの企画｜下北沢の事例と進め方
+// 発注者の検索（SHOPPING STREET）に答える記事。定義・比較・費用・期間・実績・関連リンクを1ページで揃え、
+// /services/shisetsu-event/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/shotengai-event/', site).toString();
+
+const toc = [{"id": "definition", "label": "商店街の回遊イベントとは"}, {"id": "issues", "label": "商店街イベントでよくある課題"}, {"id": "mechanism", "label": "街全体を舞台にする周遊型の仕組み"}, {"id": "case", "label": "事例：下北沢の周遊型アートイマーシブ"}, {"id": "shops", "label": "参加店舗の協力内容と負担の抑え方"}, {"id": "coordination", "label": "商店街・自治体との調整"}, {"id": "cost", "label": "費用・会期・参加人数の目安"}, {"id": "kpi", "label": "効果の測り方"}, {"id": "faq", "label": "よくある質問"}];
+
+const faqs = [
+  {
+    q: '商店街の店舗数が少なくても実施できますか？',
+    a: 'できます。10店舗前後でも、順路を分散させ、店舗以外の場所（公園・掲示板・駅前）を手がかりの場所に含めれば周遊は成立します。店舗数より、参加店舗の営業時間と位置の分布が重要です。',
+  },
+  {
+    q: 'スタンプラリーとの違いは何ですか？',
+    a: 'スタンプラリーは「集めること」が目的になりやすく、店舗には入らずスタンプだけ押して帰る行動が起こります。周遊型の謎解き・イマーシブは、店舗の中にある要素がないと物語や謎が進まないため、店内への立ち寄りと滞在が生まれます。',
+  },
+  {
+    q: '会期はどのくらい必要ですか？',
+    a: '2週間〜1ヶ月以上を推奨します。口コミで後から来る人を受け止められ、平日の来街にもつながるためです。下北沢の事例では約2ヶ月の会期で全公演が完売しました。',
+  },
+  {
+    q: '街全体を使うイベントの実績はありますか？',
+    a: '株式会社ex Labsは、下北沢の街全体を舞台にした周遊型アートイマーシブ（2026年7月7日〜8月31日、全公演完売）のほか、渋谷サクラステージを周遊するイマーシブイベント（日本経済新聞掲載）を企画・制作しています。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '商店街・街全体を使う回遊イベントの企画｜下北沢の事例と進め方',
+  description: '商店街や街全体を舞台にした回遊イベントの企画方法を解説。一過性・店舗負担・効果測定の課題、店舗を巡る理由を作る周遊型の仕組み、下北沢の周遊型アートイマーシブ（全公演完売）の事例、参加店舗の協力内容、自治体との調整、費用・会期の目安を街歩き型イベントを制作する株式会社ex Labsが整理します。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/shotengai-event.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-12',
+  dateModified: '2026-09-12',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="商店街・街全体を使う回遊イベントの企画｜下北沢の事例と進め方 - 株式会社ex Labs"
+  description="商店街や街全体を舞台にした回遊イベントの企画方法を解説。一過性・店舗負担・効果測定の課題、店舗を巡る理由を作る周遊型の仕組み、下北沢の周遊型アートイマーシブ（全公演完売）の事例、参加店舗の協力内容、自治体との調整、費用・会期の目安を街歩き型イベントを制作する株式会社ex Labsが整理します。"
+  ogImage="/assets/guide/shotengai-event.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '周遊イベントとは', href: '/guide/shuyu-event/' },
+  { name: '商店街・街全体を使う回遊イベントの企画' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">SHOPPING STREET</p>
+<h1 class="h2 serif">商店街・街全体を使う回遊イベントの企画<br>下北沢の事例と進め方</h1>
+<p class="lede">商店街の回遊イベントとは、商店街や街全体を舞台に、来場者が複数の店舗を巡る「理由」を用意して、店舗への立ち寄りと滞在を生むイベントです。スタンプラリーが代表的ですが、近年は街に散らばった手がかりや作品を探す周遊型の謎解き・イマーシブ体験が使われるようになっています。</p>
+<p class="lede">この記事では、商店街イベントでよくある課題、街全体を舞台にする周遊型の仕組み、下北沢での周遊型アートイマーシブ（全公演完売）の事例、参加店舗の協力内容、費用と会期の目安を、街歩き型のイベントを企画・制作する株式会社ex Labsが整理します。</p>
+<p class="pub-date">公開日：2026年9月12日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>商店街の回遊イベントとは、街全体を舞台に、来場者が複数の店舗を巡る「理由」を用意して立ち寄りと滞在を生むイベントです。</li><li>一過性・参加店舗の負担・特定店舗への偏り・効果が測れない、という課題は「店に入る理由」が設計されていないときに起こります。</li><li>下北沢では街に散らばった絵画を探す周遊型アートイマーシブを2026年7月7日〜8月31日に実施し、全公演が完売しました。</li><li>費用は街全体の周遊型で数百万円規模（既存導入なら100万円前後〜）、会期は2週間〜1ヶ月以上、有料チケット型ならレベニューシェアも検討できます。</li></ul></div>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="definition"><div class="wrap narrow">
+<p class="eyebrow">DEFINITION</p><h2 class="h2 serif">商店街の回遊イベントとは</h2>
+<p class="lede">回遊イベントは、来場者が1か所に集まるのではなく、街の中を移動しながら複数の店舗を訪れる設計のイベントです。目的は、集客そのものより「店舗の前を通り、中に入り、買う・食べる」行動を生むことにあります。</p>
+<p class="lede">向いているのは、来街者はいるのに個店への立ち寄りが少ない商店街、奥まった店舗や新規出店の店に人を送りたい街、会期を通じて平日の来街を増やしたい地域です。1日限りの集客だけが目的なら、ステージや物販中心の催しのほうが適しています。</p>
+<p class="lede">周遊型と回遊型の言葉の違いや、施設内で行う周遊イベントの基本は<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊イベントとは</a>で解説しています。この記事は、その中でも「商店街・街全体」を舞台にする場合に絞っています。</p>
+</div></section>
+<section class="section" id="issues"><div class="wrap narrow">
+<p class="eyebrow">ISSUES</p><h2 class="h2 serif">商店街イベントでよくある課題</h2>
+<ul class="bullets"><li>一過性で終わる：当日は人が来ても、会期後に店舗の来店が続かない</li><li>参加店舗の負担が重い：スタッフの手間や在庫の準備が必要で、参加店舗が集まらない</li><li>特定の店舗に偏る：入口付近や大型店に人が集中し、奥の店舗に人が流れない</li><li>効果が測れない：来場者数は分かっても、店舗にどれだけ入ったかが分からない</li><li>予算が単発で消える：制作費が毎回かかり、次回に資産が残らない</li></ul>
+<p class="lede">これらは、来場者が「なぜその店に行くのか」という理由が設計されていないときに起こります。周遊型の体験は、店舗を巡ること自体を物語や謎の一部にするため、奥の店舗にも人を送り込みやすくなります。</p>
+</div></section>
+<section class="section tinted" id="mechanism"><div class="wrap narrow">
+<p class="eyebrow">MECHANISM</p><h2 class="h2 serif">街全体を舞台にする周遊型の仕組み</h2>
+<p class="lede">周遊型のイベントでは、来場者は受付（またはスマートフォン）で最初の手がかりを受け取り、街の中の店舗や場所を巡って物語や謎を進めます。仕組みの要点は次の3つです。</p>
+<ul class="bullets"><li>巡る順番を分散させる：全員が同じ順路にならないよう、複数のルートや自由順の設計にして、店舗ごとの負荷を平準化します。</li><li>店舗内に「立ち寄る理由」を置く：掲示や小さな展示、店員のひとことなど、店の中に入らないと進めない要素を用意します。</li><li>会期を長く取る：1日限りでなく2週間〜1ヶ月以上の会期にすると、口コミで後から来る人を受け止められ、平日の来街にもつながります。</li></ul>
+<p class="lede">街歩き型のイマーシブ体験では、街そのものが物語の舞台になり、店舗は「物語の登場する場所」になります。来場者は目的地として店を訪れるので、通常の販促より滞在と購買につながりやすい設計です。</p>
+</div></section>
+<section class="section" id="case"><div class="wrap narrow">
+<p class="eyebrow">CASE: SHIMOKITAZAWA</p><h2 class="h2 serif">事例：下北沢の周遊型アートイマーシブ</h2>
+<p class="lede">株式会社ex Labsは、下北沢の街に散らばった絵画を探し、隠された物語を辿る周遊型のアートイマーシブを自社主催で実施しました。街歩き×謎解き×絵画による参加型のアート体験で、2026年7月7日〜8月31日の会期で全公演が完売し、店舗を巡る回遊を生みました。</p>
+<p class="lede">この事例のポイントは、絵画という「探す対象」を店舗の中に置くことで、来場者が自然に店舗へ入る導線を作ったことです。会期を約2ヶ月取り、平日も含めて来街が続く形にしました。詳細は<a href="/works/" style="color:var(--accent)">制作事例一覧</a>をご覧ください。</p>
+</div></section>
+<section class="section tinted" id="shops"><div class="wrap narrow">
+<p class="eyebrow">SHOPS</p><h2 class="h2 serif">参加店舗の協力内容と負担の抑え方</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>協力内容</th><th>店舗の負担</th><th>抑え方</th></tr></thead><tbody><tr><th scope="row">掲示物・小さな展示の設置</th><td>小（設置場所の提供）</td><td>制作側が設置・撤去を行う</td></tr><tr><th scope="row">来場者への一言の対応</th><td>小〜中（スタッフの説明）</td><td>対応は一言に限定し、カードや掲示で代替できる形にする</td></tr><tr><th scope="row">営業時間の共有</th><td>小</td><td>定休日・時間帯を事前に集め、ルート設計に反映する</td></tr><tr><th scope="row">割引・特典の提供</th><td>中（原価）</td><td>任意参加にし、特典の有無を体験の進行に影響させない</td></tr></tbody></table></div>
+<p class="lede">参加店舗の負担を「場所を貸すだけ」に近づけるほど、参加店舗が集まりやすくなります。店舗に説明する資料（会期・来場者の動き・問い合わせ先）を用意し、営業への影響が小さいことを先に伝えます。</p>
+</div></section>
+<section class="section" id="coordination"><div class="wrap narrow">
+<p class="eyebrow">COORDINATION</p><h2 class="h2 serif">商店街・自治体との調整</h2>
+<p class="lede">商店街振興組合や自治体と進める場合は、次の点を早めに確認します。</p>
+<ul class="bullets"><li>公道でのパフォーマンス・物販・設営を伴うかどうか（伴う場合は許可が必要になるため、店舗内と掲示中心の設計にすると調整が軽くなります）</li><li>受付場所と、雨天時の案内方法</li><li>会期中の問い合わせ窓口と、店舗からの連絡先</li><li>補助金・助成金を使う場合の実施報告に必要なデータ（来場者数、参加店舗数、アンケート）</li></ul>
+<p class="lede">補助金を使う場合は、報告に使う指標を企画段階で決め、受付数やアンケートで取れるようにしておくと、事業報告がスムーズです。</p>
+</div></section>
+<section class="section tinted" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST & TIME</p><h2 class="h2 serif">費用・会期・参加人数の目安</h2>
+<p class="lede">株式会社ex Labsにご依頼いただく場合、街全体の周遊型は数百万円規模が目安で、既存コンテンツを街に合わせて導入する形なら100万円前後〜から検討できます。準備期間はオリジナル制作で最短1ヶ月・標準1〜3ヶ月、会期は2週間〜1ヶ月以上を推奨します。</p>
+<p class="lede">参加人数は、受付枠と回数で1日数十〜数百名を設計します。有料チケット型にすれば、チケット収益から回収するレベニューシェア（初期費用0円）で実施できる場合があります。費用の考え方は<a href="/guide/shuyu-event-seisaku/" style="color:var(--accent)">周遊イベントの制作依頼</a>と<a href="/guide/event-revenue-share/" style="color:var(--accent)">レベニューシェアの解説</a>をご覧ください。</p>
+</div></section>
+<section class="section" id="kpi"><div class="wrap narrow">
+<p class="eyebrow">KPI</p><h2 class="h2 serif">効果の測り方</h2>
+<ul class="bullets"><li>来街：受付数、チケット販売数、会期中の日別推移</li><li>回遊：チェックポイントの通過数、ルートごとの完了率</li><li>店舗への効果：店舗ごとの立ち寄り数（通過確認）、特典の利用数、参加店舗へのヒアリング</li><li>継続：会期後の再来店、SNSの投稿数、次回参加希望店舗数</li></ul>
+<p class="lede">商店街の場合は「奥の店舗にどれだけ人が入ったか」を見ると、周遊設計が機能したかを判断できます。指標の決め方は<a href="/guide/event-kpi/" style="color:var(--accent)">体験型イベントの効果測定・KPI</a>にまとめています。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="lede">株式会社ex Labsは、謎解き・マダミス・イマーシブ・頭脳戦の4ジャンルを企画・制作する体験型イベントの制作会社です。対応範囲・参考価格・納期は<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>でご確認ください。</p>
+<div class="cta-mini">
+<p class="cta-mini-title serif">商店街・街の回遊イベントを相談する</p>
+<a class="btn" href="/?c=shisetsu#contact">商店街・街の回遊イベントを相談する（無料）</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。目的と場所を伺ったうえで、形式・費用・スケジュールをご提案します。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊イベントとは</a>／<a href="/guide/shuyu-event-seisaku/" style="color:var(--accent)">周遊イベントの制作依頼</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設のイベント企画</a>／<a href="/guide/event-revenue-share/" style="color:var(--accent)">施設イベントのレベニューシェアとは</a>／<a href="/guide/event-kpi/" style="color:var(--accent)">体験型イベントの効果測定・KPI</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#definition,#issues,#mechanism,#case,#shops,#coordination,#cost,#kpi,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>

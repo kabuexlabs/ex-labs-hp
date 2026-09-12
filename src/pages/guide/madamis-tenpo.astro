@@ -1,0 +1,171 @@
+---
+// 飲食店・バー・ホテルへのマダミス導入｜貸切公演・常設・宿泊プランの進め方
+// 発注者の検索（MADAMIS FOR VENUES）に答える記事。定義・比較・費用・期間・実績・関連リンクを1ページで揃え、
+// /services/murder-mystery/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/madamis-tenpo/', site).toString();
+
+const toc = [{"id": "definition", "label": "店舗へのマダミス導入とは"}, {"id": "types", "label": "導入の3形式を比較"}, {"id": "fit", "label": "向いている店舗と目的"}, {"id": "prep", "label": "店舗側の準備（空間・人数・時間帯・スタッフ）"}, {"id": "original", "label": "既存作品の導入とオリジナル制作の違い"}, {"id": "cost", "label": "費用・期間・人数の目安"}, {"id": "case", "label": "事例：宿泊施設向けオリジナルマダミス"}, {"id": "promo", "label": "集客と告知の考え方"}, {"id": "faq", "label": "よくある質問"}];
+
+const faqs = [
+  {
+    q: 'マダミスをやったことがないスタッフでも進行できますか？',
+    a: '常設プログラムでは、スタッフが進行できるように設計した作品と進行マニュアルを用意します。最初の数回は制作会社の進行役が立ち会い、引き継ぐ形が一般的です。',
+  },
+  {
+    q: '店舗の飲食と同時に進められますか？',
+    a: '進められます。ゲームの区切りに合わせて料理を提供するタイムテーブルを作ります。コース料理と組み合わせる場合は、提供のタイミングを事前にすり合わせます。',
+  },
+  {
+    q: '貸切公演の1回だけでも依頼できますか？',
+    a: 'できます。既存作品の貸切・出張実施は2〜4週間で準備でき、数十万円台〜が目安です。反応を見てから常設やオリジナル制作に進む店舗もあります。',
+  },
+  {
+    q: '導入の実績はありますか？',
+    a: '株式会社ex Labsは、宿泊施設向けオリジナルマダミス（新規宿泊予約20件以上、告知はXのみ）のほか、20作品以上のマダミスを制作しています。詳しくはマダミス制作サービスをご覧ください。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '飲食店・バー・ホテルへのマダミス導入｜貸切公演・常設・宿泊プランの進め方',
+  description: '飲食店・バー・ホテルにマーダーミステリー（マダミス）を導入する3つの形式（貸切公演・常設プログラム・宿泊プラン連動）を比較し、向いている店舗、店舗側の準備、既存作品とオリジナル制作の違い、費用と期間の目安を、宿泊施設向けマダミスで新規宿泊予約20件以上の実績を持つ株式会社ex Labsが解説します。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/madamis-tenpo.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-12',
+  dateModified: '2026-09-12',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="飲食店・バー・ホテルへのマダミス導入｜貸切公演・常設・宿泊プランの進め方 - 株式会社ex Labs"
+  description="飲食店・バー・ホテルにマーダーミステリー（マダミス）を導入する3つの形式（貸切公演・常設プログラム・宿泊プラン連動）を比較し、向いている店舗、店舗側の準備、既存作品とオリジナル制作の違い、費用と期間の目安を、宿泊施設向けマダミスで新規宿泊予約20件以上の実績を持つ株式会社ex Labsが解説します。"
+  ogImage="/assets/guide/madamis-tenpo.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'マダミス制作とは', href: '/guide/madamis-seisaku/' },
+  { name: '飲食店・バー・ホテルへのマダミス導入' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">MADAMIS FOR VENUES</p>
+<h1 class="h2 serif">飲食店・バー・ホテルへのマダミス導入<br>貸切公演・常設・宿泊プランの進め方</h1>
+<p class="lede">店舗へのマダミス導入とは、飲食店・バー・ホテル・旅館などの空間で、マーダーミステリー（マダミス）を「お店で遊べる体験」として提供し、来店や宿泊の理由を作る取り組みです。貸切の公演として1日だけ実施する形、常設プログラムとして繰り返し提供する形、宿泊プランに組み込む形があります。</p>
+<p class="lede">この記事では、3つの導入形式の違い、向いている店舗、店舗側の準備、既存作品とオリジナル制作の違い、費用と期間の目安を、宿泊施設向けオリジナルマダミスの制作実績を持つ株式会社ex Labsが整理します。</p>
+<p class="pub-date">公開日：2026年9月12日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>店舗へのマダミス導入とは、飲食店・バー・ホテルの空間でマーダーミステリーを提供し、来店や宿泊の理由を作る取り組みです。</li><li>形式は貸切公演（まず1回試す）、常設プログラム（繰り返し提供）、宿泊プラン連動（泊まる理由を作る）の3つです。</li><li>店舗側は個室か仕切れる席、1卓4〜10名程度、2〜3時間の枠、常設なら進行役の担当者を用意します。</li><li>費用は既存作品の貸切で数十万円台〜、オリジナル制作で100万円前後〜。宿泊施設向け作品で新規宿泊予約20件以上（告知はXのみ）の実績があります。</li></ul></div>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="definition"><div class="wrap narrow">
+<p class="eyebrow">DEFINITION</p><h2 class="h2 serif">店舗へのマダミス導入とは</h2>
+<p class="lede">マダミスは、参加者が登場人物になり、会話と推理で事件の真相を探るゲームです。1卓4〜10名程度で2〜3時間遊ぶ作品が多く、テーブルと個室があれば成立するため、飲食店・バー・ホテルの空間と相性が良い形式です。</p>
+<p class="lede">店舗にとっての価値は、「食事や宿泊に理由を足せる」ことです。閑散時間帯や平日の予約、滞在時間の延長、グループ客の獲得に使われます。マダミスの基本は<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは</a>、企業活用の全体像は<a href="/guide/madamis-business/" style="color:var(--accent)">マダミスのビジネス活用</a>をご覧ください。</p>
+</div></section>
+<section class="section" id="types"><div class="wrap narrow">
+<p class="eyebrow">3 TYPES</p><h2 class="h2 serif">導入の3形式を比較</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>形式</th><th>内容</th><th>向いている店舗</th><th>準備期間の目安</th></tr></thead><tbody><tr><th scope="row">貸切公演（1日・数回）</th><td>制作会社が作品とゲームマスターを用意し、店舗を会場にして公演する</td><td>バー、イベントスペース、個室のある飲食店</td><td>既存作品なら2〜4週間</td></tr><tr><th scope="row">常設プログラム</th><td>店舗のスタッフが進行できる作品を用意し、予約制で繰り返し提供する</td><td>個室のある飲食店、ボードゲームカフェ、ホテルのラウンジ</td><td>オリジナル制作で最短1ヶ月・標準1〜3ヶ月</td></tr><tr><th scope="row">宿泊・滞在プラン連動</th><td>客室や館内を舞台にした作品を宿泊プランに組み込む</td><td>ホテル、旅館、貸別荘</td><td>オリジナル制作で1〜3ヶ月</td></tr></tbody></table></div>
+<p class="lede">貸切公演は初期費用と負担が小さく、「まず1回試す」のに向いています。常設と宿泊プラン連動は、店舗の空間や世界観に合わせたオリジナル作品にすると、その店でしか遊べない理由になり、リピートと口コミにつながります。</p>
+</div></section>
+<section class="section tinted" id="fit"><div class="wrap narrow">
+<p class="eyebrow">WHO</p><h2 class="h2 serif">向いている店舗と目的</h2>
+<ul class="bullets"><li>個室や区切れる空間があり、2〜3時間の滞在を前提にできる店舗</li><li>平日や閑散時間帯の予約を増やしたい飲食店・バー</li><li>「泊まる理由」を作りたいホテル・旅館（連泊、平日、オフシーズン）</li><li>グループ客（4〜10名程度）の予約単価を上げたい店舗</li><li>SNSで話題になる企画を探している店舗</li></ul>
+<p class="lede">逆に、回転率を重視する業態や、騒音・照明の制約で会話が難しい空間には向きません。その場合は、1空間で短時間に遊べる謎解きや、店舗を巡る周遊型の企画が候補になります。</p>
+</div></section>
+<section class="section" id="prep"><div class="wrap narrow">
+<p class="eyebrow">PREPARATION</p><h2 class="h2 serif">店舗側の準備（空間・人数・時間帯・スタッフ）</h2>
+<ul class="bullets"><li>空間：卓ごとに会話が聞き取れる個室か、仕切りのある席。BGMの音量調整</li><li>人数：1卓の定員（4〜10名程度）と、同時に実施する卓数</li><li>時間帯：2〜3時間を確保できる枠（ディナー後、平日午後、宿泊なら夜）</li><li>スタッフ：常設の場合は進行役（ゲームマスター）の担当者と、説明・準備の時間</li><li>飲食との組み合わせ：ゲーム中の提供タイミング、コース料理との両立</li><li>予約と決済：ゲーム料金を飲食・宿泊料金に含めるか、別料金にするか</li></ul>
+<p class="lede">常設プログラムでは、スタッフが進行できるように、進行マニュアル・タイムテーブル・よくあるトラブルの対応をセットで納品してもらうと運営が安定します。</p>
+</div></section>
+<section class="section tinted" id="original"><div class="wrap narrow">
+<p class="eyebrow">ORIGINAL OR EXISTING</p><h2 class="h2 serif">既存作品の導入とオリジナル制作の違い</h2>
+<p class="lede">既存作品の導入は、完成済みのシナリオを店舗で遊べるようにする方法で、早く・安く始められます。一方、店舗の空間や地域の物語、ホテルの歴史を舞台にしたオリジナル作品は、「ここでしか遊べない」体験になり、宿泊や来店の理由として強く働きます。</p>
+<p class="lede">判断の目安は、1回限りのイベントか、繰り返し提供するかです。繰り返すなら、店舗に合わせたオリジナルのほうが単価と継続性で有利になることが多いです。比較の詳細は<a href="/guide/event-original-or-existing/" style="color:var(--accent)">オリジナル制作か既存導入か</a>、作り方は<a href="/guide/madamis-making/" style="color:var(--accent)">マダミスの作り方</a>をご覧ください。</p>
+</div></section>
+<section class="section" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST & TIME</p><h2 class="h2 serif">費用・期間・人数の目安</h2>
+<p class="lede">株式会社ex Labsにご依頼いただく場合、既存作品の貸切・出張実施は数十万円台〜、店舗・施設向けのオリジナル制作は100万円前後〜、複数作品や大規模なイベント連動は数百万円規模が目安です。期間は既存作品の導入で2〜4週間、オリジナル制作で最短1ヶ月・標準1〜3ヶ月です。</p>
+<p class="lede">参加人数は1卓4〜10名程度を基本に、複数卓で同時に実施できます。費用の内訳は<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場</a>で解説しています。</p>
+</div></section>
+<section class="section tinted" id="case"><div class="wrap narrow">
+<p class="eyebrow">CASE</p><h2 class="h2 serif">事例：宿泊施設向けオリジナルマダミス</h2>
+<p class="lede">株式会社ex Labsでは、宿泊施設向けにオリジナルのマーダーミステリーを制作し、新規宿泊予約20件以上（告知はXのみ）につながりました。滞在中に遊べる作品を用意することで、「泊まる理由」を作り、グループでの予約を生んだ事例です。</p>
+<p class="lede">一般公演では、評価サイト「毎月マダミスアンケート」で3か月連続1位となった「あるマーダーミステリーについて」を含む20作品以上を制作しています。実績は<a href="/works/" style="color:var(--accent)">制作事例一覧</a>をご覧ください。</p>
+</div></section>
+<section class="section" id="promo"><div class="wrap narrow">
+<p class="eyebrow">PROMOTION</p><h2 class="h2 serif">集客と告知の考え方</h2>
+<p class="lede">店舗のマダミスは、マダミスのファンと、店舗の既存客の両方に告知します。ファン向けにはX（旧Twitter）での作品情報と予約導線、既存客向けには店内掲示・LINE・予約サイトのプラン名で「ここで遊べる」ことを伝えます。</p>
+<p class="lede">告知文では、所要時間・人数・料金・初心者可否を明記すると予約につながりやすくなります。宿泊プランの場合は、プラン名に作品名を入れ、宿泊予約サイトから探せるようにします。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-murder">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="lede">株式会社ex Labsは、謎解き・マダミス・イマーシブ・頭脳戦の4ジャンルを企画・制作する体験型イベントの制作会社です。対応範囲・参考価格・納期は<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作サービス</a>でご確認ください。</p>
+<div class="cta-mini">
+<p class="cta-mini-title serif">マダミスの店舗導入を相談する</p>
+<a class="btn" href="/?c=madamis#contact">マダミスの店舗導入を相談する（無料）</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。目的と場所を伺ったうえで、形式・費用・スケジュールをご提案します。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/madamis-seisaku/" style="color:var(--accent)">マダミス制作とは</a>／<a href="/guide/madamis-business/" style="color:var(--accent)">マダミスのビジネス活用</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場</a>／<a href="/guide/hotel-event/" style="color:var(--accent)">ホテル・宿泊施設のイベント企画</a>／<a href="/guide/event-original-or-existing/" style="color:var(--accent)">オリジナル制作か既存導入か</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="murder" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#definition,#types,#fit,#prep,#original,#cost,#case,#promo,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>

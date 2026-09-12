@@ -1,0 +1,165 @@
+---
+// 体験型イベントの企画書の作り方｜施設・上司に通る構成と書き方
+// 発注者の検索（PROPOSAL）に答える記事。定義・比較・費用・期間・実績・関連リンクを1ページで揃え、
+// /services/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/event-kikakusho/', site).toString();
+
+const toc = [{"id": "definition", "label": "体験型イベントの企画書とは"}, {"id": "items", "label": "企画書に入れる9項目"}, {"id": "experience", "label": "「体験型」ならではの書き方"}, {"id": "budget", "label": "予算とスケジュールの書き方"}, {"id": "questions", "label": "施設・決裁者から必ず聞かれること"}, {"id": "brief", "label": "制作会社に渡す資料との違い"}, {"id": "faq", "label": "よくある質問"}];
+
+const faqs = [
+  {
+    q: '企画書は何ページくらいが適切ですか？',
+    a: '社内・施設向けなら、上記の9項目を1項目1ページ以内にまとめた5〜10ページが目安です。体験の内容と予算は図や表にすると短くなります。',
+  },
+  {
+    q: '体験の内容が決まっていない段階でも企画書を出せますか？',
+    a: '出せます。目的・対象・会場と制約・予算の上限を先に固め、体験の内容は「候補の形式」として複数書く形にします。制作会社に相談すると、形式の提案と概算を受けられます。',
+  },
+  {
+    q: '想定来場者数はどう書けばよいですか？',
+    a: '「同時に体験できる人数×1回の所要時間×受付時間×会期日数」で上限を計算し、そのうち何割が埋まる想定かを書きます。根拠には、施設の来館者数や過去のイベントの参加率を使います。',
+  },
+  {
+    q: '企画書の作成から相談できますか？',
+    a: 'できます。株式会社ex Labsでは、目的と場所を伺ったうえで形式・費用・スケジュールをご提案し、企画書に必要な情報をお渡しします。予算や内容が未定の段階でもご相談いただけます。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '体験型イベントの企画書の作り方｜施設・上司に通る構成と書き方',
+  description: '体験型イベントの企画書に入れる9項目（目的・KPI・対象・会場と制約・体験の内容・形式・スケジュール・予算・体制とリスク）と、来場者の動きを時系列で書く体験型ならではの書き方、予算と日程の書き方、施設・決裁者から聞かれることを、体験型イベントの制作会社 株式会社ex Labsが解説します。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/event-kikakusho.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-12',
+  dateModified: '2026-09-12',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="体験型イベントの企画書の作り方｜施設・上司に通る構成と書き方 - 株式会社ex Labs"
+  description="体験型イベントの企画書に入れる9項目（目的・KPI・対象・会場と制約・体験の内容・形式・スケジュール・予算・体制とリスク）と、来場者の動きを時系列で書く体験型ならではの書き方、予算と日程の書き方、施設・決裁者から聞かれることを、体験型イベントの制作会社 株式会社ex Labsが解説します。"
+  ogImage="/assets/guide/event-kikakusho.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '体験型イベントとは', href: '/guide/taikengata-event/' },
+  { name: '体験型イベントの企画書の作り方' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">PROPOSAL</p>
+<h1 class="h2 serif">体験型イベントの企画書の作り方<br>施設・上司に通る構成と書き方</h1>
+<p class="lede">体験型イベントの企画書とは、施設や決裁者に「なぜこのイベントをやるのか、何が起こるのか、いくらかかって何が得られるのか」を1つの資料で伝えるものです。通常のイベント企画書と違い、来場者が「何をするのか」と、空間・動線・人数の制約を具体的に書く必要があります。</p>
+<p class="lede">この記事では、企画書に入れる9項目、体験型ならではの書き方、予算とスケジュールの書き方、施設や決裁者から必ず聞かれることを、体験型イベントの企画・制作会社である株式会社ex Labsが整理します。制作会社に相談する前の下書きにも使えます。</p>
+<p class="pub-date">公開日：2026年9月12日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>体験型イベントの企画書は、目的・KPI・対象・会場と制約・体験の内容・形式・スケジュール・予算・体制とリスクの9項目で、読む人が「判断できる」状態にします。</li><li>体験型ならではの要点は、来場者が受付から終了まで何をするかを時系列で書き、同時体験人数・所要時間・受付枠を示すことです。</li><li>予算は制作費・運営費・告知費・会場費に分け、既存導入で数十万円台〜、オリジナルで100万円前後〜の目安と、レベニューシェア（初期費用0円）の選択肢を書きます。</li><li>制作会社には目的・対象・制約・予算上限・希望時期があれば相談でき、体験の内容は未定でも構いません。</li></ul></div>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="definition"><div class="wrap narrow">
+<p class="eyebrow">DEFINITION</p><h2 class="h2 serif">体験型イベントの企画書とは</h2>
+<p class="lede">企画書の役割は、読む人が「判断できる」状態にすることです。施設の担当者なら営業への影響と安全、決裁者なら費用対効果、制作会社なら制作範囲を判断します。読む相手ごとに知りたいことが違うため、1つの資料に「目的」「体験の内容」「制約」「費用と効果」「体制と日程」がそろっている必要があります。</p>
+<p class="lede">体験型イベントの基本は<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>、企画の発想は<a href="/guide/taikengata-idea/" style="color:var(--accent)">体験型イベントの企画アイデア</a>をご覧ください。</p>
+</div></section>
+<section class="section" id="items"><div class="wrap narrow">
+<p class="eyebrow">9 ITEMS</p><h2 class="h2 serif">企画書に入れる9項目</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>項目</th><th>書くこと</th><th>抜けやすい点</th></tr></thead><tbody><tr><th scope="row">1. 目的</th><td>集客・回遊・売上・話題化・研修のどれか。1つに絞る</td><td>目的が複数あると評価できない</td></tr><tr><th scope="row">2. 主要指標（KPI）</th><td>目的に対応する数字1つと、補助指標2〜3個</td><td>測定方法まで書く</td></tr><tr><th scope="row">3. 対象</th><td>誰に来てほしいか（年齢層・グループ構成・既存客か新規か）</td><td>「幅広く」は対象を決めていないのと同じ</td></tr><tr><th scope="row">4. 会場と制約</th><td>使える区画・時間帯・人数上限・営業への影響</td><td>使えない場所・時間も書く</td></tr><tr><th scope="row">5. 体験の内容</th><td>来場者が受付から終了まで何をするか（所要時間・動線）</td><td>「イマーシブ体験」だけでは伝わらない</td></tr><tr><th scope="row">6. 形式と制作方法</th><td>既存コンテンツの導入かオリジナル制作か、制作会社の関与範囲</td><td>自社で担当する業務を明記</td></tr><tr><th scope="row">7. スケジュール</th><td>企画確定・制作・テストプレイ・告知開始・実施・振り返り</td><td>テストプレイの日を入れる</td></tr><tr><th scope="row">8. 予算</th><td>制作費・運営費・告知費・会場費の内訳と、収入の有無</td><td>再演時の費用を分ける</td></tr><tr><th scope="row">9. 体制とリスク</th><td>担当者、当日の運営人数、安全・混雑・雨天・クレームの対応</td><td>問い合わせ窓口</td></tr></tbody></table></div>
+<p class="lede">この順番は、読む人の疑問の順番です。「なぜ」（目的）→「誰に」（対象）→「どこで何を」（会場・内容）→「どう作る」（形式）→「いつ・いくら」（日程・予算）→「誰が・何かあったら」（体制・リスク）の流れで書くと、質問が先回りされた企画書になります。</p>
+</div></section>
+<section class="section tinted" id="experience"><div class="wrap narrow">
+<p class="eyebrow">EXPERIENCE</p><h2 class="h2 serif">「体験型」ならではの書き方</h2>
+<p class="lede">体験型イベントの企画書で最も重要なのは、5番目の「体験の内容」です。来場者の立場で、時系列に書きます。</p>
+<ul class="bullets"><li>受付：どこで受け付け、何を渡すか（手がかり・キット・スマートフォンの案内）</li><li>体験中：どこを、どの順番で、何分かけて巡るか。店舗やスタッフと接点があるか</li><li>終了：どこで終わり、何が残るか（特典・写真・SNS投稿の導線）</li></ul>
+<p class="lede">あわせて、「同時に何人まで体験できるか」「1回の所要時間」「1日の受付枠」を書くと、施設側は混雑と営業への影響を判断でき、決裁者は来場者数の上限から売上の上限を計算できます。</p>
+<p class="lede">イマーシブ・周遊型・マダミス・頭脳戦のどれにするか迷う場合は、<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミス・謎解き・イマーシブ・頭脳戦の違い</a>を参考に、目的と場所の制約から選びます。</p>
+</div></section>
+<section class="section" id="budget"><div class="wrap narrow">
+<p class="eyebrow">BUDGET & SCHEDULE</p><h2 class="h2 serif">予算とスケジュールの書き方</h2>
+<p class="lede">予算は「制作費」「運営費」「告知費」「会場費」に分け、収入（チケット・協賛・特典連動の売上）がある場合は別に書きます。制作費の目安は、既存コンテンツの導入で数十万円台〜、施設に合わせたオリジナル制作で100万円前後〜、施設全体・街全体の周遊型で数百万円規模です（株式会社ex Labsにご依頼いただく場合）。内訳は<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>を参照してください。</p>
+<p class="lede">有料チケット型なら、チケット収益から回収するレベニューシェア（初期費用0円）を企画書の選択肢として書けます。条件は<a href="/guide/event-revenue-share/" style="color:var(--accent)">レベニューシェアの解説</a>にまとめています。</p>
+<p class="lede">スケジュールは、実施日から逆算します。既存コンテンツの導入なら2〜4週間、オリジナル制作なら最短1ヶ月・標準1〜3ヶ月が制作期間の目安です。テストプレイの日、告知開始の日、施設側の確認期限を企画書に入れると、後から遅れの原因になりやすい工程が見えます。</p>
+<p class="lede">想定人数の目安は、1空間で完結する公演型なら各回2〜10名程度、施設や街を巡る周遊型なら1日数十〜数百名を、受付枠と回数から計算して書きます。同時体験人数と所要時間が決まれば、会期全体の上限人数が出ます。</p>
+</div></section>
+<section class="section tinted" id="questions"><div class="wrap narrow">
+<p class="eyebrow">QUESTIONS</p><h2 class="h2 serif">施設・決裁者から必ず聞かれること</h2>
+<ul class="bullets"><li>安全と混雑：通路の確保、避難導線、同時体験人数の上限</li><li>営業への影響：通常営業のお客様への配慮、店舗スタッフの負担、騒音</li><li>効果の根拠：似た事例の実績、想定来場者数の根拠</li><li>費用対効果：総費用と、来場・回遊・売上の見込み。測定方法</li><li>中止・変更：雨天、来場者が少ない場合、トラブル時の対応</li><li>権利と表現：使用する物語・キャラクター・写真の権利、施設のブランドとの整合</li></ul>
+<p class="lede">根拠として使える事例は、制作会社の公開実績です。株式会社ex Labsでは、渋谷サクラステージを周遊するイマーシブイベント（日本経済新聞掲載）、閉店後の紀伊國屋書店での一夜限りの公演（博報堂様との取り組み）、宿泊施設向けマダミス（新規宿泊予約20件以上）などを<a href="/works/" style="color:var(--accent)">制作事例一覧</a>で公開しています。</p>
+</div></section>
+<section class="section" id="brief"><div class="wrap narrow">
+<p class="eyebrow">BRIEF</p><h2 class="h2 serif">制作会社に渡す資料との違い</h2>
+<p class="lede">社内・施設向けの企画書は「判断のため」、制作会社に渡す資料は「制作のため」です。制作会社に相談するときは、企画書のうち、目的・対象・会場と制約・予算の上限・希望時期・自社で担当できる業務があれば十分で、体験の内容は未定でも構いません。制作会社が形式を提案し、テストプレイを経て企画書の「体験の内容」を埋めていく流れになります。</p>
+<p class="lede">制作会社の選び方は<a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベントの制作会社の選び方</a>、依頼時に伝える情報は<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>にまとめています。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="lede">株式会社ex Labsは、謎解き・マダミス・イマーシブ・頭脳戦の4ジャンルを企画・制作する体験型イベントの制作会社です。対応範囲・参考価格・納期は<a href="/services/" style="color:var(--accent)">サービス一覧</a>でご確認ください。</p>
+<div class="cta-mini">
+<p class="cta-mini-title serif">企画書の作成から相談する</p>
+<a class="btn" href="/?c=taikengata#contact">企画書の作成から相談する（無料）</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。目的と場所を伺ったうえで、形式・費用・スケジュールをご提案します。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/taikengata-idea/" style="color:var(--accent)">体験型イベントの企画アイデア</a>／<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>／<a href="/guide/event-kpi/" style="color:var(--accent)">体験型イベントの効果測定・KPI</a>／<a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベントの制作会社の選び方</a>／<a href="/guide/taiken-marketing/" style="color:var(--accent)">体験型マーケティングとは</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#definition,#items,#experience,#budget,#questions,#brief,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>

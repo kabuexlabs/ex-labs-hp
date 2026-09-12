@@ -32,6 +32,7 @@
 | マダミス 作り方 | /guide/madamis-making/ |
 | マダミス 企業 イベント / マダミス ビジネス | /guide/madamis-business/ |
 | マダミス 研修 | /guide/madamis-kenshu/ |
+| マダミス 店舗 導入 / マダミス 貸切 / ホテル マダミス | /guide/madamis-tenpo/（2026-09-12 新設） |
 | マダミス 初心者 / マダミス 遊び方 | /guide/madamis-shoshinsha/ /guide/madamis-asobikata/ |
 | マダミス 謎解き 違い / マーダーミステリー 人狼 違い / イマーシブ マダミス 違い | /guide/madamis-nazotoki-chigai/（2026-09-05 新設） |
 
@@ -41,6 +42,7 @@
 | 頭脳戦 / 頭脳戦とは | /guide/zunousen/ |
 | 頭脳戦 ゲーム / 頭脳戦ゲーム | /guide/zunousen-game/ |
 | 頭脳戦制作 / 頭脳戦 イベント 制作 / 頭脳戦 大会 企画 | /guide/zunousen-seisaku/ + /services/zunousen/ |
+| 頭脳戦 動画 企画 / 頭脳戦 配信 / 心理戦 番組 企画 | /guide/zunousen-douga/（2026-09-12 新設） |
 
 ## 軸4 心理戦
 | ワード | 担当ページ |
@@ -70,11 +72,15 @@
 | 社内イベント 企画 | /guide/shanai-event/ |
 | 体験型イベント 費用 / イベント 制作 費用 相場 / 謎解きイベント 費用 | /guide/event-hiyou/（2026-09-05 新設） |
 | 体験型イベント 事例 / イマーシブ 事例 / マダミス 事例 / 制作事例 | /works/（2026-09-05 新設） |
+| 体験型マーケティング / 体験型マーケティング 事例 / experiential marketing | /guide/taiken-marketing/（2026-09-12 新設） |
+| イベント 企画書 書き方 / 体験型イベント 企画書 | /guide/event-kikakusho/（2026-09-12 新設） |
+| イベント 効果測定 / イベント KPI / 費用対効果 | /guide/event-kpi/（2026-09-12 新設） |
 
 ## 軸7 周遊イベント（2026-09-05 追加）
 | ワード | 担当ページ |
 |---|---|
 | 周遊イベント / 周遊 イベント アイデア / 周遊型 謎解き / 回遊 施策 アイデア / 回遊 周遊 違い | /guide/shuyu-event/ |
+| 商店街 イベント 企画 / 商店街 活性化 イベント / 街歩き イベント 企画 | /guide/shotengai-event/（2026-09-12 新設） |
 
 ## 横断ハブ
 - 体験型イベント用語集（DefinedTermSet・AIO用） → /guide/yougo/

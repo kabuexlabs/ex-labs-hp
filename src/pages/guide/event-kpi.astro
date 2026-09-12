@@ -1,0 +1,168 @@
+---
+// 体験型イベントの効果測定・KPI｜集客・回遊・売上をどう測るか
+// 発注者の検索（KPI & MEASUREMENT）に答える記事。定義・比較・費用・期間・実績・関連リンクを1ページで揃え、
+// /services/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/event-kpi/', site).toString();
+
+const toc = [{"id": "definition", "label": "体験型イベントの効果測定とは"}, {"id": "kpi", "label": "KPIの5分類と主な指標"}, {"id": "primary", "label": "目的別に主要指標を1つ決める"}, {"id": "methods", "label": "測定方法：現場で取れるデータ"}, {"id": "roi", "label": "費用対効果の計算例（仮の数字）"}, {"id": "cases", "label": "公開実績で測っている指標（株式会社ex Labs）"}, {"id": "revenue", "label": "レベニューシェア型の指標"}, {"id": "faq", "label": "よくある質問"}];
+
+const faqs = [
+  {
+    q: '来場者数以外に、最低限これだけは測るべき指標はありますか？',
+    a: '「新規か既存か」と「立ち寄り店舗数（または特典利用数）」の2つです。来場者数だけでは、既存客が集まっただけなのか、店舗に効果があったのかが分かりません。',
+  },
+  {
+    q: 'アンケートの回答率を上げるには？',
+    a: '体験の終了時に、特典（次回割引・限定画像など）と引き換えに回答してもらう形が有効です。設問は5問以内にし、スマートフォンで1分以内に答えられるようにします。',
+  },
+  {
+    q: '効果測定を制作会社に依頼できますか？',
+    a: 'できます。株式会社ex Labsでは、受付・通過確認・特典・アンケートを体験の設計に組み込み、会期後に指標を集計してお渡しします。指標は企画段階で一緒に決めます。',
+  },
+  {
+    q: '効果が出なかった場合はどう判断しますか？',
+    a: '主要指標が未達でも、補助指標（回遊・満足度・投稿数）で「どこまで機能したか」を分けて見ます。告知不足なら来場数が、動線の問題なら回遊が、内容の問題なら満足度が下がるため、次回の改善点を特定できます。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '体験型イベントの効果測定・KPI｜集客・回遊・売上をどう測るか',
+  description: '体験型イベントの効果測定を、集客・回遊・売上・認知・満足の5分類の指標、目的別の主要指標の決め方、受付・通過確認・特典・アンケートによる測定方法、費用対効果の計算例（仮の数字）、レベニューシェア型の指標から解説。公開実績で測っている指標も紹介する株式会社ex Labsの記事です。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/event-kpi.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-12',
+  dateModified: '2026-09-12',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="体験型イベントの効果測定・KPI｜集客・回遊・売上をどう測るか - 株式会社ex Labs"
+  description="体験型イベントの効果測定を、集客・回遊・売上・認知・満足の5分類の指標、目的別の主要指標の決め方、受付・通過確認・特典・アンケートによる測定方法、費用対効果の計算例（仮の数字）、レベニューシェア型の指標から解説。公開実績で測っている指標も紹介する株式会社ex Labsの記事です。"
+  ogImage="/assets/guide/event-kpi.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '体験型イベントとは', href: '/guide/taikengata-event/' },
+  { name: '体験型イベントの効果測定・KPI' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">KPI & MEASUREMENT</p>
+<h1 class="h2 serif">体験型イベントの効果測定・KPI<br>集客・回遊・売上をどう測るか</h1>
+<p class="lede">体験型イベントの効果測定とは、イベントの目的（集客・回遊・売上・話題化・研修効果）に対して、実施前に決めた指標（KPI）を現場のデータで確認することです。「盛り上がった」という感想ではなく、来場数・立ち寄り数・売上・投稿数などの数字で振り返るために行います。</p>
+<p class="lede">この記事では、KPIの5分類と主な指標、目的別の決め方、現場で取れる測定方法、費用対効果の計算例（仮の数字）、レベニューシェア型の指標を、体験型イベントの企画・制作会社である株式会社ex Labsが整理します。</p>
+<p class="pub-date">公開日：2026年9月12日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>体験型イベントの効果測定とは、実施前に決めた指標（KPI）を現場のデータで確認することで、測定は体験の設計に組み込んでおきます。</li><li>指標は集客・回遊・売上・認知・満足の5分類から、目的に対応する主要指標を1つ、補助指標を2〜3個選びます。</li><li>受付データ・チェックポイント通過・特典の回収・終了時アンケート・店舗ヒアリングで、来場者の行動を数字にできます。</li><li>株式会社ex Labsの公開実績では、新規宿泊予約20件以上、広告費0円でチケット約1,000枚、全公演完売、日経掲載などを指標として示しています。</li></ul></div>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="definition"><div class="wrap narrow">
+<p class="eyebrow">DEFINITION</p><h2 class="h2 serif">体験型イベントの効果測定とは</h2>
+<p class="lede">効果測定の要点は、「測る指標を実施前に決め、体験の設計に測定を組み込む」ことです。終わってから数字を集めようとしても、受付数以外はほとんど残りません。逆に、受付・チェックポイント・特典の利用を体験の中に置いておけば、来場者の行動が自動的に記録されます。</p>
+<p class="lede">体験型イベントの基本は<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>、体験型マーケティングの考え方は<a href="/guide/taiken-marketing/" style="color:var(--accent)">体験型マーケティングとは</a>をご覧ください。</p>
+</div></section>
+<section class="section" id="kpi"><div class="wrap narrow">
+<p class="eyebrow">5 CATEGORIES</p><h2 class="h2 serif">KPIの5分類と主な指標</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>分類</th><th>主な指標</th><th>取り方</th></tr></thead><tbody><tr><th scope="row">集客</th><td>来場者数、チケット販売数、予約数、新規客の割合</td><td>受付・チケットシステム・予約データ</td></tr><tr><th scope="row">回遊・滞在</th><td>立ち寄り店舗数、チェックポイント通過率、滞在時間、完了率</td><td>通過確認（スタンプ・QR・スタッフ確認）、受付〜終了の時刻</td></tr><tr><th scope="row">売上</th><td>チケット収入、特典（クーポン）利用数、対象店舗の売上増、宿泊予約数</td><td>決済データ、クーポン回収、店舗ヒアリング</td></tr><tr><th scope="row">認知・共有</th><td>SNS投稿数、ハッシュタグ数、メディア掲載、検索数</td><td>SNS検索、掲載記録</td></tr><tr><th scope="row">満足・継続</th><td>アンケート評価、再来店・リピート率、次回参加意向</td><td>終了時アンケート、会期後の来店データ</td></tr></tbody></table></div>
+<p class="lede">すべてを測る必要はありません。目的に対応する分類から主要指標を1つ、補助指標を2〜3個選びます。</p>
+</div></section>
+<section class="section tinted" id="primary"><div class="wrap narrow">
+<p class="eyebrow">PRIMARY KPI</p><h2 class="h2 serif">目的別に主要指標を1つ決める</h2>
+<ul class="bullets"><li>商業施設の回遊を増やしたい：立ち寄り店舗数（1人あたり）、補助に滞在時間・特典利用数</li><li>新規客を増やしたい：新規客の割合（アンケートまたは会員登録）、補助に来場者数</li><li>売上を上げたい：特典利用数と対象店舗の売上増、補助にチケット収入</li><li>話題にしたい：SNS投稿数とメディア掲載、補助に来場者数</li><li>宿泊・予約を増やしたい：イベント連動プランの予約数、補助に連泊率</li><li>研修・チームビルディング：参加者アンケートの評価、補助に振り返りでの発言数</li></ul>
+<p class="lede">主要指標を1つにする理由は、企画の判断がぶれないようにするためです。「回遊が主要指標」と決まっていれば、告知より動線設計に予算を寄せる判断ができます。</p>
+</div></section>
+<section class="section" id="methods"><div class="wrap narrow">
+<p class="eyebrow">METHODS</p><h2 class="h2 serif">測定方法：現場で取れるデータ</h2>
+<ul class="bullets"><li>受付データ：受付数、時間帯別の来場、グループ人数</li><li>通過確認：チェックポイントごとの通過数（QRコード、スタンプ、スタッフの確認）。周遊型では「奥の店舗まで行った割合」が分かります</li><li>特典の回収：体験中に配布したクーポンの利用数。店舗への効果を数字で示せます</li><li>終了時アンケート：満足度、来場のきっかけ、新規か既存か、再来店意向。回答率を上げるには特典と組み合わせます</li><li>店舗ヒアリング：会期中の売上・客数の変化、スタッフの負担</li><li>SNSと掲載：ハッシュタグの投稿数、メディア掲載の記録</li></ul>
+<p class="lede">スマートフォンを使う体験では、進行のためのタップがそのまま通過記録になるため、測定の手間が減ります。</p>
+</div></section>
+<section class="section tinted" id="roi"><div class="wrap narrow">
+<p class="eyebrow">ROI EXAMPLE</p><h2 class="h2 serif">費用対効果の計算例（仮の数字）</h2>
+<p class="lede">以下は説明用の仮の数字で、実際の費用や成果を示すものではありません。</p>
+<ul class="bullets"><li>総費用：制作費150万円＋運営費50万円＋告知費20万円＝220万円</li><li>来場者：会期3週間で3,000名（1日あたり約140名）</li><li>回遊：1人あたり平均3.2店舗に立ち寄り、クーポン利用1,800枚</li><li>売上：チケット収入（1,500円×3,000名＝450万円）＋クーポン経由の店舗売上</li></ul>
+<p class="lede">この場合、1来場者あたりの費用は約730円、クーポン1枚あたりの費用は約1,220円と計算できます。チケット収入がある場合は、総費用から差し引いた実質負担で計算します。数字の前提（会期・単価・受付枠）を企画書に書いておくと、終了後に同じ式で比較できます。</p>
+<p class="lede">制作費の目安は<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>を、企画書での書き方は<a href="/guide/event-kikakusho/" style="color:var(--accent)">体験型イベントの企画書の作り方</a>をご覧ください。</p>
+</div></section>
+<section class="section" id="cases"><div class="wrap narrow">
+<p class="eyebrow">CASES</p><h2 class="h2 serif">公開実績で測っている指標（株式会社ex Labs）</h2>
+<ul class="bullets"><li>宿泊施設向けオリジナルマダミス：新規宿泊予約20件以上（告知はXのみ）。指標は「イベント連動の宿泊予約数」</li><li>自社主催「ヌル・アーデン展」：広告費0円（告知はXのみ）でチケット約1,000枚（4,000円）を販売。指標は「チケット販売数と告知費」</li><li>下北沢の周遊型アートイマーシブ：2026年7月7日〜8月31日の会期で全公演完売。指標は「販売率と会期中の推移」</li><li>渋谷サクラステージ「ウワサバナシ調査委員会」：施設一体型イベントとして日本経済新聞に掲載。指標は「メディア掲載」</li></ul>
+<p class="lede">事例ごとに、集計期間・経路・対象範囲が異なります。詳細は<a href="/works/" style="color:var(--accent)">制作事例一覧</a>をご覧ください。</p>
+</div></section>
+<section class="section tinted" id="revenue"><div class="wrap narrow">
+<p class="eyebrow">REVENUE SHARE</p><h2 class="h2 serif">レベニューシェア型の指標</h2>
+<p class="lede">チケット収益から制作費を回収するレベニューシェア型では、「販売率（受付枠に対する販売数）」「1日あたりの販売数の推移」「原価回収の時点」が主要指標になります。会期の前半で回収の見込みが立たない場合に、告知や受付枠を調整する判断材料になるためです。</p>
+<p class="lede">施設側は、これに加えて「体験者の店舗立ち寄り数」「特典利用数」を見ると、分配される収益以外の効果を把握できます。仕組みは<a href="/guide/event-revenue-share/" style="color:var(--accent)">レベニューシェアの解説</a>をご覧ください。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="lede">株式会社ex Labsは、謎解き・マダミス・イマーシブ・頭脳戦の4ジャンルを企画・制作する体験型イベントの制作会社です。対応範囲・参考価格・納期は<a href="/services/" style="color:var(--accent)">サービス一覧</a>でご確認ください。</p>
+<div class="cta-mini">
+<p class="cta-mini-title serif">効果測定を含めて制作を相談する</p>
+<a class="btn" href="/?c=taikengata#contact">効果測定を含めて制作を相談する（無料）</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。目的と場所を伺ったうえで、形式・費用・スケジュールをご提案します。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/taiken-marketing/" style="color:var(--accent)">体験型マーケティングとは</a>／<a href="/guide/event-kikakusho/" style="color:var(--accent)">体験型イベントの企画書の作り方</a>／<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>／<a href="/guide/event-revenue-share/" style="color:var(--accent)">施設イベントのレベニューシェアとは</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#definition,#kpi,#primary,#methods,#roi,#cases,#revenue,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>
