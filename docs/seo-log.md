@@ -561,3 +561,4 @@
 - 計測：/api/track に ev-search／ev-zero／ev-view を追加、ticket の掲載箇所で自社・他社の送客を区別。
 - 未確認：escape.id の開演時刻・受付状況・空席（表示は「未確認」）。運用手順は docs/events-setup.md。
 - 同日追加：/events/ に「ほかのサイトで探す」外部リンク集（マダミス専門店・チケットプラットフォーム・情報ポータル・当日募集の 42 サイト、rel=nofollow、外部クリックを ev-ext で計測）。登録簿 src/data/events/sourceSites.ts、調査 docs/events-sources.md。利用条件は全件未確認のため自動取得は無し。
+- 同日追加：外部サイト掲載の公演（listings）を検索結果とサイト別一覧に並べる仕組み（src/data/events/listings.ts、ListingCard）。初期データはゼロ（この環境から各サイトへ到達できず未確認のため）。登録手順は docs/events-setup.md。

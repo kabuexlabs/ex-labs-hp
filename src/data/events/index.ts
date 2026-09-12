@@ -7,9 +7,11 @@ import { venues } from './venues.ts';
 import { channels } from './channels.ts';
 import { works } from './works.ts';
 import { occurrences } from './occurrences.ts';
+import { listings } from './listings.ts';
+import { sourceSites } from './sourceSites.ts';
 import { validateDataset } from '../../lib/events.ts';
 
-export const eventsData: EventsDataset = { sources, organizers, venues, channels, works, occurrences };
+export const eventsData: EventsDataset = { sources, organizers, venues, channels, works, occurrences, listings, sites: sourceSites };
 
 const errors = validateDataset(eventsData);
 if (errors.length) throw new Error(`公演データの検証に失敗:\n- ${errors.join('\n- ')}`);

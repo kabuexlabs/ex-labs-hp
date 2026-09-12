@@ -28,6 +28,13 @@
 7. `npm run events:validate` → `npm run test:events` → `npm run check` → push（main へ push で本番反映）
 8. 掲載停止：`published: false`（作品なら作品ごと、回なら回ごと）にして push。修正依頼の窓口は info@kabuexlabs.com とお問い合わせフォーム（c=events）
 
+## 外部サイト掲載の公演（listings）の登録手順
+- 正本：`src/data/events/listings.ts`。/events/ の検索結果に自社の回と同じ並びで出て、「ほかのサイトに掲載中の公演」ではサイトごとに作品名・日時・料金・残席が並ぶ。ボタンは掲載元の該当ページへ飛ぶ（当サイトに詳細ページは作らない）。
+- 入れ方：掲載元（店舗サイト・マダミス.jp・MMQ・TwiPla 等）を実際に開き、見えている回だけを入力する。自動取得・推測はしない。必須：`title`／`siteId`（sourceSites.ts の id）／`organizerName`／`url`（該当ページ）／`genres`／`regionId`・`areaId`／`date`／`status`／`checkedAt`・`checkedBy`。時刻・所要時間・料金・人数は読み取れた項目だけ。料金は `priceUnit`（1人／1組／貸切）を必ず付け、`amount` は1人あたりが確定している時だけ（予算絞り込みに使う）。残席は `remainingText` に掲載元の文言をそのまま。
+- 表示ルール：確認から7日を超えると「確認から1週間以上経過」と出る。`status: 'soldout'` は満席表示、`'unknown'` は「募集状況は掲載元で確認」。人数条件が無い回は、人数で絞ると「判定できない」枠に入る。
+- 早い入れ方：サイトのスケジュール画面のテキストを Claude に貼ると `listings.ts` の形式に変換できる（貼った内容＝確認済みとして checkedAt を付ける）。
+- 掲載元からの削除依頼は `published: false` にして push。
+
 ## 掲載判断のチェック（他社公演）
 - 公式サイト・主催者から日程・料金・申込条件・販売ページ URL を確認できたか（推測で埋めない）
 - 画像・紹介文の利用条件を確認できたか（出典リンクだけでは転載しない）

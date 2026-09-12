@@ -1,7 +1,7 @@
 // 公演検索（/events/）の判定ロジック。Asia/Tokyo 固定。
 // サーバー（SSR）とブラウザ（絞り込みの即時反映）の両方で同じ関数を使う。
 // import は node --experimental-strip-types でも動くよう拡張子付きにしている（scripts/events-test.mjs）。
-import type { EventsDataset, Occurrence, Organizer, Price, SalesStatus, SeatStatus, Venue, Work, Genre } from '../data/events/types.ts';
+import type { EventsDataset, Listing, Occurrence, Organizer, Price, SalesStatus, SeatStatus, Venue, Work, Genre } from '../data/events/types.ts';
 import { jstDateString, jstDate, addDays, weekRange } from './thisWeek.ts';
 
 export type WhenKey = 'today' | 'tomorrow' | 'weekend' | 'date' | 'all';
@@ -108,8 +108,12 @@ export interface SearchRow {
   region: string;
   area: string;
   genres: Genre[];
-  party: { min: number; max?: number };
+  /** 申込人数の条件。未確認なら省略（人数で絞ると 'unknown'） */
+  party?: { min: number; max?: number };
   price: Pick<Price, 'unit' | 'amount' | 'tiers'>;
+  /** own＝自社データの公演回、listing＝外部サイト掲載 */
+  kind: 'own' | 'listing';
+  siteId?: string;
 }
 
 /** 開演・終了の分を求める（endTime → 開演＋所要時間 の順。どちらも無ければ undefined） */
@@ -190,8 +194,9 @@ export function matchCriteria(row: SearchRow, c: Criteria, now: Date, window: st
   if (c.area && row.area !== c.area) return 'no';
   if (c.genre && !row.genres.includes(c.genre)) return 'no';
   if (c.party) {
-    if (c.party < row.party.min) return 'no';
-    if (row.party.max !== undefined) {
+    if (!row.party) unknown = true;
+    else if (c.party < row.party.min) return 'no';
+    else if (row.party.max !== undefined) {
       if (c.party > row.party.max) return 'no';
     } else if (c.party > row.party.min) unknown = true;
   }
@@ -255,6 +260,7 @@ export function resolveAll(ds: EventsDataset, now: Date): Resolved[] {
       eventStatus: occ.eventStatus, region: venue.regionId, area: venue.areaId, genres: work.genres,
       party: { min: work.party.min, max: work.party.max },
       price: { unit: work.price.unit, amount: work.price.amount, tiers: work.price.tiers },
+      kind: 'own',
     };
     const es = eventState(row, now);
     const ss = salesState(occ, es, now);
@@ -264,13 +270,50 @@ export function resolveAll(ds: EventsDataset, now: Date): Resolved[] {
   return out.sort((a, b) => compareRows(a.row, b.row));
 }
 
-export interface SearchResult { matched: Resolved[]; unknown: Resolved[]; window: string[] | null }
+/** 外部サイト掲載の公演回（listings）を行にしたもの */
+export interface ResolvedListing {
+  listing: Listing;
+  site: { id: string; name: string; url: string };
+  row: SearchRow;
+  eventState: EventState;
+  cta: CtaKind;
+  /** 確認から時間が経っている（7日超） */
+  stale: boolean;
+}
+export const LISTING_TTL_DAYS = 7;
+
+export function resolveListings(ds: EventsDataset, now: Date): ResolvedListing[] {
+  const out: ResolvedListing[] = [];
+  for (const l of ds.listings ?? []) {
+    if (!l.published || l.test) continue;
+    const site = (ds.sites ?? []).find((x) => x.id === l.siteId);
+    if (!site) continue;
+    const start = l.startTime ? hhmmToMin(l.startTime) : undefined;
+    const end = l.endTime ? hhmmToMin(l.endTime) : start !== undefined && l.durationMinutes ? start + l.durationMinutes : undefined;
+    const row: SearchRow = {
+      id: `listing:${l.id}`, workId: l.id, slug: '', title: l.title, date: l.date, start, end,
+      eventStatus: l.status === 'cancelled' ? 'cancelled' : 'scheduled', region: l.regionId, area: l.areaId, genres: l.genres,
+      party: l.party ? { min: l.party.min, max: l.party.max } : undefined,
+      price: { unit: l.priceUnit ?? 'per-person', amount: l.amount },
+      kind: 'listing', siteId: l.siteId,
+    };
+    const es = eventState(row, now);
+    const cta: CtaKind = es === 'cancelled' ? 'cancelled' : es === 'ended' ? 'ended' : es === 'started' ? 'started' : l.status === 'soldout' ? 'soldout' : 'check';
+    out.push({ listing: l, site, row, eventState: es, cta, stale: now.getTime() - new Date(l.checkedAt).getTime() > LISTING_TTL_DAYS * 86400000 });
+  }
+  return out.sort((a, b) => compareRows(a.row, b.row));
+}
+
+export type AnyResolved = Resolved | ResolvedListing;
+export const isListing = (r: AnyResolved): r is ResolvedListing => r.row.kind === 'listing';
+
+export interface SearchResult<T extends { row: SearchRow } = AnyResolved> { matched: T[]; unknown: T[]; window: string[] | null }
 
 /** 現在の検索結果：終了・中止は除外。条件に必要なデータが未確認の回は unknown に分ける */
-export function search(all: Resolved[], c: Criteria, now: Date): SearchResult {
+export function search<T extends { row: SearchRow }>(all: T[], c: Criteria, now: Date): SearchResult<T> {
   const window = dateWindow(c, now);
-  const matched: Resolved[] = [];
-  const unknown: Resolved[] = [];
+  const matched: T[] = [];
+  const unknown: T[] = [];
   for (const r of all) {
     const m = matchCriteria(r.row, c, now, window);
     if (m === 'match') matched.push(r);
@@ -280,7 +323,7 @@ export function search(all: Resolved[], c: Criteria, now: Date): SearchResult {
 }
 
 /** 次に候補がある日（0件のときの案内用）。today 以降で、現在の日付条件以外は同じ条件で最初に適合する日 */
-export function nextAvailableDate(all: Resolved[], c: Criteria, now: Date): string | null {
+export function nextAvailableDate(all: { row: SearchRow }[], c: Criteria, now: Date): string | null {
   const today = jstDateString(now);
   const rest: Criteria = { ...c, when: 'all', date: undefined };
   const dates = all.filter((r) => r.row.date >= today && matchCriteria(r.row, rest, now, null) === 'match').map((r) => r.row.date);
@@ -396,10 +439,38 @@ export function validateDataset(ds: EventsDataset): string[] {
     if (o.seats?.remaining !== undefined && !o.seats.remainingTerms) errs.push(`${L}: 残席数を出すには取得・再掲載条件（remainingTerms）が必要`);
     if (o.seats?.remaining !== undefined && o.seats.status !== 'available') errs.push(`${L}: 残席数があるのに status が available でない`);
     chkSrc(L, o.sourceIds);
-    const key = `${o.workId}|${o.venueId}|${o.date}|${o.startTime ?? ''}`;
-    if (dup.has(key)) errs.push(`${L}: 同じ公演回の重複（${key}）`);
-    dup.add(key);
+    if (o.published && !o.test) {
+      const key = `${o.workId}|${o.venueId}|${o.date}|${o.startTime ?? ''}`;
+      if (dup.has(key)) errs.push(`${L}: 同じ公演回の重複（${key}）`);
+      dup.add(key);
+    }
     if (o.test && o.published) errs.push(`${L}: テストデータ（test:true）が published`);
+  }
+  const siteIds = new Set((ds.sites ?? []).map((x) => x.id));
+  const dupL = new Set<string>();
+  for (const l of ds.listings ?? []) {
+    const L = `listing ${l.id}`;
+    if (!l.title || !l.organizerName) errs.push(`${L}: title/organizerName が不足`);
+    if (!siteIds.has(l.siteId)) errs.push(`${L}: siteId ${l.siteId} が sourceSites に無い`);
+    if (!/^https:\/\/[^\s"'<>]+$/.test(l.url)) errs.push(`${L}: url が不正`);
+    if (!l.genres?.length) errs.push(`${L}: genres が空`);
+    if (!l.regionId || !l.areaId) errs.push(`${L}: regionId/areaId が不足`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(l.date) || jstDateString(new Date(`${l.date}T12:00:00Z`)) !== l.date) errs.push(`${L}: date が不正`);
+    if (l.startTime && !TIME_RE.test(l.startTime)) errs.push(`${L}: startTime が不正`);
+    if (l.endTime && !TIME_RE.test(l.endTime)) errs.push(`${L}: endTime が不正`);
+    if (l.startTime && l.endTime && hhmmToMin(l.endTime) <= hhmmToMin(l.startTime)) errs.push(`${L}: 終了時刻が開演時刻以前`);
+    if (l.priceText && !l.priceUnit) errs.push(`${L}: 料金があるのに priceUnit（1人／1組／貸切）が無い`);
+    if (l.amount !== undefined && l.priceUnit !== 'per-person') errs.push(`${L}: amount は1人あたり（per-person）の時だけ`);
+    if (l.party && !(l.party.min >= 1)) errs.push(`${L}: party.min が不正`);
+    if (!['open', 'soldout', 'cancelled', 'unknown'].includes(l.status)) errs.push(`${L}: status が不正`);
+    if (!l.checkedAt || !isIso(l.checkedAt) || !l.checkedBy) errs.push(`${L}: checkedAt/checkedBy が不足`);
+    if (l.remainingText && l.status === 'unknown') errs.push(`${L}: 残席の文言があるのに status が unknown`);
+    if (l.test && l.published) errs.push(`${L}: テストデータ（test:true）が published`);
+    if (l.published && !l.test) {
+      const key = `${l.siteId}|${l.title}|${l.date}|${l.startTime ?? ''}`;
+      if (dupL.has(key)) errs.push(`${L}: 同じ掲載の重複（${key}）`);
+      dupL.add(key);
+    }
   }
   return errs;
 }

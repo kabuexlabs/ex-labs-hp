@@ -8,30 +8,37 @@ export const prerender = false;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import EventCard from '../../components/EventCard.astro';
+import ListingCard from '../../components/ListingCard.astro';
 import '../../styles/events.css';
 import { eventsData, EVENTS_CONTACT, LIST_DAYS } from '../../data/events/index';
 import { AREAS, GENRES, REGIONS, areaName } from '../../data/events/areas';
 import { sourceSites, SITE_KIND_LABEL, SITE_GENRE_LABEL, type SiteKind } from '../../data/events/sourceSites';
 const siteKinds: SiteKind[] = ['ticket', 'store', 'portal', 'community'];
-import { parseCriteria, criteriaToQuery, resolveAll, search, nextAvailableDate, BUDGET_OPTIONS, END_BY_OPTIONS, PARTY_MAX, fmtYen } from '../../lib/events';
+import { parseCriteria, criteriaToQuery, resolveAll, resolveListings, isListing, search, nextAvailableDate, compareRows, BUDGET_OPTIONS, END_BY_OPTIONS, PARTY_MAX, fmtYen, minToHhmm, type AnyResolved } from '../../lib/events';
 import { jstDateString, addDays, weekRange, fmtDateShort, fmtDateJa, fmtVerified } from '../../lib/thisWeek';
 
 const now = new Date();
 const today = jstDateString(now);
 const c = parseCriteria(Astro.url.searchParams);
-const all = resolveAll(eventsData, now).filter((r) => r.row.date <= addDays(today, LIST_DAYS));
+const limit = addDays(today, LIST_DAYS);
+const own = resolveAll(eventsData, now).filter((r) => r.row.date <= limit);
+const ext = resolveListings(eventsData, now).filter((r) => r.row.date <= limit);
+// 自社の回と外部サイト掲載を同じ並び（日付→時刻）で1つの結果にする。主催者による優先はしない
+const all: AnyResolved[] = [...own, ...ext].sort((a, b) => compareRows(a.row, b.row));
+const upcomingExt = ext.filter((r) => !['ended', 'cancelled'].includes(r.eventState));
+const listingsBySite = (id: string) => upcomingExt.filter((r) => r.site.id === id);
 const result = search(all, c, now);
 const nextDate = result.matched.length === 0 ? nextAvailableDate(all, c, now) : null;
 const weekend = weekRange(now).weekend.filter((d) => d >= today);
 const weekendLabel = weekend.map(fmtDateShort).join('・');
 const windowLabel = result.window ? result.window.map(fmtDateJa).join('・') : `これから${LIST_DAYS}日以内`;
 // 掲載データがある地域・エリアだけを選択肢にする（空の地域ページは作らない）
-const dataAreas = new Set(all.map((r) => r.venue.areaId));
-const dataRegions = new Set(all.map((r) => r.venue.regionId));
+const dataAreas = new Set(all.map((r) => r.row.area));
+const dataRegions = new Set(all.map((r) => r.row.region));
 const areaOptions = AREAS.filter((a) => dataAreas.has(a.id));
 const regionOptions = REGIONS.filter((r) => dataRegions.has(r.id));
 const latestVerified = eventsData.works.filter((w) => w.published).map((w) => w.verified.at).sort().pop() ?? '';
-const anyStale = all.some((r) => r.stale);
+const anyStale = own.some((r) => r.stale);
 const pageTitle = '今日・明日・今週末に遊べるマダミス・イマーシブ公演を探す（東京） - 株式会社ex Labs';
 const pageDesc = '東京で今日・明日・今週末に参加できるマーダーミステリー・イマーシブシアター・周遊型の物語体験を、日付・人数・エリア・ジャンル・予算から探せる無料の公演情報サービス。開催・販売・空席の確認状況を分けて表示し、予約は公式販売ページへ案内します。';
 const relax: { label: string; q: string }[] = [];
@@ -92,7 +99,7 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 </div></section>
 
 <section class="section tinted ev-results" id="results" aria-live="polite"><div class="wrap">
-<h2 class="ev-res-h"><span data-window-label>{windowLabel}</span>の公演回 <span data-count>{result.matched.length}</span>件 <small>（開催日時順。主催者による優先表示はしていません）</small></h2>
+<h2 class="ev-res-h"><span data-window-label>{windowLabel}</span>の公演回 <span data-count>{result.matched.length}</span>件 <small>（開催日時順。自社の公演と外部サイト掲載の公演を同じ基準で並べ、主催者による優先表示はしていません）</small></h2>
 <p class="ev-meta">開催情報の最終確認：{latestVerified ? fmtVerified(latestVerified) : '—'}。{anyStale && <strong>確認から2週間以上経過した公演があります。</strong>}販売・空席の状況は各公演の公式ページが正で、このページの表示は確認時点のものです。掲載基準と修正依頼は<a href="/events/about/">サービスについて</a>をご覧ください。</p>
 
 <div id="ev-zero" class="ev-zero" hidden={result.matched.length > 0}>
@@ -101,36 +108,44 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
   <ul>
     <li hidden={!nextDate}><a href={nextDate ? `/events/${criteriaToQuery({ ...c, when: 'date', date: nextDate })}#results` : '/events/'} data-next-date>{nextDate ? `次に候補がある日：${fmtDateJa(nextDate)}` : ''}</a></li>
     {relax.map((x) => <li><a href={`/events/${x.q}#results`}>{x.label}</a></li>)}
-    <li><a href="#other-sites">ほかのサイトで探す（マダミス専門店・チケットサイト・当日募集）</a></li>
+    <li><a href="#other-sites">ほかのサイトに掲載中の公演を見る（マダミス専門店・チケットサイト・当日募集）</a></li>
     <li><a href="/guide/immersive-tokyo/">東京のイマーシブ体験の選び方を読む</a>／<a href="/guide/madamis-tokyo/">東京でマダミスを遊ぶには</a></li>
   </ul>
 </div>
 
 <ul class="ev-list" id="ev-matched">
-  {result.matched.map((r) => <li><EventCard r={r} place="events" /></li>)}
+  {result.matched.map((r) => <li>{isListing(r) ? <ListingCard r={r} place="events" /> : <EventCard r={r} place="events" />}</li>)}
 </ul>
 
 <details class="ev-unknown" id="ev-unknown" hidden={result.unknown.length === 0} open={result.matched.length === 0 && result.unknown.length > 0}>
   <summary>条件を判定できない公演回 <span data-unknown-count>{result.unknown.length}</span>件（開演時刻・終了時刻・上限人数・開催の確認が取れていないため、条件に合うとは限りません）</summary>
   <ul class="ev-list" id="ev-unknown-list">
-    {result.unknown.map((r) => <li><EventCard r={r} place="events-unknown" /></li>)}
+    {result.unknown.map((r) => <li>{isListing(r) ? <ListingCard r={r} place="events-unknown" /> : <EventCard r={r} place="events-unknown" />}</li>)}
   </ul>
 </details>
 {/* 条件に合わなかった回もブラウザ側の再判定に使う（hidden のまま） */}
 <ul class="ev-list" id="ev-rest" hidden>
-  {all.filter((r) => !result.matched.includes(r) && !result.unknown.includes(r) && !['ended', 'cancelled'].includes(r.eventState)).map((r) => <li><EventCard r={r} place="events" /></li>)}
+  {all.filter((r) => !result.matched.includes(r) && !result.unknown.includes(r) && !['ended', 'cancelled'].includes(r.eventState)).map((r) => <li>{isListing(r) ? <ListingCard r={r} place="events" /> : <EventCard r={r} place="events" />}</li>)}
 </ul>
 </div></section>
 
 <section class="section ev-links" id="other-sites"><div class="wrap">
-<h2 class="h2 serif">ほかのサイトで探す（外部リンク）</h2>
-<p class="ev-lede">このページに載っていない公演は、各店舗・チケットサイト・情報サイト・当日募集のコミュニティで探せます。いずれも外部サイトで、掲載内容は各サイトが正です。店舗の X（旧Twitter）や「#マダミス募集」には、直前の空席（🈳）や当日募集が投稿されます。</p>
+<h2 class="h2 serif">ほかのサイトに掲載中の公演</h2>
+<p class="ev-lede">各店舗・チケットサイト・情報サイト・当日募集のコミュニティに掲載中の公演を、確認できたものから作品名・日時つきで並べています（<span data-ext-count>{upcomingExt.length}</span>件）。気になる公演はそのサイトの該当ページへ進んで予約してください。サイトの情報を自動取得して転載することはせず、掲載元で確認した時点の内容を確認日時つきで載せています。店舗の X（旧Twitter）や「#マダミス募集」には、直前の空席（🈳）や当日募集が投稿されます。</p>
 {siteKinds.map((k) => (
   <div class="ev-sites">
     <h3 class="ev-sites-h">{SITE_KIND_LABEL[k]}</h3>
     <ul>
       {sourceSites.filter((x) => x.kind === k).map((x) => (
         <li><a href={x.url} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={x.id} data-place="events">{x.name}<span>{SITE_GENRE_LABEL[x.genre]}{x.sameDay ? '・当日募集や空席情報あり' : ''}｜{x.what}</span></a>
+          {listingsBySite(x.id).length > 0 ? (
+            <ul class="ev-site-list">
+              {listingsBySite(x.id).slice(0, 6).map((r) => (
+                <li><a href={r.listing.url} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={x.id} data-place="events-site-listing"><time datetime={r.listing.date}>{fmtDateShort(r.listing.date)}</time>{r.row.start !== undefined ? ` ${minToHhmm(r.row.start)}` : ''} <strong>{r.listing.title}</strong>{r.listing.priceText ? `｜${r.listing.priceText}` : ''}{r.listing.status === 'soldout' ? '｜満席（確認時点）' : r.listing.remainingText ? `｜${r.listing.remainingText}（確認時点）` : ''}</a></li>
+              ))}
+              {listingsBySite(x.id).length > 6 && <li class="ev-note">ほか{listingsBySite(x.id).length - 6}件は上の検索結果に表示されます</li>}
+            </ul>
+          ) : null}
           {x.links?.length ? <p class="ev-sites-sub">{x.links.map((l, i) => <>{i > 0 && '／'}<a href={l.url} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={x.id} data-place="events-sub">{l.label}</a></>)}</p> : null}
         </li>
       ))}

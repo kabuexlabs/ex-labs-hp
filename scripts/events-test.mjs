@@ -4,9 +4,9 @@
 // 空席の有効期限、販売締切、終了・中止・非公開・テストデータの除外、並び順、条件の解釈を確認する。
 import {
   parseCriteria, criteriaToQuery, dateWindow, eventState, salesState, seatState, ctaKind, perPerson,
-  matchCriteria, resolveAll, search, nextAvailableDate, validateDataset,
+  matchCriteria, resolveAll, resolveListings, isListing, search, nextAvailableDate, validateDataset, compareRows,
 } from '../src/lib/events.ts';
-import { fixtureDataset, fixtureOcc, fixtureWork } from '../src/data/events/fixtures.ts';
+import { fixtureDataset, fixtureOcc, fixtureWork, fixtureListing } from '../src/data/events/fixtures.ts';
 
 let fail = 0;
 const eq = (name, got, want) => {
@@ -82,13 +82,15 @@ eq('貸切総額→1人あたり', perPerson({ unit: 'charter', amount: 60000 },
 eq('貸切総額→人数未指定', perPerson({ unit: 'charter', amount: 60000 }), undefined);
 
 // ---- 条件との適合 ----
-const row = (o = {}) => ({ id: 'r', workId: 'w', slug: 'w', title: 't', date: '2026-09-13', start: 19 * 60, end: 20 * 60 + 30, eventStatus: 'scheduled', region: 'tokyo', area: 'shibuya', genres: ['story-experience'], party: { min: 1, max: 6 }, price: { unit: 'per-person', amount: 4000 }, ...o });
+const row = (o = {}) => ({ id: 'r', workId: 'w', slug: 'w', title: 't', date: '2026-09-13', start: 19 * 60, end: 20 * 60 + 30, eventStatus: 'scheduled', region: 'tokyo', area: 'shibuya', genres: ['story-experience'], party: { min: 1, max: 6 }, price: { unit: 'per-person', amount: 4000 }, kind: 'own', ...o });
 const n9 = jst('2026-09-09T10:00:00');
 eq('週末＋人数2', matchCriteria(row(), q('when=weekend&party=2'), n9), 'match');
 eq('人数が上限超', matchCriteria(row(), q('party=7'), n9), 'no');
 eq('人数が下限未満', matchCriteria(row({ party: { min: 2, max: 4 } }), q('party=1'), n9), 'no');
 eq('上限未確認＋複数人→要確認', matchCriteria(row({ party: { min: 1 } }), q('party=3'), n9), 'unknown');
 eq('上限未確認＋1人→適合', matchCriteria(row({ party: { min: 1 } }), q('party=1'), n9), 'match');
+eq('人数条件が未確認（party なし）＋人数指定→要確認', matchCriteria(row({ party: undefined }), q('party=2'), n9), 'unknown');
+eq('人数条件が未確認＋人数未指定→適合', matchCriteria(row({ party: undefined }), q(''), n9), 'match');
 eq('日付が窓の外', matchCriteria(row({ date: '2026-09-19' }), q('when=weekend'), n9), 'no');
 eq('今日（時刻不明）', matchCriteria(row({ start: undefined, end: undefined }), q('when=today'), jst('2026-09-13T09:00:00')), 'match');
 eq('夜の時間帯', matchCriteria(row(), q('start=evening'), n9), 'match');
@@ -136,6 +138,21 @@ eq('0件→次の候補日（人数3は 9/19 の作品Aが適合）', nextAvaila
 eq('0件→候補なし（人数7）', nextAvailableDate(all, q('when=today&party=7'), jst('2026-09-13T09:00:00')), null);
 eq('自社と他社が同日なら時刻順（自社優先しない）', search(all, q('when=today&party=2'), jst('2026-09-13T09:00:00')).matched.map((r) => r.organizer.relation), ['ex-labs', 'ex-labs', 'third-party']);
 
+// ---- 外部サイト掲載（listings） ----
+const ext = resolveListings(ds, jst('2026-09-13T09:00:00'));
+eq('掲載：公開・非テストのみ、日付→時刻順', ext.map((r) => r.listing.id), ['l2', 'l1', 'l-sold']);
+eq('掲載：募集中は「確認」ボタン、満席は soldout', ext.map((r) => r.cta), ['check', 'check', 'soldout']);
+eq('掲載：isListing', ext.map(isListing), [true, true, true]);
+const mixed = [...all, ...ext].sort((a, b) => compareRows(a.row, b.row));
+const rm = search(mixed, q('when=today'), jst('2026-09-13T09:00:00'));
+eq('自社と外部を同じ並びで（時刻順、同時刻は作品名順、時刻不明は末尾）', rm.matched.map((r) => r.row.id), ['a-0913-10', 'listing:l2', 'a-0913-19', 'listing:l1', 'b-0913']);
+eq('外部・1組料金で予算指定→要確認（l1 は人数条件未確認で要確認）', search(ext, q('when=today&party=2&budget=5000'), jst('2026-09-13T09:00:00')).unknown.map((r) => r.listing.id), ['l2', 'l1']);
+eq('外部・人数未指定なら 1組料金だけ要確認', search(ext, q('when=today&budget=5000'), jst('2026-09-13T09:00:00')).unknown.map((r) => r.listing.id), ['l2']);
+eq('外部・1人料金 4500 は予算 5000 に適合', search(ext, q('when=today&budget=5000'), jst('2026-09-13T09:00:00')).matched.map((r) => r.listing.id), ['l1']);
+eq('外部・人数未確認＋人数指定→要確認', search(ext, q('when=today&party=3'), jst('2026-09-13T09:00:00')).unknown.map((r) => r.listing.id), ['l1']);
+eq('外部・確認から8日で stale', resolveListings(ds, jst('2026-09-17T11:00:00'))[0].stale, true);
+eq('外部・終了した回は結果に出ない', search(ext, q('when=today'), jst('2026-09-13T23:00:00')).matched.map((r) => r.listing.id), []);
+
 // ---- 登録時の検証 ----
 eq('正常データは検証エラーなし', validateDataset(ds), []);
 const bad = fixtureDataset();
@@ -148,6 +165,10 @@ bad.occurrences.push(fixtureOcc({ id: 'test-pub', test: true, published: true, d
 bad.occurrences.push(fixtureOcc({ id: 'nosrc', date: '2026-09-22', sourceIds: [] }));
 bad.works.push(fixtureWork({ id: 'w-nounit', slug: 'w-nounit', price: { unit: undefined, text: '', taxIncluded: true, feeNote: '' } }));
 bad.works.push(fixtureWork({ id: 'w-img', slug: 'w-img', image: { path: '/x.webp', holder: '', terms: '', confirmedAt: '', confirmedBy: '' } }));
+bad.listings.push(fixtureListing({ id: 'l-dup', date: '2026-09-13', startTime: '19:00' }));
+bad.listings.push(fixtureListing({ id: 'l-nosite', siteId: 'nope', date: '2026-09-21' }));
+bad.listings.push(fixtureListing({ id: 'l-nounit', priceUnit: undefined, date: '2026-09-22' }));
+bad.listings.push(fixtureListing({ id: 'l-testpub', test: true, published: true, date: '2026-09-23' }));
 const errs = validateDataset(bad);
 const has = (s) => errs.some((e) => e.includes(s));
 eq('重複回を検出', has('同じ公演回の重複'), true);
@@ -159,6 +180,10 @@ eq('テストデータの公開を検出', has('テストデータ（test:true�
 eq('情報源欠落を検出', has('情報源（sourceIds）が空'), true);
 eq('料金単位欠落を検出', has('price.unit'), true);
 eq('画像の利用条件未確認を検出', has('画像の利用条件'), true);
+eq('掲載の重複を検出', has('同じ掲載の重複'), true);
+eq('掲載元サイト不明を検出', has('sourceSites に無い'), true);
+eq('掲載の料金単位欠落を検出', has('priceUnit（1人／1組／貸切）'), true);
+eq('掲載のテストデータ公開を検出', errs.filter((e) => e.includes('listing') && e.includes('test:true')).length, 1);
 
 console.log(fail ? `\n公演検索テスト: ${fail} 件失敗` : '\n公演検索テスト: 全件OK');
 process.exit(fail ? 1 : 0);

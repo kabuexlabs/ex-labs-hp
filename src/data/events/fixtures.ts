@@ -1,6 +1,6 @@
 // 動作確認・回帰テスト専用のダミーデータ。公開ページ・サイトマップから import しない
 // （scripts/events-validate.mjs が src/pages からの参照を検出して止める）。
-import type { EventsDataset, Occurrence, Work } from './types.ts';
+import type { EventsDataset, Listing, Occurrence, Work } from './types.ts';
 
 const T = '2026-09-09T10:00:00+09:00';
 const src = (id: string) => ({ id, label: `test ${id}`, url: 'https://example.com/' + id, kind: 'own-official' as const, checkedAt: T, checkedBy: 'test', terms: 'テスト用' });
@@ -25,8 +25,24 @@ export function fixtureOcc(over: Partial<Occurrence> = {}): Occurrence {
     ...over,
   };
 }
+export function fixtureListing(over: Partial<Listing> = {}): Listing {
+  return {
+    id: 'l1', title: '外部テスト作品', siteId: 'site1', organizerName: '他社店舗', url: 'https://example.com/l1', genres: ['murder-mystery'],
+    regionId: 'tokyo', areaId: 'shibuya', date: '2026-09-13', startTime: '19:00', durationMinutes: 180,
+    priceText: '¥4,500（1人）', priceUnit: 'per-person', amount: 4500, status: 'open', checkedAt: T, checkedBy: 'test', published: true,
+    ...over,
+  };
+}
 export function fixtureDataset(): EventsDataset {
   return {
+    sites: [{ id: 'site1', name: 'テスト掲載元', url: 'https://example.com/' }],
+    listings: [
+      fixtureListing(),
+      fixtureListing({ id: 'l2', date: '2026-09-13', startTime: '13:00', party: { min: 2, max: 4 }, priceUnit: 'per-group', amount: undefined, priceText: '2人 ¥9,000' }),
+      fixtureListing({ id: 'l-unpub', published: false }),
+      fixtureListing({ id: 'l-test', published: false, test: true }),
+      fixtureListing({ id: 'l-sold', date: '2026-09-19', status: 'soldout', remainingText: '満席' }),
+    ],
     sources: [src('s1')],
     organizers: [
       { id: 'org-own', name: '株式会社ex Labs', relation: 'ex-labs', relationLabel: 'ex Labs 企画・制作', sourceIds: ['s1'] },

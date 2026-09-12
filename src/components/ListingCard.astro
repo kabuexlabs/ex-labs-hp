@@ -1,0 +1,37 @@
+---
+// 外部サイト掲載の公演回（listings）のカード。自社データの EventCard より項目が少なく、
+// ボタンは掲載元サイトの該当ページへ飛ぶ。残席・募集状態は「掲載元で確認した時点」の値として確認日時を添える。
+import type { ResolvedListing } from '../lib/events';
+import { minToHhmm, fmtYen } from '../lib/events';
+import { fmtDateShort, fmtVerified } from '../lib/thisWeek';
+import { genreName, areaName, regionName } from '../data/events/areas';
+
+export interface Props { r: ResolvedListing; place: string }
+const { r, place } = Astro.props;
+const { listing: l, site, row } = r;
+const timeText = row.start !== undefined ? `${minToHhmm(row.start)}開演${row.end !== undefined ? `〜${minToHhmm(row.end)}${l.endTime ? '' : '終了予定'}` : ''}` : '開演時刻は掲載元で確認';
+const unit = l.priceUnit === 'per-person' ? '1人あたり' : l.priceUnit === 'per-group' ? '1組あたり' : l.priceUnit === 'charter' ? '貸切総額' : '';
+const statusText = r.cta === 'cancelled' ? '中止' : r.cta === 'ended' ? '終了' : r.cta === 'started' ? '開演済み' : l.status === 'soldout' ? '確認時点で満席' : l.status === 'open' ? `確認時点で募集中${l.remainingText ? `（${l.remainingText}）` : ''}` : '募集状況は掲載元で確認';
+const canGo = !['ended', 'cancelled'].includes(r.cta);
+---
+<article class={`ev-card ev-listing is-${r.cta}`} data-row={JSON.stringify(row)} data-occ={row.id}>
+  <div class="ev-head">
+    <p class="ev-date"><time datetime={l.date}>{fmtDateShort(l.date)}</time> <span class="ev-time">{timeText}</span></p>
+    <p class="ev-org ev-org-ext">{site.name} 掲載</p>
+  </div>
+  <h3 class="ev-title"><a href={l.url} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={site.id} data-place={`${place}-listing`}>{l.title}</a></h3>
+  <p class="ev-sub">{l.genres.map(genreName).join('・')}｜{regionName(l.regionId)}・{areaName(l.areaId)}{l.venueName ? `／${l.venueName}` : ''}｜{l.organizerName}</p>
+  <dl class="ev-dl">
+    <div><dt>所要時間</dt><dd>{l.durationMinutes ? `約${l.durationMinutes}分` : l.endTime ? `〜${l.endTime}` : '掲載元で確認'}</dd></div>
+    <div><dt>料金{unit ? `（${unit}）` : ''}</dt><dd>{l.priceText ?? '掲載元で確認'}{l.amount !== undefined && <><br><span class="ev-note">1人 {fmtYen(l.amount)}（手数料の有無は掲載元で確認）</span></>}</dd></div>
+    <div><dt>申込可能な人数</dt><dd>{l.party ? (l.party.text ?? `${l.party.min}${l.party.max ? `〜${l.party.max}` : ''}名`) : '掲載元で確認'}</dd></div>
+    <div><dt>募集状況</dt><dd>{statusText}<br><span class="ev-note">{fmtVerified(l.checkedAt)}に掲載元で確認{r.stale ? '（確認から1週間以上経過）' : ''}</span></dd></div>
+  </dl>
+  <div class="ev-actions">
+    {canGo ? (
+      <a class="btn ev-btn ghost" href={l.url} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={site.id} data-place={`${place}-listing`}>{site.name}で詳細・予約を見る</a>
+    ) : (
+      <span class="ev-ended">{statusText}</span>
+    )}
+  </div>
+</article>

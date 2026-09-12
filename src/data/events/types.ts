@@ -180,7 +180,47 @@ export interface Occurrence {
   test?: boolean;
 }
 
+/** 外部サイトに掲載中の公演回（他社公演を最小限の項目で載せる簡易掲載）。
+ *  各サイトを見て確認した事実だけを入れ、遷移先 url は掲載元の該当ページにする。自動取得はしない。 */
+export interface Listing {
+  id: string;
+  /** 作品名（掲載元の表記） */
+  title: string;
+  /** 掲載元サイト（sourceSites.ts の id） */
+  siteId: string;
+  /** 主催者・店舗名 */
+  organizerName: string;
+  /** 遷移先（掲載元の該当ページ。https） */
+  url: string;
+  genres: Genre[];
+  regionId: string;
+  areaId: string;
+  venueName?: string;
+  /** 開催日（YYYY-MM-DD、日本時間） */
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  durationMinutes?: number;
+  /** 料金の表示文（例: '¥4,500（1人）'）と単位。1人あたりの金額が確定なら amount（予算絞り込みに使う） */
+  priceText?: string;
+  priceUnit?: 'per-person' | 'per-group' | 'charter';
+  amount?: number;
+  /** 申込人数の条件。未確認なら省略（人数条件では「判定できない」扱い） */
+  party?: { min: number; max?: number; text?: string };
+  /** 募集状態（掲載元の表示を確認した時点）。unknown＝掲載元で確認 */
+  status: 'open' | 'soldout' | 'cancelled' | 'unknown';
+  /** 残席など掲載元の表示文（例: '残り2席'）。確認時点の値として checkedAt と一緒に出す */
+  remainingText?: string;
+  checkedAt: string;
+  checkedBy: string;
+  published: boolean;
+  test?: boolean;
+}
+
 export interface EventsDataset {
+  listings: Listing[];
+  /** 掲載元サイトの登録簿（sourceSites.ts）。listings.siteId の参照先 */
+  sites: { id: string; name: string; url: string }[];
   sources: Source[];
   organizers: Organizer[];
   venues: Venue[];
