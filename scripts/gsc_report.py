@@ -43,7 +43,7 @@ WATCH_PAGES = ['/guide/botsunyukan/', '/guide/madamis/', '/guide/immersive/', '/
 
 
 def ingest(src):
-    m = re.search(r'(20\d{2})(\d{2})(\d{2})', os.path.basename(src))
+    m = re.search(r'(20\d{2})-?(\d{2})-?(\d{2})', os.path.basename(src))
     if not m:
         sys.exit(f'ファイル名から日付が取れない: {src}')
     date = f'{m[1]}-{m[2]}-{m[3]}'
