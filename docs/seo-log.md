@@ -564,3 +564,14 @@
 - 同日追加：外部サイト掲載の公演（listings）を検索結果とサイト別一覧に並べる仕組み（src/data/events/listings.ts、ListingCard）。初期データはゼロ（この環境から各サイトへ到達できず未確認のため）。登録手順は docs/events-setup.md。
 - 同日追加：外部サイト掲載の公演を管理画面 /contact/admin/events/ から取り込める仕組み（URL 指定でその1ページを取得→JSON-LD Event／本文推定で候補→確認して公開→KV 保存→/events/ に表示）。定期再確認 /api/events/refresh は利用条件確認済みサイトの行だけ対象（初期ゼロ）。公開ページは noindex の管理画面と API のみ追加。
 - 同日方針変更（ユーザー判断）：当面は自社公演のみ。他社取り込みの管理画面・定期取得 API・外部サイト一覧の表示を撤去（登録簿と調査メモは残す）。/events/ を「今日できるイマーシブ」狙いに改修：title「今日できるイマーシブ｜東京で今日・明日・今週末に参加できる公演を探す」、h1 同旨、冒頭に今日の件数、今日／明日／今週末の要約セクション（日本時間で毎日更新）、要点ボックス、定義・目的別・費用・実績の段落、FAQ6問（FAQPage）、CollectionPage＋ItemList、AuthorBox・LatestPosts。内部リンク：immersive-taiken／immersive-theater／immersive-preparation／madamis-shoshinsha の関連ページに追加（dateModified・lastmod 9/13）、フッター文言を変更。
+
+## 2026-09-13 リサーチ（GSC 提出なし・Web 調査）
+
+- 検索結果での自社ページの露出（WebSearch、Google ではない）：「イマーシブ 制作会社 企業向け」で /services/immersive/、「マーダーミステリー 制作会社 オリジナル 企業」で /blog/zpnp9oth8/ と /guide/madamis/、「体験型イベント 企画 会社 商業施設」で /guide/taikengata-idea/ が表示。制作ワードでの受け皿は機能している。
+- 競合の傾向：謎解きコンシェルジュ（nazotoki-concierge.com）が「商店街 企画例20選」「体験型プロモーション30選」「イベント企画会社50選」のリスト型記事で横断的に上位。タカラッシュ・IKUSA が商業施設・商店街のイベント会社リストで並ぶ。体験型マーケティングは Ad-Virtua（2026年版・費用目安・実施フロー付き）、効果測定は EventHub／IKUSA（BtoB リード獲得軸）。当サイトは「事例＋費用＋進め方＋施設回遊の指標」で差別化し、リスト型記事は追わない。
+- 空白領域：「頭脳戦 動画 企画」は検索結果がテレビ局の番組一覧や汎用の動画制作ページで、専門記事がない。9/12 新設の /guide/zunousen-douga/ は競合が薄い。
+- 市場の動き：宿泊型マダミスは星野リゾート BEB5土浦（松竹×Sally「ALICE in Misty Lake」）、MIMARU 大阪難波のボードゲームホテル、南伊豆の宿泊周遊型など他社事例が増加。ドラマ「VIVANT」の没入型体験「VIVANT IMMERSIVE MISSION」が 9/16〜11/27 に東京・京橋で開催（他社主催、当サイト未掲載）。
+- AI Mode：日本語版は 2025年9月開始、2026年2月に出典リンクの表示が改善、2026年8月時点で PC・モバイルで利用可。ファンアウト対応の方針は継続。
+- 実装（当日）：/guide/madamis-tenpo/ に「市場の動き：他社の宿泊型・店舗型マダミス」を追加し外部出典（トラベルボイス・MIMARU 公式）を明記、/guide/taiken-marketing/ に定義の外部出典（Amazon Ads）を追加、/guide/shotengai-event/ に「スタンプラリー／100円商店街・街バル／周遊型」の比較表と外部出典（ジチタイワークス）を追加。いずれも ④証拠（外部の裏付け）の補強。
+- 確認：IndexNow の GitHub Actions は 9/12 の push ごとに成功。別セッションで /events/（公演検索サービス）が新設・改修されていることを確認し、その上に本日の変更を rebase。
+- 候補（未実施）：「イベント企画会社 一覧」型のクエリに対しては自社を含む比較記事より、/services/ の「作りたいもの→サービス」表を強化する方が整合的。VIVANT 等の他社公演は /events/ の運用方針（当面は自社公演のみ）に従い掲載しない。
