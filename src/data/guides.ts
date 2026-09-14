@@ -21,6 +21,22 @@ export interface GuideArticle {
 
 export const guideArticles: GuideArticle[] = [
   {
+    href: '/guide/saiji-kikaku/',
+    title: '催事の企画・やり方｜百貨店・商業施設で集客につながる体験型催事の進め方',
+    desc: '目的別の指標、催事場・区画の確認項目、出店型と体験型の比較、開催までの8ステップ、費用とレベニューシェア、事例、効果の測り方を整理。',
+    date: '2026-09-14',
+    category: 'shisetsu',
+    thumb: '/assets/guide/saiji-kikaku.webp',
+  },
+  {
+    href: '/guide/shanai-quiz/',
+    title: '社内イベントで盛り上がるクイズ・ゲーム企画｜人数別の選び方と進行のコツ',
+    desc: '盛り上がる3条件、人数別の形式選び、クイズ大会・チーム対抗・謎解き・マダミス・頭脳戦の比較、司会と進行のコツ、費用・準備期間、実績を整理。',
+    date: '2026-09-14',
+    category: 'nazotoki',
+    thumb: '/assets/guide/shanai-quiz.webp',
+  },
+  {
     href: '/guide/taiken-marketing/',
     title: '体験型マーケティングとは｜事例・効果・イベントでの進め方',
     desc: 'experiential marketing の意味、広告との違い、来場・行動・共有・売上の4段階での測り方、手法の選び方、事例と費用・期間の目安を整理。',

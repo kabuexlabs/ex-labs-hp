@@ -1,0 +1,165 @@
+---
+// 社内イベントで盛り上がるクイズ・ゲーム企画｜人数別の選び方と進行のコツ
+// 発注者の検索（OFFICE EVENT GAMES）に答える記事。定義・比較・費用・期間・実績・関連リンクを1ページで揃え、
+// /services/nazotoki-kenshu/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/shanai-quiz/', site).toString();
+
+const toc = [{"id": "definition", "label": "社内イベントのクイズ・ゲーム企画とは"}, {"id": "conditions", "label": "盛り上がるクイズ・ゲームの3条件"}, {"id": "size", "label": "人数別の選び方"}, {"id": "formats", "label": "形式の比較：クイズ大会・チーム対抗・謎解き・マダミス・頭脳戦"}, {"id": "hosting", "label": "進行と司会のコツ"}, {"id": "cost", "label": "費用と準備期間の目安"}, {"id": "cases", "label": "事例：株式会社ex Labsの対人ゲーム"}, {"id": "faq", "label": "よくある質問"}];
+
+const faqs = [
+  {
+    q: '社内イベントのクイズは自作でも盛り上がりますか？',
+    a: '盛り上がります。ポイントは、社内ネタと一般問題を混ぜること、チーム戦にすること、最終問題の配点を上げて逆転を作ることの3つです。人数が50名を超える場合は、回答の集計方法（用紙・スマートフォン）を先に決めておきます。',
+  },
+  {
+    q: 'お酒の入る懇親会でもできますか？',
+    a: 'できます。テーブル対抗の軽いクイズや謎解きなど、歓談と並行して進められる形式にし、1ラウンド10分程度で区切ると、会場の空気を壊しません。',
+  },
+  {
+    q: 'オンラインや複数拠点でも実施できますか？',
+    a: 'できます。オンライン会議ツールでの出題と回答フォームの組み合わせ、拠点ごとのチーム対抗など、形式を調整して設計します。会場参加とオンライン参加を同じ条件にするには、回答方法と制限時間をそろえます。',
+  },
+  {
+    q: '社内イベントの企画・制作を依頼できますか？',
+    a: 'できます。株式会社ex Labsでは、目的・人数・会場・時間を伺ったうえで、クイズ・謎解き・マダミス・頭脳戦から形式をご提案します。既存プログラムの実施は数十万円台〜、準備は2〜4週間からです。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '社内イベントで盛り上がるクイズ・ゲーム企画｜人数別の選び方と進行のコツ',
+  description: '社内イベント・懇親会・全社総会で盛り上がるクイズ・ゲーム企画を、盛り上がる3条件、人数別（10名・50名・数百名）の選び方、クイズ大会・チーム対抗・謎解き・マダミス・頭脳戦の比較、進行と司会のコツ、費用と準備期間から解説。謎解き研修や頭脳戦イベントを制作する株式会社ex Labsが整理します。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/shanai-quiz.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-14',
+  dateModified: '2026-09-14',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="社内イベントで盛り上がるクイズ・ゲーム企画｜人数別の選び方と進行のコツ - 株式会社ex Labs"
+  description="社内イベント・懇親会・全社総会で盛り上がるクイズ・ゲーム企画を、盛り上がる3条件、人数別（10名・50名・数百名）の選び方、クイズ大会・チーム対抗・謎解き・マダミス・頭脳戦の比較、進行と司会のコツ、費用と準備期間から解説。謎解き研修や頭脳戦イベントを制作する株式会社ex Labsが整理します。"
+  ogImage="/assets/guide/shanai-quiz.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '社内イベントの企画アイデア', href: '/guide/shanai-event/' },
+  { name: '社内イベントで盛り上がるクイズ・ゲーム企画' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">OFFICE EVENT GAMES</p>
+<h1 class="h2 serif">社内イベントで盛り上がるクイズ・ゲーム企画<br>人数別の選び方と進行のコツ</h1>
+<p class="lede">社内イベントのクイズ・ゲーム企画とは、懇親会・全社総会・キックオフ・内定者イベントなどで、参加者全員が同じ時間に同じ遊びに参加し、部署や役職を越えた交流を生む企画です。「盛り上がる」かどうかは、クイズの内容よりも、全員に役割があるか、初対面でも参加できるか、結果が数字で分かるかで決まります。</p>
+<p class="lede">この記事では、盛り上がるクイズ・ゲームの3条件、人数別（10名・50名・数百名）の選び方、クイズ大会・チーム対抗・謎解き・マダミス・頭脳戦の比較、進行と司会のコツ、費用と準備期間を、謎解き研修や頭脳戦イベントを企画・制作する株式会社ex Labsが整理します。体験型の企画一覧は<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア</a>をご覧ください。</p>
+<p class="pub-date">公開日：2026年9月14日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>社内イベントのクイズ・ゲーム企画とは、参加者全員が同じ時間に同じ遊びに参加し、部署や役職を越えた交流を生む企画です。</li><li>盛り上がる条件は「全員に役割がある」「初対面・年齢差があっても参加できる」「結果が数字で見え、逆転がある」の3つです。</li><li>〜10名は卓上ゲーム、10〜50名はチーム対抗、50〜200名は全員参加型クイズや協力型謎解き、200名〜は周遊型や大会形式が向いています。</li><li>制作会社に依頼する場合は既存プログラムで数十万円台〜、準備は2〜4週間〜。自社運営なら景品と会場費だけでも実施できます。</li></ul></div>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="definition"><div class="wrap narrow">
+<p class="eyebrow">DEFINITION</p><h2 class="h2 serif">社内イベントのクイズ・ゲーム企画とは</h2>
+<p class="lede">社内イベントのクイズ・ゲームには、司会が出題して個人やチームが答える「クイズ大会型」、チームで課題に挑む「対抗戦型」、謎解きやマダミスのように参加者が主体的に動く「体験型」があります。</p>
+<p class="lede">目的は、部署間の交流、チームの相互理解、会社のメッセージの浸透、単純に楽しい時間を作ることなどです。目的によって、個人戦かチーム戦か、勝敗を強く出すか、社内ネタを入れるかが変わります。</p>
+</div></section>
+<section class="section" id="conditions"><div class="wrap narrow">
+<p class="eyebrow">3 CONDITIONS</p><h2 class="h2 serif">盛り上がるクイズ・ゲームの3条件</h2>
+<ol class="bullets"><li>全員に役割がある：見ているだけの人が出ると、その席から空気が冷えます。チーム内で「答える人」「相談する人」「記録する人」が自然に分かれる形式にします。</li><li>初対面・年齢差があっても参加できる：社内の内輪ネタや専門知識に偏ると、参加できない人が出ます。知識より「考える・協力する」で差がつく問題にします。</li><li>結果が数字で見え、逆転がある：得点が途中で見え、最後のラウンドで順位が変わる仕掛けがあると、終盤まで集中が続きます。</li></ol>
+<p class="lede">この3条件は、10名の懇親会でも数百名の総会でも同じです。人数が増えたら、条件を満たす形式を選び直します。</p>
+</div></section>
+<section class="section tinted" id="size"><div class="wrap narrow">
+<p class="eyebrow">BY SIZE</p><h2 class="h2 serif">人数別の選び方</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>人数</th><th>向いている形式</th><th>会場・準備</th><th>注意点</th></tr></thead><tbody><tr><th scope="row">〜10名</th><td>卓上の頭脳戦・心理戦ゲーム、少人数マダミス、テーブル謎解き</td><td>会議室1室、進行役1名</td><td>一人ひとりの発言が多くなるので、全員が話せる時間配分に</td></tr><tr><th scope="row">10〜50名</th><td>チーム対抗クイズ、協力型の謎解き、複数卓の頭脳戦</td><td>会議室〜宴会場、進行役1〜2名、チーム4〜6名</td><td>チーム分けを事前に決め、部署を混ぜる</td></tr><tr><th scope="row">50〜200名</th><td>チーム対抗の謎解き、全員参加型クイズ（スマートフォン回答）、予選・決勝形式</td><td>宴会場・ホール、司会＋運営スタッフ数名</td><td>回答の集計方法と待ち時間の設計</td></tr><tr><th scope="row">200名〜</th><td>会場内を巡る周遊型ミッション、大会形式の頭脳戦（予選→決勝）</td><td>ホール・複数会場、運営体制と進行台本</td><td>受付・動線・集計の自動化、途中参加への対応</td></tr></tbody></table></div>
+<p class="lede">大人数の対戦形式の設計（予選・決勝、複数卓の得点比較、待ち時間の扱い）は<a href="/guide/zunousen-tournament/" style="color:var(--accent)">大人数の頭脳戦イベント・大会の企画方法</a>で詳しく解説しています。</p>
+</div></section>
+<section class="section" id="formats"><div class="wrap narrow">
+<p class="eyebrow">FORMATS</p><h2 class="h2 serif">形式の比較：クイズ大会・チーム対抗・謎解き・マダミス・頭脳戦</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>形式</th><th>盛り上がる理由</th><th>向いている目的</th><th>所要時間</th></tr></thead><tbody><tr><th scope="row">クイズ大会（司会出題）</th><td>手軽で全員が理解できる。社内ネタで一体感</td><td>懇親会の余興、総会の合間</td><td>20〜40分</td></tr><tr><th scope="row">チーム対抗戦</th><td>勝敗と得点で競争が生まれる</td><td>部署間交流、キックオフ</td><td>40〜90分</td></tr><tr><th scope="row">協力型の謎解き</th><td>協力しないと解けないため会話が生まれる</td><td>チームビルディング、内定者・新人研修</td><td>60〜120分</td></tr><tr><th scope="row">マダミス（マーダーミステリー）</th><td>役割になりきることで普段と違う一面が出る</td><td>相互理解、少人数の深い交流</td><td>2〜3時間</td></tr><tr><th scope="row">頭脳戦・心理戦ゲーム</th><td>交渉と読み合いで人柄が見える</td><td>交流と競技性の両立、大会形式</td><td>30〜90分</td></tr></tbody></table></div>
+<p class="lede">食事や歓談と並行するなら、テーブル対抗の軽い謎解きやクイズが向いています。研修としての振り返りまで行うなら、協力型の謎解きやマダミスを選び、体験後の共有時間を確保します。形式の違いは<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミス・謎解き・イマーシブ・頭脳戦の違い</a>、研修としての設計は<a href="/guide/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修とは</a>と<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修</a>をご覧ください。</p>
+</div></section>
+<section class="section tinted" id="hosting"><div class="wrap narrow">
+<p class="eyebrow">HOSTING</p><h2 class="h2 serif">進行と司会のコツ</h2>
+<ul class="bullets"><li>ルール説明は3分以内：説明が長いと最初の熱が冷めます。スライド1枚と実演1回で伝わる形式にします。</li><li>最初の問題は全員が正解できるものに：「できた」体験を最初に作ると、その後の参加率が上がります。</li><li>得点を見せる：ホワイトボードやスクリーンに途中経過を出し、最終ラウンドは配点を上げて逆転の余地を残します。</li><li>時間を区切る：相談・回答・発表に制限時間を置くと、間延びしません。</li><li>司会は「盛り上げる」より「進める」：進行が滞ると空気が落ちます。判定と集計は別の担当者に任せます。</li><li>表彰は複数の軸で：優勝だけでなく、最多正解・逆転賞・チーム名賞などを用意すると、負けたチームにも見せ場が残ります。</li></ul>
+</div></section>
+<section class="section" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST & TIME</p><h2 class="h2 serif">費用と準備期間の目安</h2>
+<p class="lede">自社で司会・出題まで行う場合は、景品と会場費だけで実施できます。制作会社に依頼する場合、株式会社ex Labsでは既存プログラムの実施で数十万円台〜、会社のメッセージや部署構成に合わせたオリジナル制作は内容と人数により個別にお見積りします。</p>
+<p class="lede">準備期間は、既存プログラムの実施で2〜4週間、オリジナル制作で最短1ヶ月・標準1〜3ヶ月が目安です。参加人数は、卓上のゲームで6〜12人、チーム対抗で数十〜数百名まで設計できます。費用の考え方は<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>をご覧ください。</p>
+</div></section>
+<section class="section tinted" id="cases"><div class="wrap narrow">
+<p class="eyebrow">CASES</p><h2 class="h2 serif">事例：株式会社ex Labsの対人ゲーム</h2>
+<p class="lede">株式会社ex Labsは、頭脳戦レーベル「HACKTALE」で交渉・ブラフ・論理を軸にしたオリジナルの対人ゲームを制作・公演し、都内4会場・全10公演の「東京都頭脳王決定戦 2026」（全公演完売）を企画・運営しました。予選・本戦の大会形式で、初対面の参加者同士が競い合う構造は、社内イベントの対抗戦にそのまま応用できます。</p>
+<p class="lede">法人向けには、謎解きを使ったチームビルディング研修と、社内イベント向けのマダミス・頭脳戦プログラムを提供しています。詳しくは<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修サービス</a>をご覧ください。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-nazotoki">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="lede">株式会社ex Labsは、謎解き・マダミス・イマーシブ・頭脳戦の4ジャンルを企画・制作する体験型イベントの制作会社です。対応範囲・参考価格・納期は<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修サービス</a>でご確認ください。</p>
+<div class="cta-mini">
+<p class="cta-mini-title serif">社内イベントの企画を相談する</p>
+<a class="btn" href="/?c=kenshu#contact">社内イベントの企画を相談する（無料）</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。目的と場所を伺ったうえで、形式・費用・スケジュールをご提案します。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア</a>／<a href="/guide/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修とは</a>／<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修</a>／<a href="/guide/zunousen-tournament/" style="color:var(--accent)">大人数の頭脳戦イベント・大会の企画方法</a>／<a href="/guide/taikengata-idea/" style="color:var(--accent)">体験型イベントの企画アイデア</a>／<a href="/guide/halloween-event/" style="color:var(--accent)">ハロウィンイベントの企画アイデア</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="nazotoki" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#definition,#conditions,#size,#formats,#hosting,#cost,#cases,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>

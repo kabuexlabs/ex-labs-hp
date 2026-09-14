@@ -19,6 +19,7 @@ const toc = [
   { id: 'success', label: '成功させる3つのポイント' },
   { id: 'example', label: '商業施設・店舗での実施事例3選' },
   { id: 'cost', label: '費用（初期費用0円の形も）' },
+  { id: 'quick', label: '目的別の早見表' },
   { id: 'faq', label: 'よくある質問' },
 ];
 
@@ -74,7 +75,7 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
-  dateModified: '2026-09-12',
+  dateModified: '2026-09-14',
   mainEntityOfPage: new URL('/guide/shogyoshisetsu-event/', Astro.site).toString(),
 };
 ---
@@ -161,6 +162,13 @@ const articleLd = {
 <p class="vc-line"><a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントの仕組みを詳しく →</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談（無料）→</a>／<a href="/services/shisetsu-event/#purpose" style="color:var(--accent)">目的別（来館促進・館内回遊・閉館後・空き区画）の対応 →</a>／<a href="/guide/shuyu-event-seisaku/" style="color:var(--accent)">周遊イベントの制作依頼に必要な準備 →</a></p>
 </div></section>
 
+<section class="section tinted" id="quick"><div class="wrap narrow">
+<p class="eyebrow">QUICK REFERENCE</p><h2 class="h2 serif">目的別の早見表：目的→形式→場所→費用→期間</h2>
+<p class="lede">商業施設のイベントは「何を増やしたいか」で形式と場所が決まります。費用と期間は株式会社ex Labsにご依頼いただく場合の目安です。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>目的</th><th>向いている形式</th><th>使う場所</th><th>費用の目安</th><th>準備期間</th></tr></thead><tbody><tr><th scope="row">館内回遊・滞在時間</th><td>フロアを巡る周遊型の謎解き・イマーシブ</td><td>共用部・複数フロア・テナント店内</td><td>100万円前後〜数百万円規模</td><td>1〜3ヶ月</td></tr><tr><th scope="row">新規来館・若年層</th><td>話題性のある体験型イベント、IP・キャラクター企画</td><td>催事場＋館内</td><td>100万円前後〜</td><td>1〜3ヶ月</td></tr><tr><th scope="row">空き区画・催事場の活用</th><td>1空間完結型のマダミス・謎解き、有料チケット型</td><td>空き区画・催事場</td><td>数十万円台〜（レベニューシェアなら初期費用0円も）</td><td>2〜4週間〜</td></tr><tr><th scope="row">閉館後・営業時間外</th><td>一夜限りの物語体験、貸切公演</td><td>閉店後の店舗・フロア</td><td>数十万円台〜100万円前後</td><td>1〜2ヶ月</td></tr><tr><th scope="row">季節催事（ハロウィン等）</th><td>季節テーマの周遊ミッション</td><td>館内全体</td><td>数十万円台〜100万円前後</td><td>2〜4ヶ月前に相談</td></tr></tbody></table></div>
+<p class="lede">催事場を使う企画の進め方は<a href="/guide/saiji-kikaku/" style="color:var(--accent)">催事の企画・やり方</a>、商店街・街全体を使う場合は<a href="/guide/shotengai-event/" style="color:var(--accent)">商店街の回遊イベントの企画</a>をご覧ください。</p>
+</div></section>
+
 <ZeroCostBanner />
 
 <section class="section tinted" id="faq"><div class="wrap">
@@ -180,7 +188,7 @@ const articleLd = {
 <p class="cta-mini-title serif">商業施設の集客イベントのご相談はこちら（無料）</p>
 <a class="btn" href="/#contact">集客イベントについて相談する</a>
 </div>
-<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/saiji/" style="color:var(--accent)">催事とは</a>／<a href="/guide/kisetsu-event/" style="color:var(--accent)">季節イベント（ハロウィン・クリスマス）の企画</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>／<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用</a>／<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の施設活用</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>／<a href="/guide/shotengai-event/" style="color:var(--accent)">商店街・街全体を使う回遊イベントの企画</a></p>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/saiji/" style="color:var(--accent)">催事とは</a>／<a href="/guide/kisetsu-event/" style="color:var(--accent)">季節イベント（ハロウィン・クリスマス）の企画</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>／<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用</a>／<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の施設活用</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは</a>／<a href="/guide/shotengai-event/" style="color:var(--accent)">商店街・街全体を使う回遊イベントの企画</a>／<a href="/guide/saiji-kikaku/" style="color:var(--accent)">催事の企画・やり方</a></p>
 </div></section>
 
 <AuthorBox />
