@@ -1,7 +1,9 @@
 ---
-// 「イマーシブ 東京」「イマーシブイベント 東京」「イマーシブ体験」系の
-// 集客クエリの受け皿。自社公演の紹介＋選び方で「イマーシブ」単体の
-// トピック網羅性も高める。
+// 「イマーシブ 東京」「イマーシブ体験 東京」「イマーシブシアター 東京」系の集客クエリの受け皿。
+// 役割：東京のイマーシブを「比較して選ぶ」中心ページ。日付・人数で探すのは /events/、意味・種類・服装は各解説記事。
+// 比較表・公演カード・選び方は src/data/events/（公演検索と共通の正本）から生成し、ガイドと /events/ で
+// 開催日・料金が食い違わないようにする。他社公演は works.ts で published: true になったものだけ載る
+// （guideOnly: true は比較表だけに出し、/events/ の検索・詳細には出さない）。
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -10,61 +12,96 @@ import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { shows } from '../../data/shows';
+import { eventsData } from '../../data/events/index';
+import { areaName, regionName, genreName } from '../../data/events/areas';
+import { perPerson, fmtYen, FORMAT_LABEL } from '../../lib/events';
 import { thisWeekShows, nextOccurrence, weekRange, fmtDateJa, fmtDateShort, fmtVerified, jstDateString, addDays } from '../../lib/thisWeek';
+import { jsonLd } from '../../lib/microcms';
 
-// 「今週遊べる」欄：リクエスト時刻（日本時間）で評価する。データの正本は src/data/shows.ts
+// 「今週遊べる」欄：リクエスト時刻（日本時間）で評価する。データの正本は src/data/events/（shows.ts は変換層）
 const now = new Date();
+const today = jstDateString(now);
 const week = weekRange(now);
 const weekLast = addDays(week.end, -1); // 表示用：週の最終日（日曜）
 const weekShows = thisWeekShows(shows, now);
 const upcoming = shows.filter((s) => s.published && !weekShows.some((w) => w.show.id === s.id)).map((s) => ({ show: s, next: nextOccurrence(s, now) })).filter((x) => x.next);
 const latestVerified = shows.filter((s) => s.published).map((s) => s.verifiedAt).sort().pop() ?? '';
 const anyStale = weekShows.some((w) => w.stale);
-import { jsonLd } from '../../lib/microcms';
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
+// ---- 比較表・公演カード用の行（公開作品のみ。終了した作品は「終了した公演」枠へ） ----
+type Status = 'ongoing' | 'upcoming' | 'ended' | 'unknown';
+const MOVEMENT_LABEL: Record<string, string> = { 'free-roam': '自分で歩き回る', guided: '案内に沿って進む', seated: '座って観る時間が中心', mixed: '歩く場面と座る場面がある' };
+const SETTING_LABEL: Record<string, string> = { indoor: '屋内', outdoor: '屋外', mixed: '屋内＋屋外の移動あり' };
+const rows = eventsData.works.filter((w) => w.published).map((w) => {
+  const org = eventsData.organizers.find((o) => o.id === w.organizerId)!;
+  const own = org.relation === 'ex-labs';
+  const occ = eventsData.occurrences.filter((o) => o.workId === w.id && o.published && !o.test && o.eventStatus !== 'cancelled').sort((a, b) => a.date.localeCompare(b.date));
+  const venue = eventsData.venues.find((v) => v.id === occ[0]?.venueId);
+  const dates = occ.map((o) => o.date);
+  const futureDates = dates.filter((d) => d >= today);
+  const from = dates[0] ?? w.period?.from;
+  const to = dates[dates.length - 1] ?? w.period?.to;
+  const status: Status = !to ? 'unknown' : to < today ? 'ended' : from && from > today ? 'upcoming' : 'ongoing';
+  const ticketUrl = occ.find((o) => o.date >= today)?.sales.channels[0]?.url ?? occ[0]?.sales.channels[0]?.url;
+  const channel = eventsData.channels.find((c) => c.id === occ[0]?.sales.channels[0]?.channelId);
+  const perPersonText = w.price.unit === 'per-person' ? `${fmtYen(w.price.amount!)}` : w.price.unit === 'per-group' ? (w.price.tiers ?? []).map((t) => `${t.party}人参加 1人${fmtYen(perPerson(w.price, t.party)!)}`).join('／') : `貸切総額 ${fmtYen(w.price.amount!)}`;
+  const stale = Date.now() - Date.parse(w.verified.at) > w.verifyTtlDays * 86400000;
+  const datesText = dates.length ? (futureDates.length ? `${fmtDateShort(futureDates[0])}〜${fmtDateShort(futureDates[futureDates.length - 1])}（確認できた開催日 ${futureDates.length}日）` : `${fmtDateShort(dates[0])}〜${fmtDateShort(dates[dates.length - 1])}`) : (w.period?.text ?? '公式ページで確認');
+  return { w, org, own, venue, occ, dates, futureDates, from, to, status, ticketUrl, channel, perPersonText, stale, datesText };
+});
+const compareRows = rows.filter((r) => r.status !== 'ended');
+const endedRows = rows.filter((r) => r.status === 'ended');
+const hasThirdParty = compareRows.some((r) => !r.own);
+const listedVerified = rows.map((r) => r.w.verified.at).sort().pop() ?? latestVerified;
+const names = (xs: typeof rows) => xs.map((r) => r.w.title).join('、');
+const none = '確認できた公演なし';
+// 選び方（データから判定。未確認の項目は「該当なし」にせず「公式で確認」と書く）
+const pick = {
+  soloBook: compareRows.filter((r) => r.w.party.soloAllowed),
+  soloRun: compareRows.filter((r) => r.w.party.soloRuns === true),
+  pair: compareRows.filter((r) => r.w.party.min <= 2 && (r.w.party.max === undefined || r.w.party.max >= 2)),
+  pairPrivate: compareRows.filter((r) => r.w.party.format === 'private' && r.w.party.min <= 2),
+  actor: compareRows.filter((r) => r.w.info.actorInteraction === true),
+  indoor: compareRows.filter((r) => r.venue?.setting === 'indoor'),
+  outdoorMove: compareRows.filter((r) => r.venue?.setting === 'mixed' || r.venue?.setting === 'outdoor'),
+  notScary: compareRows.filter((r) => r.w.info.scary && /なし/.test(r.w.info.scary)),
+  beginner: compareRows.filter((r) => r.w.info.beginner),
+};
+
 const toc = [
+  { id: 'compare', label: '開催中・開催予定の公演を比較する' },
   { id: 'this-week', label: '今週遊べる東京のイマーシブイベント（ex Labsの開催予定）' },
+  { id: 'choose', label: '人数・好み・参加形式で選ぶ' },
+  { id: 'now', label: '公演ごとの詳しい紹介' },
+  { id: 'theater', label: 'イマーシブシアターを東京で探す' },
   { id: 'types', label: '東京のイマーシブ体験の種類' },
   { id: 'trend2026', label: '2026年の東京イマーシブ動向' },
-  { id: 'now', label: 'ex Labsの東京イマーシブ体験' },
-  { id: 'choose', label: '初めての選び方3つのポイント' },
-  { id: 'biz', label: '開催したい企業・施設の方へ' },
+  { id: 'past', label: '終了した公演・閉業した施設' },
+  { id: 'flow', label: '受付から終了までの流れ（自社公演の案内）' },
   { id: 'faq', label: 'よくある質問' },
+  { id: 'biz', label: '開催したい企業・施設の方へ' },
 ];
 
+const soloAnswer = pick.soloBook.length ? `${names(pick.soloBook)}は1名から申し込めます（相席形式）。${compareRows.filter((r) => !r.w.party.soloAllowed).length ? `${names(compareRows.filter((r) => !r.w.party.soloAllowed))}は各回2名以上での申込です。` : ''}` : '確認できた範囲で1名から申し込める公演はありません。';
+const pairAnswer = pick.pairPrivate.length ? `${names(pick.pairPrivate)}は申込単位で貸切のため、2名で申し込めば2名だけで体験できます。` : '2名だけで貸切にできる公演は確認できていません。';
+const durationAnswer = compareRows.map((r) => `${r.w.title}は${r.w.duration.text}`).join('、') + '。形式の目安は周遊型で60〜120分、公演型で1〜3時間です。';
 const faqs = [
-  {
-    q: '東京ではどんなイマーシブ体験ができますか？',
-    a: '劇場・施設の中を歩き回るイマーシブシアター型、商業施設や街全体を巡る周遊型、バーやレストランでの少人数没入型など、さまざまな形式があります。渋谷・六本木・下北沢など、エリアごとに個性の異なる公演が開催されています。',
-  },
-  {
-    q: 'イマーシブ体験は一人でも参加できますか？',
-    a: '作品によります。少人数制の公演は1名から参加できるものも多く、周遊型は友人・家族と一緒に楽しむ設計が一般的です。各公演の案内で推奨人数を確認しましょう。',
-  },
-  {
-    q: '演技をしたことがなくても大丈夫ですか？',
-    a: '大丈夫です。イマーシブ体験の多くは、特別な演技力を求めず「その場にいて、物語に反応する」だけで成立するよう設計されています。初めてなら、謎解き要素のある周遊型が参加しやすいです。',
-  },
-  {
-    q: '所要時間はどのくらいですか？',
-    a: '形式によりますが、周遊型で60〜120分程度、公演型で1〜3時間程度が一般的です。',
-  },
-  {
-    q: '企業や施設でイマーシブイベントを開催してもらうことはできますか？',
-    a: 'できます。株式会社ex Labsでは、商業施設・店舗・街を舞台にしたオリジナルのイマーシブイベントを企画から運営まで一貫して制作しています。制作依頼・お見積りは無料です。',
-  },
+  { q: '東京ではどんなイマーシブ体験ができますか？', a: '劇場・施設の中を歩き回るイマーシブシアター型、商業施設や街全体を巡る周遊型、バーやレストランでの少人数没入型、劇中セットを歩く展示型などがあります。このページでは、確認できた開催日・料金・参加人数を公演ごとに比較できます。' },
+  { q: 'イマーシブ体験は一人でも参加できますか？', a: soloAnswer + '公演によって「1名から申し込めるか」と「1名だけで回が成立するか」は別なので、申込条件を確認してください。' },
+  { q: '2人だけで参加できますか？', a: pairAnswer + (pick.pair.length ? `${names(pick.pair)}は2名での参加ができます。` : '') },
+  { q: '演技をしたことがなくても大丈夫ですか？', a: `演技は求められません。${pick.beginner.map((r) => `${r.w.title}は「${r.w.info.beginner}」と案内しています`).join('。')}。会話や選択で物語が進む形式なので、その場で反応するだけで成立します。` },
+  { q: '怖い演出はありますか？雨の日でも参加できますか？', a: `${pick.notScary.length ? `${names(pick.notScary)}はホラー演出なしと公式に案内しています。` : 'ホラー演出の有無は各公演の公式ページで確認してください。'}${pick.indoor.length ? `${names(pick.indoor)}は商業施設内で完結するため、雨天でも体験内容は変わりません。` : ''}${pick.outdoorMove.length ? `${names(pick.outdoorMove)}は受付後に屋外の徒歩移動があります。` : ''}` },
+  { q: '所要時間はどのくらいですか？', a: durationAnswer },
+  { q: '開催日で探すにはどうすればいいですか？', a: '公演を探す（/events/）で、今日・明日・今週末や特定の日付、人数・エリア・予算から開催予定の回を絞り込めます。掲載しているのは株式会社ex Labsが公式ページで確認した公演だけで、開演時刻や空席が未確認の回は「未確認」と表示します。' },
+  { q: '企業や施設でイマーシブイベントを開催してもらうことはできますか？', a: 'できます。株式会社ex Labsでは、商業施設・店舗・街を舞台にしたオリジナルのイマーシブイベントを企画から運営まで一貫して制作しています。制作依頼・お見積りは無料です。' },
 ];
 
 const faqLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: faqs.map((f) => ({
-    '@type': 'Question',
-    name: f.q,
-    acceptedAnswer: { '@type': 'Answer', text: f.a },
-  })),
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
 };
 
 const articleLd = {
@@ -78,7 +115,7 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
-  dateModified: '2026-09-13',
+  dateModified: '2026-09-15',
   mainEntityOfPage: new URL('/guide/immersive-tokyo/', Astro.site).toString(),
 };
 ---
@@ -99,6 +136,7 @@ const articleLd = {
 <p class="eyebrow">IMMERSIVE TOKYO GUIDE</p>
 <h1 class="h2 serif"><span class="nobr">東京で体験できる</span><span class="nobr">イマーシブイベント</span><span class="nobr">【2026年最新】</span></h1>
 <p class="lede"><strong>東京は、日本で最もイマーシブ体験（没入型イベント）が充実している街</strong>です。劇場型の大型公演から、商業施設や街全体を巡る周遊型、バーの一夜を舞台にした少人数公演まで、形式もエリアも多彩に広がっています。この記事では、東京のイマーシブ体験の種類と選び方、<strong>2026年のいま体験できる注目公演</strong>を、イマーシブ制作会社の株式会社ex Labsが紹介します。</p>
+<p class="lede">このページは「候補を比較して、参加する公演を決める」ためのページです。開催日や人数から探すなら<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="guide-intro">公演を探す（今日・明日・今週末）</a>、言葉の意味や種類は<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>、参加前の準備は<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物の記事</a>をご覧ください。</p>
 
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
@@ -106,6 +144,28 @@ const articleLd = {
 {toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
 </ol>
 </nav>
+</div></section>
+
+<section class="section tinted" id="compare"><div class="wrap">
+<p class="eyebrow">COMPARE</p><h2 class="h2 serif">開催中・開催予定の公演を比較する</h2>
+<p class="lede">公式ページで確認できた項目だけを載せています（最終確認：{fmtVerified(listedVerified)}）。開演時刻・空席・最新の料金は各公式チケットページでご確認ください。{hasThirdParty ? '「ex Labs」の表示がある公演は当社の企画・制作、それ以外は他社の公演です。' : '現在掲載しているのは、株式会社ex Labsが企画・制作した公演です。他社公演は、主催者の公式ページで開催期間・料金・参加条件を確認でき次第、同じ表に追加します。'}</p>
+<div class="cmp-wrap"><table class="cmp-table cmp-shows"><thead><tr><th>作品・会場</th><th>形式</th><th>エリア・最寄り駅</th><th>確認できた開催日</th><th>参加人数・形式</th><th>料金（1人あたり換算）</th><th>所要時間</th><th>屋内・屋外</th><th>詳細</th></tr></thead><tbody>
+{compareRows.map((r) => (
+  <tr>
+    <th scope="row"><span class="cmp-title">{r.w.title}</span>{r.own && <span class="own-badge">ex Labs 企画・制作</span>}<span class="cmp-sub">{r.venue?.listName ?? r.venue?.name ?? '会場は公式ページで確認'}</span></th>
+    <td>{r.w.genres.map(genreName).join('・')}</td>
+    <td>{r.venue ? `${regionName(r.venue.regionId)}・${areaName(r.venue.areaId)}` : '東京'}<br><span class="cmp-note">{r.venue?.station ?? '最寄り駅は公式ページで確認'}</span></td>
+    <td>{r.datesText}<br><span class="cmp-note">{r.status === 'upcoming' ? '開催予定' : r.status === 'ongoing' ? '開催中' : '開催状態は公式で確認'}{r.stale ? '（確認から時間が経過）' : ''}</span></td>
+    <td>{r.w.party.text}<br><span class="cmp-note">{FORMAT_LABEL[r.w.party.format]}</span></td>
+    <td>{r.perPersonText}<br><span class="cmp-note">{r.w.price.unit === 'per-group' ? `1組料金：${r.w.price.text}。` : ''}{r.w.price.feeNote}</span></td>
+    <td>{r.w.duration.text}</td>
+    <td>{r.venue?.setting ? SETTING_LABEL[r.venue.setting] : '公式ページで確認'}</td>
+    <td><a href={`#card-${r.w.id}`} style="color:var(--accent);font-weight:700">紹介を読む</a>{r.ticketUrl && <><br><a href={r.ticketUrl} target="_blank" rel="noopener" style="color:var(--accent);font-weight:700" data-track="ticket" data-show={r.w.id} data-place={`guide-compare-${r.own ? 'own' : '3rd'}`}>公式チケット（{r.channel?.name ?? '公式'}）→</a></>}</td>
+  </tr>
+))}
+</tbody></table></div>
+<p class="cmp-note-p">1組料金の公演は、参加人数で割った1人あたりの金額を併記しています（税込。手数料は各販売ページで確認）。「確認できた開催日」は公式ページに掲載された日付で、開演時刻が未確認の回は公演回として数えていません。日付はすべて日本時間です。</p>
+<p class="cmp-note-p"><a href="/events/" style="color:var(--accent);font-weight:700" data-track="show" data-show="events" data-place="guide-compare">日付・人数・エリア・予算で開催予定の回を絞り込む（公演を探す）→</a></p>
 </div></section>
 
 <section class="section" id="this-week" data-week-end={week.end} data-today={jstDateString(now)}><div class="wrap">
@@ -161,8 +221,8 @@ const articleLd = {
     </ul>
   </div>
 )}
-<p class="tw-meta">日付・人数・エリアから公演回を絞り込んで探すには<a href="/events/" style="color:var(--accent)">公演を探す（今日・明日・今週末）</a>をご利用ください。</p>
-<p class="tw-meta">過去の公演（下北沢「ロスト・フレーム」など）は<a href="/works/" style="color:var(--accent)">制作事例</a>としてご覧ください。参加前の服装・持ち物は<a href="/guide/immersive-preparation/" style="color:var(--accent)">イマーシブ体験の服装・持ち物</a>、観るマジックショーとの違いは<a href="/guide/magic-show-immersive-chigai/" style="color:var(--accent)">マジックショーとイマーシブ体験の違い</a>で整理しています。</p>
+<p class="tw-meta">日付・人数・エリアから公演回を絞り込んで探すには<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="guide-this-week">公演を探す（今日・明日・今週末）</a>をご利用ください。</p>
+<p class="tw-meta">過去の公演（下北沢「ロスト・フレーム」など）は<a href="#past" style="color:var(--accent)">終了した公演</a>と<a href="/works/" style="color:var(--accent)">制作事例</a>でご覧ください。参加前の服装・持ち物は<a href="/guide/immersive-preparation/" style="color:var(--accent)">イマーシブ体験の服装・持ち物</a>、観るマジックショーとの違いは<a href="/guide/magic-show-immersive-chigai/" style="color:var(--accent)">マジックショーとイマーシブ体験の違い</a>で整理しています。</p>
 <script is:inline>
 // 開いたまま日付が変わった場合のフォールバック：日本時間の今日より前の回を非表示にし、
 // 残る回がないカードは予約導線を「次回以降の日程を確認する」に切り替える。
@@ -180,57 +240,138 @@ const articleLd = {
 </script>
 </div></section>
 
-<section class="section tinted" id="types"><div class="wrap">
-<p class="eyebrow">TYPES</p><h2 class="h2 serif">東京のイマーシブ体験の種類</h2>
-<div class="genre-grid">
-<div class="genre-cell"><span class="genre-t serif">劇場・施設型</span><span class="genre-d">建物の中を自由に歩き、同時進行する物語を追うイマーシブシアター。<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは →</a></span></div>
-<div class="genre-cell"><span class="genre-t serif">街なか周遊型</span><span class="genre-d">渋谷・下北沢など実在の街や商業施設を巡りながら物語を体験する形式。謎解きと相性抜群。</span></div>
-<div class="genre-cell"><span class="genre-t serif">店舗・少人数型</span><span class="genre-d">バーやレストランの空間ごと物語に変わる、距離の近い濃密な没入体験。</span></div>
-<div class="genre-cell"><span class="genre-t serif">ミステリー融合型</span><span class="genre-d">マダミス・謎解きと融合し、推理しながら物語に入り込む形式。<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは →</a></span></div>
-</div>
-</div></section>
-
-<section class="section" id="trend2026"><div class="wrap narrow">
-<p class="eyebrow">2026 TREND</p><h2 class="h2 serif">2026年の東京イマーシブ動向</h2>
-<p class="lede">2026年の東京イマーシブシーンは、大きな転換点を迎えています。世界最大級のイマーシブ・テーマパークとして2024年に開業した<strong>「イマーシブ・フォート東京」（お台場）が、2026年2月28日をもって閉業</strong>しました。運営側は理由を「施設規模が過大だったため」と説明しており、実際に人気が集中したのは大人数向けのライトな体験ではなく、<strong>人数限定の濃密な没入体験</strong>だったと報じられています。</p>
-<p class="lede">つまり、常設の大型パークが終わった一方で、<strong>イマーシブ体験そのものの需要はむしろ「少人数×高密度」に集中している</strong>のが2026年の実態です。東京では、期間限定公演・店舗型・街なか周遊型など、物語との距離が近い小規模高密度のイマーシブが主流になりつつあります。これから体験するなら、この「距離の近さ」を基準に選ぶのがおすすめです。</p>
-</div></section>
-
-<section class="section tinted" id="now"><div class="wrap narrow">
-<p class="eyebrow">PICK UP</p><h2 class="h2 serif">ex Labsの東京イマーシブ体験</h2>
+<section class="section tinted" id="choose"><div class="wrap">
+<p class="eyebrow">HOW TO CHOOSE</p><h2 class="h2 serif">人数・好み・参加形式で選ぶ</h2>
+<p class="lede">「誰と行くか」「演者と話したいか」「歩くか」で候補が絞れます。下の表は、各公演の公式ページで確認できた条件から機械的に当てはめたもので、条件に合う公演が確認できない場合は「{none}」と表示します。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>条件</th><th>当てはまる公演（確認できた範囲）</th><th>確認するポイント</th></tr></thead><tbody>
+<tr><th scope="row">1人で申し込める</th><td>{pick.soloBook.length ? names(pick.soloBook) : none}</td><td>1名で申し込めても、他の参加者と一緒に体験する「相席」形式の場合があります</td></tr>
+<tr><th scope="row">1人だけで体験する（相席なし）</th><td>{pick.soloRun.length ? names(pick.soloRun) : none}</td><td>1名だけで回が成立するかは公式ページの「申込人数」「貸切」の欄で確認</td></tr>
+<tr><th scope="row">2人で参加できる</th><td>{pick.pair.length ? names(pick.pair) : none}</td><td>下限が2名の公演は1名では申し込めません</td></tr>
+<tr><th scope="row">2人だけで貸切にできる</th><td>{pick.pairPrivate.length ? names(pick.pairPrivate) : none}</td><td>申込単位で貸切の公演は、2名で申し込めば2名だけで体験できます（料金は1組単位）</td></tr>
+<tr><th scope="row">演者（キャスト）と会話する</th><td>{pick.actor.length ? names(pick.actor) : none}</td><td>会話が進行の一部になる公演は、その場で反応するだけで成立します。演技は求められません</td></tr>
+<tr><th scope="row">鑑賞が中心（会話は少ない）</th><td>{compareRows.filter((r) => r.w.info.movement === 'seated').length ? names(compareRows.filter((r) => r.w.info.movement === 'seated')) : none}</td><td>劇中セットを歩く展示型や、座って観る時間が長い公演が該当します。確認でき次第、比較表に追加します</td></tr>
+<tr><th scope="row">謎解きが中心／物語への参加が中心</th><td>{compareRows.map((r) => `${r.w.title}：${r.w.info.puzzle ?? '公式ページで確認'}`).join('　')}</td><td>「謎解き」といっても、パズルを解く型と、証言や手がかりを整理する型があります</td></tr>
+<tr><th scope="row">屋内で完結する</th><td>{pick.indoor.length ? names(pick.indoor) : none}</td><td>商業施設内で完結する公演は雨天でも体験内容が変わりません</td></tr>
+<tr><th scope="row">屋外の移動がある</th><td>{pick.outdoorMove.length ? names(pick.outdoorMove) : none}</td><td>受付から会場までの徒歩移動や街歩きがある公演は、歩きやすい靴と水分を用意</td></tr>
+<tr><th scope="row">怖い演出がない</th><td>{pick.notScary.length ? names(pick.notScary) : none}</td><td>公式に「ホラー演出なし」と案内している公演だけを載せています。記載がない公演は各公式ページで確認</td></tr>
+</tbody></table></div>
+<h3 class="def-sub serif">初めての人が選びやすい理由（公式の案内から）</h3>
 <ul class="bullets">
-<li><strong>ウワサバナシ調査委員会（渋谷）</strong>：渋谷サクラステージ全体を周遊する都市伝説×イマーシブ×謎解き。2026年9〜10月開催。東急不動産様ほかのご協力で実現した施設一体型で、<strong>日本経済新聞に掲載</strong>されました。<a href="/uwasabanashi/" style="color:var(--accent)">特設サイト →</a></li>
-<li><strong>怪盗と秘密の試験（六本木）</strong>：会員制バーを舞台に、日本一になった実績のあるマジシャン様とコラボしたマジック×イマーシブ公演。2026年9月開催。<strong>電ファミニコゲーマーで紹介</strong>。<a href="/kaitou/" style="color:var(--accent)">公演サイト →</a></li>
-<li><strong>ロスト・フレーム（下北沢）</strong>：街に散らばった絵画を探して歩く周遊型アートイマーシブ。体験時間75分・1〜4名。<a href="/taikenbizyutu/lostframe/" style="color:var(--accent)">ロスト・フレーム公式 →</a></li>
-<li><strong>ANATOR（神田）</strong>：少人数密室型のイマーシブ空間。公演とスペースレンタルを行う自社劇場です。<a href="/anator/" style="color:var(--accent)">公式サイト →</a></li>
+{pick.beginner.map((r) => <li><strong>{r.w.title}</strong>：{r.w.info.beginner}。{r.w.info.participation}</li>)}
+<li><strong>形式で迷ったら</strong>：友人・家族となら周遊型、少人数で密度の高い体験なら店舗型・1空間型。エリア（渋谷・六本木・下北沢・神田など）の個性も選ぶ材料になります。</li>
 </ul>
+<p class="vc-line">参加前の準備：<a href="/guide/immersive-preparation/" style="color:var(--accent)">イマーシブ体験の服装・持ち物（公演別チェック表つき）→</a>／観るショーとの違い：<a href="/guide/magic-show-immersive-chigai/" style="color:var(--accent)">マジックショーとイマーシブ体験の違い →</a></p>
+</div></section>
+
+<section class="section" id="now"><div class="wrap">
+<p class="eyebrow">PICK UP</p><h2 class="h2 serif">公演ごとの詳しい紹介</h2>
+<p class="lede">比較表の各公演について、参加者が実際にすること、申込条件、料金、確認日をまとめました。株式会社ex Labsの公演は、企画・制作者としての説明です。</p>
+<div class="sc-grid">
+{compareRows.map((r) => (
+  <article class="sc-card" id={`card-${r.w.id}`}>
+    <p class="tw-area">{r.venue ? `${regionName(r.venue.regionId)}・${areaName(r.venue.areaId)}／${r.venue.listName ?? r.venue.name}` : '東京'}{r.own ? '　｜　ex Labs 企画・制作' : `　｜　${r.org.relationLabel}`}</p>
+    <h3 class="tw-name serif">{r.w.title}</h3>
+    <p class="tw-feature">{r.w.summary}</p>
+    <dl class="tw-dl">
+      <div><dt>参加者がすること</dt><dd class="dd-normal">{r.w.info.participation ?? '公式ページで確認'}</dd></div>
+      <div><dt>進み方</dt><dd class="dd-normal">{r.w.info.movement ? MOVEMENT_LABEL[r.w.info.movement] : '公式ページで確認'}{r.w.info.choice ? `。${r.w.info.choice}` : ''}</dd></div>
+      <div><dt>申込人数・形式</dt><dd class="dd-normal">{r.w.party.text}（{FORMAT_LABEL[r.w.party.format]}）</dd></div>
+      <div><dt>料金</dt><dd class="dd-normal">{r.w.price.unit === 'per-group' ? `1組 ${r.w.price.text}` : r.w.price.text}<br><span class="tw-note">1人あたり換算：{r.perPersonText}。{r.w.price.feeNote}</span></dd></div>
+      <div><dt>所要時間</dt><dd class="dd-normal">{r.w.duration.text}</dd></div>
+      <div><dt>開催日（確認済み）</dt><dd class="dd-normal">{r.datesText}</dd></div>
+      <div><dt>年齢・言語</dt><dd class="dd-normal">{r.w.info.ageRule ?? '年齢条件は公式ページで確認'}／{r.w.info.language ?? '言語は公式ページで確認'}</dd></div>
+      <div><dt>屋内・屋外</dt><dd class="dd-normal">{r.venue?.setting ? SETTING_LABEL[r.venue.setting] : '公式ページで確認'}{r.w.info.walking ? `。${r.w.info.walking}` : ''}</dd></div>
+    </dl>
+    {(r.w.info.requirements?.length || r.w.info.scary) && (
+      <>
+        <p class="tw-k">参加前に確認したい条件</p>
+        <ul class="tw-cond">{r.w.info.scary && <li>{r.w.info.scary}</li>}{(r.w.info.requirements ?? []).map((c) => <li>{c}</li>)}</ul>
+      </>
+    )}
+    <p class="tw-meta" style="margin-top:10px">情報の確認：{fmtVerified(r.w.verified.at)}（{r.own ? '自社公式ページ' : '主催者公式ページ'}）{r.stale ? '。確認から時間が経過しているため、最新情報は公式ページを優先してください' : ''}</p>
+    <div class="tw-actions">
+      {r.ticketUrl && <a class="btn tw-btn" href={r.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={r.w.id} data-place={`guide-card-${r.own ? 'own' : '3rd'}`}>開催日時・空席を確認する（{r.channel?.name ?? '公式'}）</a>}
+      <a class="tw-sub" href={r.w.officialUrl} target={r.w.officialUrl.startsWith('/') ? undefined : '_blank'} rel={r.w.officialUrl.startsWith('/') ? undefined : 'noopener'} data-track="show" data-show={r.w.id} data-place={`guide-card-${r.own ? 'own' : '3rd'}`}>公式ページで公演内容を見る →</a>
+      {!r.w.guideOnly && <a class="tw-sub" href={`/events/${r.w.slug}/`} data-track="show" data-show={r.w.id} data-place={`guide-card-${r.own ? 'own' : '3rd'}-events`}>すべての開催日程・回ごとの状況 →</a>}
+    </div>
+  </article>
+))}
+</div>
+<h3 class="def-sub serif">その他の自社の場所</h3>
+<ul class="bullets">
+<li><strong>ANATOR（神田）</strong>：少人数密室型のイマーシブ空間。公演とスペースレンタルを行う自社劇場です。開催中の公演は<a href="/anator/" style="color:var(--accent)">ANATOR 公式サイト →</a>でご確認ください。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="theater"><div class="wrap">
+<p class="eyebrow">IMMERSIVE THEATER</p><h2 class="h2 serif">イマーシブシアターを東京で探す</h2>
+<p class="lede"><strong>イマーシブシアター</strong>は、客席のない空間で観客が歩き回り、俳優と同じ空間で物語を体験する演劇の形式です（<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは →</a>）。「没入型」と呼ばれる体験の中でも、<strong>劇中セットや映像を歩いて観る展示型</strong>と、<strong>俳優との交流がある公演</strong>は体験がまったく違います。また、マーダーミステリーは登場人物として推理する形式で、俳優が出演しない作品も多いため、ここではイマーシブシアターとして扱いません。</p>
+<p class="lede">探すときは次の5点を公式ページで確認すると、期待と実際のずれを防げます。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>確認する点</th>{compareRows.map((r) => <th>{r.w.title}</th>)}</tr></thead><tbody>
+<tr><th scope="row">俳優との交流</th>{compareRows.map((r) => <td>{r.w.info.actorInteraction === true ? 'あり（会話が進行の一部）' : r.w.info.participation?.includes('キャスト') ? 'キャスト出演あり（会話の範囲は公式で確認）' : '公式ページで確認'}</td>)}</tr>
+<tr><th scope="row">歩き方</th>{compareRows.map((r) => <td>{r.w.info.movement ? MOVEMENT_LABEL[r.w.info.movement] : '公式ページで確認'}</td>)}</tr>
+<tr><th scope="row">観客が選択できる範囲</th>{compareRows.map((r) => <td>{r.w.info.choice ?? '公式ページで確認'}</td>)}</tr>
+<tr><th scope="row">座って観る時間</th>{compareRows.map((r) => <td>{r.w.info.seating ?? '公式ページに記載なし（未確認）'}</td>)}</tr>
+<tr><th scope="row">言語・年齢</th>{compareRows.map((r) => <td>{r.w.info.language ?? '言語は公式で確認'}／{r.w.info.ageRule ?? '年齢は公式で確認'}</td>)}</tr>
+</tbody></table></div>
 <h3 class="def-sub serif">東京でイマーシブシアターを探すコツ</h3>
 <ul class="bullets">
 <li><strong>「常設」より「期間限定」を探す</strong>：2026年は大型常設施設が閉業し、東京のイマーシブシアターは期間限定公演・小規模劇場が主流です。公演情報は各劇団・レーベルの公式サイトやSNSで告知されるため、気になる作品は早めのチケット確保がおすすめです。</li>
 <li><strong>人数と距離感で選ぶ</strong>：数十人規模で歩き回る劇場型か、数名で俳優と向き合う少人数型か。初めてなら少人数型のほうが「物語の当事者」になる感覚を掴みやすいです。</li>
 <li><strong>形式の違いを知っておく</strong>：客席がない・視点を自分で選ぶ・一回では全体を見られない、がイマーシブシアターの基本。<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは？演劇との違い →</a></li>
+<li><strong>他社の公演を探す</strong>：当ページの比較表には、主催者の公式ページで開催期間・料金・参加条件を確認できた公演だけを載せます。現在確認中の候補は公開していません。ほかの公演は、東京発の情報サイト<a href="https://tokyo-immersive.com/" target="_blank" rel="noopener" style="color:var(--accent)">東京イマーシブシアター</a>や<a href="https://natalie.mu/stage/content_tag/388/play" target="_blank" rel="noopener" style="color:var(--accent)">ステージナタリー（イマーシブ・体験型演劇）</a>、<a href="https://www.enjoytokyo.jp/event/list/cat0311/" target="_blank" rel="noopener" style="color:var(--accent)">レッツエンジョイ東京（没入体験）</a>で見つけ、主催者の公式ページで日程と料金を確認してください。</li>
 </ul>
 </div></section>
 
-<section class="section" id="choose"><div class="wrap narrow">
-<p class="eyebrow">HOW TO CHOOSE</p><h2 class="h2 serif">初めての選び方3つのポイント</h2>
+<section class="section" id="types"><div class="wrap">
+<p class="eyebrow">TYPES</p><h2 class="h2 serif">東京のイマーシブ体験の種類</h2>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">劇場・施設型</span><span class="genre-d">建物の中を自由に歩き、同時進行する物語を追うイマーシブシアター。<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">街なか周遊型</span><span class="genre-d">渋谷・下北沢など実在の街や商業施設を巡りながら物語を体験する形式。謎解きと相性抜群。</span></div>
+<div class="genre-cell"><span class="genre-t serif">店舗・少人数型</span><span class="genre-d">バーやレストランの空間ごと物語に変わる、距離の近い濃密な没入体験。</span></div>
+<div class="genre-cell"><span class="genre-t serif">展示・セット型</span><span class="genre-d">劇中セットや映像空間を歩いて観る展示型。俳優との会話がない場合が多く、鑑賞に近い体験です。</span></div>
+<div class="genre-cell"><span class="genre-t serif">ミステリー融合型</span><span class="genre-d">マダミス・謎解きと融合し、推理しながら物語に入り込む形式。<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは →</a></span></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="trend2026"><div class="wrap narrow">
+<p class="eyebrow">2026 TREND</p><h2 class="h2 serif">2026年の東京イマーシブ動向</h2>
+<p class="lede">2026年の東京イマーシブシーンは、大きな転換点を迎えています。世界最大級のイマーシブ・テーマパークとして2024年に開業した<strong>「イマーシブ・フォート東京」（お台場）が、2026年2月28日をもって閉業</strong>しました。運営側は理由を「施設規模が過大だったため」と説明しており、実際に人気が集中したのは大人数向けのライトな体験ではなく、<strong>人数限定の濃密な没入体験</strong>だったと報じられています。</p>
+<p class="lede">つまり、常設の大型パークが終わった一方で、<strong>イマーシブ体験そのものの需要はむしろ「少人数×高密度」に集中している</strong>のが2026年の実態です。東京では、期間限定公演・店舗型・街なか周遊型など、物語との距離が近い小規模高密度のイマーシブが主流になりつつあります。これから体験するなら、この「距離の近さ」を基準に選ぶのがおすすめです。</p>
+</div></section>
+
+<section class="section" id="past"><div class="wrap narrow">
+<p class="eyebrow">ARCHIVE</p><h2 class="h2 serif">終了した公演・閉業した施設</h2>
+<p class="lede">開催中の一覧には含めていない、過去の公演と施設です。同じ形式の次回公演を待つ際の参考にしてください。</p>
 <ul class="bullets">
-<li><strong>没入の深さで選ぶ</strong>：がっつり演じたいなら公演型、気軽に楽しみたいなら謎解き付きの周遊型が入りやすいです。</li>
-<li><strong>誰と行くかで選ぶ</strong>：友人・家族となら周遊型、デートなら少人数の店舗型、一人参加OKの公演も増えています。</li>
-<li><strong>エリアで選ぶ</strong>：渋谷・六本木・下北沢・神田など、街の個性と物語の相性も楽しみのひとつです。</li>
+<li><strong>ロスト・フレーム（下北沢）</strong>：街に散らばった絵画を探して歩く周遊型アートイマーシブ。2026年7月7日〜8月31日、所要時間75分、1組1〜4名。参加費は1人あたり4名参加で4,000円〜1名参加で8,000円。全公演完売で終了しました。<a href="/taikenbizyutu/lostframe/" style="color:var(--accent)">公演ページ →</a>／<a href="/guide/shotengai-event/" style="color:var(--accent)">制作側の解説（商店街の回遊イベント）→</a></li>
+<li><strong>イマーシブ・フォート東京（お台場）</strong>：2024年開業の大型常設施設。2026年2月28日に閉業しました（上の「2026年の動向」参照）。</li>
+{endedRows.map((r) => <li><strong>{r.w.title}</strong>：{r.w.summary}（{r.datesText}に開催、終了）。{!r.w.guideOnly && <a href={`/events/${r.w.slug}/`} style="color:var(--accent)">記録を見る →</a>}</li>)}
 </ul>
-<p class="vc-line">参加前の準備：<a href="/guide/immersive-preparation/" style="color:var(--accent)">イマーシブ体験の服装・持ち物（公演別チェック表つき）→</a>／観るショーとの違い：<a href="/guide/magic-show-immersive-chigai/" style="color:var(--accent)">マジックショーとイマーシブ体験の違い →</a></p>
 </div></section>
 
-<section class="section tinted" id="biz"><div class="wrap narrow">
-<p class="eyebrow">FOR BUSINESS</p><h2 class="h2 serif">開催したい企業・施設の方へ</h2>
-<p class="lede">上で紹介した公演は、いずれも株式会社ex Labsが<strong>企画・制作・運営</strong>を手がけたものです。商業施設・店舗・街を舞台にしたオリジナルのイマーシブイベントを、<strong>レベニューシェア型（初期費用0円または格安）</strong>を含む柔軟な形で開催できます。</p>
-<p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）はこちら →</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは →</a></p>
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">ON THE DAY</p><h2 class="h2 serif">受付から終了までの流れ（自社公演の案内）</h2>
+<p class="lede">初めての方が迷いやすい「当日どこに行き、何をするか」を、株式会社ex Labsの公演の公式案内からまとめました。他社公演は各公式ページの「ご来場・受付について」の欄を確認してください。</p>
+<h3 class="def-sub serif">怪盗と秘密の試験（六本木・会員制バー）</h3>
+<ol class="bullets">
+<li><strong>受付</strong>：チケットに記載された受付時間までに、指定の受付場所へ。会員制バーという会場の性質上、受付時間より前に店内へは入れません。</li>
+<li><strong>事前説明</strong>：参加方法と注意事項をスタッフが案内します。</li>
+<li><strong>会員制バーへの入場</strong>：スタッフの案内に従って会場へ移動します（徒歩の移動があり、水分を持参する案内）。扉を開けた瞬間から「レイヴン怪盗団」の団員候補です。</li>
+<li><strong>秘密の試験</strong>：登場人物との会話や仲間との協力、試練を通して怪盗としての資質を示します。物語の中で本格的なイリュージョンが目の前で行われます。</li>
+</ol>
+<p class="tw-meta">公式案内より：各回2〜4名（1名不可）、18歳以上、日本語で進行、服装の指定なし、スマートフォンとイヤホンを持参、会場にクロークなし、お酒の提供なし、受付時間に遅れると参加不可。</p>
+<h3 class="def-sub serif">ウワサバナシ調査委員会（渋谷サクラステージ）</h3>
+<ol class="bullets">
+<li><strong>集合</strong>：渋谷サクラステージ SHIBUYA SIDE 3階の集合場所へ、開演5分前までに。JR渋谷駅新南改札から直結です。途中入場はできません。</li>
+<li><strong>調査</strong>：商業施設内の複数のスポットを歩いて巡り、証言と手がかりを集めて整理します。あなたの選択で展開が変わります。</li>
+<li><strong>終了</strong>：所要時間は約70分。SNSに投稿する際はネタバレへの配慮をお願いしています。</li>
+</ol>
+<p class="tw-meta">公式案内より：チケット1枚につき1名（複数人参加可、途中で一時的に離れる場合あり）、15歳以上、ホラー演出なし、スマートフォン・イヤホン・水分を持参、体験中に一時的に靴を脱ぐ可能性あり、館内での飲食・喫煙・許可のない撮影は不可。</p>
+<p class="lede">制作者からひとこと：周遊型は「歩いて集める」体験、1空間型は「その場で会話する」体験です。同じ「イマーシブ」でも当日の動き方が違うので、靴と荷物は形式に合わせて選んでください（<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物の公演別チェック表 →</a>）。ネタバレのない公演写真は、掲載条件を確認でき次第このページに追加します。</p>
 </div></section>
 
-<ZeroCostBanner />
-
-<section class="section tinted" id="faq"><div class="wrap">
+<section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
 <div class="faq-list tag-immersive">
 {faqs.map((f) => (
@@ -242,12 +383,20 @@ const articleLd = {
 </div>
 </div></section>
 
+<section class="section tinted" id="biz"><div class="wrap narrow">
+<p class="eyebrow">FOR BUSINESS</p><h2 class="h2 serif">開催したい企業・施設の方へ</h2>
+<p class="lede">上で「ex Labs 企画・制作」と表示した公演は、株式会社ex Labsが<strong>企画・制作・運営</strong>を手がけたものです。商業施設・店舗・街を舞台にしたオリジナルのイマーシブイベントを、<strong>レベニューシェア型（初期費用0円または格安）</strong>を含む柔軟な形で開催できます。</p>
+<p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）はこちら →</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは →</a></p>
+</div></section>
+
+<ZeroCostBanner />
+
 <section class="section"><div class="wrap">
 <div class="cta-mini">
 <p class="cta-mini-title serif">イマーシブイベントの開催相談はこちら（無料）</p>
-<a class="btn" href="/#contact">イマーシブについて相談する</a>
+<a class="btn" href="/?c=immersive#contact">イマーシブについて相談する</a>
 </div>
-<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/events/" style="color:var(--accent)">公演を探す</a>／<a href="/guide/immersive-taiken/" style="color:var(--accent)">イマーシブ体験とは</a>／<a href="/guide/madamis-tokyo/" style="color:var(--accent)">東京でマダミスを遊ぶには</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド</a>／<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例4選</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a></p>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="guide-footer">公演を探す</a>／<a href="/guide/immersive-taiken/" style="color:var(--accent)">イマーシブ体験とは</a>／<a href="/guide/madamis-tokyo/" style="color:var(--accent)">東京でマダミスを遊ぶには</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド</a>／<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例4選</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a></p>
 </div></section>
 
 <AuthorBox />
@@ -264,8 +413,22 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#types,#trend2026,#now,#choose,#biz,#faq{scroll-margin-top:88px}
+#compare,#types,#trend2026,#now,#choose,#biz,#faq,#theater,#past,#flow{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
+.cmp-wrap{margin-top:22px}
+.cmp-shows th[scope=row]{min-width:180px;white-space:normal}
+#choose .cmp-table th[scope=row],#theater .cmp-table th[scope=row]{white-space:normal;min-width:130px}
+#choose .cmp-table td,#theater .cmp-table td{min-width:170px}
+.cmp-shows td{min-width:120px;vertical-align:top}
+.cmp-title{display:block;font-weight:800;color:var(--ink)}
+.cmp-sub{display:block;font-size:12px;font-weight:500;color:rgba(51,48,43,.65);margin-top:2px}
+.cmp-note{display:inline-block;font-size:11.5px;font-weight:500;color:rgba(51,48,43,.65);line-height:1.6;margin-top:2px}
+.cmp-note-p{max-width:920px;margin:14px auto 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
+.own-badge{display:inline-block;margin:4px 0 0;font-size:11px;font-weight:800;color:#fff;background:var(--tag-immersive);padding:2px 8px;letter-spacing:.04em}
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:22px;max-width:1000px;margin:28px auto 0}
+.sc-card{background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);padding:26px 26px 24px;display:flex;flex-direction:column;gap:12px;text-align:left;scroll-margin-top:88px}
+.sc-card .tw-dl{grid-template-columns:1fr}
+.dd-normal{font-weight:500 !important}
 .tw-meta{max-width:920px;margin:18px auto 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62)}
 .tw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:22px;max-width:920px;margin:32px auto 0}
 .tw-card{background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);padding:26px 26px 24px;display:flex;flex-direction:column;gap:12px;text-align:left}
@@ -295,5 +458,6 @@ const articleLd = {
 .tw-next-list{margin:8px 0 0;padding-left:1.2em;font-size:13.5px;line-height:1.9}
 .tw-next-list a{color:var(--accent);font-weight:700}
 #this-week{scroll-margin-top:88px}
-@media(max-width:640px){.tw-card{padding:20px 18px}.tw-name{font-size:19px}.tw-dl{grid-template-columns:1fr}.tw-btn{width:100%;text-align:center}}
+ol.bullets{padding-left:1.4em}
+@media(max-width:640px){.tw-card,.sc-card{padding:20px 18px}.tw-name{font-size:19px}.tw-dl{grid-template-columns:1fr}.tw-btn{width:100%;text-align:center}.cmp-shows th[scope=row]{min-width:150px}}
 </style>

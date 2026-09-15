@@ -39,4 +39,23 @@ export const sources: Source[] = [
     checkedBy: 'Claude（実装環境から到達できず、内容は未確認）',
     terms: '未確認。開演時刻・受付状況・残席はこのページで確認してから入力する。自動取得はしない（利用条件未確認）',
   },
+  // ---------- 他社公演の掲載候補（公式ページ未確認）----------
+  {
+    id: 'vivant-search-2026-09-15',
+    label: '「VIVANT IMMERSIVE MISSION」に関する Web 検索結果（PR TIMES 配信・トラベルボイス記事の抜粋）',
+    url: 'https://prtimes.jp/main/html/rd/p/000000001.000189439.html',
+    kind: 'press',
+    checkedAt: '2026-09-15T02:00:00+09:00',
+    checkedBy: 'Claude（実装環境から prtimes.jp・travelvoice.jp へ到達できず、検索結果の抜粋のみ）',
+    terms: '未確認。公式サイト・公式販売ページで開催期間・料金・所要時間・参加内容を確認してから公開する。紹介文は自社で書く。画像は使わない',
+  },
+  {
+    id: 'intersection-search-2026-09-15',
+    label: '「交差 Intersection in東京」に関する Web 検索結果（PassMarket 掲載ページの抜粋）',
+    url: 'https://passmarket.yahoo.co.jp/event/show/detail/028jjc8dtqd41.html',
+    kind: 'ticket-site',
+    checkedAt: '2026-09-15T02:00:00+09:00',
+    checkedBy: 'Claude（実装環境から passmarket.yahoo.co.jp へ到達できず、検索結果の抜粋のみ）',
+    terms: '未確認。主催者公式ページと販売ページで会場・日程・料金・参加内容を確認してから公開する',
+  },
 ];

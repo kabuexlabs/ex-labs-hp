@@ -157,7 +157,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/madamis-business/': '2026-09-15',
     '/guide/immersive-cost/': '2026-09-15',
     '/guide/immersive-company/': '2026-09-15',
-    '/guide/immersive-tokyo/': '2026-09-13',
+    '/guide/immersive-tokyo/': '2026-09-15',
     '/guide/shisetsu-katsuyo/': '2026-09-08',
     '/guide/shogyoshisetsu-event/': '2026-09-15',
     '/guide/yukyu-kukaku/': '2026-09-15',
@@ -217,7 +217,7 @@ export const GET: APIRoute = async ({ site }) => {
   // 公演検索サービスの作品詳細（公開作品のみ。テストデータ・非公開は src/data/events/index が除外済み）。
   // 日付別・条件別のページは作らない（一覧 /events/ と作品詳細だけを検索対象にする）。
   for (const w of eventsData.works) {
-    if (w.published) urls.push({ loc: new URL(`/events/${w.slug}/`, base).toString(), lastmod: w.updatedAt });
+    if (w.published && !w.guideOnly) urls.push({ loc: new URL(`/events/${w.slug}/`, base).toString(), lastmod: w.updatedAt });
   }
   for (const [p, d] of Object.entries(STATIC_LASTMOD)) {
     const u = urls.find((x) => x.loc.endsWith(p));

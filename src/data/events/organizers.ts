@@ -18,4 +18,19 @@ export const organizers: Organizer[] = [
     relationLabel: 'ex Labs 企画・制作（公演ブランド：IMMERSIVE ILLUSION）',
     sourceIds: ['kaitou-official'],
   },
+  // 他社（掲載候補。公式ページで主催者名を確認してから公開）
+  {
+    id: 'vivant-immersive-mission-organizer',
+    name: '「VIVANT IMMERSIVE MISSION」主催者（公式ページで要確認）',
+    relation: 'third-party',
+    relationLabel: '他社主催（株式会社ex Labs は関与していません）',
+    sourceIds: ['vivant-search-2026-09-15'],
+  },
+  {
+    id: 'intersection-organizer',
+    name: '「交差 Intersection in東京」主催者（公式ページで要確認）',
+    relation: 'third-party',
+    relationLabel: '他社主催（株式会社ex Labs は関与していません）',
+    sourceIds: ['intersection-search-2026-09-15'],
+  },
 ];
