@@ -672,3 +672,12 @@
 - 実装（当日）：/guide/madamis-tenpo/ に「市場の動き：他社の宿泊型・店舗型マダミス」を追加し外部出典（トラベルボイス・MIMARU 公式）を明記、/guide/taiken-marketing/ に定義の外部出典（Amazon Ads）を追加、/guide/shotengai-event/ に「スタンプラリー／100円商店街・街バル／周遊型」の比較表と外部出典（ジチタイワークス）を追加。いずれも ④証拠（外部の裏付け）の補強。
 - 確認：IndexNow の GitHub Actions は 9/12 の push ごとに成功。別セッションで /events/（公演検索サービス）が新設・改修されていることを確認し、その上に本日の変更を rebase。
 - 候補（未実施）：「イベント企画会社 一覧」型のクエリに対しては自社を含む比較記事より、/services/ の「作りたいもの→サービス」表を強化する方が整合的。VIVANT 等の他社公演は /events/ の運用方針（当面は自社公演のみ）に従い掲載しない。
+
+## 2026-09-15 指示書（制作依頼導線の小規模改善）対応
+
+- 確認：サービス5本＋一覧の CTA は /?c=<種類>#contact でフォームの「ご相談の種類」が正しく事前選択される（ブラウザで6本確認、モバイル幅で横スクロールなし）。謎解き研修のみ /#contact だったため /?c=kenshu#contact に統一。
+- 確認：候補URL 7本は /guide/zunousen-cost/・zunousen-tournament/・shuyu-event-seisaku/（指示書の shuyu-event-production に相当）・madamis-haishin/（madamis-streaming-production）・ip-event/（ip-experience-event）・event-original-or-existing/・event-revenue-share/ として 2026-09-08（コミット 913b0f7）に公開済み。noindex なし、canonical は BaseLayout が末尾スラッシュ付き自URLを出力、sitemap 登録・lastmod あり、被内部リンク 4〜12本、各記事に制作相談 CTA あり。仮のスラッグへのリダイレクトは不要（存在したことがない）。Search Console の URL 検査はこの環境から未確認。
+- 実装：ガイド26本に、費用・依頼の流れ・制作の節の末尾へ「対応範囲・参考価格・条件はサービスページで」という1文の文脈リンクを追加（記事ごとに文面を変え、凍結中の柱9本と東京案内・保護ページは対象外）。追加前は69本中46本が本文中（CTA・関連欄以外）に該当サービスへのリンクを持っていなかった。dateModified と sitemap lastmod を 9/15 に更新。
+- 確認（AIO）：Organization（BaseLayout／会社概要、@id /#organization）と Person（代表ページ @id /company/iida-yuki/#person）の社名・役職・住所・設立・sameAs は整合しており修正なし。
+- データ観察（マダミス）：/guide/madamis/ の日次表示は 9/1〜9/4 が 348〜494、9/5〜9/6 が 203〜221、9/7 以降 36〜96。「マダミスとは」の表示は 239→110→46→111→63→9→11→6→1。9/5 の title 変更（title-history.md）と時間的に相関するが因果は未確定。凍結中（〜9/21）のため title は変更せず、9/21 のレビューで復元の可否を判断する。イマーシブは /guide/immersive/ が 220〜344 表示で横ばい、「イマーシブ」単独語は日次表示が少数（2〜56）のため順位変動は少数サンプル。
+- 変更しなかったもの：記事の新設（候補のみ提示）、title/h1/URL、構造化データの追加、東京案内・公演ページ・トップの本文。
