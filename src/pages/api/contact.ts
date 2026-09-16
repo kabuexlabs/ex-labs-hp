@@ -151,4 +151,7 @@ export const POST: APIRoute = async ({ request }) => {
   return redirect();
 };
 
+// GET でフォームの action URL を直接開いた場合（ブラウザの入力・クローラー）は、問い合わせフォームへ案内する。
+// 405 を返すと Search Console に「その他の4xx」として報告されるため。送信処理（POST）は変更しない。
+export const GET: APIRoute = ({ redirect }) => redirect('/#contact', 303);
 export const ALL: APIRoute = () => new Response('Method Not Allowed', { status: 405 });

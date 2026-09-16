@@ -709,3 +709,11 @@
 - 他社公演：主催者公式ページに到達できず、掲載基準（開催期間・料金・体験内容を公式で確認）を満たせないため追加0件（候補2件は非公開のまま）。他社を載せる際は自社公演に関係性表示（当社主催・制作）を戻す必要があるが、9/16 のユーザー判断で現在は非表示。
 - 旧URL転送：/blog/znpa6h6q_-gn → /blog/znpa6h6q_-gn/ → /guide/immersive/ の2段転送だったため、middleware の統合リダイレクトをスラッシュ正規化より先に判定し、末尾スラッシュの有無に関わらず1回の301で /guide/immersive/ へ送るよう修正。canonical は /guide/immersive/ 自身、サイトマップは現URLのみ、サイト内リンクに旧URLなし。Search Console の正規URLは未確認。
 - 計測：東京ガイドの予約先クリック（ticket: guide-cal／guide-cal-btn／guide-compare／guide-card）、公演詳細（show: guide-card／guide-cal）、公演検索（show: events-guide-*）は実装済み（9/15〜16）。二重計測なし、購入完了は数えない。
+
+## 2026-09-17 Search Console「他の4xxの問題が原因でブロックされました」対応
+
+- 対象URLは Search Console にアクセスできず未取得（ユーザーに「該当理由の対象URL一覧CSV」の共有を依頼）。リポジトリ・ローカルビルドの調査で、公開ページ以外に GET で 4xx（404 以外）を返す URL は /api/track（405）と /api/contact（405）の2つだけだった。前者は全ページの計測スクリプトに URL 文字列として含まれ、後者はトップと怪盗ページのフォーム action に含まれるため、クローラーが発見して GET し、405 を「その他の4xx」として報告した可能性が高い（仮説。対象URL一覧で確認する）。
+- ローカル確認（2026-09-16 23:54 UTC）：代表ページ（/、東京ガイド、/events/、/guide/immersive/、/uwasabanashi/、/kaitou/、/services/immersive/）は GET 200・正常本文・noindex なし。旧URL /blog/znpa6h6q_-gn は 301 1回で /guide/immersive/（200）。管理画面・備品・予約系は noindex ヘッダー付きで 200／401／404、/smystery/ は本番では vercel.json の転送が先に効く。
+- 修正（公開ページには触れない）：/api/track の GET を 204（noindex ヘッダー付き）に、/api/contact の GET を /#contact への 303 に変更（POST の処理は無変更）。robots.txt の * グループに Disallow: /api/ を追加し、vercel.json で /api/ 配下に X-Robots-Tag: noindex を付与。
+- 修正後（ローカル）：/api/track GET 204、/api/contact GET 303→/#contact 200、POST は従来どおり。ビルド・テスト全件合格。本番は push 後に Vercel で反映（別途確認）。
+- 備考：Astro の Origin チェックにより、Origin ヘッダーの無い POST は 403 になる（通常ブラウザのフォーム送信・ビーコンは同一オリジンのため影響なし。Googlebot は POST しない）。
