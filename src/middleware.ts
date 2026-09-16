@@ -16,13 +16,14 @@ export const onRequest = defineMiddleware((context, next) => {
     !pathname.startsWith('/api/') &&
     !pathname.startsWith('/_') &&
     !/\.[a-z0-9]{1,5}$/i.test(pathname);
+  // 検索意図が重複していたブログ記事を解説記事へ統合（301）。
+  // 末尾スラッシュの有無に関わらず1回の転送で現 URL へ送る（スラッシュ正規化 → 統合の2段転送にしない）。
+  const blogMatch = pathname.match(/^\/blog\/([^/]+)\/?$/);
+  if (isGet && blogMatch && BLOG_REDIRECTS[blogMatch[1]]) {
+    return context.redirect(BLOG_REDIRECTS[blogMatch[1]], 301);
+  }
   if (needsSlash) {
     return context.redirect(`${pathname}/${search}`, 301);
-  }
-  // 検索意図が重複していたブログ記事を解説記事へ統合（301）
-  const blogMatch = pathname.match(/^\/blog\/([^/]+)\/$/);
-  if (blogMatch && BLOG_REDIRECTS[blogMatch[1]]) {
-    return context.redirect(BLOG_REDIRECTS[blogMatch[1]], 301);
   }
   return next();
 });

@@ -53,10 +53,10 @@ export const works: Work[] = [
     },
     period: { text: '2026年9月〜10月（自社公式サイトの案内）', from: '2026-09-06', to: '2026-10-11' },
     sourceIds: ['kaitou-official', 'escape-id-kaitou'],
-    verified: { at: '2026-09-13T01:23:00+09:00', by: 'Claude（自社公式ページの記載を確認）' },
+    verified: { at: '2026-09-17T03:02:00+09:00', by: 'Claude（自社公式ページの開催日・料金・人数・条件を再確認。escape.id は未確認）' },
     verifyTtlDays: 14,
     published: true,
-    updatedAt: '2026-09-13',
+    updatedAt: '2026-09-16',
   },
   {
     id: 'uwasabanashi',
@@ -102,10 +102,10 @@ export const works: Work[] = [
     },
     period: { text: '2026年9月〜10月（自社公式サイトの開催日一覧）', from: '2026-09-19', to: '2026-10-04' },
     sourceIds: ['uwasabanashi-official', 'escape-id-uwasabanashi'],
-    verified: { at: '2026-09-13T01:23:00+09:00', by: 'Claude（自社公式ページの記載を確認）' },
+    verified: { at: '2026-09-17T03:02:00+09:00', by: 'Claude（自社公式ページの開催日・料金・人数・条件を再確認。escape.id は未確認）' },
     verifyTtlDays: 14,
     published: true,
-    updatedAt: '2026-09-13',
+    updatedAt: '2026-09-16',
   },
 
   // ---------- 他社公演の掲載候補（公開前）----------
