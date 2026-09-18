@@ -16,7 +16,7 @@ import { fmtDateJa, fmtDateShort, fmtVerified, jstDateString } from '../../lib/t
 import { jsonLd } from '../../lib/microcms';
 
 const { slug } = Astro.params;
-const work = eventsData.works.find((w) => w.slug === slug && w.published);
+const work = eventsData.works.find((w) => w.slug === slug && w.published && !w.guideOnly);
 if (!work) return new Response(null, { status: 404 });
 
 const now = new Date();

@@ -1,0 +1,156 @@
+---
+// 「イマーシブ 一人」「イマーシブ体験 東京 一人」「イマーシブシアター 一人参加」の受け皿。
+// 東京ガイド（/guide/immersive-tokyo/）の補助ページ。「一人で予約できる」と「一人だけで体験する」を区別して
+// 参加形式を判断できるようにする。公演の条件は src/data/events/（/events/ と共通）から生成し、手書きしない。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
+import { jsonLd } from '../../lib/microcms';
+
+const now = new Date();
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/immersive-tokyo-solo/', site).toString();
+const rows = buildGuideRows(now).filter((r) => r.status !== 'ended');
+const soloBook = rows.filter((r) => r.w.party.soloAllowed);
+const soloRun = rows.filter((r) => r.w.party.soloRuns === true);
+const needsTwo = rows.filter((r) => !r.w.party.soloAllowed);
+const names = (xs: typeof rows) => xs.map((r) => r.w.title).join('、');
+const latest = rows.map((r) => r.w.verified.at).sort().pop();
+const latestText = rows.find((r) => r.w.verified.at === latest)?.verifiedText ?? '';
+
+const faqs = [
+  { q: '一人分だけ予約すれば、一人で体験できますか？', a: `公演によります。${soloBook.length ? `${names(soloBook)}は1名から申し込めますが、他の参加者と同じ回で体験する相席形式です。` : '確認できた範囲で1名から申し込める公演はありません。'}${soloRun.length ? `${names(soloRun)}は1名だけで回が成立します。` : '1名だけで回が成立する（相席なし）公演は確認できていません。'}` },
+  { q: '知らない人と組むのが不安です。会話は必要ですか？', a: rows.map((r) => `${r.w.title}：${r.w.info.participation ?? '体験中の交流は公式ページで確認'}`).join('。') + '。演技は求められませんが、会話や協力が進行の一部になる公演では、その場で反応する場面があります。' },
+  { q: '遅刻や途中退出はできますか？', a: rows.map((r) => `${r.w.title}：${(r.w.info.requirements ?? []).filter((x) => /遅れ|入場/.test(x)).join('、') || '遅刻・途中入場の扱いは公式ページで確認'}`).join('。') + '。途中退出の扱いは各公式ページに記載がないため、予約前に主催者へ確認してください。' },
+  { q: '服装や持ち物はどうすればいいですか？', a: '公演の形式ごとの服装・靴・持ち物は「イマーシブ体験の服装・持ち物」の記事にまとめています。スマートフォンとイヤホンを必須にしている公演があるので、そこだけは先に確認してください。' },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const title = '東京のイマーシブ体験に一人で参加するには？申込条件・相席・選び方';
+const desc = '東京のイマーシブ体験に一人で参加したい人向けに、「一人分で予約できる」と「一人だけで体験する」の違い、申込人数・公演成立人数・相席か貸切か・体験中の交流を公演ごとの公式情報で整理。予約前に確認する点と、一人参加の形式の選び方をまとめました。';
+const articleLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
+  image: [new URL('/assets/guide/immersive-tokyo-solo.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-18', dateModified: '2026-09-18', mainEntityOfPage: pageUrl,
+};
+const soloRunText = (r: (typeof rows)[number]) => r.w.party.soloRuns === true ? '1名だけで成立' : r.w.party.soloRuns === false ? '1名では成立しない（相席）' : r.w.party.soloAllowed ? '公式に記載なし（相席形式のため他の参加者と同じ回になる）' : '—（2名以上の申込が必要）';
+---
+<BaseLayout
+  title="東京のイマーシブ体験に一人で参加するには？申込条件・相席・選び方 - 株式会社ex Labs"
+  description="東京のイマーシブ体験に一人で参加したい人向けに、「一人分で予約できる」と「一人だけで体験する」の違い、申込人数・公演成立人数・相席か貸切か・体験中の交流を公演ごとの公式情報で整理。予約前に確認する点と、一人参加の形式の選び方をまとめました。"
+  ogImage="/assets/guide/immersive-tokyo-solo.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '東京のイマーシブ体験', href: '/guide/immersive-tokyo/' },
+  { name: '一人で参加するには' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">SOLO</p>
+<h1 class="h2 serif"><span class="nobr">東京のイマーシブ体験に</span><span class="nobr">一人で参加するには？</span><span class="nobr">申込条件・相席・選び方</span></h1>
+<p class="lede"><strong>「一人分で予約できる」ことと「一人だけで体験できる」ことは別です。</strong>1名で申し込めても、同じ回の他の参加者と一緒に体験する「相席」形式の公演があります。逆に、申込の下限が2名の公演は一人では予約できません。このページでは、東京で開催中の公演について、公式ページで確認できた申込人数・成立人数・相席か貸切か・体験中の交流を整理し、自分に合う参加形式を判断できるようにしています。</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul>
+<li>確認する条件は3つ。①1名で申し込めるか、②1名だけで回が成立するか（相席か）、③体験中に会話や協力が必要か。</li>
+<li>{soloBook.length ? `${names(soloBook)}は1名から申し込めます（相席形式）。` : '確認できた範囲で1名から申し込める公演はありません。'}{needsTwo.length ? `${names(needsTwo)}は各回2名以上での申込です。` : ''}</li>
+<li>「一人で申し込める」「一人だけで貸切」「会話が少ない」は別の条件です。どれを優先するかで選ぶ公演が変わります。</li>
+</ul></div>
+</div></section>
+
+<section class="section tinted" id="table"><div class="wrap">
+<p class="eyebrow">CONDITIONS</p><h2 class="h2 serif">公演ごとの申込人数・成立人数・相席・交流</h2>
+<p class="lede">各公演の公式ページで確認した条件です（最終確認 {latestText}）。空席・残席は公式予約ページの表示が最新です。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>公演</th><th>1申込の人数</th><th>1名だけで成立するか</th><th>相席・貸切</th><th>体験中の交流</th><th>所要時間</th><th>料金（1人あたり）</th><th>開催日</th><th>公式</th></tr></thead><tbody>
+{rows.map((r) => (
+  <tr>
+    <th scope="row"><span class="cmp-title">{r.w.title}</span><span class="cmp-sub">{r.venue ? `${r.venue.listName ?? r.venue.name}` : '会場は公式で確認'}</span></th>
+    <td>{r.w.party.text}</td>
+    <td>{soloRunText(r)}</td>
+    <td>{r.formatLabel}</td>
+    <td>{r.w.info.participation ?? '公式ページで確認'}{r.w.info.actorInteraction === true ? '（キャストとの会話あり）' : ''}</td>
+    <td>{r.w.duration.text}</td>
+    <td>{r.perPersonText}<br><span class="cmp-note">{r.w.price.feeNote}</span></td>
+    <td>{r.datesText}</td>
+    <td><a href={r.w.officialUrl} data-track="show" data-show={r.w.id} data-place="solo-table" style="color:var(--accent);font-weight:700">公演内容</a>{r.ticketUrl && <><br><a href={r.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={r.w.id} data-place="solo-table" style="color:var(--accent);font-weight:700">予約サイト（{r.ticketSite}）→</a></>}</td>
+  </tr>
+))}
+</tbody></table></div>
+<p class="cmp-note-p">1組料金の公演は人数で割った1人あたりの金額を表示しています。開催日は公式ページに掲載された日付（日本時間）で、開演時刻が未確認の日は日付だけを載せています。</p>
+</div></section>
+
+<section class="section" id="types"><div class="wrap narrow">
+<p class="eyebrow">FORMATS</p><h2 class="h2 serif">一人参加の3つの形式</h2>
+<p class="lede">一人で参加する場合、公演の形式は次の3つに分かれます。すべての形式が今の東京で予約できるとは限らないので、上の表で現在の公演がどれに当たるかを確認してください。</p>
+<h3 class="sub-h serif">1. 一人分で申し込み、他の参加者と同じ回で体験する</h3>
+<p class="lede">チケット1枚につき1名で販売され、同じ回に申し込んだ人たちと一緒に進む形式です。周遊型や施設型に多く、証言や手がかりを集める場面では他の参加者と会話する機会があります。{soloBook.length ? `現在の公演では${names(soloBook)}がこの形式です。` : ''}</p>
+<h3 class="sub-h serif">2. 一人で巡る（相席なし）</h3>
+<p class="lede">1名だけで回が成立し、自分のペースで進める形式です。街歩き型のアート体験などに見られます。{soloRun.length ? `現在の公演では${names(soloRun)}が該当します。` : '現在の東京の公演では、この形式で公式に案内しているものは確認できていません。過去には下北沢の周遊型アート体験（1〜4名、終了）がこの形式でした。'}</p>
+<h3 class="sub-h serif">3. 複数名の予約が必要（一人では申し込めない）</h3>
+<p class="lede">申込の下限が2名以上の公演です。少人数の貸切公演に多く、一人で参加したい場合は同行者を誘う必要があります。{needsTwo.length ? `現在の公演では${names(needsTwo)}が該当し、${needsTwo.map((r) => r.w.party.text).join('、')}です。` : ''}</p>
+</div></section>
+
+<section class="section tinted" id="check"><div class="wrap narrow">
+<p class="eyebrow">BEFORE BOOKING</p><h2 class="h2 serif">一人で予約する前に確認すること</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>確認する点</th>{rows.map((r) => <th>{r.w.title}</th>)}</tr></thead><tbody>
+<tr><th scope="row">進行役・サポートの有無</th>{rows.map((r) => <td>{r.w.info.beginner ?? '公式ページで確認'}</td>)}</tr>
+<tr><th scope="row">会話の必要性</th>{rows.map((r) => <td>{r.w.info.actorInteraction === true ? 'キャストとの会話が進行の一部' : r.w.info.participation ?? '公式ページで確認'}</td>)}</tr>
+<tr><th scope="row">遅刻・途中入場</th>{rows.map((r) => <td>{(r.w.info.requirements ?? []).filter((x) => /遅れ|入場/.test(x)).join('。') || '公式ページで確認'}</td>)}</tr>
+<tr><th scope="row">途中退出</th>{rows.map(() => <td>公式ページに記載なし。予約前に主催者へ確認</td>)}</tr>
+<tr><th scope="row">年齢・言語</th>{rows.map((r) => <td>{r.w.info.ageRule ?? '公式で確認'}／{r.w.info.language ?? '公式で確認'}</td>)}</tr>
+<tr><th scope="row">移動・持ち物</th>{rows.map((r) => <td>{r.w.info.walking ?? '—'}{(r.w.info.requirements ?? []).filter((x) => /持参|イヤホン|ロッカー/.test(x)).map((x) => `。${x}`).join('')}</td>)}</tr>
+</tbody></table></div>
+<p class="lede">上の表に「公式ページで確認」とある項目は、公式ページに記載がない、または当社が確認できていない条件です。一般論で補っていません。</p>
+</div></section>
+
+<section class="section" id="choose"><div class="wrap narrow">
+<p class="eyebrow">HOW TO CHOOSE</p><h2 class="h2 serif">「一人で申し込める」「一人だけで貸切」「会話が少ない」は別の条件</h2>
+<ul class="bullets">
+<li><strong>一人で申し込めればよい（他の人と一緒でも構わない）</strong>：1申込の下限が1名の公演を選びます。{soloBook.length ? `現在は${names(soloBook)}。` : '現在は確認できた公演がありません。'}相席形式なので、同じ回の参加者と一緒に進みます。</li>
+<li><strong>一人だけで体験したい（貸切）</strong>：1名だけで回が成立する公演を選びます。{soloRun.length ? `現在は${names(soloRun)}。` : '現在の公演では確認できていません。申込単位で貸切の公演は2名以上が下限のため、一人で貸切にはできません。'}</li>
+<li><strong>会話や交流を少なくしたい</strong>：体験中の交流の欄を確認します。{rows.filter((r) => r.w.info.actorInteraction === true).length ? `${names(rows.filter((r) => r.w.info.actorInteraction === true))}はキャストとの会話が進行の一部なので、会話を避けたい場合には向きません。` : ''}劇中セットを歩いて観る展示型は会話が少ない傾向ですが、現在の東京の公演で公式に確認できたものはありません。</li>
+</ul>
+<p class="vc-line">二人で参加する場合の条件（同じ組で行動できるか・貸切か・二人分の総額）は<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">東京のイマーシブ体験を二人で楽しむには →</a></p>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">東京のイマーシブ公演・開催日を一覧で見る</p>
+<a class="btn" href="/guide/immersive-tokyo/" data-track="show" data-show="guide-tokyo" data-place="solo-cta">開催日カレンダーと比較表を見る</a>
+<p class="svc-cta-sub">日付・人数・予算で絞り込むなら<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="solo-cta">公演を探す</a>。服装・持ち物は<a href="/guide/immersive-preparation/" style="color:var(--accent)">イマーシブ体験の服装・持ち物</a>をご覧ください。</p>
+</div>
+<p class="cmp-note-p">紹介範囲：このページで扱っているのは、株式会社ex Labsが企画・制作し、公式ページで申込条件を確認できた公演です。東京の全公演を網羅した比較や第三者によるランキングではありません。他社公演は、主催者の公式情報で条件を確認できたものから追加します。</p>
+<p class="vc-line" style="margin-top:32px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">二人で楽しむには</a>／<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物</a>／<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/events/" style="color:var(--accent)">公演を探す</a></p>
+</div></section>
+
+<AuthorBox />
+<LatestPosts category="immersive" />
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.sub-h{margin:30px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.cmp-wrap{margin-top:22px}
+.cmp-table th[scope=row]{min-width:150px;white-space:normal}
+.cmp-table td{min-width:140px;vertical-align:top}
+.cmp-title{display:block;font-weight:800;color:var(--ink)}
+.cmp-sub{display:block;font-size:12px;font-weight:500;color:rgba(51,48,43,.65);margin-top:2px}
+.cmp-note{display:inline-block;font-size:11.5px;font-weight:500;color:rgba(51,48,43,.65);line-height:1.6;margin-top:2px}
+.cmp-note-p{max-width:920px;margin:14px auto 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
+#table,#types,#check,#choose,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.sub-h{font-size:17px}}
+</style>

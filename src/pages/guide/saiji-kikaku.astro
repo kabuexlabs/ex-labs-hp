@@ -1,0 +1,173 @@
+---
+// 催事の企画・やり方｜百貨店・商業施設で集客につながる体験型催事の進め方
+// 発注者の検索（SAIJI PLANNING）に答える記事。定義・比較・費用・期間・実績・関連リンクを1ページで揃え、
+// /services/shisetsu-event/ へ送客する。本文中の数値例は説明用の仮定。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/saiji-kikaku/', site).toString();
+
+const toc = [{"id": "definition", "label": "催事の企画とは（用語の整理）"}, {"id": "purpose", "label": "目的を先に決める：販売・集客・回遊・話題化"}, {"id": "venue", "label": "催事場・区画の条件を確認する"}, {"id": "compare", "label": "出店型（物販）と体験型の違い"}, {"id": "flow", "label": "企画から開催までの流れと期間"}, {"id": "cost", "label": "費用の目安と初期費用0円の形"}, {"id": "cases", "label": "事例：商業施設・店舗での体験型催事"}, {"id": "kpi", "label": "効果の測り方"}, {"id": "faq", "label": "よくある質問"}];
+
+const faqs = [
+  {
+    q: '催事場が埋まらない時期に、体験型催事は使えますか？',
+    a: '使えます。物販の出店者が集まりにくい時期や区画に、館内を巡る謎解き・イマーシブを置くと、催事場を「受付・スタート地点」として使いながら館内全体に人を送れます。有料チケット型ならレベニューシェア（初期費用0円）で実施できる場合があります。',
+  },
+  {
+    q: '体験型催事の会期はどのくらいが適切ですか？',
+    a: '2週間〜1ヶ月以上を推奨します。口コミで後から来る人を受け止められ、平日の来館にもつながるためです。物産展のような数日の催事と重ねる場合は、体験型の会期を長く取り、物販催事を「期間中の山」として位置づけます。',
+  },
+  {
+    q: '百貨店の催事でも依頼できますか？',
+    a: '商業施設・書店・バー・宿泊施設での実績を活かして、百貨店の催事場や共用部を使う企画にも対応します。フロア構成や営業時間、催事場の条件を伺ったうえで形式をご提案します。',
+  },
+  {
+    q: '催事の企画・制作の実績はありますか？',
+    a: '株式会社ex Labsは、渋谷サクラステージを周遊するイマーシブイベント（日本経済新聞掲載）、閉店後の紀伊國屋書店での一夜限りの公演（博報堂様との取り組み）、自社主催の有料企画（広告費0円でチケット約1,000枚）などを企画・制作しています。',
+  },
+];
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '催事の企画・やり方｜百貨店・商業施設で集客につながる体験型催事の進め方',
+  description: '催事の企画・やり方を、目的の決め方、催事場・区画の条件、出店型と体験型の違い、企画から開催までの流れと期間、費用の目安、効果の測り方から解説。渋谷サクラステージ（日経掲載）など商業施設での体験型イベントを制作する株式会社ex Labsが施設担当者・出店者向けに整理します。',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/saiji-kikaku.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-14',
+  dateModified: '2026-09-14',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="催事の企画・やり方｜百貨店・商業施設で集客につながる体験型催事の進め方 - 株式会社ex Labs"
+  description="催事の企画・やり方を、目的の決め方、催事場・区画の条件、出店型と体験型の違い、企画から開催までの流れと期間、費用の目安、効果の測り方から解説。渋谷サクラステージ（日経掲載）など商業施設での体験型イベントを制作する株式会社ex Labsが施設担当者・出店者向けに整理します。"
+  ogImage="/assets/guide/saiji-kikaku.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '催事とは', href: '/guide/saiji/' },
+  { name: '催事の企画・やり方' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">SAIJI PLANNING</p>
+<h1 class="h2 serif">催事の企画・やり方<br>百貨店・商業施設で集客につながる体験型催事の進め方</h1>
+<p class="lede">催事の企画とは、百貨店や商業施設の催事場・空き区画で、期間を区切って行う販売会やイベントを、目的・場所・内容・期間・費用の面から組み立てることです。物産展やポップアップストアのような「出店型」だけでなく、来館者が参加する謎解き・イマーシブなどの「体験型催事」が増えています。</p>
+<p class="lede">この記事では、催事のやり方を、目的の決め方、催事場・区画の条件、出店型と体験型の違い、企画から開催までの流れと期間、費用の目安、効果の測り方の順に、商業施設での体験型イベントを企画・制作する株式会社ex Labsが整理します。用語の意味は<a href="/guide/saiji/" style="color:var(--accent)">催事とは</a>で解説しています。</p>
+<p class="pub-date">公開日：2026年9月14日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>催事の企画とは、百貨店・商業施設の催事場や空き区画で行う期間限定の販売会・イベントを、目的・場所・内容・期間・費用から組み立てることです。</li><li>目的は販売・集客・回遊・話題化の4つで、主目的を1つに絞ると内容と指標が決まります。</li><li>出店型（物産展・ポップアップストア）は数日〜2週間・販売向き、体験型（謎解き・イマーシブ）は2週間〜1ヶ月以上・回遊と話題化向きで、組み合わせも可能です。</li><li>費用は既存導入で数十万円台〜、オリジナルで100万円前後〜。有料チケット型ならレベニューシェア（初期費用0円）も検討でき、準備は2〜4週間〜1〜3ヶ月が目安です。</li></ul></div>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="definition"><div class="wrap narrow">
+<p class="eyebrow">DEFINITION</p><h2 class="h2 serif">催事の企画とは（用語の整理）</h2>
+<p class="lede">催事（さいじ）は、商業施設・百貨店で期間限定に開催される販売会・イベントの総称です。催事場は催事のために用意された区画やフロア、催事品は催事のために用意された限定商品、催事営業は催事での販売活動を指します。</p>
+<p class="lede">企画の立場は2つあります。施設側（催事場を持ち、出店者や企画を集める）と、出店・企画側（催事場を借りて販売やイベントを行う）です。この記事は施設側の担当者を主な読者にしつつ、出店・企画側が施設に提案するときの考え方も含めています。</p>
+</div></section>
+<section class="section" id="purpose"><div class="wrap narrow">
+<p class="eyebrow">PURPOSE</p><h2 class="h2 serif">目的を先に決める：販売・集客・回遊・話題化</h2>
+<p class="lede">催事の目的は主に4つです。目的によって、選ぶ内容も測る指標も変わります。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>目的</th><th>主な内容</th><th>測る指標</th></tr></thead><tbody><tr><th scope="row">販売</th><td>物産展、限定品の販売、ブランドのポップアップストア</td><td>催事売上、客単価、出店者の満足</td></tr><tr><th scope="row">集客（新規来館）</th><td>話題性のある企画、季節催事、キャラクター・IP企画</td><td>来館者数、新規客の割合</td></tr><tr><th scope="row">回遊・滞在</th><td>館内を巡る謎解き・周遊型イベント、スタンプラリー</td><td>立ち寄り店舗数、滞在時間、特典利用数</td></tr><tr><th scope="row">話題化・認知</th><td>イマーシブ体験、写真映えする展示、メディア向け企画</td><td>SNS投稿数、メディア掲載</td></tr></tbody></table></div>
+<p class="lede">「販売」と「回遊」は同じ催事場で両立しにくいことがあります。物販の催事場は買う人が集まる場所で、回遊は買わない人にも館内を歩いてもらう仕組みだからです。主目的を1つに絞ると、企画の判断がぶれません。</p>
+</div></section>
+<section class="section tinted" id="venue"><div class="wrap narrow">
+<p class="eyebrow">VENUE</p><h2 class="h2 serif">催事場・区画の条件を確認する</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>確認項目</th><th>見るポイント</th><th>体験型で特に重要な点</th></tr></thead><tbody><tr><th scope="row">場所</th><td>催事場、空き区画、共用部（通路・広場）、閉店後の店舗</td><td>館内を巡る動線に組み込めるか</td></tr><tr><th scope="row">広さ・形</th><td>什器の配置、通路幅、天井高</td><td>受付・待機スペースと、同時に体験できる人数</td></tr><tr><th scope="row">時間帯</th><td>営業時間、搬入・搬出の時間、閉店後の利用可否</td><td>営業時間外の活用ができると企画の幅が広がる</td></tr><tr><th scope="row">設備</th><td>電源、照明、音響、給排水、Wi-Fi</td><td>スマートフォンを使う体験では通信環境</td></tr><tr><th scope="row">人数上限</th><td>消防・避難の観点での収容人数</td><td>受付枠と1回の所要時間から1日の受入数を計算</td></tr><tr><th scope="row">費用条件</th><td>区画の使用料、売上歩合、光熱費、警備</td><td>有料チケット型の場合の収益の扱い</td></tr></tbody></table></div>
+<p class="lede">空き区画や営業時間外の活用については、<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用</a>と<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の施設活用</a>で詳しく解説しています。</p>
+</div></section>
+<section class="section" id="compare"><div class="wrap narrow">
+<p class="eyebrow">COMPARE</p><h2 class="h2 serif">出店型（物販）と体験型の違い</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>比較軸</th><th>出店型（物産展・ポップアップストア）</th><th>体験型（謎解き・イマーシブ・周遊型）</th></tr></thead><tbody><tr><th scope="row">来館者の行動</th><td>見る・買う</td><td>参加する・巡る・話す</td></tr><tr><th scope="row">会期</th><td>数日〜2週間</td><td>2週間〜1ヶ月以上</td></tr><tr><th scope="row">施設側の収益</th><td>売上歩合・区画使用料</td><td>チケット収益の分配、テナント売上への波及</td></tr><tr><th scope="row">準備期間</th><td>出店者の手配中心で短い</td><td>企画・制作・テストプレイで最短1ヶ月・標準1〜3ヶ月</td></tr><tr><th scope="row">向いている目的</th><td>販売、季節の集客</td><td>回遊・滞在、話題化、若年層・ファミリーの新規来館</td></tr><tr><th scope="row">主なリスク</th><td>出店者が集まらない、売れ残り</td><td>受付の混雑、営業への影響、運営スタッフの確保</td></tr></tbody></table></div>
+<p class="lede">どちらが良いかではなく、目的に応じて組み合わせる形が現実的です。物産展の期間に館内周遊の謎解きを重ねると、買い物客以外の来館と、催事場以外のフロアへの回遊を同時に作れます。</p>
+</div></section>
+<section class="section tinted" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">企画から開催までの流れと期間</h2>
+<ol class="bullets"><li>目的と主要指標を決める（販売・集客・回遊・話題化のどれか）</li><li>催事場・区画の条件を確認し、使える時間帯と人数上限を出す</li><li>出店型か体験型か、または組み合わせを決める</li><li>既存コンテンツの導入かオリジナル制作かを決め、制作会社と企画を固める</li><li>制作・テストプレイ（体験型の場合）と、什器・掲示・受付の準備</li><li>告知（館内掲示・SNS・プレスリリース・出店者の告知）</li><li>開催と運営（受付・混雑対応・問い合わせ窓口）</li><li>振り返り（決めておいた指標で評価し、次回の会期・内容を調整）</li></ol>
+<p class="lede">参加人数は、1空間で完結する体験なら各回2〜10名程度、館内を巡る周遊型なら1日数十〜数百名を、受付枠と回数で設計します。</p>
+<p class="lede">期間の目安は、既存コンテンツの導入で2〜4週間、施設に合わせたオリジナル制作で最短1ヶ月・標準1〜3ヶ月です。季節催事（ハロウィン・クリスマスなど）は、2〜4ヶ月前の相談をおすすめします。</p>
+</div></section>
+<section class="section" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif">費用の目安と初期費用0円の形</h2>
+<p class="lede">体験型催事を株式会社ex Labsにご依頼いただく場合、既存コンテンツの導入で数十万円台〜、施設に合わせたオリジナル制作で100万円前後〜、フロア横断や街全体の周遊型で数百万円規模が目安です。区画使用料・什器・警備などの施設側の費用は別に見積もります。</p>
+<p class="lede">有料チケット型の体験型催事では、チケット収益から制作費を回収するレベニューシェア（初期費用0円）で実施できる場合があります。会期を2週間〜1ヶ月以上取れることが条件の1つです。仕組みは<a href="/guide/event-revenue-share/" style="color:var(--accent)">施設イベントのレベニューシェアとは</a>、費用の内訳は<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>をご覧ください。</p>
+</div></section>
+<section class="section tinted" id="cases"><div class="wrap narrow">
+<p class="eyebrow">CASES</p><h2 class="h2 serif">事例：商業施設・店舗での体験型催事</h2>
+<ul class="bullets"><li>渋谷サクラステージ「ウワサバナシ調査委員会」：東急不動産株式会社様・404 Not Found様・TSUTAYA様のご協力のもと、商業施設全体を周遊する都市伝説イマーシブ体験を企画・制作。施設一体型イベントとして日本経済新聞に掲載されました。</li><li>閉店後の紀伊國屋書店（博報堂様との取り組み）：営業時間外の書店を舞台にした一夜限りの物語体験を制作。営業時間外の店舗を「入れない時間の特別な場所」として活用した事例です。</li><li>自社主催「ヌル・アーデン展」：広告費0円（告知はXのみ）でチケット約1,000枚（4,000円）を販売した有料の体験型企画。集客の設計を自社公演で検証しています。</li></ul>
+<p class="lede">事例の詳細は<a href="/works/" style="color:var(--accent)">制作事例一覧</a>、商業施設向けの企画の考え方は<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベント企画</a>をご覧ください。</p>
+</div></section>
+<section class="section" id="kpi"><div class="wrap narrow">
+<p class="eyebrow">KPI</p><h2 class="h2 serif">効果の測り方</h2>
+<ul class="bullets"><li>販売：催事売上、客単価、出店者アンケート</li><li>集客：来館者数（催事期間と前後の比較）、新規客の割合</li><li>回遊：チェックポイントの通過数、立ち寄り店舗数、特典（クーポン）の利用数</li><li>話題化：SNS投稿数、メディア掲載</li></ul>
+<p class="lede">体験型催事では、受付・チェックポイント・特典を体験の中に組み込んでおくと、来館者の行動が自動的に記録されます。指標の決め方と計算例は<a href="/guide/event-kpi/" style="color:var(--accent)">体験型イベントの効果測定・KPI</a>にまとめています。</p>
+</div></section>
+
+<ZeroCostBanner />
+
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section tinted"><div class="wrap">
+<p class="lede">株式会社ex Labsは、謎解き・マダミス・イマーシブ・頭脳戦の4ジャンルを企画・制作する体験型イベントの制作会社です。対応範囲・参考価格・納期は<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>でご確認ください。</p>
+<div class="cta-mini">
+<p class="cta-mini-title serif">体験型催事の企画を相談する</p>
+<a class="btn" href="/?c=shisetsu#contact">体験型催事の企画を相談する（無料）</a>
+<p class="svc-cta-sub">予算・企画内容が未定の段階でもご相談いただけます。目的と場所を伺ったうえで、形式・費用・スケジュールをご提案します。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/saiji/" style="color:var(--accent)">催事とは</a>／<a href="/guide/popup-event/" style="color:var(--accent)">ポップアップイベントとは</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベント企画</a>／<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用</a>／<a href="/guide/event-revenue-share/" style="color:var(--accent)">施設イベントのレベニューシェアとは</a>／<a href="/guide/event-kpi/" style="color:var(--accent)">体験型イベントの効果測定・KPI</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.sub-h{margin:34px auto 6px;max-width:680px;font-size:19px;font-weight:800;color:var(--ink);line-height:1.6}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#definition,#purpose,#venue,#compare,#flow,#cost,#cases,#kpi,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.sub-h{font-size:17px}}
+</style>

@@ -59,3 +59,11 @@
 - 画像の利用条件（自社公演も公演ブランド・協力先との条件を確認するまで文字中心）
 - ESCAPE.ID Hub for Community（https://hub.escape.id/）：実装環境から到達できず、提供状況・利用条件・API 仕様は未確認。認証情報と許可範囲が確認できるまで接続しない（推測実装はしていない）
 - 公開後：Search Console で `/events/`・`/events/kaitou/`・`/events/uwasabanashi/`・`/events/about/` の URL 検査
+
+## 東京ガイド（/guide/immersive-tokyo/）との共通データ（2026-09-15〜）
+- 東京ガイドの比較表・公演カード・選び方の表は `src/data/events/works.ts`／`occurrences.ts`／`venues.ts` から生成する（/events/ と同じ正本）。ガイド側に日程・料金を手で書かない。
+- `Work.guideOnly: true`：東京ガイドの比較表にだけ載せ、/events/ の検索・作品詳細・サイトマップ・「今週遊べる」欄には出さない。他社公演で「開催期間・料金・条件は公式で確認できたが、回ごとの開催日・開演時刻まで確認できていない」場合に使う。回ごとに確認できたら `occurrences.ts` に入れて `guideOnly` を外す。
+- `Work.period`：回ごとの日付が無い場合に比較表へ出す開催期間（公式の案内文＋from/to）。`Work.confirmation`：公開前チェック（confirmed／unconfirmed の項目名）。
+- `Work.info.movement`（歩き方）／`seating`／`choice`／`puzzle`、`Venue.station`（最寄り駅）は「イマーシブシアター」「選び方」の表に使う。公式ページに記載が無ければ省略（表示は「公式ページで確認」）。
+- 他社公演の掲載候補（published: false）：`vivant-immersive-mission`、`intersection-tokyo`。実装環境から主催者公式サイト・PR TIMES・PassMarket へ到達できず、検索結果の抜粋しか無いため未公開。公開手順：公式ページを開いて `confirmation.unconfirmed` の各項目を確認 → 値を修正 → `sources.ts` の `checkedBy`／`terms` を更新 → `published: true`。
+- 計測：東京ガイドの掲載箇所は `guide-intro`／`guide-compare`／`guide-compare-own|3rd`／`guide-card-own|3rd`／`guide-card-…-events`／`guide-this-week`／`guide-footer`。/events/ への遷移は `show` イベントの `events-<掲載箇所>` で数える（購入完了は数えない）。

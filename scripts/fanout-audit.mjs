@@ -19,11 +19,11 @@ const FROZEN = new Set(['immersive','madamis','zunousen','shinrisen','shisetsu-k
 // 「読み方・英語」を必須にする用語解説ページ（〜とは 系）
 const TERM_PAGES = new Set(['immersive','madamis','zunousen','shinrisen','shisetsu-katsuyo','taikengata-event','shuyu-event','botsunyukan','saiji','yougo','sankagata-event','yukyu-kukaku','immersive-theater','madamis-nazotoki-chigai','magic-show-immersive-chigai']);
 // 費用・期間・人数の具体値が本来不要なページ（歴史・作品紹介・語彙・VR比較など）
-// madamis-tokyo は公演データから参加費（円）を表示するため 万円 判定を免除
-const NO_COST = new Set(['madamis-tokyo','madamis-rekishi','zunousen-sakuhin','immersive-vr','botsunyukan','saiji','yougo','case-uwasabanashi','madamis-asobikata','madamis-shoshinsha']);
+// madamis-tokyo・immersive-tokyo-solo／date は公演データから実際の料金（円）を表示するため 万円 判定を免除
+const NO_COST = new Set(['madamis-tokyo','immersive-tokyo-solo','immersive-tokyo-date','madamis-rekishi','zunousen-sakuhin','immersive-vr','botsunyukan','saiji','yougo','case-uwasabanashi','madamis-asobikata','madamis-shoshinsha']);
 // 本文編集を禁止している保護ページ（一覧・特集）は監査対象から除外
 const PROTECTED = new Set(['immersive-tokyo']);
-const NO_TERM = new Set(['madamis-rekishi','zunousen-sakuhin','immersive-vr','botsunyukan','saiji','yougo','madamis-asobikata','madamis-shoshinsha']);
+const NO_TERM = new Set(['immersive-tokyo-solo','immersive-tokyo-date','madamis-rekishi','zunousen-sakuhin','immersive-vr','botsunyukan','saiji','yougo','madamis-asobikata','madamis-shoshinsha']);
 
 const files = [
   ...fs.readdirSync('src/pages/guide').filter((f) => f.endsWith('.astro') && f !== 'index.astro').map((f) => ['guide/' + f.replace('.astro',''), path.join('src/pages/guide', f)]),

@@ -21,6 +21,38 @@ export interface GuideArticle {
 
 export const guideArticles: GuideArticle[] = [
   {
+    href: '/guide/immersive-tokyo-solo/',
+    title: '東京のイマーシブ体験に一人で参加するには？申込条件・相席・選び方',
+    desc: '「一人分で予約できる」と「一人だけで体験する」の違い、公演ごとの申込人数・成立人数・相席か貸切か・交流を公式情報で整理。予約前の確認点と選び方。',
+    date: '2026-09-18',
+    category: 'immersive',
+    thumb: '/assets/guide/immersive-tokyo-solo.webp',
+  },
+  {
+    href: '/guide/immersive-tokyo-date/',
+    title: '東京のイマーシブ体験を二人で楽しむには？貸切・料金・会話量で選ぶ',
+    desc: '二人分の総額と1人あたり料金、相席か貸切か、同じ組で行動できるか、交流・屋外移動・所要時間を公式情報で比較。予定の組み方と予約前チェック。',
+    date: '2026-09-18',
+    category: 'immersive',
+    thumb: '/assets/guide/immersive-tokyo-date.webp',
+  },
+  {
+    href: '/guide/saiji-kikaku/',
+    title: '催事の企画・やり方｜百貨店・商業施設で集客につながる体験型催事の進め方',
+    desc: '目的別の指標、催事場・区画の確認項目、出店型と体験型の比較、開催までの8ステップ、費用とレベニューシェア、事例、効果の測り方を整理。',
+    date: '2026-09-14',
+    category: 'shisetsu',
+    thumb: '/assets/guide/saiji-kikaku.webp',
+  },
+  {
+    href: '/guide/shanai-quiz/',
+    title: '社内イベントで盛り上がるクイズ・ゲーム企画｜人数別の選び方と進行のコツ',
+    desc: '盛り上がる3条件、人数別の形式選び、クイズ大会・チーム対抗・謎解き・マダミス・頭脳戦の比較、司会と進行のコツ、費用・準備期間、実績を整理。',
+    date: '2026-09-14',
+    category: 'nazotoki',
+    thumb: '/assets/guide/shanai-quiz.webp',
+  },
+  {
     href: '/guide/taiken-marketing/',
     title: '体験型マーケティングとは｜事例・効果・イベントでの進め方',
     desc: 'experiential marketing の意味、広告との違い、来場・行動・共有・売上の4段階での測り方、手法の選び方、事例と費用・期間の目安を整理。',

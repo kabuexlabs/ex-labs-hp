@@ -35,4 +35,7 @@ export const POST: APIRoute = async ({ request }) => {
   return new Response(null, { status: 204 });
 };
 
+// GET はブラウザや検索エンジンのクローラーが URL を直接開いた場合。計測はせず、本文なしの 204 を返す
+// （405 だと Search Console に「その他の4xx」として報告される）。インデックス対象外を明示する。
+export const GET: APIRoute = () => new Response(null, { status: 204, headers: { 'X-Robots-Tag': 'noindex, nofollow, noarchive', 'Cache-Control': 'no-store' } });
 export const ALL: APIRoute = () => new Response('Method Not Allowed', { status: 405 });

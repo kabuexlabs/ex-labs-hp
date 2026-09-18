@@ -21,6 +21,7 @@ const toc = [
   { id: 'promo', label: '販促・プロモーション・地域向けアイデア5選' },
   { id: 'genre', label: 'ジャンル別の向き不向き（謎解き・マダミス・イマーシブ・頭脳戦）' },
   { id: 'cost', label: '費用の目安と依頼の流れ' },
+  { id: 'quick', label: '予算・人数・期間別の早見表' },
   { id: 'faq', label: 'よくある質問' },
 ];
 
@@ -76,7 +77,7 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-09-05',
-  dateModified: '2026-09-12',
+  dateModified: '2026-09-15',
   mainEntityOfPage: new URL('/guide/taikengata-idea/', Astro.site).toString(),
 };
 ---
@@ -169,6 +170,14 @@ const articleLd = {
 <li><strong>依頼の流れ</strong>：ヒアリング（無料）→ 企画提案 → 制作・テストプレイ → 告知・集客 → 当日運営 → 振り返り。株式会社ex Labsは全工程を一貫して対応します。</li>
 </ul>
 <p class="vc-line"><a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベント制作会社の選び方 →</a>／<a href="/services/" style="color:var(--accent)">サービス一覧・制作のご相談（無料）→</a></p>
+<p class="lede">商業施設・店舗向けは<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>、社内向けは<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修サービス</a>で、対応範囲と参考価格を確認できます。</p>
+</div></section>
+
+<section class="section tinted" id="quick"><div class="wrap narrow">
+<p class="eyebrow">QUICK REFERENCE</p><h2 class="h2 serif">予算・人数・期間別の早見表</h2>
+<p class="lede">企画を絞り込むときは、予算帯・参加人数・準備期間の3つから向いている形式を決めると早く進みます。数値は株式会社ex Labsにご依頼いただく場合の目安です。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>予算帯</th><th>向いている形式</th><th>参加人数の目安</th><th>準備期間</th></tr></thead><tbody><tr><th scope="row">数十万円台〜</th><td>既存コンテンツの導入（貸切・出張公演）、テーブル謎解き、少人数の頭脳戦・マダミス</td><td>各回2〜10名／卓上6〜12人</td><td>2〜4週間</td></tr><tr><th scope="row">100万円前後〜</th><td>施設・店舗に合わせたオリジナルの謎解き・マダミス・1空間型イマーシブ</td><td>1日数十名〜、複数卓で数十〜数百名</td><td>最短1ヶ月・標準1〜3ヶ月</td></tr><tr><th scope="row">数百万円規模</th><td>施設全体・街全体を巡る周遊型イマーシブ、複数会場の大会形式</td><td>1日数十〜数百名（受付枠と回数で設計）</td><td>1〜3ヶ月以上</td></tr><tr><th scope="row">初期費用0円（条件付き）</th><td>有料チケット型のレベニューシェア（会期2週間〜1ヶ月以上）</td><td>受付枠による</td><td>1〜3ヶ月</td></tr></tbody></table></div>
+<p class="lede">企画書にまとめる手順は<a href="/guide/event-kikakusho/" style="color:var(--accent)">体験型イベントの企画書の作り方</a>、指標の決め方は<a href="/guide/event-kpi/" style="color:var(--accent)">効果測定・KPI</a>をご覧ください。</p>
 </div></section>
 
 <ZeroCostBanner />
@@ -190,7 +199,7 @@ const articleLd = {
 <p class="cta-mini-title serif">体験型イベントの企画・制作のご相談はこちら（無料）</p>
 <a class="btn" href="/services/">サービス一覧を見る</a>
 </div>
-<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベント制作会社の選び方</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベントアイデア10選</a>／<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア20選</a>／<a href="/guide/sankagata-event/" style="color:var(--accent)">参加型イベントとは</a>／<a href="/guide/taiken-marketing/" style="color:var(--accent)">体験型マーケティングとは</a>／<a href="/guide/event-kikakusho/" style="color:var(--accent)">体験型イベントの企画書の作り方</a></p>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベント制作会社の選び方</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベントアイデア10選</a>／<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア20選</a>／<a href="/guide/sankagata-event/" style="color:var(--accent)">参加型イベントとは</a>／<a href="/guide/taiken-marketing/" style="color:var(--accent)">体験型マーケティングとは</a>／<a href="/guide/event-kikakusho/" style="color:var(--accent)">体験型イベントの企画書の作り方</a>／<a href="/guide/shanai-quiz/" style="color:var(--accent)">社内イベントで盛り上がるクイズ・ゲーム企画</a></p>
 </div></section>
 
 <AuthorBox />

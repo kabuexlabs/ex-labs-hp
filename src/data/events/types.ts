@@ -53,6 +53,8 @@ export interface Venue {
   access?: string;
   /** 屋内・屋外（未確認なら省略） */
   setting?: 'indoor' | 'outdoor' | 'mixed';
+  /** 最寄り駅（公式ページに記載があるものだけ） */
+  station?: string;
   sourceIds: string[];
 }
 
@@ -135,7 +137,21 @@ export interface Work {
     language?: string;
     walking?: string;
     requirements?: string[];
+    /** 移動の仕方：free-roam＝自分で歩き回る、guided＝案内に沿って進む、seated＝座って観る時間が中心、mixed＝混在 */
+    movement?: 'free-roam' | 'guided' | 'seated' | 'mixed';
+    /** 座って観る時間の有無（公式の案内が確認できた場合） */
+    seating?: string;
+    /** 観客の選択が物語に影響する範囲（公式の案内） */
+    choice?: string;
+    /** 謎解き要素の比重（公式の案内） */
+    puzzle?: string;
   };
+  /** 公式に案内している開催期間（回ごとの日付が未確認でも期間だけ確認できた場合に使う） */
+  period?: { text: string; from?: string; to?: string };
+  /** 東京ガイドの比較にだけ載せ、/events/ の検索・作品詳細・サイトマップには出さない（他社公演で回ごとの開催日・時刻まで確認できていない場合） */
+  guideOnly?: boolean;
+  /** 公開前チェック：公式ページで確認できた項目と、未確認の項目 */
+  confirmation?: { confirmed: string[]; unconfirmed: string[] };
   /** 許諾済みの画像。無ければ文字中心で表示 */
   image?: AssetLicense;
   sourceIds: string[];

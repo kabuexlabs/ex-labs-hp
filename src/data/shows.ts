@@ -49,7 +49,7 @@ export interface Show {
 import { eventsData } from './events/index.ts';
 import { regionName, areaName } from './events/areas.ts';
 
-export const shows: Show[] = eventsData.works.map((w) => {
+export const shows: Show[] = eventsData.works.filter((w) => !w.guideOnly).map((w) => {
   const occ = eventsData.occurrences.filter((o) => o.workId === w.id && o.published && !o.test).sort((a, b) => (a.date + (a.startTime ?? '')).localeCompare(b.date + (b.startTime ?? '')));
   const venue = eventsData.venues.find((v) => v.id === (occ[0]?.venueId ?? w.venueId)) ?? eventsData.venues[0];
   const ch = occ[0]?.sales.channels[0];
