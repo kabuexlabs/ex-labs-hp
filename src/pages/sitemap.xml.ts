@@ -137,7 +137,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/immersive-tokyo-date/': '2026-09-18',
     '/guide/saiji-kikaku/': '2026-09-14',
     '/guide/shanai-quiz/': '2026-09-14',
-    '/events/': '2026-09-13',
+    '/events/': '2026-09-18',
     '/guide/immersive-taiken/': '2026-09-13',
     '/guide/immersive-theater/': '2026-09-15',
     '/guide/immersive-preparation/': '2026-09-13',

@@ -1,0 +1,127 @@
+---
+// 公演1本の「今週・来週の開催日カレンダー」カード。◯の日付をタップすると公式予約サイトへ。
+// 東京ガイド・一人参加・二人参加・体験デート・公演検索（/events/）で共通に使う。
+// 空席・残席は自社データに無いため、◯は「公式ページで確認できた開催日」を表し「予約可能」とは書かない。
+// データの正本は src/data/events/（shows.ts は変換層）。日付は日本時間。
+import type { Show } from '../data/shows';
+import { occurrenceState, weekRange, fmtDateShort, fmtDateJa, jstDateString, jstWeekday, addDays } from '../lib/thisWeek';
+
+export interface Props {
+  show: Show;
+  /** 計測の掲載箇所（data-place）。ボタンは `${place}-btn` */
+  place: string;
+  now?: Date;
+  /** 見出し下の1行（省略時は 所要時間｜人数｜料金） */
+  meta?: string;
+  /** 公演内容リンクを出さない */
+  noDetailLink?: boolean;
+}
+const { show: s, place, now = new Date(), meta, noDetailLink = false } = Astro.props;
+const today = jstDateString(now);
+const week = weekRange(now);
+const DAYS = ['日', '月', '火', '水', '木', '金', '土'];
+const days14 = Array.from({ length: 14 }, (_, i) => addDays(week.start, i));
+type CellState = 'open' | 'today' | 'started' | 'soldout' | 'ended' | 'cancelled' | 'none';
+const byDate = new Map(s.occurrences.map((o) => [o.date, o]));
+const cells = days14.map((d) => {
+  const o = byDate.get(d);
+  if (!o) return { date: d, state: 'none' as CellState, time: undefined as string | undefined };
+  const st = occurrenceState(o, now);
+  const state: CellState = st === 'upcoming' ? 'open' : st === 'today-time-unknown' ? 'today' : st === 'started' ? 'started' : st === 'soldout' ? 'soldout' : st === 'cancelled' ? 'cancelled' : 'ended';
+  return { date: d, state, time: o.time };
+});
+const openCount = cells.filter((c) => c.state === 'open' || c.state === 'today').length;
+const nextAfter = s.occurrences.map((o) => o.date).filter((d) => d >= week.end).sort()[0];
+const stale = now.getTime() - Date.parse(s.verifiedAt) > s.verifyTtlDays * 86400000;
+const MARK: Record<CellState, string> = { open: '◯', today: '◯', started: '済', soldout: '×', ended: '–', cancelled: '中止', none: '–' };
+const metaText = meta ?? `${s.duration}｜${s.capacity}｜${s.price.text}（${s.price.unit}）`;
+---
+<article class="cal-card" data-show={s.id}>
+  <div class="cal-head">
+    <p class="cal-area">{s.area}</p>
+    <h3 class="cal-name serif">{s.name}</h3>
+    <p class="cal-meta">{metaText}</p>
+  </div>
+  <div class="cal-weeks">
+    {[0, 1].map((wk) => (
+      <div class="cal-week">
+        <p class="cal-wk">{wk === 0 ? '今週' : '来週'}<span>{fmtDateShort(days14[wk * 7])}〜{fmtDateShort(days14[wk * 7 + 6])}</span></p>
+        <ol class="cal-row">
+        {cells.slice(wk * 7, wk * 7 + 7).map((c) => {
+          const wd = jstWeekday(c.date);
+          const clickable = c.state === 'open' || c.state === 'today';
+          const label = `${fmtDateShort(c.date)}（${DAYS[wd]}）${clickable ? ' 開催日・予約サイトで空席を確認' : c.state === 'soldout' ? ' 完売' : c.state === 'started' ? ' 開演済み' : c.state === 'cancelled' ? ' 中止' : c.state === 'ended' ? ' 終了' : ' 開催なし'}`;
+          return (
+            <li class={`cal-cell is-${c.state}${wd === 0 ? ' is-sun' : wd === 6 ? ' is-sat' : ''}${c.date === today ? ' is-now' : ''}`} data-date={c.date}>
+              {clickable ? (
+                <a href={s.ticketUrl} target="_blank" rel="noopener" aria-label={label} title={label} data-track="ticket" data-show={s.id} data-place={place}>
+                  <span class="cal-d">{c.date.slice(8).replace(/^0/, '')}<small>{DAYS[wd]}</small></span><span class="cal-m">{MARK[c.state]}</span>{c.time && <span class="cal-t">{c.time}</span>}
+                </a>
+              ) : (
+                <span aria-label={label} title={label}><span class="cal-d">{c.date.slice(8).replace(/^0/, '')}<small>{DAYS[wd]}</small></span><span class="cal-m">{MARK[c.state]}</span></span>
+              )}
+            </li>
+          );
+        })}
+        </ol>
+      </div>
+    ))}
+  </div>
+  <p class="cal-stock">{openCount > 0 ? `この2週間の開催日：${openCount}日。空席は予約サイトの表示が最新です` : nextAfter ? `この2週間は開催予定なし。次回 ${fmtDateJa(nextAfter)}` : 'この2週間は開催予定を確認できていません'}{stale ? '（開催情報の確認から2週間以上経過）' : ''}</p>
+  <div class="cal-actions">
+    <a class="btn cal-btn" href={s.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={s.id} data-place={`${place}-btn`}>{openCount > 0 ? `予約サイトで空席を見る（${s.ticketSite}）` : `次回以降の日程を見る（${s.ticketSite}）`}</a>
+    {!noDetailLink && <a class="cal-sub" href={s.url} data-track="show" data-show={s.id} data-place={place}>公演内容 →</a>}
+  </div>
+</article>
+
+<script>
+// 開いたまま日付が変わった場合：日本時間の今日より前のセルを「終了」にする（ページ内の全カレンダーに1回だけ適用）
+(function () {
+  try {
+    const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+    document.querySelectorAll<HTMLElement>('.cal-cell[data-date]').forEach((c) => {
+      const d = c.getAttribute('data-date') || '';
+      if (d < today && !c.classList.contains('is-ended') && !c.classList.contains('is-none')) {
+        c.className = c.className.replace(/is-(open|today|started|soldout)/, 'is-ended');
+        const a = c.querySelector('a');
+        if (a) { const sp = document.createElement('span'); sp.innerHTML = a.innerHTML; a.replaceWith(sp); }
+        const m = c.querySelector('.cal-m'); if (m) m.textContent = '–';
+      }
+    });
+  } catch (e) { /* noop */ }
+})();
+</script>
+
+<style>
+.cal-card{background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);padding:22px 20px 20px;display:flex;flex-direction:column;gap:12px;text-align:left}
+.cal-head{display:flex;flex-direction:column;gap:4px}
+.cal-area{margin:0;font-size:11.5px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.cal-name{margin:0;font-size:21px;font-weight:800;color:var(--ink);line-height:1.5}
+.cal-meta{margin:0;font-size:12.5px;line-height:1.7;color:rgba(51,48,43,.7)}
+.cal-weeks{display:flex;flex-direction:column;gap:10px}
+.cal-wk{margin:0 0 4px;font-size:12px;font-weight:800;letter-spacing:.06em;color:rgba(51,48,43,.6)}
+.cal-wk span{font-weight:500;margin-left:8px;letter-spacing:0}
+.cal-row{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-cell{border:1px solid rgba(51,48,43,.12);border-radius:8px;background:#fafafa;min-height:58px}
+.cal-cell>a,.cal-cell>span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:100%;min-height:58px;padding:6px 2px;text-decoration:none;color:rgba(51,48,43,.45)}
+.cal-d{font-size:13px;font-weight:800;line-height:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+.cal-d small{font-size:9.5px;font-weight:700;opacity:.8}
+.cal-m{font-size:15px;font-weight:800;line-height:1}
+.cal-t{font-size:9.5px;font-weight:700;line-height:1}
+.cal-cell.is-open,.cal-cell.is-today{background:#fff4ee;border-color:#f0a37f}
+.cal-cell.is-open>a,.cal-cell.is-today>a{color:var(--ink)}
+.cal-cell.is-open .cal-m,.cal-cell.is-today .cal-m{color:#d9480f;font-size:18px}
+.cal-cell.is-open>a:hover,.cal-cell.is-today>a:hover{background:#ffe6d9}
+.cal-cell.is-now{outline:2px solid var(--ink);outline-offset:-2px}
+.cal-cell.is-soldout{background:#f3f3f3}
+.cal-cell.is-soldout .cal-m,.cal-cell.is-started .cal-m{color:rgba(51,48,43,.55)}
+.cal-cell.is-ended{opacity:.45;background:repeating-linear-gradient(135deg,#fafafa 0 6px,#f1f1f1 6px 7px)}
+.cal-cell.is-none .cal-m{color:rgba(51,48,43,.3)}
+.cal-cell.is-sat .cal-d{color:#1a6fb5}.cal-cell.is-sun .cal-d{color:#c0392b}
+.cal-cell.is-open.is-sat .cal-d,.cal-cell.is-open.is-sun .cal-d,.cal-cell.is-today.is-sat .cal-d,.cal-cell.is-today.is-sun .cal-d{color:inherit}
+.cal-stock{margin:2px 0 0;font-size:12.5px;line-height:1.7;color:rgba(51,48,43,.72)}
+.cal-actions{margin-top:auto;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.cal-btn{font-size:14px;padding:14px 22px}
+.cal-sub{font-size:13.5px;font-weight:700;color:var(--accent)}
+@media(max-width:640px){.cal-card{padding:18px 14px 16px}.cal-cell,.cal-cell>a,.cal-cell>span{min-height:54px}.cal-name{font-size:19px}.cal-btn{width:100%;text-align:center}}
+</style>

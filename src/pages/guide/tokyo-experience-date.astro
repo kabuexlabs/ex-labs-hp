@@ -10,6 +10,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
+import ShowCalendar from '../../components/ShowCalendar.astro';
+import { shows } from '../../data/shows';
+import { jstDateString } from '../../lib/thisWeek';
 import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
 import { publishedItems, EXPERIENCE_DATE_PUBLISHED, GENRE_LABEL, type Genre } from '../../data/experienceDate';
 import { jsonLd } from '../../lib/microcms';
@@ -21,6 +24,8 @@ const draft = !EXPERIENCE_DATE_PUBLISHED;
 if (draft) Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
 
 const story = buildGuideRows(now).filter((r) => r.status !== 'ended');
+const today = jstDateString(now);
+const storyShows = shows.filter((s) => s.published && story.some((r) => r.w.id === s.id) && s.occurrences.some((o) => o.date >= today));
 const total2 = (r: (typeof story)[number]) => { const t = r.totalFor(2); return t === undefined ? '2名では申込不可' : fmtYen(t); };
 const SETTING: Record<string, string> = { indoor: '屋内で完結', outdoor: '屋外', mixed: '屋外の徒歩移動あり' };
 const byGenre = (g: Genre) => publishedItems.filter((i) => i.genre === g);
@@ -71,11 +76,11 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 <section class="section" style="padding-top:40px"><div class="wrap">
 <p class="eyebrow">EXPERIENCE DATE</p>
 <h1 class="h2 serif"><span class="nobr">東京でいつもと違うデートをするなら？</span><span class="nobr">二人で楽しむ非日常の体験</span></h1>
-<p class="lede">食事や映画の次に、二人で何かを体験してみたい。東京には、ものを作る体験、アートに包まれる体験、謎を解く体験、物語の登場人物として参加する体験があります。<strong>料金だけでなく、二人で話せる時間の長さや、他の参加者と一緒になるかどうかも比べて選ぶ</strong>と、当日の過ごし方のずれが減ります。このページでは、4つのジャンルの違いと、公式情報で条件を確認できた実例を、二人分の料金・所要時間・会話や協力の量・貸切条件で比較します。</p>
-<div class="key-points"><p class="key-points-h">この記事の要点</p><ul>
-<li>ジャンルで「二人で何をするか」「会話と協力の相手」が変わります。ものづくりと没入型アートは二人の会話が中心、謎解きと物語参加型は他の参加者やキャストと関わる場面があります。</li>
-<li>料金は「1人料金×2」と「1組料金」を区別し、焼成費・素材費・手数料などの追加条件を確認します。</li>
-<li>「二人で申し込める」と「二人だけで体験できる（貸切）」は別の条件です。</li>
+<p class="lede">食事や映画の次に、二人で何かを体験してみたい。東京には、ものを作る・アートに包まれる・謎を解く・物語に参加する体験があります。<strong>料金だけでなく、二人で話せる時間と、他の参加者と一緒になるかも比べて選びましょう。</strong></p>
+<div class="key-points"><p class="key-points-h">要点</p><ul>
+<li>ものづくりと展示型は二人の会話が中心。謎解きと物語参加型は他の参加者やキャストと関わる場面あり。</li>
+<li>料金は「1人料金×2」と「1組料金」を区別。焼成費・素材費・手数料は別の場合あり。</li>
+<li>「二人で申し込める」と「二人だけで体験できる（貸切）」は別の条件。</li>
 </ul></div>
 </div></section>
 
@@ -134,7 +139,8 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 
 <div class="genre-block">
   <h3 class="def-sub serif">{GENRE_LABEL.story}</h3>
-  <p class="lede">物語参加型（イマーシブ）は、キャストとの会話や選択で物語が進む体験です。以下は株式会社ex Labsが企画・制作した公演で、公式ページで申込条件と料金を確認しています（最終確認 {latestStoryText}）。</p>
+  <p class="lede">キャストとの会話や選択で物語が進む体験です。以下は株式会社ex Labsが企画・制作した公演（公式確認 {latestStoryText}）。◯の日付をタップすると予約サイトで空席を確認できます。</p>
+{storyShows.length > 0 && <div class="cal-grid">{storyShows.map((s) => <ShowCalendar show={s} place="xdate-cal" now={now} meta={(() => { const r = story.find((x) => x.w.id === s.id)!; return `2名で${total2(r)}｜${r.formatLabel}｜${r.w.duration.text}`; })()} />)}</div>}
   <div class="sc-grid">
   {story.map((r) => (
     <article class="sc-card" id={`item-${r.w.id}`}>
@@ -210,6 +216,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 .cmp-table th[scope=row]{min-width:140px;white-space:normal}
 .cmp-table td{min-width:180px;vertical-align:top}
 .cmp-note-p{max-width:920px;margin:14px auto 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
+.cal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:18px;margin:16px auto 22px}
 .sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:18px;margin:8px auto 0}
 .sc-card{background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);padding:22px 20px;display:flex;flex-direction:column;gap:12px;text-align:left;scroll-margin-top:88px}
 .tw-area{margin:0;font-size:11.5px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
