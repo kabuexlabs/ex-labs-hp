@@ -34,7 +34,7 @@ export function buildGuideRows(now: Date): GuideRow[] {
   return eventsData.works.filter((w) => w.published).map((w) => {
     const organizer = eventsData.organizers.find((o) => o.id === w.organizerId)!;
     const occ = eventsData.occurrences.filter((o) => o.workId === w.id && o.published && !o.test && o.eventStatus !== 'cancelled').sort((a, b) => a.date.localeCompare(b.date));
-    const venue = eventsData.venues.find((v) => v.id === occ[0]?.venueId);
+    const venue = eventsData.venues.find((v) => v.id === (occ[0]?.venueId ?? w.venueId));
     const dates = occ.map((o) => o.date);
     const futureDates = dates.filter((d) => d >= today);
     const from = dates[0] ?? w.period?.from;
@@ -53,7 +53,7 @@ export function buildGuideRows(now: Date): GuideRow[] {
       if (w.price.unit === 'charter') return w.price.amount;
       return pp * party;
     };
-    const perPersonText = w.price.unit === 'per-person' ? fmtYen(w.price.amount!) : w.price.unit === 'per-group' ? (w.price.tiers ?? []).map((t) => `${t.party}人 ${fmtYen(perPerson(w.price, t.party)!)}`).join('／') : `貸切 ${fmtYen(w.price.amount!)}`;
+    const perPersonText = w.price.unit === 'per-person' && w.price.amount !== undefined ? fmtYen(w.price.amount) : w.price.unit === 'per-group' ? (w.price.tiers ?? []).map((t) => `${t.party}人 ${fmtYen(perPerson(w.price, t.party)!)}`).join('／') : w.price.unit === 'charter' && w.price.amount !== undefined ? `貸切 ${fmtYen(w.price.amount)}` : '公式ページで確認';
     const datesText = dates.length ? (futureDates.length ? `${fmtDateShort(futureDates[0])}〜${fmtDateShort(futureDates[futureDates.length - 1])}（${futureDates.length}日）` : `${fmtDateShort(dates[0])}〜${fmtDateShort(dates[dates.length - 1])}（終了）`) : (w.period?.text ?? '公式ページで確認');
     const stale = now.getTime() - Date.parse(w.verified.at) > w.verifyTtlDays * 86400000;
     return {

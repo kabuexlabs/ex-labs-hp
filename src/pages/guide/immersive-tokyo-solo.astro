@@ -19,11 +19,13 @@ const soloBook = rows.filter((r) => r.w.party.soloAllowed);
 const soloRun = rows.filter((r) => r.w.party.soloRuns === true);
 const needsTwo = rows.filter((r) => !r.w.party.soloAllowed);
 const names = (xs: typeof rows) => xs.map((r) => r.w.title).join('、');
+const soloShared = rows.filter((r) => r.w.party.soloAllowed && r.w.party.format === 'shared');
+const soloOther = rows.filter((r) => r.w.party.soloAllowed && r.w.party.format !== 'shared');
 const latest = rows.map((r) => r.w.verified.at).sort().pop();
 const latestText = rows.find((r) => r.w.verified.at === latest)?.verifiedText ?? '';
 
 const faqs = [
-  { q: '一人分だけ予約すれば、一人で体験できますか？', a: `公演によります。${soloBook.length ? `${names(soloBook)}は1名から申し込めますが、他の参加者と同じ回で体験する相席形式です。` : '確認できた範囲で1名から申し込める公演はありません。'}${soloRun.length ? `${names(soloRun)}は1名だけで回が成立します。` : '1名だけで回が成立する（相席なし）公演は確認できていません。'}` },
+  { q: '一人分だけ予約すれば、一人で体験できますか？', a: `公演によります。${soloBook.length ? `${soloShared.length ? `${names(soloShared)}は1名から申し込めますが、他の参加者と同じ回で体験する相席形式です。` : ''}${soloOther.length ? `${names(soloOther)}も1名から申し込めます（相席か貸切かは公式ページで確認）。` : ''}` : '確認できた範囲で1名から申し込める公演はありません。'}${soloRun.length ? `${names(soloRun)}は1名だけで回が成立します。` : '1名だけで回が成立する（相席なし）公演は確認できていません。'}` },
   { q: '知らない人と組むのが不安です。会話は必要ですか？', a: rows.map((r) => `${r.w.title}：${r.w.info.participation ?? '体験中の交流は公式ページで確認'}`).join('。') + '。演技は求められませんが、会話や協力が進行の一部になる公演では、その場で反応する場面があります。' },
   { q: '遅刻や途中退出はできますか？', a: rows.map((r) => `${r.w.title}：${(r.w.info.requirements ?? []).filter((x) => /遅れ|入場/.test(x)).join('、') || '遅刻・途中入場の扱いは公式ページで確認'}`).join('。') + '。途中退出の扱いは各公式ページに記載がないため、予約前に主催者へ確認してください。' },
   { q: '服装や持ち物はどうすればいいですか？', a: '公演の形式ごとの服装・靴・持ち物は「イマーシブ体験の服装・持ち物」の記事にまとめています。スマートフォンとイヤホンを必須にしている公演があるので、そこだけは先に確認してください。' },
@@ -59,7 +61,7 @@ const soloRunText = (r: (typeof rows)[number]) => r.w.party.soloRuns === true ? 
 <p class="lede"><strong>「一人分で予約できる」ことと「一人だけで体験できる」ことは別です。</strong>1名で申し込めても、同じ回の他の参加者と一緒に体験する「相席」形式の公演があります。逆に、申込の下限が2名の公演は一人では予約できません。このページでは、東京で開催中の公演について、公式ページで確認できた申込人数・成立人数・相席か貸切か・体験中の交流を整理し、自分に合う参加形式を判断できるようにしています。</p>
 <div class="key-points"><p class="key-points-h">この記事の要点</p><ul>
 <li>確認する条件は3つ。①1名で申し込めるか、②1名だけで回が成立するか（相席か）、③体験中に会話や協力が必要か。</li>
-<li>{soloBook.length ? `${names(soloBook)}は1名から申し込めます（相席形式）。` : '確認できた範囲で1名から申し込める公演はありません。'}{needsTwo.length ? `${names(needsTwo)}は各回2名以上での申込です。` : ''}</li>
+<li>{soloBook.length ? `${soloShared.length ? `${names(soloShared)}は1名から申し込めます（相席形式）。` : ''}${soloOther.length ? `${names(soloOther)}も1名から申し込めます（相席か貸切かは公式ページで確認）。` : ''}` : '確認できた範囲で1名から申し込める公演はありません。'}{needsTwo.length ? `${names(needsTwo)}は各回2名以上での申込です。` : ''}</li>
 <li>「一人で申し込める」「一人だけで貸切」「会話が少ない」は別の条件です。どれを優先するかで選ぶ公演が変わります。</li>
 </ul></div>
 </div></section>

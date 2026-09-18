@@ -50,7 +50,7 @@ const MOVEMENT_LABEL: Record<string, string> = { 'free-roam': '自分で歩き�
 const SETTING_LABEL: Record<string, string> = { indoor: '屋内', outdoor: '屋外', mixed: '屋内＋屋外の移動あり' };
 const rows = eventsData.works.filter((w) => w.published).map((w) => {
   const occ = eventsData.occurrences.filter((o) => o.workId === w.id && o.published && !o.test && o.eventStatus !== 'cancelled').sort((a, b) => a.date.localeCompare(b.date));
-  const venue = eventsData.venues.find((v) => v.id === occ[0]?.venueId);
+  const venue = eventsData.venues.find((v) => v.id === (occ[0]?.venueId ?? w.venueId));
   const dates = occ.map((o) => o.date);
   const futureDates = dates.filter((d) => d >= today);
   const from = dates[0] ?? w.period?.from;
@@ -58,7 +58,7 @@ const rows = eventsData.works.filter((w) => w.published).map((w) => {
   const status: Status = !to ? 'unknown' : to < today ? 'ended' : from && from > today ? 'upcoming' : 'ongoing';
   const ticketUrl = occ.find((o) => o.date >= today)?.sales.channels[0]?.url ?? occ[0]?.sales.channels[0]?.url;
   const channel = eventsData.channels.find((c) => c.id === occ[0]?.sales.channels[0]?.channelId);
-  const perPersonText = w.price.unit === 'per-person' ? `${fmtYen(w.price.amount!)}` : w.price.unit === 'per-group' ? (w.price.tiers ?? []).map((t) => `${t.party}人 ${fmtYen(perPerson(w.price, t.party)!)}`).join('／') : `貸切 ${fmtYen(w.price.amount!)}`;
+  const perPersonText = w.price.unit === 'per-person' && w.price.amount !== undefined ? `${fmtYen(w.price.amount)}` : w.price.unit === 'per-group' ? (w.price.tiers ?? []).map((t) => `${t.party}人 ${fmtYen(perPerson(w.price, t.party)!)}`).join('／') : w.price.unit === 'charter' && w.price.amount !== undefined ? `貸切 ${fmtYen(w.price.amount)}` : '公式ページで確認';
   const stale = Date.now() - Date.parse(w.verified.at) > w.verifyTtlDays * 86400000;
   const datesText = dates.length ? (futureDates.length ? `${fmtDateShort(futureDates[0])}〜${fmtDateShort(futureDates[futureDates.length - 1])}（${futureDates.length}日）` : `${fmtDateShort(dates[0])}〜${fmtDateShort(dates[dates.length - 1])}`) : (w.period?.text ?? '公式ページで確認');
   return { w, venue, occ, dates, futureDates, from, to, status, ticketUrl, channel, perPersonText, stale, datesText };
@@ -79,7 +79,9 @@ const pick = {
   beginner: compareRows.filter((r) => r.w.info.beginner),
 };
 
-const soloAnswer = pick.soloBook.length ? `${names(pick.soloBook)}は1名から申し込めます（相席形式）。${compareRows.filter((r) => !r.w.party.soloAllowed).length ? `${names(compareRows.filter((r) => !r.w.party.soloAllowed))}は各回2名以上での申込です。` : ''}` : '確認できた範囲で1名から申し込める公演はありません。';
+const soloShared = pick.soloBook.filter((r) => r.w.party.format === 'shared');
+const soloOther = pick.soloBook.filter((r) => r.w.party.format !== 'shared');
+const soloAnswer = pick.soloBook.length ? `${soloShared.length ? `${names(soloShared)}は1名から申し込めます（相席形式）。` : ''}${soloOther.length ? `${names(soloOther)}も1名から申し込めます（相席か貸切かは公式ページで確認）。` : ''}${compareRows.filter((r) => !r.w.party.soloAllowed).length ? `${names(compareRows.filter((r) => !r.w.party.soloAllowed))}は各回2名以上での申込です。` : ''}` : '確認できた範囲で1名から申し込める公演はありません。';
 const pairAnswer = pick.pairPrivate.length ? `${names(pick.pairPrivate)}は申込単位で貸切のため、2名で申し込めば2名だけで体験できます。` : '2名だけで貸切にできる公演は確認できていません。';
 const durationAnswer = compareRows.map((r) => `${r.w.title}は${r.w.duration.text}`).join('、') + '。形式の目安は周遊型で60〜120分、公演型で1〜3時間です。';
 const faqs = [
