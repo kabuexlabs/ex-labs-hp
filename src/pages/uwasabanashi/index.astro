@@ -6,15 +6,18 @@ import SiteGuard from '../../components/SiteGuard.astro';
 // 使わず、このファイルだけで完結させている。
 
 // キャスト一覧。写真は /public/assets/uwasabanashi/cast-<id>.webp に配置。
-// 並び順は50音順（おおの→かなで→かわかみ→くぼた→しえら→すぎた→べっとう→ほしの→まゆり→みずしろ→わため）。
+// 並び順は50音順（おおの→かすや→かなで→かわかみ→くぼた→しえら→すぎた→てじま→にいの→べっとう→ほしの→まゆり→みずしろ→わため）。
 // キャストを追加・変更するときも必ず50音順を維持すること。
 const cast = [
   { id: 'ohno', name: '大野愛', x: 'madoka145', bio: '舞台やイマーシブシアターを中心に、俳優・ダンサーとして活動中。マーダーミステリーのGMとしての経験も重ね、エンターテイメントの現場で幅広く活躍している。' },
+  { id: 'kasuya', name: '糟谷紅里', x: 'akari__kasuya', bio: '文房具でいったい何が…！？新人調査員の皆様！渋谷サクラステージを歩いて真相の調査をお願いします！！『ウワサバナシ調査委員会』でお会いしましょう！' },
   { id: 'hanakanade', name: '花奏和音', x: 'waonnu', bio: '山形県出身。東北芸術工科大学デザイン工学部卒。18歳から地元劇団で芝居を学び、2020年より東京での活動を開始。小劇場やテーマパークを中心に、現在イマーシブシアター・体験型コンテンツに多く出演中。' },
   { id: 'kawakami', name: '川上雅人', x: 'masatooooo0801', bio: '東京を拠点に舞台、映像、イマーシブ、テーマパークと幅広く活動中。特技は人の顔と名前を覚えることと返信が早いこと。' },
   { id: 'kubota', name: '窪田莉緒', x: 'rio_kubota13', bio: '舞台を中心に活動する俳優。身体表現を活かした演技を強みとし、ジャンルを問わず幅広い作品に出演。作品の世界観を大切に、一つひとつの役と真摯に向き合っている。' },
   { id: 'shiera', name: 'しえら', x: 'shierrrrrrra', bio: 'ダンサー、アクターなどをメインに活動しています。たまに歌って踊ったりもします。' },
   { id: 'sugita', name: '杉田真帆', x: 'Maho__0407', bio: '舞台役者、フリーランスで都内で活動中' },
+  { id: 'tejima', name: '手島沙樹', x: 'Saki_ssssssssss', bio: '犯人を特定なんてドキドキしちゃいますね！新人調査員の皆様の活躍が見られる事をとても楽しみにしております。' },
+  { id: 'niino', name: '新野成彬', x: 'gnuseiren19', bio: '現実を改変できるノート！？そんなものがあったら一体どうなっちゃうんだ！！その結末は新人調査員の皆様次第！渋谷サクラステージでお待ちしております！！' },
   { id: 'betto', name: 'べっとうかつき', x: 'katuki_betto', bio: 'ホラーやイマーシブ作品を中心に活動。出演に加え、企画や制作も行う。体験型エンターテインメントならではの没入感に魅力を感じ、観客の記憶に残る体験を目指して日々取り組んでいます。' },
   { id: 'hoshino', name: '星乃圭吾', x: 'KeigoHoshino', bio: '俳優・声優・アイドル・司会・エンタメクリエイターなど様々な分野で活動中です！座右の銘は『期待に応えて 予想を裏切る』' },
   { id: 'mayuri', name: 'まゆり（楯真由子）', x: 'MayuliG_G6', bio: '出てくる度、物騒な事件を起こしがちなお姉さんです。今日はどんな風に君たちを可愛がろうかな。なんてね。' },
@@ -458,6 +461,9 @@ a:hover{color:#fff}
 .castcard:nth-child(9){transition-delay:.85s;animation-delay:-4.5s}
 .castcard:nth-child(10){transition-delay:.95s;animation-delay:-1.5s}
 .castcard:nth-child(11){transition-delay:1.05s;animation-delay:-3.5s}
+.castcard:nth-child(12){transition-delay:1.15s;animation-delay:-5.5s}
+.castcard:nth-child(13){transition-delay:1.25s;animation-delay:-1s}
+.castcard:nth-child(14){transition-delay:1.35s;animation-delay:-3s}
 .castimg{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;display:block;border:1px solid rgba(255,255,255,.08);filter:saturate(.9);transition:filter .3s ease}
 .castcard:hover .castimg{filter:saturate(1.05) brightness(1.06)}
 .castname{font-size:14px;letter-spacing:.06em;color:#fff;line-height:1.5}
