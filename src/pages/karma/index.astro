@@ -1,0 +1,588 @@
+---
+import SiteGuard from '../../components/SiteGuard.astro';
+// 体験型取調室 FACT ROOM 新作公演「臓腑、或いはカルマ」公式LP。
+// デザインハンドオフ（design_handoff_karma_lp / README.md）を Astro に移植したもの。
+// スマートフォン前提の1カラム構成。PC では中央 600px 幅で表示し、外側は暗色背景。
+// コーポレートサイトとはデザイン系統が別物なので BaseLayout は使わず、
+// /uwasabanashi/ と同じくこのファイルだけで完結させている。
+//
+// 未確定（ハンドオフの「要確認」）：販売開始日時・当日券・決済方法／問い合わせ先／
+// 役名表記（キャスト告知は「神崎真」、STORY は「新崎 真」）／NEWS 未掲載。
+
+const assets = '/assets/karma';
+const ticketUrl = 'https://escape.id/factroom-org/e-fact-karma/';
+const organizerUrl = 'https://escape.id/factroom-org/';
+const hashtagUrl = 'https://x.com/search?q=%23%E5%8F%96%E8%AA%BF%E5%AE%A4%E3%82%AB%E3%83%AB%E3%83%9E';
+const mapEmbed =
+  'https://maps.google.com/maps?q=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E5%8F%B8%E7%94%BA2-15-11&t=&z=16&ie=UTF8&iwloc=B&output=embed';
+const mapLink = 'https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E5%8D%83%E4%BB%A3%E7%94%B0%E5%8C%BA%E7%A5%9E%E7%94%B0%E5%8F%B8%E7%94%BA2-15-11';
+
+const dateShort = '10.10 — 11.8';
+const dateLabel = '2026.10.10（土）〜 11.8（日）';
+
+// キャスト（表示順はハンドオフ cast.json 準拠）。
+// 一覧写真は /public/assets/karma/cast/<id>.webp（450×600）、
+// モーダルの告知カードは /public/assets/karma/cast/card-<n>.webp（900×1272）。
+const cast = [
+  { id: 'ogawa', card: 1, name: '小川 直彦', role: '神崎真 役', tag: '容疑者', desc: '新興宗教団体のカリスマ教祖。', comment: '皆さまと同じ空間を共有できることを楽しみにしております。' },
+  { id: 'hayashi', card: 2, name: 'はやし ゆうへい', role: '神崎真 役', tag: '容疑者', desc: '新興宗教団体のカリスマ教祖。', comment: 'これまでの経験を生かし、今回の公演でも皆さまに心から楽しんでいただける物語体験をお届けできるよう、精いっぱい努めてまいります！よろしくお願いいたします！' },
+  { id: 'ando', card: 3, name: '安藤 紫緒', role: '神崎真 役', tag: '容疑者', desc: '新興宗教団体のカリスマ教祖。', comment: 'プレイヤーの皆さまと果たしてどんな物語が紡げるのか、とても楽しみで仕方がありません！' },
+  { id: 'tsukina', card: 4, name: '月那 珠梨', role: '神崎真 役', tag: '容疑者', desc: '新興宗教団体のカリスマ教祖。', comment: '皆さまとどんな舌戦ができるのか楽しみです。お待ちしております！' },
+  { id: 'manabe', card: 5, name: '真辺 彩加', role: '神崎真 役', tag: '容疑者', desc: '新興宗教団体のカリスマ教祖。', comment: '今回はこれまでに演じたことのないタイプのお役をいただき楽しみにしております。皆様、ぜひ濃厚な時間をともに過ごしましょう。' },
+  { id: 'kiritani', card: 6, name: '桐谷 紫月', role: '沖田ゆうき 役', tag: '特別捜査班', desc: 'あなたを導く、先輩刑事。', comment: 'この世界を一緒に楽しみましょうね。' },
+  { id: 'shiraha', card: 7, name: '白羽 リナ', role: '沖田ゆうき 役', tag: '特別捜査班', desc: 'あなたを導く、先輩刑事。', comment: '真実とは何なのか。その目で、言葉で確かめてください。捜査へのご協力お待ちしております。' },
+  { id: 'haruka', card: 8, name: '遥', role: '沖田ゆうき 役', tag: '特別捜査班', desc: 'あなたを導く、先輩刑事。', comment: '取調という普段では絶対にできないことを体験出来る…凄い！私自身もとても楽しみです！皆さんにお会い出来ることを楽しみにしております。' },
+  { id: 'sankai', card: 9, name: '山海 まなり', role: '沖田ゆうき 役', tag: '特別捜査班', desc: 'あなたを導く、先輩刑事。', comment: '先輩捜査官としてバッチリサポートします。一緒に捜査を頑張りましょう！みなさんがどんな結末へたどり着くのか、心から楽しみにしています。' },
+];
+
+const faqs = [
+  { q: '体験時間は？', a: '約50分です。' },
+  { q: '来場前の準備は？', a: '大きな荷物は駅周辺のロッカー等へ預け、開始前にお手洗いを済ませてください。' },
+  { q: '初めてでも参加できますか？', a: '初心者も参加できます。先輩刑事・沖田が案内します。' },
+  { q: '1人でも参加できますか？', a: '1〜6人で参加できます。1人でも参加できます。' },
+  { q: '写真や動画の撮影はできますか？', a: '明確な許可がない限り撮影・録音は禁止です。許可された場合も指定の時間・場所・内容に限ります。' },
+  { q: '怖い演出はありますか？', a: '猟奇殺人・遺体・臓器を扱う物語です。ホラー演出の有無は主催者ページをご確認ください。' },
+  { q: '年齢条件は？', a: '対象年齢は18歳以上。17歳以下は保護者同伴が必要です。' },
+  { q: '購入後にキャンセルや日時変更はできますか？', a: 'お客様都合のキャンセル・払い戻し・日時変更はできません。' },
+];
+
+const notes = [
+  { n: '01', h: '参加条件', items: ['対象年齢18歳以上。17歳以下は保護者同伴が必要です。', '日本語で進行します。', '飲酒で正常な判断・行動が難しいとスタッフが判断した場合は参加できません。', 'スタッフ・キャストの指示に従わない場合は途中退場となる場合があり、返金はありません。'] },
+  { n: '02', h: '受付・持ち物', items: ['受付時間に遅れると、演出・進行の都合で参加できません。', 'クローク・大型荷物の保管場所はありません。大きな荷物は駅周辺のロッカー等へ預け、身軽にご来場ください。', '貴重品は自己管理。紛失・盗難・破損について主催者・会場は免責となります。', '開始前にお手洗いをお済ませください。'] },
+  { n: '03', h: '撮影・SNS・禁止事項', items: ['ネタバレのネット・SNS公開は禁止です。', '明確な許可のない写真・動画撮影・録音は禁止。許可時も指定の時間・場所・内容に限ります。', '他の参加者が映った画像・動画の無断公開は禁止です。', 'キャスト・参加者への接触、暴言・威圧的行為、進行妨害は禁止です。', '備品・装飾には案内がある場合を除き触れないでください。'] },
+  { n: '04', h: '演出について', items: ['密室の取調室でキャストと対話する体験型サスペンスです。', '猟奇殺人・遺体・臓器を扱う物語です。', 'フィクション作品です。実在の人物・団体・事件とは無関係です。'] },
+];
+
+const title = '【公式】臓腑、或いはカルマ | 体験型取調室 FACT ROOM';
+const canonical = 'https://kabuexlabs.com/karma/';
+const ogImage = `https://kabuexlabs.com${assets}/og.jpg`;
+const description =
+  '体験型取調室 FACT ROOM 新作「臓腑、或いはカルマ」公式サイト。2026年10月10日〜11月8日、神田・ANATORにて開催。「その言葉は、予言か。殺意か。」';
+
+// 検索結果のリッチリザルト用イベント構造化データ
+const eventLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TheaterEvent',
+  name: '臓腑、或いはカルマ',
+  description,
+  url: canonical,
+  image: ogImage,
+  startDate: '2026-10-10',
+  endDate: '2026-11-08',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  eventStatus: 'https://schema.org/EventScheduled',
+  inLanguage: 'ja',
+  typicalAgeRange: '18-',
+  location: {
+    '@type': 'Place',
+    name: 'ANATOR',
+    url: 'https://kabuexlabs.com/anator/',
+    address: {
+      '@type': 'PostalAddress',
+      postalCode: '101-0048',
+      streetAddress: '神田司町2-15-11 HARVEY神田司町 4F',
+      addressLocality: '千代田区',
+      addressRegion: '東京都',
+      addressCountry: 'JP',
+    },
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '4500',
+    priceCurrency: 'JPY',
+    url: ticketUrl,
+    availability: 'https://schema.org/InStock',
+  },
+  organizer: {
+    '@type': 'Organization',
+    name: '体験型取調室 FACT ROOM',
+    url: organizerUrl,
+  },
+  performer: cast.map((c) => ({ '@type': 'Person', name: c.name })),
+};
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+};
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+<meta name="theme-color" content="#0d1213">
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:url" content={canonical}>
+<meta property="og:image" content={ogImage}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="臓腑、或いはカルマ｜体験型取調室 FACT ROOM">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json" set:html={JSON.stringify(eventLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Cormorant:wght@600;700&display=swap" rel="stylesheet">
+<SiteGuard />
+</head>
+<body>
+
+<div class="page">
+
+<header class="hdr">
+  <div class="hdr-row">
+    <a href="#kv" class="hdr-brand">
+      <span class="hdr-org">体験型取調室 FACT ROOM</span>
+      <span class="hdr-title">臓腑、或いはカルマ</span>
+    </a>
+    <span class="hdr-date">{dateShort}</span>
+  </div>
+  <nav class="karma-nav" aria-label="ページ内メニュー">
+    <a href="#story">STORY</a>
+    <a href="#about">ABOUT</a>
+    <a href="#cast">CAST</a>
+    <a href="#ticket">TICKET</a>
+    <a href="#notes">NOTES</a>
+    <a href="#access">ACCESS</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+</header>
+
+<main>
+
+<section class="kv" id="kv">
+  <img class="kv-img" src={`${assets}/kv.webp`} alt="臓腑、或いはカルマ キービジュアル" width="1200" height="1695" fetchpriority="high">
+  <div class="dateband">
+    <span class="db-year">2026</span>
+    <div class="db-row">
+      <span class="db-num">10/10</span><span class="db-dow">Sat.</span>
+      <span class="db-tilde">〜</span>
+      <span class="db-num">11/8</span><span class="db-dow">Sun.</span>
+    </div>
+    <p class="db-venue">神田・ANATOR にて開催</p>
+    <p class="db-spec">ルーム型／1〜6人／約50分／¥4,500</p>
+  </div>
+</section>
+
+<section class="lead">
+  <span class="lead-label">体験型取調室 FACT ROOM 新作</span>
+  <h1 class="lead-h1">「その言葉は、予言か。殺意か。」</h1>
+  <p class="lead-p">容疑者と向き合う密室の取調室。<br>あなた自身が刑事として問いを投げかけ、<br>会話を通じて事件の真相に迫ります。</p>
+  <p class="lead-p">今回対峙するのは、<br>とある新興宗教の教祖。</p>
+</section>
+
+<section class="sec sec-story" id="story">
+  <div class="sh"><h2 class="sh-en">STORY</h2><span class="sh-ja">ストーリー</span></div>
+  <div class="story">
+    <p>連続猟奇殺人事件で、<br>遺体から臓器が持ち去られる。</p>
+    <p>容疑者は、人々を魅了する<br>新興宗教団体の教祖・新崎 真。</p>
+    <p>事件前から被害者を名指ししていた彼は、<br>「悪のカルマ」が見える<span class="story-em">と語る。</span></p>
+    <p>参加者は特別捜査班の刑事となり、<br>取調室で教祖と対話し、事件の真相を探る。</p>
+  </div>
+  <p class="note">※フィクション作品です。実在の人物・団体・事件とは無関係です。</p>
+</section>
+
+<section class="sec sec-alt sec-about" id="about">
+  <div class="sh"><h2 class="sh-en">ABOUT</h2><span class="sh-ja">本作の楽しみ方</span></div>
+  <div class="about-cards">
+    <div class="ab-card">
+      <span class="ab-num">01</span>
+      <h3 class="ab-h">刑事として、<br>容疑者を取り調べる。</h3>
+      <p class="ab-p">密室で自ら質問し、会話から真相を探る体験です。</p>
+    </div>
+    <div class="ab-card">
+      <span class="ab-num">02</span>
+      <h3 class="ab-h">対話する相手は、<br>カリスマ教祖。</h3>
+      <p class="ab-p">目の前の演者の言葉を信じるか、疑うか。緊張感のある対話を体験します。</p>
+    </div>
+    <div class="ab-card">
+      <span class="ab-num">03</span>
+      <h3 class="ab-h">猟奇殺人と予言。<br>その関係を追う。</h3>
+      <p class="ab-p">猟奇殺人と教祖の予言の関係を追うサスペンスです。</p>
+    </div>
+  </div>
+  <div class="about-meta">
+    <div class="chips">
+      <span class="chip">ルーム型</span>
+      <span class="chip">1〜6人</span>
+      <span class="chip">約50分</span>
+      <span class="chip">日本語進行</span>
+    </div>
+    <p class="about-p">参加者は物語の登場人物となり、キャストとの会話や参加者同士の協力を行います。<br>初心者歓迎。先輩刑事・沖田が案内します。</p>
+  </div>
+</section>
+
+<section class="sec sec-cast" id="cast">
+  <div class="sh"><h2 class="sh-en">CAST</h2><span class="sh-ja">出演者</span></div>
+  <div class="castgrid">
+    {cast.map((c, i) => (
+      <button class="castcard" type="button" data-cast={i} aria-haspopup="dialog">
+        <img class="castimg" src={`${assets}/cast/${c.id}.webp`} alt={c.name} loading="lazy" width="450" height="600">
+        <span class="castmeta">
+          <span class="castrole">{c.role}</span>
+          <span class="castname">{c.name}</span>
+        </span>
+      </button>
+    ))}
+  </div>
+  <p class="note">※ 写真をタップすると出演者コメントをご覧いただけます</p>
+</section>
+
+<dialog class="castdlg" id="castdlg" aria-label="出演者コメント">
+<div class="dlgbody">
+  <button class="dlgclose" type="button" aria-label="閉じる">×</button>
+  <img class="dlgimg" id="dlgimg" src="" alt="" width="900" height="1272">
+  <div class="dlginfo">
+    <span class="dlgtag" id="dlgtag"></span>
+    <div class="dlgnames">
+      <span class="dlgrole" id="dlgrole"></span>
+      <h3 class="dlgname" id="dlgname"></h3>
+    </div>
+    <p class="dlgdesc" id="dlgdesc"></p>
+    <div class="dlgcomment">
+      <span class="dlgcomment-label">COMMENT</span>
+      <p class="dlgcomment-p" id="dlgcomment"></p>
+    </div>
+  </div>
+</div>
+</dialog>
+
+<section class="sec sec-ticket" id="ticket">
+  <div class="sh"><h2 class="sh-en">TICKET</h2><span class="sh-ja sh-ja-dark">チケット</span></div>
+  <div class="pricebox">
+    <span class="pricelabel">全日程共通</span>
+    <p class="priceval">¥4,500<span class="priceunit">／1枚</span></p>
+    <a class="buy" href={ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show="karma" data-place="ticket">チケット購入（ESCAPE.ID）</a>
+    <p class="pricenote">ESCAPE.IDの作品ページからご購入いただけます。</p>
+  </div>
+  <div class="tkt-table">
+    <div class="tkt-th">開催日</div><div class="tkt-td">{dateLabel}</div>
+    <div class="tkt-th">会場</div><div class="tkt-td">ANATOR<br><span class="tkt-addr">東京都千代田区神田司町2-15-11 4F</span></div>
+    <div class="tkt-th">参加人数</div><div class="tkt-td">1〜6人</div>
+    <div class="tkt-th">所要時間</div><div class="tkt-td">約50分</div>
+    <div class="tkt-th tkt-last">変更・取消</div><div class="tkt-td tkt-last tkt-cancel">購入後の自己都合によるキャンセル・払い戻し・日時変更は不可。チケットの規定人数より少なく来場しても参加できますが、人数減による返金は不可。</div>
+  </div>
+</section>
+
+<section class="sec sec-alt sec-team" id="team">
+  <div class="sh"><h2 class="sh-en">TEAM</h2><span class="sh-ja">制作チーム</span></div>
+  <div class="team-org">
+    <span class="team-label">主催</span>
+    <h3 class="team-name">体験型取調室 FACT ROOM</h3>
+    <a class="team-link" href={organizerUrl} target="_blank" rel="noopener">主催者ページ →</a>
+  </div>
+  <dl class="team-dl">
+    <dt>脚本・演出</dt><dd>久畑バク</dd>
+    <dt>制作進行</dt><dd>かふ</dd>
+    <dt>キービジュアル</dt><dd>荒牧まりの</dd>
+    <dt>企画・プロデュース</dt><dd>樋口玄馬(HIGE)</dd>
+    <dt>運営</dt><dd><a href="https://kabuexlabs.com/" target="_blank" rel="noopener">株式会社 exLabs</a></dd>
+  </dl>
+</section>
+
+<section class="sec sec-notes" id="notes">
+  <div class="sh"><h2 class="sh-en">NOTES</h2><span class="sh-ja">注意事項</span></div>
+  <p class="notes-sub">ご購入前に必ずご確認ください</p>
+  <div class="notes">
+    {notes.map((n) => (
+      <div class="note-card">
+        <h3 class="note-h"><span class="note-num">{n.n}</span>{n.h}</h3>
+        <ul>{n.items.map((t) => <li>{t}</li>)}</ul>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section class="sec sec-alt sec-access" id="access">
+  <div class="sh"><h2 class="sh-en">ACCESS</h2><span class="sh-ja">会場案内</span></div>
+  <div class="ac-info">
+    <h3 class="ac-name">ANATOR</h3>
+    <p class="ac-addr">〒101-0048<br>東京都千代田区神田司町2-15-11<br>HARVEY神田司町 4F</p>
+    <p class="ac-station">小川町駅から徒歩2分<br>淡路町駅から徒歩2分</p>
+  </div>
+  <iframe class="map" title="ANATOR 地図" src={mapEmbed} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  <div class="ac-btns">
+    <a class="btn-line" href={mapLink} target="_blank" rel="noopener">Google Map →</a>
+    <a class="btn-line" href="https://kabuexlabs.com/anator/" target="_blank" rel="noopener">会場ページ →</a>
+  </div>
+</section>
+
+<section class="sec sec-faq" id="faq">
+  <div class="sh"><h2 class="sh-en">FAQ</h2><span class="sh-ja">よくある質問</span></div>
+  <div class="faqlist">
+    {faqs.map(({ q, a }) => (
+      <div class="faq">
+        <span class="faq-q">Q</span>
+        <p class="faq-qp">{q}</p>
+        <span class="faq-a">A</span>
+        <p class="faq-ap">{a}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<section class="sec sec-alt sec-contact" id="contact">
+  <div class="sh"><h2 class="sh-en">CONTACT</h2><span class="sh-ja">お問い合わせ</span></div>
+  <a class="btn-line btn-contact" href={organizerUrl} target="_blank" rel="noopener">主催者ページへ →</a>
+  <footer class="ftr">
+    <div class="ftr-brand">
+      <span class="ftr-title">臓腑、或いはカルマ</span>
+      <span class="ftr-org">体験型取調室 FACT ROOM</span>
+      <a class="ftr-tag" href={hashtagUrl} target="_blank" rel="noopener">#取調室カルマ</a>
+    </div>
+    <div class="ftr-credits">
+      <span>主催：体験型取調室 FACT ROOM</span>
+      <span>脚本・演出：久畑バク／制作進行：かふ</span>
+      <span>キービジュアル：荒牧まりの</span>
+      <span>企画・プロデュース：樋口玄馬(HIGE)</span>
+      <span>会場：ANATOR／運営会社：<a class="ftr-link" href="https://kabuexlabs.com/" target="_blank" rel="noopener">株式会社 exLabs</a></span>
+    </div>
+    <div class="ftr-notes">
+      <span>※フィクション作品です。実在の人物・団体・事件とは無関係です。</span>
+      <span>© 株式会社 exLabs All Rights Reserved.<br>本サイトに掲載の文章・画像等の無断転載・複製を禁じます。</span>
+    </div>
+  </footer>
+</section>
+
+</main>
+</div>
+
+<div class="bottombar">
+  <div class="bottombar-in">
+    <a class="bb-cast" href="#cast">出演者を見る</a>
+    <a class="bb-buy" href={ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show="karma" data-place="bottom">チケット購入</a>
+  </div>
+</div>
+
+<style is:global>
+html{scroll-behavior:smooth}
+body{margin:0;background:#070a0b;color:#e9e3d8;font-family:'Zen Kaku Gothic New','Hiragino Sans',sans-serif;line-height:1.9;font-size:15px;letter-spacing:.03em;-webkit-font-smoothing:antialiased;overflow-x:clip}
+/* 粒状ノイズ（画面固定） */
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.10;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .9 0 0 0 0 .85 0 0 0 0 .8 0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+a{color:#e9e3d8;text-decoration:none}
+a:hover{color:#d33a33}
+p{margin:0}
+h1,h2,h3{margin:0;font-family:'Shippori Mincho B1','Hiragino Mincho ProN',serif;font-weight:700}
+ul{margin:0;padding-left:1.2em}
+li{margin:4px 0}
+img{max-width:100%}
+:where(a,button,summary):focus-visible{outline:2px solid #d33a33;outline-offset:3px}
+
+/* ページ枡（スマホ前提の1カラム。PCは中央600px） */
+.page{position:relative;z-index:1;max-width:600px;margin:0 auto;background:#0d1213;box-shadow:0 0 80px rgba(0,0,0,.7);padding-bottom:72px}
+
+/* ヘッダー（sticky） */
+.hdr{position:sticky;top:0;z-index:50;background:rgba(13,18,19,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(233,227,216,.12)}
+.hdr-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px}
+.hdr-brand{display:flex;flex-direction:column;line-height:1.2;gap:2px}
+.hdr-brand:hover{color:#e9e3d8}
+.hdr-org{font-family:'Zen Kaku Gothic New','Hiragino Sans',sans-serif;font-size:9px;letter-spacing:.12em;color:#8a928e;font-weight:500}
+.hdr-title{font-family:'Shippori Mincho B1','Hiragino Mincho ProN',serif;font-size:15px;font-weight:700;letter-spacing:.04em;color:#f3eee5}
+.hdr-date{font-family:'Cormorant',serif;font-size:14px;letter-spacing:.06em;color:#e9e3d8;font-weight:600}
+.karma-nav{display:flex;gap:0;padding:0 8px;overflow-x:auto;scrollbar-width:none;font-family:'Cormorant',serif;font-size:13px;font-weight:600;letter-spacing:.08em;border-top:1px solid rgba(233,227,216,.06)}
+.karma-nav::-webkit-scrollbar{display:none}
+.karma-nav a{flex:none;padding:8px 10px;color:#c9c3b8}
+.karma-nav a:hover{color:#d33a33}
+
+/* KV */
+@keyframes karma-fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.kv{animation:karma-fade .9s ease both}
+.kv-img{width:100%;height:auto;display:block}
+.dateband{background:#e9e3d8;color:#141a1b;padding:22px 20px 20px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.db-year{font-family:'Cormorant',serif;font-size:15px;letter-spacing:.3em;font-weight:700}
+.db-row{display:flex;align-items:baseline;justify-content:center;gap:6px;flex-wrap:wrap;font-family:'Cormorant','Shippori Mincho B1',serif;font-weight:700;line-height:1}
+.db-num{font-size:clamp(48px,14vw,72px);letter-spacing:-.02em}
+.db-dow{font-size:13px;letter-spacing:.1em;writing-mode:vertical-rl;align-self:center}
+.db-tilde{font-size:clamp(28px,8vw,40px);color:#b8201f;margin:0 4px}
+.db-venue{font-family:'Shippori Mincho B1','Hiragino Mincho ProN',serif;font-weight:700;font-size:15px;letter-spacing:.2em;margin-top:6px}
+.db-spec{font-size:11px;letter-spacing:.15em;color:#5a6260}
+
+/* Lead */
+.lead{padding:56px 24px 48px;text-align:center;display:flex;flex-direction:column;gap:22px;align-items:center;border-bottom:1px solid rgba(233,227,216,.08)}
+.lead-label{font-size:11px;letter-spacing:.3em;color:#b8201f;font-weight:700}
+.lead-h1{font-size:clamp(19px,5.2vw,28px);font-weight:800;line-height:1.5;letter-spacing:.04em;color:#f3eee5;white-space:nowrap}
+.lead-p{color:#c9c3b8;font-size:14px;line-height:2.1}
+
+/* セクション共通 */
+/* アンカー移動時に sticky ヘッダー（約96px）の下に見出しが隠れないようにする */
+.sec,.kv{scroll-margin-top:96px}
+.sec{padding:56px 20px 64px;display:flex;flex-direction:column;gap:28px;align-items:center}
+.sec-alt{background:#0a0e0f}
+.sec-story{padding:64px 24px;gap:36px}
+.sec-about,.sec-cast{gap:32px}
+.sec-ticket{background:#8c1716}
+.sec-contact{padding:56px 20px 40px;gap:40px}
+.note{font-size:11px;color:#9aa29e;text-align:center}
+/* 英字見出し＋日本語タグ（重なりは意図的） */
+.sh{position:relative;display:inline-block;padding:0 12px 10px 0}
+.sh-en{font-family:'Cormorant',serif;font-size:52px;font-weight:600;letter-spacing:.04em;color:#f3eee5;line-height:1}
+.sh-ja{position:absolute;right:-6px;bottom:0;background:#b8201f;color:#fff;font-size:11px;letter-spacing:.25em;padding:2px 10px;font-weight:700;line-height:1.9;white-space:nowrap}
+.sh-ja-dark{background:#0d1213;color:#f3eee5}
+
+/* STORY */
+.story{font-family:'Shippori Mincho B1','Hiragino Mincho ProN',serif;font-size:clamp(15px,4.2vw,18px);line-height:2.3;text-align:center;text-wrap:pretty;display:flex;flex-direction:column;gap:28px}
+.story-em{color:#d33a33}
+
+/* ABOUT */
+.about-cards{display:flex;flex-direction:column;gap:14px;width:100%}
+.ab-card{background:#e9e3d8;color:#141a1b;padding:28px 24px;display:flex;flex-direction:column;gap:10px}
+.ab-num{font-family:'Cormorant',serif;font-size:40px;font-weight:700;line-height:1;color:#b8201f}
+.ab-h{font-size:20px;line-height:1.5;letter-spacing:.06em;font-weight:800}
+.ab-p{font-size:14px;color:#3d4544;text-wrap:pretty}
+.about-meta{width:100%;display:flex;flex-direction:column;gap:14px;font-size:14px;color:#c9c3b8;padding-top:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{border:1px solid rgba(233,227,216,.3);padding:4px 12px;font-size:12px;letter-spacing:.1em}
+.about-p{text-align:center;text-wrap:pretty}
+
+/* CAST */
+.castgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 12px;width:100%}
+.castcard{display:flex;flex-direction:column;gap:8px;cursor:pointer;background:none;border:0;padding:0;margin:0;text-align:left;font-family:inherit;color:inherit;transition:opacity .2s ease}
+.castcard:hover{opacity:.8}
+.castimg{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;display:block;border:1px solid rgba(233,227,216,.15);filter:saturate(.85);box-sizing:border-box}
+.castmeta{display:flex;flex-direction:column;gap:0;line-height:1.5}
+.castrole{font-size:10px;letter-spacing:.1em;color:#b8201f}
+.castname{font-family:'Shippori Mincho B1','Hiragino Mincho ProN',serif;font-size:13px;letter-spacing:.04em;color:#f3eee5}
+
+/* キャストモーダル */
+.castdlg{background:#0d1213;color:#e9e3d8;border:1px solid rgba(233,227,216,.15);max-width:560px;width:calc(100% - 32px);box-sizing:border-box;padding:0;max-height:92svh;overflow:auto;position:fixed;margin:auto;font-family:'Zen Kaku Gothic New','Hiragino Sans',sans-serif;letter-spacing:.03em;line-height:1.9}
+.dlgbody{display:flex;flex-direction:column;gap:20px;padding:20px}
+.castdlg::backdrop{background:rgba(5,8,9,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.dlgclose{position:absolute;top:6px;right:10px;background:none;border:0;color:#c9c3b8;font-size:28px;cursor:pointer;line-height:1;z-index:2;text-shadow:0 0 6px #000;padding:0 2px}
+.dlgclose:hover{color:#d33a33}
+.dlgimg{width:100%;height:auto;display:block;border:1px solid rgba(233,227,216,.12);box-sizing:border-box}
+.dlginfo{display:flex;flex-direction:column;gap:10px}
+.dlgtag{font-size:11px;letter-spacing:.25em;color:#b8201f;font-weight:700}
+.dlgnames{display:flex;flex-direction:column;gap:2px}
+.dlgrole{font-size:12px;letter-spacing:.12em;color:#9aa29e}
+.dlgname{font-size:24px;letter-spacing:.08em;color:#f3eee5}
+.dlgdesc{font-family:'Shippori Mincho B1','Hiragino Mincho ProN',serif;font-size:14px;color:#c9c3b8}
+.dlgcomment{border-top:1px solid rgba(233,227,216,.12);padding-top:12px;display:flex;flex-direction:column;gap:4px}
+.dlgcomment-label{font-size:11px;letter-spacing:.2em;color:#9aa29e}
+.dlgcomment-p{font-size:14px;color:#e9e3d8;text-wrap:pretty}
+
+/* TICKET */
+.pricebox{background:#0d1213;width:100%;padding:32px 24px;display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;box-sizing:border-box}
+.pricelabel{font-size:12px;letter-spacing:.25em;color:#9aa29e}
+.priceval{font-family:'Cormorant','Shippori Mincho B1',serif;font-weight:700;font-size:clamp(48px,14vw,64px);line-height:1;color:#f3eee5}
+.priceunit{font-family:'Zen Kaku Gothic New','Hiragino Sans',sans-serif;font-size:13px;letter-spacing:.1em;margin-left:8px;color:#c9c3b8;font-weight:400}
+.buy{display:block;width:100%;box-sizing:border-box;background:#b8201f;color:#fff;font-weight:700;letter-spacing:.14em;padding:16px;text-align:center;margin-top:8px;transition:background .2s ease}
+.buy:hover{background:#d33a33;color:#fff}
+.pricenote{font-size:11px;color:#9aa29e}
+.tkt-table{width:100%;border:1px solid rgba(233,227,216,.35);font-size:14px;display:grid;grid-template-columns:100px 1fr;box-sizing:border-box}
+.tkt-th{padding:14px 14px;border-bottom:1px solid rgba(233,227,216,.35);border-right:1px solid rgba(233,227,216,.35);color:#f3eee5}
+.tkt-td{padding:14px 16px;border-bottom:1px solid rgba(233,227,216,.35)}
+.tkt-last{border-bottom:0}
+.tkt-addr{font-size:12px;color:#e9c9c8}
+.tkt-cancel{font-size:13px;text-wrap:pretty}
+
+/* TEAM */
+.team-org{display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
+.team-label{font-size:11px;letter-spacing:.2em;color:#9aa29e}
+.team-name{font-size:22px;letter-spacing:.1em;line-height:1.4}
+.team-link{font-size:12px;letter-spacing:.15em;color:#c9c3b8;border-bottom:1px solid rgba(201,195,184,.4)}
+.team-link:hover{color:#d33a33;border-color:#d33a33}
+.team-dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:10px 20px;font-size:14px;width:100%;border-top:1px solid rgba(233,227,216,.12);padding-top:24px}
+.team-dl dt{color:#9aa29e;letter-spacing:.12em;white-space:nowrap}
+.team-dl dd{margin:0}
+
+/* NOTES */
+.notes-sub{font-size:12px;color:#9aa29e;text-align:center}
+.notes{display:flex;flex-direction:column;gap:14px;width:100%;font-size:13px;color:#c9c3b8}
+.note-card{background:#0a0e0f;border:1px solid rgba(233,227,216,.1);padding:22px 20px;display:flex;flex-direction:column;gap:10px}
+.note-h{font-size:16px;letter-spacing:.1em;color:#f3eee5;display:flex;gap:10px;align-items:center}
+.note-num{font-family:'Cormorant',serif;color:#b8201f;font-size:22px;font-weight:700}
+
+/* ACCESS */
+.ac-info{display:flex;flex-direction:column;gap:14px;font-size:14px;text-align:center;align-items:center}
+.ac-name{font-size:26px;letter-spacing:.12em}
+.ac-addr{color:#c9c3b8}
+.ac-station{color:#e9e3d8}
+.map{width:100%;aspect-ratio:4/3;border:0;filter:grayscale(1) invert(.92) contrast(.9);display:block}
+.ac-btns{display:flex;gap:10px;width:100%}
+.btn-line{flex:1;text-align:center;border:1px solid rgba(233,227,216,.4);padding:12px;font-size:12px;letter-spacing:.12em;color:#e9e3d8;transition:color .2s ease,border-color .2s ease}
+.btn-line:hover{border-color:#d33a33;color:#d33a33}
+.btn-contact{flex:none;padding:14px 36px;font-size:13px;letter-spacing:.15em}
+
+/* FAQ */
+.faqlist{display:flex;flex-direction:column;border-top:1px solid rgba(233,227,216,.12);width:100%}
+.faq{display:grid;grid-template-columns:24px 1fr;gap:8px 12px;padding:18px 0;border-bottom:1px solid rgba(233,227,216,.12);font-size:14px}
+.faq-q,.faq-a{font-family:'Cormorant',serif;font-size:20px;font-weight:700;line-height:1.3}
+.faq-q{color:#b8201f}
+.faq-a{color:#9aa29e}
+.faq-qp{font-weight:700;color:#f3eee5;line-height:1.7}
+.faq-ap{color:#c9c3b8;text-wrap:pretty;font-size:13px}
+
+/* CONTACT / フッター */
+.ftr{display:flex;flex-direction:column;gap:20px;border-top:1px solid rgba(233,227,216,.12);padding-top:32px;font-size:12px;color:#9aa29e;width:100%;text-align:center;align-items:center}
+.ftr-brand{display:flex;flex-direction:column;gap:6px;align-items:center}
+.ftr-title{font-family:'Shippori Mincho B1','Hiragino Mincho ProN',serif;font-size:22px;color:#f3eee5;letter-spacing:.08em}
+.ftr-org{font-size:11px;letter-spacing:.2em}
+.ftr-tag{color:#d33a33;margin-top:6px}
+.ftr-tag:hover{color:#f3eee5}
+.ftr-credits{display:flex;flex-direction:column;gap:2px;line-height:1.8}
+.ftr-link{color:#c9c3b8}
+.ftr-notes{display:flex;flex-direction:column;gap:8px;line-height:1.8;font-size:11px}
+
+/* 下部固定バー（常時表示） */
+.bottombar{position:fixed;bottom:0;left:0;right:0;z-index:60;display:flex;justify-content:center;pointer-events:none}
+.bottombar-in{display:grid;grid-template-columns:1fr 1.3fr;width:100%;max-width:600px;pointer-events:auto;box-shadow:0 -10px 30px rgba(0,0,0,.5)}
+.bb-cast,.bb-buy{display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;padding:18px 12px;transition:background .2s ease}
+.bb-cast{background:#e9e3d8;color:#141a1b;font-size:13px;letter-spacing:.12em}
+.bb-cast:hover{background:#f3eee5;color:#141a1b}
+.bb-buy{background:#b8201f;color:#fff;font-size:14px;letter-spacing:.14em}
+.bb-buy:hover{background:#d33a33;color:#fff}
+
+@media (prefers-reduced-motion: reduce){
+html{scroll-behavior:auto}
+.kv{animation:none}
+}
+</style>
+
+<script is:inline define:vars={{ cast, assets }}>
+(function () {
+  var dlg = document.getElementById('castdlg');
+  if (!dlg || typeof dlg.showModal !== 'function') return;
+  var img = document.getElementById('dlgimg');
+  var tag = document.getElementById('dlgtag');
+  var role = document.getElementById('dlgrole');
+  var name = document.getElementById('dlgname');
+  var desc = document.getElementById('dlgdesc');
+  var comment = document.getElementById('dlgcomment');
+  document.querySelectorAll('.castcard').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var c = cast[Number(btn.dataset.cast)];
+      if (!c) return;
+      img.src = assets + '/cast/card-' + c.card + '.webp';
+      img.alt = c.name + ' キャスト告知カード';
+      tag.textContent = c.tag;
+      role.textContent = c.role;
+      name.textContent = c.name;
+      desc.textContent = c.desc;
+      comment.textContent = c.comment;
+      dlg.scrollTop = 0;
+      dlg.showModal();
+    });
+  });
+  dlg.querySelector('.dlgclose').addEventListener('click', function () { dlg.close(); });
+  // オーバーレイ（dialog 自身の外側）クリックで閉じる。パネル内のクリックは閉じない
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+})();
+</script>
+
+</body>
+</html>

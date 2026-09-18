@@ -737,3 +737,11 @@
 - 公開判断：実装環境から他社の公式サイト（陶芸教室Futaba、うづまこ陶芸教室、元祖食品サンプル屋、チームラボプラネッツ、東京ミステリーサーカス、asoview・RETRIP・spacemarket 等の比較記事）へ到達できず、検索結果の抜粋しか得られない。指示書の「公式で確認できた施設だけ掲載」「自社公演だけの一覧では検索意図を満たさない」に従い、候補5件を published: false で用意し、記事は下書き扱い（X-Robots-Tag noindex、Article/FAQ 構造化データなし、記事一覧・サイトマップ・東京ガイド／二人記事からのリンクは EXPERIENCE_DATE_PUBLISHED（公式確認済みが2ジャンル以上）で自動的に有効化）。URL 自体は表示でき、下書きの注意書きを冒頭に表示。
 - 競合の傾向（検索結果の抜粋のみ）：レッツエンジョイ東京・じゃらん・スペースマーケット・icci 代官山・RETRIP がスポット列挙型（15〜62件）。本記事は件数ではなく「二人で何をするか・会話と協力の相手・二人分の料金・貸切条件」で比較する構成にし、文章・構成は流用していない。
 - 公開手順（ユーザー側）：各候補の公式ページで confirmation.unconfirmed を確認 → experienceDate.ts の値を更新し checkedAt／checkedBy を実際の確認日に → published: true（2ジャンル以上）→ push。自動で noindex 解除・構造化データ・一覧・サイトマップ・内部リンクが有効になる。
+
+## 2026-09-18 公演LP「臓腑、或いはカルマ」（体験型取調室 FACT ROOM）を新設
+
+- 新規：/karma/（src/pages/karma/index.astro）。デザインハンドオフ（README.md・cast.json・faq.json・プロトタイプHTML）をピクセル準拠で Astro に移植。/uwasabanashi/ と同じく BaseLayout を使わない独立ページ（SiteGuard あり）。スマホ前提の1カラム、PC は中央 600px。キャスト9名のモーダル（dialog）、下部固定バー（出演者を見る／チケット購入）、TheaterEvent＋FAQPage 構造化データ。
+- 画像：public/assets/karma/（KV 1200px webp、キャスト 450×600 webp、告知カード 900px webp、OG 1200×630 jpg を KV から生成）。
+- 登録：sitemap（lastmod 9/18）・llms.txt。guide 記事ではないので guides.ts・llms-full は対象外。
+- 計測：チケット導線に data-track="ticket" data-show="karma"（data-place: ticket／bottom）。
+- 未確定（ハンドオフの要確認をそのまま保留）：販売開始日時・当日券・決済方法／問い合わせ先／役名表記（告知カード「神崎真」・STORY「新崎 真」）／NEWS。会社表記はハンドオフどおり「株式会社 exLabs」。/anator/ 等からの内部リンクは未設置（ユーザー判断待ち）。

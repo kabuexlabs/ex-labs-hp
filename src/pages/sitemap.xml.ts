@@ -117,6 +117,7 @@ const STATIC_PATHS = [
   '/game/lost-frame/',
   '/uwasabanashi/',
   '/anator/',
+  '/karma/',
   '/kaitou/',
   ...htPaths,
 ];
@@ -220,6 +221,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/services/murder-mystery/': '2026-09-08',
     '/services/zunousen/': '2026-09-08',
     '/services/shisetsu-event/': '2026-09-08',
+    '/karma/': '2026-09-18',
   };
   // 公演検索サービスの作品詳細（公開作品のみ。テストデータ・非公開は src/data/events/index が除外済み）。
   // 日付別・条件別のページは作らない（一覧 /events/ と作品詳細だけを検索対象にする）。
