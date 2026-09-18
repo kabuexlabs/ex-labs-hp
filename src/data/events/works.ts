@@ -14,6 +14,7 @@ export const works: Work[] = [
       '各回2〜4名での参加（1名での申込不可）。受付後に会場まで徒歩で移動する案内があり、スマートフォンとイヤホンを持参します。18歳以上、日本語で進行します。',
     ],
     officialUrl: '/kaitou/',
+    image: { path: '/assets/events/kaitou-kv.webp', holder: '株式会社ex Labs', terms: '自社制作のキービジュアル（/kaitou/ と同じ）', confirmedAt: '2026-09-18', confirmedBy: 'Claude（自社サイトで使用中の画像）' },
     // 所要時間は公式チケットページのみに記載。案内に60分／70分の不一致があり未確定
     duration: { text: '詳細はチケットページで確認' },
     price: {
@@ -70,6 +71,7 @@ export const works: Work[] = [
       'チケット1枚につき1名。複数人で参加する場合は代表者がまとめて購入します（同行者と一時的に離れる場面があります）。15歳以上。所要時間は約70分です。',
     ],
     officialUrl: '/uwasabanashi/',
+    image: { path: '/assets/uwasabanashi/story-venue.webp', holder: '株式会社ex Labs', terms: '自社公演ページ /uwasabanashi/ で使用中の会場写真', confirmedAt: '2026-09-18', confirmedBy: 'Claude（自社サイトで使用中の画像）' },
     duration: { minutes: 70, text: '約70分（自社公式の案内）' },
     price: {
       unit: 'per-person',
@@ -175,6 +177,7 @@ export const works: Work[] = [
       '脚本・演出：久畑バク／制作進行：かふ／キービジュアル：荒牧まりの／企画・プロデュース：樋口玄馬（HIGE）・株式会社ex Labs。主催：体験型取調室 FACTROOM。会場は東京・神田司町の ANATOR です。',
     ],
     officialUrl: 'https://escape.id/factroom-org/e-fact-karma/',
+    image: { path: '/assets/karma/og.jpg', holder: '体験型取調室 FACTROOM', terms: '公演LP制作のため提供されたキービジュアル（自社サイト /karma/ で使用中）', confirmedAt: '2026-09-18', confirmedBy: 'Claude（/karma/ のハンドオフ素材）' },
     ticketUrl: 'https://escape.id/factroom-org/e-fact-karma/',
     venueId: 'anator-kanda',
     duration: { minutes: 50, text: '約50分（公式チケットページの案内）' },

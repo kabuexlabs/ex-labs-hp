@@ -1,0 +1,39 @@
+---
+// 写真の上に見出しと短いキャッチだけを置く帯（東京ガイド・一人参加・二人参加・公演検索）。本文は置かない。
+export interface Props {
+  image: string;
+  imagePos?: string;
+  eyebrow: string;
+  catchText: string;
+  /** 帯の下に並べる短いチップ（データから作った事実だけ） */
+  chips?: string[];
+  alt?: string;
+}
+const { image, imagePos = 'center 30%', eyebrow, catchText, chips = [], alt = '' } = Astro.props;
+---
+<section class="vh"><div class="wrap">
+  <div class="vh-band">
+    <img class="vh-img" src={image} alt={alt} width="1440" height="720" loading="eager" decoding="async" fetchpriority="high" style={`object-position:${imagePos}`} />
+    <div class="vh-shade"></div>
+    <div class="vh-text">
+      <p class="vh-eyebrow">{eyebrow}</p>
+      <slot />
+      <p class="vh-catch">{catchText}</p>
+      {chips.length > 0 && <p class="vh-chips">{chips.map((c) => <span>{c}</span>)}</p>}
+    </div>
+  </div>
+</div></section>
+
+<style>
+.vh{padding:18px 0 0}
+.vh-band{position:relative;min-height:340px;border-radius:16px;overflow:hidden;background:#1d1d1f;display:flex;align-items:flex-end}
+.vh-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vh-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.35) 45%,rgba(0,0,0,.78) 100%)}
+.vh-text{position:relative;padding:32px 36px 30px;color:#fff;display:flex;flex-direction:column;gap:10px;max-width:760px}
+.vh-eyebrow{margin:0;font-family:var(--font-en);font-weight:700;font-size:13px;letter-spacing:.2em;text-transform:uppercase;opacity:.85}
+.vh-text :global(h1){margin:0;font-size:clamp(20px,2.4vw,28px);line-height:1.5;letter-spacing:.08em;font-weight:800;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.vh-catch{margin:0;font-size:clamp(22px,3.6vw,40px);font-weight:900;line-height:1.3;letter-spacing:.04em;text-shadow:0 2px 14px rgba(0,0,0,.55)}
+.vh-chips{margin:4px 0 0;display:flex;flex-wrap:wrap;gap:8px}
+.vh-chips span{font-size:12.5px;font-weight:800;background:#fff;color:var(--ink);border-radius:999px;padding:6px 12px}
+@media(max-width:640px){.vh{padding-top:10px}.vh-band{min-height:300px;border-radius:12px}.vh-text{padding:22px 18px 20px}.vh-text :global(h1){font-size:17px}.vh-catch{font-size:24px}}
+</style>

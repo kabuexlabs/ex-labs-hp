@@ -1,8 +1,7 @@
 ---
 // 「イマーシブ デート 東京」「イマーシブ体験 二人」「イマーシブ 二人 貸切」の受け皿。
-// 東京ガイド（/guide/immersive-tokyo/）の補助ページ。最初に「2名で申し込める公演の開催日カレンダー」を出し、
-// ◯の日付から予約サイトへ直行できるようにする。貸切か相席か・二人分の総額は表、説明は折りたたみに置く。
-// 条件は src/data/events/ から生成し、手書きしない。
+// 東京ガイド（/guide/immersive-tokyo/）の補助ページ。写真の帯 → 2名で申し込める公演の予約カード（◯をタップで予約サイトへ）
+// の順で、本文は折りたたみに置く。条件は src/data/events/ から生成し、手書きしない。
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -10,6 +9,7 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import ShowCalendar from '../../components/ShowCalendar.astro';
+import VisualHero from '../../components/VisualHero.astro';
 import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
 import { shows } from '../../data/shows';
 import { jsonLd } from '../../lib/microcms';
@@ -33,9 +33,18 @@ const togetherText = (r: (typeof rows)[number]) => r.w.party.format === 'private
 /** 2名で申し込めるかと料金が分かるかは別。人数条件外→「2名では申込不可」、料金単位未確認→「公式ページで確認」 */
 const canPair = (r: (typeof rows)[number]) => r.w.party.min <= 2 && (r.w.party.max === undefined || r.w.party.max >= 2);
 const total2 = (r: (typeof rows)[number]) => { if (!canPair(r)) return '2名では申込不可'; const t = r.totalFor(2); return t === undefined ? '公式ページで確認' : `${fmtYen(t)}`; };
-// カレンダー：2名で申し込める公演だけ。見出し下は「2名で総額（1人あたり）｜貸切・相席｜所要時間」
+// カード：2名で申し込める公演だけ。料金は「2名の総額」を大きく、「1人あたり」を補足に
 const pairCal = pair.map((r) => ({ r, s: shows.find((s) => s.id === r.w.id && s.published) })).filter((x): x is { r: (typeof rows)[number]; s: NonNullable<typeof x.s> } => !!x.s);
-const calMeta = (r: (typeof rows)[number]) => `${r.totalFor(2) !== undefined ? `2名で${total2(r)}（1人 ${fmtYen(r.perPersonFor(2)!)}）` : '2名分の料金は公式ページで確認'}｜${r.formatLabel}｜${r.w.duration.text}`;
+const priceMain = (r: (typeof rows)[number]) => r.totalFor(2) !== undefined ? total2(r) : '料金は公式で確認';
+const priceSub = (r: (typeof rows)[number]) => r.totalFor(2) !== undefined ? `2名の総額・1人 ${fmtYen(r.perPersonFor(2)!)}｜${r.formatLabel}` : r.formatLabel;
+// 帯のチップ（データから作った事実だけ）
+const knownTotals = pair.map((r) => r.totalFor(2)).filter((t): t is number => t !== undefined);
+const heroChips = [
+  ...(knownTotals.length ? [`2名 ${fmtYen(Math.min(...knownTotals))}〜`] : []),
+  ...(pairPrivate.length ? ['2名だけの貸切あり'] : []),
+  ...(actor.length ? ['キャストと会話'] : []),
+  ...(rows.some((r) => r.venue?.setting === 'indoor') ? ['屋内で完結する公演あり'] : []),
+];
 
 const faqs = [
   { q: '二人で申し込めば、二人だけで体験できますか？', a: `${pairPrivate.length ? `${names(pairPrivate)}は申込単位で貸切なので、2名で申し込めば2名だけで体験できます。` : '2名だけで貸切にできる公演は確認できていません。'}${pairShared.length ? `${names(pairShared)}は1名ずつのチケットで、同じ回の他の参加者と一緒に体験します。` : ''}` },
@@ -71,30 +80,26 @@ const articleLd = {
   { name: '二人で楽しむには' },
 ]} />
 
-<section class="section" style="padding-top:40px;padding-bottom:8px"><div class="wrap">
-<p class="eyebrow">FOR TWO</p>
-<h1 class="h2 serif"><span class="nobr">東京のイマーシブ体験を</span><span class="nobr">二人で楽しむには？</span><span class="nobr">貸切・料金・会話量で選ぶ</span></h1>
-<p class="lede"><strong>2名で申し込める公演の開催日</strong>です。◯の日付をタップすると予約サイトで空席を確認できます。二人分の総額と、貸切か相席かは各カードと下の表で。</p>
-<div class="key-points"><p class="key-points-h">要点</p><ul>
-<li>イマーシブ体験とは、客席から観るのではなく物語の当事者として空間の中で体験する没入型イベントのことです。</li>
-<li>{pairPrivate.length ? `${names(pairPrivate)}は申込単位で貸切（2名だけで体験）。` : '2名だけで貸切にできる公演は確認できていません。'}{pairShared.length ? `${names(pairShared)}は同じ回に入る相席。` : ''}</li>
-<li>総額は1組料金と1人料金で計算が違うので、カードと表に2名分の総額と1人あたりを両方載せています。</li>
-</ul></div>
-</div></section>
+<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 28%" eyebrow="FOR TWO" catchText="二人で行ける日が、ひと目でわかる" chips={heroChips} alt="六本木の会員制バーで開催するイマーシブ公演のキービジュアル">
+  <h1>東京のイマーシブ体験を二人で楽しむには？貸切・料金・会話量で選ぶ</h1>
+</VisualHero>
 
-<section class="section tinted" id="pair-cal"><div class="wrap">
-<p class="eyebrow">THIS WEEK</p><h2 class="h2 serif">2名で申し込める公演の開催日</h2>
-<p class="cal-legend"><span class="lg lg-open">◯</span> 開催日（タップで予約サイトへ）　<span class="lg lg-sold">×</span> 完売　<span class="lg lg-none">–</span> 開催なし　<span class="lg lg-ended">薄字</span> 終了</p>
+<section class="section cards" id="pair-cal"><div class="wrap">
+<h2 class="cards-h">2名で申し込める公演<span>◯の日付をタップで予約サイトへ</span></h2>
 {pairCal.length ? (
-  <div class="cal-grid">{pairCal.map(({ r, s }) => <ShowCalendar show={s} place="date-cal" now={now} meta={calMeta(r)} />)}</div>
+  <div class="cal-grid">{pairCal.map(({ r, s }) => <ShowCalendar show={s} place="date-cal" now={now} priceMain={priceMain(r)} priceSub={priceSub(r)} />)}</div>
 ) : (
-  <p class="lede">確認できた範囲で、2名で申し込める公演は現在ありません。開催中の公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京ガイドのカレンダー</a>をご覧ください。</p>
+  <p class="lede">確認できた範囲で、2名で申し込める公演は現在ありません。開催中の公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京ガイド</a>をご覧ください。</p>
 )}
-<p class="cmp-note-p">開催日は公式ページで確認した日付（最終確認 {latestText}）。空席は予約サイトの表示が最新です。総額は税込で、予約サイトの手数料は含みません。</p>
+<p class="cards-note">開催日は公式ページで確認した日付（最終確認 {latestText}）。総額は税込・手数料別。空席は予約サイトの表示が最新です。</p>
 </div></section>
 
-<section class="section" id="table"><div class="wrap">
-<p class="eyebrow">COMPARE</p><h2 class="h2 serif">二人で参加する条件を見比べる</h2>
+<section class="section tinted acc-wrap"><div class="wrap">
+<h2 class="cards-h">くわしく知りたい人は<span>タップで開きます</span></h2>
+
+<details class="acc" id="table">
+<summary><span class="acc-t">条件を表で見比べる</span><span class="acc-s">二人分の総額・貸切か相席か・同じ組で行動できるか・交流・屋外移動・所要時間</span></summary>
+<div class="acc-b">
 <div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>公演</th><th>二人分の総額</th><th>貸切・相席</th><th>同じ組で行動</th><th>交流</th><th>屋外移動</th><th>所要時間</th><th>予約</th></tr></thead><tbody>
 {rows.map((r) => (
   <tr>
@@ -109,14 +114,12 @@ const articleLd = {
   </tr>
 ))}
 </tbody></table></div>
-<p class="cmp-note-p">総額は公式の料金表から計算（1組料金は2名分、1人料金は2倍。手数料は予約サイトで確認）。{EXPERIENCE_DATE_PUBLISHED && <>イマーシブ以外の体験（ものづくり・展示・謎解き）も含めて比べるなら<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート</a>。</>}一人で参加する条件は<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)">一人で参加するには</a>へ。</p>
-</div></section>
-
-<section class="section tinted acc-wrap"><div class="wrap">
-<p class="eyebrow">MORE</p><h2 class="h2 serif">選び方・予定の組み方・予約前チェック・よくある質問</h2>
+<p class="cmp-note-p">総額は公式の料金表から計算（1組料金は2名分、1人料金は2倍。手数料は予約サイトで確認）。</p>
+</div>
+</details>
 
 <details class="acc" id="choose">
-<summary><span class="acc-t">二人の過ごし方で確認する条件が変わる</span><span class="acc-s">相談しながら進める／演者と交流／会話を抑える／雨の日</span></summary>
+<summary><span class="acc-t">二人の過ごし方で選ぶ</span><span class="acc-s">相談しながら進める／演者と交流／会話を抑える／雨の日</span></summary>
 <div class="acc-b">
 <ul class="bullets">
 <li><strong>二人で相談しながら進めたい</strong>：「同じ組で行動」を確認します。{pairPrivate.length ? `${names(pairPrivate)}は貸切で最後まで同じ組です。` : ''}{pairShared.length ? `${names(pairShared)}は同じ回に参加できますが、公式に「途中で一時的に離れる場面がある」と案内されています。` : ''}</li>
@@ -124,6 +127,7 @@ const articleLd = {
 <li><strong>会話の負担を抑えたい</strong>：会話が進行の一部になる公演は避け、証言や手がかりを集めて整理する型を選びます。{rows.filter((r) => r.w.info.actorInteraction !== true).length ? `${names(rows.filter((r) => r.w.info.actorInteraction !== true))}は「${rows.filter((r) => r.w.info.actorInteraction !== true).map((r) => r.w.info.participation).join('」「')}」と案内されています。` : ''}会話量を公式に明記した公演はないため、気になる場合は主催者に確認してください。</li>
 <li><strong>雨の日や歩きやすさが気になる</strong>：{outdoor.length ? `${names(outdoor)}は受付後に屋外の徒歩移動があります。` : ''}{rows.filter((r) => r.venue?.setting === 'indoor').length ? `${names(rows.filter((r) => r.venue?.setting === 'indoor'))}は商業施設内で完結します。` : ''}</li>
 </ul>
+{EXPERIENCE_DATE_PUBLISHED && <p class="vc-line">イマーシブ以外の体験（ものづくり・展示・謎解き）も含めて比べるなら<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート →</a></p>}
 </div>
 </details>
 
@@ -141,7 +145,7 @@ const articleLd = {
   </tr>
 ))}
 </tbody></table></div>
-<p class="cmp-note-p">公式ページに記載のある集合・受付の条件だけを載せています。会場が非公開の公演もあるため、周辺の店や前後の過ごし方は提案していません。所要時間が「チケットページで確認」の公演は前後の予定に余裕を持たせてください。</p>
+<p class="cmp-note-p">公式ページに記載のある集合・受付の条件だけを載せています。会場が非公開の公演もあるため、周辺の店や前後の過ごし方は提案していません。</p>
 </div>
 </details>
 
@@ -167,8 +171,18 @@ const articleLd = {
 </div>
 </details>
 
-<p class="cmp-note-p">紹介範囲：このページで扱っているのは、公式ページで申込条件と料金を確認できた公演です（現在は株式会社ex Labsが企画・制作した公演）。東京の全公演を網羅した比較や第三者によるランキングではありません。他社公演は、主催者の公式情報で条件を確認できたものから追加します。</p>
-<p class="vc-line" style="margin-top:24px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)">一人で参加するには</a>／<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物</a>／<a href="/guide/magic-show-immersive-chigai/" style="color:var(--accent)">マジックショーとイマーシブ体験の違い</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="date-cta">公演を探す</a></p>
+<details class="acc" id="about">
+<summary><span class="acc-t">このページについて</span><span class="acc-s">イマーシブ体験とは・要点・紹介範囲・関連ページ</span></summary>
+<div class="acc-b">
+<div class="key-points"><p class="key-points-h">要点</p><ul>
+<li>イマーシブ体験とは、客席から観るのではなく物語の当事者として空間の中で体験する没入型イベントのことです。</li>
+<li>{pairPrivate.length ? `${names(pairPrivate)}は申込単位で貸切（2名だけで体験）。` : '2名だけで貸切にできる公演は確認できていません。'}{pairShared.length ? `${names(pairShared)}は同じ回に入る相席。` : ''}</li>
+<li>総額は1組料金と1人料金で計算が違うので、カードと表に2名分の総額と1人あたりを両方載せています。</li>
+</ul></div>
+<p class="cmp-note-p">出典：各公演の公式ページ・公式チケットページ（最終確認 {latestText}）。紹介範囲：このページで扱っているのは、公式ページで申込条件と料金を確認できた公演です（現在は株式会社ex Labsが企画・制作した公演）。東京の全公演を網羅した比較や第三者によるランキングではありません。他社公演は、主催者の公式情報で条件を確認できたものから追加します。</p>
+<p class="vc-line" style="margin-top:16px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)">一人で参加するには</a>／<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物</a>／<a href="/guide/magic-show-immersive-chigai/" style="color:var(--accent)">マジックショーとイマーシブ体験の違い</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="date-cta">公演を探す</a></p>
+</div>
+</details>
 </div></section>
 
 <AuthorBox />
@@ -176,12 +190,14 @@ const articleLd = {
 </BaseLayout>
 
 <style>
+.section.cards{padding:36px 0 44px}
+.section.acc-wrap{padding:44px 0 60px}
 #pair-cal,#table{scroll-margin-top:88px}
-.cal-legend{max-width:920px;margin:14px auto 0;font-size:12.5px;line-height:2;color:rgba(51,48,43,.75);text-align:left}
-.lg{display:inline-block;min-width:22px;text-align:center;font-weight:800}
-.lg-open{color:#d9480f}.lg-sold{color:rgba(51,48,43,.5)}.lg-none{color:rgba(51,48,43,.4)}.lg-ended{color:rgba(51,48,43,.35)}
-.cal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:22px;max-width:1000px;margin:22px auto 0}
-.cmp-wrap{margin-top:22px}
+.cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:18px;margin:18px auto 0}
+.cards-note{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:rgba(29,29,31,.55);text-align:left}
+.cmp-wrap{margin-top:8px}
 .cmp-table th[scope=row]{min-width:150px;white-space:normal}
 .cmp-table td{min-width:130px;vertical-align:top}
 .cmp-title{display:block;font-weight:800;color:var(--ink)}
@@ -189,17 +205,17 @@ const articleLd = {
 .cmp-note{display:inline-block;font-size:11.5px;font-weight:500;color:rgba(51,48,43,.65);line-height:1.6;margin-top:2px}
 .cmp-note-p{max-width:920px;margin:14px auto 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
 .cmp-btn{display:inline-block;background:var(--accent);color:#fff !important;font-weight:800;font-size:12.5px;padding:8px 12px;border-radius:999px;text-decoration:none !important;white-space:nowrap;margin-bottom:6px}
-.acc{max-width:920px;margin:14px auto 0;background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);scroll-margin-top:88px}
-.acc summary{list-style:none;cursor:pointer;padding:18px 22px;display:flex;flex-direction:column;gap:3px;position:relative}
+.acc{margin:12px 0 0;background:#fff;border:var(--bd);border-radius:12px;box-shadow:var(--shadow-1);scroll-margin-top:88px}
+.acc summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;flex-direction:column;gap:3px;position:relative}
 .acc summary::-webkit-details-marker{display:none}
-.acc summary::after{content:'＋';position:absolute;right:20px;top:16px;font-size:20px;font-weight:800;color:var(--accent)}
+.acc summary::after{content:'＋';position:absolute;right:18px;top:14px;font-size:20px;font-weight:800;color:var(--accent)}
 .acc[open] summary::after{content:'−'}
-.acc-t{font-size:16.5px;font-weight:800;color:var(--ink);padding-right:32px}
-.acc-s{font-size:12.5px;color:rgba(51,48,43,.62)}
-.acc-b{padding:0 22px 22px;text-align:left}
+.acc-t{font-size:15.5px;font-weight:800;color:var(--ink);padding-right:32px}
+.acc-s{font-size:12px;color:rgba(51,48,43,.62)}
+.acc-b{padding:0 20px 20px;text-align:left}
 .acc-b .lede{text-align:left}
-.acc-b .cmp-wrap{margin-top:8px}
-.acc-b .bullets{margin-top:8px}
+.acc-b .bullets{margin-top:4px}
+.acc-b .key-points{margin-top:4px;max-width:none}
 ol.bullets{padding-left:1.4em}
-@media(max-width:640px){.acc summary{padding:16px 18px}.acc-b{padding:0 16px 18px}}
+@media(max-width:640px){.section.cards{padding:26px 0 34px}.section.acc-wrap{padding:34px 0 48px}.cards-h{font-size:18px}.acc summary{padding:14px 16px}.acc-b{padding:0 16px 16px}}
 </style>

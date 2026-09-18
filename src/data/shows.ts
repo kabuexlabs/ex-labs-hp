@@ -44,6 +44,10 @@ export interface Show {
   verifyTtlDays: number;
   /** 公開可否 */
   published: boolean;
+  /** カード用の料金表示：大きく出す金額と補足（1組料金は最少人数の金額を「〜」付きで） */
+  priceCard: { main: string; sub: string };
+  /** 許諾済みの画像（カード表示用）。無ければ文字だけのカードにする */
+  image?: { path: string; alt: string };
 }
 
 import { eventsData } from './events/index.ts';
@@ -77,5 +81,12 @@ export const shows: Show[] = eventsData.works.filter((w) => !w.guideOnly).map((w
     verifiedFrom: srcs.map((s) => `${s!.label}${s!.url ? ' ' + s!.url : ''}（${s!.terms}）`),
     verifyTtlDays: w.verifyTtlDays,
     published: w.published,
+    priceCard: (() => {
+      if (w.price.unit === 'per-person' && w.price.amount !== undefined) return { main: `¥${w.price.amount.toLocaleString('ja-JP')}`, sub: '1人・税込' };
+      if (w.price.unit === 'per-group' && w.price.tiers?.length) { const t = [...w.price.tiers].sort((a, b) => a.party - b.party)[0]; return { main: `¥${t.amount.toLocaleString('ja-JP')}〜`, sub: `1組（${t.party}人）・1人 ¥${Math.round(t.amount / t.party).toLocaleString('ja-JP')}〜` }; }
+      if (w.price.unit === 'charter' && w.price.amount !== undefined) return { main: `¥${w.price.amount.toLocaleString('ja-JP')}`, sub: '貸切・税込' };
+      return { main: '料金は公式で確認', sub: '' };
+    })(),
+    ...(w.image ? { image: { path: w.image.path, alt: `${w.title} キービジュアル` } } : {}),
   };
 });

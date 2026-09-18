@@ -1,8 +1,7 @@
 ---
 // 「イマーシブ 一人」「イマーシブ体験 東京 一人」「イマーシブシアター 一人参加」の受け皿。
-// 東京ガイド（/guide/immersive-tokyo/）の補助ページ。最初に「1名で申し込める公演の開催日カレンダー」を出し、
-// ◯の日付から予約サイトへ直行できるようにする。「一人で予約できる」と「一人だけで体験する」の区別などの
-// 説明は折りたたみに置く。公演の条件は src/data/events/（/events/ と共通）から生成し、手書きしない。
+// 東京ガイド（/guide/immersive-tokyo/）の補助ページ。写真の帯 → 1名で申し込める公演の予約カード（◯をタップで予約サイトへ）
+// の順で、本文は折りたたみに置く。公演の条件は src/data/events/（/events/ と共通）から生成し、手書きしない。
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -10,7 +9,8 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import ShowCalendar from '../../components/ShowCalendar.astro';
-import { buildGuideRows } from '../../lib/tokyoGuide';
+import VisualHero from '../../components/VisualHero.astro';
+import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
 import { shows } from '../../data/shows';
 import { jsonLd } from '../../lib/microcms';
 
@@ -26,9 +26,17 @@ const soloShared = rows.filter((r) => r.w.party.soloAllowed && r.w.party.format 
 const soloOther = rows.filter((r) => r.w.party.soloAllowed && r.w.party.format !== 'shared');
 const latest = rows.map((r) => r.w.verified.at).sort().pop();
 const latestText = rows.find((r) => r.w.verified.at === latest)?.verifiedText ?? '';
-// カレンダー：1名で申し込める公演だけ（Show 形式は shows.ts の変換層）
-const soloShows = soloBook.map((r) => shows.find((s) => s.id === r.w.id && s.published)).filter((s): s is NonNullable<typeof s> => !!s);
+// カード：1名で申し込める公演だけ（Show 形式は shows.ts の変換層）
+const soloCal = soloBook.map((r) => ({ r, s: shows.find((s) => s.id === r.w.id && s.published) })).filter((x): x is { r: (typeof rows)[number]; s: NonNullable<typeof x.s> } => !!x.s);
+const priceMain = (r: (typeof rows)[number]) => r.perPersonFor(1) !== undefined ? fmtYen(r.perPersonFor(1)!) : '料金は公式で確認';
+const priceSub = (r: (typeof rows)[number]) => `${r.perPersonFor(1) !== undefined ? '1人・税込' : ''}${r.perPersonFor(1) !== undefined && r.formatLabel ? '｜' : ''}${r.formatLabel}`;
 const soloRunText = (r: (typeof rows)[number]) => r.w.party.soloRuns === true ? '1名だけで成立' : r.w.party.soloRuns === false ? '相席（他の参加者と同じ回）' : r.w.party.soloAllowed ? '相席（公式に記載なし）' : '2名以上の申込が必要';
+const knownSolo = soloBook.map((r) => r.perPersonFor(1)).filter((t): t is number => t !== undefined);
+const heroChips = [
+  ...(knownSolo.length ? [`1人 ${fmtYen(Math.min(...knownSolo))}〜`] : []),
+  ...(soloBook.length ? [`1名から申込 ${soloBook.length}公演`] : []),
+  ...(rows.some((r) => r.w.info.beginner) ? ['初めてでも参加可'] : []),
+];
 
 const faqs = [
   { q: '一人分だけ予約すれば、一人で体験できますか？', a: `公演によります。${soloBook.length ? `${soloShared.length ? `${names(soloShared)}は1名から申し込めますが、他の参加者と同じ回で体験する相席形式です。` : ''}${soloOther.length ? `${names(soloOther)}も1名から申し込めます（相席か貸切かは公式ページで確認）。` : ''}` : '確認できた範囲で1名から申し込める公演はありません。'}${soloRun.length ? `${names(soloRun)}は1名だけで回が成立します。` : '1名だけで回が成立する（相席なし）公演は確認できていません。'}` },
@@ -64,30 +72,26 @@ const articleLd = {
   { name: '一人で参加するには' },
 ]} />
 
-<section class="section" style="padding-top:40px;padding-bottom:8px"><div class="wrap">
-<p class="eyebrow">SOLO</p>
-<h1 class="h2 serif"><span class="nobr">東京のイマーシブ体験に</span><span class="nobr">一人で参加するには？</span><span class="nobr">申込条件・相席・選び方</span></h1>
-<p class="lede"><strong>1名で申し込める公演の開催日</strong>です。◯の日付をタップすると予約サイトで空席を確認できます。「一人で予約できる」と「一人だけで体験する」は別なので、相席か貸切かは下の表で。</p>
-<div class="key-points"><p class="key-points-h">要点</p><ul>
-<li>イマーシブ体験とは、客席から観るのではなく物語の当事者として空間の中で体験する没入型イベントのことです。</li>
-<li>{soloBook.length ? `1名で申し込める公演：${names(soloBook)}${soloShared.length ? '（相席）' : ''}。` : '1名で申し込める公演は確認できていません。'}{needsTwo.length ? `${names(needsTwo)}は2名以上。` : ''}</li>
-<li>確認する条件は「1名で申し込めるか」「1名だけで成立するか（相席か）」「会話が必要か」の3つ。</li>
-</ul></div>
-</div></section>
+<VisualHero image="/assets/uwasabanashi/story-venue.webp" imagePos="center 40%" eyebrow="SOLO" catchText="一人で申し込める公演の、今週の開催日" chips={heroChips} alt="渋谷サクラステージの外観">
+  <h1>東京のイマーシブ体験に一人で参加するには？申込条件・相席・選び方</h1>
+</VisualHero>
 
-<section class="section tinted" id="solo-cal"><div class="wrap">
-<p class="eyebrow">THIS WEEK</p><h2 class="h2 serif">1名で申し込める公演の開催日</h2>
-<p class="cal-legend"><span class="lg lg-open">◯</span> 開催日（タップで予約サイトへ）　<span class="lg lg-sold">×</span> 完売　<span class="lg lg-none">–</span> 開催なし　<span class="lg lg-ended">薄字</span> 終了</p>
-{soloShows.length ? (
-  <div class="cal-grid">{soloShows.map((s) => <ShowCalendar show={s} place="solo-cal" now={now} meta={`${s.duration}｜${s.capacity}｜${s.price.text}（${s.price.unit}）`} />)}</div>
+<section class="section cards" id="solo-cal"><div class="wrap">
+<h2 class="cards-h">1名で申し込める公演<span>◯の日付をタップで予約サイトへ</span></h2>
+{soloCal.length ? (
+  <div class="cal-grid">{soloCal.map(({ r, s }) => <ShowCalendar show={s} place="solo-cal" now={now} priceMain={priceMain(r)} priceSub={priceSub(r)} />)}</div>
 ) : (
-  <p class="lede">確認できた範囲で、1名から申し込める公演は現在ありません。開催中の公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京ガイドのカレンダー</a>をご覧ください。</p>
+  <p class="lede">確認できた範囲で、1名から申し込める公演は現在ありません。開催中の公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京ガイド</a>をご覧ください。</p>
 )}
-<p class="cmp-note-p">開催日は公式ページで確認した日付（最終確認 {latestText}）。空席は予約サイトの表示が最新です。{needsTwo.length ? `${names(needsTwo)}は2名以上での申込のため、ここには載せていません。` : ''}</p>
+<p class="cards-note">開催日は公式ページで確認した日付（最終確認 {latestText}）。料金は税込・手数料別。空席は予約サイトの表示が最新です。{needsTwo.length ? `${names(needsTwo)}は2名以上での申込のため、ここには載せていません。` : ''}</p>
 </div></section>
 
-<section class="section" id="table"><div class="wrap">
-<p class="eyebrow">COMPARE</p><h2 class="h2 serif">一人参加の条件を見比べる</h2>
+<section class="section tinted acc-wrap"><div class="wrap">
+<h2 class="cards-h">くわしく知りたい人は<span>タップで開きます</span></h2>
+
+<details class="acc" id="table">
+<summary><span class="acc-t">条件を表で見比べる</span><span class="acc-s">1申込の人数・相席か貸切か・体験中の交流・所要時間・1人あたり料金</span></summary>
+<div class="acc-b">
 <div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>公演</th><th>1申込の人数</th><th>相席・貸切</th><th>体験中の交流</th><th>所要時間</th><th>1人あたり</th><th>予約</th></tr></thead><tbody>
 {rows.map((r) => (
   <tr>
@@ -102,10 +106,8 @@ const articleLd = {
 ))}
 </tbody></table></div>
 <p class="cmp-note-p">1組料金の公演は人数で割った1人あたりの金額（税込、手数料は予約サイトで確認）。二人で参加する条件は<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">二人で楽しむには</a>へ。</p>
-</div></section>
-
-<section class="section tinted acc-wrap"><div class="wrap">
-<p class="eyebrow">MORE</p><h2 class="h2 serif">一人参加の形式・予約前の確認・よくある質問</h2>
+</div>
+</details>
 
 <details class="acc" id="types">
 <summary><span class="acc-t">一人参加の3つの形式と選び方</span><span class="acc-s">相席で申し込む／一人で巡る／複数名が必要</span></summary>
@@ -114,7 +116,7 @@ const articleLd = {
 <li><strong>一人分で申し込み、他の参加者と同じ回で体験する（相席）</strong>：チケット1枚につき1名で販売され、同じ回に申し込んだ人たちと一緒に進みます。{soloBook.length ? `現在は${names(soloBook)}。` : '現在は確認できた公演がありません。'}</li>
 <li><strong>一人で巡る（相席なし）</strong>：1名だけで回が成立し、自分のペースで進めます。{soloRun.length ? `現在は${names(soloRun)}。` : '現在の東京の公演では公式に案内しているものを確認できていません（過去には下北沢の周遊型アート体験、1〜4名、終了）。'}</li>
 <li><strong>複数名の予約が必要</strong>：申込の下限が2名以上で、一人では申し込めません。{needsTwo.length ? `現在は${names(needsTwo)}（${needsTwo.map((r) => r.w.party.text).join('、')}）。` : ''}</li>
-<li><strong>会話や交流を少なくしたい</strong>：上の表の「体験中の交流」を確認します。{rows.filter((r) => r.w.info.actorInteraction === true).length ? `${names(rows.filter((r) => r.w.info.actorInteraction === true))}はキャストとの会話が進行の一部です。` : ''}演技は求められません。</li>
+<li><strong>会話や交流を少なくしたい</strong>：表の「体験中の交流」を確認します。{rows.filter((r) => r.w.info.actorInteraction === true).length ? `${names(rows.filter((r) => r.w.info.actorInteraction === true))}はキャストとの会話が進行の一部です。` : ''}演技は求められません。</li>
 </ul>
 </div>
 </details>
@@ -143,8 +145,18 @@ const articleLd = {
 </div>
 </details>
 
-<p class="cmp-note-p">紹介範囲：このページで扱っているのは、公式ページで申込条件を確認できた公演です（現在は株式会社ex Labsが企画・制作した公演）。東京の全公演を網羅した比較や第三者によるランキングではありません。他社公演は、主催者の公式情報で条件を確認できたものから追加します。</p>
-<p class="vc-line" style="margin-top:24px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">二人で楽しむには</a>／<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物</a>／<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="solo-cta">公演を探す</a></p>
+<details class="acc" id="about">
+<summary><span class="acc-t">このページについて</span><span class="acc-s">イマーシブ体験とは・要点・紹介範囲・関連ページ</span></summary>
+<div class="acc-b">
+<div class="key-points"><p class="key-points-h">要点</p><ul>
+<li>イマーシブ体験とは、客席から観るのではなく物語の当事者として空間の中で体験する没入型イベントのことです。</li>
+<li>{soloBook.length ? `1名で申し込める公演：${names(soloBook)}${soloShared.length ? '（相席）' : ''}。` : '1名で申し込める公演は確認できていません。'}{needsTwo.length ? `${names(needsTwo)}は2名以上。` : ''}</li>
+<li>確認する条件は「1名で申し込めるか」「1名だけで成立するか（相席か）」「会話が必要か」の3つ。</li>
+</ul></div>
+<p class="cmp-note-p">出典：各公演の公式ページ・公式チケットページ（最終確認 {latestText}）。紹介範囲：このページで扱っているのは、公式ページで申込条件を確認できた公演です（現在は株式会社ex Labsが企画・制作した公演）。東京の全公演を網羅した比較や第三者によるランキングではありません。他社公演は、主催者の公式情報で条件を確認できたものから追加します。</p>
+<p class="vc-line" style="margin-top:16px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">二人で楽しむには</a>／<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物</a>／<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="solo-cta">公演を探す</a></p>
+</div>
+</details>
 </div></section>
 
 <AuthorBox />
@@ -152,12 +164,14 @@ const articleLd = {
 </BaseLayout>
 
 <style>
+.section.cards{padding:36px 0 44px}
+.section.acc-wrap{padding:44px 0 60px}
 #solo-cal,#table{scroll-margin-top:88px}
-.cal-legend{max-width:920px;margin:14px auto 0;font-size:12.5px;line-height:2;color:rgba(51,48,43,.75);text-align:left}
-.lg{display:inline-block;min-width:22px;text-align:center;font-weight:800}
-.lg-open{color:#d9480f}.lg-sold{color:rgba(51,48,43,.5)}.lg-none{color:rgba(51,48,43,.4)}.lg-ended{color:rgba(51,48,43,.35)}
-.cal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:22px;max-width:1000px;margin:22px auto 0}
-.cmp-wrap{margin-top:22px}
+.cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:18px;margin:18px auto 0}
+.cards-note{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:rgba(29,29,31,.55);text-align:left}
+.cmp-wrap{margin-top:8px}
 .cmp-table th[scope=row]{min-width:150px;white-space:normal}
 .cmp-table td{min-width:130px;vertical-align:top}
 .cmp-title{display:block;font-weight:800;color:var(--ink)}
@@ -165,16 +179,16 @@ const articleLd = {
 .cmp-note{display:inline-block;font-size:11.5px;font-weight:500;color:rgba(51,48,43,.65);line-height:1.6;margin-top:2px}
 .cmp-note-p{max-width:920px;margin:14px auto 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
 .cmp-btn{display:inline-block;background:var(--accent);color:#fff !important;font-weight:800;font-size:12.5px;padding:8px 12px;border-radius:999px;text-decoration:none !important;white-space:nowrap;margin-bottom:6px}
-.acc{max-width:920px;margin:14px auto 0;background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);scroll-margin-top:88px}
-.acc summary{list-style:none;cursor:pointer;padding:18px 22px;display:flex;flex-direction:column;gap:3px;position:relative}
+.acc{margin:12px 0 0;background:#fff;border:var(--bd);border-radius:12px;box-shadow:var(--shadow-1);scroll-margin-top:88px}
+.acc summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;flex-direction:column;gap:3px;position:relative}
 .acc summary::-webkit-details-marker{display:none}
-.acc summary::after{content:'＋';position:absolute;right:20px;top:16px;font-size:20px;font-weight:800;color:var(--accent)}
+.acc summary::after{content:'＋';position:absolute;right:18px;top:14px;font-size:20px;font-weight:800;color:var(--accent)}
 .acc[open] summary::after{content:'−'}
-.acc-t{font-size:16.5px;font-weight:800;color:var(--ink);padding-right:32px}
-.acc-s{font-size:12.5px;color:rgba(51,48,43,.62)}
-.acc-b{padding:0 22px 22px;text-align:left}
+.acc-t{font-size:15.5px;font-weight:800;color:var(--ink);padding-right:32px}
+.acc-s{font-size:12px;color:rgba(51,48,43,.62)}
+.acc-b{padding:0 20px 20px;text-align:left}
 .acc-b .lede{text-align:left}
-.acc-b .cmp-wrap{margin-top:8px}
-.acc-b .bullets{margin-top:8px}
-@media(max-width:640px){.acc summary{padding:16px 18px}.acc-b{padding:0 16px 18px}}
+.acc-b .bullets{margin-top:4px}
+.acc-b .key-points{margin-top:4px;max-width:none}
+@media(max-width:640px){.section.cards{padding:26px 0 34px}.section.acc-wrap{padding:34px 0 48px}.cards-h{font-size:18px}.acc summary{padding:14px 16px}.acc-b{padding:0 16px 16px}}
 </style>

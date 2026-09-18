@@ -11,6 +11,7 @@ import EventCard from '../../components/EventCard.astro';
 import ListingCard from '../../components/ListingCard.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import ShowCalendar from '../../components/ShowCalendar.astro';
+import VisualHero from '../../components/VisualHero.astro';
 import { shows as calendarShows } from '../../data/shows';
 import LatestPosts from '../../components/LatestPosts.astro';
 import '../../styles/events.css';
@@ -88,19 +89,18 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 <script type="application/ld+json" set:html={jsonLd(pageLd)} />
 <Breadcrumb items={[{ name: 'ホーム', href: '/' }, { name: '今日できるイマーシブ（公演を探す）' }]} />
 
-<section class="section ev-hero" data-today={today}><div class="wrap">
-<p class="eyebrow">TODAY'S IMMERSIVE</p>
-<h1 class="h2 serif">今日できるイマーシブを探す<br class="sponly">｜東京の今日・明日・今週末の公演</h1>
-<p class="ev-lede"><strong>今日（{fmtDateJa(today)}）、東京で参加できるイマーシブ体験・マダミスは{todayRows.length}件</strong>を確認しています（日本時間で毎日更新）。遊びたい日と人数を選ぶと、参加できる公演回だけが並びます。掲載は株式会社ex Labs が公式情報で確認した公演で、予約と決済は各公演の公式販売ページで行います。</p>
+<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 60%" eyebrow="TODAY'S IMMERSIVE" catchText={`今日 ${todayRows.length}件・明日 ${tomorrowRows.length}件・今週末 ${weekendRows.length}件`} chips={[`今日 ${fmtDateJa(today)}`, '東京', '日本時間で毎日更新', '予約は各公式販売ページ']} alt="東京で開催中のイマーシブ公演のキービジュアル">
+  <h1 class="h2 serif">今日できるイマーシブを探す<br class="sponly">｜東京の今日・明日・今週末の公演</h1>
+</VisualHero>
 
-<div class="key-points">
-<p class="key-points-h">要点</p>
-<ul>
-<li>「今日できるイマーシブ」＝当日または直近の日程で参加できる没入型の公演・周遊イベント・マダミス。予約制が基本で、当日枠は公式販売ページの空席次第です。</li>
-<li>今日 {todayRows.length}件／明日 {tomorrowRows.length}件／今週末（{weekendLabel}）{weekendRows.length}件。開催・販売・空席の確認状況を分けて表示し、開催予定があるだけでは「予約可」と出しません。</li>
-<li>費用の目安は1人¥4,000（周遊型）〜1組¥13,000（少人数型・2人）。所要時間は周遊型60〜120分、公演型1〜3時間が一般的です。</li>
-</ul>
-</div>
+<section class="section cards" id="calendar"><div class="wrap">
+<h2 class="cards-h">今週・来週の開催日<span>◯の日付をタップで予約サイトへ</span></h2>
+<div class="ev-cal-grid">{calendarShows.filter((s) => s.published && s.occurrences.some((o) => o.date >= today)).map((s) => <ShowCalendar show={s} place="events-cal" now={now} />)}</div>
+<p class="ev-meta" style="margin-top:14px">◯は公式ページで確認できた開催日です。空席・残席は予約サイトの表示が最新で、開催日があるだけでは「予約可」とは表示していません。</p>
+</div></section>
+
+<section class="section ev-hero" data-today={today}><div class="wrap">
+<h2 class="cards-h">日付・人数で絞り込む<span>参加できる公演回だけが並びます</span></h2>
 
 <form class="ev-form" id="ev-form" method="get" action="/events/" aria-label="公演の検索条件">
   <fieldset>
@@ -156,12 +156,6 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 <h3 class="ev-sum-h">今週末（{weekend.map(fmtDateJa).join('・')}）</h3>
 {weekendRows.length > 0 ? <ul class="ev-sum">{weekendRows.map((r) => <li><strong>{fmtDateShort(r.row.date)} {label(r)}</strong>（{place(r)}）：{timeOf(r)}・{ctaOf(r)} <a href="/events/?when=weekend#results">今週末の公演回を見る →</a></li>)}</ul> : <p class="ev-sum-none">今週末の開催は確認できていません。</p>}
 <p class="ev-meta" style="margin-top:14px">開催情報の最終確認：{latestVerified ? fmtVerified(latestVerified) : '—'}。{anyStale && <strong>確認から2週間以上経過した公演があります。</strong>}販売・空席は各公演の公式ページが正で、表示は確認時点のものです。</p>
-</div></section>
-
-<section class="section" id="calendar"><div class="wrap">
-<h2 class="h2 serif">今週・来週の開催日をひと目で（◯をタップで予約サイトへ）</h2>
-<p class="ev-meta">◯は公式ページで確認できた開催日です。空席・残席は予約サイトの表示が最新で、開催日があるだけでは「予約可」とは表示していません。</p>
-<div class="ev-cal-grid">{calendarShows.filter((s) => s.published && s.occurrences.some((o) => o.date >= today)).map((s) => <ShowCalendar show={s} place="events-cal" now={now} />)}</div>
 </div></section>
 
 <section class="section ev-results" id="results" aria-live="polite"><div class="wrap">
@@ -235,6 +229,14 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 </div></section>
 
 <section class="section ev-about" id="about"><div class="wrap">
+<div class="key-points">
+<p class="key-points-h">要点</p>
+<ul>
+<li>「今日できるイマーシブ」＝当日または直近の日程で参加できる没入型の公演・周遊イベント・マダミス。予約制が基本で、当日枠は公式販売ページの空席次第です。</li>
+<li>今日 {todayRows.length}件／明日 {tomorrowRows.length}件／今週末（{weekendLabel}）{weekendRows.length}件。開催・販売・空席の確認状況を分けて表示し、開催予定があるだけでは「予約可」と出しません。</li>
+<li>費用の目安は1人¥4,000（周遊型）〜1組¥13,000（少人数型・2人）。所要時間は周遊型60〜120分、公演型1〜3時間が一般的です。</li>
+</ul>
+</div>
 <h2 class="h2 serif">このサービスについて</h2>
 <p>「公演を探す」は、株式会社ex Labs が運営する、マダミス・イマーシブ公演の発見と集客を支援する無料の公演情報サービスです。掲載料・予約手数料・利用料はいただいておらず、予約と決済は各公演の公式販売ページで行います。検索結果は利用者の条件への適合と開催日時の順に並び、ex Labs の公演には「ex Labs 企画・制作」と表示しています。将来、広告枠を設ける場合は「広告」「PR」と明示します。</p>
 <p>掲載内容の修正・掲載停止のご依頼、公演の掲載のご相談（無料）は <a href={`mailto:${EVENTS_CONTACT}`}>{EVENTS_CONTACT}</a> または<a href="/?c=events#contact">お問い合わせフォーム</a>へ。詳細は<a href="/events/about/">サービスについて（掲載基準・運営者・修正依頼）</a>。</p>

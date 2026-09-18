@@ -11,6 +11,7 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import ShowCalendar from '../../components/ShowCalendar.astro';
+import VisualHero from '../../components/VisualHero.astro';
 import { shows } from '../../data/shows';
 import { eventsData } from '../../data/events/index';
 import { areaName, regionName, genreName } from '../../data/events/areas';
@@ -44,6 +45,8 @@ const calShows = shows.filter((s) => s.published).map((s) => {
 });
 const latestVerified = shows.filter((s) => s.published).map((s) => s.verifiedAt).sort().pop() ?? '';
 const anyStale = calShows.some((c) => c.stale);
+const ppKnown = eventsData.works.filter((w) => w.published && !w.guideOnly).map((w) => perPerson(w.price, w.party.min)).filter((v): v is number => v !== undefined);
+const heroChips = [`開催中 ${calShows.length}公演`, ...(ppKnown.length ? [`1人 ${fmtYen(Math.min(...ppKnown))}〜`] : []), '◯をタップで予約サイトへ'];
 const MARK: Record<CellState, string> = { open: '◯', today: '◯', started: '済', soldout: '×', ended: '–', cancelled: '中止', none: '–' };
 
 // ---- 比較表・公演カード用 ----
@@ -130,15 +133,12 @@ const articleLd = {
   { name: '東京のイマーシブ体験' },
 ]} />
 
-<section class="section" style="padding-top:40px;padding-bottom:8px"><div class="wrap">
-<p class="eyebrow">IMMERSIVE TOKYO GUIDE</p>
-<h1 class="h2 serif"><span class="nobr">東京で体験できる</span><span class="nobr">イマーシブイベント</span><span class="nobr">【2026年最新】</span></h1>
-<p class="lede">東京のイマーシブ体験（没入型イベント）の<strong>開催日を見て、そのまま予約サイトへ</strong>。◯の日付をタップすると空席を確認できます。形式の違いや選び方は下の折りたたみへ。</p>
-</div></section>
+<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 60%" eyebrow="IMMERSIVE TOKYO GUIDE" catchText="今週、東京で行けるイマーシブ" chips={heroChips} alt="東京で開催中のイマーシブ公演のキービジュアル">
+  <h1 class="h2 serif"><span class="nobr">東京で体験できる</span><span class="nobr">イマーシブイベント</span><span class="nobr">【2026年最新】</span></h1>
+</VisualHero>
 
-<section class="section tinted" id="this-week" data-week-end={week.end} data-today={today}><div class="wrap">
-<p class="eyebrow">THIS WEEK</p><h2 class="h2 serif">今週・来週の開催日と予約</h2>
-<p class="cal-legend"><span class="lg lg-open">◯</span> 開催日（タップで予約サイトへ）　<span class="lg lg-sold">×</span> 完売　<span class="lg lg-none">–</span> 開催なし　<span class="lg lg-ended">薄字</span> 終了</p>
+<section class="section cards" id="this-week" data-week-end={week.end} data-today={today}><div class="wrap">
+<h2 class="cards-h">今週・来週の開催日<span>◯の日付をタップで予約サイトへ</span></h2>
 <div class="cal-grid">
 {calShows.map(({ s }) => <ShowCalendar show={s} place="guide-cal" now={now} />)}
 </div>
@@ -156,8 +156,13 @@ const articleLd = {
 </script>
 </div></section>
 
-<section class="section" id="compare"><div class="wrap">
-<p class="eyebrow">COMPARE</p><h2 class="h2 serif">開催中の公演を比較する</h2>
+
+<section class="section tinted acc-wrap"><div class="wrap">
+<h2 class="cards-h">くわしく知りたい人は<span>タップで開きます</span></h2>
+
+<details class="acc" id="compare">
+<summary><span class="acc-t">開催中の公演を表で比較する</span><span class="acc-s">形式・エリア・開催日・人数・料金・所要時間</span></summary>
+<div class="acc-b">
 <div class="cmp-wrap"><table class="cmp-table cmp-shows"><thead><tr><th>作品・会場</th><th>形式</th><th>エリア・最寄り駅</th><th>開催日</th><th>人数・形式</th><th>料金（1人あたり）</th><th>所要時間</th><th>予約</th></tr></thead><tbody>
 {compareRows.map((r) => (
   <tr>
@@ -173,10 +178,8 @@ const articleLd = {
 ))}
 </tbody></table></div>
 <p class="cmp-note-p">1組料金の公演は人数で割った1人あたりの金額を併記。開催日は公式ページに掲載された日付で、日本時間です。</p>
-</div></section>
-
-<section class="section tinted acc-wrap"><div class="wrap">
-<p class="eyebrow">MORE</p><h2 class="h2 serif">選び方・公演の詳細・よくある質問</h2>
+</div>
+</details>
 
 <details class="acc" id="choose">
 <summary><span class="acc-t">人数・好み・参加形式で選ぶ</span><span class="acc-s">1人／2人／演者と会話／屋内・屋外／怖くない</span></summary>
@@ -348,10 +351,12 @@ const articleLd = {
 .def-sub{font-size:19px;color:var(--ink);margin:28px 0 6px;text-align:left}
 #compare,#this-week{scroll-margin-top:88px}
 /* ---- カレンダー（カードの見た目は ShowCalendar.astro） ---- */
-.cal-legend{max-width:920px;margin:14px auto 0;font-size:12.5px;line-height:2;color:rgba(51,48,43,.75);text-align:left}
-.lg{display:inline-block;min-width:22px;text-align:center;font-weight:800}
-.lg-open{color:#d9480f}.lg-sold{color:rgba(51,48,43,.5)}.lg-none{color:rgba(51,48,43,.4)}.lg-ended{color:rgba(51,48,43,.35)}
-.cal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:22px;max-width:1000px;margin:22px auto 0}
+.section.cards{padding:36px 0 44px}
+.section.acc-wrap{padding:44px 0 60px}
+.cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:18px;margin:18px auto 0}
+#compare .cmp-wrap{margin-top:4px}
 /* ---- 比較表 ---- */
 .cmp-wrap{margin-top:22px}
 .cmp-shows th[scope=row]{min-width:170px;white-space:normal}
@@ -364,7 +369,7 @@ const articleLd = {
 #choose .cmp-table th[scope=row],#theater .cmp-table th[scope=row]{white-space:normal;min-width:130px}
 #choose .cmp-table td,#theater .cmp-table td{min-width:170px}
 /* ---- 折りたたみ ---- */
-.acc{max-width:920px;margin:14px auto 0;background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);scroll-margin-top:88px}
+.acc{margin:12px 0 0;background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);scroll-margin-top:88px}
 .acc summary{list-style:none;cursor:pointer;padding:18px 22px;display:flex;flex-direction:column;gap:3px;position:relative}
 .acc summary::-webkit-details-marker{display:none}
 .acc summary::after{content:'＋';position:absolute;right:20px;top:16px;font-size:20px;font-weight:800;color:var(--accent)}
@@ -378,7 +383,7 @@ const articleLd = {
 .sc-card{background:rgba(51,48,43,.02);border:var(--bd);border-radius:var(--r-l);padding:22px 20px;display:flex;flex-direction:column;gap:12px;text-align:left;scroll-margin-top:88px}
 .sc-card .tw-dl{grid-template-columns:1fr 1fr}
 .dd-normal{font-weight:500 !important}
-.tw-meta{max-width:920px;margin:18px auto 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62)}
+.tw-meta{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:rgba(29,29,31,.55);text-align:left}
 .tw-area{margin:0;font-size:11.5px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
 .tw-name{margin:0;font-size:21px;font-weight:800;color:var(--ink);line-height:1.5}
 .tw-feature{margin:0;font-size:13.5px;line-height:1.85;color:rgba(51,48,43,.82)}
@@ -393,5 +398,5 @@ const articleLd = {
 .tw-btn{font-size:14px;padding:14px 22px}
 .tw-sub{font-size:13.5px;font-weight:700;color:var(--accent)}
 ol.bullets{padding-left:1.4em}
-@media(max-width:640px){.cal-card{padding:18px 14px 16px}.cal-cell,.cal-cell>a,.cal-cell>span{min-height:54px}.tw-name{font-size:19px}.tw-btn{width:100%;text-align:center}.sc-card{padding:18px 14px}.sc-card .tw-dl{grid-template-columns:1fr}.acc summary{padding:16px 18px}.acc-b{padding:0 16px 18px}}
+@media(max-width:640px){.section.cards{padding:26px 0 34px}.section.acc-wrap{padding:34px 0 48px}.cards-h{font-size:18px}.tw-name{font-size:19px}.tw-btn{width:100%;text-align:center}.sc-card{padding:18px 14px}.sc-card .tw-dl{grid-template-columns:1fr}.acc summary{padding:16px 18px}.acc-b{padding:0 16px 18px}}
 </style>

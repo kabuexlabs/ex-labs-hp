@@ -140,7 +140,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 <div class="genre-block">
   <h3 class="def-sub serif">{GENRE_LABEL.story}</h3>
   <p class="lede">キャストとの会話や選択で物語が進む体験です。以下は株式会社ex Labsが企画・制作した公演（公式確認 {latestStoryText}）。◯の日付をタップすると予約サイトで空席を確認できます。</p>
-{storyShows.length > 0 && <div class="cal-grid">{storyShows.map((s) => <ShowCalendar show={s} place="xdate-cal" now={now} meta={(() => { const r = story.find((x) => x.w.id === s.id)!; return `2名で${total2(r)}｜${r.formatLabel}｜${r.w.duration.text}`; })()} />)}</div>}
+{storyShows.length > 0 && <div class="cal-grid">{storyShows.map((s) => <ShowCalendar show={s} place="xdate-cal" now={now} priceMain={(() => { const r = story.find((x) => x.w.id === s.id)!; return r.totalFor(2) !== undefined ? total2(r) : '料金は公式で確認'; })()} priceSub={(() => { const r = story.find((x) => x.w.id === s.id)!; return `2名の総額｜${r.formatLabel}`; })()} />)}</div>}
   <div class="sc-grid">
   {story.map((r) => (
     <article class="sc-card" id={`item-${r.w.id}`}>
