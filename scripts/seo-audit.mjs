@@ -33,7 +33,10 @@ const llms = read('public/llms.txt');
 
 // ---------- 1. guide 記事 ----------
 const guideDir = 'src/pages/guide';
-const guideFiles = fs.readdirSync(path.join(ROOT, guideDir)).filter((f) => f.endsWith('.astro') && f !== 'index.astro');
+// 下書き（公開前）ページ：ソースに「下書き（公開前）」の注意書きを持つ記事は noindex で運用し、
+// 一覧・サイトマップ・llms.txt への登録は公開時に行うため、登録チェックの対象から外す。
+const isDraft = (f) => fs.readFileSync(path.join(ROOT, guideDir, f), 'utf8').includes('下書き（公開前）');
+const guideFiles = fs.readdirSync(path.join(ROOT, guideDir)).filter((f) => f.endsWith('.astro') && f !== 'index.astro' && !isDraft(f));
 const NO_ARTICLE_LD = new Set(['yougo']); // 用語集は DefinedTermSet なので Article/FAQ 不要
 const rows = [];
 for (const f of guideFiles) {

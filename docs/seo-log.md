@@ -729,3 +729,11 @@
 - 内部リンク：総合ガイドの「人数・好み・参加形式で選ぶ」冒頭から A・B へ、A・B から総合ガイド（カレンダー・比較表）・/events/・服装持ち物・相互リンク。イマーシブ解説には既にガイドへのリンクがあるため追加なし。guides.ts・sitemap（lastmod 9/18）・llms.txt・llms-full.txt 登録、サムネ生成。
 - 計測：既存 data-track を再利用（show: solo-table／solo-cta／date-table／date-cta、guide-tokyo・events は data-show で区別、ticket: solo-table／date-table）。
 - 評価：A は一人参加語群、B は二人・デート・貸切語群を分けて追う。総合ガイド＋補助ページ合算の流入と予約先遷移（ticket の solo-*／date-*）を週次で確認。表示回数・平均順位は単純合算しない。
+
+## 2026-09-18 「東京の非日常・体験デート」記事（指示書対応、下書き）
+
+- 確認：「デート」「非日常」「体験」「二人」を扱う既存URLは immersive-tokyo-date（イマーシブの二人参加）のみで、体験ジャンル横断の入口は無し。新規 /guide/tokyo-experience-date/ を作成。役割分担：本記事＝ジャンル未定の二人が体験の種類を比較して選ぶ／immersive-tokyo＝公演・開催日・予約／immersive-tokyo-date＝二人申込・同じ組・貸切・二人分の料金／immersive-preparation＝服装・持ち物。
+- 実装：ジャンル比較表（ものづくり／没入型アート・展示／謎解き・脱出ゲーム／物語参加型：二人で何をするか・会話と協力の相手・費用と時間の実例・予約前確認）、実例カード（他社は src/data/experienceDate.ts の published のみ、物語参加型は src/data/events/ から生成し「当社主催・制作」を明記）、二人の希望から選ぶ、予約前チェック、FAQ2問、紹介範囲の明示。他社予約先クリックは ev-ext（data-show＝施設ID、place=xdate-card）、自社は ticket／show（xdate-*）で区別。
+- 公開判断：実装環境から他社の公式サイト（陶芸教室Futaba、うづまこ陶芸教室、元祖食品サンプル屋、チームラボプラネッツ、東京ミステリーサーカス、asoview・RETRIP・spacemarket 等の比較記事）へ到達できず、検索結果の抜粋しか得られない。指示書の「公式で確認できた施設だけ掲載」「自社公演だけの一覧では検索意図を満たさない」に従い、候補5件を published: false で用意し、記事は下書き扱い（X-Robots-Tag noindex、Article/FAQ 構造化データなし、記事一覧・サイトマップ・東京ガイド／二人記事からのリンクは EXPERIENCE_DATE_PUBLISHED（公式確認済みが2ジャンル以上）で自動的に有効化）。URL 自体は表示でき、下書きの注意書きを冒頭に表示。
+- 競合の傾向（検索結果の抜粋のみ）：レッツエンジョイ東京・じゃらん・スペースマーケット・icci 代官山・RETRIP がスポット列挙型（15〜62件）。本記事は件数ではなく「二人で何をするか・会話と協力の相手・二人分の料金・貸切条件」で比較する構成にし、文章・構成は流用していない。
+- 公開手順（ユーザー側）：各候補の公式ページで confirmation.unconfirmed を確認 → experienceDate.ts の値を更新し checkedAt／checkedBy を実際の確認日に → published: true（2ジャンル以上）→ push。自動で noindex 解除・構造化データ・一覧・サイトマップ・内部リンクが有効になる。

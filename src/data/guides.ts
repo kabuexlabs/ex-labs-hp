@@ -3,6 +3,7 @@
 // 新しい記事を追加したら、ここに1件追加するだけで各一覧に反映される。
 // thumb は scripts で自動生成したサムネイル（public/assets/guide/）。
 import type { PostCategory } from '../lib/microcms';
+import { EXPERIENCE_DATE_PUBLISHED } from './experienceDate';
 
 export interface GuideArticle {
   /** URLパス（末尾スラッシュあり） */
@@ -20,6 +21,15 @@ export interface GuideArticle {
 }
 
 export const guideArticles: GuideArticle[] = [
+  // 体験デート記事：他社項目が公式確認できて公開扱いになった時だけ一覧に出す（src/data/experienceDate.ts）
+  ...(EXPERIENCE_DATE_PUBLISHED ? [{
+    href: '/guide/tokyo-experience-date/',
+    title: '東京の非日常デート｜二人で楽しむ体験を料金・時間・過ごし方で比較',
+    desc: 'ものづくり・没入型アート・謎解き・物語参加型を、二人分の料金、所要時間、会話と協力の量、貸切条件で比較。予約前の確認点つき。',
+    date: '2026-09-18',
+    category: 'immersive' as PostCategory,
+    thumb: '/assets/guide/tokyo-experience-date.webp',
+  }] : []),
   {
     href: '/guide/immersive-tokyo-solo/',
     title: '東京のイマーシブ体験に一人で参加するには？申込条件・相席・選び方',

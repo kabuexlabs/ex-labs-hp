@@ -1,0 +1,230 @@
+---
+// 「東京 非日常 デート」「東京 体験 デート」「東京 体験型 デート」の受け皿。
+// イマーシブという言葉を知らない人にも、体験ジャンル（ものづくり／没入型アート／謎解き／物語参加型）を比較して
+// 行き先を選べる入口。物語参加型は src/data/events/（東京ガイドと共通）から、他社の施設・体験は
+// src/data/experienceDate.ts（公式確認済みのものだけ published）から生成する。
+// 他社項目が公式確認できず2ジャンル未満の間は下書き扱い（noindex、記事一覧・サイトマップ・内部リンクに出さない）。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
+import { publishedItems, EXPERIENCE_DATE_PUBLISHED, GENRE_LABEL, type Genre } from '../../data/experienceDate';
+import { jsonLd } from '../../lib/microcms';
+
+const now = new Date();
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/tokyo-experience-date/', site).toString();
+const draft = !EXPERIENCE_DATE_PUBLISHED;
+if (draft) Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+
+const story = buildGuideRows(now).filter((r) => r.status !== 'ended');
+const total2 = (r: (typeof story)[number]) => { const t = r.totalFor(2); return t === undefined ? '2名では申込不可' : fmtYen(t); };
+const SETTING: Record<string, string> = { indoor: '屋内で完結', outdoor: '屋外', mixed: '屋外の徒歩移動あり' };
+const byGenre = (g: Genre) => publishedItems.filter((i) => i.genre === g);
+const genres: Genre[] = ['craft', 'art', 'puzzle', 'story'];
+const genreInfo: Record<Genre, { doing: string; talk: string; check: string }> = {
+  craft: { doing: '陶芸・指輪・ガラスなどを、講師の説明を受けながら二人がそれぞれ（または一緒に）作る', talk: '会話は二人が中心。講師とのやり取りはあるが、他の参加者と協力する場面は少ない', check: '同じ席・同じ回で作れるか、焼成や仕上げで完成品の受け取りが後日になるか、素材・送料などの追加料金' },
+  art: { doing: '作品空間を歩いて鑑賞する。日時指定チケットで入場し、順路や滞在時間は自由なことが多い', talk: '会話は自由。他の来場者も一緒で貸切にはならない。協力や役割はない', check: '日時指定か、混雑する時間帯、裸足や水に入る作品の有無、再入場の可否' },
+  puzzle: { doing: '制限時間内に二人で（または他の参加者とチームで）謎を解き、脱出やミッション達成を目指す', talk: '二人の相談が中心。公演によっては他のチームと合流し、初対面の人と協力する', check: '二人だけで1チームになれるか、他の参加者と同じチームになるか、難易度、途中退出の扱い' },
+  story: { doing: '物語の登場人物として空間に入り、キャストとの会話や選択で物語を進める', talk: 'キャストとの会話が進行の一部。相席形式では他の参加者も一緒に進む', check: '二人が同じ組か（貸切か相席か）、途中で離れる場面の有無、年齢条件、集合時刻と遅刻の扱い' },
+};
+
+const faqs = [
+  { q: '「二人で申し込める」と「二人だけで体験できる」は同じですか？', a: '違います。1名ずつのチケットで同じ回に入る体験は他の参加者も一緒で、途中で離れる場面がある公演もあります。二人だけで体験したい場合は、申込単位で貸切になる体験を選び、公式ページの「貸切」「申込人数」の欄で確認してください。' },
+  { q: '料金は二人分でいくらと考えればいいですか？', a: '体験によって「1人料金×2」と「1組料金」があり、素材費・焼成費・送料・手数料が別になる場合があります。このページの各項目には二人分の総額と単位、追加料金の条件を載せています。空き状況と最終的な金額は公式予約ページでご確認ください。' },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const title = '東京の非日常デート｜二人で楽しむ体験を料金・時間・過ごし方で比較';
+const desc = '東京で楽しむ体験デートを、ものづくり・没入型アート・謎解き・物語参加型の4ジャンルから比較。二人分の料金と単位、所要時間、二人の会話と他の参加者との協力の量、貸切か相席か、予約前に確認する点を公式情報で整理し、公式予約ページへ進めます。';
+const articleLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
+  image: [new URL('/assets/guide/tokyo-experience-date.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-18', dateModified: '2026-09-18', mainEntityOfPage: pageUrl,
+};
+const latestStory = story.map((r) => r.w.verified.at).sort().pop();
+const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.verifiedText ?? '';
+---
+<BaseLayout
+  title="東京の非日常デート｜二人で楽しむ体験を料金・時間・過ごし方で比較 - 株式会社ex Labs"
+  description="東京で楽しむ体験デートを、ものづくり・没入型アート・謎解き・物語参加型の4ジャンルから比較。二人分の料金と単位、所要時間、二人の会話と他の参加者との協力の量、貸切か相席か、予約前に確認する点を公式情報で整理し、公式予約ページへ進めます。"
+  ogImage="/assets/guide/tokyo-experience-date.webp"
+>
+{!draft && <script type="application/ld+json" set:html={jsonLd(faqLd)} />}
+{!draft && <script type="application/ld+json" set:html={jsonLd(articleLd)} />}
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '解説記事一覧', href: '/guide/' },
+  { name: '東京の非日常デート' },
+]} />
+
+{draft && (
+  <section class="section" style="padding-top:24px;padding-bottom:0"><div class="wrap">
+  <p class="draft-note"><strong>下書き（公開前）</strong>：他社の施設・体験は主催者の公式ページで料金・所要時間・二人での参加条件を確認でき次第、掲載します。現在は公式確認済みの項目が足りないため、検索エンジンには登録せず、記事一覧・サイトマップにも載せていません。</p>
+  </div></section>
+)}
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">EXPERIENCE DATE</p>
+<h1 class="h2 serif"><span class="nobr">東京でいつもと違うデートをするなら？</span><span class="nobr">二人で楽しむ非日常の体験</span></h1>
+<p class="lede">食事や映画の次に、二人で何かを体験してみたい。東京には、ものを作る体験、アートに包まれる体験、謎を解く体験、物語の登場人物として参加する体験があります。<strong>料金だけでなく、二人で話せる時間の長さや、他の参加者と一緒になるかどうかも比べて選ぶ</strong>と、当日の過ごし方のずれが減ります。このページでは、4つのジャンルの違いと、公式情報で条件を確認できた実例を、二人分の料金・所要時間・会話や協力の量・貸切条件で比較します。</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul>
+<li>ジャンルで「二人で何をするか」「会話と協力の相手」が変わります。ものづくりと没入型アートは二人の会話が中心、謎解きと物語参加型は他の参加者やキャストと関わる場面があります。</li>
+<li>料金は「1人料金×2」と「1組料金」を区別し、焼成費・素材費・手数料などの追加条件を確認します。</li>
+<li>「二人で申し込める」と「二人だけで体験できる（貸切）」は別の条件です。</li>
+</ul></div>
+</div></section>
+
+<section class="section tinted" id="genres"><div class="wrap">
+<p class="eyebrow">GENRES</p><h2 class="h2 serif">ジャンルで比べる：二人で何をするか・会話と協力・費用・時間</h2>
+<p class="lede">ジャンルの傾向と、予約前に確認する点です。費用と時間は実例の項目に載せています（ジャンル全体の相場は作っていません）。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>ジャンル</th><th>二人で何をするか</th><th>会話・協力の場面</th><th>費用・時間の実例</th><th>予約前に確認すること</th></tr></thead><tbody>
+{genres.map((g) => {
+  const items = byGenre(g);
+  const example = g === 'story'
+    ? story.map((r) => `${r.w.title}：2名で${total2(r)}・${r.w.duration.text}`).join('／')
+    : items.length ? items.map((i) => `${i.name}：${i.price}・${i.time}`).join('／') : '公式確認後に記載';
+  return (
+    <tr>
+      <th scope="row">{GENRE_LABEL[g]}</th>
+      <td>{genreInfo[g].doing}</td>
+      <td>{genreInfo[g].talk}</td>
+      <td>{example}</td>
+      <td>{genreInfo[g].check}</td>
+    </tr>
+  );
+})}
+</tbody></table></div>
+</div></section>
+
+<section class="section" id="items"><div class="wrap">
+<p class="eyebrow">EXAMPLES</p><h2 class="h2 serif">実例：公式情報で条件を確認できた体験</h2>
+<p class="lede">各項目の重要な条件（二人での参加・費用・時間・開催状況・注意点）を同じ項目で並べています。出典と確認日を各項目に記載し、空き状況は公式予約ページでご確認ください。</p>
+
+{genres.filter((g) => g !== 'story').map((g) => byGenre(g).length > 0 && (
+  <div class="genre-block">
+    <h3 class="def-sub serif">{GENRE_LABEL[g]}</h3>
+    <div class="sc-grid">
+    {byGenre(g).map((i) => (
+      <article class="sc-card" id={`item-${i.id}`}>
+        <p class="tw-area">{i.area}</p>
+        <h4 class="tw-name serif">{i.name}</h4>
+        <dl class="tw-dl">
+          <div><dt>体験内容</dt><dd class="dd-normal">{i.what}</dd></div>
+          <div><dt>二人での参加</dt><dd class="dd-normal">{i.forTwo}</dd></div>
+          <div><dt>費用（二人分）</dt><dd class="dd-normal">{i.price}</dd></div>
+          <div><dt>時間</dt><dd class="dd-normal">{i.time}</dd></div>
+          <div><dt>開催状況</dt><dd class="dd-normal">{i.status}</dd></div>
+          <div><dt>選ぶ理由</dt><dd class="dd-normal">{i.fit}</dd></div>
+          <div><dt>注意点</dt><dd class="dd-normal">{i.notes}</dd></div>
+        </dl>
+        <p class="tw-meta" style="margin-top:10px">出典：<a href={i.officialUrl} target="_blank" rel="noopener nofollow" style="color:var(--accent)">公式ページ</a>（{i.checkedAt} 確認）</p>
+        <div class="tw-actions">
+          <a class="btn tw-btn ghost" href={i.bookingUrl ?? i.officialUrl} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={i.siteId} data-place="xdate-card">公式ページで詳細・予約を見る</a>
+        </div>
+      </article>
+    ))}
+    </div>
+  </div>
+))}
+
+<div class="genre-block">
+  <h3 class="def-sub serif">{GENRE_LABEL.story}</h3>
+  <p class="lede">物語参加型（イマーシブ）は、キャストとの会話や選択で物語が進む体験です。以下は株式会社ex Labsが企画・制作した公演で、公式ページで申込条件と料金を確認しています（最終確認 {latestStoryText}）。</p>
+  <div class="sc-grid">
+  {story.map((r) => (
+    <article class="sc-card" id={`item-${r.w.id}`}>
+      <p class="tw-area">{r.venue ? `${r.venue.listName ?? r.venue.name}${r.venue.station ? `（${r.venue.station}）` : ''}` : '会場は公式ページで確認'}　｜　当社主催・制作</p>
+      <h4 class="tw-name serif">{r.w.title}</h4>
+      <dl class="tw-dl">
+        <div><dt>体験内容</dt><dd class="dd-normal">{r.w.summary}</dd></div>
+        <div><dt>二人での参加</dt><dd class="dd-normal">{r.w.party.text}（{r.formatLabel}）{r.w.party.text.includes('離れる') ? '' : ''}</dd></div>
+        <div><dt>費用（二人分）</dt><dd class="dd-normal">2名で{total2(r)}（{r.w.price.unit === 'per-group' ? '1組料金' : '1人料金×2'}、税込）。{r.w.price.feeNote}</dd></div>
+        <div><dt>時間</dt><dd class="dd-normal">{r.w.duration.text}。{(r.w.info.requirements ?? []).find((x) => /遅れ|入場/.test(x)) ?? ''}</dd></div>
+        <div><dt>開催状況</dt><dd class="dd-normal">期間限定。確認できた開催日 {r.datesText}。空き状況は公式予約ページで確認</dd></div>
+        <div><dt>選ぶ理由</dt><dd class="dd-normal">{r.w.info.actorInteraction === true ? 'キャストと会話しながら進めたい二人向け。' : ''}{r.w.party.format === 'private' ? '申込単位で貸切のため、二人だけで体験できます。' : r.w.party.format === 'shared' ? '1名ずつのチケットで同じ回に参加します（他の参加者も一緒）。' : ''}{r.w.info.participation ?? ''}</dd></div>
+        <div><dt>注意点</dt><dd class="dd-normal">{r.w.info.ageRule ?? '年齢条件は公式で確認'}。{r.venue?.setting ? SETTING[r.venue.setting] : ''}{r.w.info.walking ? `。${r.w.info.walking}` : ''}{r.w.info.scary ? `。${r.w.info.scary}` : ''}</dd></div>
+      </dl>
+      <p class="tw-meta" style="margin-top:10px">出典：<a href={r.w.officialUrl} style="color:var(--accent)" data-track="show" data-show={r.w.id} data-place="xdate-card">公式ページ</a>（{r.verifiedText} 確認）</p>
+      <div class="tw-actions">
+        {r.ticketUrl && <a class="btn tw-btn" href={r.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={r.w.id} data-place="xdate-card">予約サイトで空席を見る（{r.ticketSite}）</a>}
+        <a class="tw-sub" href={`/events/${r.w.slug}/`} data-track="show" data-show={r.w.id} data-place="xdate-card-events">回ごとの日程・状況 →</a>
+      </div>
+    </article>
+  ))}
+  </div>
+  <p class="vc-line">開催日カレンダーと公演の比較は<a href="/guide/immersive-tokyo/" style="color:var(--accent)" data-track="show" data-show="guide-tokyo" data-place="xdate-story">東京で体験できるイマーシブイベント →</a>／二人参加の条件（同じ組・貸切・二人分の料金）は<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)" data-track="show" data-show="guide-tokyo-date" data-place="xdate-story">イマーシブ体験を二人で楽しむには →</a></p>
+</div>
+</div></section>
+
+<section class="section tinted" id="choose"><div class="wrap narrow">
+<p class="eyebrow">HOW TO CHOOSE</p><h2 class="h2 serif">二人の希望から選ぶ</h2>
+<ul class="bullets">
+<li><strong>形に残るものを作りたい</strong>：ものづくり。{byGenre('craft').length ? `実例：${byGenre('craft').map((i) => i.name).join('、')}。` : '実例は公式確認後に掲載します。'}完成品を当日持ち帰れるか、焼成後の受け取りかを確認します。</li>
+<li><strong>一緒に相談して解きたい</strong>：謎解き・脱出ゲーム、または証言や手がかりを整理する型の物語参加型。{byGenre('puzzle').length ? `実例：${byGenre('puzzle').map((i) => i.name).join('、')}。` : ''}{story.filter((r) => r.w.info.actorInteraction !== true).length ? `物語参加型では${story.filter((r) => r.w.info.actorInteraction !== true).map((r) => r.w.title).join('、')}が「${story.filter((r) => r.w.info.actorInteraction !== true).map((r) => r.w.info.participation).join('」「')}」と案内されています。` : ''}二人だけで1チームになれるかは公演ごとに確認します。</li>
+<li><strong>物語の中で役割を演じてみたい</strong>：キャストと交流する物語参加型。{story.filter((r) => r.w.info.actorInteraction === true).length ? `${story.filter((r) => r.w.info.actorInteraction === true).map((r) => r.w.title).join('、')}はキャストとの会話が進行の一部です。` : ''}演技は求められませんが、その場で反応する場面があります。</li>
+<li><strong>自分のペースで鑑賞したい</strong>：没入型アート・展示。{byGenre('art').length ? `実例：${byGenre('art').map((i) => i.name).join('、')}。` : '実例は公式確認後に掲載します。'}会話は自由ですが、他の来場者と一緒で貸切にはなりません。</li>
+</ul>
+<p class="lede">「二人の会話が多い」ことと「他の人やキャストとの会話が多い」ことは別です。二人で話す時間を優先するならものづくりや展示型、初対面の人やキャストと関わる時間を楽しみたいなら謎解きや物語参加型が候補になります。効果や相性は人によって違うため、このページでは条件の違いだけを載せています。</p>
+</div></section>
+
+<section class="section" id="check"><div class="wrap narrow">
+<p class="eyebrow">BEFORE BOOKING</p><h2 class="h2 serif">予約前に確認すること</h2>
+<ol class="bullets">
+<li><strong>料金の単位</strong>：1人あたりか1組あたりか。素材費・焼成費・送料・予約サイトの手数料が別かどうか。</li>
+<li><strong>同じ回・同じ組</strong>：1名ずつのチケットは同じ日時の回を選んで代表者がまとめて購入。1組単位は人数を2名にして申し込む。</li>
+<li><strong>貸切と相席、最低催行人数</strong>：二人だけで体験できるか、他の参加者やチームと一緒か。最低人数に満たないと中止になる体験もあります。</li>
+<li><strong>開始・集合・移動・遅刻とキャンセル</strong>：受付時間より前に入れない会場、途中入場不可の公演、受付後の徒歩移動がある公演があります。キャンセル・日時変更の可否は各予約ページの規約に従います。</li>
+<li><strong>現在の予約枠</strong>：開催日があることと空席があることは別です。空き状況は公式予約ページで確認してください。</li>
+</ol>
+<p class="lede">公演ごとの細かな条件（年齢・持ち物・注意事項）は各公式ページと<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="xdate-check">公演を探す</a>の作品詳細に載せています。服装・持ち物は<a href="/guide/immersive-preparation/" style="color:var(--accent)">イマーシブ体験の服装・持ち物</a>をご覧ください。</p>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="cmp-note-p">紹介範囲：物語参加型は株式会社ex Labsが企画・制作した公演で、当社主催・制作と明記しています。他社の施設・体験は、主催者の公式ページで所在地・料金・所要時間・二人での参加条件・受付状況を確認できたものだけを掲載し、確認日を併記しています。東京の全体験を網羅した比較や第三者によるランキングではありません。</p>
+<p class="vc-line" style="margin-top:32px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">イマーシブ体験を二人で楽しむには</a>／<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)">一人で参加するには</a>／<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物</a>／<a href="/events/" style="color:var(--accent)">公演を探す</a></p>
+</div></section>
+
+<AuthorBox />
+<LatestPosts category="immersive" />
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.wrap.narrow .lede{text-align:left}
+.draft-note{max-width:920px;margin:0 auto;background:#fff4ee;border:1px solid #f0a37f;border-radius:12px;padding:14px 18px;font-size:13.5px;line-height:1.8;color:var(--ink);text-align:left}
+.def-sub{font-size:19px;color:var(--ink);margin:28px 0 6px;text-align:left}
+.genre-block{max-width:1000px;margin:0 auto}
+.cmp-wrap{margin-top:22px}
+.cmp-table th[scope=row]{min-width:140px;white-space:normal}
+.cmp-table td{min-width:180px;vertical-align:top}
+.cmp-note-p{max-width:920px;margin:14px auto 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:18px;margin:8px auto 0}
+.sc-card{background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);padding:22px 20px;display:flex;flex-direction:column;gap:12px;text-align:left;scroll-margin-top:88px}
+.tw-area{margin:0;font-size:11.5px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.tw-name{margin:0;font-size:20px;font-weight:800;color:var(--ink);line-height:1.5}
+.tw-dl{margin:6px 0 0;display:grid;grid-template-columns:1fr;gap:10px 14px}
+.tw-dl div{background:rgba(51,48,43,.03);padding:10px 12px}
+.tw-dl dt{font-size:11px;font-weight:800;color:rgba(51,48,43,.55);letter-spacing:.06em}
+.tw-dl dd{margin:4px 0 0;font-size:13.5px;line-height:1.6;color:var(--ink);font-weight:700}
+.dd-normal{font-weight:500 !important}
+.tw-meta{max-width:920px;margin:18px auto 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62)}
+.tw-actions{margin-top:auto;padding-top:12px;display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.tw-btn{font-size:14px;padding:14px 22px}
+.tw-btn.ghost{background:#fff;color:var(--ink)}
+.tw-sub{font-size:13.5px;font-weight:700;color:var(--accent)}
+ol.bullets{padding-left:1.4em}
+#genres,#items,#choose,#check,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.sc-card{padding:18px 14px}.tw-btn{width:100%;text-align:center}}
+</style>

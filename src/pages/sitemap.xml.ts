@@ -6,6 +6,7 @@ import { tmWorks } from '../data/toudaimurderWorks';
 import { tmNews } from '../data/toudaimurderNews';
 import { htPaths } from '../data/hacktale';
 import { BLOG_REDIRECTS } from '../data/redirects';
+import { EXPERIENCE_DATE_PUBLISHED } from '../data/experienceDate';
 import { eventsData } from '../data/events/index';
 
 // NOTE: keep every URL here in its canonical trailing-slash form, and
@@ -126,6 +127,8 @@ export const GET: APIRoute = async ({ site }) => {
   const urls: { loc: string; lastmod?: string }[] = STATIC_PATHS.map((p) => ({
     loc: new URL(p, base).toString(),
   }));
+  // 体験デート記事は他社項目が公式確認できて公開扱いになった時だけ載せる（下書きは noindex）
+  if (EXPERIENCE_DATE_PUBLISHED) urls.push({ loc: new URL('/guide/tokyo-experience-date/', base).toString(), lastmod: '2026-09-18' });
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {

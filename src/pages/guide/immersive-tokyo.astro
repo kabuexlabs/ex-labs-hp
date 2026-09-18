@@ -16,6 +16,7 @@ import { areaName, regionName, genreName } from '../../data/events/areas';
 import { perPerson, fmtYen, FORMAT_LABEL } from '../../lib/events';
 import { occurrenceState, weekRange, fmtDateJa, fmtDateShort, fmtVerified, jstDateString, jstWeekday, addDays } from '../../lib/thisWeek';
 import { jsonLd } from '../../lib/microcms';
+import { EXPERIENCE_DATE_PUBLISHED } from '../../data/experienceDate';
 
 const now = new Date();
 const today = jstDateString(now);
@@ -219,7 +220,7 @@ const articleLd = {
 <summary><span class="acc-t">人数・好み・参加形式で選ぶ</span><span class="acc-s">1人／2人／演者と会話／屋内・屋外／怖くない</span></summary>
 <div class="acc-b">
 <p class="lede">各公演の公式ページで確認できた条件から当てはめています。条件に合う公演が確認できない場合は「{none}」と表示します。</p>
-<p class="lede">詳しい判断材料は、<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)">一人で参加する場合</a>（1名で申し込めるか・1名だけで成立するか・交流の有無）と<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">二人で参加する場合</a>（二人分の総額・貸切か・同じ組で行動できるか）に分けてまとめています。</p>
+<p class="lede">詳しい判断材料は、<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)">一人で参加する場合</a>（1名で申し込めるか・1名だけで成立するか・交流の有無）と<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">二人で参加する場合</a>（二人分の総額・貸切か・同じ組で行動できるか）に分けてまとめています。{EXPERIENCE_DATE_PUBLISHED && <>イマーシブ以外の体験（ものづくり・展示・謎解き）と比べるなら<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート</a>。</>}</p>
 <div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>条件</th><th>当てはまる公演</th><th>確認するポイント</th></tr></thead><tbody>
 <tr><th scope="row">1人で申し込める</th><td>{pick.soloBook.length ? names(pick.soloBook) : none}</td><td>1名で申し込めても、他の参加者と一緒に体験する「相席」形式の場合があります</td></tr>
 <tr><th scope="row">1人だけで体験する（相席なし）</th><td>{pick.soloRun.length ? names(pick.soloRun) : none}</td><td>1名だけで回が成立するかは公式ページの「申込人数」「貸切」の欄で確認</td></tr>
