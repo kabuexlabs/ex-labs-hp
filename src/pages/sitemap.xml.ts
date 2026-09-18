@@ -14,6 +14,8 @@ import { eventsData } from '../data/events/index';
 // Console as "excluded / not indexed" noise.
 const STATIC_PATHS = [
   '/',
+  '/guide/immersive-tokyo-solo/',
+  '/guide/immersive-tokyo-date/',
   '/guide/saiji-kikaku/',
   '/guide/shanai-quiz/',
   '/guide/taiken-marketing/',
@@ -127,6 +129,8 @@ export const GET: APIRoute = async ({ site }) => {
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {
+    '/guide/immersive-tokyo-solo/': '2026-09-18',
+    '/guide/immersive-tokyo-date/': '2026-09-18',
     '/guide/saiji-kikaku/': '2026-09-14',
     '/guide/shanai-quiz/': '2026-09-14',
     '/events/': '2026-09-13',
@@ -157,7 +161,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/madamis-business/': '2026-09-15',
     '/guide/immersive-cost/': '2026-09-15',
     '/guide/immersive-company/': '2026-09-15',
-    '/guide/immersive-tokyo/': '2026-09-16',
+    '/guide/immersive-tokyo/': '2026-09-18',
     '/guide/shisetsu-katsuyo/': '2026-09-08',
     '/guide/shogyoshisetsu-event/': '2026-09-15',
     '/guide/yukyu-kukaku/': '2026-09-15',
