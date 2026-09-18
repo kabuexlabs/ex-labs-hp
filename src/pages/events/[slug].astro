@@ -28,13 +28,15 @@ const past = all.filter((r) => r.eventState === 'ended');
 const cancelled = all.filter((r) => r.eventState === 'cancelled');
 const isOver = upcoming.length === 0 && all.length > 0;
 const organizer = eventsData.organizers.find((o) => o.id === work.organizerId)!;
-const venues = [...new Set(all.map((r) => r.venue.id))].map((id) => eventsData.venues.find((v) => v.id === id)!);
+const venueIds = [...new Set(all.map((r) => r.venue.id))];
+if (venueIds.length === 0 && work.venueId) venueIds.push(work.venueId);
+const venues = venueIds.map((id) => eventsData.venues.find((v) => v.id === id)!).filter(Boolean);
 const own = organizer.relation === 'ex-labs';
 const sources = work.sourceIds.map((id) => eventsData.sources.find((s) => s.id === id)!).filter(Boolean);
 const others = resolveAll(eventsData, now).filter((r) => r.work.id !== work.id && !['ended', 'cancelled'].includes(r.eventState));
 const otherWorks = [...new Map(others.map((r) => [r.work.id, r])).values()];
 const areaText = venues.map((v) => `${regionName(v.regionId)}・${areaName(v.areaId)}`).filter((x, i, a) => a.indexOf(x) === i).join('／');
-const priceUnit = work.price.unit === 'per-person' ? '1人あたり' : work.price.unit === 'per-group' ? '1組あたり' : '貸切総額';
+const priceUnit = work.price.unit === 'per-person' ? '1人あたり' : work.price.unit === 'per-group' ? '1組あたり' : work.price.unit === 'charter' ? '貸切総額' : '単位は公式で確認';
 const ppList = work.price.unit === 'per-group' && work.price.tiers ? work.price.tiers.map((t) => `${t.party}人参加 ${fmtYen(perPerson(work.price, t.party)!)}`).join('／') : '';
 const title = `${work.title}｜開催日程・料金・予約先（${areaText}） - 株式会社ex Labs`;
 const desc = `${work.title}（${work.genres.map(genreName).join('・')}、${areaText}）の開催日程・料金・申込人数・参加条件と公式予約ページ。${isOver ? 'この公演は終了しました。' : '開催・販売・空席の確認状況を分けて掲載しています。'}${own ? '株式会社ex Labs が企画・制作。' : ''}`.slice(0, 158);
@@ -110,7 +112,7 @@ const eventLd = upcoming.concat(cancelled).map((r) => {
 {upcoming.length > 0 ? (
   <ul class="ev-list">{upcoming.map((r) => <li><EventCard r={r} place="detail" compact /></li>)}</ul>
 ) : (
-  <div class="ev-zero"><p class="ev-zero-t">これから開催予定の回は確認できていません</p><p>今後の日程は公式ページでご確認ください。</p></div>
+  <div class="ev-zero"><p class="ev-zero-t">これから開催予定の回は確認できていません</p><p>開催日・開演時刻・料金・空席は公式チケットページでご確認ください。</p>{work.ticketUrl && <p style="margin-top:12px"><a class="btn ev-btn ghost" style="width:auto" href={work.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={work.id} data-place={`detail-${own ? 'own' : '3rd'}`}>公式チケットページで日程・空席を確認する</a></p>}</div>
 )}
 {cancelled.length > 0 && (
   <><p class="ev-res-h" style="margin-top:26px;font-size:15px">中止になった回</p><ul class="ev-past">{cancelled.map((r) => <li>{fmtDateShort(r.occ.date)}{r.occ.startTime ? ` ${r.occ.startTime}` : ''} 中止</li>)}</ul></>

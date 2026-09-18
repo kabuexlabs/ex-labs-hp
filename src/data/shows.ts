@@ -32,7 +32,7 @@ export interface Show {
   /** 年齢条件 */
   age: string;
   /** 料金：1人あたり／1組あたりを明記し、税込・手数料の扱いを含める */
-  price: { text: string; unit: '1人あたり' | '1組あたり'; note: string };
+  price: { text: string; unit: '1人あたり' | '1組あたり' | '料金単位は未確認'; note: string };
   /** 参加判断に必要な条件（確認できたもののみ） */
   conditions: string[];
   occurrences: ShowOccurrence[];
@@ -51,7 +51,7 @@ import { regionName, areaName } from './events/areas.ts';
 
 export const shows: Show[] = eventsData.works.map((w) => {
   const occ = eventsData.occurrences.filter((o) => o.workId === w.id && o.published && !o.test).sort((a, b) => (a.date + (a.startTime ?? '')).localeCompare(b.date + (b.startTime ?? '')));
-  const venue = eventsData.venues.find((v) => v.id === occ[0]?.venueId) ?? eventsData.venues[0];
+  const venue = eventsData.venues.find((v) => v.id === (occ[0]?.venueId ?? w.venueId)) ?? eventsData.venues[0];
   const ch = occ[0]?.sales.channels[0];
   const channel = eventsData.channels.find((c) => c.id === ch?.channelId);
   const srcs = w.sourceIds.map((id) => eventsData.sources.find((s) => s.id === id)).filter(Boolean);
@@ -61,12 +61,12 @@ export const shows: Show[] = eventsData.works.map((w) => {
     area: `${regionName(venue.regionId)}・${areaName(venue.areaId)}／${venue.listName ?? venue.name}`,
     feature: w.summary,
     url: w.officialUrl,
-    ticketUrl: ch?.url ?? w.officialUrl,
-    ticketSite: channel?.name ?? '公式ページ',
+    ticketUrl: ch?.url ?? w.ticketUrl ?? w.officialUrl,
+    ticketSite: channel?.name ?? (w.ticketUrl ? new URL(w.ticketUrl).hostname : '公式ページ'),
     duration: w.duration.text,
     capacity: w.party.text,
     age: w.info.ageRule ?? '年齢条件は公式ページで確認',
-    price: { text: w.price.text, unit: w.price.unit === 'per-person' ? '1人あたり' : '1組あたり', note: w.price.feeNote },
+    price: { text: w.price.text, unit: w.price.unit === 'per-person' ? '1人あたり' : w.price.unit === 'unknown' ? '料金単位は未確認' : '1組あたり', note: w.price.feeNote },
     conditions: [...(w.info.walking ? [w.info.walking] : []), ...(w.info.requirements ?? [])],
     occurrences: occ.map((o) => ({
       date: o.date,

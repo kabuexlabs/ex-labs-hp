@@ -39,4 +39,13 @@ export const sources: Source[] = [
     checkedBy: 'Claude（実装環境から到達できず、内容は未確認）',
     terms: '未確認。開演時刻・受付状況・残席はこのページで確認してから入力する。自動取得はしない（利用条件未確認）',
   },
+  {
+    id: 'escape-id-factroom',
+    label: 'escape.id「体験型取調室 FACTROOM」公演ページ',
+    url: 'https://escape.id/factroom-org/e-fact-karma/',
+    kind: 'ticket-site',
+    checkedAt: '2026-09-18T11:10:00+09:00',
+    checkedBy: 'ユーザーがページ本文（あらすじ・特徴・体験時間・スタッフ・会場・注意事項・参加条件）を貼付、Claude が転記',
+    terms: '自社（株式会社ex Labs）が企画・プロデュースする公演の公式販売ページ。あらすじ・条件を自社データとして使用。開催日時・料金・空席は貼付内容に無く未確認（ページで確認して occurrences に入れる）',
+  },
 ];

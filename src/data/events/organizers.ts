@@ -18,4 +18,12 @@ export const organizers: Organizer[] = [
     relationLabel: 'ex Labs 企画・制作（公演ブランド：IMMERSIVE ILLUSION）',
     sourceIds: ['kaitou-official'],
   },
+  {
+    id: 'factroom',
+    name: '体験型取調室 FACTROOM',
+    url: 'https://escape.id/factroom-org/',
+    relation: 'ex-labs',
+    relationLabel: 'ex Labs 企画・プロデュース（主催：体験型取調室 FACTROOM）',
+    sourceIds: ['escape-id-factroom'],
+  },
 ];

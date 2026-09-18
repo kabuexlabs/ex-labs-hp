@@ -21,4 +21,15 @@ export const venues: Venue[] = [
     access: '商業施設内の複数スポットを歩いて巡る',
     sourceIds: ['uwasabanashi-official'],
   },
+  {
+    id: 'anator-kanda',
+    name: 'ANATOR（HARVEY神田司町 4F）',
+    listName: 'ANATOR',
+    regionId: 'tokyo',
+    areaId: 'kanda',
+    address: '東京都千代田区神田司町2-15-11 HARVEY神田司町 4F',
+    access: '小川町駅徒歩2分、淡路町駅徒歩2分',
+    setting: 'indoor',
+    sourceIds: ['escape-id-factroom'],
+  },
 ];

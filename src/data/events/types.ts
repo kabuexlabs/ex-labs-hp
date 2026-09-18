@@ -76,7 +76,8 @@ export interface AssetLicense {
 
 /** 料金。1人分・1組分・貸切総額を混同しない */
 export interface Price {
-  unit: 'per-person' | 'per-group' | 'charter';
+  /** unknown＝料金単位が未確認（表示は「公式で確認」、予算絞り込みでは判定できない扱い） */
+  unit: 'per-person' | 'per-group' | 'charter' | 'unknown';
   /** 1人あたり（per-person）または貸切総額（charter）の金額（円、税込） */
   amount?: number;
   /** 1組あたりの人数別料金（per-group）。人数に応じて1人あたりを算出する */
@@ -117,6 +118,10 @@ export interface Work {
   description: string[];
   /** 作品の公式ページ（自社サイト内なら相対パス） */
   officialUrl: string;
+  /** 公式チケットページ（公演回が未登録でも案内する） */
+  ticketUrl?: string;
+  /** 主な会場（公演回が未登録でも会場・エリアを表示する） */
+  venueId?: string;
   duration: { minutes?: number; text: string };
   price: Price;
   party: PartyRule;

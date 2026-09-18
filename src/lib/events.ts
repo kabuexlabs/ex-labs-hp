@@ -392,10 +392,12 @@ export function validateDataset(ds: EventsDataset): string[] {
     if (slugs.has(w.slug)) errs.push(`${L}: slug が重複 ${w.slug}`); slugs.add(w.slug);
     if (!w.title || !w.summary || !w.description?.length) errs.push(`${L}: title/summary/description が不足`);
     if (!orgIds.has(w.organizerId)) errs.push(`${L}: organizerId ${w.organizerId} が無い`);
+    if (w.venueId && !venueIds.has(w.venueId)) errs.push(`${L}: venueId ${w.venueId} が無い`);
     if (!w.genres?.length) errs.push(`${L}: genres が空`);
     if (!isUrl(w.officialUrl)) errs.push(`${L}: officialUrl が不正`);
+    if (w.ticketUrl && !/^https:\/\/[^\s"'<>]+$/.test(w.ticketUrl)) errs.push(`${L}: ticketUrl が不正`);
     if (!w.duration?.text) errs.push(`${L}: duration.text が不足`);
-    if (!w.price || !['per-person', 'per-group', 'charter'].includes(w.price.unit)) errs.push(`${L}: price.unit（1人／1組／貸切）が不足`);
+    if (!w.price || !['per-person', 'per-group', 'charter', 'unknown'].includes(w.price.unit)) errs.push(`${L}: price.unit（1人／1組／貸切／unknown）が不足`);
     else {
       if (!w.price.text || !w.price.feeNote) errs.push(`${L}: price.text/feeNote が不足`);
       if (w.price.unit === 'per-person' && w.price.amount === undefined) errs.push(`${L}: per-person に amount が無い`);

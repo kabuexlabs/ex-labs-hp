@@ -193,6 +193,19 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 <p><strong>掲載している公演について</strong>：株式会社ex Labs が企画・制作するイマーシブ公演を、公式情報で確認したうえで掲載しています。渋谷サクラステージを舞台にした「ウワサバナシ調査委員会」は日本経済新聞で紹介され、「怪盗と秘密の試験」は電ファミニコゲーマーで紹介されました。他社の公演は掲載条件を確認できたものから順次追加します（<a href="/events/about/">掲載基準</a>）。</p>
 </div></section>
 
+<section class="section ev-links" id="works"><div class="wrap">
+<h2 class="h2 serif">掲載中の公演（作品一覧）</h2>
+<p class="ev-lede">日程が確認できていない作品も、作品ページで内容・条件と公式チケットページを案内しています。</p>
+<ul>
+  {eventsData.works.filter((w) => w.published).map((w) => {
+    const nxt = own.find((r) => r.work.id === w.id && !['ended', 'cancelled'].includes(r.eventState));
+    const v = eventsData.venues.find((x) => x.id === (nxt?.venue.id ?? eventsData.occurrences.find((o) => o.workId === w.id)?.venueId ?? w.venueId)) ?? null;
+    const org = eventsData.organizers.find((o) => o.id === w.organizerId);
+    return <li><a href={`/events/${w.slug}/`} data-track="show" data-show={w.id} data-place={`events-works-${org?.relation === 'ex-labs' ? 'own' : '3rd'}`}>{w.title}<span>{w.genres.map((g) => GENRES.find((x) => x.id === g)?.name ?? g).join('・')}{v ? `｜${regionName(v.regionId)}・${areaName(v.areaId)}` : ''}｜{nxt ? `次回 ${fmtDateJa(nxt.occ.date)}` : '開催日は公式チケットページで確認'}｜{org?.relationLabel}</span></a></li>;
+  })}
+</ul>
+</div></section>
+
 <section class="section ev-links"><div class="wrap">
 <h2 class="h2 serif">選び方・基礎知識</h2>
 <p class="ev-lede">初めての方は、公演を選ぶ前に形式の違いと参加の準備を確認しておくと失敗しません。</p>

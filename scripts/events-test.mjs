@@ -80,6 +80,9 @@ eq('1組料金→人数外は算出不可', perPerson(grp, 5), undefined);
 eq('1組料金→人数未指定は算出不可', perPerson(grp), undefined);
 eq('貸切総額→1人あたり', perPerson({ unit: 'charter', amount: 60000 }, 6), 10000);
 eq('貸切総額→人数未指定', perPerson({ unit: 'charter', amount: 60000 }), undefined);
+eq('料金単位未確認→算出不可', perPerson({ unit: 'unknown' }, 2), undefined);
+eq('料金単位未確認＋予算指定→要確認', matchCriteria({ id: 'u', workId: 'u', slug: 'u', title: 'u', date: '2026-09-20', eventStatus: 'scheduled', region: 'tokyo', area: 'kanda', genres: ['story-experience'], party: { min: 1, max: 6 }, price: { unit: 'unknown' }, kind: 'own' }, parseCriteria(new URLSearchParams('budget=5000')), new Date('2026-09-13T09:00:00+09:00')), 'unknown');
+eq('料金単位未確認の作品は検証を通る', validateDataset({ ...fixtureDataset(), works: [...fixtureDataset().works, fixtureWork({ id: 'w-unknown', slug: 'w-unknown', price: { unit: 'unknown', text: '公式で確認', taxIncluded: true, feeNote: '公式で確認' } })] }), []);
 
 // ---- 条件との適合 ----
 const row = (o = {}) => ({ id: 'r', workId: 'w', slug: 'w', title: 't', date: '2026-09-13', start: 19 * 60, end: 20 * 60 + 30, eventStatus: 'scheduled', region: 'tokyo', area: 'shibuya', genres: ['story-experience'], party: { min: 1, max: 6 }, price: { unit: 'per-person', amount: 4000 }, kind: 'own', ...o });

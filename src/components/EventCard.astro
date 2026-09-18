@@ -28,7 +28,7 @@ const ppList = work.price.unit === 'per-group' && work.price.tiers
   : work.price.unit === 'charter' && work.price.amount !== undefined && work.party.max
     ? `${work.party.max}人参加で ${fmtYen(perPerson(work.price, work.party.max)!)}`
     : '';
-const priceUnit = work.price.unit === 'per-person' ? '1人あたり' : work.price.unit === 'per-group' ? '1組あたり' : '貸切総額';
+const priceUnit = work.price.unit === 'per-person' ? '1人あたり' : work.price.unit === 'per-group' ? '1組あたり' : work.price.unit === 'charter' ? '貸切総額' : '単位は公式で確認';
 const seatText = r.seatState === 'available' && occ.seats.remaining !== undefined
   ? `確認時点で残り${occ.seats.remaining}席（${fmtVerified(occ.seats.checkedAt!)}確認）`
   : r.seatState !== 'unknown' && occ.seats.checkedAt ? `${SEAT_LABEL[r.seatState]}（${fmtVerified(occ.seats.checkedAt)}確認）` : SEAT_LABEL[r.seatState];

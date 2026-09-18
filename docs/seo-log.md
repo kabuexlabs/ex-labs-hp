@@ -564,3 +564,6 @@
 - 同日追加：外部サイト掲載の公演（listings）を検索結果とサイト別一覧に並べる仕組み（src/data/events/listings.ts、ListingCard）。初期データはゼロ（この環境から各サイトへ到達できず未確認のため）。登録手順は docs/events-setup.md。
 - 同日追加：外部サイト掲載の公演を管理画面 /contact/admin/events/ から取り込める仕組み（URL 指定でその1ページを取得→JSON-LD Event／本文推定で候補→確認して公開→KV 保存→/events/ に表示）。定期再確認 /api/events/refresh は利用条件確認済みサイトの行だけ対象（初期ゼロ）。公開ページは noindex の管理画面と API のみ追加。
 - 同日方針変更（ユーザー判断）：当面は自社公演のみ。他社取り込みの管理画面・定期取得 API・外部サイト一覧の表示を撤去（登録簿と調査メモは残す）。/events/ を「今日できるイマーシブ」狙いに改修：title「今日できるイマーシブ｜東京で今日・明日・今週末に参加できる公演を探す」、h1 同旨、冒頭に今日の件数、今日／明日／今週末の要約セクション（日本時間で毎日更新）、要点ボックス、定義・目的別・費用・実績の段落、FAQ6問（FAQPage）、CollectionPage＋ItemList、AuthorBox・LatestPosts。内部リンク：immersive-taiken／immersive-theater／immersive-preparation／madamis-shoshinsha の関連ページに追加（dateModified・lastmod 9/13）、フッター文言を変更。
+
+## 2026-09-18 公演検索に「体験型取調室 FACTROOM」を追加
+- ユーザー貼付の escape.id 公演ページ本文から作品ページ /events/factroom/ を新設（企画・プロデュース ex Labs、主催 FACTROOM、会場 ANATOR 神田、約50分、1〜6人、18歳以上）。開催日時・料金は貼付に無く未確認のため公演回は未登録（検索結果には出ない）。/events/ に「掲載中の公演（作品一覧）」を追加し、日程未登録の作品も作品ページへ導線。料金単位 unknown を型・検証で許可。
