@@ -29,7 +29,7 @@ const latest = rows.map((r) => r.w.verified.at).sort().pop();
 const latestText = rows.find((r) => r.w.verified.at === latest)?.verifiedText ?? '';
 const SETTING: Record<string, string> = { indoor: '屋内で完結', outdoor: '屋外', mixed: '屋外の徒歩移動あり' };
 /** 同じ組で行動できるか（公式の案内から判定。分からなければ「公式で確認」） */
-const togetherText = (r: (typeof rows)[number]) => r.w.party.format === 'private' ? '最後まで同じ組（貸切）' : r.w.party.text.includes('離れる') ? '同じ回。途中で一時的に離れる場面あり' : r.w.party.format === 'shared' ? '同じ回（他の参加者も一緒）' : '公式ページで確認';
+const togetherText = (r: (typeof rows)[number]) => r.w.party.format === 'private' ? '1組だけで体験（申込単位で貸切）' : r.w.party.text.includes('離れる') ? '同じ回。途中で一時的に離れる場面あり' : r.w.party.format === 'shared' ? '同じ回（他の参加者も一緒）' : '公式ページで確認';
 /** 2名で申し込めるかと料金が分かるかは別。人数条件外→「2名では申込不可」、料金単位未確認→「公式ページで確認」 */
 const canPair = (r: (typeof rows)[number]) => r.w.party.min <= 2 && (r.w.party.max === undefined || r.w.party.max >= 2);
 const total2 = (r: (typeof rows)[number]) => { if (!canPair(r)) return '2名では申込不可'; const t = r.totalFor(2); return t === undefined ? '公式ページで確認' : `${fmtYen(t)}`; };
@@ -91,7 +91,7 @@ const articleLd = {
 ) : (
   <p class="lede">確認できた範囲で、2名で申し込める公演は現在ありません。開催中の公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京ガイド</a>をご覧ください。</p>
 )}
-<p class="cards-note">開催日は公式ページで確認した日付（最終確認 {latestText}）。総額は税込・手数料別。空席は予約サイトの表示が最新です。</p>
+<p class="cards-note">◯＝公式ページで確認できた開催日（最終確認 {latestText}）で、空席を保証するものではありません。空席は予約サイトの表示が最新です。総額は税込・手数料別。</p>
 </div></section>
 
 <section class="section tinted acc-wrap"><div class="wrap">
@@ -122,7 +122,7 @@ const articleLd = {
 <summary><span class="acc-t">二人の過ごし方で選ぶ</span><span class="acc-s">相談しながら進める／演者と交流／会話を抑える／雨の日</span></summary>
 <div class="acc-b">
 <ul class="bullets">
-<li><strong>二人で相談しながら進めたい</strong>：「同じ組で行動」を確認します。{pairPrivate.length ? `${names(pairPrivate)}は貸切で最後まで同じ組です。` : ''}{pairShared.length ? `${names(pairShared)}は同じ回に参加できますが、公式に「途中で一時的に離れる場面がある」と案内されています。` : ''}</li>
+<li><strong>二人で相談しながら進めたい</strong>：「同じ組で行動」を確認します。{pairPrivate.length ? `${names(pairPrivate)}は申込単位の貸切で、1組だけで体験します（進行中の動き方は公式ページで確認）。` : ''}{pairShared.length ? `${names(pairShared)}は同じ回に参加できますが、公式に「途中で一時的に離れる場面がある」と案内されています。` : ''}</li>
 <li><strong>演者との交流を楽しみたい</strong>：{actor.length ? `${names(actor)}はキャストとの会話が進行の一部です。` : '現在の公演で、キャストとの会話を公式に案内しているものは確認できていません。'}</li>
 <li><strong>会話の負担を抑えたい</strong>：会話が進行の一部になる公演は避け、証言や手がかりを集めて整理する型を選びます。{rows.filter((r) => r.w.info.actorInteraction !== true).length ? `${names(rows.filter((r) => r.w.info.actorInteraction !== true))}は「${rows.filter((r) => r.w.info.actorInteraction !== true).map((r) => r.w.info.participation).join('」「')}」と案内されています。` : ''}会話量を公式に明記した公演はないため、気になる場合は主催者に確認してください。</li>
 <li><strong>雨の日や歩きやすさが気になる</strong>：{outdoor.length ? `${names(outdoor)}は受付後に屋外の徒歩移動があります。` : ''}{rows.filter((r) => r.venue?.setting === 'indoor').length ? `${names(rows.filter((r) => r.venue?.setting === 'indoor'))}は商業施設内で完結します。` : ''}</li>

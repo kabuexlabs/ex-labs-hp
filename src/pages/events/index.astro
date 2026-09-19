@@ -96,7 +96,7 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 <section class="section cards" id="calendar"><div class="wrap">
 <h2 class="cards-h">今週・来週の開催日<span>◯の日付をタップで予約サイトへ</span></h2>
 <div class="ev-cal-grid">{calendarShows.filter((s) => s.published && s.occurrences.some((o) => o.date >= today)).map((s) => <ShowCalendar show={s} place="events-cal" now={now} />)}</div>
-<p class="ev-meta" style="margin-top:14px">◯は公式ページで確認できた開催日です。空席・残席は予約サイトの表示が最新で、開催日があるだけでは「予約可」とは表示していません。</p>
+<p class="ev-meta" style="margin-top:14px">◯＝公式ページで確認できた開催日で、空席を保証するものではありません。空席・残席は予約サイトの表示が最新で、開催日があるだけでは「予約可」とは表示していません。</p>
 </div></section>
 
 <section class="section ev-hero" data-today={today}><div class="wrap">

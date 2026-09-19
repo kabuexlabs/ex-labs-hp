@@ -40,7 +40,8 @@ const todayOpen = openCells.some((c) => c.date === today);
 const nextAfter = s.occurrences.map((o) => o.date).filter((d) => d >= week.end).sort()[0];
 const stale = now.getTime() - Date.parse(s.verifiedAt) > s.verifyTtlDays * 86400000;
 const MARK: Record<CellState, string> = { open: '◯', today: '◯', started: '済', soldout: '×', ended: '–', cancelled: '中止', none: '–' };
-const badge = todayOpen ? '本日開催' : openCount > 0 ? `2週間で${openCount}日開催` : nextAfter ? `次回 ${fmtDateShort(nextAfter)}` : '';
+const noDates = s.occurrences.length === 0;
+const badge = noDates ? '日程は公式で確認' : todayOpen ? '本日開催' : openCount > 0 ? `2週間で${openCount}日開催` : nextAfter ? `次回 ${fmtDateShort(nextAfter)}` : '';
 const pMain = priceMain ?? s.priceCard.main;
 const pSub = priceSub ?? s.priceCard.sub;
 const pUnknown = /公式/.test(pMain);
@@ -58,7 +59,7 @@ const chips = [short(s.duration), short(s.capacity)].filter((c) => c && c.length
     <p class="cal-price"><span class={`cal-yen${pUnknown ? ' is-unknown' : ''}`}>{pMain}</span>{pSub && <span class="cal-unit">{pSub}</span>}</p>
     {chips.length > 0 && <p class="cal-chips">{chips.map((c) => <span>{c}</span>)}</p>}
     {meta && !priceMain && <p class="cal-meta">{meta}</p>}
-    <div class="cal-weeks">
+    {noDates ? <p class="cal-nodates">回ごとの開催日は未確認です。日程は公式ページでご確認ください。</p> : <div class="cal-weeks">
       {[0, 1].map((wk) => (
         <div class="cal-week">
           <p class="cal-wk">{wk === 0 ? '今週' : '来週'}<span>{fmtDateShort(days14[wk * 7])}〜{fmtDateShort(days14[wk * 7 + 6])}</span></p>
@@ -66,7 +67,7 @@ const chips = [short(s.duration), short(s.capacity)].filter((c) => c && c.length
           {cells.slice(wk * 7, wk * 7 + 7).map((c) => {
             const wd = jstWeekday(c.date);
             const clickable = c.state === 'open' || c.state === 'today';
-            const label = `${fmtDateShort(c.date)}（${DAYS[wd]}）${clickable ? ' 開催日・予約サイトで空席を確認' : c.state === 'soldout' ? ' 完売' : c.state === 'started' ? ' 開演済み' : c.state === 'cancelled' ? ' 中止' : c.state === 'ended' ? ' 終了' : ' 開催なし'}`;
+            const label = `${fmtDateShort(c.date)}（${DAYS[wd]}）${clickable ? ' 開催日・予約サイトで空席を確認' : c.state === 'soldout' ? ' 完売' : c.state === 'started' ? ' 開演済み' : c.state === 'cancelled' ? ' 中止' : c.state === 'ended' ? ' 終了' : ' 開催日として確認できていない日'}`;
             return (
               <li class={`cal-cell is-${c.state}${wd === 0 ? ' is-sun' : wd === 6 ? ' is-sat' : ''}${c.date === today ? ' is-now' : ''}`} data-date={c.date}>
                 {clickable ? (
@@ -82,8 +83,8 @@ const chips = [short(s.duration), short(s.capacity)].filter((c) => c && c.length
           </ol>
         </div>
       ))}
-    </div>
-    <p class="cal-stock">{openCount > 0 ? '◯をタップで予約サイトへ。空席は予約サイトの表示が最新' : nextAfter ? `この2週間は開催なし。次回 ${fmtDateShort(nextAfter)}` : 'この2週間の開催は確認できていません'}{stale ? '（確認から2週間以上経過）' : ''}</p>
+    </div>}
+    <p class="cal-stock">{noDates ? '空席・日程は予約サイトの表示が最新' : openCount > 0 ? '◯をタップで予約サイトへ。空席は予約サイトの表示が最新' : nextAfter ? `この2週間に確認できた開催日はありません。次回 ${fmtDateShort(nextAfter)}` : 'この2週間に確認できた開催日はありません'}{stale ? '（確認から2週間以上経過）' : ''}</p>
     <div class="cal-actions">
       <a class="btn cal-btn" href={s.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={s.id} data-place={`${place}-btn`}>{openCount > 0 ? '予約サイトで空席を見る' : '次回以降の日程を見る'}<small>{s.ticketSite}</small></a>
       {!noDetailLink && <a class="cal-sub" href={s.url} data-track="show" data-show={s.id} data-place={place}>公演内容 →</a>}
@@ -148,6 +149,7 @@ const chips = [short(s.duration), short(s.capacity)].filter((c) => c && c.length
 .cal-cell.is-none .cal-m{color:rgba(29,29,31,.3)}
 .cal-cell.is-sat .cal-d{color:#1a6fb5}.cal-cell.is-sun .cal-d{color:#c0392b}
 .cal-cell.is-open.is-sat .cal-d,.cal-cell.is-open.is-sun .cal-d,.cal-cell.is-today.is-sat .cal-d,.cal-cell.is-today.is-sun .cal-d{color:inherit}
+.cal-nodates{margin:4px 0 0;padding-top:10px;border-top:1px dashed rgba(0,0,0,.1);font-size:12.5px;line-height:1.6;color:rgba(29,29,31,.7)}
 .cal-stock{margin:0;font-size:11.5px;line-height:1.6;color:rgba(29,29,31,.62)}
 .cal-actions{margin-top:auto;display:flex;flex-direction:column;align-items:stretch;gap:8px;padding-top:4px}
 .cal-btn{width:100%;font-size:14.5px;padding:14px 18px;flex-direction:column;gap:2px;line-height:1.2}

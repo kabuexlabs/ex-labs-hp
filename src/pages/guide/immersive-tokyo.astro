@@ -46,7 +46,8 @@ const calShows = shows.filter((s) => s.published).map((s) => {
 const latestVerified = shows.filter((s) => s.published).map((s) => s.verifiedAt).sort().pop() ?? '';
 const anyStale = calShows.some((c) => c.stale);
 const ppKnown = eventsData.works.filter((w) => w.published && !w.guideOnly).map((w) => perPerson(w.price, w.party.min)).filter((v): v is number => v !== undefined);
-const heroChips = [`開催中 ${calShows.length}公演`, ...(ppKnown.length ? [`1人 ${fmtYen(Math.min(...ppKnown))}〜`] : []), '◯をタップで予約サイトへ'];
+const datedCount = calShows.filter((c) => c.s.occurrences.some((o) => o.date >= today)).length;
+const heroChips = [`日程確認済み ${datedCount}公演`, ...(calShows.length > datedCount ? [`紹介 ${calShows.length}公演`] : []), ...(ppKnown.length ? [`1人 ${fmtYen(Math.min(...ppKnown))}〜`] : []), '◯をタップで予約サイトへ'];
 const MARK: Record<CellState, string> = { open: '◯', today: '◯', started: '済', soldout: '×', ended: '–', cancelled: '中止', none: '–' };
 
 // ---- 比較表・公演カード用 ----
@@ -142,7 +143,7 @@ const articleLd = {
 <div class="cal-grid">
 {calShows.map(({ s }) => <ShowCalendar show={s} place="guide-cal" now={now} />)}
 </div>
-<p class="tw-meta">開催日は公式ページで確認した日付（最終確認 {fmtVerified(latestVerified)}）。空席は予約サイトの表示が最新です。{anyStale && <strong>確認から2週間以上経過しているため、最新情報は予約サイトを優先してください。</strong>}日付・人数で絞り込むなら<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="guide-this-week">公演を探す</a>。</p>
+<p class="tw-meta">◯＝公式ページで確認できた開催日（最終確認 {fmtVerified(latestVerified)}）で、空席を保証するものではありません。空席は予約サイトの表示が最新です。{anyStale && <strong>確認から2週間以上経過しているため、最新情報は予約サイトを優先してください。</strong>}日付・人数で絞り込むなら<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="guide-this-week">公演を探す</a>。</p>
 <script is:inline>
 // 開いたまま日付が変わった場合：日本時間の今日より前のセルを「終了」にし、表示週が終わっていれば注意書きを出す。
 (function(){try{

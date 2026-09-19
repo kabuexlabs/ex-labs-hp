@@ -30,7 +30,7 @@ const latestText = rows.find((r) => r.w.verified.at === latest)?.verifiedText ??
 const soloCal = soloBook.map((r) => ({ r, s: shows.find((s) => s.id === r.w.id && s.published) })).filter((x): x is { r: (typeof rows)[number]; s: NonNullable<typeof x.s> } => !!x.s);
 const priceMain = (r: (typeof rows)[number]) => r.perPersonFor(1) !== undefined ? fmtYen(r.perPersonFor(1)!) : '料金は公式で確認';
 const priceSub = (r: (typeof rows)[number]) => `${r.perPersonFor(1) !== undefined ? '1人・税込' : ''}${r.perPersonFor(1) !== undefined && r.formatLabel ? '｜' : ''}${r.formatLabel}`;
-const soloRunText = (r: (typeof rows)[number]) => r.w.party.soloRuns === true ? '1名だけで成立' : r.w.party.soloRuns === false ? '相席（他の参加者と同じ回）' : r.w.party.soloAllowed ? '相席（公式に記載なし）' : '2名以上の申込が必要';
+const soloRunText = (r: (typeof rows)[number]) => r.w.party.soloRuns === true ? '1名だけで成立' : r.w.party.soloRuns === false ? '相席（他の参加者と同じ回）' : r.w.party.soloAllowed ? '相席・貸切は公式ページで確認' : '2名以上の申込が必要';
 const knownSolo = soloBook.map((r) => r.perPersonFor(1)).filter((t): t is number => t !== undefined);
 const heroChips = [
   ...(knownSolo.length ? [`1人 ${fmtYen(Math.min(...knownSolo))}〜`] : []),
@@ -39,7 +39,7 @@ const heroChips = [
 ];
 
 const faqs = [
-  { q: '一人分だけ予約すれば、一人で体験できますか？', a: `公演によります。${soloBook.length ? `${soloShared.length ? `${names(soloShared)}は1名から申し込めますが、他の参加者と同じ回で体験する相席形式です。` : ''}${soloOther.length ? `${names(soloOther)}も1名から申し込めます（相席か貸切かは公式ページで確認）。` : ''}` : '確認できた範囲で1名から申し込める公演はありません。'}${soloRun.length ? `${names(soloRun)}は1名だけで回が成立します。` : '1名だけで回が成立する（相席なし）公演は確認できていません。'}` },
+  { q: '一人分だけ予約すれば、一人で体験できますか？', a: `公演によります。${soloBook.length ? `${soloShared.length ? `${names(soloShared)}は1名から申し込めますが、他の参加者と同じ回で体験する相席形式です。` : ''}${soloOther.length ? `${names(soloOther)}も1名から申し込めます（相席・貸切は公式ページで確認）。` : ''}` : '確認できた範囲で1名から申し込める公演はありません。'}${soloRun.length ? `${names(soloRun)}は1名だけで回が成立します。` : '1名だけで回が成立する（相席なし）公演は確認できていません。'}` },
   { q: '知らない人と組むのが不安です。会話は必要ですか？', a: rows.map((r) => `${r.w.title}：${r.w.info.participation ?? '体験中の交流は公式ページで確認'}`).join('。') + '。演技は求められませんが、会話や協力が進行の一部になる公演では、その場で反応する場面があります。' },
   { q: '遅刻や途中退出はできますか？', a: rows.map((r) => `${r.w.title}：${(r.w.info.requirements ?? []).filter((x) => /遅れ|入場/.test(x)).join('、') || '遅刻・途中入場の扱いは公式ページで確認'}`).join('。') + '。途中退出の扱いは各公式ページに記載がないため、予約前に主催者へ確認してください。' },
   { q: '服装や持ち物はどうすればいいですか？', a: '公演の形式ごとの服装・靴・持ち物は「イマーシブ体験の服装・持ち物」の記事にまとめています。スマートフォンとイヤホンを必須にしている公演があるので、そこだけは先に確認してください。' },
@@ -83,7 +83,7 @@ const articleLd = {
 ) : (
   <p class="lede">確認できた範囲で、1名から申し込める公演は現在ありません。開催中の公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京ガイド</a>をご覧ください。</p>
 )}
-<p class="cards-note">開催日は公式ページで確認した日付（最終確認 {latestText}）。料金は税込・手数料別。空席は予約サイトの表示が最新です。{needsTwo.length ? `${names(needsTwo)}は2名以上での申込のため、ここには載せていません。` : ''}</p>
+<p class="cards-note">◯＝公式ページで確認できた開催日（最終確認 {latestText}）で、空席を保証するものではありません。空席は予約サイトの表示が最新です。料金は税込・手数料別。{needsTwo.length ? `${names(needsTwo)}は2名以上での申込のため、ここには載せていません。` : ''}</p>
 </div></section>
 
 <section class="section tinted acc-wrap"><div class="wrap">
@@ -113,7 +113,7 @@ const articleLd = {
 <summary><span class="acc-t">一人参加の3つの形式と選び方</span><span class="acc-s">相席で申し込む／一人で巡る／複数名が必要</span></summary>
 <div class="acc-b">
 <ul class="bullets">
-<li><strong>一人分で申し込み、他の参加者と同じ回で体験する（相席）</strong>：チケット1枚につき1名で販売され、同じ回に申し込んだ人たちと一緒に進みます。{soloBook.length ? `現在は${names(soloBook)}。` : '現在は確認できた公演がありません。'}</li>
+<li><strong>一人分で申し込み、他の参加者と同じ回で体験する（相席）</strong>：チケット1枚につき1名で販売され、同じ回に申し込んだ人たちと一緒に進みます。{soloShared.length ? `現在は${names(soloShared)}。` : '現在は公式に相席と案内している公演を確認できていません。'}{soloOther.length ? `${names(soloOther)}は1名から申し込めますが、相席・貸切は公式ページで確認してください。` : ''}</li>
 <li><strong>一人で巡る（相席なし）</strong>：1名だけで回が成立し、自分のペースで進めます。{soloRun.length ? `現在は${names(soloRun)}。` : '現在の東京の公演では公式に案内しているものを確認できていません（過去には下北沢の周遊型アート体験、1〜4名、終了）。'}</li>
 <li><strong>複数名の予約が必要</strong>：申込の下限が2名以上で、一人では申し込めません。{needsTwo.length ? `現在は${names(needsTwo)}（${needsTwo.map((r) => r.w.party.text).join('、')}）。` : ''}</li>
 <li><strong>会話や交流を少なくしたい</strong>：表の「体験中の交流」を確認します。{rows.filter((r) => r.w.info.actorInteraction === true).length ? `${names(rows.filter((r) => r.w.info.actorInteraction === true))}はキャストとの会話が進行の一部です。` : ''}演技は求められません。</li>
@@ -150,7 +150,7 @@ const articleLd = {
 <div class="acc-b">
 <div class="key-points"><p class="key-points-h">要点</p><ul>
 <li>イマーシブ体験とは、客席から観るのではなく物語の当事者として空間の中で体験する没入型イベントのことです。</li>
-<li>{soloBook.length ? `1名で申し込める公演：${names(soloBook)}${soloShared.length ? '（相席）' : ''}。` : '1名で申し込める公演は確認できていません。'}{needsTwo.length ? `${names(needsTwo)}は2名以上。` : ''}</li>
+<li>{soloBook.length ? `1名で申し込める公演：${[...soloShared.map((r) => `${r.w.title}（相席）`), ...soloOther.map((r) => `${r.w.title}（相席・貸切は公式ページで確認）`)].join('、')}。` : '1名で申し込める公演は確認できていません。'}{needsTwo.length ? `${names(needsTwo)}は2名以上。` : ''}</li>
 <li>確認する条件は「1名で申し込めるか」「1名だけで成立するか（相席か）」「会話が必要か」の3つ。</li>
 </ul></div>
 <p class="cmp-note-p">出典：各公演の公式ページ・公式チケットページ（最終確認 {latestText}）。紹介範囲：このページで扱っているのは、公式ページで申込条件を確認できた公演です（現在は株式会社ex Labsが企画・制作した公演）。東京の全公演を網羅した比較や第三者によるランキングではありません。他社公演は、主催者の公式情報で条件を確認できたものから追加します。</p>

@@ -344,7 +344,7 @@ export const EVENT_STATUS_LABEL: Record<Occurrence['eventStatus'], string> = {
 };
 export const SALES_LABEL: Record<SalesStatus, string> = { 'not-yet': '発売前', open: '受付中', closed: '受付終了', unknown: '受付状況は未確認' };
 export const SEAT_LABEL: Record<SeatStatus, string> = { available: '確認時点で空席あり', soldout: '確認時点で満席', unknown: '空席は公式サイトで確認' };
-export const FORMAT_LABEL: Record<Work['party']['format'], string> = { shared: '相席（他の参加者と一緒）', private: '申込単位で貸切', either: '相席・貸切の両方あり', unknown: '参加形式は未確認' };
+export const FORMAT_LABEL: Record<Work['party']['format'], string> = { shared: '相席（他の参加者と一緒）', private: '申込単位で貸切', either: '相席・貸切の両方あり', unknown: '相席・貸切は公式ページで確認' };
 export const CTA_LABEL: Record<CtaKind, string> = {
   book: '公式ページで予約する',
   check: '公式ページで空席・受付状況を確認する',
