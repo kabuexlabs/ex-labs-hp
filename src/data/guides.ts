@@ -25,8 +25,8 @@ export const guideArticles: GuideArticle[] = [
   ...(EXPERIENCE_DATE_PUBLISHED ? [{
     href: '/guide/tokyo-experience-date/',
     title: '東京の非日常デート｜二人で楽しむ体験を料金・時間・過ごし方で比較',
-    desc: 'ものづくり・没入型アート・謎解き・物語参加型を、二人分の料金、所要時間、会話と協力の量、貸切条件で比較。予約前の確認点つき。',
-    date: '2026-09-18',
+    desc: 'ものづくり・謎解き・物語参加型の実例を、二人分の料金、所要時間、貸切か相席か、予約前の確認点で比較。公式予約先へ進める。',
+    date: '2026-09-20',
     category: 'immersive' as PostCategory,
     thumb: '/assets/guide/tokyo-experience-date.webp',
   }] : []),

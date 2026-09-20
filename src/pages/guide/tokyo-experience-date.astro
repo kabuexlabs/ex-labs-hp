@@ -11,6 +11,7 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import ShowCalendar from '../../components/ShowCalendar.astro';
+import VisualHero from '../../components/VisualHero.astro';
 import { shows } from '../../data/shows';
 import { jstDateString } from '../../lib/thisWeek';
 import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
@@ -23,16 +24,24 @@ const pageUrl = new URL('/guide/tokyo-experience-date/', site).toString();
 const draft = !EXPERIENCE_DATE_PUBLISHED;
 if (draft) Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
 
-const story = buildGuideRows(now).filter((r) => r.status !== 'ended');
+// 物語参加型の実例：開催中で、二人での参加形式（貸切／相席）と料金単位が公式で確認できた公演だけ（未確認の公演は二人向けの実例に含めない）
+const story = buildGuideRows(now).filter((r) => r.status !== 'ended' && r.w.party.format !== 'unknown' && r.totalFor(2) !== undefined);
 const today = jstDateString(now);
 const storyShows = shows.filter((s) => s.published && story.some((r) => r.w.id === s.id) && s.occurrences.some((o) => o.date >= today));
-const total2 = (r: (typeof story)[number]) => { const t = r.totalFor(2); return t === undefined ? '2名では申込不可' : fmtYen(t); };
+// 申込可否（人数条件）と料金の有無は別の状態として扱う
+const canPair = (r: (typeof story)[number]) => r.w.party.min <= 2 && (r.w.party.max === undefined || r.w.party.max >= 2);
+const total2 = (r: (typeof story)[number]) => { if (!canPair(r)) return '2名では申込不可'; const t = r.totalFor(2); return t === undefined ? '料金は公式で確認' : fmtYen(t); };
 const SETTING: Record<string, string> = { indoor: '屋内で完結', outdoor: '屋外', mixed: '屋外の徒歩移動あり' };
 const byGenre = (g: Genre) => publishedItems.filter((i) => i.genre === g);
-const genres: Genre[] = ['craft', 'art', 'puzzle', 'story'];
+// 見出し・比較表は「実例を掲載できているジャンル」だけに揃える（実例のないジャンルの傾向だけを書かない）
+const genres: Genre[] = (['craft', 'art', 'puzzle', 'story'] as Genre[]).filter((g) => (g === 'story' ? story.length > 0 : byGenre(g).length > 0));
+const genreNames = genres.map((g) => GENRE_LABEL[g]).join('・');
+const exampleCount = publishedItems.length + story.length;
+// 公式URLを実際に開いて確認できていない項目は、URLを直接リンクせず公式サイト名での検索リンクにする（誤ったURLを載せない）
+const extHref = (i: (typeof publishedItems)[number]) => i.urlChecked ? (i.bookingUrl ?? i.officialUrl) : `https://www.google.com/search?q=${encodeURIComponent(`${i.name.replace(/（[^）]*）/g, '').trim()} 公式`)}`;
 const genreInfo: Record<Genre, { doing: string; talk: string; check: string }> = {
-  craft: { doing: '陶芸・指輪・ガラスなどを、講師の説明を受けながら二人がそれぞれ（または一緒に）作る', talk: '会話は二人が中心。講師とのやり取りはあるが、他の参加者と協力する場面は少ない', check: '同じ席・同じ回で作れるか、焼成や仕上げで完成品の受け取りが後日になるか、素材・送料などの追加料金' },
-  art: { doing: '作品空間を歩いて鑑賞する。日時指定チケットで入場し、順路や滞在時間は自由なことが多い', talk: '会話は自由。他の来場者も一緒で貸切にはならない。協力や役割はない', check: '日時指定か、混雑する時間帯、裸足や水に入る作品の有無、再入場の可否' },
+  craft: { doing: '指輪や絵などを、講師の説明を受けながら二人がそれぞれ（または一緒に）作る', talk: '講師とのやり取りが中心。他の参加者と同席するか、協力する場面があるかは各体験の案内で確認', check: '同じ席・同じ回で作れるか、焼成や仕上げで完成品の受け取りが後日になるか、素材・送料などの追加料金' },
+  art: { doing: '作品空間を歩いて鑑賞する。日時指定チケットで入場し、順路や滞在時間は自由なことが多い', talk: '他の来場者も一緒で貸切にはならない。会話や撮影の制限は展示ごとに確認', check: '日時指定か、混雑する時間帯、裸足や水に入る作品の有無、再入場の可否' },
   puzzle: { doing: '制限時間内に二人で（または他の参加者とチームで）謎を解き、脱出やミッション達成を目指す', talk: '二人の相談が中心。公演によっては他のチームと合流し、初対面の人と協力する', check: '二人だけで1チームになれるか、他の参加者と同じチームになるか、難易度、途中退出の扱い' },
   story: { doing: '物語の登場人物として空間に入り、キャストとの会話や選択で物語を進める', talk: 'キャストとの会話が進行の一部。相席形式では他の参加者も一緒に進む', check: '二人が同じ組か（貸切か相席か）、途中で離れる場面の有無、年齢条件、集合時刻と遅刻の扱い' },
 };
@@ -43,20 +52,20 @@ const faqs = [
 ];
 const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
 const title = '東京の非日常デート｜二人で楽しむ体験を料金・時間・過ごし方で比較';
-const desc = '東京で楽しむ体験デートを、ものづくり・没入型アート・謎解き・物語参加型の4ジャンルから比較。二人分の料金と単位、所要時間、二人の会話と他の参加者との協力の量、貸切か相席か、予約前に確認する点を公式情報で整理し、公式予約ページへ進めます。';
+const desc = '東京で楽しむ体験デートを、ものづくり・謎解き・物語参加型の3ジャンルから比較。二人分の料金と単位、所要時間、二人の会話と他の参加者との協力の量、貸切か相席か、予約前に確認する点を公式情報で整理し、公式予約ページへ進めます。';
 const articleLd = {
   '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
   image: [new URL('/assets/guide/tokyo-experience-date.webp', site).toString()],
   author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
-  datePublished: '2026-09-18', dateModified: '2026-09-18', mainEntityOfPage: pageUrl,
+  datePublished: '2026-09-20', dateModified: '2026-09-20', mainEntityOfPage: pageUrl,
 };
 const latestStory = story.map((r) => r.w.verified.at).sort().pop();
 const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.verifiedText ?? '';
 ---
 <BaseLayout
   title="東京の非日常デート｜二人で楽しむ体験を料金・時間・過ごし方で比較 - 株式会社ex Labs"
-  description="東京で楽しむ体験デートを、ものづくり・没入型アート・謎解き・物語参加型の4ジャンルから比較。二人分の料金と単位、所要時間、二人の会話と他の参加者との協力の量、貸切か相席か、予約前に確認する点を公式情報で整理し、公式予約ページへ進めます。"
+  description="東京で楽しむ体験デートを、ものづくり・謎解き・物語参加型の3ジャンルから比較。二人分の料金と単位、所要時間、二人の会話と他の参加者との協力の量、貸切か相席か、予約前に確認する点を公式情報で整理し、公式予約ページへ進めます。"
   ogImage="/assets/guide/tokyo-experience-date.webp"
 >
 {!draft && <script type="application/ld+json" set:html={jsonLd(faqLd)} />}
@@ -73,12 +82,14 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
   </div></section>
 )}
 
-<section class="section" style="padding-top:40px"><div class="wrap">
-<p class="eyebrow">EXPERIENCE DATE</p>
-<h1 class="h2 serif"><span class="nobr">東京でいつもと違うデートをするなら？</span><span class="nobr">二人で楽しむ非日常の体験</span></h1>
-<p class="lede">食事や映画の次に、二人で何かを体験してみたい。東京には、ものを作る・アートに包まれる・謎を解く・物語に参加する体験があります。<strong>料金だけでなく、二人で話せる時間と、他の参加者と一緒になるかも比べて選びましょう。</strong></p>
+<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 45%" eyebrow="EXPERIENCE DATE" catchText="食事と映画の次は、二人で体験を" chips={[`実例 ${exampleCount}件`, `${genres.length}ジャンルを比較`, '二人分の料金・時間・貸切か相席か']} alt="東京で開催中のイマーシブ公演のキービジュアル">
+  <h1 class="h2 serif"><span class="nobr">東京でいつもと違うデートをするなら？</span><span class="nobr">二人で楽しむ非日常の体験</span></h1>
+</VisualHero>
+
+<section class="section" style="padding-top:28px"><div class="wrap">
+<p class="lede">東京で二人で楽しめる体験を、<strong>{genreNames}</strong>から比べます。<strong>料金だけでなく、二人だけで進められるか、他の参加者やキャストと関わるかも比べて選びましょう。</strong></p>
 <div class="key-points"><p class="key-points-h">要点</p><ul>
-<li>ものづくりと展示型は二人の会話が中心。謎解きと物語参加型は他の参加者やキャストと関わる場面あり。</li>
+<li>二人だけで話せる時間の長さは体験ごとに違います。各実例の「二人での参加」欄で、同席・貸切・他の参加者やキャストとの関わりを確認できます。</li>
 <li>料金は「1人料金×2」と「1組料金」を区別。焼成費・素材費・手数料は別の場合あり。</li>
 <li>「二人で申し込める」と「二人だけで体験できる（貸切）」は別の条件。</li>
 </ul></div>
@@ -127,9 +138,9 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
           <div><dt>選ぶ理由</dt><dd class="dd-normal">{i.fit}</dd></div>
           <div><dt>注意点</dt><dd class="dd-normal">{i.notes}</dd></div>
         </dl>
-        <p class="tw-meta" style="margin-top:10px">出典：<a href={i.officialUrl} target="_blank" rel="noopener nofollow" style="color:var(--accent)">公式ページ</a>（{i.checkedAt} 確認）</p>
+        <p class="tw-meta" style="margin-top:10px">出典：{i.urlChecked ? <a href={i.officialUrl} target="_blank" rel="noopener nofollow" style="color:var(--accent)">公式ページ</a> : '公式ページの記載'}（{i.checkedAt} 確認）{i.confirmation.unconfirmed.length > 0 && `。未確認：${i.confirmation.unconfirmed.filter((u) => !/URL/.test(u)).join('・')}`}</p>
         <div class="tw-actions">
-          <a class="btn tw-btn ghost" href={i.bookingUrl ?? i.officialUrl} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={i.siteId} data-place="xdate-card">公式ページで詳細・予約を見る</a>
+          <a class="btn tw-btn ghost" href={extHref(i)} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={i.siteId} data-place="xdate-card">{i.urlChecked ? '公式ページで詳細・予約を見る' : '公式サイトを検索して予約ページへ'}</a>
         </div>
       </article>
     ))}
@@ -173,9 +184,9 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 <li><strong>形に残るものを作りたい</strong>：ものづくり。{byGenre('craft').length ? `実例：${byGenre('craft').map((i) => i.name).join('、')}。` : '実例は公式確認後に掲載します。'}完成品を当日持ち帰れるか、焼成後の受け取りかを確認します。</li>
 <li><strong>一緒に相談して解きたい</strong>：謎解き・脱出ゲーム、または証言や手がかりを整理する型の物語参加型。{byGenre('puzzle').length ? `実例：${byGenre('puzzle').map((i) => i.name).join('、')}。` : ''}{story.filter((r) => r.w.info.actorInteraction !== true).length ? `物語参加型では${story.filter((r) => r.w.info.actorInteraction !== true).map((r) => r.w.title).join('、')}が「${story.filter((r) => r.w.info.actorInteraction !== true).map((r) => r.w.info.participation).join('」「')}」と案内されています。` : ''}二人だけで1チームになれるかは公演ごとに確認します。</li>
 <li><strong>物語の中で役割を演じてみたい</strong>：キャストと交流する物語参加型。{story.filter((r) => r.w.info.actorInteraction === true).length ? `${story.filter((r) => r.w.info.actorInteraction === true).map((r) => r.w.title).join('、')}はキャストとの会話が進行の一部です。` : ''}演技は求められませんが、その場で反応する場面があります。</li>
-<li><strong>自分のペースで鑑賞したい</strong>：没入型アート・展示。{byGenre('art').length ? `実例：${byGenre('art').map((i) => i.name).join('、')}。` : '実例は公式確認後に掲載します。'}会話は自由ですが、他の来場者と一緒で貸切にはなりません。</li>
+{byGenre('art').length > 0 && <li><strong>自分のペースで鑑賞したい</strong>：没入型アート・展示。実例：{byGenre('art').map((i) => i.name).join('、')}。他の来場者と一緒で貸切にはなりません。</li>}
 </ul>
-<p class="lede">「二人の会話が多い」ことと「他の人やキャストとの会話が多い」ことは別です。二人で話す時間を優先するならものづくりや展示型、初対面の人やキャストと関わる時間を楽しみたいなら謎解きや物語参加型が候補になります。効果や相性は人によって違うため、このページでは条件の違いだけを載せています。</p>
+<p class="lede">「二人の会話が多い」ことと「他の人やキャストとの会話が多い」ことは別です。初対面の人と組まずに二人だけで進めたいなら、各部屋が貸切の脱出ゲームや申込単位で貸切の公演が候補になります。効果や相性は人によって違うため、このページでは公式に確認できた条件の違いだけを載せています。</p>
 </div></section>
 
 <section class="section" id="check"><div class="wrap narrow">
@@ -198,7 +209,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 </div></section>
 
 <section class="section"><div class="wrap">
-<p class="cmp-note-p">紹介範囲：物語参加型は株式会社ex Labsが企画・制作した公演で、当社主催・制作と明記しています。他社の施設・体験は、主催者の公式ページで所在地・料金・所要時間・二人での参加条件・受付状況を確認できたものだけを掲載し、確認日を併記しています。東京の全体験を網羅した比較や第三者によるランキングではありません。</p>
+<p class="cmp-note-p">紹介範囲：物語参加型は株式会社ex Labsが企画・制作した公演で、当社主催・制作と明記しています。他社の施設・体験は、主催者の公式ページの記載（料金・所要時間・二人での参加条件）を確認できたものだけを掲載し、確認日と未確認の項目を併記しています。最低料金は特定日時の予約可能価格ではありません。東京の全体験を網羅した比較や第三者によるランキングではありません。</p>
 <p class="vc-line" style="margin-top:32px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">イマーシブ体験を二人で楽しむには</a>／<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)">一人で参加するには</a>／<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物</a>／<a href="/events/" style="color:var(--accent)">公演を探す</a></p>
 </div></section>
 

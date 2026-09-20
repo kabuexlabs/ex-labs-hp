@@ -35,6 +35,8 @@ export interface ExperienceItem {
   officialUrl: string;
   /** 公式予約ページ（公式ページと同じなら省略） */
   bookingUrl?: string;
+  /** officialUrl を実際に開いて確認できたか。false の間は記事でURLを直接リンクせず、公式サイト名での検索リンクにする */
+  urlChecked?: boolean;
   /** 掲載元の識別子（計測 ev-ext の data-show に使う） */
   siteId: string;
   /** 実際に確認した日（YYYY-MM-DD）と確認方法 */
@@ -141,6 +143,69 @@ export const experienceItems: ExperienceItem[] = [
     checkedBy: 'Claude（Web 検索結果の抜粋のみ。公式ページ未確認）',
     confirmation: { confirmed: [], unconfirmed: ['掲載する公演の選定', '料金', '所要時間', '二人での参加条件（相席）', '受付状況'] },
     published: false,
+  },
+
+  // ---- 2026-09-20 公開分：SEO担当の調査報告（公式ページの記載を転記、確認日 2026-09-20）を根拠に掲載 ----
+  // 実装環境から各公式サイトへ到達できないため、URL の生存と税込表示など報告に「未確認」とある項目は unconfirmed に残す。
+  {
+    id: 'icci-daikanyama-pair-ring',
+    name: 'icci 代官山 シルバーペアリング制作',
+    genre: 'craft',
+    area: '東京・代官山（最寄り駅は公式で確認）',
+    what: '二人がそれぞれ1本ずつ、シルバーの指輪を自分の手で作る。オプション加工は預かりになる。',
+    forTwo: '二人向けのペアリング制作プラン。同席・貸切かどうかは公式で確認',
+    price: '1本 12,000円〜（税込）。二人が各1本作る場合は 24,000円〜（公式料金からの計算。オプション加工は別料金）',
+    time: '約1時間。通常は当日持ち帰り（オプション加工を付けた場合は預かり）',
+    status: '常設。受付状況は公式予約ページで確認',
+    fit: '形に残るものを二人で作り、当日持ち帰りたい場合',
+    notes: '最低料金は特定日時の予約可能価格ではない。オプション加工分と受け取り時期は予約時に確認',
+    officialUrl: 'https://icci.jp/',
+    urlChecked: false,
+    siteId: 'icci',
+    checkedAt: '2026-09-20',
+    checkedBy: 'SEO担当の調査報告（公式ページの記載を転記）',
+    confirmation: { confirmed: ['料金（1本 12,000円〜税込）', '所要時間（約1時間）', '当日持ち帰り（通常）'], unconfirmed: ['公式URLの生存', '最寄り駅', '同席・貸切', '受付状況'] },
+    published: true,
+  },
+  {
+    id: 'artbar-tokyo',
+    name: 'Artbar Tokyo（絵を描く体験）',
+    genre: 'craft',
+    area: '東京・代官山／原宿／銀座 など（セッションごとに会場が異なる）',
+    what: '講師の進行で、二人がそれぞれキャンバスに絵を描く。画材・ドリンクなどが料金に含まれる。',
+    forTwo: '友人同士の参加が可能と案内。二人で同じ会場・同じセッションを予約する',
+    price: '1人 4,620円〜（公式トップの案内。画材・ドリンク等込み）。二人で 9,240円〜（計算。セッションごとに料金が異なるため予約ページで確定）',
+    time: '約2時間',
+    status: '常設（会場・日時はセッションごと）。受付状況は公式予約ページで確認',
+    fit: '完成した絵をその場で見比べたい、飲み物を片手に過ごしたい二人',
+    notes: '年齢条件、同席、作品の持ち帰りの例外は公式で確認。最低料金を全セッション共通の価格として扱わない',
+    officialUrl: 'https://artbar.co.jp/',
+    urlChecked: false,
+    siteId: 'artbar',
+    checkedAt: '2026-09-20',
+    checkedBy: 'SEO担当の調査報告（公式ページの記載を転記）',
+    confirmation: { confirmed: ['料金（1人 4,620円〜）', '所要時間（約2時間）', '画材・ドリンク込み', '友人同士の参加可'], unconfirmed: ['公式URLの生存', 'セッションごとの料金', '年齢条件', '同席', '持ち帰りの例外', '受付状況'] },
+    published: true,
+  },
+  {
+    id: 'zettai-kukan-ikebukuro',
+    name: '絶対空間 池袋店（リアル脱出ゲーム）',
+    genre: 'puzzle',
+    area: '東京・池袋（最寄り駅は公式で確認）',
+    what: '二人だけのチームで部屋に入り、制限時間内に謎を解いて脱出を目指す。',
+    forTwo: '2名から申し込める。各部屋は1組ごとの貸切で、他のチームと一緒にならない',
+    price: '1人 平日昼 2,000円／夜・土日祝 2,500円（公式料金表。税込表示かは要確認）。二人で 4,000円／5,000円（料金表からの計算）',
+    time: '本編40分、説明込みで約1時間（共通FAQ）。部屋によって案内が異なる場合は各部屋のページを優先',
+    status: '常設。受付状況は公式予約ページで確認',
+    fit: '二人だけで相談しながら、初対面の人と組まずに解きたい場合',
+    notes: '部屋（作品）ごとの難易度と時間は個別ページで確認。二人分の金額は料金表からの計算で、特定日時の予約可能価格ではない',
+    officialUrl: 'https://zettaikukan.com/',
+    urlChecked: false,
+    siteId: 'zettai-kukan',
+    checkedAt: '2026-09-20',
+    checkedBy: 'SEO担当の調査報告（公式ページの記載を転記）',
+    confirmation: { confirmed: ['2名から', '各部屋貸切', '料金表（平日昼 2,000円／夜・土日祝 2,500円）', '本編40分・説明込み約1時間'], unconfirmed: ['公式URLの生存', '税込表示', '最寄り駅', '各部屋の時間表記', '受付状況'] },
+    published: true,
   },
 ];
 

@@ -129,7 +129,7 @@ export const GET: APIRoute = async ({ site }) => {
     loc: new URL(p, base).toString(),
   }));
   // 体験デート記事は他社項目が公式確認できて公開扱いになった時だけ載せる（下書きは noindex）
-  if (EXPERIENCE_DATE_PUBLISHED) urls.push({ loc: new URL('/guide/tokyo-experience-date/', base).toString(), lastmod: '2026-09-18' });
+  if (EXPERIENCE_DATE_PUBLISHED) urls.push({ loc: new URL('/guide/tokyo-experience-date/', base).toString(), lastmod: '2026-09-20' });
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {
