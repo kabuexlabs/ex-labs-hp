@@ -1,5 +1,9 @@
 ---
+// 終了表示を日付で切り替えるためリクエスト時に描画する（日付は日本時間。開催日の正本は src/data/events/）
+export const prerender = false;
 import SiteGuard from '../../components/SiteGuard.astro';
+import { eventsData } from '../../data/events/index';
+import { jstDateString } from '../../lib/thisWeek';
 // 公演「ウワサバナシ調査委員会」公式LP。
 // 検索インデックス許可済み（sitemap.xml の STATIC_PATHS にも掲載）。
 // コーポレートサイトとはデザイン系統が別物なので BaseLayout は
@@ -28,6 +32,11 @@ const cast = [
 const title = '【公式】ウワサバナシ調査委員会 | イマーシブ公演';
 const canonical = 'https://kabuexlabs.com/uwasabanashi/';
 const ogImage = 'https://kabuexlabs.com/assets/uwasabanashi/og.png';
+// 最終開催日（公演データ）を過ぎたら「終了」表示。それまでは終了扱いにしない
+const lastDate = eventsData.occurrences.filter((o) => o.workId === 'uwasabanashi' && o.published && o.eventStatus !== 'cancelled').map((o) => o.date).sort().pop() ?? '2026-10-04';
+// 開発時のみ ?asof=YYYY-MM-DD で終了表示を確認できる（本番では無視）
+const todayJst = (import.meta.env.DEV && Astro.url.searchParams.get('asof')) || jstDateString(new Date());
+const ended = todayJst > lastDate;
 const description =
   'イマーシブ公演「ウワサバナシ調査委員会」公式サイト。2026年9月19日・20日・26日・27日・10月3日・4日、渋谷サクラステージにて開催。ねぇ、知ってる？現実を変えることができるノートがあるって。';
 
@@ -54,13 +63,13 @@ const eventLd = {
       addressCountry: 'JP',
     },
   },
-  offers: {
+  ...(ended ? {} : { offers: {
     '@type': 'Offer',
     price: '4000',
     priceCurrency: 'JPY',
     url: 'https://escape.id/uwasabanashi-org/e-case1/',
     availability: 'https://schema.org/InStock',
-  },
+  } }),
   organizer: {
     '@type': 'Organization',
     name: '株式会社ex Labs',
@@ -142,7 +151,7 @@ const faqs = [
 <a href="#faq">FAQ</a>
 </header>
 
-<a class="cta" href={ticketUrl} target="_blank" rel="noopener">チケットを購入する</a>
+{ended ? <a class="cta" href="https://kabuexlabs.com/guide/immersive-tokyo/">全日程終了｜東京のほかの公演を見る</a> : <a class="cta" href={ticketUrl} target="_blank" rel="noopener">チケットを購入する</a>}
 
 <main>
 
@@ -156,7 +165,7 @@ const faqs = [
 <span class="kvdate">
 <span class="kvd">2026.{dates[0]}<span class="kvsep">／</span>{dates[1]}<span class="kvsep">／</span>{dates[2]}</span><br class="sponly"><span class="kvsep pconly">／</span><span class="kvd">{dates[3]}<span class="kvsep">／</span>{dates[4]}<span class="kvsep">／</span>{dates[5]}</span>
 </span>
-<span class="kvvenue">渋谷サクラステージ</span>
+<span class="kvvenue">渋谷サクラステージ{ended && '（全日程終了）'}</span>
 </div>
 </div>
 </section>
@@ -233,8 +242,18 @@ const faqs = [
 <div class="pricebox"><p class="pricelabel">全日程共通</p><p class="priceval">¥4,000<span class="dim priceunit">（税込）</span></p></div>
 </div>
 <div class="center">
-<a class="buy" href={ticketUrl} target="_blank" rel="noopener">チケットを購入する</a>
-<p class="pricenote">日時指定チケット制／表示価格のほか別途手数料がかかります</p>
+{ended ? (
+  <>
+  <p class="pricenote" style="font-size:15px;color:#fff">本公演は全日程を終了しました。ご来場ありがとうございました。</p>
+  <a class="buy" href="https://kabuexlabs.com/guide/immersive-tokyo/">東京のほかのイマーシブ公演を見る</a>
+  </>
+) : (
+  <>
+  <a class="buy" href={ticketUrl} target="_blank" rel="noopener">チケットを購入する</a>
+  <p class="pricenote">日時指定チケット制／表示価格のほか別途手数料がかかります。空席は購入ページ（escape.id）の表示が最新です</p>
+  </>
+)}
+<p class="pricenote">日程が合わない場合：<a href="https://kabuexlabs.com/events/" target="_blank" rel="noopener" style="color:var(--accent)">東京のほかのイマーシブ公演を日付・人数で探す →</a></p>
 </div>
 </div>
 </section>

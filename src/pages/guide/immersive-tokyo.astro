@@ -46,8 +46,9 @@ const calShows = shows.filter((s) => s.published).map((s) => {
 const latestVerified = shows.filter((s) => s.published).map((s) => s.verifiedAt).sort().pop() ?? '';
 const anyStale = calShows.some((c) => c.stale);
 const ppKnown = eventsData.works.filter((w) => w.published && !w.guideOnly).map((w) => perPerson(w.price, w.party.min)).filter((v): v is number => v !== undefined);
-const datedCount = calShows.filter((c) => c.s.occurrences.some((o) => o.date >= today)).length;
-const heroChips = [`日程確認済み ${datedCount}公演`, ...(calShows.length > datedCount ? [`紹介 ${calShows.length}公演`] : []), ...(ppKnown.length ? [`1人 ${fmtYen(Math.min(...ppKnown))}〜`] : []), '◯をタップで予約サイトへ'];
+// 「紹介している公演数」と「今週（月〜日）に確認済みの開催日がある公演数」を分ける。期間内でも日程未確認は今週に数えない
+const thisWeekCount = calShows.filter((c) => c.cells.slice(0, 7).some((x) => x.state === 'open' || x.state === 'today')).length;
+const heroChips = [`紹介 ${calShows.length}公演`, `今週に開催日あり ${thisWeekCount}公演`, ...(ppKnown.length ? [`1人 ${fmtYen(Math.min(...ppKnown))}〜`] : []), '◯をタップで予約サイトへ'];
 const MARK: Record<CellState, string> = { open: '◯', today: '◯', started: '済', soldout: '×', ended: '–', cancelled: '中止', none: '–' };
 
 // ---- 比較表・公演カード用 ----
@@ -134,7 +135,7 @@ const articleLd = {
   { name: '東京のイマーシブ体験' },
 ]} />
 
-<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 60%" eyebrow="IMMERSIVE TOKYO GUIDE" catchText="今週、東京で行けるイマーシブ" chips={heroChips} alt="東京で開催中のイマーシブ公演のキービジュアル">
+<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 60%" eyebrow="IMMERSIVE TOKYO GUIDE" catchText="東京のイマーシブ、開催日から予約へ" chips={heroChips} alt="東京で開催中のイマーシブ公演のキービジュアル">
   <h1 class="h2 serif"><span class="nobr">東京で体験できる</span><span class="nobr">イマーシブイベント</span><span class="nobr">【2026年最新】</span></h1>
 </VisualHero>
 

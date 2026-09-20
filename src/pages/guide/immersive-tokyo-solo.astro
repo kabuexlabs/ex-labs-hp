@@ -30,7 +30,8 @@ const latestText = rows.find((r) => r.w.verified.at === latest)?.verifiedText ??
 const soloCal = soloBook.map((r) => ({ r, s: shows.find((s) => s.id === r.w.id && s.published) })).filter((x): x is { r: (typeof rows)[number]; s: NonNullable<typeof x.s> } => !!x.s);
 const priceMain = (r: (typeof rows)[number]) => r.perPersonFor(1) !== undefined ? fmtYen(r.perPersonFor(1)!) : '料金は公式で確認';
 const priceSub = (r: (typeof rows)[number]) => `${r.perPersonFor(1) !== undefined ? '1人・税込' : ''}${r.perPersonFor(1) !== undefined && r.formatLabel ? '｜' : ''}${r.formatLabel}`;
-const soloRunText = (r: (typeof rows)[number]) => r.w.party.soloRuns === true ? '1名だけで成立' : r.w.party.soloRuns === false ? '相席（他の参加者と同じ回）' : r.w.party.soloAllowed ? '相席・貸切は公式ページで確認' : '2名以上の申込が必要';
+// 表の「相席・貸切」列：カード・FAQ と同じく公演データの format を正にする（unknown は「公式ページで確認」。1枚1名だけで相席と推定しない）
+const soloRunText = (r: (typeof rows)[number]) => !r.w.party.soloAllowed ? '2名以上の申込が必要' : r.w.party.soloRuns === true ? '1名だけで成立' : r.formatLabel;
 const knownSolo = soloBook.map((r) => r.perPersonFor(1)).filter((t): t is number => t !== undefined);
 const heroChips = [
   ...(knownSolo.length ? [`1人 ${fmtYen(Math.min(...knownSolo))}〜`] : []),
