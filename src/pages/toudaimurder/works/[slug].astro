@@ -51,7 +51,9 @@ const workLd = {
   ...(minPlayers ? { numberOfPlayers: { '@type': 'QuantitativeValue', minValue: minPlayers, ...(maxPlayers ? { maxValue: maxPlayers } : {}) } } : {}),
   ...(minutes ? { timeRequired: `PT${minutes}M` } : {}),
   ...(work.awards?.length ? { award: work.awards.map((a) => a.replace(/[^\p{L}\p{N}\s％%位年月]/gu, '').trim()).filter(Boolean) } : {}),
-  author: { '@type': 'Organization', name: 'UNLIMITED MYSTERY', url: new URL(`${base}/`, site).toString() },
+  author: work.author
+    ? [{ '@type': 'Person', name: work.author }, { '@type': 'Organization', name: 'UNLIMITED MYSTERY', url: new URL(`${base}/`, site).toString() }]
+    : { '@type': 'Organization', name: 'UNLIMITED MYSTERY', url: new URL(`${base}/`, site).toString() },
   publisher: { '@type': 'Organization', name: 'UNLIMITED MYSTERY' },
   ...(priceYen ? { offers: { '@type': 'Offer', price: priceYen, priceCurrency: 'JPY', availability: 'https://schema.org/InStock', url: pageUrl } } : {}),
 };
@@ -84,6 +86,7 @@ const metaDesc = metaDescFull.length <= 155 ? metaDescFull : `${work.title}は�
         <p class="crumb mono"><a href={`${base}/`}>TOP</a> / <a href={`${base}/works/`}>WORKS</a> / {work.title}</p>
         <div class="specs"><span class="spec spec-genre">マーダーミステリー（マダミス）</span>{work.specs.map((s) => <span class="spec">{s}</span>)}</div>
         <h1 class="wt min">{work.title}</h1>
+        {work.author && <p class="author mono">作 — {work.author}</p>}
         {work.catch && <p class="catch min">{work.catch}</p>}
         {work.synopsis && (
           <>
@@ -146,11 +149,13 @@ const metaDesc = metaDescFull.length <= 155 ? metaDescFull : `${work.title}は�
 .fin{animation:fadeup .8s cubic-bezier(.22,.61,.36,1) both}
 .fin2{animation:fadeup .8s cubic-bezier(.22,.61,.36,1) .15s both}
 .dt{display:grid;grid-template-columns:400px 1fr;gap:64px;padding:72px 0 88px;align-items:start;border-bottom:1px solid var(--ln)}
+.dt>*{min-width:0}
 .dt .crumb{margin:0 0 28px}
-.specs{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 20px}
-.spec{border:1px solid var(--ln);color:var(--dim);font-size:12px;padding:4px 14px;letter-spacing:.1em}
+.specs{display:flex;gap:12px;flex-wrap:wrap;margin:0 0 20px;max-width:100%}
+.spec{border:1px solid var(--ln);color:var(--dim);font-size:12px;padding:4px 14px;letter-spacing:.1em;max-width:100%;overflow-wrap:anywhere}
 .spec-genre{border-color:var(--acc);color:var(--acc)}
 .wt{font-size:clamp(30px,3.4vw,48px);font-weight:800;line-height:1.4;margin:0 0 24px}
+.author{font-size:12px;color:var(--dim);letter-spacing:.1em;margin:-14px 0 24px}
 .catch{font-size:17px;font-weight:800;line-height:2;letter-spacing:.08em;margin:0 0 36px;white-space:pre-line;border-left:3px solid var(--acc);padding-left:18px}
 .syn{color:var(--dim);margin:0 0 40px;white-space:pre-line}
 .slbl{font-size:11px;color:var(--acc);letter-spacing:.28em;display:block;margin-bottom:12px}

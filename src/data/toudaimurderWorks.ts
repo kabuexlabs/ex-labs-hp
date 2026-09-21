@@ -15,6 +15,8 @@ export interface TmWork {
   slug: string;
   title: string;
   badge: string;
+  /** シナリオ作者名（外部作家に制作を依頼した作品のみ設定） */
+  author?: string;
   /** キービジュアル画像 (public/ 配下のパス)。未設定ならプレースホルダー表示 */
   image?: string;
   /** 人数／時間 のカード表記 (例: '6人／240分') */
@@ -50,6 +52,7 @@ export const tmWorks: TmWork[] = [
     slug: 'arumadamisu2',
     title: 'あるマーダーミステリーについて2',
     badge: '続編',
+    author: '綾部ヒサト',
     image: '/assets/toudaimurder/arumadamisu2.webp',
     meta: '5人／180分',
     play: 'GM必須｜店舗公演',
@@ -70,6 +73,7 @@ export const tmWorks: TmWork[] = [
     slug: 'frankenstein',
     title: 'フランケンシュタイン城の殺人',
     badge: 'NEW',
+    author: 'うろん堂',
     image: '/assets/toudaimurder/frankenstein.webp',
     meta: '6人／240分',
     play: 'GM必須｜店舗公演・オンライン',
@@ -92,6 +96,7 @@ export const tmWorks: TmWork[] = [
     slug: 'sonohi',
     title: 'その火が消えるとき',
     badge: 'NEW',
+    author: 'いろ',
     image: '/assets/toudaimurder/sonohi.webp',
     meta: '7人／240分',
     play: 'GM必須｜店舗公演｜推理重視・経験者向け',
@@ -151,6 +156,7 @@ export const tmWorks: TmWork[] = [
     slug: 'bluedia',
     title: 'ブルーダイヤの不在証明',
     badge: 'ONLINE',
+    author: 'うろん堂',
     image: '/assets/toudaimurder/bluedia.webp',
     meta: '4人／150分',
     play: 'オンライン・店舗公演',
@@ -298,6 +304,7 @@ export const tmWorks: TmWork[] = [
     slug: 'kurenai',
     title: '紅の散乱',
     badge: 'NEW',
+    author: '御湯波ライト',
     image: '/assets/toudaimurder/kurenai.webp',
     meta: '5人／180分',
     play: '店舗公演',
