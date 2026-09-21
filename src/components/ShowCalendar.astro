@@ -59,7 +59,7 @@ const chips = [short(s.duration), short(s.capacity)].filter((c) => c && c.length
     <p class="cal-price"><span class={`cal-yen${pUnknown ? ' is-unknown' : ''}`}>{pMain}</span>{pSub && <span class="cal-unit">{pSub}</span>}</p>
     {chips.length > 0 && <p class="cal-chips">{chips.map((c) => <span>{c}</span>)}</p>}
     {meta && !priceMain && <p class="cal-meta">{meta}</p>}
-    {noDates ? <p class="cal-nodates">回ごとの開催日は未確認です。日程は公式ページでご確認ください。</p> : <div class="cal-weeks">
+    {noDates ? <p class="cal-nodates">開催日は公式ページでご確認ください。</p> : <div class="cal-weeks">
       {[0, 1].map((wk) => (
         <div class="cal-week">
           <p class="cal-wk">{wk === 0 ? '今週' : '来週'}<span>{fmtDateShort(days14[wk * 7])}〜{fmtDateShort(days14[wk * 7 + 6])}</span></p>
@@ -84,7 +84,7 @@ const chips = [short(s.duration), short(s.capacity)].filter((c) => c && c.length
         </div>
       ))}
     </div>}
-    <p class="cal-stock">{noDates ? '空席・日程は予約サイトの表示が最新' : openCount > 0 ? '◯をタップで予約サイトへ。空席は予約サイトの表示が最新' : nextAfter ? `この2週間に確認できた開催日はありません。次回 ${fmtDateShort(nextAfter)}` : 'この2週間に確認できた開催日はありません'}{stale ? '（確認から2週間以上経過）' : ''}</p>
+    <p class="cal-stock">{noDates ? '空席・日程は予約サイトの表示が最新' : openCount > 0 ? '◯をタップで予約サイトへ。空席は予約サイトの表示が最新' : nextAfter ? `この2週間に確認できた開催日はありません。次回 ${fmtDateShort(nextAfter)}` : 'この2週間に確認できた開催日はありません'}{stale ? '（最新の日程は予約サイトでご確認ください）' : ''}</p>
     <div class="cal-actions">
       <a class="btn cal-btn" href={s.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={s.id} data-place={`${place}-btn`}>{openCount > 0 ? '予約サイトで空席を見る' : '次回以降の日程を見る'}<small>{s.ticketSite}</small></a>
       {!noDetailLink && <a class="cal-sub" href={s.url} data-track="show" data-show={s.id} data-place={place}>公演内容 →</a>}

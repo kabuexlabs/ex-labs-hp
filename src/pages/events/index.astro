@@ -96,7 +96,7 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 <section class="section cards" id="calendar"><div class="wrap">
 <h2 class="cards-h">今週・来週の開催日<span>◯の日付をタップで予約サイトへ</span></h2>
 <div class="ev-cal-grid">{calendarShows.filter((s) => s.published && s.occurrences.some((o) => o.date >= today)).map((s) => <ShowCalendar show={s} place="events-cal" now={now} />)}</div>
-<p class="ev-meta" style="margin-top:14px">◯＝公式ページで確認できた開催日で、空席を保証するものではありません。空席・残席は予約サイトの表示が最新で、開催日があるだけでは「予約可」とは表示していません。</p>
+<p class="ev-meta" style="margin-top:14px">◯は開催日です。空席は予約サイトの表示が最新で、◯があっても満席の場合があります。</p>
 </div></section>
 
 <section class="section ev-hero" data-today={today}><div class="wrap">
@@ -155,7 +155,7 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 {tomorrowRows.length > 0 ? <ul class="ev-sum">{tomorrowRows.map((r) => <li><strong>{label(r)}</strong>（{place(r)}）：{timeOf(r)}・{ctaOf(r)} <a href="/events/?when=tomorrow#results">明日の公演回を見る →</a></li>)}</ul> : <p class="ev-sum-none">明日の開催は確認できていません。</p>}
 <h3 class="ev-sum-h">今週末（{weekend.map(fmtDateJa).join('・')}）</h3>
 {weekendRows.length > 0 ? <ul class="ev-sum">{weekendRows.map((r) => <li><strong>{fmtDateShort(r.row.date)} {label(r)}</strong>（{place(r)}）：{timeOf(r)}・{ctaOf(r)} <a href="/events/?when=weekend#results">今週末の公演回を見る →</a></li>)}</ul> : <p class="ev-sum-none">今週末の開催は確認できていません。</p>}
-<p class="ev-meta" style="margin-top:14px">開催情報の最終確認：{latestVerified ? fmtVerified(latestVerified) : '—'}。{anyStale && <strong>確認から2週間以上経過した公演があります。</strong>}販売・空席は各公演の公式ページが正で、表示は確認時点のものです。</p>
+<p class="ev-meta" style="margin-top:14px">販売・空席は各公演の公式ページの表示が最新です。{anyStale && <strong>日程が変わっている場合があるため、予約前に公式ページをご確認ください。</strong>}</p>
 </div></section>
 
 <section class="section ev-results" id="results" aria-live="polite"><div class="wrap">

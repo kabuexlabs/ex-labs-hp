@@ -111,10 +111,10 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 
 <section class="section" style="padding-top:28px"><div class="wrap">
 <p class="lede">東京で二人で楽しめる体験を、<strong>{genreNames}</strong>から比べます。<strong>料金だけでなく、二人だけで進められるか、他の参加者やキャストと関わるかも比べて選びましょう。</strong></p>
-<div class="key-points"><p class="key-points-h">要点</p><ul>
-<li>二人だけで話せる時間の長さは体験ごとに違います。各実例の「二人での参加」欄で、同席・貸切・他の参加者やキャストとの関わりを確認できます。</li>
-<li>料金は「1人料金×2」と「1組料金」を区別。焼成費・素材費・手数料は別の場合あり。</li>
-<li>「二人で申し込める」と「二人だけで体験できる（貸切）」は別の条件。</li>
+<div class="key-points"><p class="key-points-h">このページでできること</p><ul>
+<li>東京の体験デートを、{genreNames}の実例から選べます。</li>
+<li>二人分の料金、所要時間、二人だけで体験できるかを、体験ごとに見比べられます。</li>
+<li>気になった体験は、そのまま予約ページへ進めます。</li>
 </ul></div>
 </div></section>
 
@@ -135,7 +135,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 {togetherUnknown.length > 0 && <li><span class="pick-k">公式で確認</span>{togetherUnknown.map((c, i) => <>{i > 0 && '／'}<a href={c.href}>{c.name}</a></>)}</li>}
 </ul></div>
 </div>
-<p class="cards-note">金額は公式料金からの二人分の計算（税込・手数料や追加料金の条件は各項目に記載）で、特定日時の予約可能価格ではありません。時間は公式の所要時間で、集合・受付や移動の時間は含みません。前後の予定には余裕を持たせてください。</p>
+<p class="cards-note">金額は二人分の目安です（税込・手数料や追加料金は各体験の案内をご確認ください）。所要時間には集合・受付や移動の時間は含まれないので、前後の予定には余裕を。</p>
 <div class="cmp-wrap"><table class="cmp-table cmp-x"><thead><tr><th>体験</th><th>ジャンル</th><th>二人分の総額</th><th>所要時間</th><th>場所・最寄り</th><th>二人だけか相席か</th><th>屋外移動</th></tr></thead><tbody>
 {cmpRows.map((c) => (
   <tr>
@@ -144,7 +144,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
   </tr>
 ))}
 </tbody></table></div>
-<p class="cards-note">「公式で確認」は、公式ページの記載を確認できていない項目です。雨の日は「屋外移動」欄で、受付から会場までの移動の有無を確認してください（会場が屋内でも、駅から受付までの移動は含みません）。</p>
+<p class="cards-note">雨の日は「屋外移動」欄で、受付から会場までの移動の有無をご確認ください。「公式で確認」の項目は、各公式ページの案内が最新です。</p>
 </div></section>
 
 <section class="section tinted" id="genres"><div class="wrap">
@@ -170,8 +170,8 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 </div></section>
 
 <section class="section" id="items"><div class="wrap">
-<p class="eyebrow">EXAMPLES</p><h2 class="h2 serif">実例：公式情報で条件を確認できた体験</h2>
-<p class="lede">各項目の重要な条件（二人での参加・費用・時間・開催状況・注意点）を同じ項目で並べています。出典と確認日を各項目に記載し、空き状況は公式予約ページでご確認ください。</p>
+<p class="eyebrow">EXAMPLES</p><h2 class="h2 serif">二人で楽しめる体験の実例</h2>
+<p class="lede">二人での参加・費用・時間・開催状況・注意点を、同じ項目でそろえています。空き状況は各予約ページでご確認ください。</p>
 
 {genres.filter((g) => g !== 'story').map((g) => byGenre(g).length > 0 && (
   <div class="genre-block">
@@ -190,7 +190,6 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
           <div><dt>選ぶ理由</dt><dd class="dd-normal">{i.fit}</dd></div>
           <div><dt>注意点</dt><dd class="dd-normal">{i.notes}</dd></div>
         </dl>
-        <p class="tw-meta" style="margin-top:10px">出典：{i.urlChecked ? <a href={i.officialUrl} target="_blank" rel="noopener nofollow" style="color:var(--accent)">公式ページ</a> : '公式ページの記載'}（{i.checkedAt} 確認）{i.confirmation.unconfirmed.length > 0 && `。未確認：${i.confirmation.unconfirmed.filter((u) => !/URL/.test(u)).join('・')}`}</p>
         <div class="tw-actions">
           <a class="btn tw-btn ghost" href={extHref(i)} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={i.siteId} data-place="xdate-card">{i.urlChecked ? '公式ページで詳細・予約を見る' : '公式サイトを検索して予約ページへ'}</a>
         </div>
@@ -202,7 +201,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 
 <div class="genre-block">
   <h3 class="def-sub serif">{GENRE_LABEL.story}</h3>
-  <p class="lede">キャストとの会話や選択で物語が進む体験です。以下は株式会社ex Labsが企画・制作した公演（公式確認 {latestStoryText}）。◯の日付をタップすると予約サイトで空席を確認できます。</p>
+  <p class="lede">キャストとの会話や選択で物語が進む体験です（株式会社ex Labsが企画・制作）。◯の日付をタップすると予約サイトで空席を確認できます。</p>
 {storyShows.length > 0 && <div class="cal-grid">{storyShows.map((s) => <ShowCalendar show={s} place="xdate-cal" now={now} priceMain={(() => { const r = story.find((x) => x.w.id === s.id)!; return r.totalFor(2) !== undefined ? total2(r) : '料金は公式で確認'; })()} priceSub={(() => { const r = story.find((x) => x.w.id === s.id)!; return `2名の総額｜${r.formatLabel}`; })()} />)}</div>}
   <div class="sc-grid">
   {story.map((r) => (
@@ -218,7 +217,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
         <div><dt>選ぶ理由</dt><dd class="dd-normal">{r.w.info.actorInteraction === true ? 'キャストと会話しながら進めたい二人向け。' : ''}{r.w.party.format === 'private' ? '申込単位で貸切のため、二人だけで体験できます。' : r.w.party.format === 'shared' ? '1名ずつのチケットで同じ回に参加します（他の参加者も一緒）。' : ''}{r.w.info.participation ?? ''}</dd></div>
         <div><dt>注意点</dt><dd class="dd-normal">{r.w.info.ageRule ?? '年齢条件は公式で確認'}。{r.venue?.setting ? SETTING[r.venue.setting] : ''}{r.w.info.walking ? `。${r.w.info.walking}` : ''}{r.w.info.scary ? `。${r.w.info.scary}` : ''}</dd></div>
       </dl>
-      <p class="tw-meta" style="margin-top:10px">出典：<a href={r.w.officialUrl} style="color:var(--accent)" data-track="show" data-show={r.w.id} data-place="xdate-card">公式ページ</a>（{r.verifiedText} 確認）</p>
+      <p class="tw-meta" style="margin-top:10px"><a href={r.w.officialUrl} style="color:var(--accent)" data-track="show" data-show={r.w.id} data-place="xdate-card">公演の公式ページ →</a></p>
       <div class="tw-actions">
         {r.ticketUrl && <a class="btn tw-btn" href={r.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={r.w.id} data-place="xdate-card">予約サイトで空席を見る（{r.ticketSite}）</a>}
         <a class="tw-sub" href={`/events/${r.w.slug}/`} data-track="show" data-show={r.w.id} data-place="xdate-card-events">回ごとの日程・状況 →</a>
@@ -261,7 +260,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 </div></section>
 
 <section class="section"><div class="wrap">
-<p class="cmp-note-p">紹介範囲：物語参加型は株式会社ex Labsが企画・制作した公演で、当社主催・制作と明記しています。他社の施設・体験は、主催者の公式ページの記載（料金・所要時間・二人での参加条件）を確認できたものだけを掲載し、確認日と未確認の項目を併記しています。最低料金は特定日時の予約可能価格ではありません。東京の全体験を網羅した比較や第三者によるランキングではありません。</p>
+<p class="cmp-note-p">掲載内容は各体験の公式ページの案内をもとにしています。料金・日程・空席は変わることがあるため、最新の情報は各公式ページでご確認ください。物語参加型の2公演は株式会社ex Labsが企画・制作しています。</p>
 <p class="vc-line" style="margin-top:32px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">イマーシブ体験を二人で楽しむには</a>／<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)">一人で参加するには</a>／<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物</a>／<a href="/events/" style="color:var(--accent)">公演を探す</a></p>
 </div></section>
 

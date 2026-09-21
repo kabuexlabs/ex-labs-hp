@@ -144,7 +144,7 @@ const articleLd = {
 <div class="cal-grid">
 {calShows.map(({ s }) => <ShowCalendar show={s} place="guide-cal" now={now} />)}
 </div>
-<p class="tw-meta">◯＝公式ページで確認できた開催日（最終確認 {fmtVerified(latestVerified)}）で、空席を保証するものではありません。空席は予約サイトの表示が最新です。{anyStale && <strong>確認から2週間以上経過しているため、最新情報は予約サイトを優先してください。</strong>}日付・人数で絞り込むなら<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="guide-this-week">公演を探す</a>。</p>
+<p class="tw-meta">◯は開催日です。空席は予約サイトの表示が最新で、◯があっても満席の場合があります。{anyStale && <strong>最新の日程は予約サイトでご確認ください。</strong>}日付・人数で絞り込むなら<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="guide-this-week">公演を探す</a>。</p>
 <script is:inline>
 // 開いたまま日付が変わった場合：日本時間の今日より前のセルを「終了」にし、表示週が終わっていれば注意書きを出す。
 (function(){try{
@@ -208,7 +208,7 @@ const articleLd = {
 </details>
 
 <details class="acc" id="now">
-<summary><span class="acc-t">公演ごとの詳しい紹介</span><span class="acc-s">参加者がすること・条件・料金・確認日</span></summary>
+<summary><span class="acc-t">公演ごとの詳しい紹介</span><span class="acc-s">参加者がすること・条件・料金</span></summary>
 <div class="acc-b">
 <div class="sc-grid">
 {compareRows.map((r) => (
@@ -222,7 +222,7 @@ const articleLd = {
       <div><dt>申込人数・形式</dt><dd class="dd-normal">{r.w.party.text}（{FORMAT_LABEL[r.w.party.format]}）</dd></div>
       <div><dt>料金</dt><dd class="dd-normal">{r.w.price.unit === 'per-group' ? `1組 ${r.w.price.text}` : r.w.price.text}<br><span class="tw-note">1人あたり：{r.perPersonText}。{r.w.price.feeNote}</span></dd></div>
       <div><dt>所要時間</dt><dd class="dd-normal">{r.w.duration.text}</dd></div>
-      <div><dt>開催日（確認済み）</dt><dd class="dd-normal">{r.datesText}</dd></div>
+      <div><dt>開催日</dt><dd class="dd-normal">{r.datesText}</dd></div>
       <div><dt>年齢・言語</dt><dd class="dd-normal">{r.w.info.ageRule ?? '年齢条件は公式ページで確認'}／{r.w.info.language ?? '言語は公式ページで確認'}</dd></div>
       <div><dt>屋内・屋外</dt><dd class="dd-normal">{r.venue?.setting ? SETTING_LABEL[r.venue.setting] : '公式ページで確認'}{r.w.info.walking ? `。${r.w.info.walking}` : ''}</dd></div>
     </dl>
@@ -232,7 +232,6 @@ const articleLd = {
         <ul class="tw-cond">{r.w.info.scary && <li>{r.w.info.scary}</li>}{(r.w.info.requirements ?? []).map((c) => <li>{c}</li>)}</ul>
       </>
     )}
-    <p class="tw-meta" style="margin-top:10px">情報の確認：{fmtVerified(r.w.verified.at)}（公式ページ）{r.stale ? '。確認から時間が経過しているため、最新情報は公式ページを優先してください' : ''}</p>
     <div class="tw-actions">
       {r.ticketUrl && <a class="btn tw-btn" href={r.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={r.w.id} data-place="guide-card">予約サイトで空席を見る（{r.channel?.name ?? '公式'}）</a>}
       <a class="tw-sub" href={r.w.officialUrl} target={r.w.officialUrl.startsWith('/') ? undefined : '_blank'} rel={r.w.officialUrl.startsWith('/') ? undefined : 'noopener'} data-track="show" data-show={r.w.id} data-place="guide-card">公式ページで公演内容を見る →</a>

@@ -84,7 +84,7 @@ const articleLd = {
 ) : (
   <p class="lede">確認できた範囲で、1名から申し込める公演は現在ありません。開催中の公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京ガイド</a>をご覧ください。</p>
 )}
-<p class="cards-note">◯＝公式ページで確認できた開催日（最終確認 {latestText}）で、空席を保証するものではありません。空席は予約サイトの表示が最新です。料金は税込・手数料別。{needsTwo.length ? `${names(needsTwo)}は2名以上での申込のため、ここには載せていません。` : ''}</p>
+<p class="cards-note">◯は開催日です。空席は予約サイトの表示が最新で、◯があっても満席の場合があります。料金は税込・手数料別。{needsTwo.length ? `${names(needsTwo)}は2名以上での申込のため、ここには載せていません。` : ''}</p>
 </div></section>
 
 <section class="section tinted acc-wrap"><div class="wrap">
@@ -147,14 +147,14 @@ const articleLd = {
 </details>
 
 <details class="acc" id="about">
-<summary><span class="acc-t">このページについて</span><span class="acc-s">イマーシブ体験とは・要点・紹介範囲・関連ページ</span></summary>
+<summary><span class="acc-t">イマーシブ体験とは・関連ページ</span><span class="acc-s">初めての方向けの短い説明と、あわせて読みたいページ</span></summary>
 <div class="acc-b">
-<div class="key-points"><p class="key-points-h">要点</p><ul>
-<li>イマーシブ体験とは、客席から観るのではなく物語の当事者として空間の中で体験する没入型イベントのことです。</li>
-<li>{soloBook.length ? `1名で申し込める公演：${[...soloShared.map((r) => `${r.w.title}（相席）`), ...soloOther.map((r) => `${r.w.title}（相席・貸切は公式ページで確認）`)].join('、')}。` : '1名で申し込める公演は確認できていません。'}{needsTwo.length ? `${names(needsTwo)}は2名以上。` : ''}</li>
-<li>確認する条件は「1名で申し込めるか」「1名だけで成立するか（相席か）」「会話が必要か」の3つ。</li>
+<div class="key-points"><p class="key-points-h">イマーシブ体験とは</p><ul>
+<li>イマーシブ体験とは、客席から観るのではなく、物語の当事者として空間の中で体験する没入型のイベントのことです。</li>
+<li>{soloBook.length ? `1名で申し込める公演：${[...soloShared.map((r) => `${r.w.title}（他の参加者と一緒）`), ...soloOther.map((r) => `${r.w.title}（相席・貸切は公式ページで確認）`)].join('、')}。` : '1名で申し込める公演は現在ありません。'}{needsTwo.length ? `${names(needsTwo)}は2名以上での申込です。` : ''}</li>
+<li>一人で参加するときに見る条件は「1名で申し込めるか」「他の参加者と一緒か」「会話が必要か」の3つです。</li>
 </ul></div>
-<p class="cmp-note-p">出典：各公演の公式ページ・公式チケットページ（最終確認 {latestText}）。紹介範囲：このページで扱っているのは、公式ページで申込条件を確認できた公演です（現在は株式会社ex Labsが企画・制作した公演）。東京の全公演を網羅した比較や第三者によるランキングではありません。他社公演は、主催者の公式情報で条件を確認できたものから追加します。</p>
+<p class="cmp-note-p">掲載内容は各公演の公式ページの案内をもとにしています。日程・料金・空席は変わることがあるため、最新の情報は予約サイトでご確認ください。</p>
 <p class="vc-line" style="margin-top:16px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">二人で楽しむには</a>／<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物</a>／<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="solo-cta">公演を探す</a></p>
 </div>
 </details>
