@@ -246,7 +246,7 @@ const faqLd = {
 <dialog class="castdlg" id="castdlg" aria-label="出演者コメント">
 <div class="dlgbody">
   <button class="dlgclose" type="button" aria-label="閉じる">×</button>
-  <img class="dlgimg" id="dlgimg" src="" alt="" width="900" height="1272">
+  <div class="dlgfig"><img class="dlgimg" id="dlgimg" src="" alt="" width="900" height="1272"></div>
   <div class="dlginfo">
     <span class="dlgtag" id="dlgtag"></span>
     <div class="dlgnames">
@@ -464,7 +464,11 @@ img{max-width:100%}
 .castdlg::backdrop{background:rgba(5,8,9,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .dlgclose{position:absolute;top:6px;right:10px;background:none;border:0;color:#c9c3b8;font-size:28px;cursor:pointer;line-height:1;z-index:2;text-shadow:0 0 6px #000;padding:0 2px}
 .dlgclose:hover{color:#d33a33}
-.dlgimg{width:100%;height:auto;display:block;border:1px solid rgba(233,227,216,.12);box-sizing:border-box}
+/* iOS Safari は縦並び flex の直下に置いた img を縦に引き伸ばすことがあるため、
+   div で包んで flex の伸縮対象から外し、縦横比（900×1272）を CSS で固定する */
+.dlgbody>*{flex:0 0 auto;min-height:0}
+.dlgfig{width:100%;aspect-ratio:900/1272;border:1px solid rgba(233,227,216,.12);box-sizing:border-box;background:#0a0e0f}
+.dlgimg{width:100%;height:100%;display:block;object-fit:contain}
 .dlginfo{display:flex;flex-direction:column;gap:10px}
 .dlgtag{font-size:11px;letter-spacing:.25em;color:#b8201f;font-weight:700}
 .dlgnames{display:flex;flex-direction:column;gap:2px}
