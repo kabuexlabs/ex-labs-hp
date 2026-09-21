@@ -60,6 +60,29 @@ const articleLd = {
   publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-09-20', dateModified: '2026-09-20', mainEntityOfPage: pageUrl,
 };
+// 予算・時間・二人だけか・屋外移動で横断して選ぶための行（他社＝compare、自社＝公演データ。未確認は「公式で確認」のまま）
+type CmpRow = { id: string; name: string; genre: string; pairTotal: string; pairTotalMin?: number; time: string; minutes?: number; place: string; together: string; privateForTwo?: boolean; outdoor: string; href: string; ext: boolean };
+const cmpRows: CmpRow[] = [
+  ...publishedItems.filter((i) => i.compare).map<CmpRow>((i) => ({ id: i.id, name: i.name, genre: GENRE_LABEL[i.genre], ...i.compare!, href: `#item-${i.id}`, ext: true })),
+  ...story.map<CmpRow>((r) => ({
+    id: r.w.id, name: r.w.title, genre: `${GENRE_LABEL.story}（当社制作）`,
+    pairTotal: `${total2(r)}（${r.w.price.unit === 'per-group' ? '1組料金' : '1人料金×2'}、税込・手数料別）`, pairTotalMin: r.totalFor(2),
+    time: r.w.duration.minutes ? `約${r.w.duration.minutes}分（本編。集合・受付は別）` : '公式で確認', minutes: r.w.duration.minutes,
+    place: `${shows.find((s) => s.id === r.w.id)?.area ?? r.venue?.listName ?? '公式で確認'}${r.venue?.station ? `（${r.venue.station.replace(/（[^）]*）/g, '')}）` : ''}`,
+    together: r.w.party.format === 'private' ? '二人だけで体験（申込単位で貸切）' : r.w.party.format === 'shared' ? '同じ回に他の参加者も一緒' : '公式で確認', privateForTwo: r.w.party.format === 'private' ? true : r.w.party.format === 'shared' ? false : undefined,
+    outdoor: r.venue?.setting === 'indoor' ? '屋内で完結' : r.venue?.setting === 'mixed' ? '受付後に屋外の徒歩移動あり' : r.venue?.setting === 'outdoor' ? '屋外' : '公式で確認',
+    href: `#item-${r.w.id}`, ext: false,
+  })),
+];
+const yen = (n: number) => `${n.toLocaleString('ja-JP')}円`;
+const byBudget = (lo: number, hi: number) => cmpRows.filter((c) => c.pairTotalMin !== undefined && c.pairTotalMin >= lo && c.pairTotalMin <= hi).sort((a, b) => a.pairTotalMin! - b.pairTotalMin!);
+const budgetUnknown = cmpRows.filter((c) => c.pairTotalMin === undefined);
+const byTime = (lo: number, hi: number) => cmpRows.filter((c) => c.minutes !== undefined && c.minutes >= lo && c.minutes <= hi);
+const timeUnknown = cmpRows.filter((c) => c.minutes === undefined);
+const privateRows = cmpRows.filter((c) => c.privateForTwo === true);
+const sharedRows = cmpRows.filter((c) => c.privateForTwo === false);
+const togetherUnknown = cmpRows.filter((c) => c.privateForTwo === undefined);
+const nameLinks = (xs: CmpRow[]) => xs.map((c) => ({ name: c.name, href: c.href, extra: c.pairTotalMin !== undefined ? yen(c.pairTotalMin) + (c.pairTotal.includes('〜') ? '〜' : '') : '' }));
 const latestStory = story.map((r) => r.w.verified.at).sort().pop();
 const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.verifiedText ?? '';
 ---
@@ -93,6 +116,35 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 <li>料金は「1人料金×2」と「1組料金」を区別。焼成費・素材費・手数料は別の場合あり。</li>
 <li>「二人で申し込める」と「二人だけで体験できる（貸切）」は別の条件。</li>
 </ul></div>
+</div></section>
+
+<section class="section tinted" id="pick"><div class="wrap">
+<h2 class="cards-h">条件から選ぶ<span>二人分の予算・使える時間・二人だけで過ごしたいか</span></h2>
+<div class="pick-grid">
+<div class="pick-col"><p class="pick-h">二人分の予算で</p><ul class="pick-list">
+{[['1万円まで', 0, 10000], ['1〜2万円', 10001, 20000], ['2万円以上', 20001, 999999]].map(([label, lo, hi]) => { const xs = byBudget(lo as number, hi as number); return xs.length > 0 && <li><span class="pick-k">{label}</span>{nameLinks(xs).map((n, i) => <>{i > 0 && '／'}<a href={n.href}>{n.name}</a><small>{n.extra}</small></>)}</li>; })}
+{budgetUnknown.length > 0 && <li><span class="pick-k">料金は公式で確認</span>{budgetUnknown.map((c, i) => <>{i > 0 && '／'}<a href={c.href}>{c.name}</a></>)}</li>}
+</ul></div>
+<div class="pick-col"><p class="pick-h">使える時間で</p><ul class="pick-list">
+{[['約1時間', 0, 75], ['約1.5〜2時間', 76, 130], ['2時間超', 131, 999]].map(([label, lo, hi]) => { const xs = byTime(lo as number, hi as number); return xs.length > 0 && <li><span class="pick-k">{label}</span>{xs.map((c, i) => <>{i > 0 && '／'}<a href={c.href}>{c.name}</a></>)}</li>; })}
+{timeUnknown.length > 0 && <li><span class="pick-k">所要時間は公式で確認</span>{timeUnknown.map((c, i) => <>{i > 0 && '／'}<a href={c.href}>{c.name}</a></>)}</li>}
+</ul></div>
+<div class="pick-col"><p class="pick-h">二人だけで過ごしたいか</p><ul class="pick-list">
+{privateRows.length > 0 && <li><span class="pick-k">二人だけ（貸切）</span>{privateRows.map((c, i) => <>{i > 0 && '／'}<a href={c.href}>{c.name}</a></>)}</li>}
+{sharedRows.length > 0 && <li><span class="pick-k">他の参加者も一緒</span>{sharedRows.map((c, i) => <>{i > 0 && '／'}<a href={c.href}>{c.name}</a></>)}</li>}
+{togetherUnknown.length > 0 && <li><span class="pick-k">公式で確認</span>{togetherUnknown.map((c, i) => <>{i > 0 && '／'}<a href={c.href}>{c.name}</a></>)}</li>}
+</ul></div>
+</div>
+<p class="cards-note">金額は公式料金からの二人分の計算（税込・手数料や追加料金の条件は各項目に記載）で、特定日時の予約可能価格ではありません。時間は公式の所要時間で、集合・受付や移動の時間は含みません。前後の予定には余裕を持たせてください。</p>
+<div class="cmp-wrap"><table class="cmp-table cmp-x"><thead><tr><th>体験</th><th>ジャンル</th><th>二人分の総額</th><th>所要時間</th><th>場所・最寄り</th><th>二人だけか相席か</th><th>屋外移動</th></tr></thead><tbody>
+{cmpRows.map((c) => (
+  <tr>
+    <th scope="row"><a href={c.href} style="color:var(--ink)">{c.name}</a></th>
+    <td>{c.genre}</td><td>{c.pairTotal}</td><td>{c.time}</td><td>{c.place}</td><td>{c.together}</td><td>{c.outdoor}</td>
+  </tr>
+))}
+</tbody></table></div>
+<p class="cards-note">「公式で確認」は、公式ページの記載を確認できていない項目です。雨の日は「屋外移動」欄で、受付から会場までの移動の有無を確認してください（会場が屋内でも、駅から受付までの移動は含みません）。</p>
 </div></section>
 
 <section class="section tinted" id="genres"><div class="wrap">
@@ -222,6 +274,20 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 .wrap.narrow .lede{text-align:left}
 .draft-note{max-width:920px;margin:0 auto;background:#fff4ee;border:1px solid #f0a37f;border-radius:12px;padding:14px 18px;font-size:13.5px;line-height:1.8;color:var(--ink);text-align:left}
 .def-sub{font-size:19px;color:var(--ink);margin:28px 0 6px;text-align:left}
+.cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cards-note{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:rgba(29,29,31,.55);text-align:left}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:14px;margin-top:16px}
+.pick-col{background:#fff;border:var(--bd);border-radius:12px;box-shadow:var(--shadow-1);padding:16px 18px;text-align:left}
+.pick-h{margin:0 0 8px;font-size:14px;font-weight:800;color:var(--ink)}
+.pick-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.pick-list li{font-size:13.5px;line-height:1.7}
+.pick-list a{color:var(--accent);font-weight:700}
+.pick-list small{font-size:11px;color:rgba(29,29,31,.6);margin-left:3px}
+.pick-k{display:inline-block;min-width:7em;font-size:12px;font-weight:800;color:#e8481c;margin-right:6px}
+.cmp-x th[scope=row]{min-width:160px;white-space:normal}
+.cmp-x td{min-width:120px;vertical-align:top;font-size:13px}
+#pick{scroll-margin-top:88px}
 .genre-block{max-width:1000px;margin:0 auto}
 .cmp-wrap{margin-top:22px}
 .cmp-table th[scope=row]{min-width:140px;white-space:normal}

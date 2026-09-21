@@ -35,6 +35,25 @@ export interface ExperienceItem {
   officialUrl: string;
   /** 公式予約ページ（公式ページと同じなら省略） */
   bookingUrl?: string;
+  /** 横断比較用の短い値（未確認は「公式で確認」のまま。数値は公式料金からの計算で、特定日時の予約可能価格ではない） */
+  compare?: {
+    /** 二人分の総額の短い表示 */
+    pairTotal: string;
+    /** 二人分の最低額（円）。予算で選ぶ案内に使う。不明なら省略 */
+    pairTotalMin?: number;
+    /** 所要時間の短い表示 */
+    time: string;
+    /** 所要時間の目安（分）。時間で選ぶ案内に使う。不明なら省略 */
+    minutes?: number;
+    /** 場所・最寄り */
+    place: string;
+    /** 二人だけか相席か */
+    together: string;
+    /** 二人だけで体験できることが公式で確認できた場合 true、他の参加者と一緒なら false、未確認なら省略 */
+    privateForTwo?: boolean;
+    /** 屋外移動の有無 */
+    outdoor: string;
+  };
   /** officialUrl を実際に開いて確認できたか。false の間は記事でURLを直接リンクせず、公式サイト名での検索リンクにする */
   urlChecked?: boolean;
   /** 掲載元の識別子（計測 ev-ext の data-show に使う） */
@@ -161,6 +180,7 @@ export const experienceItems: ExperienceItem[] = [
     notes: '最低料金は特定日時の予約可能価格ではない。オプション加工分と受け取り時期は予約時に確認',
     officialUrl: 'https://icci.jp/',
     urlChecked: false,
+    compare: { pairTotal: '24,000円〜（1本12,000円〜×2、税込。オプション加工は別）', pairTotalMin: 24000, time: '約1時間', minutes: 60, place: '代官山（最寄り駅は公式で確認）', together: '同席・貸切は公式で確認', outdoor: '公式で確認' },
     siteId: 'icci',
     checkedAt: '2026-09-20',
     checkedBy: 'SEO担当の調査報告（公式ページの記載を転記）',
@@ -181,6 +201,7 @@ export const experienceItems: ExperienceItem[] = [
     notes: '年齢条件、同席、作品の持ち帰りの例外は公式で確認。最低料金を全セッション共通の価格として扱わない',
     officialUrl: 'https://artbar.co.jp/',
     urlChecked: false,
+    compare: { pairTotal: '9,240円〜（1人4,620円〜×2。セッションごとに異なる）', pairTotalMin: 9240, time: '約2時間', minutes: 120, place: '代官山／原宿／銀座 など（セッションごと）', together: '二人で同じセッションを予約（貸切かは公式で確認）', outdoor: '公式で確認' },
     siteId: 'artbar',
     checkedAt: '2026-09-20',
     checkedBy: 'SEO担当の調査報告（公式ページの記載を転記）',
@@ -201,6 +222,7 @@ export const experienceItems: ExperienceItem[] = [
     notes: '部屋（作品）ごとの難易度と時間は個別ページで確認。二人分の金額は料金表からの計算で、特定日時の予約可能価格ではない',
     officialUrl: 'https://zettaikukan.com/',
     urlChecked: false,
+    compare: { pairTotal: '4,000円／5,000円（1人2,000円／2,500円×2。税込表示は要確認）', pairTotalMin: 4000, time: '約1時間（本編40分＋説明）', minutes: 60, place: '池袋（最寄り駅は公式で確認）', together: '二人だけで貸切（各部屋1組）', privateForTwo: true, outdoor: '公式で確認' },
     siteId: 'zettai-kukan',
     checkedAt: '2026-09-20',
     checkedBy: 'SEO担当の調査報告（公式ページの記載を転記）',
