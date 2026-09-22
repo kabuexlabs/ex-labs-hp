@@ -31,6 +31,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/tokyo-experience-date.webp',
   }] : []),
   {
+    href: '/guide/tokyo-nazo-date/',
+    title: '東京で二人で参加できる謎解き・脱出ゲーム｜貸切・料金・所要時間で比較',
+    desc: '二人だけで遊べるか（貸切・相席）、二人分の料金、制限時間と合計時間、屋内外、初心者向けの表記で、渋谷・新宿・池袋の施設と周遊型を比較。予約前の確認点つき。',
+    date: '2026-09-22',
+    category: 'immersive',
+    thumb: '/assets/guide/tokyo-nazo-date.webp',
+  },
+  {
     href: '/guide/immersive-tokyo-solo/',
     title: '東京のイマーシブ体験に一人で参加するには？申込条件・相席・選び方',
     desc: '「一人分で予約できる」と「一人だけで体験する」の違い、公演ごとの申込人数・成立人数・相席か貸切か・交流を公式情報で整理。予約前の確認点と選び方。',

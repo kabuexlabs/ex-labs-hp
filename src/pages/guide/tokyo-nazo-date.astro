@@ -1,0 +1,208 @@
+---
+// 「東京 謎解き デート」「東京 脱出ゲーム 2人」「二人 貸切 謎解き 東京」「脱出ゲーム 初心者 2人」の受け皿。
+// 役割：二人で謎解き・脱出ゲームを選ぶ読者に絞り、施設・作品ごとの参加条件（二人だけか・料金・時間・屋内外）を比較する。
+// 体験ジャンル全体の比較は /guide/tokyo-experience-date/、イマーシブ公演の二人参加条件は /guide/immersive-tokyo-date/ に任せる。
+// 他社は src/data/nazoDate.ts（公式ページで確認できた項目だけ）、自社の周遊型は src/data/events/ から生成する。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import VisualHero from '../../components/VisualHero.astro';
+import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
+import { shows } from '../../data/shows';
+import { publishedNazoItems, type NazoItem } from '../../data/nazoDate';
+import { jsonLd } from '../../lib/microcms';
+
+const now = new Date();
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/tokyo-nazo-date/', site).toString();
+
+// 自社の周遊型（謎解き要素あり）を同じ列で並べる
+const own = buildGuideRows(now).filter((r) => r.w.id === 'uwasabanashi' && r.status !== 'ended');
+type Row = { id: string; name: string; area: string; format: string; players: string; privateForTwo?: boolean; together: string; pairPrice: string; pairPriceMin?: number; timeLimit: string; totalTime: string; minutes?: number; indoor: string; beginner: string; href: string; ext: boolean; own: boolean; officialUrl: string; siteId: string };
+const rows: Row[] = [
+  ...publishedNazoItems.map<Row>((i) => ({ ...i, href: `#item-${i.id}`, ext: true, own: false })),
+  ...own.map<Row>((r) => {
+    const s = shows.find((x) => x.id === r.w.id);
+    const t = r.totalFor(2);
+    return {
+      id: r.w.id, name: r.w.title, area: s?.area ?? '東京・渋谷', format: '周遊型（当社制作）', players: r.w.party.text,
+      privateForTwo: r.w.party.format === 'private' ? true : r.w.party.format === 'shared' ? false : undefined,
+      together: r.w.party.format === 'shared' ? '同じ回に他の参加者も一緒（途中で一時的に離れる場面あり）' : r.formatLabel,
+      pairPrice: t !== undefined ? `${fmtYen(t)}（1人${fmtYen(r.perPersonFor(2)!)}×2、税込・手数料別）` : '公式ページで確認', pairPriceMin: t,
+      timeLimit: '制限時間なし', totalTime: r.w.duration.minutes ? `約${r.w.duration.minutes}分（本編。集合・受付は別）` : '公式ページで確認', minutes: r.w.duration.minutes,
+      indoor: r.venue?.setting === 'indoor' ? '屋内（商業施設内を歩く）' : '公式ページで確認', beginner: r.w.info.beginner ?? '公式ページで確認',
+      href: `#item-${r.w.id}`, ext: false, own: true, officialUrl: r.w.officialUrl, siteId: r.w.id,
+    };
+  }),
+];
+const privateRows = rows.filter((r) => r.privateForTwo === true);
+const sharedRows = rows.filter((r) => r.privateForTwo === false);
+const unknownRows = rows.filter((r) => r.privateForTwo === undefined);
+const shortRows = rows.filter((r) => r.minutes !== undefined && r.minutes <= 60);
+const indoorRows = rows.filter((r) => /^屋内/.test(r.indoor));
+const names = (xs: Row[]) => xs.map((r) => r.name).join('、');
+const known = rows.filter((r) => r.pairPriceMin !== undefined);
+const heroChips = [`${rows.length}件を比較`, ...(privateRows.length ? [`二人だけで遊べる ${privateRows.length}件`] : []), ...(known.length ? [`二人で ${fmtYen(Math.min(...known.map((r) => r.pairPriceMin!)))}〜`] : []), '短時間の作品あり'];
+const extHref = (r: Row) => r.officialUrl || `https://www.google.com/search?q=${encodeURIComponent(`${r.name} 公式`)}`;
+
+const faqs = [
+  { q: '二人だけで遊べる謎解き・脱出ゲームはありますか？', a: `${privateRows.length ? `${names(privateRows)}は2人から申し込め、部屋（テーマ）ごとに貸切なので二人だけで遊べます。` : '二人だけで貸切にできる施設は現在掲載していません。'}${sharedRows.length ? `${names(sharedRows)}は同じ回に他の参加者も一緒です。` : ''}${unknownRows.length ? `${names(unknownRows)}は他の参加者と一緒になるかを作品ページでご確認ください。` : ''}` },
+  { q: '初めてでも大丈夫ですか？', a: `難易度の表記は施設・作品ごとに違うため、各公式ページで確認してください。初めての二人は、${shortRows.length ? `${names(shortRows)}のような約1時間以内の作品` : '短時間の作品'}から始めると予定が組みやすいです。謎解きの経験がなくても参加できる作品が多く、演技は求められません。` },
+  { q: '二人分の料金はいくらですか？', a: `${known.map((r) => `${r.name}は${r.pairPrice}`).join('。')}。${rows.filter((r) => r.pairPriceMin === undefined).length ? `${names(rows.filter((r) => r.pairPriceMin === undefined))}の料金は公式ページの料金表でご確認ください。` : ''}料金は施設・時間帯・作品で変わることがあります。` },
+  { q: '所要時間はどのくらい見ておけばいいですか？', a: `ゲームの制限時間と、説明・受付を含む合計時間は別です。${rows.map((r) => `${r.name}：${r.totalTime}`).join('。')}。受付時刻に遅れると参加できない施設があるため、前後の予定には余裕を持たせてください。` },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const title = '東京で二人で参加できる謎解き・脱出ゲーム｜貸切・料金・所要時間で比較';
+const desc = '東京で二人で楽しめる謎解き・脱出ゲームを、二人だけで遊べるか（貸切・相席）、二人分の料金、制限時間と合計体験時間、屋内・屋外、初心者向けの表記で比較。渋谷・新宿・池袋の店舗型と周遊型を並べ、予約前に確認する点と公式予約ページへの導線をまとめました。';
+const articleLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
+  image: [new URL('/assets/guide/tokyo-nazo-date.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-22', dateModified: '2026-09-22', mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="東京で二人で参加できる謎解き・脱出ゲーム｜貸切・料金・所要時間で比較 - 株式会社ex Labs"
+  description="東京で二人で楽しめる謎解き・脱出ゲームを、二人だけで遊べるか（貸切・相席）、二人分の料金、制限時間と合計体験時間、屋内・屋外、初心者向けの表記で比較。渋谷・新宿・池袋の店舗型と周遊型を並べ、予約前に確認する点と公式予約ページへの導線をまとめました。"
+  ogImage="/assets/guide/tokyo-nazo-date.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '東京の非日常デート', href: '/guide/tokyo-experience-date/' },
+  { name: '二人で楽しめる謎解き・脱出ゲーム' },
+]} />
+
+<VisualHero image="/assets/uwasabanashi/story-venue.webp" imagePos="center 40%" eyebrow="NAZO FOR TWO" catchText="二人だけで解きたい日も、短時間で遊びたい日も" chips={heroChips} alt="渋谷サクラステージの外観">
+  <h1>東京で二人で楽しめる謎解き・脱出ゲーム</h1>
+</VisualHero>
+
+<section class="section" style="padding-top:28px"><div class="wrap">
+<p class="lede">リアル脱出ゲームとは、部屋や街を舞台に、制限時間内に謎を解いて脱出やミッション達成を目指す体験型のゲームのことです。二人で遊ぶときに気になる<strong>「二人だけで遊べるか」「二人分でいくらか」「どのくらい時間がかかるか」</strong>を、東京の施設・作品ごとに並べました。</p>
+<div class="key-points"><p class="key-points-h">このページでできること</p><ul>
+<li>二人だけで遊びたい／短時間で遊びたい／初めて／街を歩きたい、の希望から施設を選べます。</li>
+<li>二人分の料金、制限時間と合計体験時間、屋内か屋外かを同じ表で見比べられます。</li>
+<li>気になった施設は、そのまま公式ページ・予約ページへ進めます。</li>
+</ul></div>
+</div></section>
+
+<section class="section tinted" id="compare"><div class="wrap">
+<h2 class="cards-h">比較表<span>二人だけか・料金・時間・屋内外</span></h2>
+<div class="cmp-wrap"><table class="cmp-table cmp-x"><thead><tr><th>施設・作品</th><th>場所／形式</th><th>人数</th><th>二人だけで遊べるか</th><th>二人分の料金</th><th>制限時間</th><th>合計時間の目安</th><th>屋内・屋外</th><th>初心者向け</th></tr></thead><tbody>
+{rows.map((r) => (
+  <tr>
+    <th scope="row"><a href={r.href} style="color:var(--ink)">{r.name}</a>{r.own && <span class="cmp-sub">当社制作</span>}</th>
+    <td>{r.area}／{r.format}</td><td>{r.players}</td>
+    <td>{r.privateForTwo === true ? '二人だけ（貸切）' : r.privateForTwo === false ? '他の参加者と一緒' : '作品ページで確認'}</td>
+    <td>{r.pairPrice}</td><td>{r.timeLimit}</td><td>{r.totalTime}</td><td>{r.indoor}</td><td>{r.beginner}</td>
+  </tr>
+))}
+</tbody></table></div>
+<p class="cards-note">料金は二人分の目安で、税込かどうかや追加料金は各公式ページの案内をご確認ください。合計時間には受付までの移動は含まれません。</p>
+</div></section>
+
+<section class="section" id="pick"><div class="wrap">
+<h2 class="cards-h">目的で選ぶ<span>貸切・短時間・初めて・雨の日・街歩き</span></h2>
+<div class="pick-grid">
+<div class="pick-col"><p class="pick-h">二人だけで遊びたい</p><p class="pick-p">{privateRows.length ? <>{privateRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a></>)}は部屋ごとの貸切です。</> : '現在、二人だけで貸切にできる施設は掲載していません。'}{sharedRows.length ? <>{names(sharedRows)}は他の参加者と一緒に進みます。</> : ''}</p></div>
+<div class="pick-col"><p class="pick-h">短時間で遊びたい（約1時間以内）</p><p class="pick-p">{shortRows.length ? <>{shortRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a>（{r.totalTime}）</>)}</> : '約1時間以内の作品は掲載していません。'}</p></div>
+<div class="pick-col"><p class="pick-h">初めての二人</p><p class="pick-p">難易度の表記は施設ごとに違います。短時間の作品や、進行のサポートがある作品から選ぶと安心です。{own.length ? <>{own.map((r) => <a href={`#item-${r.w.id}`}>{r.w.title}</a>)}は「{own[0].w.info.beginner}」と案内しています。</> : ''}</p></div>
+<div class="pick-col"><p class="pick-h">雨の日</p><p class="pick-p">{indoorRows.length ? <>{indoorRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a></>)}は屋内で遊べます。駅から受付までの移動は各公式ページでご確認ください。</> : '屋内の施設は掲載していません。'}</p></div>
+<div class="pick-col"><p class="pick-h">街を歩きながら解きたい</p><p class="pick-p">{own.length ? <>{own.map((r) => <a href={`#item-${r.w.id}`}>{r.w.title}</a>)}は渋谷サクラステージの館内を歩いて巡る周遊型です。</> : ''}屋外を歩く街歩き型は、開催中の作品を確認でき次第、追加します。</p></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="items"><div class="wrap">
+<h2 class="cards-h">施設・作品ごとの詳細<span>公式ページの案内から</span></h2>
+<div class="sc-grid">
+{rows.map((r) => (
+  <article class="sc-card" id={`item-${r.id}`}>
+    <p class="tw-area">{r.area}　｜　{r.format}</p>
+    <h3 class="tw-name serif">{r.name}</h3>
+    <dl class="tw-dl">
+      <div><dt>人数・二人だけか</dt><dd class="dd-normal">{r.players}。{r.together}</dd></div>
+      <div><dt>二人分の料金</dt><dd class="dd-normal">{r.pairPrice}</dd></div>
+      <div><dt>時間</dt><dd class="dd-normal">制限時間 {r.timeLimit}／合計 {r.totalTime}</dd></div>
+      <div><dt>屋内・屋外／初心者向け</dt><dd class="dd-normal">{r.indoor}／{r.beginner}</dd></div>
+    </dl>
+    <div class="tw-actions">
+      {r.own ? (
+        <>
+          {own[0]?.ticketUrl && <a class="btn tw-btn" href={own[0].ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={r.siteId} data-place="nazo-card">予約サイトで空席を見る</a>}
+          <a class="tw-sub" href={r.officialUrl} data-track="show" data-show={r.siteId} data-place="nazo-card">公演の公式ページ →</a>
+        </>
+      ) : (
+        <a class="btn tw-btn ghost" href={extHref(r)} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={r.siteId} data-place="nazo-card">公式ページで作品・料金・予約を見る</a>
+      )}
+    </div>
+  </article>
+))}
+</div>
+<p class="cards-note">掲載内容は各施設の公式ページの案内をもとにしています。料金・作品・空き状況は変わることがあるため、最新の情報は公式ページでご確認ください。</p>
+</div></section>
+
+<section class="section" id="check"><div class="wrap narrow">
+<h2 class="cards-h">予約前に確認すること</h2>
+<ol class="bullets">
+<li><strong>料金の単位</strong>：1人あたりか、1組（部屋）あたりか。平日・夜・土日祝で変わる施設があります。</li>
+<li><strong>受付時刻と遅刻</strong>：開始の何分前に受付するか。遅れると参加できない施設・公演があります。</li>
+<li><strong>人数</strong>：2人で申し込めるか、二人だけで1チームになれるか、他の参加者と合流するか。</li>
+<li><strong>キャンセル・日時変更</strong>：予約後の変更・返金の可否は各予約ページの規約に従います。</li>
+<li><strong>開催の継続</strong>：作品の入れ替えや期間限定の公演があるため、遊びたい作品が予約日に開催されているかを確認します。</li>
+</ol>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<h2 class="cards-h">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="cmp-note-p">周遊型の「ウワサバナシ調査委員会」は株式会社ex Labsが企画・制作しています。他の施設は各運営会社の公式ページの案内をもとに掲載しています。</p>
+<p class="vc-line" style="margin-top:20px">あわせて読む：<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート（ものづくり・物語参加型も含めて比べる）</a>／<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">イマーシブ体験を二人で楽しむには</a>／<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミスと謎解きの違い</a>／<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="nazo-cta">公演を探す</a></p>
+</div></section>
+
+<AuthorBox />
+<LatestPosts category="immersive" />
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cards-note{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:rgba(29,29,31,.55);text-align:left}
+.cmp-wrap{margin-top:16px}
+.cmp-x th[scope=row]{min-width:170px;white-space:normal}
+.cmp-x td{min-width:110px;vertical-align:top;font-size:13px}
+.cmp-sub{display:block;font-size:11px;font-weight:700;color:var(--accent);margin-top:2px}
+.cmp-note-p{max-width:920px;margin:0 auto;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:14px;margin-top:16px}
+.pick-col{background:#fff;border:var(--bd);border-radius:12px;box-shadow:var(--shadow-1);padding:16px 18px;text-align:left}
+.pick-h{margin:0 0 6px;font-size:14px;font-weight:800;color:#e8481c}
+.pick-p{margin:0;font-size:13.5px;line-height:1.75;color:var(--ink)}
+.pick-p a{color:var(--accent);font-weight:700}
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:18px;margin:16px auto 0}
+.sc-card{background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);padding:20px 18px;display:flex;flex-direction:column;gap:10px;text-align:left;scroll-margin-top:88px}
+.tw-area{margin:0;font-size:11.5px;font-weight:800;letter-spacing:.1em;color:var(--accent)}
+.tw-name{margin:0;font-size:19px;font-weight:800;color:var(--ink);line-height:1.5}
+.tw-dl{margin:4px 0 0;display:grid;grid-template-columns:1fr;gap:8px}
+.tw-dl div{background:rgba(51,48,43,.03);padding:9px 12px}
+.tw-dl dt{font-size:11px;font-weight:800;color:rgba(51,48,43,.55);letter-spacing:.06em}
+.tw-dl dd{margin:3px 0 0;font-size:13.5px;line-height:1.6;color:var(--ink)}
+.dd-normal{font-weight:500 !important}
+.tw-actions{margin-top:auto;padding-top:8px;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.tw-btn{font-size:14px;padding:13px 20px}
+.tw-btn.ghost{background:#fff;color:var(--ink)}
+.tw-sub{font-size:13.5px;font-weight:700;color:var(--accent)}
+ol.bullets{padding-left:1.4em;text-align:left}
+#compare,#pick,#items,#check,#faq{scroll-margin-top:88px}
+.section.tinted,.section{padding:44px 0}
+@media(max-width:640px){.section.tinted,.section{padding:32px 0}.cards-h{font-size:18px}.sc-card{padding:16px 14px}.tw-btn{width:100%;text-align:center}}
+</style>

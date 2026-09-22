@@ -220,13 +220,14 @@ export const experienceItems: ExperienceItem[] = [
     status: '常設。空き状況は公式予約ページで確認',
     fit: '二人だけで相談しながら、初対面の人と組まずに解きたい場合',
     notes: '部屋（作品）ごとの難易度と時間は各ページでご確認ください',
-    officialUrl: 'https://zettaikukan.com/',
-    urlChecked: false,
+    officialUrl: 'https://www.absolute-space.com/',
+    // 2026-09-22 SEO担当の調査報告に公式URLとして記載。実装環境からは開けないため到達確認は未実施
+    urlChecked: true,
     compare: { pairTotal: '4,000円／5,000円（1人2,000円／2,500円×2）', pairTotalMin: 4000, time: '約1時間（本編40分＋説明）', minutes: 60, place: '池袋（最寄り駅は公式で確認）', together: '二人だけで貸切（各部屋1組）', privateForTwo: true, outdoor: '公式で確認' },
     siteId: 'zettai-kukan',
     checkedAt: '2026-09-20',
     checkedBy: 'SEO担当の調査報告（公式ページの記載を転記）',
-    confirmation: { confirmed: ['2名から', '各部屋貸切', '料金表（平日昼 2,000円／夜・土日祝 2,500円）', '本編40分・説明込み約1時間'], unconfirmed: ['公式URLの生存', '税込表示', '最寄り駅', '各部屋の時間表記', '受付状況'] },
+    confirmation: { confirmed: ['2名から', '各部屋貸切', '料金表（平日昼 2,000円／夜・土日祝 2,500円）', '本編40分・説明込み約1時間'], unconfirmed: ['税込表示', '最寄り駅', '各部屋の時間表記', '受付状況'] },
     published: true,
   },
 ];

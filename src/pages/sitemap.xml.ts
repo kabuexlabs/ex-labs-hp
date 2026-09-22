@@ -15,6 +15,7 @@ import { eventsData } from '../data/events/index';
 // Console as "excluded / not indexed" noise.
 const STATIC_PATHS = [
   '/',
+  '/guide/tokyo-nazo-date/',
   '/guide/immersive-tokyo-solo/',
   '/guide/immersive-tokyo-date/',
   '/guide/saiji-kikaku/',
@@ -133,6 +134,7 @@ export const GET: APIRoute = async ({ site }) => {
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {
+    '/guide/tokyo-nazo-date/': '2026-09-22',
     '/guide/immersive-tokyo-solo/': '2026-09-18',
     '/guide/immersive-tokyo-date/': '2026-09-18',
     '/guide/saiji-kikaku/': '2026-09-14',
