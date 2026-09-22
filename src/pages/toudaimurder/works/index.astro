@@ -65,7 +65,7 @@ const cardData = tmWorks.map((w, i) => ({
           <a href={`${base}/works/${w.slug}/`}><div class="ph pv">{w.image ? <img src={w.image} alt={`${w.title} キービジュアル`} loading="lazy" decoding="async" /> : <span class="mono">作品キービジュアル 407×570</span>}</div></a>
           <div class="cmeta"><span class="badge">{w.badge}</span>{w.meta && <span class="cdate mono">{w.meta}</span>}</div>
           <h2 class="ct"><a href={`${base}/works/${w.slug}/`}>{w.title}</a></h2>
-          {w.author && <p class="cauthor mono">作 — {w.author}</p>}
+          {w.author && <p class="cauthor">作 — {w.author}</p>}
           <p class="cpl">{w.play}</p>
           <p class="wd">{w.desc}</p>
         </div>
@@ -123,5 +123,5 @@ apply();
 .ssel:focus{outline:none;border-color:var(--acc)}
 .fcount{font-size:12px;color:var(--dim);margin-left:auto}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:40px;padding-bottom:96px}
-.cauthor{font-size:11px;color:var(--dim);letter-spacing:.08em;margin:0 0 6px}
+.cauthor{display:inline-block;font-size:12px;font-weight:700;color:var(--acc);letter-spacing:.06em;margin:0 0 8px;border:1px solid var(--acc);border-radius:999px;padding:2px 14px;background:color-mix(in srgb,var(--acc) 12%,transparent)}
 </style>

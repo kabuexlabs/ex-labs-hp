@@ -120,6 +120,7 @@ export const tmWorks: TmWork[] = [
     slug: 'jusankaku',
     title: '忘却の村 十三角館の殺人事件',
     badge: '人狼×マダミス',
+    // author は意図的に設定しない（表記しない方針）
     image: '/assets/toudaimurder/jusankaku.webp',
     meta: '13人／240分',
     play: '東大マダミス式パンドラ人狼',
@@ -179,6 +180,7 @@ export const tmWorks: TmWork[] = [
     slug: 'jinro',
     title: '人狼デスゲームへの挑戦',
     badge: '人狼×マダミス',
+    author: 'かるら',
     image: '/assets/toudaimurder/jinro.webp',
     meta: '4〜8人／120分',
     play: 'GM必須｜店舗公演・オンライン',
@@ -201,6 +203,7 @@ export const tmWorks: TmWork[] = [
     slug: 'blacktown',
     title: 'Black Town Dogs',
     badge: 'NEW',
+    author: '三ヶ崎四五六',
     image: '/assets/toudaimurder/blacktown.webp',
     meta: '29人／240分',
     play: 'GM必須｜店舗公演',
@@ -222,6 +225,7 @@ export const tmWorks: TmWork[] = [
     slug: 'twin',
     title: 'ツイン号沈没事故に関する考察',
     badge: '推理',
+    author: 'あこ',
     image: '/assets/toudaimurder/twin.webp',
     meta: '6人／180分',
     play: '店舗公演',
@@ -241,6 +245,7 @@ export const tmWorks: TmWork[] = [
     slug: 'dokuhaku',
     title: '殺人鬼Xの独白',
     badge: '代表作',
+    author: 'かるら',
     image: '/assets/toudaimurder/dokuhaku.webp',
     meta: '6人／180分',
     play: 'GM必須｜店舗公演',
@@ -254,6 +259,7 @@ export const tmWorks: TmWork[] = [
     slug: 'arumadamisu',
     title: 'あるマーダーミステリーについて',
     badge: '人気作',
+    author: 'かるら',
     image: '/assets/toudaimurder/arumadamisu.webp',
     meta: '5人／150分',
     play: 'GM必須｜店舗公演・オンライン',
@@ -280,6 +286,7 @@ export const tmWorks: TmWork[] = [
     slug: 'akuma',
     title: 'ある悪魔の儀式について',
     badge: '高難度',
+    author: 'かるら',
     image: '/assets/toudaimurder/akuma.webp',
     meta: '6人／180分',
     play: '店舗公演',
@@ -333,16 +340,3 @@ export const TM_LINE_URL = 'https://lin.ee/Vict8us';
 export const TM_X_URL = 'https://x.com/toudaimurder';
 export const TM_CONTACT_EMAIL = 'info@kabuexlabs.com';
 export const TM_COMPANY = { name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' };
-
-// お客様の声 (X投稿のスクリーンショット)。
-// 追加するときは public/assets/toudaimurder/voices/ に画像を置いて配列に足すだけ。
-export interface TmVoice {
-  src: string;
-  alt: string;
-  workSlug?: string;
-}
-
-export const tmVoices: TmVoice[] = [
-  { src: '/assets/toudaimurder/voices/voice-1.webp', alt: 'お客様の声：「フランケンシュタイン城の殺人」は傑作、本格推理小説と並べても遜色のない完成度、というX投稿', workSlug: 'frankenstein' },
-  { src: '/assets/toudaimurder/voices/voice-2.webp', alt: 'お客様の声：「フランケンシュタイン城の殺人」を個人的マダミス大賞にしたい、というX投稿', workSlug: 'frankenstein' },
-];
