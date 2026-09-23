@@ -9,6 +9,8 @@ import HeroWorksMarquee from '../components/HeroWorksMarquee.astro';
 import SourceField from '../components/SourceField.astro';
 import { pressItems } from '../data/press';
 import { mediaItems } from '../data/media';
+import { eventsData } from '../data/events/index';
+import { jstDateString } from '../lib/thisWeek';
 
 const latestMedia = mediaItems[0];
 
@@ -18,8 +20,11 @@ function pressDate(iso: string) {
   return `${y}.${m}.${d}`;
 }
 
-// 現在実施中のイベント — 終了したら配列から消すだけでOK。
-const liveEvents = [
+// 現在実施中のイベント。until（最終開催日、日本時間）を過ぎたものは自動で外し、実績（#works）にだけ残す。
+// 最終日は時刻が分からないので「本日最終日」と表示し、翌日から外す。自社公演の最終日は公演データ（src/data/events/）から取る。
+const todayJst = jstDateString(new Date());
+const lastDateOf = (workId: string, fallback?: string) => eventsData.occurrences.filter((o) => o.workId === workId && o.published && o.eventStatus !== 'cancelled').map((o) => o.date).sort().pop() ?? eventsData.works.find((w) => w.id === workId)?.period?.to ?? fallback;
+const allEvents = [
   {
     title: 'ウワサバナシ調査委員会',
     host: 'ex Labs主催',
@@ -28,6 +33,7 @@ const liveEvents = [
     url: 'https://kabuexlabs.com/uwasabanashi/',
     img: '/assets/events/uwasabanashi-kv.webp',
     w: 880, h: 1244,
+    until: lastDateOf('uwasabanashi', '2026-10-04'),
   },
   {
     title: '怪盗と秘密の試験',
@@ -37,6 +43,7 @@ const liveEvents = [
     url: 'https://kabuexlabs.com/kaitou/',
     img: '/assets/events/kaitou-kv.webp',
     w: 880, h: 1248,
+    until: lastDateOf('kaitou', '2026-10-11'),
   },
   {
     title: 'ロスト・フレーム',
@@ -46,8 +53,11 @@ const liveEvents = [
     url: 'https://kabuexlabs.com/taikenbizyutu/lostframe/',
     img: '/assets/events/lost-frame.webp',
     w: 800, h: 1138,
+    until: '2026-08-31', // 全公演終了（制作事例に記載）
   },
 ];
+const liveEvents = allEvents.filter((e) => !e.until || e.until >= todayJst);
+const endedEvents = allEvents.filter((e) => e.until && e.until < todayJst);
 
 // お取引先、ご協力企業様 — client/partner company logos shown above the 展開団体
 // marquee. 1段構成（7社）。
@@ -106,6 +116,7 @@ const marqueeItems = Array(2).fill(groups).flat();
 <a class="btn" href="#contact">相談してみる</a>
 <a class="btn ghost" href="#works">実績を見る</a>
 </div>
+<p class="hero-visitor">参加したい方は <a href="/events/" data-track="show" data-show="events" data-place="home-hero">開催中の公演を探す →</a></p>
 {/* 実績の看板数字。エントランスアニメは付けない（iOS bfcache で
     opacity:0 のまま固まる既知の不具合クラスを避ける）。 */}
 <div class="hero-stat">
@@ -210,13 +221,13 @@ const marqueeItems = Array(2).fill(groups).flat();
 
 <section class="section tinted" id="events"><div class="wrap">
 <p class="eyebrow">NOW SHOWING</p><h2 class="h2 serif">現在実施中のイベント</h2>
-<p class="h2sub">画像をタップすると、各イベントの特設サイトへ移動します。</p>
+<p class="h2sub">画像をタップすると、各イベントの特設サイトへ移動します。開催日・空席は<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="home-now">公演を探す</a>で日付・人数から確認できます。</p>
 <div class="event-row">
 {liveEvents.map((e) => (
   e.url ? (
     <a class="event-card" href={e.url} target="_blank" rel="noopener noreferrer">
       <img src={e.img} alt={`${e.title} ポスター`} width={e.w} height={e.h} loading="lazy" decoding="async">
-      <span class="event-name">{e.title}<span class="event-host"><span class="nobr">{e.host}｜</span><span class="nobr">開催地：{e.place}&nbsp;↗</span></span></span>
+      <span class="event-name">{e.title}<span class="event-host"><span class="nobr">{e.host}｜</span><span class="nobr">開催地：{e.place}&nbsp;↗</span>{e.until === todayJst && <span class="nobr">｜本日最終日</span>}</span></span>
       <span class="event-desc">{e.desc.split('​').map((c) => <span class="nobr">{c}</span>)}</span>
     </a>
   ) : (
@@ -228,6 +239,7 @@ const marqueeItems = Array(2).fill(groups).flat();
   )
 ))}
 </div>
+{endedEvents.length > 0 && <p class="vc-line" style="margin-top:28px">終了した公演：{endedEvents.map((e, i) => <>{i > 0 && '／'}<a href={e.url} style="color:var(--accent)">{e.title}</a>（{e.host}・{e.place}）</>)}。制作の内容は<a href="#works" style="color:var(--accent)">実績</a>と各公演ページに残しています。</p>}
 </div></section>
 
 <LatestPosts heading="最新記事" tinted={false} alwaysShow />
@@ -274,6 +286,7 @@ const marqueeItems = Array(2).fill(groups).flat();
 <div class="str-grid">
 <div class="str-card"><p class="str-num">01</p><h3 class="str-title">初期費用は0円、もしくは格安！</h3>
 <p class="str-lead"><span class="nobr">弊社は法人様からではなく、</span><span class="nobr">イベントのお客様から</span><span class="nobr">収益回収するモデルを</span><span class="nobr">実現しております。</span></p>
+<p class="str-cond">有料チケット型のイベントで、チケット売上から費用を回収する形式（レベニューシェア）では、施設側の初期費用を抑えた開催が可能です。条件に応じて受託・併用でご提案します。<a href="/services/shisetsu-event/#revenue" data-track="cta" data-show="services-shisetsu" data-place="home-strength">適用条件を見る →</a></p>
 <ul class="feature-points"><li><span><span class="nobr">企画の中身だけでなく、</span><span class="nobr">集客成果まで責任を持ちます。</span></span></li><li><span><span class="nobr">「制作して終わり」ではなく</span><span class="nobr">「成功するところまで伴走する」</span><span class="nobr">そんな会社を目指しております。</span></span></li></ul></div>
 <div class="str-card"><p class="str-num">02</p><h3 class="str-title">どんなコンテンツでも<br>制作可能！</h3>
 <p class="str-lead"><span class="nobr">謎解き・マーダーミステリー・</span><span class="nobr">頭脳戦・</span><span class="nobr">イマーシブコンテンツなど、</span><span class="nobr">多岐に渡るジャンルを</span><span class="nobr">企画・制作可能です。</span></p>

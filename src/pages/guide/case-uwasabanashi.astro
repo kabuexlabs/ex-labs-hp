@@ -10,6 +10,13 @@ import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
+import { jstDateString } from '../../lib/thisWeek';
+// 開催期間（自社公式の案内）。開催前／期間中／終了後で表現を切り替え、終了後も同じURLで開催記録として残す
+const RUN = { from: '2026-09-19', to: '2026-10-04' };
+const todayJst = jstDateString(new Date());
+// 監査スクリプトがタグ除去で「<」を誤認しないよう、比較は「>」で書く
+const phase: 'before' | 'during' | 'after' = RUN.from > todayJst ? 'before' : todayJst > RUN.to ? 'after' : 'during';
+const phaseLabel = phase === 'before' ? '現時点の実績（開催前）' : phase === 'during' ? '開催期間中に確認できている実績' : '開催記録（終了）';
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
@@ -19,7 +26,7 @@ const toc = [
   { id: 'concept', label: '企画：なぜ「都市伝説」だったのか' },
   { id: 'design', label: '体験設計の工夫3つ' },
   { id: 'media', label: '成果：日本経済新聞・電ファミニコゲーマー掲載' },
-  { id: 'kpi', label: '企画の目的・現時点の実績・今後測る項目' },
+  { id: 'kpi', label: '企画の目的・確認できている実績・測る項目' },
   { id: 'faq', label: 'よくある質問' },
 ];
 
@@ -136,12 +143,12 @@ const articleLd = {
 </div></section>
 
 <section class="section" id="kpi"><div class="wrap narrow">
-<p class="eyebrow">KPI</p><h2 class="h2 serif">企画の目的・現時点の実績・今後測る項目</h2>
-<p class="lede">メディア掲載は広報の成果であり、施設側が知りたい「回遊・滞在・消費」の成果とは別物です。本件は2026年9月19日〜10月4日の開催のため、ここでは目的・現時点の実績・開催後に測る項目を分けて記載します。</p>
+<p class="eyebrow">KPI</p><h2 class="h2 serif">企画の目的・確認できている実績・測る項目</h2>
+<p class="lede">メディア掲載は広報の成果であり、施設側が知りたい「回遊・滞在・消費」の成果とは別物です。{phase === 'after' ? '本件は2026年9月19日〜10月4日に開催しました。目的・確認できている実績・集計する項目を分けて記載します。' : phase === 'during' ? '本件は2026年9月19日〜10月4日の開催期間中です。目的・現在確認できている実績・終了後に測る項目を分けて記載します。' : '本件は2026年9月19日〜10月4日の開催のため、ここでは目的・現時点の実績・開催後に測る項目を分けて記載します。'}</p>
 <ul class="bullets">
 <li><strong>企画の目的</strong>：施設の共有区画を「目的地」に変え、館内の回遊と滞在時間を伸ばすこと。協力テナント（404 Not Found・TSUTAYA）への送客を物語の導線に組み込むこと。</li>
-<li><strong>現時点の実績（開催前）</strong>：日本経済新聞・電ファミニコゲーマーでの掲載、東急不動産株式会社と施設内テナントとの協働体制、当社担当範囲は企画・脚本・制作物・告知・チケット販売・当日運営。</li>
-<li><strong>開催後に測る項目</strong>：参加者数（チケット販売数）、参加者の館内滞在時間と訪問フロア数（アンケート）、協力テナントへの送客数、SNS投稿数、施設側アンケート。集計方法と期間を明記したうえで本ページに追記します。</li>
+<li><strong>{phaseLabel}</strong>：日本経済新聞・電ファミニコゲーマーでの掲載、東急不動産株式会社と施設内テナントとの協働体制、当社担当範囲は企画・脚本・制作物・告知・チケット販売・当日運営。</li>
+<li><strong>{phase === 'after' ? '集計する項目' : '開催後に測る項目'}</strong>：参加者数（チケット販売数）、参加者の館内滞在時間と訪問フロア数（アンケート）、協力テナントへの送客数、SNS投稿数、施設側アンケート。集計方法と期間を明記したうえで本ページに追記します。</li>
 <li><strong>この事例から言えること・言えないこと</strong>：施設一体型イベントが報道価値を持ち、施設・テナントの協働を引き出せることは言えます。回遊や消費への効果は開催後の数字で示します。</li>
 </ul>
 </div></section>
@@ -178,7 +185,7 @@ const articleLd = {
 <section class="section tinted"><div class="wrap">
 <div class="cta-mini">
 <p class="cta-mini-title serif">貴施設でも施設一体型イマーシブを開催しませんか？（相談無料）</p>
-<a class="btn" href="/#contact">開催について相談する</a>
+<a class="btn" href="/?c=shisetsu#contact" data-track="cta" data-show="contact" data-place="case-uwasabanashi">この形式（施設一体型）を自社施設で実施できるか相談する</a>
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作とは（工程・体制の解説）</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例4選</a>／<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントとは</a></p>
 </div></section>
