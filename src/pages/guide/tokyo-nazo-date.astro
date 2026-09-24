@@ -21,7 +21,7 @@ const pageUrl = new URL('/guide/tokyo-nazo-date/', site).toString();
 
 // 自社の周遊型（謎解き要素あり）を同じ列で並べる
 const own = buildGuideRows(now).filter((r) => r.w.id === 'uwasabanashi' && r.status !== 'ended');
-type Row = { id: string; name: string; area: string; format: string; players: string; privateForTwo?: boolean; together: string; pairPrice: string; pairPriceMin?: number; timeLimit: string; totalTime: string; totalMinutes?: number; tax: string; indoor: string; beginner: string; href: string; ext: boolean; own: boolean; officialUrl: string; siteId: string };
+type Row = { id: string; name: string; area: string; format: string; players: string; privateForTwo?: boolean; privacy?: 'room' | 'team' | 'shared'; together: string; pairPrice: string; pairPriceMin?: number; timeLimit: string; totalTime: string; totalMinutes?: number; tax: string; indoor: string; beginner: string; href: string; ext: boolean; own: boolean; officialUrl: string; siteId: string };
 const rows: Row[] = [
   ...publishedNazoItems.map<Row>((i) => ({ ...i, href: `#item-${i.id}`, ext: true, own: false })),
   ...own.map<Row>((r) => {
@@ -30,15 +30,20 @@ const rows: Row[] = [
     return {
       id: r.w.id, name: r.w.title, area: s?.area ?? '東京・渋谷', format: '周遊型（当社制作）', players: r.w.party.text,
       privateForTwo: r.w.party.format === 'private' ? true : r.w.party.format === 'shared' ? false : undefined,
+      privacy: r.w.party.format === 'private' ? 'room' : r.w.party.format === 'shared' ? 'shared' : undefined,
       together: r.w.party.format === 'shared' ? '同じ回に他の参加者も一緒（途中で一時的に離れる場面あり）' : r.formatLabel,
       pairPrice: t !== undefined ? `${fmtYen(t)}（1人${fmtYen(r.perPersonFor(2)!)}×2、税込・手数料別）` : '公式ページで確認', pairPriceMin: t,
-      timeLimit: '制限時間なし', totalTime: r.w.duration.minutes ? `約${r.w.duration.minutes}分（本編。集合・受付は別）` : '公式ページで確認', totalMinutes: r.w.duration.minutes, tax: '税込。予約サイトの手数料は別',
+      timeLimit: 'なし（自分のペースで進む）', totalTime: r.w.duration.minutes ? `約${r.w.duration.minutes}分（本編。集合・受付は別）` : '公式ページで確認', totalMinutes: r.w.duration.minutes, tax: '税込。予約サイトの手数料は別',
       indoor: r.venue?.setting === 'indoor' ? '屋内（商業施設内を歩く）' : '公式ページで確認', beginner: r.w.info.beginner ?? '公式ページで確認',
       href: `#item-${r.w.id}`, ext: false, own: true, officialUrl: r.w.officialUrl, siteId: r.w.id,
     };
   }),
 ];
 const privateRows = rows.filter((r) => r.privateForTwo === true);
+// 部屋を一組で貸切（room）と、同じチームで遊べるだけ（team）は別の条件として表示する
+const roomRows = rows.filter((r) => r.privacy === 'room');
+const teamRows = rows.filter((r) => r.privacy === 'team');
+const privacyText = (r: Row) => r.privacy === 'room' ? '部屋を一組で貸切（二人だけ）' : r.privacy === 'team' ? '同じチームで遊べる（知らない人と組まない）' : r.privacy === 'shared' ? '他の参加者と一緒' : '作品ページで確認';
 const sharedRows = rows.filter((r) => r.privateForTwo === false);
 const unknownRows = rows.filter((r) => r.privateForTwo === undefined);
 // 「約1時間以内」は説明・受付込みの合計時間が公式で確認できた作品だけ（ゲーム時間しか分からないものは含めない）
@@ -50,7 +55,7 @@ const heroChips = [`${rows.length}作品を比較`, ...(privateRows.length ? [`�
 const extHref = (r: Row) => r.officialUrl || `https://www.google.com/search?q=${encodeURIComponent(`${r.name} 公式`)}`;
 
 const faqs = [
-  { q: '二人だけで遊べる謎解き・脱出ゲームはありますか？', a: `${privateRows.length ? `${names(privateRows)}は、二人だけのチームで遊べます（部屋ごとの貸切、または1〜2人のチームチケット。施設全体の貸切ではありません）。` : '二人だけで遊べる作品は現在掲載していません。'}${sharedRows.length ? `${names(sharedRows)}は同じ回に他の参加者も一緒です。` : ''}${unknownRows.length ? `${names(unknownRows)}は他の参加者と一緒になるかを作品ページでご確認ください。` : ''}` },
+  { q: '二人だけで遊べる謎解き・脱出ゲームはありますか？', a: `${roomRows.length ? `${names(roomRows)}は部屋（テーマ）を一組で貸し切るので、2人で申し込めば部屋を二人だけで使えます。` : ''}${teamRows.length ? `${names(teamRows)}は1〜2人のチームチケットで知らない人とチームを組みませんが、部屋や施設の貸切ではありません。` : ''}${!roomRows.length && !teamRows.length ? '二人だけで遊べる作品は現在掲載していません。' : ''}${sharedRows.length ? `${names(sharedRows)}は同じ回に他の参加者も一緒です。` : ''}${unknownRows.length ? `${names(unknownRows)}は他の参加者と一緒になるかを作品ページでご確認ください。` : ''}` },
   { q: '初めてでも大丈夫ですか？', a: `難易度の表記は施設・作品ごとに違うため、各公式ページで確認してください。初めての二人は、${shortRows.length ? `${names(shortRows)}のような約1時間以内の作品` : '短時間の作品'}から始めると予定が組みやすいです。謎解きの経験がなくても参加できる作品が多く、演技は求められません。` },
   { q: '二人分の料金はいくらですか？', a: `通常料金で、${known.map((r) => `${r.name}は${r.pairPrice}`).join('。')}。${rows.filter((r) => r.pairPriceMin === undefined).length ? `${names(rows.filter((r) => r.pairPriceMin === undefined))}の料金は公式ページの料金表でご確認ください。` : ''}料金は施設・時間帯・作品で変わることがあります。` },
   { q: '所要時間はどのくらい見ておけばいいですか？', a: `ゲームの制限時間と、説明・受付を含む合計時間は別です。${rows.map((r) => `${r.name}：${r.totalTime}`).join('。')}。受付時刻に遅れると参加できない施設があるため、前後の予定には余裕を持たせてください。` },
@@ -90,7 +95,7 @@ const articleLd = {
 <li>二人分の料金、制限時間と合計体験時間、屋内か屋外かを同じ表で見比べられます。</li>
 <li>気になった施設は、そのまま公式ページ・予約ページへ進めます。</li>
 </ul></div>
-<p class="lede" style="margin-top:18px"><strong>まず目的で絞るなら</strong>：短時間で遊ぶなら{shortRows.filter((r) => !r.own).length ? shortRows.filter((r) => !r.own).map((r, i) => <>{i > 0 && '・'}<a href={r.href} style="color:var(--accent)">{r.name.replace(/（[^）]*）/g, '')}</a></>) : '合計約1時間以内の作品'}、部屋を貸し切って二人だけで遊ぶなら{privateRows.filter((r) => !r.own && (r.totalMinutes === undefined || r.totalMinutes > 30)).map((r, i) => <>{i > 0 && '・'}<a href={r.href} style="color:var(--accent)">{r.name.replace(/（[^）]*）/g, '')}</a></>)}、キャストと会話しながら物語を進めるなら{own.map((r) => <a href={`#item-${r.w.id}`} style="color:var(--accent)">{r.w.title}</a>)}や<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">イマーシブ公演</a>が候補です。</p>
+<p class="lede" style="margin-top:18px"><strong>まず目的で絞るなら</strong>：短時間で遊ぶなら{shortRows.filter((r) => !r.own).length ? shortRows.filter((r) => !r.own).map((r, i) => <>{i > 0 && '・'}<a href={r.href} style="color:var(--accent)">{r.name.replace(/（[^）]*）/g, '')}</a></>) : '合計約1時間以内の作品'}、部屋を貸し切って二人だけで遊ぶなら{roomRows.filter((r) => !r.own).map((r, i) => <>{i > 0 && '・'}<a href={r.href} style="color:var(--accent)">{r.name.replace(/（[^）]*）/g, '')}</a></>)}、キャストと会話しながら物語を進めるなら{own.map((r) => <a href={`#item-${r.w.id}`} style="color:var(--accent)">{r.w.title}</a>)}や<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">イマーシブ公演</a>が候補です。</p>
 </div></section>
 
 <section class="section tinted" id="compare"><div class="wrap">
@@ -100,18 +105,18 @@ const articleLd = {
   <tr>
     <th scope="row"><a href={r.href} style="color:var(--ink)">{r.name}</a>{r.own && <span class="cmp-sub">当社制作</span>}</th>
     <td>{r.area}／{r.format}</td><td>{r.players}</td>
-    <td>{r.privateForTwo === true ? '二人だけ（貸切）' : r.privateForTwo === false ? '他の参加者と一緒' : '作品ページで確認'}</td>
+    <td>{privacyText(r)}</td>
     <td>{r.pairPrice}</td><td>{r.tax}</td><td>{r.timeLimit}</td><td>{r.totalTime}</td><td>{r.indoor}</td><td>{r.beginner}</td>
   </tr>
 ))}
 </tbody></table></div>
-<p class="cards-note">料金は通常料金の二人分です（割引料金は含めていません。土日祝・ハイシーズンの対象日は各公式ページで確認）。「二人だけ」は同じチームで遊べることで、施設全体の貸切ではありません。合計時間には受付までの移動は含まれません。</p>
+<p class="cards-note">料金は通常料金の二人分です（割引料金は含めていません。土日祝・ハイシーズンの対象日は各公式ページで確認）。「部屋を一組で貸切」は部屋を二人だけで使えること、「同じチームで遊べる」は知らない人と組まないことで、どちらも施設全体の貸切ではありません。合計時間には受付までの移動は含まれません。</p>
 </div></section>
 
 <section class="section" id="pick"><div class="wrap">
 <h2 class="cards-h">目的で選ぶ<span>貸切・短時間・初めて・雨の日・街歩き</span></h2>
 <div class="pick-grid">
-<div class="pick-col"><p class="pick-h">二人だけで遊びたい</p><p class="pick-p">{privateRows.length ? <>{privateRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a></>)}は部屋ごとの貸切です。</> : '現在、二人だけで貸切にできる施設は掲載していません。'}{sharedRows.length ? <>{names(sharedRows)}は他の参加者と一緒に進みます。</> : ''}</p></div>
+<div class="pick-col"><p class="pick-h">二人だけで遊びたい</p><p class="pick-p"><strong>部屋を一組で貸切</strong>：{roomRows.length ? <>{roomRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a></>)}</> : '現在掲載していません'}。<br><strong>同じチームで遊べる（知らない人と組まない）</strong>：{teamRows.length ? <>{teamRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a></>)}。部屋の貸切ではありません</> : '現在掲載していません'}。{sharedRows.length ? <><br>{names(sharedRows)}は他の参加者と一緒に進みます。</> : ''}{unknownRows.length ? <><br>{names(unknownRows)}は作品ページでご確認ください。</> : ''}</p></div>
 <div class="pick-col"><p class="pick-h">短時間で遊びたい（合計約1時間以内）</p><p class="pick-p">{shortRows.length ? <>{shortRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a>（{r.totalTime}）</>)}</> : '約1時間以内の作品は掲載していません。'}{rows.filter((r) => r.totalMinutes === undefined).length ? <>{names(rows.filter((r) => r.totalMinutes === undefined))}は説明・受付を含む合計時間が公式で確認できていないため、ここには含めていません。</> : ''}</p></div>
 <div class="pick-col"><p class="pick-h">初めての二人</p><p class="pick-p">難易度の表記は施設ごとに違います。短時間の作品や、進行のサポートがある作品から選ぶと安心です。{own.length ? <>{own.map((r) => <a href={`#item-${r.w.id}`}>{r.w.title}</a>)}は「{own[0].w.info.beginner}」と案内しています。</> : ''}</p></div>
 <div class="pick-col"><p class="pick-h">雨の日</p><p class="pick-p">{indoorRows.length ? <>{indoorRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a></>)}は屋内で遊べます。駅から受付までの移動は各公式ページでご確認ください。</> : '屋内の施設は掲載していません。'}</p></div>
@@ -127,9 +132,9 @@ const articleLd = {
     <p class="tw-area">{r.area}　｜　{r.format}</p>
     <h3 class="tw-name serif">{r.name}</h3>
     <dl class="tw-dl">
-      <div><dt>人数・二人だけか</dt><dd class="dd-normal">{r.players}。{r.together}</dd></div>
+      <div><dt>人数・二人だけか</dt><dd class="dd-normal">{r.players}。{privacyText(r)}。{r.together}</dd></div>
       <div><dt>二人分の料金</dt><dd class="dd-normal">{r.pairPrice}。{r.tax}</dd></div>
-      <div><dt>時間</dt><dd class="dd-normal">制限時間 {r.timeLimit}／合計 {r.totalTime}</dd></div>
+      <div><dt>制限時間／合計時間</dt><dd class="dd-normal">{r.timeLimit}／{r.totalTime}</dd></div>
       <div><dt>屋内・屋外／初心者向け</dt><dd class="dd-normal">{r.indoor}／{r.beginner}</dd></div>
     </dl>
     <div class="tw-actions">

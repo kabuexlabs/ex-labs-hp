@@ -12,8 +12,10 @@ export interface NazoItem {
   format: '店舗型' | '街歩き型' | '周遊型';
   /** 人数の条件 */
   players: string;
-  /** 二人だけで1チームになれるか（true＝貸切・二人だけ、false＝他の参加者と一緒、undefined＝公式で確認） */
+  /** 二人だけで1チームになれるか（true＝二人だけ、false＝他の参加者と一緒、undefined＝公式で確認） */
   privateForTwo?: boolean;
+  /** 二人だけの形：room＝部屋を一組で貸切、team＝同じチームで遊べる（知らない人と組まないが部屋貸切とは限らない）、shared＝他の参加者と一緒 */
+  privacy?: 'room' | 'team' | 'shared';
   together: string;
   /** 二人分の料金の表示 */
   pairPrice: string;
@@ -46,12 +48,13 @@ export const nazoItems: NazoItem[] = [
     format: '店舗型',
     players: '1〜2人（チームチケット1枚）',
     privateForTwo: true,
-    together: '1〜2人のチームチケットで、知らない人とチームを組まない（公式FAQ）。施設全体の貸切ではない',
+    privacy: 'team',
+    together: '1〜2人のチームチケットで、知らない人とチームを組まない（公式FAQ）。部屋や施設の貸切ではない',
     pairPrice: '平日2,000円／土日祝・ハイシーズン2,200円（1〜2人のチームチケット1枚の通常料金）',
     pairPriceMin: 2000,
     timeLimit: '10分',
     gameMinutes: 10,
-    totalTime: '合計約20分（開演10分前に受付）',
+    totalTime: '約20分（開演10分前に受付）',
     totalMinutes: 20,
     tax: '税込かどうか・手数料は公式ページで確認',
     indoor: '屋内',
@@ -74,7 +77,7 @@ export const nazoItems: NazoItem[] = [
     pairPriceMin: 4000,
     timeLimit: '20分',
     gameMinutes: 20,
-    totalTime: '合計30分',
+    totalTime: '約30分',
     totalMinutes: 30,
     tax: '税込かどうか・手数料は公式ページで確認',
     indoor: '屋内',
@@ -93,7 +96,8 @@ export const nazoItems: NazoItem[] = [
     format: '店舗型',
     players: '2〜8人',
     privateForTwo: true,
-    together: 'テーマごとに完全貸切。2人で申し込めば二人だけで遊べる',
+    privacy: 'room',
+    together: 'テーマごとに完全貸切。2人で申し込めば部屋を二人だけで使える',
     pairPrice: '8,800円（平日）／9,600円（土日祝）。50分ゲームに2名で参加した場合の1人4,400円／4,800円×2（税込）',
     pairPriceMin: 8800,
     timeLimit: '50分（ゲーム時間）',
@@ -116,7 +120,8 @@ export const nazoItems: NazoItem[] = [
     format: '店舗型',
     players: '2人から',
     privateForTwo: true,
-    together: '各部屋が1組ごとの貸切。2人なら二人だけで遊べる',
+    privacy: 'room',
+    together: '各部屋が1組ごとの貸切。2人なら部屋を二人だけで使える',
     pairPrice: '4,000円（平日昼）／5,000円（夜・土日祝）。1人2,000円／2,500円×2',
     pairPriceMin: 4000,
     timeLimit: '本編40分',
