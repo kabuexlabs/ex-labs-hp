@@ -89,7 +89,7 @@ const orgLd = {
 <link rel="icon" type="image/png" href="/favicon-ex.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@600;800&family=JetBrains+Mono:wght@400&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@600;800&family=JetBrains+Mono:wght@400&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <slot name="head" />
 <SiteGuard />
@@ -98,7 +98,7 @@ const orgLd = {
 <div class:list={['pg', { pgwide: wide }]}>
 <slot name="rail" />
 <header class="hdr">
-<div class="hbar"><a href={`${base}/`} class="logo"><img class="logomark" src="/assets/toudaimurder/um-mark.svg" alt="" width="46" height="41">UNLIMITED&nbsp;<span class="acc">MYSTERY</span></a>
+<div class="hbar"><a href={`${base}/`} class="logo"><img class="logomark" src="/assets/toudaimurder/um-logo.svg" alt="UNLIMITED MYSTERY" height="30"></a>
 <nav class="nav">
 {nav.map((item) => (
   <a class="nit" href={item.href}>
@@ -122,7 +122,7 @@ const orgLd = {
 <slot />
 <slot name="footer">
   <footer class="ftr wrap">
-    <div class="umlk"><img class="ummark" src="/assets/toudaimurder/um-mark.svg" alt="UNLIMITED MYSTERY ロゴ" width="46" height="41" loading="lazy"><span class="umtx">UNLIMITED<br>MYSTERY</span></div>
+    <div class="umlk"><img class="ummark" src="/assets/toudaimurder/um-logo.svg" alt="UNLIMITED MYSTERY" height="46" loading="lazy"></div>
     <p class="copy">運営会社：<a href="https://kabuexlabs.com/">株式会社ex Labs</a>｜<a href="https://kabuexlabs.com/services/murder-mystery/">マーダーミステリー制作のご依頼（法人向け）</a></p>
     <p class="copy" style="margin-top:6px">解説記事：<a href="https://kabuexlabs.com/guide/madamis/">マダミス（マーダーミステリー）とは</a>／<a href="https://kabuexlabs.com/guide/madamis-asobikata/">マダミスの遊び方</a>／<a href="https://kabuexlabs.com/guide/madamis-shoshinsha/">初心者ガイド</a>／<a href="https://kabuexlabs.com/guide/madamis-nazotoki-chigai/">謎解き・人狼との違い</a>／<a href="https://kabuexlabs.com/guide/madamis-seisaku/">マダミス制作とは</a></p>
     <p class="copy en" style="margin-top:6px">© UNLIMITED MYSTERY. All Rights Reserved.</p>
@@ -160,8 +160,8 @@ a{color:#eae5e1;text-decoration:none}a:hover{color:#e0243f}
 .bt{border-top:1px solid var(--ln)}
 .hdr{position:sticky;top:0;z-index:50;background:rgba(11,10,12,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--ln)}
 .hbar{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:14px 32px}
-.logo{display:flex;align-items:center;gap:10px;font-family:'Outfit',sans-serif;font-weight:600;font-size:16px;letter-spacing:.22em;white-space:nowrap}
-.logomark{width:26px;height:auto;flex:none}
+.logo{display:flex;align-items:center;white-space:nowrap}
+.logomark{width:auto;height:30px;flex:none;display:block}
 .nav{display:flex;gap:34px}
 .nit{display:flex;flex-direction:column;align-items:center;gap:1px}
 .nen{font-size:13px;font-weight:600;letter-spacing:.22em}
@@ -195,15 +195,13 @@ body.noscroll{overflow:hidden}
 .more:hover{background:var(--acc);color:#0b0a0c}
 .ftr{border-top:1px solid var(--ln);padding-top:44px;padding-bottom:36px}
 .copy{font-size:11px;color:var(--dim);margin:0}
-.umlk{display:flex;align-items:center;gap:12px;margin:0 0 20px}
-.ummark{width:46px;height:auto;display:block}
-.umtx{font-family:'Playfair Display',serif;font-weight:600;font-size:15px;letter-spacing:.18em;line-height:1.35;color:#eae5e1}
+.umlk{display:flex;align-items:center;margin:0 0 20px}
+.ummark{width:auto;height:46px;display:block}
 @media (max-width:1100px){.nav{display:none}.menub{display:flex}}
 @media (max-width:700px){
   .wrap{padding:0 22px}
   .hbar{padding:12px 18px}
-  .logo{font-size:13.5px;letter-spacing:.16em}
-  .logomark{width:22px}
+  .logomark{height:24px}
   .sht{font-size:clamp(40px,13vw,64px)}
   .pg{font-size:14px}
   .more{padding:10px 26px;letter-spacing:.2em;font-size:12px}
