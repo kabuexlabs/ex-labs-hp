@@ -33,7 +33,7 @@ const rows: Row[] = [
       privacy: r.w.party.format === 'private' ? 'room' : r.w.party.format === 'shared' ? 'shared' : undefined,
       together: r.w.party.format === 'shared' ? '同じ回に他の参加者も一緒（途中で一時的に離れる場面あり）' : r.formatLabel,
       pairPrice: t !== undefined ? `${fmtYen(t)}（1人${fmtYen(r.perPersonFor(2)!)}×2、税込・手数料別）` : '公式ページで確認', pairPriceMin: t,
-      timeLimit: 'なし（自分のペースで進む）', totalTime: r.w.duration.minutes ? `約${r.w.duration.minutes}分（本編。集合・受付は別）` : '公式ページで確認', totalMinutes: r.w.duration.minutes, tax: '税込。予約サイトの手数料は別',
+      timeLimit: '公式ページで確認', totalTime: r.w.duration.minutes ? `所要時間 約${r.w.duration.minutes}分（集合・受付時間は別途確認）` : '公式ページで確認', totalMinutes: r.w.duration.minutes, tax: '税込。予約サイトの手数料は別',
       indoor: r.venue?.setting === 'indoor' ? '屋内（商業施設内を歩く）' : '公式ページで確認', beginner: r.w.info.beginner ?? '公式ページで確認',
       href: `#item-${r.w.id}`, ext: false, own: true, officialUrl: r.w.officialUrl, siteId: r.w.id,
     };

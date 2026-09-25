@@ -156,4 +156,6 @@ const chips = [short(s.duration), short(s.capacity)].filter((c) => c && c.length
 .cal-btn small{font-size:10.5px;font-weight:600;opacity:.85;letter-spacing:.04em}
 .cal-sub{font-size:12.5px;font-weight:700;color:var(--accent);text-align:center}
 @media(max-width:640px){.cal-body{padding:12px 12px 14px}.cal-yen{font-size:24px}}
+/* 320〜340px 幅：セルが31px程度まで縮むため、余白と間隔を詰めてタップ幅を確保する */
+@media(max-width:340px){.cal-body{padding:10px 8px 12px}.cal-row{gap:2px}.cal-cell>a,.cal-cell>span{padding:4px 0}}
 </style>
