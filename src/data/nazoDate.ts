@@ -29,6 +29,10 @@ export interface NazoItem {
   totalMinutes?: number;
   /** 税込区分・手数料 */
   tax: string;
+  /** 2人で申し込んだときの1人あたり通常料金（平日／土日祝など高い方）。割引・クーポン・4名時単価は使わない */
+  perPerson2?: { low: number; high: number; note: string };
+  /** 最寄り駅・出口（公式で確認できた場合だけ） */
+  station?: string;
   indoor: string;
   beginner: string;
   officialUrl: string;
@@ -60,6 +64,7 @@ export const nazoItems: NazoItem[] = [
     indoor: '屋内',
     beginner: '公式ページで確認',
     officialUrl: 'https://realdgame.jp/shop/shibuya/events/10min/',
+    perPerson2: { low: 1000, high: 1100, note: '1〜2人のチームチケット（平日2,000円／土日祝・ハイシーズン2,200円）を2人で割った額' },
     siteId: 'scrap-shibuya-10min',
     checkedAt: '2026-09-23',
     checkedBy: 'SEO担当の調査報告（公式作品ページの記載）',
@@ -83,6 +88,7 @@ export const nazoItems: NazoItem[] = [
     indoor: '屋内',
     beginner: '公式ページで確認',
     officialUrl: 'https://realdgame.jp/shop/shibuya/events/desolateearth/',
+    perPerson2: { low: 2000, high: 2100, note: 'ペア合計（平日4,000円／土日祝・ハイシーズン4,200円）を2人で割った額' },
     siteId: 'scrap-shibuya-desolateearth',
     checkedAt: '2026-09-23',
     checkedBy: 'SEO担当の調査報告（公式作品ページの記載）',
@@ -107,6 +113,7 @@ export const nazoItems: NazoItem[] = [
     indoor: '屋内',
     beginner: '難易度モードの案内は公式ページで確認',
     officialUrl: 'https://noescape.co.jp/shinjuku/sp/price/',
+    perPerson2: { low: 4400, high: 4800, note: '50分ゲームに2名で参加した場合（平日4,400円／土日祝4,800円、税込）' },
     siteId: 'noescape-shinjuku',
     checkedAt: '2026-09-23',
     checkedBy: 'SEO担当の調査報告（新宿店の公式料金ページがリンクする料金表の記載。20分ゲームは別料金のため含めない）',
@@ -132,6 +139,7 @@ export const nazoItems: NazoItem[] = [
     indoor: '屋内',
     beginner: '作品ごとの難易度は公式ページで確認',
     officialUrl: 'https://www.absolute-space.com/',
+    perPerson2: { low: 2000, high: 2500, note: '平日昼2,000円／夜・土日祝2,500円' },
     siteId: 'zettai-kukan',
     checkedAt: '2026-09-22',
     checkedBy: 'SEO担当の調査報告（公式ページの記載）',

@@ -1,0 +1,195 @@
+---
+// 「渋谷 雨の日 デート」「渋谷 室内 デート」の受け皿。
+// 役割：渋谷で会うことが決まっている二人が、雨でも楽しめる予約できる体験を「駅からの移動・体験中の屋内外・二人分の料金・時間」で選ぶ。
+// ジャンル全体の比較は /guide/tokyo-experience-date/、謎解きの施設比較は /guide/tokyo-nazo-date/、公演の日程は /guide/immersive-tokyo/ に任せる。
+// 他社は src/data/nazoDate.ts（渋谷エリアの掲載分）、自社公演は src/data/events/ から生成する。終了した公演は現行の比較から自動で外れる。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import VisualHero from '../../components/VisualHero.astro';
+import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
+import { publishedNazoItems } from '../../data/nazoDate';
+import { jsonLd } from '../../lib/microcms';
+
+const now = new Date();
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/shibuya-rainy-date/', site).toString();
+
+type Row = { id: string; name: string; kind: string; station: string; walkOutside: string; during: string; pair: string; game: string; total: string; privacy: string; doing: string; bag: string; reserve: string; href: string; own: boolean; siteId: string };
+// 自社：渋谷で開催中の公演だけ（終了すると外れる）
+const ownRows: Row[] = buildGuideRows(now)
+  .filter((r) => r.status !== 'ended' && r.venue?.areaId === 'shibuya')
+  .map((r) => {
+    const t = r.totalFor(2);
+    return {
+      id: r.w.id, name: r.w.title, kind: '館内を歩く物語参加型（ex Labs企画・制作）',
+      station: r.venue?.station ?? '公式ページで確認',
+      walkOutside: r.venue?.station?.includes('直結') ? '駅から直結（公式の案内）' : '公式ページで確認',
+      during: r.venue?.setting === 'indoor' ? '商業施設の館内（屋内）' : '公式ページで確認',
+      pair: t !== undefined ? `${fmtYen(t)}（1人${fmtYen(r.perPersonFor(2)!)}、税込・手数料別）` : '公式ページで確認',
+      game: '公式ページで確認', total: r.w.duration.minutes ? `所要時間 約${r.w.duration.minutes}分（集合・受付は別）` : '公式ページで確認',
+      privacy: r.w.party.format === 'shared' ? '他の参加者と同じ回（途中で一時的に離れる場面あり）' : r.formatLabel,
+      doing: r.w.info.participation ?? r.w.summary,
+      bag: (r.w.info.requirements ?? []).filter((x) => /持参|靴|ロッカー|荷物/.test(x)).join('。') || '公式ページで確認',
+      reserve: (r.w.info.requirements ?? []).find((x) => /遅れ|入場/.test(x)) ?? '日時指定チケット制',
+      href: r.ticketUrl ?? r.w.officialUrl, own: true, siteId: r.w.id,
+    };
+  });
+// 他社：渋谷の掲載分
+const extRows: Row[] = publishedNazoItems.filter((i) => i.area.includes('渋谷')).map((i) => ({
+  id: i.id, name: i.name, kind: '室内の脱出ゲーム', station: i.station ?? '公式ページで確認', walkOutside: '公式ページで確認', during: i.indoor,
+  pair: i.pairPrice, game: i.timeLimit, total: i.totalTime,
+  privacy: i.privacy === 'room' ? '部屋を一組で貸切' : i.privacy === 'team' ? '同じチームで遊べる（知らない人と組まない。部屋の貸切ではない）' : '作品ページで確認',
+  doing: '制限時間内に二人で謎を解き、脱出を目指す', bag: '公式ページで確認', reserve: '予約制（受付時刻は作品ページで確認）',
+  href: i.officialUrl, own: false, siteId: i.siteId,
+}));
+const rows = [...extRows, ...ownRows];
+const shortRows = extRows;
+const faqs = [
+  { q: '駅から一度も濡れずに行けますか？', a: `${ownRows.length ? `${ownRows.map((r) => r.name).join('、')}は${ownRows[0].station}です。` : ''}${extRows.length ? `${extRows.map((r) => r.name).join('、')}は、館内で遊べることは確認できていますが、駅からの屋外移動は公式ページでご確認ください。` : ''}「屋内で遊べる」ことと「駅から濡れずに行ける」ことは別なので、傘の用意をおすすめします。` },
+  { q: '二人でいくらかかりますか？', a: `${rows.map((r) => `${r.name}：${r.pair}`).join('。')}。料金は曜日や時間帯で変わる場合があります。` },
+  { q: '短い時間で楽しめるものはありますか？', a: `${shortRows.length ? `${shortRows.map((r) => `${r.name}（${r.total}）`).join('、')}は短時間で遊べます。` : '短時間で遊べる作品は現在掲載していません。'}前後の予定と組み合わせやすい長さです。` },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const title = '渋谷の雨の日デート｜屋内体験を料金・移動・所要時間で比較';
+const desc = '渋谷で雨の日に二人で楽しめる屋内の体験を、駅からの移動、体験中の屋内外、二人分の料金、本編と受付を含む時間、貸切か相席かで比較。短時間の脱出ゲームから館内を歩く物語参加型まで、予約先へ直接進めます。';
+const articleLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
+  image: [new URL('/assets/guide/shibuya-rainy-date.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-26', dateModified: '2026-09-26', mainEntityOfPage: pageUrl,
+};
+const chips = [`${rows.length}件を比較`, '屋内で遊べる', ...(shortRows.length ? ['約20分〜の短時間あり'] : [])];
+---
+<BaseLayout
+  title="渋谷の雨の日デート｜屋内体験を料金・移動・所要時間で比較 - 株式会社ex Labs"
+  description="渋谷で雨の日に二人で楽しめる屋内の体験を、駅からの移動、体験中の屋内外、二人分の料金、本編と受付を含む時間、貸切か相席かで比較。短時間の脱出ゲームから館内を歩く物語参加型まで、予約先へ直接進めます。"
+  ogImage="/assets/guide/shibuya-rainy-date.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '東京の非日常デート', href: '/guide/tokyo-experience-date/' },
+  { name: '渋谷の雨の日デート' },
+]} />
+
+<VisualHero image="/assets/uwasabanashi/story-venue.webp" imagePos="center 40%" eyebrow="SHIBUYA RAINY DAY" catchText="雨でも、渋谷で二人で遊べる" chips={chips} alt="渋谷サクラステージの外観">
+  <h1>渋谷で雨の日に楽しむ体験デート</h1>
+</VisualHero>
+
+<section class="section" style="padding-top:28px"><div class="wrap">
+<p class="lede">雨の日デートとは、天候に左右されない屋内の過ごし方を中心に組むデートのことです。渋谷で会う日が雨でも、屋内で二人で遊べる体験を並べました。<strong>「館内で遊べること」と「駅から一度も濡れずに行けること」は別</strong>なので、表では駅からの移動と体験中の屋内外を分けています。</p>
+<div class="key-points"><p class="key-points-h">このページでできること</p><ul>
+<li>渋谷で予約できる屋内の体験を、二人分の料金と時間で見比べられます。</li>
+<li>短時間で遊ぶ／物語に参加する、の目的から選べます。</li>
+<li>気になった体験は、そのまま予約ページへ進めます。</li>
+</ul></div>
+</div></section>
+
+<section class="section tinted" id="compare"><div class="wrap">
+<h2 class="cards-h">比較表<span>駅からの移動・屋内外・料金・時間</span></h2>
+<div class="cmp-wrap"><table class="cmp-table cmp-x"><thead><tr><th>施設・作品</th><th>最寄り・出口</th><th>駅からの屋外移動</th><th>体験中</th><th>二人分の料金</th><th>本編</th><th>受付を含む時間</th><th>二人だけか</th><th>予約</th></tr></thead><tbody>
+{rows.map((r) => (
+  <tr>
+    <th scope="row"><a href={`#item-${r.id}`} style="color:var(--ink)">{r.name}</a><span class="cmp-sub">{r.kind}</span></th>
+    <td>{r.station}</td><td>{r.walkOutside}</td><td>{r.during}</td><td>{r.pair}</td><td>{r.game}</td><td>{r.total}</td><td>{r.privacy}</td>
+    <td><a class="cmp-btn" href={r.href} target="_blank" rel={r.own ? 'noopener' : 'noopener nofollow'} data-track={r.own ? 'ticket' : 'ev-ext'} data-show={r.siteId} data-place="shibuya-rain-table">予約ページ →</a></td>
+  </tr>
+))}
+</tbody></table></div>
+<p class="cards-note">料金は通常料金の二人分です。曜日・時間帯の条件と手数料は各予約ページでご確認ください。「公式ページで確認」の項目は、各公式ページの案内が最新です。</p>
+</div></section>
+
+<section class="section" id="pick"><div class="wrap">
+<h2 class="cards-h">目的で選ぶ</h2>
+<div class="pick-grid">
+<div class="pick-col"><p class="pick-h">短時間で楽しむ</p><p class="pick-p">{shortRows.length ? <>{shortRows.map((r, i) => <>{i > 0 && '／'}<a href={`#item-${r.id}`}>{r.name}</a>（{r.total}）</>)}。映画や食事の前後に入れやすい長さです。</> : '現在掲載していません。'}</p></div>
+<div class="pick-col"><p class="pick-h">物語に参加する</p><p class="pick-p">{ownRows.length ? <>{ownRows.map((r) => <a href={`#item-${r.id}`}>{r.name}</a>)}は、商業施設の館内を歩きながら証言や手がかりを集めていく体験です（{ownRows[0].total}）。</> : '渋谷で開催中の物語参加型の公演は現在ありません。東京全体の公演は'}<a href="/guide/immersive-tokyo/">東京のイマーシブ公演</a>でも探せます。</p></div>
+<div class="pick-col"><p class="pick-h">一緒に作る</p><p class="pick-p">渋谷で予約条件を確認できた「作る体験」は、現在掲載していません。代官山など近いエリアの作る体験は<a href="/guide/tokyo-experience-date/">東京の非日常デート</a>で比べられます。</p></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="items"><div class="wrap">
+<h2 class="cards-h">体験ごとの詳細</h2>
+<div class="sc-grid">
+{rows.map((r) => (
+  <article class="sc-card" id={`item-${r.id}`}>
+    <p class="tw-area">渋谷　｜　{r.kind}</p>
+    <h3 class="tw-name serif">{r.name}</h3>
+    <dl class="tw-dl">
+      <div><dt>実際にすること</dt><dd class="dd-normal">{r.doing}</dd></div>
+      <div><dt>雨の日の移動</dt><dd class="dd-normal">{r.station}。駅からの屋外移動：{r.walkOutside}。体験中：{r.during}</dd></div>
+      <div><dt>二人分の料金／時間</dt><dd class="dd-normal">{r.pair}／本編 {r.game}・{r.total}</dd></div>
+      <div><dt>二人だけか／荷物／予約</dt><dd class="dd-normal">{r.privacy}／{r.bag}／{r.reserve}</dd></div>
+    </dl>
+    <div class="tw-actions">
+      <a class={`btn tw-btn${r.own ? '' : ' ghost'}`} href={r.href} target="_blank" rel={r.own ? 'noopener' : 'noopener nofollow'} data-track={r.own ? 'ticket' : 'ev-ext'} data-show={r.siteId} data-place="shibuya-rain-card">{r.own ? '予約サイトで空席を見る' : '公式ページで作品・予約を見る'}</a>
+    </div>
+  </article>
+))}
+</div>
+</div></section>
+
+<section class="section" id="plan"><div class="wrap narrow">
+<h2 class="cards-h">予定の組み方</h2>
+<ul class="bullets">
+<li><strong>体験の前</strong>：受付時刻の少し前に着くようにします。{extRows.some((r) => r.total.includes('10分前')) ? '開演10分前に受付の作品があります。' : ''}遅れると参加できない体験もあります。</li>
+<li><strong>体験</strong>：表の「受付を含む時間」を目安にします。本編の時間だけで予定を組まないのがコツです。</li>
+<li><strong>体験の後</strong>：周辺で休憩や食事を。雨の日は駅周辺の屋内施設が混みやすいので、時間に余裕を持たせてください。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<h2 class="cards-h">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="cmp-note-p">掲載内容は各施設・公演の公式ページの案内をもとにしています。物語参加型の公演は株式会社ex Labsが企画・制作しています。</p>
+<p class="vc-line" style="margin-top:20px">あわせて読む：<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート</a>／<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)">二人で楽しめる謎解き・脱出ゲーム</a>／<a href="/guide/tokyo-date-under-5000/" style="color:var(--accent)">1人5,000円以内の体験デート</a>／<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a></p>
+</div></section>
+
+<AuthorBox />
+<LatestPosts category="immersive" />
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cards-note{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:rgba(29,29,31,.55);text-align:left}
+.cmp-wrap{margin-top:16px}
+.cmp-x th[scope=row]{min-width:170px;white-space:normal}
+.cmp-x td{min-width:110px;vertical-align:top;font-size:13px}
+.cmp-sub{display:block;font-size:11px;font-weight:700;color:var(--accent);margin-top:2px}
+.cmp-btn{display:inline-block;background:var(--accent);color:#fff !important;font-weight:800;font-size:12.5px;padding:8px 12px;border-radius:999px;text-decoration:none !important;white-space:nowrap}
+.cmp-note-p{max-width:920px;margin:0 auto;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:14px;margin-top:16px}
+.pick-col{background:#fff;border:var(--bd);border-radius:12px;box-shadow:var(--shadow-1);padding:16px 18px;text-align:left}
+.pick-h{margin:0 0 6px;font-size:14px;font-weight:800;color:#e8481c}
+.pick-p{margin:0;font-size:13.5px;line-height:1.75;color:var(--ink)}
+.pick-p a{color:var(--accent);font-weight:700}
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:18px;margin:16px auto 0}
+.sc-card{background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);padding:20px 18px;display:flex;flex-direction:column;gap:10px;text-align:left;scroll-margin-top:88px}
+.tw-area{margin:0;font-size:11.5px;font-weight:800;letter-spacing:.1em;color:var(--accent)}
+.tw-name{margin:0;font-size:19px;font-weight:800;color:var(--ink);line-height:1.5}
+.tw-dl{margin:4px 0 0;display:grid;grid-template-columns:1fr;gap:8px}
+.tw-dl div{background:rgba(51,48,43,.03);padding:9px 12px}
+.tw-dl dt{font-size:11px;font-weight:800;color:rgba(51,48,43,.55);letter-spacing:.06em}
+.tw-dl dd{margin:3px 0 0;font-size:13.5px;line-height:1.6;color:var(--ink)}
+.dd-normal{font-weight:500 !important}
+.tw-actions{margin-top:auto;padding-top:8px}
+.tw-btn{font-size:14px;padding:13px 20px}
+.tw-btn.ghost{background:#fff;color:var(--ink)}
+ol.bullets,ul.bullets{text-align:left}
+#compare,#pick,#items,#plan,#faq{scroll-margin-top:88px}
+.section.tinted,.section{padding:44px 0}
+@media(max-width:640px){.section.tinted,.section{padding:32px 0}.cards-h{font-size:18px}.sc-card{padding:16px 14px}.tw-btn{width:100%;text-align:center}}
+</style>

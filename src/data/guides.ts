@@ -31,6 +31,22 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/tokyo-experience-date.webp',
   }] : []),
   {
+    href: '/guide/shibuya-rainy-date/',
+    title: '渋谷の雨の日デート｜屋内体験を料金・移動・所要時間で比較',
+    desc: '渋谷で雨の日に二人で楽しめる屋内の体験を、駅からの移動、体験中の屋内外、二人分の料金、受付を含む時間、貸切か相席かで比較。',
+    date: '2026-09-26',
+    category: 'immersive',
+    thumb: '/assets/guide/shibuya-rainy-date.webp',
+  },
+  {
+    href: '/guide/tokyo-date-under-5000/',
+    title: '東京で1人5,000円以内の体験デート｜二人の料金と時間で比較',
+    desc: '二人で申し込んだときの通常料金で1人5,000円以内の体験を比較。平日・土日の差、手数料など追加費用、所要時間、二人だけで遊べるか（食事・交通費は別）。',
+    date: '2026-09-26',
+    category: 'immersive',
+    thumb: '/assets/guide/tokyo-date-under-5000.webp',
+  },
+  {
     href: '/guide/tokyo-nazo-date/',
     title: '東京で二人で参加できる謎解き・脱出ゲーム｜貸切・料金・所要時間で比較',
     desc: '二人だけで遊べるか（貸切・相席）、二人分の料金、制限時間と合計時間、屋内外、初心者向けの表記で、渋谷・新宿・池袋の施設と周遊型を比較。予約前の確認点つき。',

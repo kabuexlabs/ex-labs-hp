@@ -151,7 +151,7 @@ const faqs = [
 <a href="#faq">FAQ</a>
 </header>
 
-{ended ? <a class="cta" href="https://kabuexlabs.com/guide/immersive-tokyo/">全日程終了｜東京のほかの公演を見る</a> : <a class="cta" href={ticketUrl} target="_blank" rel="noopener">チケットを購入する</a>}
+{ended ? <a class="cta" href="https://kabuexlabs.com/guide/immersive-tokyo/">全日程終了｜東京のほかの公演を見る</a> : <a class="cta" href={ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show="uwasabanashi" data-place="lp-fab">チケットを購入する</a>}
 
 <main>
 
@@ -249,7 +249,7 @@ const faqs = [
   </>
 ) : (
   <>
-  <a class="buy" href={ticketUrl} target="_blank" rel="noopener">チケットを購入する</a>
+  <a class="buy" href={ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show="uwasabanashi" data-place="lp-ticket">チケットを購入する</a>
   <p class="pricenote">日時指定チケット制／表示価格のほか別途手数料がかかります。空席は購入ページ（escape.id）の表示が最新です</p>
   </>
 )}

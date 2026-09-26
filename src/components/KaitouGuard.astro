@@ -23,4 +23,6 @@ document.addEventListener('contextmenu',function(e){
 document.addEventListener('dragstart',function(e){
   var t=e.target;if(t&&t.tagName==='IMG')e.preventDefault();
 });
+// 予約ボタンの計測（個人情報なし・data-track 付きリンクのみ。SiteGuard と同じ /api/track）
+(function(){try{document.addEventListener('click',function(e){var a=e.target&&e.target.closest?e.target.closest('a[data-track]'):null;if(!a)return;var b=JSON.stringify({e:a.getAttribute('data-track'),p:location.pathname,c:(a.getAttribute('data-show')||'')+'-'+(a.getAttribute('data-place')||'')});if(navigator.sendBeacon){navigator.sendBeacon('/api/track',new Blob([b],{type:'application/json'}))}else{fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},body:b,keepalive:true})}},true)}catch(_){}})();
 </script>

@@ -1,0 +1,198 @@
+---
+// 「東京 体験 デート 安い」「東京 デート 5000円」の受け皿。
+// 役割：二人で遊ぶ「体験の料金」の予算を決めて選ぶ（食事・交通費は別）。ジャンル比較は /guide/tokyo-experience-date/ に任せる。
+// 判定は2名で申し込んだときの通常料金（割引・クーポン・4名時単価は使わない）。手数料・税区分が確認できない候補は「確認済み」と書かない。
+// 他社は src/data/nazoDate.ts・src/data/experienceDate.ts、自社公演は src/data/events/ から生成する（料金を手書きしない）。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import VisualHero from '../../components/VisualHero.astro';
+import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
+import { publishedNazoItems } from '../../data/nazoDate';
+import { publishedItems } from '../../data/experienceDate';
+import { jsonLd } from '../../lib/microcms';
+
+const LIMIT = 5000;
+const now = new Date();
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/tokyo-date-under-5000/', site).toString();
+const yen = (n: number) => `${n.toLocaleString('ja-JP')}円`;
+
+type Row = { id: string; name: string; area: string; genre: string; ppLow: number; ppHigh: number; ppNote: string; pair: string; dayDiff: string; extra: string; judge: string; time: string; minutes?: number; privacy: string; href: string; own: boolean; siteId: string; reason: string };
+
+const ext: Row[] = publishedNazoItems.filter((i) => i.perPerson2).map((i) => ({
+  id: i.id, name: i.name, area: i.area.replace('東京・', ''), genre: '謎解き・脱出ゲーム',
+  ppLow: i.perPerson2!.low, ppHigh: i.perPerson2!.high, ppNote: i.perPerson2!.note, pair: `${yen(i.perPerson2!.low * 2)}〜${yen(i.perPerson2!.high * 2)}`,
+  dayDiff: i.perPerson2!.low === i.perPerson2!.high ? '差なし' : `平日 ${yen(i.perPerson2!.low)}／土日祝など ${yen(i.perPerson2!.high)}（1人）`,
+  extra: i.tax, judge: /税込（/.test(i.tax) ? `税込で1人${yen(i.perPerson2!.high)}まで。手数料は予約画面で確認` : `表示料金で1人${yen(i.perPerson2!.high)}まで。税区分・手数料は予約画面で確認`,
+  time: i.totalMinutes !== undefined ? i.totalTime : `本編 ${i.timeLimit}（受付を含む時間は公式で確認）`, minutes: i.totalMinutes,
+  privacy: i.privacy === 'room' ? '部屋を一組で貸切' : i.privacy === 'team' ? '同じチーム（知らない人と組まない）' : '作品ページで確認',
+  href: i.officialUrl, own: false, siteId: i.siteId,
+  reason: i.totalMinutes !== undefined && i.totalMinutes <= 30 ? '短時間' : i.totalMinutes !== undefined && i.totalMinutes <= 60 ? '1時間程度' : '協力して遊ぶ',
+}));
+const main = ext.filter((r) => r.ppHigh <= LIMIT).sort((a, b) => a.ppLow - b.ppLow);
+
+// 確認が必要な候補：表示料金は5,000円以内だが、別途手数料や日程で変わる料金があるもの
+type Check = { id: string; name: string; area: string; pp: string; why: string; href: string; own: boolean; siteId: string };
+const own = buildGuideRows(now).filter((r) => r.status !== 'ended');
+const ownCheck: Check[] = own.filter((r) => { const p = r.perPersonFor(2); return p !== undefined && p <= LIMIT; }).map((r) => ({
+  id: r.w.id, name: `${r.w.title}（ex Labs企画・制作）`, area: r.venue?.listName ?? '東京', pp: `1人${fmtYen(r.perPersonFor(2)!)}（税込）`,
+  why: `${r.w.price.feeNote}。手数料を含めた合計は予約画面で確認してください`, href: r.ticketUrl ?? r.w.officialUrl, own: true, siteId: r.w.id,
+}));
+const artbar = publishedItems.find((i) => i.id === 'artbar-tokyo');
+const extCheck: Check[] = artbar?.compare?.pairTotalMin ? [{
+  id: artbar.id, name: artbar.name, area: '代官山・原宿・銀座など', pp: `1人${yen(artbar.compare.pairTotalMin / 2)}〜（画材・ドリンク込み）`,
+  why: 'セッションごとに料金が異なり、5,000円を超える回もあり得ます。予約ページで回ごとの料金を確認してください', href: `https://www.google.com/search?q=${encodeURIComponent('Artbar Tokyo 公式')}`, own: false, siteId: artbar.siteId,
+}] : [];
+const checks = [...ownCheck, ...extCheck];
+// 5,000円を超える自社公演（参考として明記）
+const over = own.filter((r) => { const p = r.perPersonFor(2); return p !== undefined && p > LIMIT; });
+
+const faqs = [
+  { q: 'この5,000円に食事や交通費は入っていますか？', a: '入っていません。このページの予算は体験の料金だけです。食事・交通費・飲み物などは別にかかります。' },
+  { q: '二人でいくらになりますか？', a: `${main.map((r) => `${r.name}は二人で${r.pair}`).join('。')}。いずれも二人で申し込んだときの通常料金で、割引やクーポンは含めていません。` },
+  { q: '手数料や税金で5,000円を超えることはありますか？', a: '予約サイトの手数料や税区分は候補ごとに違い、ここでは確認できていないものがあります。各行の「5,000円以内の判定」に確認が必要な点を書いているので、最終的な金額は予約画面でご確認ください。' },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const title = '東京で1人5,000円以内の体験デート｜二人の料金と時間で比較';
+const desc = '東京で1人5,000円以内に収まる体験デートを、二人で申し込んだときの通常料金で比較。1人料金と二人の総額、平日・土日の差、手数料など追加でかかる費用、所要時間、二人だけで遊べるかを並べ、予約先へ直接進めます（食事・交通費は別）。';
+const articleLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
+  image: [new URL('/assets/guide/tokyo-date-under-5000.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-26', dateModified: '2026-09-26', mainEntityOfPage: pageUrl,
+};
+const cheapest = main[0];
+const chips = [`${main.length}件が1人5,000円以内`, ...(cheapest ? [`1人 ${yen(cheapest.ppLow)}〜`] : []), '食事・交通費は別'];
+const reasons = [
+  { h: '短時間で遊びたい', xs: main.filter((r) => r.reason === '短時間') },
+  { h: '1時間程度で遊びたい', xs: main.filter((r) => r.reason === '1時間程度') },
+  { h: '二人で協力して解きたい', xs: main },
+];
+---
+<BaseLayout
+  title="東京で1人5,000円以内の体験デート｜二人の料金と時間で比較 - 株式会社ex Labs"
+  description="東京で1人5,000円以内に収まる体験デートを、二人で申し込んだときの通常料金で比較。1人料金と二人の総額、平日・土日の差、手数料など追加でかかる費用、所要時間、二人だけで遊べるかを並べ、予約先へ直接進めます（食事・交通費は別）。"
+  ogImage="/assets/guide/tokyo-date-under-5000.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '東京の非日常デート', href: '/guide/tokyo-experience-date/' },
+  { name: '1人5,000円以内の体験デート' },
+]} />
+
+<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 45%" eyebrow="UNDER 5,000 YEN" catchText="体験は1人5,000円まで、で選ぶ" chips={chips} alt="東京で開催中の体験型公演のキービジュアル">
+  <h1>東京で1人5,000円以内で楽しむ体験デート</h1>
+</VisualHero>
+
+<section class="section" style="padding-top:28px"><div class="wrap">
+<p class="lede">体験デートとは、食事や買い物だけでなく、二人で何かを体験することを中心に組むデートのことです。<strong>このページの予算は「体験の料金」だけです。食事・交通費・飲み物は別です。</strong>二人で申し込んだときの通常料金で、1人5,000円以内に収まる体験を並べました。割引・クーポン・4人で申し込んだときの単価は使っていません。</p>
+<div class="key-points"><p class="key-points-h">このページでできること</p><ul>
+<li>1人料金と二人の総額、平日と土日の差を並べて見比べられます。</li>
+<li>手数料など追加でかかる費用の有無と、所要時間・二人だけで遊べるかを確認できます。</li>
+<li>気になった体験は、そのまま予約ページへ進めます。</li>
+</ul></div>
+</div></section>
+
+<section class="section tinted" id="compare"><div class="wrap">
+<h2 class="cards-h">1人5,000円以内の体験<span>安い順</span></h2>
+<div class="cmp-wrap"><table class="cmp-table cmp-x"><thead><tr><th>作品・施設</th><th>エリア</th><th>二人の総額</th><th>1人料金</th><th>平日・土日の差</th><th>追加でかかる費用</th><th>5,000円以内の判定</th><th>所要時間</th><th>二人だけか</th><th>予約</th></tr></thead><tbody>
+{main.map((r) => (
+  <tr id={`item-${r.id}`}>
+    <th scope="row">{r.name}<span class="cmp-sub">{r.genre}</span></th>
+    <td>{r.area}</td><td>{r.pair}</td><td>{yen(r.ppLow)}〜{yen(r.ppHigh)}<br><span class="cmp-note">{r.ppNote}</span></td><td>{r.dayDiff}</td><td>{r.extra}</td><td>{r.judge}</td><td>{r.time}</td><td>{r.privacy}</td>
+    <td><a class="cmp-btn" href={r.href} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={r.siteId} data-place="u5000-table">公式ページ →</a></td>
+  </tr>
+))}
+</tbody></table></div>
+<p class="cards-note">料金は二人で申し込んだときの通常料金です。曜日・時間帯・ハイシーズンの条件は各公式ページでご確認ください。</p>
+</div></section>
+
+<section class="section" id="pick"><div class="wrap">
+<h2 class="cards-h">予算以外の理由で選ぶ<span>目的別の選び方</span></h2>
+<div class="pick-grid">
+{reasons.filter((x) => x.xs.length).map((x) => (
+  <div class="pick-col"><p class="pick-h">{x.h}</p><p class="pick-p">{x.xs.map((r, i) => <>{i > 0 && '／'}<a href={`#item-${r.id}`}>{r.name}</a>（1人{yen(r.ppLow)}〜）</>)}</p></div>
+))}
+<div class="pick-col"><p class="pick-h">一緒に作りたい</p><p class="pick-p">{extCheck.length ? <>{extCheck.map((c) => <a href={`#check-${c.id}`}>{c.name}</a>)}は{extCheck[0].pp}ですが、回によって料金が違うため下の「確認が必要な候補」に入れています。</> : '5,000円以内と確認できた作る体験は現在ありません。'}</p></div>
+</div>
+</div></section>
+
+{checks.length > 0 && (
+<section class="section tinted" id="check"><div class="wrap">
+<h2 class="cards-h">確認が必要な候補<span>表示料金は5,000円以内だが、追加費用や回ごとの料金で変わる</span></h2>
+<div class="sc-grid">
+{checks.map((c) => (
+  <article class="sc-card" id={`check-${c.id}`}>
+    <p class="tw-area">{c.area}</p>
+    <h3 class="tw-name serif">{c.name}</h3>
+    <p class="pick-p"><strong>{c.pp}</strong>。{c.why}。</p>
+    <div class="tw-actions"><a class={`btn tw-btn${c.own ? '' : ' ghost'}`} href={c.href} target="_blank" rel={c.own ? 'noopener' : 'noopener nofollow'} data-track={c.own ? 'ticket' : 'ev-ext'} data-show={c.siteId} data-place="u5000-check">{c.own ? '予約サイトで料金と空席を見る' : '公式サイトを検索して料金を見る'}</a></div>
+  </article>
+))}
+</div>
+{over.length > 0 && <p class="cards-note">{over.map((r) => `${r.w.title}は二人で${fmtYen(r.totalFor(2)!)}（1人${fmtYen(r.perPersonFor(2)!)}）`).join('、')}のため、このページの対象外です。二人で参加する条件は<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">イマーシブ体験を二人で楽しむには</a>で比べられます。</p>}
+</div></section>
+)}
+
+<section class="section" id="tips"><div class="wrap narrow">
+<h2 class="cards-h">予算内に収めるコツ</h2>
+<ul class="bullets">
+<li><strong>平日を選ぶ</strong>：土日祝・ハイシーズンで料金が上がる施設があります。表の「平日・土日の差」を確認してください。</li>
+<li><strong>手数料を確認する</strong>：予約サイトの手数料が別にかかる場合があります。決済前の画面で合計額を確認します。</li>
+<li><strong>人数で単価が変わるものに注意</strong>：人数が多いほど1人あたりが安くなる料金は、2人で申し込むと高くなります。このページは2人の料金で判定しています。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<h2 class="cards-h">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="cmp-note-p">掲載内容は各施設・公演の公式ページの案内をもとにしています。物語参加型の公演は株式会社ex Labsが企画・制作しています。</p>
+<p class="vc-line" style="margin-top:20px">あわせて読む：<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート（体験のジャンルで選ぶ）</a>／<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)">二人で楽しめる謎解き・脱出ゲーム</a>／<a href="/guide/shibuya-rainy-date/" style="color:var(--accent)">渋谷の雨の日デート</a>／<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a></p>
+</div></section>
+
+<AuthorBox />
+<LatestPosts category="immersive" />
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cards-note{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:rgba(29,29,31,.55);text-align:left}
+.cmp-wrap{margin-top:16px}
+.cmp-x th[scope=row]{min-width:170px;white-space:normal}
+.cmp-x td{min-width:110px;vertical-align:top;font-size:13px}
+.cmp-x tr{scroll-margin-top:88px}
+.cmp-sub{display:block;font-size:11px;font-weight:700;color:var(--accent);margin-top:2px}
+.cmp-note{display:inline-block;font-size:11px;color:rgba(51,48,43,.6);line-height:1.5;margin-top:2px}
+.cmp-btn{display:inline-block;background:var(--accent);color:#fff !important;font-weight:800;font-size:12.5px;padding:8px 12px;border-radius:999px;text-decoration:none !important;white-space:nowrap}
+.cmp-note-p{max-width:920px;margin:0 auto;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px;margin-top:16px}
+.pick-col{background:#fff;border:var(--bd);border-radius:12px;box-shadow:var(--shadow-1);padding:16px 18px;text-align:left}
+.pick-h{margin:0 0 6px;font-size:14px;font-weight:800;color:#e8481c}
+.pick-p{margin:0;font-size:13.5px;line-height:1.75;color:var(--ink)}
+.pick-p a{color:var(--accent);font-weight:700}
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:18px;margin:16px auto 0}
+.sc-card{background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);padding:20px 18px;display:flex;flex-direction:column;gap:10px;text-align:left;scroll-margin-top:88px}
+.tw-area{margin:0;font-size:11.5px;font-weight:800;letter-spacing:.1em;color:var(--accent)}
+.tw-name{margin:0;font-size:19px;font-weight:800;color:var(--ink);line-height:1.5}
+.tw-actions{margin-top:auto;padding-top:8px}
+.tw-btn{font-size:14px;padding:13px 20px}
+.tw-btn.ghost{background:#fff;color:var(--ink)}
+ul.bullets{text-align:left}
+#compare,#pick,#check,#tips,#faq{scroll-margin-top:88px}
+.section.tinted,.section{padding:44px 0}
+@media(max-width:640px){.section.tinted,.section{padding:32px 0}.cards-h{font-size:18px}.sc-card{padding:16px 14px}.tw-btn{width:100%;text-align:center}}
+</style>
