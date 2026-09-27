@@ -242,7 +242,7 @@ const eventLd = {
     <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Story</h2><span class="orn">+·◎·</span></div><p>ストーリー</p></div>
     <!-- あらすじ（2026-09-27 支給、改行は支給どおり）。情景は本文、最後の2行を見出しの大きさで強調する -->
     <div class="story-txt">
-      <p class="body story-b">京セラ美術館の<wbr>一角。<br>三雲彼方展と<wbr>記された<wbr>展示の<wbr>パンフレットを<wbr>開いた<wbr>瞬間、<wbr>あなたの中に<wbr>知らない<wbr>記憶が<wbr>流れ込んできた。</p>
+      <p class="body story-b lines">京セラ美術館の一角。<br>三雲彼方展と記された<br>展示のパンフレットを開いた瞬間、<br>あなたの中に<br>知らない記憶が流れ込んできた。</p>
       <p class="story-h glow-t">あるはずのない<wbr>記憶に<wbr>導かれ、<br>あなたは<wbr>交錯する<wbr>未来へ<wbr>いざなわれていく……</p>
     </div>
   </div>
@@ -253,7 +253,7 @@ const eventLd = {
     <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Experience</h2><span class="orn">+·◎·</span></div><p>体験について</p></div>
     <div class="exp-lead">
       <p class="exp-h glow-t">『鑑賞するアート』から<br>『体験するアート』へ</p>
-      <p class="body">体験する美術館は、「『鑑賞するアート』から『体験するアート』へ」をテーマにした、絵画を鑑賞することで物語の中に観客が巻き込まれていくイマーシブ体験です。</p>
+      <p class="body lines">体験する美術館は、<br>「『鑑賞するアート』から<wbr>『体験するアート』へ」<br>をテーマにした、<br>絵画を鑑賞することで<br>物語の中に観客が巻き込まれていく<br>イマーシブ体験です。</p>
     </div>
     <div class="spec">
       <div><span class="lb">+・体験ジャンル</span><span class="genre-v">絵画 × イマーシブ</span></div>
@@ -266,7 +266,7 @@ const eventLd = {
       <div class="hl-txt">
         <p class="hl-t italiana">Highlights<span></span></p>
         <p class="hl-h">具体的な体験方法・見どころ</p>
-        <p class="hl-b">京都市京セラ美術館の2部屋を活用した物語体験コンテンツ。</p>
+        <p class="hl-b lines">京都市京セラ美術館の<br>2部屋を活用した<br>物語体験コンテンツ。</p>
       </div>
     </div>
   </div>
@@ -352,9 +352,9 @@ const eventLd = {
   <div class="w1160">
     <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Flow</h2><span class="orn">+·◎·</span></div><p>当日の流れ</p></div>
     <div class="flow">
-      <div><span class="bodoni fn">01</span><span class="fh">受付</span><span class="fd">各回開始の10分前から、本館地下1階「講演室」扉前にて受付</span></div>
+      <div><span class="bodoni fn">01</span><span class="fh">受付</span><span class="fd lines">各回開始の10分前から、<br>本館地下1階「講演室」扉前にて受付</span></div>
       <div><span class="bodoni fn">02</span><span class="fh">参加準備・事前説明</span></div>
-      <div class="gold"><span class="bodoni fn">03</span><span class="fh">体験開始</span><span class="fd">絵画を通して物語に巻き込まれていく、60分のイマーシブ体験</span></div>
+      <div class="gold"><span class="bodoni fn">03</span><span class="fh">体験開始</span><span class="fd lines">絵画を通して<br>物語に巻き込まれていく、<br>60分のイマーシブ体験</span></div>
       <div><span class="bodoni fn">04</span><span class="fh">体験終了・退場</span></div>
     </div>
   </div>
@@ -412,7 +412,7 @@ const eventLd = {
 <section id="contact" class="sec contact">
   <div class="w880 center">
     <div class="sh sh-48"><div class="sh-r"><span class="orn">+·◎·</span><h2>Contact</h2><span class="orn">+·◎·</span></div><p>お問い合わせ</p></div>
-    <p class="contact-t">公演に関するお問い合わせは、下記メールアドレスまでご連絡ください。</p>
+    <p class="contact-t lines">公演に関するお問い合わせは、<br>下記メールアドレスまで<br>ご連絡ください。</p>
     <a href="mailto:info@kabuexlabs.com" class="mail bodoni">info@kabuexlabs.com<span class="ic">↗</span></a>
   </div>
 </section>
@@ -572,7 +572,9 @@ h1,h2,p{margin:0}
 .story-line{position:absolute;left:-10%;right:-10%;bottom:120px;height:1px;background:rgba(255,247,242,.35);transform:rotate(-8deg)}
 .story-txt{word-break:auto-phrase;padding-bottom:clamp(120px,16vw,200px)}
 @media (max-width:599.98px){.story-circle{width:240px;height:240px;left:-90px;bottom:0;opacity:.6}.story-line{bottom:80px}}
-.story-b{word-break:keep-all;margin-bottom:clamp(40px,6vw,64px);color:rgba(255,247,242,.9)}
+/* 文章は指定した位置（読点・句点・文節）でだけ改行する。入りきらない時だけ <wbr> か最終手段で折り返す */
+.lines{word-break:keep-all;overflow-wrap:anywhere}
+.story-b{margin-bottom:clamp(40px,6vw,64px);color:rgba(255,247,242,.9)}
 .story-h{word-break:keep-all;font-size:clamp(22px,3vw,36px);font-weight:600;line-height:1.7;letter-spacing:.08em;text-wrap:pretty}
 
 /* Experience */
