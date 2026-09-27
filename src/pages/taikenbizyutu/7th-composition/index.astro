@@ -41,22 +41,35 @@ const cast: { name: string; roman: string; profile: string; photo?: string }[] =
   profile: '［プロフィール　荒巻まりの より提供予定］',
 }));
 
+// 文字の強弱：［ ］で始まる未確定の文言は目立たせない（.tbd）
+const isTbd = (t: string) => t.startsWith('［');
 const kv = (arr: string[][]) => arr.map(([k, v]) => ({ k, v }));
+// チケット情報は「まず読んでほしい要点」と「補足」に分ける
+const ticketKey = kv([
+  ['開催日', '2026年11月21日（土）・22日（日）・23日（月）'],
+  ['公演時間', '60分（各日7公演）'],
+  ['定員', '各回30名（1名から参加可能）'],
+  ['対象年齢', '18歳以上'],
+  ['販売開始日時', '［未定］'],
+  ['販売締切', '開演1時間前'],
+]);
 const ticketRows = kv([
-  ['開催日', '2026年11月21日（土）・22日（日）・23日（月）'], ['料金', '1名4,500円［税込・税別は要確認］'],
-  ['割引', 'なし'], ['別途入館料', 'なし'], ['公演時間', '60分'], ['公演回数', '各日7公演'],
-  ['定員', '各回30名'], ['最少催行人数', '各回12名'], ['対象年齢', '18歳以上'], ['1名での参加', '可能'],
-  ['服装', '動きやすい服装でお越しください'], ['私物の持ち込み', '不可'], ['販売開始日時', '［未定］'],
-  ['購入先URL', TICKET_URL ?? '［未定］'], ['販売締切', '開演1時間前'],
+  ['割引', 'なし'], ['別途入館料', 'なし'], ['最少催行人数', '各回12名'],
+  ['服装', '動きやすい服装でお越しください'], ['私物の持ち込み', '不可'],
+  ['購入先URL', TICKET_URL ?? '［未定］'],
 ]);
 const schedule = [
   ['第1回', '12:00', '13:00'], ['第2回', '12:45', '13:45'], ['第3回', '13:30', '14:30'], ['第4回', '14:15', '15:15'],
   ['第5回', '15:00', '16:00'], ['第6回', '15:45', '16:45'], ['第7回', '16:30', '17:30'],
 ];
-const notes = [
-  '本公演は18歳以上の方を対象としています。', '動きやすい服装でお越しください。',
-  '遅刻は厳禁です。指定時刻に1分でも遅れた場合はご参加いただけません。', '体験中の撮影はできません。',
-  '公演内容のネタバレは禁止です。', 'チケット購入後のお客様都合によるキャンセルはお受けできません。',
+// 注意事項：[強調する要点, 補足]。見落とすと参加できなくなるものを先頭に置く
+const notes: [string, string][] = [
+  ['遅刻は厳禁です。', '指定時刻に1分でも遅れた場合はご参加いただけません。'],
+  ['18歳以上の方が対象です。', ''],
+  ['お客様都合のキャンセルはできません。', 'チケット購入後のキャンセルはお受けできません。'],
+  ['体験中の撮影はできません。', ''],
+  ['公演内容のネタバレは禁止です。', ''],
+  ['動きやすい服装でお越しください。', ''],
 ];
 const ngList = ['途中退出・再入場', '録音', '日時変更', '主催者都合で中止した場合の返金', '最少催行人数に満たない場合の実施判断・連絡・返金'];
 const accessRows = kv([
@@ -178,7 +191,7 @@ const eventLd = {
           <div class="yr">2026</div>
           <div class="big">11.21<span class="badge"><span>Sat</span></span></div>
           <div class="row2">
-            <div class="at"><span class="bodoni">at</span>京都市<br>京セラ美術館</div>
+            <div class="at"><span class="at-s"><span class="bodoni">at</span>京都市</span><span class="at-m">京セラ美術館</span></div>
             <div class="slash"></div>
             <div class="big">23<span class="badge"><span>Mon</span></span></div>
           </div>
@@ -200,7 +213,7 @@ const eventLd = {
       <span>お知らせ</span>
     </div>
     {news.map((n) => (
-      <div class="news-row"><span class="bodoni d">{n.date}</span><span>{n.text}</span></div>
+      <div class="news-row"><span class="bodoni d">{n.date}</span><span class:list={[{ tbd: isTbd(n.text) }]}>{n.text}</span></div>
     ))}
   </div>
 </section>
@@ -211,8 +224,8 @@ const eventLd = {
   <div class="w880 rel">
     <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Story</h2><span class="orn">+·◎·</span></div><p>ストーリー</p></div>
     <p class="story-lead">あるはずのない記憶に導かれ、交錯する未来へ——</p>
-    <p class="story-h glow-t">［あらすじ 見出し］</p>
-    <p class="body">［あらすじ本文　荒巻まりの・right より提供予定］</p>
+    <p class="story-h glow-t tbd">［あらすじ 見出し］</p>
+    <p class="body tbd">［あらすじ本文　荒巻まりの・right より提供予定］</p>
   </div>
 </section>
 
@@ -270,10 +283,10 @@ const eventLd = {
               : <div class="card-ph ph">cast photo</div>}
             <p class="card-pf italiana">Profile<span></span></p>
             <div>
-              <p class="card-name">{c.name}</p>
+              <p class:list={['card-name', { tbd: isTbd(c.name) }]}>{c.name}</p>
               <p class="card-roman bodoni">{c.roman}</p>
             </div>
-            <p class="card-txt">{c.profile}</p>
+            <p class:list={['card-txt', { tbd: isTbd(c.profile) }]}>{c.profile}</p>
           </div>
         </div>
       ))}
@@ -287,11 +300,16 @@ const eventLd = {
     <div class="price">
       <span class="lb">+・料金・+</span>
       <span class="price-v"><span class="p1">1名</span><span class="bodoni pn">4,500</span><span class="p2">円</span></span>
-      <span class="price-note">［税込・税別は要確認］</span>
+      <span class="price-note tbd">［税込・税別は要確認］</span>
     </div>
-    <div class="info">
+    <div class="key">
+      {ticketKey.map((r) => (
+        <div class="key-row"><span class="k">{r.k}</span><span class:list={['v', { tbd: isTbd(r.v) }]}>{r.v}</span></div>
+      ))}
+    </div>
+    <div class="info info-sub">
       {ticketRows.map((r) => (
-        <div class="info-row"><span class="k">+・{r.k}</span><span class="v">{r.v}</span></div>
+        <div class="info-row"><span class="k">+・{r.k}</span><span class:list={['v', { tbd: isTbd(r.v) }]}>{r.v}</span></div>
       ))}
     </div>
     <div class="sched">
@@ -327,9 +345,9 @@ const eventLd = {
   <div class="w820">
     <div class="sh sh-40"><div class="sh-r"><span class="orn">+·◎·</span><h2>Attention</h2><span class="orn">+·◎·</span></div><p>注意事項</p></div>
     <div class="deco" aria-hidden="true"><span class="l"></span><span class="bodoni">+·◇·+</span><span class="r"></span></div>
-    <ul class="att">{notes.map((t) => <li>{t}</li>)}</ul>
+    <ul class="att att-main">{notes.map(([em, rest], i) => <li class:list={[{ top: i < 3 }]}><strong>{em}</strong>{rest && <span>{rest}</span>}</li>)}</ul>
     <p class="att-h">以下の扱いは不可能です。</p>
-    <ul class="att">{ngList.map((t) => <li>{t}</li>)}</ul>
+    <ul class="att att-sub">{ngList.map((t) => <li>{t}</li>)}</ul>
     <div class="deco deco-b" aria-hidden="true"><span class="l"></span><span class="bodoni">+·◇·+</span><span class="r"></span></div>
   </div>
 </section>
@@ -339,8 +357,8 @@ const eventLd = {
     <div class="sh sh-56"><div class="sh-r"><span class="orn">+·◎·</span><h2>Access</h2><span class="orn">+·◎·</span></div><p>会場・アクセス</p></div>
     <div class="acc">
       <div class="acc-info">
-        {accessRows.map((r) => (
-          <div class="info-row"><span class="k">+・{r.k}</span><span class="v">{r.v}</span></div>
+        {accessRows.map((r, i) => (
+          <div class:list={['info-row', { main: i === 0 }]}><span class="k">+・{r.k}</span><span class:list={['v', { tbd: isTbd(r.v) }]}>{r.v}</span></div>
         ))}
       </div>
       {MAP_EMBED_URL
@@ -390,7 +408,7 @@ const eventLd = {
       ))}
     </div>
     <a href="#contact" class="ft-ct">公演に関するお問い合わせ<span class="bodoni">↗</span></a>
-    <p class="ft-copy bodoni">© ［権利者名・表記未確認］</p>
+    <p class="ft-copy bodoni tbd">© ［権利者名・表記未確認］</p>
   </div>
 </footer>
 
@@ -437,6 +455,8 @@ h1,h2,p{margin:0}
 .glow{animation:ticketGlow 2.4s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.glow{animation:none}html{scroll-behavior:auto}}
 .glow-t{text-shadow:0 0 22px rgba(255,200,218,.6)}
+/* 未確定の文言（［ ］）は読めるが目立たせない */
+.tbd{opacity:.5;font-weight:400 !important;text-shadow:none !important}
 
 /* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;background:#FFF7F2;color:#861E3E;font-weight:600;outline:1px solid rgba(255,247,242,.6);white-space:nowrap}
@@ -475,28 +495,31 @@ h1,h2,p{margin:0}
 :global(html.menu-open) body{overflow:hidden}
 
 /* Hero */
-.hero{position:relative;padding:clamp(96px,10vw,128px) 0 clamp(64px,8vw,112px)}
-.hero-in{max-width:1360px;margin:0 auto;padding:0 clamp(20px,4vw,48px);display:flex;flex-wrap:wrap;gap:clamp(28px,5vw,72px);align-items:flex-end}
-.hero-vis{flex:1 1 560px;min-width:0}
-.hero-vis img{display:block;width:100%;height:auto;aspect-ratio:1075/880;object-fit:cover;object-position:top;-webkit-mask-image:linear-gradient(#000 76%,transparent);mask-image:linear-gradient(#000 76%,transparent)}
+/* KV はトリミングせず全体を見せる。PC は1画面に収まる高さ、スマホは横幅いっぱい */
+.hero{position:relative;padding:calc(62px + clamp(16px,2.4vw,32px)) 0 clamp(64px,8vw,112px)}
+.hero-in{max-width:1360px;margin:0 auto;padding:0 clamp(20px,4vw,48px);display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(28px,5vw,72px);align-items:center}
+.hero-vis{flex:0 1 auto;min-width:0}
+.hero-vis img{display:block;width:auto;height:auto;max-width:100%;max-height:calc(100vh - 62px - clamp(32px,4.8vw,64px));max-height:calc(100svh - 62px - clamp(32px,4.8vw,64px));box-shadow:0 24px 60px rgba(40,4,16,.45)}
 .hero-txt{flex:1 1 400px;min-width:0;display:flex;gap:clamp(18px,3vw,40px);align-items:flex-start}
 .hero-tate{writing-mode:vertical-rl;display:flex;gap:12px;flex-shrink:0}
 .hero-tate h1{font-size:clamp(30px,3.4vw,44px);font-weight:500;letter-spacing:.14em;line-height:1}
-.hero-tate .bodoni{font-size:14px;letter-spacing:.24em;color:#F2C9D4}
+.hero-tate .bodoni{font-size:12px;letter-spacing:.24em;color:#F2C9D4;opacity:.8}
 .hero-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:28px}
-.genre{font-size:15px;letter-spacing:.3em;display:flex;align-items:center;gap:12px}
-.genre .x{font-size:18px}
+.genre{font-size:13px;letter-spacing:.3em;display:flex;align-items:center;gap:10px;color:#F2C9D4}
+.genre .x{font-size:16px}
 .date{line-height:.92}
 .yr{font-size:clamp(28px,3.2vw,42px);letter-spacing:.04em}
 .big{position:relative;display:inline-block;font-size:clamp(72px,9.6vw,148px);letter-spacing:-.02em;margin-right:64px}
 .badge{position:absolute;top:-4px;right:-64px;width:56px;height:56px;border:1px solid #FFF7F2;border-right-color:transparent;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-style:italic;letter-spacing:.02em;transform:rotate(-20deg)}
 .badge span{transform:rotate(20deg)}
 .row2{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
-.at{font-family:'Shippori Mincho',serif;font-size:clamp(17px,1.8vw,22px);line-height:1.5;letter-spacing:.12em;padding-bottom:.9em}
-.at .bodoni{font-style:italic;font-size:1.2em;margin-right:6px}
+.at{font-family:'Shippori Mincho',serif;display:flex;flex-direction:column;gap:6px;line-height:1.3;letter-spacing:.12em;padding-bottom:.7em}
+.at-s{font-size:14px;color:#F2C9D4}
+.at .bodoni{font-style:italic;font-size:1.3em;margin-right:6px}
+.at-m{font-size:clamp(22px,2.3vw,30px);font-weight:600;letter-spacing:.1em}
 .slash{width:clamp(40px,5vw,72px);height:1px;background:#FFF7F2;transform:rotate(40deg);margin-bottom:2.2em}
-.catch{font-size:clamp(19px,2vw,24px);font-weight:500;line-height:1.8;letter-spacing:.12em;text-shadow:0 0 18px rgba(255,210,225,.55)}
-.en-detail{font-size:13px;line-height:1.5;letter-spacing:.14em;color:#F2C9D4}
+.catch{font-size:clamp(20px,2.2vw,28px);font-weight:600;line-height:1.8;letter-spacing:.12em;text-shadow:0 0 18px rgba(255,210,225,.55)}
+.en-detail{font-size:11px;line-height:1.6;letter-spacing:.14em;color:#F2C9D4;opacity:.7}
 
 /* Section heading */
 .sec{position:relative;padding:clamp(80px,10vw,140px) clamp(20px,4vw,48px)}
@@ -521,6 +544,7 @@ h1,h2,p{margin:0}
 .story-circle{position:absolute;left:-80px;bottom:40px;width:380px;height:380px;background:url(/assets/7th-composition/kv.webp) 4% 3%/420% auto no-repeat;-webkit-mask-image:radial-gradient(closest-side,#000 35%,transparent);mask-image:radial-gradient(closest-side,#000 35%,transparent);opacity:.85}
 .story-line{position:absolute;left:-10%;right:-10%;bottom:120px;height:1px;background:rgba(255,247,242,.35);transform:rotate(-8deg)}
 .story-lead{margin-bottom:20px;font-size:clamp(16px,1.8vw,20px);letter-spacing:.1em}
+.story-h.tbd{font-size:clamp(18px,2vw,22px)}
 .story-h{margin-bottom:48px;font-size:clamp(28px,4.4vw,48px);font-weight:600;line-height:1.55;letter-spacing:.06em;text-wrap:pretty}
 
 /* Experience */
@@ -543,11 +567,11 @@ h1,h2,p{margin:0}
 /* Creators */
 .team{display:flex;flex-direction:column;align-items:center;gap:44px;text-align:center}
 .team-lead{display:flex;flex-direction:column;gap:14px}
-.team-lead .role{font-size:15px;letter-spacing:.24em;color:#F2C9D4}
+.team-lead .role{font-size:13px;letter-spacing:.24em;color:#F2C9D4}
 .team-lead .name{font-size:clamp(34px,5vw,52px);font-weight:600;letter-spacing:.2em}
 .team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:44px 32px;width:100%}
 .team-grid>div{display:flex;flex-direction:column;gap:12px}
-.team-grid .role{font-size:14px;letter-spacing:.2em;color:#F2C9D4}
+.team-grid .role{font-size:12px;letter-spacing:.2em;color:#F2C9D4;opacity:.85}
 .team-grid .name{font-size:26px;font-weight:500;letter-spacing:.2em}
 
 /* Cast */
@@ -572,11 +596,18 @@ h1,h2,p{margin:0}
 .price-v .p1{font-size:18px;letter-spacing:.1em}
 .price-v .pn{font-size:clamp(64px,9vw,104px);line-height:1}
 .price-v .p2{font-size:22px}
-.price-note{font-size:13px;letter-spacing:.1em;color:#F2C9D4}
+.price-note{font-size:12px;letter-spacing:.1em;color:#F2C9D4}
+.key{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1px;background:rgba(255,247,242,.22);border:1px solid rgba(255,247,242,.22);margin-bottom:48px}
+.key-row{background:#6A1430;padding:24px clamp(18px,2.4vw,28px);display:flex;flex-direction:column;gap:10px}
+.key-row .k{font-size:12px;letter-spacing:.24em;color:#F2C9D4}
+.key-row .v{font-size:clamp(18px,1.8vw,21px);font-weight:600;line-height:1.6;letter-spacing:.06em}
 .info{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));column-gap:56px;border-top:1px solid rgba(255,247,242,.22)}
 .info-row{padding:20px 0;border-bottom:1px solid rgba(255,247,242,.22);display:flex;flex-direction:column;gap:8px}
-.info-row .k{font-size:14px;font-weight:700;letter-spacing:.2em}
+.info-row .k{font-size:12px;letter-spacing:.2em;color:#F2C9D4}
 .info-row .v{font-size:17px;line-height:1.8;letter-spacing:.08em;overflow-wrap:anywhere}
+.info-row.main .v{font-size:clamp(20px,2vw,24px);font-weight:600}
+.info-sub .info-row{padding:14px 0;gap:4px}
+.info-sub .info-row .v{font-size:15px;color:rgba(255,247,242,.85)}
 .sched{margin-top:72px}
 .sched-t{margin-bottom:8px;font-size:32px;text-align:center}
 .sched-s{margin-bottom:32px;font-size:14px;letter-spacing:.24em;text-align:center}
@@ -586,8 +617,8 @@ h1,h2,p{margin:0}
 .sched-row{align-items:baseline;padding:14px 0;border-bottom:1px solid rgba(255,247,242,.2)}
 .sched-row .no{font-size:16px;letter-spacing:.14em}
 .sched-row .t{font-size:24px;letter-spacing:.04em}
-.sched-row .e{color:#F2C9D4}
-.sched-note{margin-top:20px;font-size:14px;line-height:1.9;letter-spacing:.08em}
+.sched-row .e{font-size:18px;color:#F2C9D4}
+.sched-note{margin-top:20px;font-size:13px;color:#F2C9D4;line-height:1.9;letter-spacing:.08em}
 .ticket-cta{margin-top:64px;display:flex;justify-content:center}
 @media (max-width:420px){.btn-xl{padding:20px 28px;letter-spacing:.14em}}
 
@@ -608,7 +639,13 @@ h1,h2,p{margin:0}
 .deco .r{background:linear-gradient(270deg,transparent,#E9A6BA)}
 .deco .bodoni{font-size:14px;letter-spacing:.4em}
 .att{margin:0;padding:0 0 0 1.4em;font-family:'Zen Kaku Gothic New',sans-serif;font-size:16px;line-height:2;letter-spacing:.1em;display:flex;flex-direction:column;gap:10px}
-.att-h{margin:48px 0 16px;font-size:18px;font-weight:600;letter-spacing:.16em}
+.att-h{margin:48px 0 16px;font-size:16px;font-weight:600;letter-spacing:.16em}
+.att-main{gap:16px}
+.att-main strong{font-family:'Shippori Mincho',serif;font-size:17px;font-weight:600}
+.att-main span{display:block;font-size:14px;line-height:1.8;color:rgba(255,247,242,.75)}
+.att-main li.top::marker{color:#EACF6C}
+.att-main li.top strong{font-size:clamp(18px,2vw,21px);color:#EACF6C}
+.att-sub{font-size:14px;color:rgba(255,247,242,.75);gap:4px}
 
 /* Access */
 .acc{display:flex;flex-wrap:wrap;gap:40px 56px}
@@ -630,7 +667,7 @@ h1,h2,p{margin:0}
 .faq details[open] .sign::before{content:'−'}
 .faq summary:hover .qt{color:#EACF6C}
 .ans{display:flex;align-items:baseline;gap:18px;padding:0 0 26px}
-.ans p{flex:1;font-family:'Zen Kaku Gothic New',sans-serif;font-size:16px;line-height:2;letter-spacing:.08em}
+.ans p{flex:1;font-family:'Zen Kaku Gothic New',sans-serif;font-size:16px;line-height:2;letter-spacing:.08em;color:rgba(255,247,242,.9)}
 
 /* Contact */
 .contact{padding-bottom:clamp(96px,12vw,160px)}
@@ -654,12 +691,12 @@ h1,h2,p{margin:0}
 .ft-btn .b{margin-top:10px;font-size:15px;letter-spacing:.24em;display:flex;align-items:center;gap:10px}
 .ft-cr{display:flex;flex-direction:column;gap:32px}
 .ft-cr>div{display:flex;flex-direction:column;gap:10px}
-.ft-cr .k{font-size:15px;letter-spacing:.2em}
+.ft-cr .k{font-size:12px;letter-spacing:.2em;opacity:.7}
 .ft-cr .v{font-size:22px;font-weight:500;letter-spacing:.2em}
 .ft-ct{display:inline-flex;align-items:center;gap:14px;color:#1E0A10;font-family:'Zen Kaku Gothic New',sans-serif;font-weight:500;font-size:16px;letter-spacing:.16em}
 .ft-ct:hover{color:#861E3E}
 .ft-ct .bodoni{width:32px;height:32px;border:1px solid #1E0A10;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
-.ft-copy{font-size:16px;letter-spacing:.14em}
+.ft-copy{font-size:13px;letter-spacing:.14em}
 
 /* Floating CTA */
 .float{position:fixed;right:clamp(14px,2.4vw,32px);bottom:clamp(14px,2.4vw,32px);z-index:40;gap:12px;font-size:15px;letter-spacing:.16em;padding:16px 26px;outline:1px solid rgba(255,247,242,.7);outline-offset:4px;box-shadow:0 10px 28px rgba(40,4,16,.4)}
