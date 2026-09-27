@@ -3,6 +3,10 @@
     {
       "path": "/api/yoyaku/reminder",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/hacktale/reminder",
+      "schedule": "10 0 * * *"
     }
   ],
   "redirects": [
@@ -135,6 +139,28 @@
         {
           "key": "X-Robots-Tag",
           "value": "noindex, nofollow, noarchive"
+        }
+      ]
+    },
+    {
+      "source": "/hacktale/admin/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
+      "source": "/hacktale/reservation/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
         }
       ]
     }

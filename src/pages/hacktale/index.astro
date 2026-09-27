@@ -61,7 +61,8 @@ const orgLd = {
 <h1 class="h1">日本で唯一無二の<br>『頭脳戦』制作団体</h1>
 <p class="lead m0">交渉/閃きなどを必要とする『頭脳戦』を制作している団体、ハックテイルです。</p>
 <div class="fx ac gap16 fwrap" style="margin-top:40px">
-<a class="btn btn-acc" href="#works">作品一覧を見る</a>
+<a class="btn btn-acc" href={`${htBase}/reservation/`}>公演を予約する</a>
+<a class="btn" href="#works">作品一覧を見る</a>
 <a class="btn" href={HT_LINE_URL} target="_blank" rel="noopener">公式LINEで予約</a>
 <a class="btn" href={HT_X_URL} target="_blank" rel="noopener">Xを見る</a>
 </div>
@@ -112,8 +113,8 @@ const orgLd = {
 <div class="shead"><h2 class="sheadh"><span class="en st">TICKET</span><span class="sj">チケット・参加方法</span></h2></div>
 <div class="steps">
 <div class="step"><div class="en snum">01</div><h3 class="sh3">作品を選ぶ</h3><p class="sp">WORKSから遊びたい作品をお選びください。</p></div>
-<div class="step"><div class="en snum">02</div><h3 class="sh3">ご連絡</h3><p class="sp"><a href="#contact">お問い合わせフォーム</a>、<a href={HT_LINE_URL} target="_blank" rel="noopener">公式LINE</a>、もしくは<a href={HT_X_URL} target="_blank" rel="noopener">X（{HT_X_HANDLE}）</a>のDMまでご連絡ください。</p></div>
-<div class="step"><div class="en snum">03</div><h3 class="sh3">ご予約</h3><p class="sp">貸し切りでのご予約が基本となります。日程を調整のうえ、公演をご案内します。</p></div>
+<div class="step"><div class="en snum">02</div><h3 class="sh3">ご予約・ご連絡</h3><p class="sp">開催日程が決まっている公開公演は<a href={`${htBase}/reservation/`}>公演予約ページ</a>からそのままお申し込みいただけます。貸切のご相談は<a href="#contact">お問い合わせフォーム</a>、<a href={HT_LINE_URL} target="_blank" rel="noopener">公式LINE</a>、もしくは<a href={HT_X_URL} target="_blank" rel="noopener">X（{HT_X_HANDLE}）</a>のDMまで。</p></div>
+<div class="step"><div class="en snum">03</div><h3 class="sh3">ご参加</h3><p class="sp">公開公演は予約確定メールの案内に沿ってご来場ください。貸切は日程を調整のうえ、公演をご案内します。</p></div>
 </div>
 </div></section>
 
@@ -127,7 +128,7 @@ const orgLd = {
 
 <footer class="ftr"><div class="wrap"><div class="fcols">
 <div><img class="logo" src="/assets/hacktale/logo.png" alt="HACKTALE"><p class="ftag">明確に勝敗のつく頭脳戦を展開します。</p></div>
-<div><div class="fh en">MENU</div><a class="flink" href="#works">WORKS — 作品紹介</a><a class="flink" href="#event">EVENT — イベント</a><a class="flink" href="#about">ABOUT — レーベル紹介</a><a class="flink" href="#ticket">TICKET — 参加方法</a></div>
+<div><div class="fh en">MENU</div><a class="flink" href="#works">WORKS — 作品紹介</a><a class="flink" href="#event">EVENT — イベント</a><a class="flink" href={`${htBase}/reservation/`}>RESERVATION — 公演予約</a><a class="flink" href="#about">ABOUT — レーベル紹介</a><a class="flink" href="#ticket">TICKET — 参加方法</a></div>
 <div><div class="fh en">CONTACT</div><a class="flink" href="#contact">お問い合わせフォーム</a><a class="flink" href={HT_X_URL} target="_blank" rel="noopener">X — {HT_X_HANDLE}</a><a class="flink" href={HT_LINE_URL} target="_blank" rel="noopener">公式LINE</a></div>
 <div><div class="fh en">COMPANY</div><a class="flink" href={HT_COMPANY_URL}>運営会社 — 株式会社ex Labs</a>
 <a class="flink" href="https://kabuexlabs.com/services/zunousen/">頭脳戦制作の依頼 — ex Labs</a><a class="flink" href="https://kabuexlabs.com/guide/zunousen/">頭脳戦とは — 解説記事</a><a class="flink" href="https://kabuexlabs.com/guide/shinrisen/">心理戦とは — 解説記事</a><a class="flink" href="https://kabuexlabs.com/guide/zunousen-game/">頭脳戦ゲームの種類</a><a class="flink" href="https://kabuexlabs.com/guide/zunousen-sakuhin/">頭脳戦が面白い作品15選</a></div>

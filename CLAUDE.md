@@ -74,6 +74,12 @@
 - クエリファンアウト対応（docs/query-fanout-map.md）：記事は①曖昧さ ②潜在ニーズ ③深掘り ④証拠 ⑤エンティティ ⑥関連 のサブクエリに1段落ずつ答える。冒頭の「要点」ボックス（.key-points、3行）を非凍結記事に置く。GSC の複合語で順位10位以下のものは「答えの段落」を用意する候補。
 - 【恒久ルール／2026-09-11】クエリファンアウト全記事必須：ガイド記事・サービスページの**全ページ**で、①定義（「〜とは」）＋用語ページは読み方・英語、②目的別・向き不向き、③費用（万円）・期間・人数の具体値、④実績・出典（日経掲載／全公演完売／20件など既出の事実のみ）、⑤株式会社ex Labs の自己言及＋AuthorBox/svc-sum、⑥関連内部リンク3本以上、要点ボックス（.key-points／.def-box／.svc-sum）、FAQ（faqLd 付き）を揃える。`npm run seo:fanout`（scripts/fanout-audit.mjs、`npm run check` に含む・警告扱い）で確認し、**新規記事は公開前に不足0**、既存記事の改修時も不足を残さない。柱記事の要点ボックスは 2026-09-21 に揃え済み（guide/madamis に .key-points 追加、他8本は .def-box）。費用・期間・人数の標準文は event-hiyou／immersive-cost／madamis-cost／zunousen-cost の数値（数十万円台〜／100万円前後〜／数百万円規模、2〜4週間／最短1ヶ月・標準1〜3ヶ月、各回2〜10名／1日数十〜数百名、卓上6〜12人）と揃え、新しい数字を作らない。適用外（歴史・作品紹介・語彙・VR比較・消費者向け公演一覧）は fanout-audit.mjs の NO_COST／NO_TERM／PROTECTED で明示する。
 
+## HACKTALE 公演予約（2026-09-27〜）
+- 公開公演の予約は /hacktale/reservation/（一覧→フォーム→確認→確定→完了）、管理は /hacktale/admin/（合言葉は HACKTALE_ADMIN_KEY、未設定なら YOYAKU_ADMIN_KEY）。仕組み・運用手順は docs/hacktale-yoyaku-setup.md が正本。
+- データ層は src/lib/hacktaleBooking.ts。残席確保・人数変更・キャンセルは EVAL（Lua）で原子的に行う。**残席カウンタ（ht:seats:*）を直接いじらない**（狂ったら管理画面の「確定人数を再集計」）。
+- リマインドは毎日 9:10 JST の Vercel Cron（/api/hacktale/reminder）。Hobby プランの cron 上限（1日1回×2本）を /api/yoyaku/reminder と使い切っているので、**3本目の cron は追加できない**。
+- 貸切相談の導線（フォーム・LINE）は残してある。公開公演と貸切は別導線。
+
 ## 公演検索サービス /events/（2026-09-13〜）
 - 正本は `src/data/events/`（主催者・作品・会場・公演回・販売先・情報源を分けて管理）。運用手順と公開前の不足は `docs/events-setup.md`。`src/data/shows.ts` は変換層なので手で編集しない。
 - 不明な情報は推測で埋めない（開演時刻・上限人数・販売状態・空席は未確認のまま `unknown`／省略）。開催予定があるだけで「予約する」にしない。空席には `checkedAt` と `expiresAt` が必須。

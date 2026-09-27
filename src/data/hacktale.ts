@@ -101,6 +101,7 @@ export function htBreadcrumbLd(items: { name: string; url?: string }[]) {
 /** sitemap.xml に載せる公開ページのパス */
 export const htPaths = [
   '/hacktale/',
+  '/hacktale/reservation/',
   '/hacktale/works/',
   '/hacktale/works/present-poker/',
   '/hacktale/works/werewolf-theorem/',

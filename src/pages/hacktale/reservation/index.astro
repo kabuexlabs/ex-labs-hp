@@ -1,0 +1,159 @@
+---
+// HACKTALE 公演予約 — 予約可能な公演の一覧。
+// 残席・受付状態はリクエストのたびに KV から読む（キャッシュしない）。
+export const prerender = false;
+
+import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
+import { htBase, HT_LINE_URL } from '../../../data/hacktale';
+import {
+  isKvConfigured,
+  getWorks,
+  getSessions,
+  bookedSeatsMap,
+  availability,
+  AVAILABILITY_LABEL,
+  formatStartJa,
+  jstNow,
+  type HtSession,
+  type HtAvailability,
+} from '../../../lib/hacktaleBooking';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+
+const workFilter = (Astro.url.searchParams.get('work') ?? '').slice(0, 40);
+const err = Astro.url.searchParams.get('err') ?? '';
+
+const now = jstNow();
+const today = now.slice(0, 10);
+
+let rows: { s: HtSession; workTitle: string; image?: string; durationMin?: number; avail: HtAvailability }[] = [];
+let filterTitle = '';
+const configured = isKvConfigured();
+
+if (configured) {
+  const works = new Map((await getWorks()).map((w) => [w.id, w]));
+  // 非公開（draft）は載せない。今日以降の公演だけを開催順に表示し、
+  // 中止・満席・受付終了も状態付きで残す（予約はできない）。
+  const sessions = (await getSessions()).filter(
+    (s) => s.status !== 'draft' && s.start.slice(0, 10) >= today && (!workFilter || s.workId === workFilter),
+  );
+  const seats = await bookedSeatsMap(sessions.map((s) => s.id));
+  rows = sessions.map((s) => {
+    const w = works.get(s.workId);
+    return {
+      s,
+      workTitle: w?.title ?? s.workId,
+      image: w?.image,
+      durationMin: w?.durationMin,
+      avail: availability(s, seats.get(s.id) ?? 0, now),
+    };
+  });
+  if (workFilter) filterTitle = works.get(workFilter)?.title ?? '';
+}
+
+const openCount = rows.filter((r) => r.avail.state === 'open').length;
+---
+
+<HacktaleLayout
+  title="公演予約 RESERVATION | ハックテイル"
+  description="HACKTALE（ハックテイル）の公演予約ページ。開催日時と残席を確認して、そのままオンラインでご予約いただけます。貸切公演のご相談も受け付けています。"
+  twitterCard="summary"
+  back={{ href: `${htBase}/`, label: 'トップへ戻る' }}
+>
+
+<section class="sec"><div class="wrap">
+<div class="shead"><h1 class="sheadh"><span class="en st">RESERVATION</span><span class="sj">公演予約</span></h1></div>
+<p class="intro">開催日時と残席をご確認のうえ、「予約する」からお申し込みください。予約確定後、確認メールをお送りします。</p>
+
+{err === 'notfound' && <p class="alert">指定された公演が見つかりませんでした。最新の一覧からお選びください。</p>}
+{!configured && <p class="alert">予約システムは現在準備中です。お手数ですが、<a href={`${htBase}/#contact`}>お問い合わせフォーム</a>または<a href={HT_LINE_URL} target="_blank" rel="noopener">公式LINE</a>からご連絡ください。</p>}
+
+{filterTitle && (
+  <p class="filter">「{filterTitle}」の公演を表示中 — <a href={`${htBase}/reservation/`}>すべての公演を見る</a></p>
+)}
+
+{configured && rows.length === 0 && (
+  <div class="empty">
+    <p class="fw7 m0">現在受付中の公演はありません。</p>
+    <p class="edesc">貸切公演のご予約・日程のご相談はいつでも受け付けています。お気軽にご連絡ください。</p>
+    <div class="fx ac gap16 fwrap"><a class="btn btn-acc" href={`${htBase}/#contact`}>貸切公演を相談する</a><a class="btn" href={HT_LINE_URL} target="_blank" rel="noopener">公式LINEで相談</a></div>
+  </div>
+)}
+
+{rows.length > 0 && (
+  <div class="list">
+  {rows.map(({ s, workTitle, image, durationMin, avail }) => (
+    <div class="row">
+      {image && <img class="thumb" src={image} alt="" loading="lazy" decoding="async">}
+      <div class="body">
+        <div class="chips">
+          <span class:list={['stat', avail.state]}>{AVAILABILITY_LABEL(avail)}</span>
+          {durationMin && <span class="chip">約{durationMin}分</span>}
+        </div>
+        <p class="wt">{workTitle}</p>
+        <p class="dt">{formatStartJa(s.start)}</p>
+        <p class="meta">{s.venue}｜{s.price}</p>
+        {s.deadline && avail.state === 'open' && <p class="meta dim2">受付期限: {formatStartJa(s.deadline)} まで</p>}
+      </div>
+      <div class="act">
+        {avail.state === 'open'
+          ? <a class="btn btn-acc" href={`${htBase}/reservation/${s.id}/`}>予約する</a>
+          : <span class:list={['btn', 'dead']}>{avail.state === 'cancelled' ? '公演中止' : avail.state === 'full' ? '満席' : '受付終了'}</span>}
+      </div>
+    </div>
+  ))}
+  </div>
+)}
+
+{configured && rows.length > 0 && openCount === 0 && (
+  <p class="edesc" style="margin-top:20px">現在受付中の公演はありません。次回公演の情報はNEWS・Xでお知らせします。</p>
+)}
+
+<div class="kashikiri">
+  <p class="kh fw7 m0">貸切公演をご希望の方へ</p>
+  <p class="kd">上記の公開公演とは別に、ご希望の日程での貸切公演も承っています。日程を調整のうえご案内しますので、お問い合わせフォーム・公式LINEからご相談ください。</p>
+  <div class="fx ac gap16 fwrap"><a class="btn" href={`${htBase}/#contact`}>貸切公演を相談する</a><a class="btn" href={HT_LINE_URL} target="_blank" rel="noopener">公式LINEで相談</a></div>
+</div>
+</div></section>
+
+</HacktaleLayout>
+
+<style>
+.sec{padding:64px 0 112px}
+.shead{margin-bottom:20px}
+.sheadh{display:flex;align-items:baseline;gap:18px;margin:0}
+.st{font-size:clamp(38px,4.5vw,60px);line-height:1}
+.sj{font-size:13px;letter-spacing:.2em;color:#9b978c}
+.intro{font-size:14px;line-height:2;color:#c9c5ba;margin:0 0 32px;max-width:640px}
+.alert{border:1px solid #e5484d;color:#e08a8a;padding:14px 18px;font-size:14px;line-height:1.9;margin:0 0 24px}
+.alert a{color:#e08a8a;text-decoration:underline}
+.filter{font-size:13px;color:#9b978c;margin:0 0 20px}
+.filter a{color:var(--acc);border-bottom:1px solid rgba(217,230,59,.4)}
+.list{display:flex;flex-direction:column;gap:16px}
+.row{display:grid;grid-template-columns:88px 1fr auto;gap:20px;align-items:center;border:1px solid rgba(255,255,255,.12);background:#141416;padding:18px 22px}
+.thumb{width:88px;height:88px;object-fit:cover;display:block;border:1px solid rgba(255,255,255,.12)}
+.chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.chip{font-size:11px;letter-spacing:.08em;border:1px solid rgba(255,255,255,.25);padding:3px 9px;color:#c9c5ba}
+.stat{font-size:11px;letter-spacing:.1em;padding:3px 9px;font-weight:700}
+.stat.open{background:var(--acc);color:#0d0d0e}
+.stat.full,.stat.cancelled{background:#e5484d;color:#fff}
+.stat.closed{border:1px solid rgba(255,255,255,.35);color:#c9c5ba}
+.wt{font-size:17px;font-weight:900;margin:0 0 4px}
+.dt{font-size:15px;font-weight:700;color:var(--acc);margin:0 0 6px;letter-spacing:.04em}
+.meta{font-size:12px;color:#9b978c;margin:0;line-height:1.8}
+.dim2{color:#6f6c64}
+.act .btn{white-space:nowrap}
+.dead{border-color:rgba(255,255,255,.15);color:#6f6c64;cursor:default}
+.empty{border:1px solid rgba(255,255,255,.12);background:#141416;padding:32px 28px;display:flex;flex-direction:column;gap:16px}
+.edesc{font-size:13px;line-height:2;color:#c9c5ba;margin:0}
+.kashikiri{margin-top:56px;border:1px solid rgba(217,230,59,.4);padding:28px;display:flex;flex-direction:column;gap:14px}
+.kh{font-size:16px}
+.kd{font-size:13px;line-height:2;color:#c9c5ba;margin:0}
+@media(max-width:760px){
+.row{grid-template-columns:64px 1fr;gap:14px;padding:16px}
+.thumb{width:64px;height:64px}
+.act{grid-column:1/-1}
+.act .btn{width:100%;justify-content:center;box-sizing:border-box}
+.kashikiri{padding:22px 18px}
+}
+</style>

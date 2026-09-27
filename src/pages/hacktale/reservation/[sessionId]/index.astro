@@ -1,0 +1,228 @@
+---
+// HACKTALE 公演予約 — 入力フォームと確認画面。
+// GET: 入力フォーム／POST(confirm): 内容確認／POST(edit): 入力に戻る。
+// 確定は /api/hacktale/reserve へ POST（確認画面から）。確認画面を開いた
+// 時点では席を確保せず、確定時に残席を再確認する。
+export const prerender = false;
+
+import { randomBytes } from 'node:crypto';
+import HacktaleLayout from '../../../../layouts/HacktaleLayout.astro';
+import { htBase } from '../../../../data/hacktale';
+import {
+  isKvConfigured,
+  getSession,
+  getWork,
+  bookedSeats,
+  availability,
+  AVAILABILITY_LABEL,
+  formatStartJa,
+} from '../../../../lib/hacktaleBooking';
+import { normalizePhone, validPhone, validEmail } from '../../../../lib/yoyaku';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+
+const { sessionId = '' } = Astro.params;
+
+if (!isKvConfigured()) return Astro.redirect(`${htBase}/reservation/`, 303);
+const session = await getSession(sessionId);
+if (!session || session.status === 'draft') {
+  return Astro.redirect(`${htBase}/reservation/?err=notfound`, 303);
+}
+const work = await getWork(session.workId);
+const avail = availability(session, await bookedSeats(session.id));
+
+// エラー表示（確定APIからのリダイレクト）
+const ERR_MSG: Record<string, string> = {
+  input: '入力内容に不備がありました。お手数ですが、もう一度ご確認ください。',
+  full: '申し訳ありません、確定前に満席となったため、ご希望の人数ではお取りできませんでした。最新の残席をご確認ください。',
+  closed: 'この公演は受付を終了しました。',
+  cancelled: 'この公演は中止となりました。',
+  rate: '申し込みが集中しています。しばらく時間をおいてからお試しください。',
+  kv: 'システムエラーが発生しました。時間をおいてお試しいただくか、お問い合わせフォームからご連絡ください。',
+};
+let error = ERR_MSG[Astro.url.searchParams.get('err') ?? ''] ?? '';
+
+// フォーム値（確認画面・修正時の保持用）
+let v = { name: '', email: '', phone: '', x: '', count: '1', note: '' };
+let mode: 'form' | 'confirm' = 'form';
+let idem = '';
+
+const maxCount = avail.state === 'open' ? avail.remaining : 0;
+
+if (Astro.request.method === 'POST' && avail.state === 'open') {
+  const form = await Astro.request.formData();
+  const get = (k: string) => String(form.get(k) ?? '').trim();
+  v = {
+    name: get('name').slice(0, 40),
+    email: get('email').slice(0, 254),
+    phone: get('phone').slice(0, 20),
+    x: get('x').replace(/^@/, '').slice(0, 30),
+    count: get('count'),
+    note: get('note').slice(0, 500),
+  };
+  if (get('action') === 'confirm') {
+    const count = parseInt(v.count, 10);
+    const problems: string[] = [];
+    if (!v.name) problems.push('お名前を入力してください。');
+    if (!validEmail(v.email)) problems.push('メールアドレスの形式をご確認ください。');
+    if (!validPhone(normalizePhone(v.phone))) problems.push('電話番号の形式をご確認ください（例: 090-1234-5678）。');
+    if (!Number.isInteger(count) || count < 1 || count > maxCount) problems.push('参加人数をご確認ください。');
+    if (get('agree') === '') problems.push('注意事項と個人情報の取り扱いへの同意が必要です。');
+    if (problems.length > 0) {
+      error = problems.join(' ');
+    } else {
+      mode = 'confirm';
+      idem = randomBytes(16).toString('hex');
+    }
+  }
+  // action === 'edit' は入力フォームを値付きで再表示するだけ
+}
+
+const countOptions = Array.from({ length: Math.max(maxCount, 0) }, (_, i) => i + 1);
+const pageTitle = `${work?.title ?? '公演'}の予約 | ハックテイル`;
+---
+
+<HacktaleLayout
+  title={pageTitle}
+  description={`HACKTALE「${work?.title ?? ''}」${formatStartJa(session.start)}の公演予約ページ。`}
+  twitterCard="summary"
+  back={{ href: `${htBase}/reservation/`, label: '公演一覧へ戻る' }}
+  noindex
+>
+
+<section class="sec"><div class="wrap narrow">
+
+<div class="head">
+  {work?.image && <img class="thumb" src={work.image} alt="" decoding="async">}
+  <div>
+    <div class="chips"><span class:list={['stat', avail.state]}>{AVAILABILITY_LABEL(avail)}</span>{work?.durationMin && <span class="chip">約{work.durationMin}分</span>}</div>
+    <h1 class="wt">{work?.title ?? session.workId}</h1>
+    <p class="dt">{formatStartJa(session.start)}</p>
+    <p class="meta">会場: {session.venue}{session.meeting ? `／集合: ${session.meeting}` : ''}</p>
+    <p class="meta">料金: {session.price}</p>
+    {session.deadline && <p class="meta">受付期限: {formatStartJa(session.deadline)} まで</p>}
+  </div>
+</div>
+
+{session.notes && (
+  <div class="notes"><p class="nh fw7 m0">当日の注意事項</p><p class="nb">{session.notes}</p></div>
+)}
+
+{error && <p class="alert" role="alert">{error}</p>}
+
+{avail.state !== 'open' && (
+  <div class="closedbox">
+    <p class="m0 fw7">{avail.state === 'cancelled' ? 'この公演は中止となりました。' : avail.state === 'full' ? 'この公演は満席です。' : 'この公演は受付を終了しました。'}</p>
+    <p class="edesc">他の公演は<a href={`${htBase}/reservation/`}>公演一覧</a>から、貸切公演のご相談は<a href={`${htBase}/#contact`}>お問い合わせフォーム</a>からどうぞ。</p>
+  </div>
+)}
+
+{avail.state === 'open' && mode === 'form' && (
+  <form class="form" method="POST" action={`${htBase}/reservation/${session.id}/`}>
+    <input type="hidden" name="action" value="confirm">
+    <div><div class="fl">お名前（ニックネーム可）<span class="req">必須</span></div>
+      <input class="in" type="text" name="name" required maxlength="40" autocomplete="name" value={v.name}></div>
+    <div><div class="fl">メールアドレス<span class="req">必須</span></div>
+      <input class="in" type="email" name="email" required maxlength="254" autocomplete="email" value={v.email}>
+      <p class="hint">予約確認メール・リマインドをお送りします。</p></div>
+    <div><div class="fl">電話番号<span class="req">必須</span></div>
+      <input class="in" type="tel" name="phone" required maxlength="20" autocomplete="tel" placeholder="090-1234-5678" value={v.phone}>
+      <p class="hint">緊急時（開催直前の変更など）のご連絡にのみ使用します。</p></div>
+    <div><div class="fl">XのID（任意）</div>
+      <input class="in" type="text" name="x" maxlength="30" placeholder="@hacktalegame" value={v.x}></div>
+    <div><div class="fl">参加人数<span class="req">必須</span></div>
+      <select class="in" name="count" required>
+        {countOptions.map((n) => <option value={n} selected={String(n) === v.count}>{n}名</option>)}
+      </select>
+      <p class="hint">代表者の方がまとめてご予約いただけます（残り{maxCount}席まで）。</p></div>
+    <div><div class="fl">備考（任意）</div>
+      <textarea class="in" name="note" rows="4" maxlength="500">{v.note}</textarea></div>
+    <label class="agree"><input type="checkbox" name="agree" required>
+      <span>当日の注意事項および個人情報の取り扱い（ご入力いただいた情報は本公演のご連絡・受付のみに使用します）に同意します<span class="req">必須</span></span></label>
+    <div><button class="btn btn-acc send" type="submit">入力内容を確認する</button></div>
+  </form>
+)}
+
+{avail.state === 'open' && mode === 'confirm' && (
+  <div class="confirm">
+    <p class="ch fw7">ご入力内容の確認</p>
+    <table class="ct"><tbody>
+      <tr><th>公演</th><td>{work?.title ?? session.workId}<br>{formatStartJa(session.start)}</td></tr>
+      <tr><th>お名前</th><td>{v.name}</td></tr>
+      <tr><th>メール</th><td>{v.email}</td></tr>
+      <tr><th>電話番号</th><td>{v.phone}</td></tr>
+      <tr><th>XのID</th><td>{v.x ? `@${v.x}` : '（未記入）'}</td></tr>
+      <tr><th>参加人数</th><td>{v.count}名</td></tr>
+      <tr><th>備考</th><td>{v.note || '（なし）'}</td></tr>
+    </tbody></table>
+    <p class="cnote">まだ予約は確定していません。内容をご確認のうえ「予約を確定する」を押してください。</p>
+    <div class="fx gap16 fwrap">
+      <form method="POST" action="/api/hacktale/reserve">
+        <input type="hidden" name="session" value={session.id}>
+        <input type="hidden" name="idem" value={idem}>
+        <input type="hidden" name="name" value={v.name}>
+        <input type="hidden" name="email" value={v.email}>
+        <input type="hidden" name="phone" value={v.phone}>
+        <input type="hidden" name="x" value={v.x}>
+        <input type="hidden" name="count" value={v.count}>
+        <input type="hidden" name="note" value={v.note}>
+        <input type="hidden" name="agree" value="on">
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+        <button class="btn btn-acc send" type="submit">予約を確定する</button>
+      </form>
+      <form method="POST" action={`${htBase}/reservation/${session.id}/`}>
+        <input type="hidden" name="action" value="edit">
+        {Object.entries(v).map(([k, val]) => <input type="hidden" name={k} value={val}>)}
+        <button class="btn send" type="submit">入力内容を修正する</button>
+      </form>
+    </div>
+  </div>
+)}
+
+</div></section>
+
+</HacktaleLayout>
+
+<style>
+.sec{padding:56px 0 112px}
+.narrow{max-width:720px}
+.head{display:grid;grid-template-columns:110px 1fr;gap:22px;align-items:start;margin-bottom:26px}
+.thumb{width:110px;height:110px;object-fit:cover;display:block;border:1px solid rgba(255,255,255,.12)}
+.chips{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.chip{font-size:11px;letter-spacing:.08em;border:1px solid rgba(255,255,255,.25);padding:3px 9px;color:#c9c5ba}
+.stat{font-size:11px;letter-spacing:.1em;padding:3px 9px;font-weight:700}
+.stat.open{background:var(--acc);color:#0d0d0e}
+.stat.full,.stat.cancelled{background:#e5484d;color:#fff}
+.stat.closed{border:1px solid rgba(255,255,255,.35);color:#c9c5ba}
+.wt{font-size:clamp(22px,3.4vw,30px);font-weight:900;line-height:1.5;margin:0 0 6px}
+.dt{font-size:16px;font-weight:700;color:var(--acc);margin:0 0 8px;letter-spacing:.04em}
+.meta{font-size:13px;color:#9b978c;margin:0;line-height:2}
+.notes{border:1px solid rgba(217,230,59,.4);padding:18px 22px;margin:0 0 26px}
+.nh{font-size:13px;letter-spacing:.08em}
+.nb{font-size:13px;line-height:2;color:#c9c5ba;margin:8px 0 0;white-space:pre-wrap}
+.alert{border:1px solid #e5484d;color:#e08a8a;padding:14px 18px;font-size:14px;line-height:1.9;margin:0 0 24px}
+.closedbox{border:1px solid rgba(255,255,255,.18);padding:24px;display:flex;flex-direction:column;gap:10px;font-size:14px}
+.edesc{font-size:13px;line-height:2;color:#c9c5ba;margin:0}
+.edesc a{color:var(--acc);border-bottom:1px solid rgba(217,230,59,.4)}
+.form{display:flex;flex-direction:column;gap:22px}
+.fl{font-size:13px;font-weight:700;letter-spacing:.08em;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.req{font-size:10px;background:#3a2020;color:#e08a8a;padding:2px 7px;letter-spacing:.1em;flex-shrink:0}
+.in{width:100%;box-sizing:border-box;background:#141416;border:1px solid rgba(255,255,255,.18);color:#f1efe9;padding:13px 14px;font-size:16px;font-family:inherit}
+.in:focus{outline:none;border-color:var(--acc)}
+textarea.in{resize:vertical}
+.hint{font-size:12px;color:#9b978c;margin:8px 0 0;line-height:1.8}
+.agree{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.9;color:#c9c5ba;cursor:pointer}
+.agree input{margin-top:5px;accent-color:var(--acc);flex-shrink:0}
+.send{cursor:pointer;font-family:inherit}
+.confirm{border:1px solid rgba(255,255,255,.12);background:#141416;padding:26px}
+.ch{font-size:16px;margin:0 0 16px}
+.ct{width:100%;border-collapse:collapse;margin:0 0 18px}
+.ct th{text-align:left;font-size:12px;letter-spacing:.08em;color:#9b978c;padding:12px 16px 12px 0;width:110px;font-weight:500;vertical-align:top;border-bottom:1px solid rgba(255,255,255,.08)}
+.ct td{font-size:14px;padding:12px 0;color:#f1efe9;border-bottom:1px solid rgba(255,255,255,.08);line-height:1.9;word-break:break-all}
+.cnote{font-size:12px;color:#9b978c;margin:0 0 18px;line-height:1.9}
+@media(max-width:560px){
+.head{grid-template-columns:72px 1fr;gap:14px}
+.thumb{width:72px;height:72px}
+.confirm{padding:20px 16px}
+}
+</style>

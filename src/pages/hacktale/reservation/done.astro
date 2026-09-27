@@ -1,0 +1,61 @@
+---
+// HACKTALE 公演予約 — 予約完了画面。
+// URLには予約番号だけを載せる（この番号から個人情報は参照できない）。
+// 詳細は確認メールに記載される。
+export const prerender = false;
+
+import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
+import { htBase } from '../../../data/hacktale';
+
+Astro.response.headers.set('Cache-Control', 'no-store');
+
+const rawNo = Astro.url.searchParams.get('no') ?? '';
+const no = /^HT-\d{6}-[A-Z0-9]{4}$/.test(rawNo) ? rawNo : '';
+const mailFailed = Astro.url.searchParams.get('mail') === '0';
+---
+
+<HacktaleLayout
+  title="ご予約ありがとうございました | ハックテイル"
+  description="HACKTALE公演のご予約を承りました。"
+  twitterCard="summary"
+  back={{ href: `${htBase}/reservation/`, label: '公演一覧へ戻る' }}
+  noindex
+>
+
+<section class="sec"><div class="wrap narrow">
+<p class="kick en m0">RESERVED</p>
+<h1 class="t1">ご予約を承りました</h1>
+
+{no && (
+  <div class="nobox"><p class="nl m0">予約番号</p><p class="nn en m0">{no}</p></div>
+)}
+
+{mailFailed ? (
+  <p class="body warn">確認メールの送信に失敗した可能性があります。予約は確定していますのでご安心ください。確認のご連絡を差し上げる場合があります。メールが届かない場合は <a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> までお問い合わせください。</p>
+) : (
+  <p class="body">ご入力いただいたメールアドレスに確認メールをお送りしました。開催日時・会場・料金などの詳細はメールをご確認ください。<br>数分待っても届かない場合は、迷惑メールフォルダをご確認のうえ、<a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> までご連絡ください。</p>
+)}
+
+<p class="body">変更・キャンセルのご希望は、確認メールへの返信またはお問い合わせフォームからご連絡ください。</p>
+
+<div class="fx ac gap16 fwrap" style="margin-top:36px">
+<a class="btn btn-acc" href={`${htBase}/`}>トップへ戻る</a>
+<a class="btn" href={`${htBase}/reservation/`}>他の公演を見る</a>
+</div>
+</div></section>
+
+</HacktaleLayout>
+
+<style>
+.sec{padding:88px 0 128px}
+.narrow{max-width:720px}
+.kick{font-size:14px;letter-spacing:.35em;color:var(--acc)}
+.t1{font-size:clamp(26px,4vw,40px);font-weight:900;line-height:1.5;margin:18px 0 24px}
+.nobox{border:1px solid rgba(217,230,59,.4);padding:18px 24px;margin:0 0 24px;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+.nl{font-size:12px;letter-spacing:.14em;color:#9b978c}
+.nn{font-size:24px;letter-spacing:.08em;color:var(--acc)}
+.body{font-size:14px;line-height:2.1;color:#c9c5ba;margin:0 0 14px}
+.body a{color:var(--acc);border-bottom:1px solid rgba(217,230,59,.4)}
+.warn{border:1px solid #e5484d;padding:14px 18px;color:#e0b0a8}
+@media(max-width:760px){.sec{padding:56px 0 88px}}
+</style>
