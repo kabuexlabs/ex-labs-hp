@@ -1,0 +1,198 @@
+---
+// 「東京 友達 遊ぶ」「東京 大人 遊び場」「東京 体験 友達」の受け皿（需要量は未計測の仮説）。
+// 役割：2〜4人の友達グループが、人数ごとの総額・全員が同じ組か・貸切か相席か・会話の多さ・時間・雨の日で体験を選ぶ。
+// デート（2人）向けは /guide/tokyo-experience-date/ ほか、公演の日程は /guide/immersive-tokyo/ に任せる。
+// 自社公演は src/data/events/、他社は src/data/nazoDate.ts から生成し、料金を手書きしない（未確認は「公式で確認」）。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import VisualHero from '../../components/VisualHero.astro';
+import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
+import { publishedNazoItems } from '../../data/nazoDate';
+import { jsonLd } from '../../lib/microcms';
+
+const now = new Date();
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/tokyo-friends-activities/', site).toString();
+const SIZES = [2, 3, 4];
+
+type Row = { id: string; name: string; area: string; kind: string; party: string; totals: string[]; together: string; privacy: string; talk: string; time: string; weather: string; note: string; href: string; own: boolean; siteId: string; privateGroup?: boolean; talkHeavy?: boolean };
+
+const own: Row[] = buildGuideRows(now).filter((r) => r.status !== 'ended').map((r) => ({
+  id: r.w.id, name: r.w.title, area: r.venue?.listName ?? r.venue?.name ?? '東京', kind: `物語参加型（${r.organizer.relationLabel}）`,
+  party: r.w.party.text,
+  totals: SIZES.map((n) => { const t = r.totalFor(n); return t !== undefined ? fmtYen(t) : r.w.party.min > n || (r.w.party.max !== undefined && r.w.party.max < n) ? '申込不可' : '公式で確認'; }),
+  together: r.w.party.format === 'private' ? '全員が同じ組（申込単位で貸切）' : r.w.party.format === 'shared' ? '同じ回に参加（途中で一時的に離れる場面あり）' : '公式ページで確認',
+  privacy: r.formatLabel,
+  talk: r.w.info.participation ?? '公式ページで確認',
+  time: r.w.duration.minutes ? `約${r.w.duration.minutes}分（集合・受付は別）` : r.w.duration.text,
+  weather: r.venue?.setting === 'indoor' ? '屋内で完結' : r.venue?.setting === 'mixed' ? '受付後に屋外の徒歩移動あり' : '公式ページで確認',
+  note: [r.w.info.ageRule, r.w.info.scary].filter(Boolean).join('。'),
+  href: r.ticketUrl ?? r.w.officialUrl, own: true, siteId: r.w.id,
+  privateGroup: r.w.party.format === 'private', talkHeavy: r.w.info.actorInteraction === true,
+}));
+const ext: Row[] = publishedNazoItems.filter((i) => i.privacy === 'room').map((i) => ({
+  id: i.id, name: i.name, area: i.area.replace('東京・', ''), kind: '室内の脱出ゲーム', party: i.players,
+  totals: SIZES.map((n) => {
+    if (n === 2) return i.perPerson2 ? `${(i.perPerson2.low * 2).toLocaleString('ja-JP')}〜${(i.perPerson2.high * 2).toLocaleString('ja-JP')}円` : '公式で確認';
+    return i.id === 'zettai-kukan-ikebukuro' && i.perPerson2 ? `${(i.perPerson2.low * n).toLocaleString('ja-JP')}〜${(i.perPerson2.high * n).toLocaleString('ja-JP')}円（1人料金×人数）` : '公式の料金表で確認';
+  }),
+  together: '全員が同じチーム', privacy: '部屋を一組で貸切',
+  talk: '全員で相談しながら謎を解く（キャストとの会話はなし）', time: i.totalMinutes !== undefined ? i.totalTime : `本編 ${i.timeLimit}（受付を含む時間は公式で確認）`,
+  weather: i.indoor, note: i.tax, href: i.officialUrl, own: false, siteId: i.siteId, privateGroup: true, talkHeavy: false,
+}));
+const rows = [...own, ...ext];
+const names = (xs: Row[]) => xs.map((r) => r.name).join('、');
+const privateRows = rows.filter((r) => r.privateGroup);
+const castRows = rows.filter((r) => r.talkHeavy);
+const indoorRows = rows.filter((r) => /屋内/.test(r.weather));
+
+const faqs = [
+  { q: '友達3〜4人で、全員同じ組で遊べますか？', a: `${privateRows.length ? `${names(privateRows)}は、申込単位または部屋ごとの貸切なので、申し込んだ全員が同じ組で遊べます。` : ''}${rows.filter((r) => !r.privateGroup).length ? `${names(rows.filter((r) => !r.privateGroup))}は同じ回の他の参加者と一緒になる、または貸切かどうかを公式で確認する必要があります。` : ''}` },
+  { q: '人数で料金は変わりますか？', a: `体験によって違います。${own.filter((r) => r.totals.every((t) => /¥/.test(t))).map((r) => `${r.name}は2名${r.totals[0]}・3名${r.totals[1]}・4名${r.totals[2]}`).join('。')}${own.some((r) => r.totals.every((t) => /¥/.test(t))) ? '。' : ''}人数で1人あたりの料金が変わる施設もあるため、表の「公式の料金表で確認」は予約前に確認してください。` },
+  { q: '会話が得意でない人がいても楽しめますか？', a: `${castRows.length ? `${names(castRows)}はキャストとの会話が進行の一部です。` : ''}脱出ゲームは仲間内の相談が中心で、キャストと話す場面はありません。グループの雰囲気に合わせて選んでください。` },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const title = '東京で友達と遊ぶ体験｜2〜4人で楽しめる屋内・謎解き・物語体験を比較';
+const desc = '東京で友達2〜4人と遊べる体験を、人数ごとの総額、全員が同じ組か、貸切か相席か、会話の多さ、所要時間、雨の日の屋内外で比較。物語に参加する公演と、部屋を貸し切る脱出ゲームを並べ、予約先へ直接進めます。';
+const articleLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
+  image: [new URL('/assets/guide/tokyo-friends-activities.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-09-27', dateModified: '2026-09-27', mainEntityOfPage: pageUrl,
+};
+const chips = [`${rows.length}件を比較`, '2〜4人の総額', ...(privateRows.length ? [`全員同じ組で遊べる ${privateRows.length}件`] : [])];
+---
+<BaseLayout
+  title="東京で友達と遊ぶ体験｜2〜4人で楽しめる屋内・謎解き・物語体験を比較 - 株式会社ex Labs"
+  description="東京で友達2〜4人と遊べる体験を、人数ごとの総額、全員が同じ組か、貸切か相席か、会話の多さ、所要時間、雨の日の屋内外で比較。物語に参加する公演と、部屋を貸し切る脱出ゲームを並べ、予約先へ直接進めます。"
+  ogImage="/assets/guide/tokyo-friends-activities.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '解説記事一覧', href: '/guide/' },
+  { name: '東京で友達と遊ぶ体験' },
+]} />
+
+<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 45%" eyebrow="WITH FRIENDS" catchText="いつもの集まりを、体験に変える" chips={chips} alt="東京で開催中の体験型公演のキービジュアル">
+  <h1>東京で友達と遊ぶ体験｜2〜4人で楽しめる屋内・謎解き・物語体験</h1>
+</VisualHero>
+
+<section class="section" style="padding-top:28px"><div class="wrap">
+<p class="lede">体験型の遊びとは、食事やカラオケのように「過ごす場所」を選ぶのではなく、みんなで何かに挑戦する時間そのものを楽しむ遊び方のことです。友達2〜4人で遊ぶときに気になる<strong>「人数で総額はいくらか」「全員が同じ組になれるか」「会話が多いか少ないか」</strong>を、体験ごとに並べました。</p>
+<div class="key-points"><p class="key-points-h">このページでできること</p><ul>
+<li>2名・3名・4名それぞれの総額を見比べられます。</li>
+<li>全員が同じ組か、貸切か相席か、会話の多さ、雨の日の屋内外から選べます。</li>
+<li>気になった体験は、そのまま予約ページへ進めます。</li>
+</ul></div>
+</div></section>
+
+<section class="section tinted" id="compare"><div class="wrap">
+<h2 class="cards-h">比較表<span>人数ごとの総額・同じ組か・時間・雨の日</span></h2>
+<div class="cmp-wrap"><table class="cmp-table cmp-x"><thead><tr><th>体験</th><th>人数</th><th>2名の総額</th><th>3名の総額</th><th>4名の総額</th><th>全員が同じ組か</th><th>会話の多さ</th><th>所要時間</th><th>雨の日</th><th>予約</th></tr></thead><tbody>
+{rows.map((r) => (
+  <tr>
+    <th scope="row"><a href={`#item-${r.id}`} style="color:var(--ink)">{r.name}</a><span class="cmp-sub">{r.area}／{r.kind}</span></th>
+    <td>{r.party}</td>{r.totals.map((t) => <td>{t}</td>)}<td>{r.together}</td><td>{r.talk}</td><td>{r.time}</td><td>{r.weather}</td>
+    <td><a class="cmp-btn" href={r.href} target="_blank" rel={r.own ? 'noopener' : 'noopener nofollow'} data-track={r.own ? 'ticket' : 'ev-ext'} data-show={r.siteId} data-place="friends-table">{r.own ? '予約サイト →' : '公式ページ →'}</a></td>
+  </tr>
+))}
+</tbody></table></div>
+<p class="cards-note">総額は通常料金で、手数料や税区分は各予約ページでご確認ください。「公式で確認」「申込不可」は、公式の案内で人数条件や料金を確認できていない、または申し込めない人数です。</p>
+</div></section>
+
+<section class="section" id="pick"><div class="wrap">
+<h2 class="cards-h">グループに合わせて選ぶ<span>目的別</span></h2>
+<div class="pick-grid">
+<div class="pick-col"><p class="pick-h">仲間内だけで遊びたい</p><p class="pick-p">{privateRows.length ? <>{privateRows.map((r, i) => <>{i > 0 && '／'}<a href={`#item-${r.id}`}>{r.name}</a></>)}は、申し込んだ全員だけで遊べます。</> : '現在掲載していません。'}</p></div>
+<div class="pick-col"><p class="pick-h">物語やキャストとの会話を楽しみたい</p><p class="pick-p">{castRows.length ? <>{castRows.map((r, i) => <>{i > 0 && '／'}<a href={`#item-${r.id}`}>{r.name}</a></>)}はキャストとの会話が進行の一部です。演技は求められません。</> : '現在掲載していません。'}</p></div>
+<div class="pick-col"><p class="pick-h">会話が苦手な人もいる</p><p class="pick-p">{ext.length ? <>{ext.map((r, i) => <>{i > 0 && '／'}<a href={`#item-${r.id}`}>{r.name}</a></>)}は仲間内の相談が中心で、キャストと話す場面はありません。</> : ''}</p></div>
+<div class="pick-col"><p class="pick-h">雨の日</p><p class="pick-p">{indoorRows.length ? <>{indoorRows.map((r, i) => <>{i > 0 && '／'}<a href={`#item-${r.id}`}>{r.name}</a></>)}は屋内で完結します。駅からの移動は各公式ページでご確認ください。</> : ''}</p></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="items"><div class="wrap">
+<h2 class="cards-h">体験ごとの詳細</h2>
+<div class="sc-grid">
+{rows.map((r) => (
+  <article class="sc-card" id={`item-${r.id}`}>
+    <p class="tw-area">{r.area}　｜　{r.kind}</p>
+    <h3 class="tw-name serif">{r.name}</h3>
+    <dl class="tw-dl">
+      <div><dt>人数・同じ組か</dt><dd class="dd-normal">{r.party}。{r.together}（{r.privacy}）</dd></div>
+      <div><dt>総額（2名／3名／4名）</dt><dd class="dd-normal">{r.totals.join('／')}</dd></div>
+      <div><dt>参加者がすること</dt><dd class="dd-normal">{r.talk}</dd></div>
+      <div><dt>時間／雨の日</dt><dd class="dd-normal">{r.time}／{r.weather}</dd></div>
+      {r.note && <div><dt>注意点</dt><dd class="dd-normal">{r.note}</dd></div>}
+    </dl>
+    <div class="tw-actions"><a class={`btn tw-btn${r.own ? '' : ' ghost'}`} href={r.href} target="_blank" rel={r.own ? 'noopener' : 'noopener nofollow'} data-track={r.own ? 'ticket' : 'ev-ext'} data-show={r.siteId} data-place="friends-card">{r.own ? '予約サイトで空席を見る' : '公式ページで料金・予約を見る'}</a></div>
+  </article>
+))}
+</div>
+</div></section>
+
+<section class="section" id="check"><div class="wrap narrow">
+<h2 class="cards-h">予約前に確認すること</h2>
+<ul class="bullets">
+<li><strong>人数の上限・下限</strong>：申し込める人数が決まっている体験があります。当日に人数が変わる可能性があるなら、変更の扱いも確認します。</li>
+<li><strong>料金の単位</strong>：1人料金か、1組料金か。人数で1人あたりが変わる料金もあります。</li>
+<li><strong>年齢と内容</strong>：18歳以上の公演や、怖い描写を含む作品があります。全員が参加できるかを確認します。</li>
+<li><strong>集合時刻</strong>：受付に遅れると参加できない体験があります。待ち合わせは早めに。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<h2 class="cards-h">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="cmp-note-p">掲載内容は各公演・施設の公式ページの案内をもとにしています。物語参加型の公演は、各行に記載のとおり株式会社ex Labsが企画・制作またはプロデュースしています。</p>
+<p class="vc-line" style="margin-top:20px">あわせて読む：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)">二人で楽しめる謎解き・脱出ゲーム</a>／<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート</a>／<a href="/guide/madamis-tokyo/" style="color:var(--accent)">東京でマダミスを遊ぶには</a>／<a href="/hacktale/" style="color:var(--accent)">8人で遊ぶ頭脳戦（HACKTALE）</a></p>
+</div></section>
+
+<AuthorBox />
+<LatestPosts category="immersive" />
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cards-note{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:rgba(29,29,31,.55);text-align:left}
+.cmp-wrap{margin-top:16px}
+.cmp-x th[scope=row]{min-width:170px;white-space:normal}
+.cmp-x td{min-width:100px;vertical-align:top;font-size:13px}
+.cmp-sub{display:block;font-size:11px;font-weight:700;color:var(--accent);margin-top:2px}
+.cmp-btn{display:inline-block;background:var(--accent);color:#fff !important;font-weight:800;font-size:12.5px;padding:8px 12px;border-radius:999px;text-decoration:none !important;white-space:nowrap}
+.cmp-note-p{max-width:920px;margin:0 auto;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px;margin-top:16px}
+.pick-col{background:#fff;border:var(--bd);border-radius:12px;box-shadow:var(--shadow-1);padding:16px 18px;text-align:left}
+.pick-h{margin:0 0 6px;font-size:14px;font-weight:800;color:#e8481c}
+.pick-p{margin:0;font-size:13.5px;line-height:1.75;color:var(--ink)}
+.pick-p a{color:var(--accent);font-weight:700}
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:18px;margin:16px auto 0}
+.sc-card{background:#fff;border:var(--bd);border-radius:var(--r-l);box-shadow:var(--shadow-1);padding:20px 18px;display:flex;flex-direction:column;gap:10px;text-align:left;scroll-margin-top:88px}
+.tw-area{margin:0;font-size:11.5px;font-weight:800;letter-spacing:.1em;color:var(--accent)}
+.tw-name{margin:0;font-size:19px;font-weight:800;color:var(--ink);line-height:1.5}
+.tw-dl{margin:4px 0 0;display:grid;grid-template-columns:1fr;gap:8px}
+.tw-dl div{background:rgba(51,48,43,.03);padding:9px 12px}
+.tw-dl dt{font-size:11px;font-weight:800;color:rgba(51,48,43,.55);letter-spacing:.06em}
+.tw-dl dd{margin:3px 0 0;font-size:13.5px;line-height:1.6;color:var(--ink)}
+.dd-normal{font-weight:500 !important}
+.tw-actions{margin-top:auto;padding-top:8px}
+.tw-btn{font-size:14px;padding:13px 20px}
+.tw-btn.ghost{background:#fff;color:var(--ink)}
+ul.bullets{text-align:left}
+#compare,#pick,#items,#check,#faq{scroll-margin-top:88px}
+.section.tinted,.section{padding:44px 0}
+@media(max-width:640px){.section.tinted,.section{padding:32px 0}.cards-h{font-size:18px}.sc-card{padding:16px 14px}.tw-btn{width:100%;text-align:center}}
+</style>

@@ -30,7 +30,7 @@ const ownRows: Row[] = buildGuideRows(now)
       walkOutside: r.venue?.station?.includes('直結') ? '駅から直結（公式の案内）' : '公式ページで確認',
       during: r.venue?.setting === 'indoor' ? '商業施設の館内（屋内）' : '公式ページで確認',
       pair: t !== undefined ? `${fmtYen(t)}（1人${fmtYen(r.perPersonFor(2)!)}、税込・手数料別）` : '公式ページで確認',
-      game: '公式ページで確認', total: r.w.duration.minutes ? `所要時間 約${r.w.duration.minutes}分（集合・受付は別）` : '公式ページで確認',
+      game: r.w.duration.minutes ? `約${r.w.duration.minutes}分（公式の所要時間）` : '公式ページで確認', total: '集合・受付を含む時間は公式ページで確認',
       privacy: r.w.party.format === 'shared' ? '他の参加者と同じ回（途中で一時的に離れる場面あり）' : r.formatLabel,
       doing: r.w.info.participation ?? r.w.summary,
       bag: (r.w.info.requirements ?? []).filter((x) => /持参|靴|ロッカー|荷物/.test(x)).join('。') || '公式ページで確認',
@@ -93,7 +93,7 @@ const chips = [`${rows.length}件を比較`, '屋内で遊べる', ...(shortRows
 
 <section class="section tinted" id="compare"><div class="wrap">
 <h2 class="cards-h">比較表<span>駅からの移動・屋内外・料金・時間</span></h2>
-<div class="cmp-wrap"><table class="cmp-table cmp-x"><thead><tr><th>施設・作品</th><th>最寄り・出口</th><th>駅からの屋外移動</th><th>体験中</th><th>二人分の料金</th><th>本編</th><th>受付を含む時間</th><th>二人だけか</th><th>予約</th></tr></thead><tbody>
+<div class="cmp-wrap"><table class="cmp-table cmp-x"><thead><tr><th>施設・作品</th><th>最寄り・出口</th><th>駅からの屋外移動</th><th>体験中</th><th>二人分の料金</th><th>本編の時間</th><th>受付を含む時間</th><th>二人だけか</th><th>予約</th></tr></thead><tbody>
 {rows.map((r) => (
   <tr>
     <th scope="row"><a href={`#item-${r.id}`} style="color:var(--ink)">{r.name}</a><span class="cmp-sub">{r.kind}</span></th>
@@ -109,7 +109,7 @@ const chips = [`${rows.length}件を比較`, '屋内で遊べる', ...(shortRows
 <h2 class="cards-h">目的で選ぶ</h2>
 <div class="pick-grid">
 <div class="pick-col"><p class="pick-h">短時間で楽しむ</p><p class="pick-p">{shortRows.length ? <>{shortRows.map((r, i) => <>{i > 0 && '／'}<a href={`#item-${r.id}`}>{r.name}</a>（{r.total}）</>)}。映画や食事の前後に入れやすい長さです。</> : '現在掲載していません。'}</p></div>
-<div class="pick-col"><p class="pick-h">物語に参加する</p><p class="pick-p">{ownRows.length ? <>{ownRows.map((r) => <a href={`#item-${r.id}`}>{r.name}</a>)}は、商業施設の館内を歩きながら証言や手がかりを集めていく体験です（{ownRows[0].total}）。</> : '渋谷で開催中の物語参加型の公演は現在ありません。東京全体の公演は'}<a href="/guide/immersive-tokyo/">東京のイマーシブ公演</a>でも探せます。</p></div>
+<div class="pick-col"><p class="pick-h">物語に参加する</p><p class="pick-p">{ownRows.length ? <>{ownRows.map((r) => <a href={`#item-${r.id}`}>{r.name}</a>)}は、商業施設の館内を歩きながら証言や手がかりを集めていく体験です（{ownRows[0].game}）。</> : '渋谷で開催中の物語参加型の公演は現在ありません。東京全体の公演は'}<a href="/guide/immersive-tokyo/">東京のイマーシブ公演</a>でも探せます。</p></div>
 <div class="pick-col"><p class="pick-h">一緒に作る</p><p class="pick-p">渋谷で予約条件を確認できた「作る体験」は、現在掲載していません。代官山など近いエリアの作る体験は<a href="/guide/tokyo-experience-date/">東京の非日常デート</a>で比べられます。</p></div>
 </div>
 </div></section>

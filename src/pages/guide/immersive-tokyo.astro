@@ -187,7 +187,7 @@ const articleLd = {
 <summary><span class="acc-t">人数・好み・参加形式で選ぶ</span><span class="acc-s">1人／2人／演者と会話／屋内・屋外／怖くない</span></summary>
 <div class="acc-b">
 <p class="lede">各公演の公式ページで確認できた条件から当てはめています。条件に合う公演が確認できない場合は「{none}」と表示します。</p>
-<p class="lede">詳しい判断材料は、<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)" data-track="show" data-show="guide-solo" data-place="guide-choose">一人で参加する場合</a>（1名で申し込めるか・1名だけで成立するか・交流の有無）と<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)" data-track="show" data-show="guide-date" data-place="guide-choose">二人で参加する場合</a>（二人分の総額・貸切か・同じ組で行動できるか）に分けてまとめています。{EXPERIENCE_DATE_PUBLISHED && <>イマーシブに決めていない二人が、ものづくり・謎解きも含めて比べるなら<a href="/guide/tokyo-experience-date/" style="color:var(--accent)" data-track="show" data-show="guide-xdate" data-place="guide-choose">東京の非日常デート</a>、謎解き・脱出ゲームに絞るなら<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)" data-track="show" data-show="guide-nazo" data-place="guide-choose">二人で楽しめる謎解き・脱出ゲーム</a>。渋谷で雨の日なら<a href="/guide/shibuya-rainy-date/" style="color:var(--accent)" data-track="show" data-show="guide-shibuya-rain" data-place="guide-choose">渋谷の雨の日デート</a>、体験の予算を1人5,000円以内に抑えるなら<a href="/guide/tokyo-date-under-5000/" style="color:var(--accent)" data-track="show" data-show="guide-u5000" data-place="guide-choose">1人5,000円以内の体験デート</a>。</>}</p>
+<p class="lede">詳しい判断材料は、<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)" data-track="show" data-show="guide-solo" data-place="guide-choose">一人で参加する場合</a>（1名で申し込めるか・1名だけで成立するか・交流の有無）と<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)" data-track="show" data-show="guide-date" data-place="guide-choose">二人で参加する場合</a>（二人分の総額・貸切か・同じ組で行動できるか）に分けてまとめています。{EXPERIENCE_DATE_PUBLISHED && <>イマーシブに決めていない二人が、ものづくり・謎解きも含めて比べるなら<a href="/guide/tokyo-experience-date/" style="color:var(--accent)" data-track="show" data-show="guide-xdate" data-place="guide-choose">東京の非日常デート</a>、謎解き・脱出ゲームに絞るなら<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)" data-track="show" data-show="guide-nazo" data-place="guide-choose">二人で楽しめる謎解き・脱出ゲーム</a>。渋谷で雨の日なら<a href="/guide/shibuya-rainy-date/" style="color:var(--accent)" data-track="show" data-show="guide-shibuya-rain" data-place="guide-choose">渋谷の雨の日デート</a>、体験の予算を1人5,000円以内に抑えるなら<a href="/guide/tokyo-date-under-5000/" style="color:var(--accent)" data-track="show" data-show="guide-u5000" data-place="guide-choose">1人5,000円以内の体験デート</a>。友達3〜4人で行くなら<a href="/guide/tokyo-friends-activities/" style="color:var(--accent)" data-track="show" data-show="guide-friends" data-place="guide-choose">東京で友達と遊ぶ体験</a>で人数ごとの総額を比べられます。</>}</p>
 <div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>条件</th><th>当てはまる公演</th><th>確認するポイント</th></tr></thead><tbody>
 <tr><th scope="row">1人で申し込める</th><td>{pick.soloBook.length ? names(pick.soloBook) : none}</td><td>1名で申し込めても、他の参加者と一緒に体験する「相席」形式の場合があります</td></tr>
 <tr><th scope="row">1人だけで体験する（相席なし）</th><td>{pick.soloRun.length ? names(pick.soloRun) : none}</td><td>1名だけで回が成立するかは公式ページの「申込人数」「貸切」の欄で確認</td></tr>
@@ -276,10 +276,10 @@ const articleLd = {
 </details>
 
 <details class="acc" id="trend2026">
-<summary><span class="acc-t">2026年の東京イマーシブ動向</span><span class="acc-s">大型常設の閉業と「少人数×高密度」への集中</span></summary>
+<summary><span class="acc-t">2026年の東京イマーシブ動向</span><span class="acc-s">大型常設の閉業と、このページで紹介している公演の特徴</span></summary>
 <div class="acc-b">
 <p class="lede">2026年の東京イマーシブシーンは、大きな転換点を迎えています。世界最大級のイマーシブ・テーマパークとして2024年に開業した<strong>「イマーシブ・フォート東京」（お台場）が、2026年2月28日をもって閉業</strong>しました。運営側は理由を「施設規模が過大だったため」と説明しており、実際に人気が集中したのは大人数向けのライトな体験ではなく、<strong>人数限定の濃密な没入体験</strong>だったと報じられています。</p>
-<p class="lede">常設の大型パークが終わった一方で、<strong>イマーシブ体験そのものの需要はむしろ「少人数×高密度」に集中している</strong>のが2026年の実態です。東京では、期間限定公演・店舗型・街なか周遊型など、物語との距離が近い小規模高密度のイマーシブが主流になりつつあります。</p>
+<p class="lede">常設の大型パークが終わった一方で、このページで紹介している東京の公演は、<strong>期間限定公演・店舗型・館内周遊型など、少人数で物語との距離が近い形式</strong>です。市場全体の需要を示すデータではなく、掲載している公演に共通する特徴です。</p>
 </div>
 </details>
 

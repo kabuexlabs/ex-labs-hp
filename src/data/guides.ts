@@ -31,6 +31,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/tokyo-experience-date.webp',
   }] : []),
   {
+    href: '/guide/tokyo-friends-activities/',
+    title: '東京で友達と遊ぶ体験｜2〜4人で楽しめる屋内・謎解き・物語体験を比較',
+    desc: '友達2〜4人で遊べる体験を、人数ごとの総額、全員が同じ組か、貸切か相席か、会話の多さ、所要時間、雨の日の屋内外で比較。',
+    date: '2026-09-27',
+    category: 'immersive',
+    thumb: '/assets/guide/tokyo-friends-activities.webp',
+  },
+  {
     href: '/guide/shibuya-rainy-date/',
     title: '渋谷の雨の日デート｜屋内体験を料金・移動・所要時間で比較',
     desc: '渋谷で雨の日に二人で楽しめる屋内の体験を、駅からの移動、体験中の屋内外、二人分の料金、受付を含む時間、貸切か相席かで比較。',

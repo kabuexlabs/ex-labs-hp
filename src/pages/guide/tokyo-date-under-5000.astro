@@ -33,12 +33,20 @@ const ext: Row[] = publishedNazoItems.filter((i) => i.perPerson2).map((i) => ({
   href: i.officialUrl, own: false, siteId: i.siteId,
   reason: i.totalMinutes !== undefined && i.totalMinutes <= 30 ? '短時間' : i.totalMinutes !== undefined && i.totalMinutes <= 60 ? '1時間程度' : '協力して遊ぶ',
 }));
-const main = ext.filter((r) => r.ppHigh <= LIMIT).sort((a, b) => a.ppLow - b.ppLow);
+// 自社公演：開催中・1人料金（2名時）が5,000円以内のものを、他社と同じ判定条件で主表に入れる（終了すると外れる）
+const ownRows: Row[] = buildGuideRows(now).filter((r) => r.status !== 'ended').filter((r) => { const p = r.perPersonFor(2); return p !== undefined && p <= LIMIT; }).map((r) => ({
+  id: r.w.id, name: `${r.w.title}（ex Labs企画・制作）`, area: r.venue?.listName ?? '東京', genre: '館内を歩く物語参加型',
+  ppLow: r.perPersonFor(2)!, ppHigh: r.perPersonFor(2)!, ppNote: '1人1枚のチケット（税込）', pair: fmtYen(r.totalFor(2)!),
+  dayDiff: '差なし', extra: r.w.price.feeNote, judge: `税込で1人${fmtYen(r.perPersonFor(2)!)}。別途手数料があるため、合計は予約画面で確認`,
+  time: r.w.duration.minutes ? `約${r.w.duration.minutes}分（集合・受付は別）` : '公式ページで確認', minutes: r.w.duration.minutes,
+  privacy: r.w.party.format === 'shared' ? '他の参加者と同じ回' : r.formatLabel, href: r.ticketUrl ?? r.w.officialUrl, own: true, siteId: r.w.id, reason: '物語に参加する',
+}));
+const main = [...ext.filter((r) => r.ppHigh <= LIMIT), ...ownRows].sort((a, b) => a.ppLow - b.ppLow);
 
 // 確認が必要な候補：表示料金は5,000円以内だが、別途手数料や日程で変わる料金があるもの
 type Check = { id: string; name: string; area: string; pp: string; why: string; href: string; own: boolean; siteId: string };
 const own = buildGuideRows(now).filter((r) => r.status !== 'ended');
-const ownCheck: Check[] = own.filter((r) => { const p = r.perPersonFor(2); return p !== undefined && p <= LIMIT; }).map((r) => ({
+const ownCheck: Check[] = own.filter(() => false).map((r) => ({
   id: r.w.id, name: `${r.w.title}（ex Labs企画・制作）`, area: r.venue?.listName ?? '東京', pp: `1人${fmtYen(r.perPersonFor(2)!)}（税込）`,
   why: `${r.w.price.feeNote}。手数料を含めた合計は予約画面で確認してください`, href: r.ticketUrl ?? r.w.officialUrl, own: true, siteId: r.w.id,
 }));
@@ -71,7 +79,8 @@ const chips = [`${main.length}件が1人5,000円以内`, ...(cheapest ? [`1人 $
 const reasons = [
   { h: '短時間で遊びたい', xs: main.filter((r) => r.reason === '短時間') },
   { h: '1時間程度で遊びたい', xs: main.filter((r) => r.reason === '1時間程度') },
-  { h: '二人で協力して解きたい', xs: main },
+  { h: '二人で協力して解きたい', xs: main.filter((r) => !r.own) },
+  { h: '物語に参加したい', xs: main.filter((r) => r.own) },
 ];
 ---
 <BaseLayout
@@ -106,8 +115,8 @@ const reasons = [
 {main.map((r) => (
   <tr id={`item-${r.id}`}>
     <th scope="row">{r.name}<span class="cmp-sub">{r.genre}</span></th>
-    <td>{r.area}</td><td>{r.pair}</td><td>{yen(r.ppLow)}〜{yen(r.ppHigh)}<br><span class="cmp-note">{r.ppNote}</span></td><td>{r.dayDiff}</td><td>{r.extra}</td><td>{r.judge}</td><td>{r.time}</td><td>{r.privacy}</td>
-    <td><a class="cmp-btn" href={r.href} target="_blank" rel="noopener nofollow" data-track="ev-ext" data-show={r.siteId} data-place="u5000-table">公式ページ →</a></td>
+    <td>{r.area}</td><td>{r.pair}</td><td>{r.ppLow === r.ppHigh ? yen(r.ppLow) : `${yen(r.ppLow)}〜${yen(r.ppHigh)}`}<br><span class="cmp-note">{r.ppNote}</span></td><td>{r.dayDiff}</td><td>{r.extra}</td><td>{r.judge}</td><td>{r.time}</td><td>{r.privacy}</td>
+    <td><a class="cmp-btn" href={r.href} target="_blank" rel={r.own ? 'noopener' : 'noopener nofollow'} data-track={r.own ? 'ticket' : 'ev-ext'} data-show={r.siteId} data-place="u5000-table">{r.own ? '予約サイト →' : '公式ページ →'}</a></td>
   </tr>
 ))}
 </tbody></table></div>
