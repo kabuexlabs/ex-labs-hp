@@ -11,8 +11,9 @@ import SiteGuard from '../../../components/SiteGuard.astro';
 // ---- 未定の項目（決まったらここを埋める） ----
 // 購入先URL。null の間はチケットボタンをすべて #ticket へのアンカーにする
 const TICKET_URL: string | null = null;
-// 地図の埋め込みURL（Google マップの「地図を埋め込む」の src）。null の間は枠だけ表示
-const MAP_EMBED_URL: string | null = null;
+// 地図の埋め込みURL（Google マップ。APIキー不要の検索埋め込み）。null にすると枠だけ表示
+const MAP_EMBED_URL: string | null = 'https://maps.google.com/maps?q=' + encodeURIComponent('京都市京セラ美術館') + '&hl=ja&z=16&output=embed';
+const MAP_LINK_URL = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('京都市京セラ美術館');
 
 const ticketHref = TICKET_URL ?? '#ticket';
 const ticketAttrs = TICKET_URL
@@ -72,11 +73,27 @@ const notes: [string, string][] = [
   ['動きやすい服装でお越しください。', ''],
 ];
 const ngList = ['途中退出・再入場', '録音', '日時変更', '主催者都合で中止した場合の返金', '最少催行人数に満たない場合の実施判断・連絡・返金'];
-const accessRows = kv([
-  ['会場名', '京都市京セラ美術館'], ['使用会場', '講演室・多目的ホール'],
-  ['受付・集合場所', '［確認中｜松崎圭佑］'], ['使用室の階・館内経路', '［確認中｜松崎圭佑］'],
-  ['住所・最寄り駅・地図', '［確認中｜松崎圭佑］'], ['バリアフリー対応', 'なし'], ['荷物預かり', 'なし'],
-]);
+// 会場・アクセス（2026-09-27 支給）。main は強調表示、more は補足（小さめ）、list は箇条書き
+const accessRows: { k: string; v?: string; main?: boolean; more?: string[]; list?: string[] }[] = [
+  { k: '会場名', v: '京都市京セラ美術館（本館）', main: true },
+  { k: '使用会場', v: '本館地下1階「講演室」および「多目的室（多目的ホール）」' },
+  { k: '受付・集合場所', v: '本館地下1階「講演室」扉前', main: true,
+    more: ['※通路の滞留を防ぐため、受付は各回開始の10分前より開始いたします。'] },
+  { k: '所在階・館内経路', v: '本館 地下1階（B1F）',
+    more: [
+      '神宮道側のメインエントランス（スロープを下りたガラス張りの地下入口）より入館後、直進したロビー周辺に位置します。',
+      '「講演室」と「多目的室」は同じ地下1階にあるため、体験中に階段やエレベーターで上下階を移動することはありません。',
+    ] },
+  { k: '住所', v: '〒606-8344 京都府京都市左京区岡崎円勝寺町124' },
+  { k: 'アクセス', list: [
+    '京都市営地下鉄東西線「東山駅」1番出口より徒歩約8分',
+    '京阪本線「三条駅」／地下鉄「三条京阪駅」より徒歩約16分',
+    '各線「京都駅」より市バス5・86系統「岡崎公園 美術館・平安神宮前」下車すぐ',
+    '阪急「京都河原町駅」より市バス46・5系統「岡崎公園 美術館・平安神宮前」下車すぐ',
+  ] },
+  { k: 'バリアフリー対応', v: 'なし' },
+  { k: '荷物預かり', v: 'なし' },
+];
 const faqs = [
   ['1人でも参加できますか？', 'はい。1名様からご参加いただけます。'],
   ['年齢制限はありますか？', '18歳以上の方を対象としています。'],
@@ -107,7 +124,7 @@ const eventLd = {
   endDate: '2026-11-23T17:30:00+09:00',
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
   eventStatus: 'https://schema.org/EventScheduled',
-  location: { '@type': 'Place', name: '京都市京セラ美術館', address: { '@type': 'PostalAddress', addressLocality: '京都市', addressRegion: '京都府', addressCountry: 'JP' } },
+  location: { '@type': 'Place', name: '京都市京セラ美術館', address: { '@type': 'PostalAddress', postalCode: '606-8344', streetAddress: '岡崎円勝寺町124', addressLocality: '京都市左京区', addressRegion: '京都府', addressCountry: 'JP' } },
   organizer: { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' },
   offers: { '@type': 'Offer', price: 4500, priceCurrency: 'JPY', url: TICKET_URL ?? canonical },
 };
@@ -335,7 +352,7 @@ const eventLd = {
   <div class="w1160">
     <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Flow</h2><span class="orn">+·◎·</span></div><p>当日の流れ</p></div>
     <div class="flow">
-      <div><span class="bodoni fn">01</span><span class="fh">受付</span></div>
+      <div><span class="bodoni fn">01</span><span class="fh">受付</span><span class="fd">各回開始の10分前から、本館地下1階「講演室」扉前にて受付</span></div>
       <div><span class="bodoni fn">02</span><span class="fh">参加準備・事前説明</span></div>
       <div class="gold"><span class="bodoni fn">03</span><span class="fh">体験開始</span><span class="fd">絵画を通して物語に巻き込まれていく、60分のイマーシブ体験</span></div>
       <div><span class="bodoni fn">04</span><span class="fh">体験終了・退場</span></div>
@@ -359,13 +376,21 @@ const eventLd = {
     <div class="sh sh-56"><div class="sh-r"><span class="orn">+·◎·</span><h2>Access</h2><span class="orn">+·◎·</span></div><p>会場・アクセス</p></div>
     <div class="acc">
       <div class="acc-info">
-        {accessRows.map((r, i) => (
-          <div class:list={['info-row', { main: i === 0 }]}><span class="k">+・{r.k}</span><span class:list={['v', { tbd: isTbd(r.v) }]}>{r.v}</span></div>
+        {accessRows.map((r) => (
+          <div class:list={['info-row', { main: r.main }]}>
+            <span class="k">+・{r.k}</span>
+            {r.v && <span class="v">{r.v}</span>}
+            {r.more?.map((t) => <span class="more">{t}</span>)}
+            {r.list && <ul class="acc-list">{r.list.map((t) => <li>{t}</li>)}</ul>}
+          </div>
         ))}
       </div>
-      {MAP_EMBED_URL
-        ? <iframe class="map" src={MAP_EMBED_URL} title="京都市京セラ美術館の地図" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-        : <div class="map ph">map embed</div>}
+      <div class="map-wrap">
+        {MAP_EMBED_URL
+          ? <iframe class="map" src={MAP_EMBED_URL} title="京都市京セラ美術館の地図" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          : <div class="map ph">map embed</div>}
+        <a class="map-link" href={MAP_LINK_URL} target="_blank" rel="noopener">Google マップで開く<span class="bodoni">↗</span></a>
+      </div>
     </div>
   </div>
 </section>
@@ -653,7 +678,12 @@ h1,h2,p{margin:0}
 /* Access */
 .acc{display:flex;flex-wrap:wrap;gap:40px 56px}
 .acc-info{flex:1 1 380px;min-width:0;border-top:1px solid rgba(255,247,242,.22)}
-.map{flex:1 1 380px;min-width:0;min-height:360px;border:1px solid rgba(255,247,242,.25)}
+.info-row .more{font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px;line-height:1.9;letter-spacing:.06em;color:rgba(255,247,242,.8)}
+.acc-list{margin:2px 0 0;padding:0 0 0 1.2em;font-family:'Zen Kaku Gothic New',sans-serif;font-size:15px;line-height:1.9;letter-spacing:.06em;display:flex;flex-direction:column;gap:6px}
+.map-wrap{flex:1 1 380px;min-width:0;align-self:flex-start;position:sticky;top:90px;display:flex;flex-direction:column;gap:14px}
+.map{display:block;width:100%;height:clamp(320px,40vw,480px);border:1px solid rgba(255,247,242,.25)}
+.map-link{align-self:flex-end;display:inline-flex;align-items:center;gap:10px;font-size:14px;letter-spacing:.12em}
+.map-link .bodoni{width:28px;height:28px;border:1px solid currentColor;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
 .map.ph{background:repeating-linear-gradient(135deg,#5C1029 0 10px,#661430 10px 20px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:.1em;color:#F2C9D4}
 
 /* FAQ */
