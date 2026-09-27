@@ -194,11 +194,14 @@ img{max-width:100%}
 .hero{position:relative;height:360svh;--o:0;--z:0;--f:0}
 .hero.static{height:100svh;--o:1}
 .stage{position:sticky;top:0;height:100svh;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.lamp{position:absolute;top:0;left:50%;width:100svh;height:100svh;transform:translateX(-50%);overflow:visible}
+.lamp,.beam{position:absolute;top:0;left:50%;width:100svh;height:100svh;max-width:none;transform:translateX(-50%);overflow:visible}
+.beam{opacity:calc(.4 + var(--o) * .6);will-change:opacity;pointer-events:none}
 .persp{position:relative;perspective:1300px;perspective-origin:50% 0%;margin-top:6svh}
 .book{position:relative;width:min(40vw,300px,32svh);aspect-ratio:1/1.42;container-type:inline-size;transform-style:preserve-3d;transform:translateX(calc(var(--o) * 50%)) rotateX(calc((1 - var(--z)) * 30deg)) scale(calc(1 + var(--z) * 7))}
 .b-glow{position:absolute;inset:-70% -110%;transform:translateZ(-2px);background:radial-gradient(closest-side,rgba(232,227,214,.2),rgba(232,227,214,.05) 55%,transparent);opacity:calc(.5 + var(--o) * .5);pointer-events:none}
-.b-shadow{position:absolute;inset:4% -6% -8% 2%;transform:translateZ(-1px);background:radial-gradient(closest-side,rgba(0,0,0,.75),transparent);filter:blur(10px)}
+/* 落ち影：元は radial-gradient + filter:blur(10px)。拡大中にぼかしを毎フレーム再計算して重いので、
+   ぼかし後と同等になるよう広げた多段グラデーションに置き換え（見た目は同等） */
+.b-shadow{position:absolute;inset:calc(4% - 14px) calc(-6% - 14px) calc(-8% - 14px) calc(2% - 14px);transform:translateZ(-1px);background:radial-gradient(closest-side,rgba(0,0,0,.72),rgba(0,0,0,.6) 28%,rgba(0,0,0,.36) 58%,rgba(0,0,0,.12) 82%,rgba(0,0,0,0))}
 .b-back{position:absolute;inset:0;background:#171d1a;border-radius:0 1.5cqw 1.5cqw 0}
 .b-block{position:absolute;top:1.2cqw;bottom:1.2cqw;left:0;right:1.6cqw;transform-style:preserve-3d;transform:translateZ(5cqw)}
 .b-edge-b{position:absolute;left:0;right:0;top:100%;height:5cqw;transform-origin:top center;transform:rotateX(-90deg);background:repeating-linear-gradient(0deg,#cdc5b2 0 1px,#ece6d6 1px 2px)}
@@ -388,29 +391,11 @@ img{max-width:100%}
 <main id="top">
   <section class="hero" id="hero" aria-label="メインビジュアル">
     <div class="stage">
+      {/* 点描の光：元は SVG フィルター（feTurbulence ほか）を毎フレーム再計算していて重かったため、
+          同じフィルターを 2400px で書き出した画像に置き換えた（scratchpad の beam.mjs 相当・seed 4）。
+          見た目は同一。不透明度だけを変えるので GPU 合成で済む。 */}
+      <img class="beam" src="/assets/douwa/beam.webp" alt="" aria-hidden="true" width="2400" height="2400" decoding="async" fetchpriority="high">
       <svg class="lamp" viewBox="0 0 1000 1000" aria-hidden="true">
-        <defs>
-          <filter id="stipple" x="-30%" y="-10%" width="160%" height="130%" style="color-interpolation-filters:sRGB">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="22" result="b"></feGaussianBlur>
-            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="4" result="n"></feTurbulence>
-            <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.6 0 0 0 -0.2" result="na"></feColorMatrix>
-            <feComposite in="b" in2="na" operator="arithmetic" k1="0" k2="1" k3="-1" k4="0.47" result="d"></feComposite>
-            <feComponentTransfer in="d" result="s"><feFuncA type="discrete" tableValues="0 1"></feFuncA></feComponentTransfer>
-            <feFlood style="flood-color:#e8e3d6" result="c"></feFlood>
-            <feComposite in="c" in2="s" operator="in"></feComposite>
-          </filter>
-          <linearGradient id="beamG" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" style="stop-color:#000;stop-opacity:.95"></stop>
-            <stop offset=".5" style="stop-color:#000;stop-opacity:.5"></stop>
-            <stop offset="1" style="stop-color:#000;stop-opacity:0"></stop>
-          </linearGradient>
-        </defs>
-        <g style="opacity:calc(.4 + var(--o) * .6)">
-          <g filter="url(#stipple)">
-            <polygon points="474,150 526,150 920,1000 80,1000" fill="url(#beamG)"></polygon>
-            <ellipse cx="500" cy="152" rx="46" ry="10" fill="#000"></ellipse>
-          </g>
-        </g>
         <line x1="500" y1="-10" x2="500" y2="112" stroke="rgba(232,227,214,.55)" stroke-width="1"></line>
         <polygon points="490,112 510,112 528,150 472,150" fill="#0e100f" stroke="rgba(232,227,214,.45)" stroke-width="1"></polygon>
       </svg>
@@ -493,14 +478,13 @@ img{max-width:100%}
     <section id="story" class="sec">
       <SecHead en="Story" ja="あらすじ" />
       <div class="story">
-        <p class="lead"><J t="『夜の植物館』を巡り、失われた記憶を取り戻すイマーシブ体験。" /></p>
-        <p><J t="迷い込んだのは、夢の中の植物館。" /></p>
-        <p><J t={"なぜここにいるのか。\n隣にいる人は、誰なのか。\nあなたは、何ひとつ思い出せない。"} /></p>
+        <p class="lead"><J t={"『夜の植物館』を巡り、\n失われた記憶を取り戻す\nイマーシブ体験。"} /></p>
+        <p><J t={"迷い込んだのは、夢の中の植物館。\nなぜここにいるのか。\n隣にいる人は、誰なのか。\nあなたは、何ひとつ思い出せない。"} /></p>
         <div class="qwrap">
-          <p><J t="静まり返った館内で「館長」は、あなたに告げる。" /></p>
-          <p class="quote"><J t="「夢にとらわれる前に、はやくお帰りください」" /></p>
+          <p><J t={"静まり返った館内で「館長」は、\nあなたに告げる。"} /></p>
+          <p class="quote"><J t={"「夢にとらわれる前に、\nはやくお帰りください」"} /></p>
+          <p><J t={"『夜の植物館』を歩きながら、\n忘れていた記憶を集め、\n「家に帰る」ための物語。"} /></p>
         </div>
-        <p><J t="『夜の植物館』を歩きながら、忘れていた記憶を集め、「家に帰る」ための物語。" /></p>
       </div>
     </section>
 
@@ -648,19 +632,28 @@ img{max-width:100%}
   } else if (hero) {
     var c = function (x) { return Math.min(1, Math.max(0, x)); };
     var ease = function (x) { return x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2; };
-    var ticking = false;
+    var ticking = false, total = 0, top0 = 0, prev = '';
+    var measure = function () {
+      total = hero.offsetHeight - window.innerHeight;
+      top0 = hero.getBoundingClientRect().top + window.scrollY;
+    };
     var apply = function () {
       ticking = false;
-      var total = hero.offsetHeight - window.innerHeight;
-      var p = total > 0 ? -hero.getBoundingClientRect().top / total : 0;
+      // レイアウトを読まずに scrollY だけで進捗を出す。hero を過ぎた後・値が同じときは書き込まない
+      var p = total > 0 ? c((window.scrollY - top0) / total) : 0;
       var z = c((p - .56) / .34);
-      hero.style.setProperty('--o', ease(c((p - .06) / .4)).toFixed(4));
-      hero.style.setProperty('--z', (z * z).toFixed(4));
-      hero.style.setProperty('--f', c((p - .8) / .14).toFixed(4));
+      var o = ease(c((p - .06) / .4)).toFixed(3), zz = (z * z).toFixed(3), f = c((p - .8) / .14).toFixed(3);
+      var key = o + zz + f;
+      if (key === prev) return;
+      prev = key;
+      hero.style.setProperty('--o', o);
+      hero.style.setProperty('--z', zz);
+      hero.style.setProperty('--f', f);
     };
     var req = function () { if (!ticking) { ticking = true; requestAnimationFrame(apply); } };
     window.addEventListener('scroll', req, { passive: true });
-    window.addEventListener('resize', req, { passive: true });
+    window.addEventListener('resize', function () { measure(); req(); }, { passive: true });
+    measure();
     apply();
   }
 
