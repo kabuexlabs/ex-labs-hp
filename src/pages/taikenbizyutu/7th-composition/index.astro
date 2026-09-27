@@ -223,9 +223,11 @@ const eventLd = {
   <div class="story-line" aria-hidden="true"></div>
   <div class="w880 rel">
     <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Story</h2><span class="orn">+·◎·</span></div><p>ストーリー</p></div>
-    <p class="story-lead">あるはずのない記憶に導かれ、交錯する未来へ——</p>
-    <p class="story-h glow-t tbd">［あらすじ 見出し］</p>
-    <p class="body tbd">［あらすじ本文　荒巻まりの・right より提供予定］</p>
+    <!-- あらすじ（2026-09-27 支給、改行は支給どおり）。情景は本文、最後の2行を見出しの大きさで強調する -->
+    <div class="story-txt">
+      <p class="body story-b">京セラ美術館の<wbr>一角。<br>三雲彼方展と<wbr>記された<wbr>展示の<wbr>パンフレットを<wbr>開いた<wbr>瞬間、<wbr>あなたの中に<wbr>知らない<wbr>記憶が<wbr>流れ込んできた。</p>
+      <p class="story-h glow-t">あるはずのない<wbr>記憶に<wbr>導かれ、<br>あなたは<wbr>交錯する<wbr>未来へ<wbr>いざなわれていく……</p>
+    </div>
   </div>
 </section>
 
@@ -543,9 +545,10 @@ h1,h2,p{margin:0}
 .story{overflow:hidden}
 .story-circle{position:absolute;left:-80px;bottom:40px;width:380px;height:380px;background:url(/assets/7th-composition/kv.webp) 4% 3%/420% auto no-repeat;-webkit-mask-image:radial-gradient(closest-side,#000 35%,transparent);mask-image:radial-gradient(closest-side,#000 35%,transparent);opacity:.85}
 .story-line{position:absolute;left:-10%;right:-10%;bottom:120px;height:1px;background:rgba(255,247,242,.35);transform:rotate(-8deg)}
-.story-lead{margin-bottom:20px;font-size:clamp(16px,1.8vw,20px);letter-spacing:.1em}
-.story-h.tbd{font-size:clamp(18px,2vw,22px)}
-.story-h{margin-bottom:48px;font-size:clamp(28px,4.4vw,48px);font-weight:600;line-height:1.55;letter-spacing:.06em;text-wrap:pretty}
+.story-txt{word-break:auto-phrase;padding-bottom:clamp(120px,16vw,200px)}
+@media (max-width:599.98px){.story-circle{width:240px;height:240px;left:-90px;bottom:0;opacity:.6}.story-line{bottom:80px}}
+.story-b{word-break:keep-all;margin-bottom:clamp(40px,6vw,64px);color:rgba(255,247,242,.9)}
+.story-h{word-break:keep-all;font-size:clamp(22px,3vw,36px);font-weight:600;line-height:1.7;letter-spacing:.08em;text-wrap:pretty}
 
 /* Experience */
 .exp-lead{max-width:880px;margin:0 auto 72px}
