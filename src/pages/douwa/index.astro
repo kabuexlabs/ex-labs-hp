@@ -56,35 +56,41 @@ const nav = [
   .filter(([en]) => en !== 'Cast' || cast.length > 0)
   .map(([en, ja, href], i) => ({ en, ja, href, no: String(i + 1).padStart(2, '0') }));
 
+// 当日の流れ・注意事項：先頭の短い見出し（label）で何の話かを先に見せる
 const flow = [
-  '予約した開始時刻に、夢の島熱帯植物館の**正面入口**へお越しください。',
-  '受付でescape.idの**購入済みチケット画面**をご提示ください。',
-  '受付後、**約50分**の体験にご参加いただきます。',
-  '最終回は**20:00開始、20:50終了**予定です。',
-].map((text, i) => ({ text, no: String(i + 1).padStart(2, '0') }));
+  { label: '集合', text: '予約した開始時刻に、夢の島熱帯植物館の正面入口へお越しください。' },
+  { label: '受付', text: '受付でescape.idの購入済みチケット画面をご提示ください。' },
+  { label: '体験', text: '受付後、約50分の体験にご参加いただきます。' },
+  { label: '終了', text: '最終回は20:00開始、20:50終了予定です。' },
+].map((f, i) => ({ ...f, no: String(i + 1).padStart(2, '0') }));
 
 const notes = [
-  '**通信可能なスマートフォン**をお持ちください。',
-  'イヤホンは不要です。体験用アプリのダウンロードや**事前登録も必要ありません。**',
-  '**歩きやすい服装**でお越しください。',
-  '大きな荷物の持ち込みはご遠慮ください。**荷物のお預かりはできません。**',
-  '**開始時刻を過ぎた場合は、ご参加いただけません。**',
-  '体験中は**お手洗いをご利用いただけません。**事前にお済ませください。',
-  '途中退出後の**復帰はできません。**',
-  '体験中の**撮影は禁止**です。',
-  '**ネタバレを含む投稿は禁止**です。ネタバレを含まない感想は投稿いただけます。',
-  'お客様都合による**キャンセル・日時変更は受け付けておりません。**',
-  '**雨天でも実施**します。',
-  '主催者の判断で公演を中止する場合は、チケット代金を**全額払い戻します。**',
+  { group: '持ち物・服装', items: [
+    { label: 'スマートフォン', text: '通信可能なスマートフォンをお持ちください。イヤホンは不要です。体験用アプリのダウンロードや事前登録も必要ありません。' },
+    { label: '服装', text: '歩きやすい服装でお越しください。' },
+    { label: '荷物', text: '大きな荷物の持ち込みはご遠慮ください。荷物のお預かりはできません。' },
+  ] },
+  { group: '当日・体験中', items: [
+    { label: '遅刻', text: '開始時刻を過ぎた場合は、ご参加いただけません。' },
+    { label: 'お手洗い', text: '体験中はお手洗いをご利用いただけません。事前にお済ませください。' },
+    { label: '途中退出', text: '途中退出後の復帰はできません。' },
+    { label: '撮影', text: '体験中の撮影は禁止です。' },
+    { label: 'SNS投稿', text: '物語の内容やネタバレを含む投稿は禁止です。ネタバレを含まない感想は投稿いただけます。' },
+  ] },
+  { group: 'キャンセル・天候', items: [
+    { label: 'キャンセル', text: 'お客様都合によるキャンセル・日時変更は受け付けておりません。' },
+    { label: '雨天', text: '雨天でも実施します。' },
+    { label: '中止の場合', text: '主催者の判断で公演を中止する場合は、チケット代金を全額払い戻します。' },
+  ] },
 ];
 
 const faqs = [
-  { q: '1人でも参加できますか？', a: 'はい。個別チケットでご参加いただけます。**参加者1名から開催**します。' },
-  { q: '知らない人と同じ組になりますか？', a: '個別チケットの場合は、**ほかのお客様と同じ組になる**場合があります。' },
-  { q: '仲間だけで参加できますか？', a: '**グループチケット**をご購入いただくと、**最大4名で貸切参加**が可能です。' },
-  { q: '年齢制限はありますか？', a: '**18歳以上**の方が対象です。' },
-  { q: '雨でも開催しますか？', a: 'はい。**雨天でも実施**します。' },
-  { q: '荷物を預けられますか？', a: '**荷物のお預かりはできません。**大きな荷物を持たずにお越しください。' },
+  { q: '1人でも参加できますか？', a: 'はい。個別チケットでご参加いただけます。参加者1名から開催します。' },
+  { q: '知らない人と同じ組になりますか？', a: '個別チケットの場合は、ほかのお客様と同じ組になる場合があります。' },
+  { q: '仲間だけで参加できますか？', a: 'グループチケットをご購入いただくと、最大4名で貸切参加が可能です。' },
+  { q: '年齢制限はありますか？', a: '18歳以上の方が対象です。' },
+  { q: '雨でも開催しますか？', a: 'はい。雨天でも実施します。' },
+  { q: '荷物を預けられますか？', a: '荷物のお預かりはできません。大きな荷物を持たずにお越しください。' },
 ];
 
 const eventLd = {
@@ -122,7 +128,7 @@ const eventLd = {
 const faqLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: faqs.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a.replaceAll('**', '') } })),
+  mainEntity: faqs.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
 };
 ---
 
@@ -314,10 +320,14 @@ img{max-width:100%}
 .flow{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .flow li{display:grid;grid-template-columns:48px 1fr;gap:16px;padding:22px 0;border-top:1px solid rgba(232,227,214,.2)}
 .flow .no{font-family:Archivo,sans-serif;font-weight:700;font-size:22px}
-.flow .tx{font-size:15px;line-height:1.9;text-wrap:pretty}
-.notes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
-.notes li{display:grid;grid-template-columns:16px 1fr;gap:8px;font-size:15px;line-height:1.9;text-wrap:pretty}
-.notes li::before{content:"・";color:#a9a497}
+.flow .tx{display:flex;flex-direction:column;gap:4px;font-size:15px;line-height:1.9;color:#cfcabd}
+/* 見出し語：本文より明るく太く。何の話かを先に拾えるようにする */
+.lb{display:block;font-size:16px;font-weight:600;color:#e8e3d6;letter-spacing:.04em}
+.ng + .ng{margin-top:48px}
+.ng-h{margin:0 0 4px;font-size:13px;font-weight:400;color:#bdb8ab;letter-spacing:.12em}
+.notes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.notes li{display:flex;flex-direction:column;gap:4px;padding:16px 0;border-top:1px solid rgba(232,227,214,.2);font-size:15px;line-height:1.9;color:#cfcabd}
+.notes li:last-child{border-bottom:1px solid rgba(232,227,214,.2)}
 
 /* access */
 .map{margin-top:24px;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;font-size:11px;color:#a9a497;text-align:center;line-height:1.8}
@@ -351,11 +361,6 @@ img{max-width:100%}
   .row{grid-template-columns:72px 1fr;gap:12px}
   .times{gap:4px}
 }
-
-/* 強調：ランプの灯りに合わせた琥珀色の下線（J.astro の **語句** で付く） */
-.mk{color:#fff;text-decoration:underline;text-decoration-color:#d9b36a;text-decoration-thickness:2px;text-underline-offset:.32em;text-decoration-skip-ink:none}
-.ov .mk{color:#1a1c1b;text-decoration-color:#a8782a}
-.lead .mk,.quote .mk{text-decoration-thickness:3px}
 
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto}
@@ -447,7 +452,7 @@ img{max-width:100%}
   <section id="about" class="ov">
     <div class="wrap">
       <h1><img src="/assets/douwa/logo-dark.webp" alt="午前零時の童話集 Midnight Tales" width="720" height="748"><span class="sr">× 夢の島熱帯植物館</span></h1>
-      <p class="ov-lead"><J t="**普段は入れない夜の**夢の島熱帯植物館を巡る物語体験。" /></p>
+      <p class="ov-lead"><J t="普段は入れない夜の夢の島熱帯植物館を巡る物語体験。" /></p>
       <div class="ov-date">
         <span class="ov-y hv">2026</span>
         <div class="ov-d hv">11.05 – 11.22</div>
@@ -485,19 +490,19 @@ img{max-width:100%}
     <section id="story" class="sec">
       <SecHead en="Story" ja="あらすじ" />
       <div class="story">
-        <p class="lead"><J t={"『夜の植物館』を巡り、\n**失われた記憶**を取り戻す\nイマーシブ体験。"} /></p>
-        <p><J t={"迷い込んだのは、夢の中の植物館。\nなぜここにいるのか。\n隣にいる人は、誰なのか。\nあなたは、**何ひとつ思い出せない。**"} /></p>
+        <p class="lead"><J t={"『夜の植物館』を巡り、\n失われた記憶を取り戻す\nイマーシブ体験。"} /></p>
+        <p><J t={"迷い込んだのは、夢の中の植物館。\nなぜここにいるのか。\n隣にいる人は、誰なのか。\nあなたは、何ひとつ思い出せない。"} /></p>
         <div class="qwrap">
           <p><J t={"静まり返った館内で「館長」は、\nあなたに告げる。"} /></p>
           <p class="quote"><J t={"「夢にとらわれる前に、\nはやくお帰りください」"} /></p>
-          <p><J t={"『夜の植物館』を歩きながら、\n**忘れていた記憶を集め、**\n**「家に帰る」**ための物語。"} /></p>
+          <p><J t={"『夜の植物館』を歩きながら、\n忘れていた記憶を集め、\n「家に帰る」ための物語。"} /></p>
         </div>
       </div>
     </section>
 
     <section id="feature" class="sec">
       <SecHead en="Feature" ja="体験の特徴・楽しみ方" />
-      <p class="lead" style="margin:0 0 48px"><J t="**最大4人1組**で、夜の植物館を巡る**約50分**の物語体験。" /></p>
+      <p class="lead" style="margin:0 0 48px"><J t="最大4人1組で、夜の植物館を巡る約50分の物語体験。" /></p>
       <div class="stats">
         <div class="stat"><span class="k">最大</span><span class="v">4<small>人1組</small></span></div>
         <div class="stat"><span class="k">所要時間 約</span><span class="v">50<small>分</small></span></div>
@@ -541,15 +546,15 @@ img{max-width:100%}
         <div class="tk">
           <span class="nm">個別チケット</span>
           <span class="pr">3,500<small>円 / 1人</small></span>
-          <p><J t="個別チケットは、**ほかのお客様と同じ組になる**場合があります。" /></p>
+          <p><J t="個別チケットは、ほかのお客様と同じ組になる場合があります。" /></p>
         </div>
         <div class="tk g">
           <span class="nm">グループチケット</span>
           <span class="pr">14,000<small>円 / 1組</small></span>
-          <p><span class="mk">最大4名貸切</span></p>
+          <p>最大4名貸切</p>
         </div>
       </div>
-      <p class="tk-note">いずれも<span class="mk">税込・入館料込み</span>。</p>
+      <p class="tk-note">いずれも税込・入館料込み。</p>
 
       <div class="rows" style="margin-top:48px">
         <div class="row"><span>開催日</span><span><J t="2026年11月5日〜8日、11月12日〜15日、11月19日〜22日（全12日間）" /></span></div>
@@ -559,8 +564,8 @@ img{max-width:100%}
           </div>
         </div>
         <div class="row"><span>所要時間</span><span>約50分</span></div>
-        <div class="row"><span>開催人数</span><span><J t="**参加者1名から**開催します。" /></span></div>
-        <div class="row"><span>対象年齢</span><span><J t="対象年齢は**18歳以上**です。" /></span></div>
+        <div class="row"><span>開催人数</span><span><J t="参加者1名から開催します。" /></span></div>
+        <div class="row"><span>対象年齢</span><span><J t="対象年齢は18歳以上です。" /></span></div>
         <div class="row"><span>販売</span><span>escape.id{!RESERVE_URL && <><br><span style="font-size:13px;color:#bdb8ab"><J t="販売開始日は決まり次第お知らせします。" /></span></>}</span></div>
       </div>
       {RESERVE_URL ? (
@@ -573,15 +578,20 @@ img{max-width:100%}
     <section id="flow" class="sec">
       <SecHead en="Flow" ja="当日の流れ" />
       <ol class="flow">
-        {flow.map((f) => <li><span class="no">{f.no}</span><span class="tx"><J t={f.text} /></span></li>)}
+        {flow.map((f) => <li><span class="no">{f.no}</span><span class="tx"><strong class="lb">{f.label}</strong><J t={f.text} /></span></li>)}
       </ol>
     </section>
 
     <section id="notice" class="sec">
       <SecHead en="Notice" ja="注意事項" />
-      <ul class="notes">
-        {notes.map((n) => <li><span><J t={n} /></span></li>)}
-      </ul>
+      {notes.map((g) => (
+        <div class="ng">
+          <h3 class="ng-h">{g.group}</h3>
+          <ul class="notes">
+            {g.items.map((n) => <li><strong class="lb">{n.label}</strong><span><J t={n.text} /></span></li>)}
+          </ul>
+        </div>
+      ))}
     </section>
 
     <section id="access" class="sec">
@@ -631,6 +641,10 @@ img{max-width:100%}
 
 <script is:inline>
 (function () {
+  // 再読み込み・再訪問でブラウザが前回の位置（ページ下部）を復元し、開いた瞬間に下へ飛ぶのを防ぐ。
+  // 毎回ヒーロー（本の演出）から始める。#ticket などのアンカー付きで開いたときはそこへ飛ばす。
+  try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
+  if (!location.hash) window.scrollTo(0, 0);
   // ---- hero: スクロール連動で本が開く（p = hero 内の進捗 0–1）----
   var hero = document.getElementById('hero');
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
