@@ -722,6 +722,15 @@ export async function sendNoticeMail(
 }
 
 /**
+ * 一斉送信フォームの二重送信防止。フォーム表示ごとのトークンを SET NX で
+ * 1回だけ通す（ボタン連打・再読み込みでの再送信で同じメールを二度送らない）。
+ */
+export async function claimBulkSend(token: string): Promise<boolean> {
+  if (!/^[0-9a-f]{32}$/.test(token)) return false;
+  return (await redis('SET', `ht:bulk:${token}`, '1', 'NX', 'EX', 7 * 86400)) === 'OK';
+}
+
+/**
  * 開催決定（立卓）の状態遷移。SET NX で「最初の1回」だけが true を返すので、
  * 同時に最少人数を満たす申し込みが来ても開催案内の一斉送信は1回だけ走る。
  */

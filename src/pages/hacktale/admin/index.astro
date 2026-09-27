@@ -41,6 +41,7 @@ import {
   resendGoMail,
   sendFlopMailAll,
   sendNoticeMail,
+  claimBulkSend,
   afterReservation,
   markGo,
   unmarkGo,
@@ -76,7 +77,8 @@ import {
   renderTemplate,
   missingPlaceholders,
 } from '../../../lib/hacktaleTemplates';
-import { normalizePhone, validPhone, validEmail } from '../../../lib/yoyaku';
+import { normalizePhone, validPhone, validEmail, adminEmail } from '../../../lib/yoyaku';
+import { randomBytes } from 'node:crypto';
 import { loginAllowed, recordLoginFailure } from '../../../lib/contact';
 
 Astro.response.headers.set('Cache-Control', 'no-store');
@@ -90,6 +92,10 @@ let message = Astro.url.searchParams.get('msg') ?? '';
 let sessionId = Astro.url.searchParams.get('session') ?? '';
 // go | flop | changed | cancelled — 一斉送信フォームを出す
 let noticeMode = Astro.url.searchParams.get('notice') ?? '';
+// 一斉送信フォームで入力された内容（エラー・テスト送信後も消さずに再表示する）
+let postedSubject: string | null = null;
+let postedBody: string | null = null;
+let postedTo: Set<string> | null = null;
 
 let key = Astro.cookies.get(COOKIE)?.value ?? '';
 const configured = isKvConfigured();
@@ -318,7 +324,7 @@ if (Astro.request.method === 'POST') {
     }
 
     // --- 一斉送信・予約の操作 ---------------------------------------------------
-    const resActions = ['res-add', 'res-cancel', 'res-count', 'res-resend', 'res-resend-go', 'notice', 'go-send', 'flop-send', 'remind-now'];
+    const resActions = ['res-add', 'res-cancel', 'res-count', 'res-resend', 'res-resend-go', 'notice', 'notice-test', 'go-send', 'flop-send', 'remind-now'];
     if (resActions.includes(action)) {
       const s = await getSession(get('session'));
       const settings = await getSettings();
@@ -388,19 +394,39 @@ if (Astro.request.method === 'POST') {
             const r = await remindSession(works, s.id, settings, true);
             return back({ session: s.id, msg: `リマインドを送信しました（対象${r.due}件／成功${r.sent}件${r.failed ? `／失敗${r.failed}件` : ''}）。送信済みの予約には再送しません。` });
           }
-        } else if (action === 'notice') {
+        } else if (action === 'notice' || action === 'notice-test') {
+          // 予約者への一斉送信（自由文・日時変更・中止の案内）。宛先は画面で選んだ予約だけ。
           const subject = get('subject').slice(0, 120);
           const body = getText('body', 6000);
+          const picked = new Set(form.getAll('to').map((v) => String(v)));
+          postedSubject = subject;
+          postedBody = body;
+          postedTo = picked;
+          if (!noticeMode) noticeMode = 'custom'; // エラー・テスト送信後もフォームを再表示する
+          const all = await getReservations(s.id);
+          const targets = all.filter((r) => picked.has(r.id) && r.email);
           if (!subject || !body) error = '件名と本文を入力してください。';
-          else {
-            const confirmed = (await getReservations(s.id)).filter((r) => r.status === 'confirmed');
+          else if (body.includes('（ここに本文を入力')) error = '本文の「（ここに本文を入力してください）」を書き換えてから送信してください。';
+          else if (action === 'notice-test') {
+            // 自分宛のテスト送信：1人目の宛先（いなければ見本）の内容で差し込んで info@ に送る
+            const sample = targets[0] ?? all[0];
+            const fake: HtReservation = {
+              ...(sample ?? { id: 'HT-000000-TEST', sessionId: s.id, name: '（お名前）', phone: '', count: 1, status: 'confirmed', source: 'manual', createdAt: new Date().toISOString() }),
+              email: adminEmail(),
+            } as HtReservation;
+            const ok = await sendNoticeMail(work, s, fake, `【テスト送信】${subject}`, body, settings);
+            message = ok
+              ? `テストメールを ${adminEmail()} に送信しました（${sample ? `${sample.name}様あての内容` : '見本の内容'}）。内容を確認してから本番の送信をしてください。`
+              : 'テストメールの送信に失敗しました。メール設定（SMTP/Resend）を確認してください。';
+          } else if (targets.length === 0) error = '送信先が選ばれていません（メールアドレスのある予約者にチェックを入れてください）。';
+          else if (!(await claimBulkSend(get('bulk')))) {
+            // 同じフォームからの2回目（連打・再読み込み）は送らない
+            return back({ session: s.id, msg: 'この一斉送信はすでに実行済みです（二重送信を防ぐため、2回目は送っていません）。送信結果は下の「メール送信履歴」で確認できます。' });
+          } else {
             let sent = 0;
             let failed = 0;
-            for (const r of confirmed) {
-              if (!r.email) continue;
-              (await sendNoticeMail(work, s, r, subject, body, settings)) ? sent++ : failed++;
-            }
-            return back({ session: s.id, msg: `案内メールを送信しました（成功${sent}件${failed ? `／失敗${failed}件` : ''}／メールアドレスなし${confirmed.length - sent - failed}件）。` });
+            for (const r of targets) (await sendNoticeMail(work, s, r, subject, body, settings)) ? sent++ : failed++;
+            return back({ session: s.id, msg: `予約者への一斉送信が完了しました（送信先${targets.length}件：成功${sent}件${failed ? `／失敗${failed}件。失敗分は下の「メール送信履歴」で確認し、宛先を絞って再送してください` : ''}）。` });
           }
         } else {
           const r = await getReservation(s.id, get('res'));
@@ -542,10 +568,15 @@ if (detail && noticeMode) {
   } else if (noticeMode === 'cancelled') {
     noticeSubject = `【HACKTALE】公演中止のお知らせ（{日付}「{作品名}」）`;
     noticeBody = `ご予約いただいていた下記の公演は、誠に申し訳ありませんが中止となりました。\n\n■ 公演\n${t}\n{日時}\n${detail.s.venue}\n\n楽しみにお待ちいただいていたところ、大変申し訳ございません。今後の公演情報はNEWS・Xでお知らせいたします。`;
+  } else if (noticeMode === 'custom') {
+    noticeSubject = `【HACKTALE】{日付}「{作品名}」公演についてのご連絡`;
+    noticeBody = `お世話になっております。\n\n先日お申し込みいただきました{日時}「{作品名}」の公演につきまして、ご連絡いたします。\n\n（ここに本文を入力してください）\n\nどうぞよろしくお願いいたします。`;
   } else if (noticeMode === 'changed') {
     noticeSubject = `【HACKTALE】公演内容変更のお知らせ（{日付}「{作品名}」）`;
     noticeBody = `ご予約いただいている公演の開催内容が変更になりましたのでお知らせします。\n\n■ 変更後の内容\n{作品名}\n{日時}\n会場: ${detail.s.venue}${detail.s.meeting ? `（集合: ${detail.s.meeting}）` : ''}\n\nご都合が合わなくなった場合は、このメールへの返信でキャンセル・変更を承ります。`;
   }
+  if (postedSubject !== null) noticeSubject = postedSubject;
+  if (postedBody !== null) noticeBody = postedBody;
   const sample = confirmedOf(detail.reservations)[0];
   preview = renderTemplate(noticeBody, {
     workTitle: t,
@@ -558,6 +589,11 @@ if (detail && noticeMode) {
     reservationId: sample?.id ?? 'HT-000000-XXXX',
   });
 }
+// 一斉送信フォームの宛先候補（メールアドレスのある予約。確定は既定でチェック、キャンセル済みは外す）
+const bulkToken = randomBytes(16).toString('hex');
+const recipientCandidates = detail ? detail.reservations.filter((r) => r.email) : [];
+const noMailCount = detail ? confirmedOf(detail.reservations).filter((r) => !r.email).length : 0;
+const isChecked = (r: HtReservation) => (postedTo ? postedTo.has(r.id) : r.status === 'confirmed');
 const noticeTarget = detail
   ? noticeMode === 'go'
     ? confirmedOf(detail.reservations).filter((r) => r.email && !r.goMailAt).length
@@ -628,7 +664,10 @@ const decisionLabel = (s: HtSession, booked: number) =>
                 <span class="badge">{SESSION_STATUS_LABEL[s.status]}</span>
                 <span class:list={['badge', { goB: s.go }]}>{decisionLabel(s, s.booked)}</span>
               </div>
-              <a class="btn small" href={`${BASE}?session=${s.id}`}>管理</a>
+              <div class="btnrow" style="margin:0">
+                {conf.some((r) => r.email) && <a class="btn small ghost" href={`${BASE}?session=${s.id}&notice=custom#notice`}>メール一斉送信</a>}
+                <a class="btn small" href={`${BASE}?session=${s.id}`}>管理</a>
+              </div>
             </div>
             <div class="meter" title={`確定${s.booked}名／最少${min}名／定員${s.capacity}名`}>
               <div class="meterbar"><span class="mfill" style={`width:${Math.min(100, (s.booked / s.capacity) * 100)}%`}></span><span class="mmin" style={`left:${(min / s.capacity) * 100}%`}></span></div>
@@ -776,6 +815,7 @@ const decisionLabel = (s: HtSession, booked: number) =>
         {detail.s.status !== 'draft' && detail.s.status !== 'cancelled' && <form method="POST" class="inline"><input type="hidden" name="action" value="session-status"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="status" value="draft"><button class="btn small ghost" type="submit">非公開に戻す</button></form>}
         {detail.s.status !== 'cancelled' && <form method="POST" class="inline" onsubmit="return confirm('この公演を中止にしますか？（人数未達の場合は「開催見送り」を使ってください）')"><input type="hidden" name="action" value="session-status"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="status" value="cancelled"><button class="btn small danger" type="submit">中止（その他の理由）</button></form>}
         <form method="POST" class="inline"><input type="hidden" name="action" value="session-clone"><input type="hidden" name="session" value={detail.s.id}><button class="btn small ghost" type="submit">複製</button></form>
+        <a class="btn small" href={`${BASE}?session=${detail.s.id}&notice=custom#notice`}>予約者へメール一斉送信</a>
         <a class="btn small ghost" href={`${BASE}?session=${detail.s.id}&csv=1`}>CSV出力</a>
         {detail.s.go && <form method="POST" class="inline"><input type="hidden" name="action" value="remind-now"><input type="hidden" name="session" value={detail.s.id}><button class="btn small ghost" type="submit" onclick="return confirm('未送信の確定予約にリマインドメールを今すぐ送信します。よろしいですか？')">リマインドを今すぐ送信</button></form>}
         {detail.s.go && !detail.s.flop && <form method="POST" class="inline" onsubmit="return confirm('開催決定を取り消しますか？（送信済みの開催案内は取り消せません）')"><input type="hidden" name="action" value="ungo"><input type="hidden" name="session" value={detail.s.id}><button class="linkbtn" type="submit">開催決定を取り消す</button></form>}
@@ -785,23 +825,49 @@ const decisionLabel = (s: HtSession, booked: number) =>
     </section>
 
     {noticeMode && (
-      <section class="card notice">
-        <h2>{noticeMode === 'go' ? '開催案内メール（一斉送信）' : noticeMode === 'flop' ? '開催見送りメール' : noticeMode === 'cancelled' ? '中止のご案内メール' : '変更のご案内メール'}</h2>
+      <section class="card notice" id="notice">
+        <h2>{noticeMode === 'go' ? '開催案内メール（一斉送信）' : noticeMode === 'flop' ? '開催見送りメール' : noticeMode === 'cancelled' ? '中止のご案内メール' : noticeMode === 'custom' ? '予約者へメール一斉送信' : '変更のご案内メール'}</h2>
         <p class="dim">
           {noticeMode === 'go'
             ? `開催案内をまだ受け取っていない確定予約 ${noticeTarget}件に送信します。ここで手直しした本文は公演回に保存され、この後に申し込んだ方にも同じ案内が自動で届きます。`
-            : `確定済みの予約 ${noticeTarget}件に送信します。`}
+            : noticeMode === 'flop'
+              ? `確定済みの予約 ${noticeTarget}件に送信します。`
+              : '下の「送信先」でチェックした予約者に送ります。まず「自分にテスト送信」で届き方を確認できます。'}
           宛名（〇〇 様）と予約番号・問い合わせ先は自動で付きます。
         </p>
         <form method="POST" class="grid">
-          <input type="hidden" name="action" value={noticeMode === 'go' ? 'go-send' : noticeMode === 'flop' ? 'flop-send' : 'notice'}>
+          {(noticeMode === 'go' || noticeMode === 'flop') && <input type="hidden" name="action" value={noticeMode === 'go' ? 'go-send' : 'flop-send'}>}
           <input type="hidden" name="session" value={detail.s.id}>
           {noticeMode === 'go'
             ? <p class="wide dim">件名: {renderTemplate(noticeSubject, { workTitle: workTitle(detail.s.workId), start: detail.s.start, price: detail.s.price })}</p>
             : <label class="wide">件名<input type="text" name="subject" value={noticeSubject} required maxlength="120"></label>}
           <label class="wide">本文<textarea name="body" rows="16" required>{noticeBody}</textarea></label>
+          {(noticeMode === 'custom' || noticeMode === 'changed' || noticeMode === 'cancelled') && (
+            <>
+            <p class="wide dim">差し込み（送信時に予約者ごとに置き換わります）: {PLACEHOLDERS.map((p) => <span class="ph" title={p.desc}>{p.key}</span>)}</p>
+            <input type="hidden" name="bulk" value={bulkToken}>
+            <fieldset class="wide rcpt">
+              <legend>送信先（{recipientCandidates.filter(isChecked).length}件選択中）</legend>
+              {recipientCandidates.length === 0 && <p class="dim2">メールアドレスのある予約者がいません。</p>}
+              {recipientCandidates.map((r) => (
+                <label class:list={['check', { cancelled: r.status === 'cancelled' }]}>
+                  <input type="checkbox" name="to" value={r.id} checked={isChecked(r)}>
+                  {r.name}様（{r.count}名）<span class="dim2">{r.email}{r.status === 'cancelled' ? '・キャンセル済み' : ''}</span>
+                </label>
+              ))}
+              {noMailCount > 0 && <p class="dim2">※メールアドレスのない予約（電話・LINEでの手動登録）が{noMailCount}件あります。この方々には個別にご連絡ください。</p>}
+            </fieldset>
+            </>
+          )}
           <details class="wide pv"><summary>差し込み後のプレビュー（{confirmedOf(detail.reservations)[0]?.name ?? '見本'}様あて）</summary><pre>{preview}</pre></details>
-          <button class="btn" type="submit" onclick="return confirm('この内容で一斉送信します。よろしいですか？')">この内容で送信する</button>
+          {(noticeMode === 'custom' || noticeMode === 'changed' || noticeMode === 'cancelled') ? (
+            <div class="wide btnrow">
+              <button class="btn ghost" type="submit" name="action" value="notice-test" formnovalidate>自分にテスト送信（{adminEmail()}）</button>
+              <button class="btn" type="submit" name="action" value="notice" onclick="return confirm('チェックした予約者に一斉送信します。よろしいですか？')">チェックした予約者に送信する</button>
+            </div>
+          ) : (
+            <button class="btn" type="submit" onclick="return confirm('この内容で一斉送信します。よろしいですか？')">この内容で送信する</button>
+          )}
         </form>
       </section>
     )}
@@ -1002,6 +1068,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#d9e63b}
 .tblwrap{overflow-x:auto}
 .noroster{margin:4px 0 0}
 .tbl a{color:#f1efe9}
+.rcpt{border:1px solid rgba(255,255,255,.15);padding:10px 14px 12px;margin:0;display:flex;flex-direction:column;gap:6px}
+.rcpt legend{font-size:12.5px;font-weight:700;padding:0 6px}
+.rcpt .check{font-size:13px}
+.rcpt .check.cancelled{color:#8f8b82}
 @media(max-width:720px){.grid{grid-template-columns:1fr}.tbl{display:block;overflow-x:auto;white-space:nowrap}.wrap{padding:20px 14px 60px}}
 </style>
 </body>
