@@ -45,9 +45,13 @@ export interface HtWorkRec {
   durationMin?: number;
   /** 標準の定員。公演回を新規作成するときの初期値（既存の公演回には影響しない） */
   defaultCapacity: number;
-  /** 料金の初期値（公演回作成時にコピーされる） */
+  /** 料金の初期値（対面。公演回作成時にコピーされる） */
   defaultPrice?: string;
-  /** 形式の初期値 */
+  /** オンライン公演の料金の初期値（未設定なら defaultPrice） */
+  defaultPriceOnline?: string;
+  /** 対応している形式。人狼定理は対面・オンラインの両方 */
+  formats?: HtFormat[];
+  /** 旧データの形式（formats 導入前）。新規の公演回では使わない */
   defaultFormat?: HtFormat;
   active: boolean; // false: 新しい公演回の作成対象から外す（既存回はそのまま）
   createdAt: string;
@@ -249,6 +253,18 @@ export async function saveWork(w: HtWorkRec): Promise<void> {
   await redis('HSET', WORKS_KEY, w.id, JSON.stringify(w));
 }
 
+/** 作品が対応している形式（旧データは人狼定理=両方、他=対面） */
+export function workFormats(w: HtWorkRec | null): HtFormat[] {
+  if (w?.formats && w.formats.length > 0) return w.formats;
+  if (!w || w.id === 'werewolf-theorem') return ['offline', 'online'];
+  return [w.defaultFormat ?? 'offline'];
+}
+
+/** 形式ごとの料金の初期値 */
+export function workDefaultPrice(w: HtWorkRec, format: HtFormat): string | undefined {
+  return format === 'online' ? w.defaultPriceOnline ?? w.defaultPrice : w.defaultPrice;
+}
+
 // 初版の既定料金は長い説明文で、メールの {料金} 差し込みに向かないため置き換える。
 const LEGACY_PRICE: Record<string, string> = {
   '4,500円（1名様あたり）／お支払い方法は当日ご案内します': '4,500円',
@@ -260,22 +276,27 @@ export async function seedWorks(): Promise<void> {
   const existing = await getWorks();
   if (existing.length > 0) {
     for (const w of existing) {
-      const fixed = w.defaultPrice && LEGACY_PRICE[w.defaultPrice];
-      if (fixed || !w.defaultFormat) {
+      if (w.formats && w.formats.length > 0) continue; // 対応形式を設定済み＝移行済み
+      const fixed = (w.defaultPrice && LEGACY_PRICE[w.defaultPrice]) || w.defaultPrice;
+      if (w.id === 'werewolf-theorem') {
+        // 人狼定理は対面4,500円・オンライン3,500円の両対応
         await saveWork({
           ...w,
-          defaultPrice: fixed || w.defaultPrice,
-          defaultFormat: w.defaultFormat ?? (w.id === 'werewolf-theorem' ? 'online' : 'offline'),
+          formats: ['offline', 'online'],
+          defaultPrice: fixed === '3,500円' ? '4,500円' : fixed,
+          defaultPriceOnline: w.defaultPriceOnline ?? '3,500円',
         });
+      } else {
+        await saveWork({ ...w, formats: [w.defaultFormat ?? 'offline'], defaultPrice: fixed });
       }
     }
     return;
   }
   const now = new Date().toISOString();
   const seeds: HtWorkRec[] = [
-    { id: 'present-poker', title: 'プレゼント・ポーカー', desc: '交渉/閃き/論理を駆使し、勝利を目指せ。公演終了時、明確に1名の勝利者が出る。', image: '/assets/hacktale/kv-poker.webp', durationMin: 180, defaultCapacity: 6, defaultPrice: '4,500円', defaultFormat: 'offline', active: true, createdAt: now },
-    { id: 'werewolf-theorem', title: '人狼定理', desc: '論理と交渉の頭脳戦。勝利者は2名、途中脱落なし。人狼のルールを知らなくても遊べる。', image: '/assets/hacktale/kv-werewolf.webp', durationMin: 240, defaultCapacity: 8, defaultPrice: '3,500円', defaultFormat: 'online', active: true, createdAt: now },
-    { id: 'dice-box', title: 'ダイスボックス', desc: '閃きが試される、ダイスの箱。', image: '/assets/hacktale/kv-dicebox.webp', durationMin: 240, defaultCapacity: 9, defaultPrice: '未定', defaultFormat: 'offline', active: true, createdAt: now },
+    { id: 'present-poker', title: 'プレゼント・ポーカー', desc: '交渉/閃き/論理を駆使し、勝利を目指せ。公演終了時、明確に1名の勝利者が出る。', image: '/assets/hacktale/kv-poker.webp', durationMin: 180, defaultCapacity: 6, defaultPrice: '4,500円', formats: ['offline'], active: true, createdAt: now },
+    { id: 'werewolf-theorem', title: '人狼定理', desc: '論理と交渉の頭脳戦。勝利者は2名、途中脱落なし。人狼のルールを知らなくても遊べる。', image: '/assets/hacktale/kv-werewolf.webp', durationMin: 240, defaultCapacity: 8, defaultPrice: '4,500円', defaultPriceOnline: '3,500円', formats: ['offline', 'online'], active: true, createdAt: now },
+    { id: 'dice-box', title: 'ダイスボックス', desc: '閃きが試される、ダイスの箱。', image: '/assets/hacktale/kv-dicebox.webp', durationMin: 240, defaultCapacity: 9, defaultPrice: '未定', formats: ['offline'], active: true, createdAt: now },
   ];
   for (const w of seeds) await saveWork(w);
 }

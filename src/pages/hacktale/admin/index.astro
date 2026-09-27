@@ -46,6 +46,8 @@ import {
   unmarkGo,
   remindSession,
   sessionFormat,
+  workFormats,
+  workDefaultPrice,
   sessionTemplates,
   initialTemplates,
   minPlayersOf,
@@ -136,6 +138,10 @@ if (Astro.request.method === 'POST') {
 
     // --- 作品 ---------------------------------------------------------------
     if (action === 'work-save') {
+      const formats: HtFormat[] = [
+        ...(get('f_offline') !== '' ? (['offline'] as const) : []),
+        ...(get('f_online') !== '' ? (['online'] as const) : []),
+      ];
       const isNew = get('new') === '1';
       const id = isNew ? get('id').toLowerCase() : get('id');
       const existing = await getWork(id);
@@ -143,6 +149,7 @@ if (Astro.request.method === 'POST') {
       else if (isNew && existing) error = `作品ID「${id}」はすでに使われています。`;
       else if (!isNew && !existing) error = '作品が見つかりません。';
       else if (!get('title')) error = '作品名を入力してください。';
+      else if (formats.length === 0) error = '対応する形式（対面・オンライン）を1つ以上選んでください。';
       else {
         const w: HtWorkRec = {
           id,
@@ -152,7 +159,8 @@ if (Astro.request.method === 'POST') {
           durationMin: parseInt(get('duration'), 10) || undefined,
           defaultCapacity: Math.min(Math.max(parseInt(get('capacity'), 10) || 1, 1), 500),
           defaultPrice: get('price').slice(0, 100) || undefined,
-          defaultFormat: get('format') === 'online' ? 'online' : 'offline',
+          defaultPriceOnline: get('price_online').slice(0, 100) || undefined,
+          formats: formats,
           active: get('active') !== '',
           createdAt: existing?.createdAt ?? new Date().toISOString(),
         };
@@ -178,10 +186,14 @@ if (Astro.request.method === 'POST') {
       }
       if (!error && work) {
         const start = get('start') || base.start || '';
+        const fIn = get('format');
         if (!validStart(start)) error = '開催日時を入力してください。';
-        else {
+        else if (action === 'session-create' && fIn !== 'offline' && fIn !== 'online') error = '形式（対面・オンライン）を選んでください。';
+        else if (action === 'session-create' && !workFormats(work).includes(fIn as HtFormat)) {
+          error = `「${work.title}」は${FORMAT_LABEL[fIn as HtFormat]}公演に対応していません（作品の設定で対応形式を追加できます）。`;
+        } else {
           const f = get('format');
-          const format: HtFormat = f === 'online' || f === 'offline' ? f : base.format ?? work.defaultFormat ?? 'offline';
+          const format: HtFormat = f === 'online' || f === 'offline' ? f : base.format ?? sessionFormat(base as HtSession, work);
           const goKind: GoKind = format === 'online' ? 'online' : get('prep') !== '' ? 'offline-prep' : 'offline';
           const capacity = Math.min(Math.max(parseInt(get('capacity'), 10) || base.capacity || work.defaultCapacity, 1), 500);
           const minIn = parseInt(get('min'), 10);
@@ -194,7 +206,7 @@ if (Astro.request.method === 'POST') {
             meeting: base.meeting,
             // 作品の標準定員・料金は「初期値」としてコピーするだけなので、
             // 後から作品側を変えても既存の公演回には影響しない。
-            price: (get('price') || base.price || work.defaultPrice || '').slice(0, 100) || '未定',
+            price: (get('price') || base.price || workDefaultPrice(work, format) || '').slice(0, 100) || '未定',
             capacity,
             minPlayers: Math.min(Number.isInteger(minIn) && minIn >= 1 ? minIn : base.minPlayers ?? capacity, capacity),
             autoGo: base.autoGo ?? format === 'offline',
@@ -272,6 +284,9 @@ if (Astro.request.method === 'POST') {
         else if (!Number.isInteger(minPlayers) || minPlayers < 1 || minPlayers > capacity) error = '開催最少人数は1〜定員の範囲で入力してください。';
         else if (get('deadline') && !validStart(get('deadline'))) error = '受付期限の形式が正しくありません。';
         else if (discordUrl && !validUrl(discordUrl)) error = 'Discordリンクは https:// から始まるURLを入力してください。';
+        else if (!workFormats(await getWork(get('work') || s.workId)).includes(get('format') === 'online' ? 'online' : 'offline')) {
+          error = `この作品は${get('format') === 'online' ? 'オンライン' : '対面'}公演に対応していません（作品の設定で対応形式を追加できます）。`;
+        }
         else {
           const updated: HtSession = {
             ...s,
@@ -463,7 +478,7 @@ if (authed() && configured && sessionId && Astro.url.searchParams.get('csv') ===
 
 // --- 表示用データ ----------------------------------------------------------------
 let works: HtWorkRec[] = [];
-let sessions: (HtSession & { booked: number })[] = [];
+let sessions: (HtSession & { booked: number; reservations: HtReservation[] })[] = [];
 let settings: HtSettings = { reminderEnabled: true, reminderHours: 36 };
 let detail: {
   s: HtSession;
@@ -484,9 +499,10 @@ if (authed() && configured) {
   works = await getWorks();
   const all = await getSessions();
   const seats = await bookedSeatsMap(all.map((s) => s.id));
-  sessions = all
-    .filter((s) => showPast || s.start >= now.slice(0, 10))
-    .map((s) => ({ ...s, booked: seats.get(s.id) ?? 0 }));
+  const shown = all.filter((s) => showPast || s.start >= now.slice(0, 10));
+  // 一覧で各回の予約者まで見えるよう、表示する回の予約をまとめて読む
+  const resLists = await Promise.all(shown.map((s) => getReservations(s.id)));
+  sessions = shown.map((s, i) => ({ ...s, booked: seats.get(s.id) ?? 0, reservations: resLists[i] }));
   settings = await getSettings();
   if (sessionId) {
     const s = await getSession(sessionId);
@@ -590,28 +606,61 @@ const decisionLabel = (s: HtSession, booked: number) =>
     <>
     {!settings.bankInfo && <p class="warn">振込先が未設定です。オンライン公演の開催案内に差し込むため、ページ下の「設定」で入力してください。</p>}
 
-    {/* ============ 公演回一覧 ============ */}
+    {/* ============ 公演回一覧（各回の予約状況と予約者） ============ */}
     <section class="card">
-      <div class="cardhead"><h1>公演回</h1><a class="linkbtn" href={showPast ? BASE : `${BASE}?past=1`}>{showPast ? '今後の公演だけ表示' : '過去の公演も表示'}</a></div>
+      <div class="cardhead"><h1>公演回と予約状況</h1><a class="linkbtn" href={showPast ? BASE : `${BASE}?past=1`}>{showPast ? '今後の公演だけ表示' : '過去の公演も表示'}</a></div>
       {sessions.length === 0 && <p class="dim">公演回がありません。下のフォームから作成してください。</p>}
       {sessions.length > 0 && (
-        <table class="tbl">
-          <thead><tr><th>開催日時</th><th>作品</th><th>形式</th><th>公開</th><th>開催</th><th>予約/定員</th><th></th></tr></thead>
-          <tbody>
-          {sessions.map((s) => (
-            <tr>
-              <td class="nowrap">{formatStartJa(s.start)}</td>
-              <td>{workTitle(s.workId)}</td>
-              <td class="nowrap">{FORMAT_LABEL[sessionFormat(s, works.find((w) => w.id === s.workId) ?? null)]}</td>
-              <td class="nowrap">{SESSION_STATUS_LABEL[s.status]}<br><span class="dim2">{AVAILABILITY_LABEL(availability(s, s.booked, now))}</span></td>
-              <td class="nowrap">{decisionLabel(s, s.booked)}</td>
-              <td class="nowrap">{s.booked}／{s.capacity}名</td>
-              <td class="nowrap"><a class="btn small" href={`${BASE}?session=${s.id}`}>管理</a></td>
-            </tr>
-          ))}
-          </tbody>
-        </table>
+        <p class="dim">{showPast ? '全' : '今後の'}公演 {sessions.length}回／確定予約 {sessions.reduce((n, s) => n + confirmedOf(s.reservations).length, 0)}組 {sessions.reduce((n, s) => n + s.booked, 0)}名。各回の「予約者」を開くとお客様の情報が見られます。</p>
       )}
+      {sessions.map((s) => {
+        const conf = confirmedOf(s.reservations);
+        const cancelled = s.reservations.length - conf.length;
+        const min = minPlayersOf(s);
+        const fmt = sessionFormat(s, works.find((w) => w.id === s.workId) ?? null);
+        return (
+          <article class="sc">
+            <div class="schead">
+              <div class="sct">
+                <a class="scdate" href={`${BASE}?session=${s.id}`}>{formatStartJa(s.start)}</a>
+                <span class="scwork">{workTitle(s.workId)}</span>
+                <span class="badge">{FORMAT_LABEL[fmt]}</span>
+                <span class="badge">{SESSION_STATUS_LABEL[s.status]}</span>
+                <span class:list={['badge', { goB: s.go }]}>{decisionLabel(s, s.booked)}</span>
+              </div>
+              <a class="btn small" href={`${BASE}?session=${s.id}`}>管理</a>
+            </div>
+            <div class="meter" title={`確定${s.booked}名／最少${min}名／定員${s.capacity}名`}>
+              <div class="meterbar"><span class="mfill" style={`width:${Math.min(100, (s.booked / s.capacity) * 100)}%`}></span><span class="mmin" style={`left:${(min / s.capacity) * 100}%`}></span></div>
+              <span class="mtext">予約 <b>{s.booked}</b>名／最少 {min}名／定員 {s.capacity}名（残り{Math.max(s.capacity - s.booked, 0)}席）｜{AVAILABILITY_LABEL(availability(s, s.booked, now))}</span>
+            </div>
+            {s.reservations.length > 0 ? (
+              <details class="roster" open={conf.length > 0}>
+                <summary>予約者 {conf.length}組 {s.booked}名{cancelled > 0 ? `（キャンセル ${cancelled}件）` : ''}</summary>
+                <div class="tblwrap">
+                <table class="tbl">
+                  <thead><tr><th>お名前</th><th>人数</th><th>電話</th><th>メール</th><th>X</th><th>備考</th><th>予約日時</th><th>メール</th></tr></thead>
+                  <tbody>
+                  {s.reservations.map((r) => (
+                    <tr class:list={[{ cancelled: r.status === 'cancelled' }]}>
+                      <td class="nowrap">{r.name}{r.status === 'cancelled' && <span class="dim2">（キャンセル）</span>}<br><span class="dim2">{r.id}{r.source === 'manual' ? '・手動' : ''}</span></td>
+                      <td class="nowrap">{r.count}名</td>
+                      <td class="nowrap">{r.phone ? <a href={`tel:${r.phone}`}>{r.phone}</a> : '―'}</td>
+                      <td class="small2">{r.email ? <a href={`mailto:${r.email}`}>{r.email}</a> : '―'}</td>
+                      <td class="nowrap">{r.xId ? <a href={`https://x.com/${encodeURIComponent(r.xId)}`} target="_blank" rel="noopener noreferrer">@{r.xId}</a> : '―'}</td>
+                      <td class="small2">{r.note ?? '―'}</td>
+                      <td class="nowrap small2">{new Date(Date.parse(r.createdAt) + 9 * 3600000).toISOString().slice(5, 16).replace('T', ' ').replace('-', '/')}</td>
+                      <td class="nowrap small2">{r.goMailAt ? '開催案内 済' : r.goMailError ? <b class="fail">開催案内 失敗</b> : r.confirmMailAt ? '受付 済' : r.confirmMailError ? <b class="fail">受付 失敗</b> : '―'}</td>
+                    </tr>
+                  ))}
+                  </tbody>
+                </table>
+                </div>
+              </details>
+            ) : <p class="dim2 noroster">まだ予約はありません。</p>}
+          </article>
+        );
+      })}
     </section>
 
     {/* ============ 公演回の新規作成 ============ */}
@@ -622,12 +671,12 @@ const decisionLabel = (s: HtSession, booked: number) =>
         <input type="hidden" name="action" value="session-create">
         <label>作品
           <select name="work" required>
-            {works.filter((w) => w.active).map((w) => <option value={w.id}>{w.title}（標準{w.defaultCapacity}名・{FORMAT_LABEL[w.defaultFormat ?? 'offline']}）</option>)}
+            {works.filter((w) => w.active).map((w) => <option value={w.id}>{w.title}（標準{w.defaultCapacity}名・{workFormats(w).map((f) => FORMAT_LABEL[f]).join('/')}）</option>)}
           </select>
         </label>
-        <label>形式
-          <select name="format">
-            <option value="">作品の標準に合わせる</option>
+        <label>形式（必須）
+          <select name="format" required>
+            <option value="" disabled selected>選んでください</option>
             <option value="offline">対面</option>
             <option value="online">オンライン</option>
           </select>
@@ -636,7 +685,7 @@ const decisionLabel = (s: HtSession, booked: number) =>
         <label>会場（空欄=形式ごとの標準）<input type="text" name="venue" placeholder="対面: 神田三崎町／オンライン: Discord"></label>
         <label>定員（空欄=作品の標準）<input type="number" name="capacity" min="1" max="500"></label>
         <label>開催最少人数（空欄=定員と同じ）<input type="number" name="min" min="1" max="500"></label>
-        <label class="wide">料金（空欄=作品の標準。メールの {'{料金}'} に入ります。例: 4,500円）<input type="text" name="price" maxlength="100"></label>
+        <label class="wide">料金（空欄=作品の形式ごとの標準。人狼定理なら対面4,500円／オンライン3,500円。メールの {'{料金}'} に入ります）<input type="text" name="price" maxlength="100"></label>
         <label class="check"><input type="checkbox" name="prep">事前読み込みあり（対面の開催案内にDiscordサーバー案内を入れる）</label>
         <button class="btn" type="submit">作成する（非公開で保存）</button>
       </form>
@@ -645,18 +694,20 @@ const decisionLabel = (s: HtSession, booked: number) =>
     {/* ============ 作品 ============ */}
     <section class="card">
       <h2>作品</h2>
-      <p class="dim">「標準の定員」「料金」「形式」は新しい公演回を作るときの初期値です。変更しても登録済みの公演回には影響しません。</p>
+      <p class="dim">「標準の定員」「料金」は新しい公演回を作るときの初期値です。変更しても登録済みの公演回には影響しません。「対面公演あり／オンライン公演あり」は、その形式で公演回を作れるかどうかです（人狼定理は両方）。</p>
       {works.map((w) => (
         <details class="wk">
-          <summary>{w.title}（標準{w.defaultCapacity}名・{FORMAT_LABEL[w.defaultFormat ?? 'offline']}{w.durationMin ? `・約${w.durationMin}分` : ''}）{!w.active && '｜停止中'}</summary>
+          <summary>{w.title}（標準{w.defaultCapacity}名・{workFormats(w).map((f) => FORMAT_LABEL[f]).join('/')}{w.durationMin ? `・約${w.durationMin}分` : ''}）{!w.active && '｜停止中'}</summary>
           <form method="POST" class="grid">
             <input type="hidden" name="action" value="work-save">
             <input type="hidden" name="id" value={w.id}>
             <label>作品名<input type="text" name="title" value={w.title} required maxlength="60"></label>
             <label>所要時間（分）<input type="number" name="duration" value={w.durationMin ?? ''} min="0"></label>
             <label>標準の定員<input type="number" name="capacity" value={w.defaultCapacity} min="1" max="500" required></label>
-            <label>標準の形式<select name="format"><option value="offline" selected={(w.defaultFormat ?? 'offline') === 'offline'}>対面</option><option value="online" selected={w.defaultFormat === 'online'}>オンライン</option></select></label>
-            <label>料金の初期値<input type="text" name="price" value={w.defaultPrice ?? ''} maxlength="100"></label>
+            <label>料金の初期値（対面）<input type="text" name="price" value={w.defaultPrice ?? ''} maxlength="100"></label>
+            <label>料金の初期値（オンライン）<input type="text" name="price_online" value={w.defaultPriceOnline ?? ''} maxlength="100" placeholder="空欄=対面と同じ"></label>
+            <label class="check"><input type="checkbox" name="f_offline" checked={workFormats(w).includes('offline')}>対面公演あり</label>
+            <label class="check"><input type="checkbox" name="f_online" checked={workFormats(w).includes('online')}>オンライン公演あり</label>
             <label>画像パス<input type="text" name="image" value={w.image ?? ''} placeholder="/assets/hacktale/kv-xxx.webp"></label>
             <label class="wide">紹介文<textarea name="desc" rows="2">{w.desc ?? ''}</textarea></label>
             <label class="check"><input type="checkbox" name="active" checked={w.active}>新しい公演回の作成対象にする</label>
@@ -673,8 +724,10 @@ const decisionLabel = (s: HtSession, booked: number) =>
           <label>作品名<input type="text" name="title" required maxlength="60"></label>
           <label>所要時間（分）<input type="number" name="duration" min="0"></label>
           <label>標準の定員<input type="number" name="capacity" min="1" max="500" value="8" required></label>
-          <label>標準の形式<select name="format"><option value="offline">対面</option><option value="online">オンライン</option></select></label>
-          <label>料金の初期値<input type="text" name="price" maxlength="100"></label>
+          <label>料金の初期値（対面）<input type="text" name="price" maxlength="100"></label>
+          <label>料金の初期値（オンライン）<input type="text" name="price_online" maxlength="100" placeholder="空欄=対面と同じ"></label>
+          <label class="check"><input type="checkbox" name="f_offline" checked>対面公演あり</label>
+          <label class="check"><input type="checkbox" name="f_online">オンライン公演あり</label>
           <label class="wide">紹介文<textarea name="desc" rows="2"></textarea></label>
           <label class="check"><input type="checkbox" name="active" checked>新しい公演回の作成対象にする</label>
           <button class="btn" type="submit">登録</button>
@@ -932,6 +985,23 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#d9e63b}
 .pv summary{cursor:pointer;font-size:12.5px;color:#c9c5ba}
 .pv pre{white-space:pre-wrap;font-family:inherit;font-size:12.5px;line-height:1.8;background:#0d0d0e;border:1px solid rgba(255,255,255,.12);padding:14px;margin:8px 0 0;max-height:420px;overflow:auto}
 .foot{color:#6f6c64;font-size:11px;text-align:center;margin-top:40px}
+.sc{border-top:1px solid rgba(255,255,255,.1);padding:16px 0 14px}
+.sc:first-of-type{border-top:none}
+.schead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.sct{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px}
+.scdate{font-weight:900;font-size:15px;color:#f1efe9;text-decoration:none}
+.scdate:hover{color:#d9e63b}
+.scwork{font-weight:700;font-size:14px}
+.meter{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:10px 0 6px}
+.meterbar{position:relative;width:180px;height:8px;background:#2a2a2e;flex-shrink:0}
+.mfill{position:absolute;left:0;top:0;bottom:0;background:#d9e63b}
+.mmin{position:absolute;top:-4px;bottom:-4px;width:2px;background:#e5484d;margin-left:-1px}
+.mtext{font-size:12.5px;color:#c9c5ba}
+.mtext b{color:#d9e63b;font-size:14px}
+.roster summary{cursor:pointer;font-size:13px;font-weight:700;color:#e9f28d;margin:4px 0}
+.tblwrap{overflow-x:auto}
+.noroster{margin:4px 0 0}
+.tbl a{color:#f1efe9}
 @media(max-width:720px){.grid{grid-template-columns:1fr}.tbl{display:block;overflow-x:auto;white-space:nowrap}.wrap{padding:20px 14px 60px}}
 </style>
 </body>
