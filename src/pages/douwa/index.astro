@@ -6,6 +6,7 @@
 const INDEXABLE = false;
 import SiteGuard from '../../components/SiteGuard.astro';
 import SecHead from '../../components/douwa/SecHead.astro';
+import J from '../../components/douwa/J.astro';
 
 // ---- 未定の項目（決まったらここを埋める。null の間は非表示／仮表示） ----
 // escape.id の販売ページURL。null の間は予約ボタンを「近日販売開始」表示にし、#ticket へ飛ばす
@@ -17,8 +18,8 @@ const TERMS_URL: string | null = null;
 const X_URL: string | null = null;
 // キャスト（掲載の有無が未定。空配列の間はセクションとメニュー項目を出さない）
 const cast: { name: string; role?: string; days?: string; photo?: string }[] = [];
-// スタッフ（profile・photo が決まったら追加する）
-const staff: { role: string; name: string; profile?: string; photo?: string }[] = [
+// スタッフ（profile が決まったら追加する。写真欄は掲載しない）
+const staff: { role: string; name: string; profile?: string }[] = [
   { role: 'シナリオライター', name: 'タロサカ' },
   { role: 'ディレクター', name: '荒巻まりの' },
   { role: 'プロデューサー', name: 'かるら' },
@@ -155,7 +156,7 @@ const faqLd = {
 <SiteGuard />
 <style is:global>
 html{scroll-behavior:smooth}
-body{margin:0;background:#1a1c1b;color:#e8e3d6;font-family:"Shippori Mincho B1",serif;-webkit-font-smoothing:antialiased}
+body{margin:0;background:#1a1c1b;color:#e8e3d6;font-family:"Shippori Mincho B1",serif;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere;line-break:strict}
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:90;opacity:.16;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 body.menu-open{overflow:hidden}
 a{color:#e8e3d6}
@@ -279,9 +280,8 @@ img{max-width:100%}
 .stat .v.txt{font-size:30px;line-height:1.2}
 
 /* staff / cast */
-.staff{display:flex;flex-direction:column;gap:14px;padding:32px 0;border-bottom:1px solid rgba(232,227,214,.2)}
-.staff .photo{width:200px;aspect-ratio:1;object-fit:cover;display:block}
-.staff .role{font-size:14px;color:#bdb8ab;margin-top:12px}
+.staff{display:flex;flex-direction:column;gap:10px;padding:32px 0;border-bottom:1px solid rgba(232,227,214,.2)}
+.staff .role{font-size:14px;color:#bdb8ab}
 .staff .name{font-size:24px;font-weight:600}
 .staff p{margin:0;font-size:15px;line-height:1.9;color:#bdb8ab}
 .casts{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:24px 16px}
@@ -301,7 +301,7 @@ img{max-width:100%}
 .tk p{margin:0;font-size:14px;line-height:1.9;color:#bdb8ab}
 .tk-note{margin:16px 0 0;font-size:13px;color:#bdb8ab}
 .times{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-.times span{font-size:12px;text-align:center;padding:6px 0;border:1px solid rgba(232,227,214,.2)}
+.times span{font-size:12px;text-align:center;padding:6px 0;border:1px solid rgba(232,227,214,.2);white-space:nowrap;overflow-wrap:normal}
 .cta{margin-top:40px;display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 24px;background:#e8e3d6;color:#1a1c1b !important;text-decoration:none;font-weight:600;font-size:16px;letter-spacing:.12em}
 .cta.off{background:transparent;color:#e8e3d6 !important;border:1px solid rgba(232,227,214,.35)}
 
@@ -340,6 +340,12 @@ img{max-width:100%}
 .ft-links{display:flex;gap:20px;flex-wrap:wrap;font-size:13px}
 .ft-links a{color:#bdb8ab}
 .ft-c{font-family:Archivo,sans-serif;font-size:11px;color:#a9a497;letter-spacing:.1em}
+
+/* スマホ：ラベル列を詰めて本文の行幅を確保（時刻グリッドが折り返さないように） */
+@media (max-width: 480px){
+  .row{grid-template-columns:72px 1fr;gap:12px}
+  .times{gap:4px}
+}
 
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto}
@@ -449,7 +455,7 @@ img{max-width:100%}
   <section id="about" class="ov">
     <div class="wrap">
       <h1><img src="/assets/douwa/logo-dark.webp" alt="午前零時の童話集 Midnight Tales" width="720" height="748"><span class="sr">× 夢の島熱帯植物館</span></h1>
-      <p class="ov-lead">普段は入れない夜の夢の島熱帯植物館を巡る物語体験。</p>
+      <p class="ov-lead"><J t="普段は入れない夜の夢の島熱帯植物館を巡る物語体験。" /></p>
       <div class="ov-date">
         <span class="ov-y hv">2026</span>
         <div class="ov-d hv">11.05 – 11.22</div>
@@ -477,36 +483,36 @@ img{max-width:100%}
       <SecHead en="News" ja="お知らせ" />
       {news.length > 0 ? (
         <div class="rows">
-          {news.map((n) => <div class="news-row"><span class="d mono">{n.date}</span><span class="t">{n.text}</span></div>)}
+          {news.map((n) => <div class="news-row"><span class="d mono">{n.date}</span><span class="t"><J t={n.text} /></span></div>)}
         </div>
       ) : (
-        <p class="news-empty">チケットの販売開始日は、決まり次第こちらでお知らせします。</p>
+        <p class="news-empty"><J t="チケットの販売開始日は、決まり次第こちらでお知らせします。" /></p>
       )}
     </section>
 
     <section id="story" class="sec">
       <SecHead en="Story" ja="あらすじ" />
       <div class="story">
-        <p class="lead">『夜の植物館』を巡り、失われた記憶を取り戻すイマーシブ体験。</p>
-        <p>迷い込んだのは、夢の中の植物館。</p>
-        <p>なぜここにいるのか。<br>隣にいる人は、誰なのか。<br>あなたは、何ひとつ思い出せない。</p>
+        <p class="lead"><J t="『夜の植物館』を巡り、失われた記憶を取り戻すイマーシブ体験。" /></p>
+        <p><J t="迷い込んだのは、夢の中の植物館。" /></p>
+        <p><J t={"なぜここにいるのか。\n隣にいる人は、誰なのか。\nあなたは、何ひとつ思い出せない。"} /></p>
         <div class="qwrap">
-          <p>静まり返った館内で「館長」は、あなたに告げる。</p>
-          <p class="quote">「夢にとらわれる前に、はやくお帰りください」</p>
+          <p><J t="静まり返った館内で「館長」は、あなたに告げる。" /></p>
+          <p class="quote"><J t="「夢にとらわれる前に、はやくお帰りください」" /></p>
         </div>
-        <p style="text-wrap:pretty">『夜の植物館』を歩きながら、忘れていた記憶を集め、「家に帰る」ための物語。</p>
+        <p><J t="『夜の植物館』を歩きながら、忘れていた記憶を集め、「家に帰る」ための物語。" /></p>
       </div>
     </section>
 
     <section id="feature" class="sec">
       <SecHead en="Feature" ja="体験の特徴・楽しみ方" />
-      <p class="lead" style="margin:0 0 48px">最大4人1組で、夜の植物館を巡る約50分の物語体験。</p>
+      <p class="lead" style="margin:0 0 48px"><J t="最大4人1組で、夜の植物館を巡る約50分の物語体験。" /></p>
       <div class="stats">
         <div class="stat"><span class="k">最大</span><span class="v">4<small>人1組</small></span></div>
         <div class="stat"><span class="k">所要時間 約</span><span class="v">50<small>分</small></span></div>
         <div class="stat"><span class="k">怖さ</span><span class="v txt">控えめ</span></div>
       </div>
-      <p style="margin:32px 0 0;font-size:16px;line-height:2">物語体験が好きな方におすすめ。</p>
+      <p style="margin:32px 0 0;font-size:16px;line-height:2"><J t="物語体験が好きな方におすすめ。" /></p>
     </section>
 
     <section id="staff" class="sec">
@@ -514,10 +520,9 @@ img{max-width:100%}
       <div class="rows">
         {staff.map((s) => (
           <div class="staff">
-            {s.photo ? <img class="photo" src={s.photo} alt={s.name} width="200" height="200" loading="lazy"> : <div class="photo ph" aria-hidden="true"></div>}
             <span class="role">{s.role}</span>
             <span class="name">{s.name}</span>
-            {s.profile && <p>{s.profile}</p>}
+            {s.profile && <p><J t={s.profile} /></p>}
           </div>
         ))}
       </div>
@@ -545,7 +550,7 @@ img{max-width:100%}
         <div class="tk">
           <span class="nm">個別チケット</span>
           <span class="pr">3,500<small>円 / 1人</small></span>
-          <p>個別チケットは、ほかのお客様と同じ組になる場合があります。</p>
+          <p><J t="個別チケットは、ほかのお客様と同じ組になる場合があります。" /></p>
         </div>
         <div class="tk g">
           <span class="nm">グループチケット</span>
@@ -556,16 +561,16 @@ img{max-width:100%}
       <p class="tk-note">いずれも税込・入館料込み。</p>
 
       <div class="rows" style="margin-top:48px">
-        <div class="row"><span>開催日</span><span>2026年11月5日〜8日、11月12日〜15日、11月19日〜22日（全12日間）</span></div>
+        <div class="row"><span>開催日</span><span><J t="2026年11月5日〜8日、11月12日〜15日、11月19日〜22日（全12日間）" /></span></div>
         <div class="row"><span>開始時間</span>
-          <div style="display:flex;flex-direction:column;gap:14px"><span>各日17:00〜20:00、12分間隔・全16回</span>
+          <div style="display:flex;flex-direction:column;gap:14px"><span><J t="各日17:00〜20:00、12分間隔・全16回" /></span>
             <div class="times">{times.map((t) => <span class="mono">{t}</span>)}</div>
           </div>
         </div>
         <div class="row"><span>所要時間</span><span>約50分</span></div>
-        <div class="row"><span>開催人数</span><span>参加者1名から開催します。</span></div>
-        <div class="row"><span>対象年齢</span><span>対象年齢は18歳以上です。</span></div>
-        <div class="row"><span>販売</span><span>escape.id{!RESERVE_URL && '（販売開始日は決まり次第お知らせします）'}</span></div>
+        <div class="row"><span>開催人数</span><span><J t="参加者1名から開催します。" /></span></div>
+        <div class="row"><span>対象年齢</span><span><J t="対象年齢は18歳以上です。" /></span></div>
+        <div class="row"><span>販売</span><span>escape.id{!RESERVE_URL && <><br><span style="font-size:13px;color:#bdb8ab"><J t="販売開始日は決まり次第お知らせします。" /></span></>}</span></div>
       </div>
       {RESERVE_URL ? (
         <a href={RESERVE_URL} class="cta" target="_blank" rel="noopener" data-track="ticket" data-show="douwa" data-place="douwa-ticket"><span>escape.id で予約する</span><span class="arc">→</span></a>
@@ -577,14 +582,14 @@ img{max-width:100%}
     <section id="flow" class="sec">
       <SecHead en="Flow" ja="当日の流れ" />
       <ol class="flow">
-        {flow.map((f) => <li><span class="no">{f.no}</span><span class="tx">{f.text}</span></li>)}
+        {flow.map((f) => <li><span class="no">{f.no}</span><span class="tx"><J t={f.text} /></span></li>)}
       </ol>
     </section>
 
     <section id="notice" class="sec">
       <SecHead en="Notice" ja="注意事項" />
       <ul class="notes">
-        {notes.map((n) => <li><span>{n}</span></li>)}
+        {notes.map((n) => <li><span><J t={n} /></span></li>)}
       </ul>
     </section>
 
@@ -595,7 +600,7 @@ img{max-width:100%}
         <div class="row"><span>集合場所</span><span>正面入口</span></div>
         <div class="row"><span>住所</span>{ADDRESS ? <span>{ADDRESS}</span> : <span style="color:#bdb8ab">追記予定</span>}</div>
       </div>
-      <div class="map ph mono">MAP<br>地図・最寄り駅からのアクセス案内 追記予定</div>
+      <div class="map ph mono">MAP<br><J t="地図・最寄り駅からのアクセス案内 追記予定" /></div>
     </section>
 
     <section id="faq" class="sec">
@@ -604,9 +609,9 @@ img{max-width:100%}
         {faqs.map((f, i) => (
           <div class="fq">
             <h3><button type="button" aria-expanded="false" aria-controls={`fa${i}`}>
-              <span class="qa">Q.</span><span class="qt">{f.q}</span><span class="sg" aria-hidden="true"></span>
+              <span class="qa">Q.</span><span class="qt"><J t={f.q} /></span><span class="sg" aria-hidden="true"></span>
             </button></h3>
-            <div class="fa" id={`fa${i}`} hidden><span class="qa">A.</span><span>{f.a}</span></div>
+            <div class="fa" id={`fa${i}`} hidden><span class="qa">A.</span><span><J t={f.a} /></span></div>
           </div>
         ))}
       </div>
