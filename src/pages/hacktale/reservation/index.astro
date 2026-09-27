@@ -1,8 +1,8 @@
 ---
 // HACKTALE 公演予約 — カレンダー＋日付別の公演一覧。
-// 月カレンダーの各日に公演（開始時刻・残り席）を表示し、受付中の公演は
-// そのまま予約フォームへ進める。残席・受付状態はリクエストのたびに KV から
-// 読む（キャッシュしない）。?m=YYYY-MM で月、?work= / ?fmt= で絞り込み。
+// カレンダーはトップページと共通の HacktaleCalendar（データはページに埋め込み）。
+// 受付中の公演はカレンダーからそのまま予約フォームへ進める。残席・受付状態は
+// リクエストのたびに KV から読む（キャッシュしない）。?work= / ?fmt= で絞り込み。
 export const prerender = false;
 
 import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
@@ -23,6 +23,8 @@ import {
   type HtWorkRec,
 } from '../../../lib/hacktaleBooking';
 import { FORMAT_LABEL, type HtFormat } from '../../../lib/hacktaleTemplates';
+import HacktaleCalendar from '../../../components/HacktaleCalendar.astro';
+import { buildCalendarData, type CalData } from '../../../lib/hacktaleCalendar';
 
 Astro.response.headers.set('Cache-Control', 'no-store');
 
@@ -46,6 +48,7 @@ interface Row {
 }
 let rows: Row[] = [];
 let works: HtWorkRec[] = [];
+let calData: CalData | null = null;
 const configured = isKvConfigured();
 
 if (configured) {
@@ -71,6 +74,7 @@ if (configured) {
       };
     })
     .filter((r) => (!workFilter || r.s.workId === workFilter) && (!fmtFilter || r.format === fmtFilter));
+  calData = await buildCalendarData((workId, format) => (!workFilter || workId === workFilter) && (!fmtFilter || format === fmtFilter));
 }
 
 // 絞り込みの選択肢は「今後の公演がある作品」だけ
@@ -83,40 +87,13 @@ const qs = (p: Record<string, string>) => {
   return `${htBase}/reservation/${s ? `?${s}` : ''}`;
 };
 
-// --- カレンダー（日本時間・日曜始まり） ------------------------------------------
-const thisMonth = today.slice(0, 7);
-const firstRowMonth = rows[0]?.s.start.slice(0, 7);
-const lastRowMonth = rows[rows.length - 1]?.s.start.slice(0, 7) ?? thisMonth;
-const mParam = Astro.url.searchParams.get('m') ?? '';
-let month = /^\d{4}-\d{2}$/.test(mParam) ? mParam : firstRowMonth ?? thisMonth;
-if (month < thisMonth) month = thisMonth;
-const maxMonth = lastRowMonth > thisMonth ? lastRowMonth : thisMonth;
-if (month > maxMonth) month = maxMonth;
-
-const addMonth = (ym: string, d: number) => {
-  const [y, m] = ym.split('-').map(Number);
-  const dt = new Date(Date.UTC(y, m - 1 + d, 1));
-  return `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, '0')}`;
-};
-const [yy, mm] = month.split('-').map(Number);
-const firstDow = new Date(Date.UTC(yy, mm - 1, 1)).getUTCDay();
-const daysInMonth = new Date(Date.UTC(yy, mm, 0)).getUTCDate();
-const cells: ({ date: string; day: number } | null)[] = [];
-for (let i = 0; i < firstDow; i++) cells.push(null);
-for (let d = 1; d <= daysInMonth; d++) cells.push({ date: `${month}-${String(d).padStart(2, '0')}`, day: d });
-while (cells.length % 7 !== 0) cells.push(null);
-
+// --- 日付別の一覧（今後の全日程） ------------------------------------------------
 const byDate = new Map<string, Row[]>();
 for (const r of rows) {
   const d = r.s.start.slice(0, 10);
   byDate.set(d, [...(byDate.get(d) ?? []), r]);
 }
-const monthRows = rows.filter((r) => r.s.start.startsWith(month));
-const monthDates = [...new Set(monthRows.map((r) => r.s.start.slice(0, 10)))];
-const otherMonths = [...new Set(rows.map((r) => r.s.start.slice(0, 7)))].filter((m) => m !== month);
-
-const shortLabel = (a: HtAvailability) =>
-  a.state === 'open' ? `残${a.remaining}` : a.state === 'full' ? '満席' : a.state === 'closed' ? '終了' : a.flop ? '見送' : '中止';
+const allDates = [...byDate.keys()];
 const WD = ['日', '月', '火', '水', '木', '金', '土'];
 const dayHead = (date: string) => {
   const [y, m, d] = date.split('-').map(Number);
@@ -142,13 +119,13 @@ const openCount = rows.filter((r) => r.avail.state === 'open').length;
 {configured && (
   <div class="filters" aria-label="絞り込み">
     <div class="fgroup">
-      <a class:list={['fchip', { on: !workFilter }]} href={qs({ work: '', m: '' })}>すべての作品</a>
-      {workChoices.map((w) => <a class:list={['fchip', { on: workFilter === w.id }]} href={qs({ work: w.id, m: '' })}>{w.title}</a>)}
+      <a class:list={['fchip', { on: !workFilter }]} href={qs({ work: '' })}>すべての作品</a>
+      {workChoices.map((w) => <a class:list={['fchip', { on: workFilter === w.id }]} href={qs({ work: w.id })}>{w.title}</a>)}
     </div>
     <div class="fgroup">
-      <a class:list={['fchip', { on: !fmtFilter }]} href={qs({ fmt: '', m: '' })}>対面・オンライン</a>
-      <a class:list={['fchip', { on: fmtFilter === 'offline' }]} href={qs({ fmt: 'offline', m: '' })}>対面</a>
-      <a class:list={['fchip', { on: fmtFilter === 'online' }]} href={qs({ fmt: 'online', m: '' })}>オンライン</a>
+      <a class:list={['fchip', { on: !fmtFilter }]} href={qs({ fmt: '' })}>対面・オンライン</a>
+      <a class:list={['fchip', { on: fmtFilter === 'offline' }]} href={qs({ fmt: 'offline' })}>対面</a>
+      <a class:list={['fchip', { on: fmtFilter === 'online' }]} href={qs({ fmt: 'online' })}>オンライン</a>
     </div>
   </div>
 )}
@@ -166,34 +143,11 @@ const openCount = rows.filter((r) => r.avail.state === 'open').length;
 
 {rows.length > 0 && (
   <>
-  {/* ============ カレンダー ============ */}
-  <div class="cal">
-    <div class="calhead">
-      {month > thisMonth ? <a class="nav" href={qs({ m: addMonth(month, -1) })} aria-label="前の月">←</a> : <span class="nav off" aria-hidden="true">←</span>}
-      <p class="calm en">{yy}.{String(mm).padStart(2, '0')}<span class="calmj">{yy}年{mm}月</span></p>
-      {month < maxMonth ? <a class="nav" href={qs({ m: addMonth(month, 1) })} aria-label="次の月">→</a> : <span class="nav off" aria-hidden="true">→</span>}
-    </div>
-    <div class="grid" role="grid">
-      {WD.map((w, i) => <div class:list={['dow', { sun: i === 0, sat: i === 6 }]} role="columnheader">{w}</div>)}
-      {cells.map((c, i) => c === null ? <div class="cell blank"></div> : (
-        <div class:list={['cell', { past: c.date < today, today: c.date === today, has: byDate.has(c.date), sun: i % 7 === 0, sat: i % 7 === 6 }]} role="gridcell">
-          <span class="dn">{c.day}</span>
-          {(byDate.get(c.date) ?? []).map((r) => (
-            <a class:list={['ev', r.avail.state]} href={r.avail.state === 'open' ? `${htBase}/reservation/${r.s.id}/` : `#d-${c.date}`} title={`${r.workTitle} ${r.s.start.slice(11)} ${AVAILABILITY_LABEL(r.avail)}`}>
-              <span class="et">{r.s.start.slice(11)}</span>
-              <span class="ew">{r.workTitle}</span>
-              <span class="er">{shortLabel(r.avail)}</span>
-            </a>
-          ))}
-        </div>
-      ))}
-    </div>
-    <p class="legend"><span class="lg open"></span>受付中（数字は残り席）<span class="lg full"></span>満席<span class="lg closed"></span>受付終了・見送り</p>
-  </div>
+  {/* ============ カレンダー（トップページと共通） ============ */}
+  {calData && <div class="calwrap"><HacktaleCalendar data={calData} showFilter={false} detailBase="#d-" /></div>}
 
-  {/* ============ この月の公演 ============ */}
-  {monthRows.length === 0 && <p class="edesc">この月の公演はありません。{otherMonths.length > 0 && <>ほかの月: {otherMonths.map((m) => <a class="mlink" href={qs({ m })}>{Number(m.slice(5))}月</a>)}</>}</p>}
-  {monthDates.map((date) => (
+  {/* ============ 日付別の公演一覧 ============ */}
+  {allDates.map((date) => (
     <div class="day" id={`d-${date}`}>
       <p class="dayh">{dayHead(date)}</p>
       <div class="list">
@@ -227,9 +181,6 @@ const openCount = rows.filter((r) => r.avail.state === 'open').length;
       </div>
     </div>
   ))}
-  {monthRows.length > 0 && otherMonths.length > 0 && (
-    <p class="edesc more">ほかの月の公演: {otherMonths.map((m) => <a class="mlink" href={qs({ m })}>{Number(m.slice(0, 4)) !== yy ? `${m.slice(0, 4)}年` : ''}{Number(m.slice(5))}月</a>)}</p>
-  )}
   </>
 )}
 
@@ -262,38 +213,7 @@ const openCount = rows.filter((r) => r.avail.state === 'open').length;
 .fchip:hover{border-color:var(--acc);color:var(--acc)}
 .fchip.on{background:var(--acc);border-color:var(--acc);color:#0d0d0e;font-weight:700}
 
-/* カレンダー */
-.cal{border:1px solid rgba(255,255,255,.12);background:#141416;padding:20px 20px 16px;margin:0 0 40px}
-.calhead{display:flex;align-items:center;justify-content:space-between;margin:0 0 14px}
-.calm{font-size:28px;margin:0;line-height:1;display:flex;align-items:baseline;gap:12px}
-.calmj{font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;color:#9b978c;letter-spacing:.1em}
-.nav{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid rgba(255,255,255,.25);font-size:18px;color:#f1efe9}
-.nav:hover{border-color:var(--acc);color:var(--acc)}
-.nav.off{opacity:.2}
-.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
-.dow{text-align:center;font-size:11px;letter-spacing:.1em;color:#9b978c;padding:4px 0 6px}
-.dow.sun{color:#e08a8a}.dow.sat{color:#8ab4e0}
-.cell{min-height:92px;border:1px solid rgba(255,255,255,.07);padding:6px;display:flex;flex-direction:column;gap:4px;min-width:0}
-.cell.blank{border-color:transparent}
-.cell.past{opacity:.35}
-.cell.today{border-color:rgba(217,230,59,.6)}
-.cell.has{background:rgba(255,255,255,.025)}
-.dn{font-size:12px;color:#c9c5ba;line-height:1}
-.cell.sun .dn{color:#e08a8a}.cell.sat .dn{color:#8ab4e0}
-.ev{display:flex;flex-direction:column;gap:1px;font-size:11px;line-height:1.35;padding:4px 5px;border-left:3px solid rgba(255,255,255,.3);background:rgba(255,255,255,.05);color:#c9c5ba;min-width:0}
-.ev:hover{background:rgba(217,230,59,.12);color:#f1efe9}
-.et{font-weight:700;color:#f1efe9}
-.ew{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.er{font-weight:700}
-.ev.open{border-left-color:var(--acc)}
-.ev.open .er{color:var(--acc)}
-.ev.full{border-left-color:#e5484d}
-.ev.full .er{color:#e5484d}
-.ev.closed,.ev.cancelled{opacity:.6}
-.legend{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;color:#9b978c;margin:14px 0 0}
-.lg{display:inline-block;width:10px;height:10px;margin-right:-8px}
-.lg.open{background:var(--acc)}.lg.full{background:#e5484d}.lg.closed{background:rgba(255,255,255,.3)}
-
+.calwrap{margin:0 0 40px}
 /* 日付別の一覧 */
 .day{margin:0 0 28px;scroll-margin-top:90px}
 .dayh{font-size:15px;font-weight:900;letter-spacing:.06em;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.12)}
@@ -327,13 +247,7 @@ const openCount = rows.filter((r) => r.avail.state === 'open').length;
 @media(max-width:760px){
 .st{font-size:clamp(30px,9vw,38px)}
 .sj{white-space:nowrap}
-.cal{padding:14px 10px 12px;margin:0 -8px 32px}
-.calm{font-size:22px}
-.grid{gap:2px}
-.cell{min-height:64px;padding:4px 3px}
-.dn{font-size:11px}
-.ev{padding:3px 3px;border-left-width:2px;font-size:10px;align-items:flex-start}
-.ew{display:none}
+.calwrap{margin:0 -8px 32px}
 .row{grid-template-columns:64px 1fr;gap:14px;padding:16px}
 .thumb{width:64px;height:64px}
 .act{grid-column:1/-1}

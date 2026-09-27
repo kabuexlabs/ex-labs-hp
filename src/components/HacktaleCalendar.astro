@@ -1,0 +1,250 @@
+---
+// HACKTALE 公演カレンダー（参考: 一般的な公演予約サイトの月カレンダー）。
+// 各日に「○/× 残○」「開始〜終了」「公演名」を作品ごとの色で並べ、
+// 受付中はタップでそのまま予約フォームへ。
+//   ・トップページ（静的）: data を渡さず、/api/hacktale/calendar から取得
+//   ・予約ページ（SSR）: data をページに埋め込み（APIを叩かない）
+// 描画はブラウザ側で行う。公演名など管理画面で入力された文字列は
+// textContent で入れ、HTMLとして解釈させない。
+import type { CalData } from '../lib/hacktaleCalendar';
+import { jsonLd } from '../lib/microcms';
+
+export interface Props {
+  data?: CalData;
+  /** 公演メニュー（作品の絞り込み）を出すか */
+  showFilter?: boolean;
+  /** 受付中以外の公演を押したときの行き先（末尾に日付が付く） */
+  detailBase?: string;
+}
+const { data, showFilter = true, detailBase = '/hacktale/reservation/#d-' } = Astro.props;
+---
+
+<div class="hcal" data-src="/api/hacktale/calendar" data-filter={showFilter ? '1' : '0'} data-detail={detailBase}>
+  {data && <script type="application/json" set:html={jsonLd(data)} />}
+  <p class="hc-loading">公演カレンダーを読み込んでいます…</p>
+  <noscript><p class="hc-msg">カレンダーの表示にはJavaScriptが必要です。<a href="/hacktale/reservation/">公演予約ページ</a>から公演をお選びください。</p></noscript>
+</div>
+
+<script>
+type CalSession = {
+  id: string; workId: string; title: string; tag?: string; date: string; start: string; end?: string;
+  state: 'open' | 'full' | 'closed' | 'cancelled'; remaining: number; go: boolean; flop: boolean;
+};
+type CalData = { today: string; works: { id: string; title: string; color: string }[]; sessions: CalSession[] };
+
+const WD = ['日', '月', '火', '水', '木', '金', '土'];
+
+function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string): HTMLElementTagNameMap[K] {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+const ym = (d: string) => d.slice(0, 7);
+function addMonth(m: string, n: number): string {
+  const [y, mo] = m.split('-').map(Number);
+  const d = new Date(Date.UTC(y, mo - 1 + n, 1));
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+}
+function iso(d: Date): string {
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+}
+
+function mount(root: HTMLElement, data: CalData) {
+  const showFilter = root.dataset.filter === '1';
+  const detail = root.dataset.detail || '/hacktale/reservation/#d-';
+  const color = new Map(data.works.map((w) => [w.id, w.color]));
+  const thisMonth = ym(data.today);
+  let work = '';
+
+  const visible = () => data.sessions.filter((s) => !work || s.workId === work);
+  const firstOpen = () => visible().find((s) => s.state === 'open') ?? visible()[0];
+  const lastMonth = () => {
+    const v = visible();
+    const m = v.length ? ym(v[v.length - 1].date) : thisMonth;
+    return m > thisMonth ? m : thisMonth;
+  };
+  let month = firstOpen() ? ym(firstOpen()!.date) : thisMonth;
+
+  root.replaceChildren();
+
+  // --- 操作列（今月・公演メニュー） ---
+  const bar = el('div', 'hc-bar');
+  const todayBtn = el('button', 'hc-btn', '今月');
+  todayBtn.type = 'button';
+  bar.append(todayBtn);
+  let select: HTMLSelectElement | null = null;
+  if (showFilter) {
+    select = el('select', 'hc-sel');
+    select.setAttribute('aria-label', '公演メニューで絞り込む');
+    select.append(new Option('すべての公演メニュー', ''));
+    for (const w of data.works) if (data.sessions.some((s) => s.workId === w.id)) select.append(new Option(w.title, w.id));
+    bar.append(select);
+  }
+  root.append(bar);
+
+  // --- 月の見出し ---
+  const head = el('div', 'hc-head');
+  const prev = el('button', 'hc-nav', '‹');
+  const next = el('button', 'hc-nav', '›');
+  prev.type = next.type = 'button';
+  prev.setAttribute('aria-label', '前の月');
+  next.setAttribute('aria-label', '次の月');
+  const title = el('p', 'hc-month');
+  head.append(prev, title, next);
+  root.append(head);
+
+  const grid = el('div', 'hc-grid');
+  root.append(grid);
+  const msg = el('p', 'hc-msg');
+  root.append(msg);
+
+  const legend = el('p', 'hc-legend');
+  const lg = (cls: string, mark: string, label: string) => {
+    const s = el('span', 'hc-lg');
+    s.append(el('i', `hc-ic ${cls}`, mark), document.createTextNode(label));
+    return s;
+  };
+  legend.append(lg('ok', '○', '受付中（数字は残り席）'), lg('ng', '×', '満席・受付終了'));
+  root.append(legend);
+
+  function render() {
+    const [y, m] = month.split('-').map(Number);
+    title.replaceChildren(el('span', 'hc-y', `${y}年`), el('span', 'hc-m', String(m).padStart(2, '0')), el('span', 'hc-y', '月'));
+    prev.disabled = month <= thisMonth;
+    next.disabled = month >= lastMonth();
+
+    const byDate = new Map<string, CalSession[]>();
+    for (const s of visible()) byDate.set(s.date, [...(byDate.get(s.date) ?? []), s]);
+
+    grid.replaceChildren();
+    WD.forEach((w, i) => grid.append(el('div', `hc-dow${i === 0 ? ' sun' : i === 6 ? ' sat' : ''}`, w)));
+    // 月初の週の日曜から、月末の週の土曜まで（前後の月の日付も薄く出す）
+    const first = new Date(Date.UTC(y, m - 1, 1));
+    const start = new Date(first.getTime() - first.getUTCDay() * 86400000);
+    const last = new Date(Date.UTC(y, m, 0));
+    const end = new Date(last.getTime() + (6 - last.getUTCDay()) * 86400000);
+    for (let d = start; d <= end; d = new Date(d.getTime() + 86400000)) {
+      const date = iso(d);
+      const dow = d.getUTCDay();
+      const cell = el('div', 'hc-cell');
+      if (ym(date) !== month) cell.classList.add('other');
+      if (date < data.today) cell.classList.add('past');
+      if (date === data.today) cell.classList.add('today');
+      if (dow === 0) cell.classList.add('sun');
+      if (dow === 6) cell.classList.add('sat');
+      const day = d.getUTCDate();
+      cell.append(el('span', 'hc-dn', day === 1 ? `${d.getUTCMonth() + 1}/1` : String(day)));
+      for (const s of byDate.get(date) ?? []) {
+        const open = s.state === 'open';
+        const a = el('a', `hc-ev ${open ? 'open' : 'ng'}`);
+        a.href = open ? `/hacktale/reservation/${encodeURIComponent(s.id)}/` : `${detail}${date}`;
+        a.style.setProperty('--c', color.get(s.workId) ?? '#6b7a8f');
+        const status = open ? `受付中 残り${s.remaining}席` : s.state === 'full' ? '満席' : s.state === 'cancelled' ? (s.flop ? '開催見送り' : '公演中止') : '受付終了';
+        a.setAttribute('aria-label', `${date} ${s.start} ${s.title}${s.tag ? `（${s.tag}）` : ''} ${status}`);
+        const st = el('span', 'hc-st');
+        st.append(el('i', `hc-ic ${open ? 'ok' : 'ng'}`, open ? '○' : '×'), el('span', 'hc-rem', open ? `残${s.remaining}` : s.state === 'full' ? '満席' : s.flop ? '見送' : s.state === 'cancelled' ? '中止' : '終了'));
+        a.append(st, el('span', 'hc-tm', s.end ? `${s.start}-${s.end}` : s.start), el('span', 'hc-tt', `${s.title}${s.tag ? `【${s.tag}】` : ''}`));
+        if (s.go) a.append(el('span', 'hc-go', '開催決定'));
+        cell.append(a);
+      }
+      grid.append(cell);
+    }
+
+    const inMonth = visible().filter((s) => ym(s.date) === month);
+    if (visible().length === 0) msg.textContent = '現在募集中の公演はありません。貸切公演のご相談はお問い合わせからどうぞ。';
+    else if (inMonth.length === 0) msg.textContent = 'この月の公演はありません。「›」で次の月をご覧ください。';
+    else msg.textContent = '';
+    msg.hidden = msg.textContent === '';
+  }
+
+  prev.addEventListener('click', () => { month = addMonth(month, -1); render(); });
+  next.addEventListener('click', () => { month = addMonth(month, 1); render(); });
+  todayBtn.addEventListener('click', () => { month = thisMonth; render(); });
+  select?.addEventListener('change', () => {
+    work = select!.value;
+    const f = firstOpen();
+    month = f ? ym(f.date) : thisMonth;
+    render();
+  });
+  render();
+}
+
+for (const root of document.querySelectorAll<HTMLElement>('.hcal')) {
+  const embedded = root.querySelector('script[type="application/json"]');
+  if (embedded) {
+    mount(root, JSON.parse(embedded.textContent || '{}') as CalData);
+  } else {
+    fetch(root.dataset.src || '/api/hacktale/calendar')
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((d: CalData) => mount(root, d))
+      .catch(() => {
+        root.replaceChildren();
+        const p = el('p', 'hc-msg');
+        p.append('カレンダーを読み込めませんでした。');
+        const a = el('a', '', '公演予約ページ');
+        a.href = '/hacktale/reservation/';
+        p.append(a, 'からご確認ください。');
+        root.append(p);
+      });
+  }
+}
+</script>
+
+<style is:global>
+.hcal{border:1px solid rgba(255,255,255,.12);background:#141416;padding:18px 18px 14px}
+.hc-loading,.hc-msg{font-size:13px;color:#9b978c;margin:12px 0 4px;line-height:1.9}
+.hc-msg a{color:var(--acc,#d9e63b);border-bottom:1px solid rgba(217,230,59,.4)}
+.hc-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.hc-btn{background:transparent;border:1px solid rgba(255,255,255,.3);color:#f1efe9;font:inherit;font-size:13px;font-weight:700;letter-spacing:.08em;padding:8px 18px;cursor:pointer}
+.hc-btn:hover{border-color:var(--acc,#d9e63b);color:var(--acc,#d9e63b)}
+.hc-sel{flex:1;min-width:0;max-width:360px;background:#0d0d0e;border:1px solid rgba(255,255,255,.25);color:#f1efe9;font:inherit;font-size:14px;padding:9px 34px 9px 12px;appearance:none;background-image:linear-gradient(45deg,transparent 50%,#9b978c 50%),linear-gradient(135deg,#9b978c 50%,transparent 50%);background-position:calc(100% - 19px) 50%,calc(100% - 14px) 50%;background-size:5px 5px;background-repeat:no-repeat;cursor:pointer}
+.hc-sel:focus{outline:none;border-color:var(--acc,#d9e63b)}
+.hc-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px}
+.hc-nav{width:44px;height:44px;background:transparent;border:1px solid rgba(255,255,255,.3);color:#f1efe9;font-size:24px;line-height:1;cursor:pointer}
+.hc-nav:hover:not(:disabled){border-color:var(--acc,#d9e63b);color:var(--acc,#d9e63b)}
+.hc-nav:disabled{opacity:.2;cursor:default}
+.hc-month{margin:0;display:flex;align-items:baseline;gap:2px;font-weight:900}
+.hc-m{font-family:Anton,sans-serif;font-weight:400;font-size:32px;letter-spacing:.04em;margin:0 2px;line-height:1}
+.hc-y{font-size:15px}
+.hc-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid rgba(255,255,255,.1);border-left:1px solid rgba(255,255,255,.1)}
+.hc-dow{text-align:center;font-size:12px;letter-spacing:.1em;color:#c9c5ba;padding:6px 0;border-right:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);background:#1b1b1e}
+.hc-dow.sun{color:#ff8f8f;background:rgba(229,72,77,.14)}
+.hc-dow.sat{color:#9cc3ff;background:rgba(80,140,230,.14)}
+.hc-cell{min-height:96px;padding:4px 3px 5px;display:flex;flex-direction:column;gap:3px;min-width:0;border-right:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1)}
+.hc-cell.other{background:rgba(0,0,0,.25)}
+.hc-cell.other .hc-dn{opacity:.4}
+.hc-cell.past .hc-dn{opacity:.35}
+.hc-cell.today{box-shadow:inset 0 0 0 2px rgba(217,230,59,.7)}
+.hc-dn{font-size:13px;color:#f1efe9;padding:0 3px;line-height:1.4}
+.hc-cell.sun .hc-dn{color:#ff8f8f}
+.hc-cell.sat .hc-dn{color:#9cc3ff}
+.hc-ev{display:flex;flex-direction:column;gap:1px;padding:4px 4px 5px;background:color-mix(in srgb,var(--c) 34%,#141416);border-left:3px solid var(--c);color:#f1efe9;font-size:11.5px;line-height:1.35;min-width:0;text-decoration:none;transition:filter .15s}
+.hc-ev:hover{filter:brightness(1.25);color:#fff}
+.hc-ev.ng{background:#232326;border-left-color:#4a4a50;color:#8f8b82}
+.hc-st{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.hc-ic{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;font-style:normal;font-size:12px;font-weight:900;line-height:1;flex-shrink:0}
+.hc-ic.ok{background:var(--acc,#d9e63b);color:#0d0d0e}
+.hc-ic.ng{background:#4a4a50;color:#d4d0c6}
+.hc-rem{font-weight:900}
+.hc-ev.open .hc-rem{color:var(--acc,#d9e63b)}
+.hc-tm{font-weight:700;white-space:nowrap;overflow:hidden;font-variant-numeric:tabular-nums}
+.hc-tt{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all}
+.hc-go{align-self:flex-start;font-size:9.5px;font-weight:700;letter-spacing:.06em;border:1px solid var(--acc,#d9e63b);color:var(--acc,#d9e63b);padding:0 4px;margin-top:2px;white-space:nowrap}
+.hc-ev.ng .hc-go{border-color:#4a4a50;color:#8f8b82}
+.hc-legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin:12px 0 0;font-size:12px;color:#c9c5ba}
+.hc-lg{display:inline-flex;align-items:center;gap:6px}
+@media(max-width:760px){
+.hcal{padding:12px 8px 10px}
+.hc-bar{gap:8px}
+.hc-btn{padding:8px 14px}
+.hc-m{font-size:28px}
+.hc-nav{width:40px;height:40px}
+.hc-cell{min-height:70px;padding:3px 2px 4px}
+.hc-dn{font-size:12px;padding:0 2px}
+.hc-ev{padding:3px 2px 4px;border-left-width:2px;font-size:10px;line-height:1.3}
+.hc-ic{width:13px;height:13px;font-size:10px}
+.hc-st{gap:2px}
+.hc-go{display:none}
+}
+</style>

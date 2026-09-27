@@ -1,10 +1,11 @@
 ---
 // HACKTALE トップページ。
-// セクション順: ティッカー → ヒーロー → WORKS → EVENT → HACKTALEとは → ABOUT
+// セクション順: ティッカー → ヒーロー → SCHEDULE（現在募集中の公演カレンダー）→ WORKS → EVENT → HACKTALEとは → ABOUT
 // → TICKET → CONTACT → フッターマーキー → フッター
 import HacktaleLayout from '../../layouts/HacktaleLayout.astro';
 import { jsonLd } from '../../lib/microcms';
 import HacktaleContactForm from '../../components/HacktaleContactForm.astro';
+import HacktaleCalendar from '../../components/HacktaleCalendar.astro';
 import {
   htBase,
   htWorks,
@@ -61,10 +62,20 @@ const orgLd = {
 <h1 class="h1">日本で唯一無二の<br>『頭脳戦』制作団体</h1>
 <p class="lead m0">交渉/閃きなどを必要とする『頭脳戦』を制作している団体、ハックテイルです。</p>
 <div class="fx ac gap16 fwrap" style="margin-top:40px">
-<a class="btn btn-acc" href={`${htBase}/reservation/`}>公演を予約する</a>
+<a class="btn btn-acc" href="#schedule">公演を予約する</a>
 <a class="btn" href="#works">作品一覧を見る</a>
 <a class="btn" href={HT_LINE_URL} target="_blank" rel="noopener">公式LINEで予約</a>
 <a class="btn" href={HT_X_URL} target="_blank" rel="noopener">Xを見る</a>
+</div>
+</div></section>
+
+<section class="sec" id="schedule"><div class="wrap">
+<div class="shead"><h2 class="sheadh"><span class="en st">SCHEDULE</span><span class="sj">現在募集中の公演</span></h2><a class="more en" href={`${htBase}/reservation/`}>MORE</a></div>
+<p class="whatp schlead">カレンダーから日程を選ぶと、そのまま予約できます。開催に必要な人数が集まった時点で開催決定となり、当日の詳細をメールでご案内します。</p>
+<HacktaleCalendar />
+<div class="fx ac gap16 fwrap schcta">
+<a class="btn btn-acc" href={`${htBase}/reservation/`}>公演一覧・ご予約はこちら</a>
+<a class="btn" href="#contact">貸切公演を相談する</a>
 </div>
 </div></section>
 
@@ -149,6 +160,8 @@ const orgLd = {
 .sec{padding:104px 0;border-top:1px solid rgba(255,255,255,.08)}
 .dark2{background:#111113}
 .shead{display:flex;align-items:baseline;gap:18px;margin-bottom:48px}
+.whatp.schlead{margin:-24px 0 28px}
+.schcta{margin-top:28px}
 /* セクション見出し（英語＋日本語の組）は h2。見出し階層が h1→h3 と飛ぶのを
    防ぐためのもので、見た目は従来の .shead の並びのまま。 */
 .sheadh{display:flex;align-items:baseline;gap:18px;margin:0;font-size:inherit;font-weight:inherit}
@@ -219,6 +232,11 @@ const orgLd = {
 .hero{padding:76px 0 64px}
 .sec{padding:64px 0}
 .shead{margin-bottom:32px;gap:12px}
+.whatp.schlead{margin:-12px 0 20px;font-size:14px}
+.schcta{margin-top:20px}
+.schcta .btn{flex:1 1 100%;justify-content:center}
+#schedule .sj{white-space:nowrap}
+#schedule .more{display:none}
 .sheadh{gap:12px}
 .kwrow{margin-bottom:24px;gap:14px}
 .steps{gap:22px}
