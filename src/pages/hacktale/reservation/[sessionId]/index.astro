@@ -16,7 +16,10 @@ import {
   availability,
   AVAILABILITY_LABEL,
   formatStartJa,
+  sessionFormat,
+  minPlayersOf,
 } from '../../../../lib/hacktaleBooking';
+import { FORMAT_LABEL } from '../../../../lib/hacktaleTemplates';
 import { normalizePhone, validPhone, validEmail } from '../../../../lib/yoyaku';
 
 Astro.response.headers.set('Cache-Control', 'no-store');
@@ -29,7 +32,10 @@ if (!session || session.status === 'draft') {
   return Astro.redirect(`${htBase}/reservation/?err=notfound`, 303);
 }
 const work = await getWork(session.workId);
-const avail = availability(session, await bookedSeats(session.id));
+const booked = await bookedSeats(session.id);
+const avail = availability(session, booked);
+const format = sessionFormat(session, work);
+const min = minPlayersOf(session);
 
 // エラー表示（確定APIからのリダイレクト）
 const ERR_MSG: Record<string, string> = {
@@ -95,14 +101,25 @@ const pageTitle = `${work?.title ?? '公演'}の予約 | ハックテイル`;
 <div class="head">
   {work?.image && <img class="thumb" src={work.image} alt="" decoding="async">}
   <div>
-    <div class="chips"><span class:list={['stat', avail.state]}>{AVAILABILITY_LABEL(avail)}</span>{work?.durationMin && <span class="chip">約{work.durationMin}分</span>}</div>
+    <div class="chips">
+      <span class:list={['stat', avail.state]}>{AVAILABILITY_LABEL(avail)}</span>
+      <span class="chip">{FORMAT_LABEL[format]}</span>
+      {avail.state !== 'cancelled' && (session.go
+        ? <span class="chip gochip">開催決定</span>
+        : booked < min && <span class="chip">あと{min - booked}名で開催決定</span>)}
+    </div>
     <h1 class="wt">{work?.title ?? session.workId}</h1>
     <p class="dt">{formatStartJa(session.start)}</p>
-    <p class="meta">会場: {session.venue}{session.meeting ? `／集合: ${session.meeting}` : ''}</p>
-    <p class="meta">料金: {session.price}</p>
+    <p class="meta">プレイ人数: {min < session.capacity ? `${min}〜${session.capacity}名` : `${session.capacity}名`}{work?.durationMin ? `／約${work.durationMin}分` : ''}</p>
+    <p class="meta">料金: {session.price}{format === 'offline' && /円$/.test(session.price) ? '/名' : ''}</p>
+    <p class="meta">形式: {FORMAT_LABEL[format]}（{session.venue}{session.meeting ? `／集合: ${session.meeting}` : ''}）</p>
     {session.deadline && <p class="meta">受付期限: {formatStartJa(session.deadline)} まで</p>}
   </div>
 </div>
+
+{!session.go && avail.state === 'open' && (
+  <p class="gonote">開催に必要な人数（{min}名）が集まった時点で開催決定となり、当日の詳細（{format === 'online' ? 'Discordのご案内・お支払い方法' : '会場・お支払い方法'}など）をメールでご案内します。人数に達しなかった場合は開催を見送り、事前にメールでご連絡します。</p>
+)}
 
 {session.notes && (
   <div class="notes"><p class="nh fw7 m0">当日の注意事項</p><p class="nb">{session.notes}</p></div>
@@ -197,6 +214,8 @@ const pageTitle = `${work?.title ?? '公演'}の予約 | ハックテイル`;
 .wt{font-size:clamp(22px,3.4vw,30px);font-weight:900;line-height:1.5;margin:0 0 6px}
 .dt{font-size:16px;font-weight:700;color:var(--acc);margin:0 0 8px;letter-spacing:.04em}
 .meta{font-size:13px;color:#9b978c;margin:0;line-height:2}
+.gochip{border-color:var(--acc);color:var(--acc)}
+.gonote{font-size:12.5px;line-height:1.9;color:#c9c5ba;border-left:2px solid var(--acc);padding:4px 0 4px 14px;margin:0 0 24px}
 .notes{border:1px solid rgba(217,230,59,.4);padding:18px 22px;margin:0 0 26px}
 .nh{font-size:13px;letter-spacing:.08em}
 .nb{font-size:13px;line-height:2;color:#c9c5ba;margin:8px 0 0;white-space:pre-wrap}

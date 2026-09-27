@@ -33,7 +33,7 @@ const mailFailed = Astro.url.searchParams.get('mail') === '0';
 {mailFailed ? (
   <p class="body warn">確認メールの送信に失敗した可能性があります。予約は確定していますのでご安心ください。確認のご連絡を差し上げる場合があります。メールが届かない場合は <a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> までお問い合わせください。</p>
 ) : (
-  <p class="body">ご入力いただいたメールアドレスに確認メールをお送りしました。開催日時・会場・料金などの詳細はメールをご確認ください。<br>数分待っても届かない場合は、迷惑メールフォルダをご確認のうえ、<a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> までご連絡ください。</p>
+  <p class="body">ご入力いただいたメールアドレスに確認メールをお送りしました。開催人数に達した時点で、当日の詳細（会場・お支払い方法など）を改めてメールでご案内します（すでに開催決定している公演は、詳細をお送りしたメールをご確認ください）。<br>数分待っても届かない場合は、迷惑メールフォルダをご確認のうえ、<a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a> までご連絡ください。</p>
 )}
 
 <p class="body">変更・キャンセルのご希望は、確認メールへの返信またはお問い合わせフォームからご連絡ください。</p>

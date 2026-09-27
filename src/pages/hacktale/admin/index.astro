@@ -1,7 +1,7 @@
 ---
 // HACKTALE 公演予約の管理ページ（社内用）。
-//   /hacktale/admin/                 … 公演回一覧＋作品＋リマインド設定
-//   /hacktale/admin/?session=<id>    … 公演回の編集・予約者一覧・メール
+//   /hacktale/admin/                 … 公演回一覧＋作品＋設定
+//   /hacktale/admin/?session=<id>    … 公演回の編集・開催決定/見送り・予約者一覧・メール
 //   /hacktale/admin/?session=<id>&csv=1 … 予約者CSV
 // HACKTALE_ADMIN_KEY（未設定なら YOYAKU_ADMIN_KEY）を知っている人だけが
 // 操作できる。合言葉は POST でのみ受け取り、以降は HttpOnly な
@@ -26,6 +26,7 @@ import {
   availability,
   AVAILABILITY_LABEL,
   SESSION_STATUS_LABEL,
+  MAIL_KIND_LABEL,
   getReservations,
   getReservation,
   reserveSeats,
@@ -35,9 +36,19 @@ import {
   getSettings,
   saveSettings,
   getMailLog,
-  sendConfirmMail,
+  sendAcceptMail,
+  sendGoMailAll,
+  resendGoMail,
+  sendFlopMailAll,
   sendNoticeMail,
+  afterReservation,
+  markGo,
+  unmarkGo,
   remindSession,
+  sessionFormat,
+  sessionTemplates,
+  initialTemplates,
+  minPlayersOf,
   formatStartJa,
   validStart,
   jstNow,
@@ -46,7 +57,23 @@ import {
   type HtSessionStatus,
   type HtReservation,
   type HtWorkRec,
+  type HtSettings,
+  type HtMailLog,
 } from '../../../lib/hacktaleBooking';
+import {
+  type HtFormat,
+  type GoKind,
+  FORMAT_LABEL,
+  PLACEHOLDERS,
+  SUBJECTS,
+  DEFAULT_OFFLINE_VENUE,
+  DEFAULT_ONLINE_VENUE,
+  defaultAcceptTemplate,
+  defaultGoTemplate,
+  FLOP_TEMPLATE,
+  renderTemplate,
+  missingPlaceholders,
+} from '../../../lib/hacktaleTemplates';
 import { normalizePhone, validPhone, validEmail } from '../../../lib/yoyaku';
 import { loginAllowed, recordLoginFailure } from '../../../lib/contact';
 
@@ -59,7 +86,8 @@ let error = '';
 let loginFailed = false;
 let message = Astro.url.searchParams.get('msg') ?? '';
 let sessionId = Astro.url.searchParams.get('session') ?? '';
-const noticeMode = Astro.url.searchParams.get('notice') ?? ''; // changed | cancelled
+// go | flop | changed | cancelled — 一斉送信フォームを出す
+let noticeMode = Astro.url.searchParams.get('notice') ?? '';
 
 let key = Astro.cookies.get(COOKIE)?.value ?? '';
 const configured = isKvConfigured();
@@ -69,10 +97,15 @@ const back = (params: Record<string, string>) => {
   const q = new URLSearchParams(params);
   return Astro.redirect(`${BASE}?${q.toString()}`, 303);
 };
+const validUrl = (u: string) => /^https:\/\/[^\s]+$/.test(u);
+const sendSummary = (r: { sent: number; failed: number; skipped: number }) =>
+  `成功${r.sent}件${r.failed ? `／失敗${r.failed}件（予約一覧から再送できます）` : ''}${r.skipped ? `／対象外${r.skipped}件（送信済み・メールなし）` : ''}`;
 
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   const get = (k: string) => String(form.get(k) ?? '').trim();
+  // 文面は改行・字下げを保つため trim しない（末尾の空白行だけ落とす）
+  const getText = (k: string, max: number) => String(form.get(k) ?? '').replace(/\r\n/g, '\n').replace(/\s+$/, '').slice(0, max);
   const action = get('action');
 
   if (action === 'login') {
@@ -96,8 +129,9 @@ if (Astro.request.method === 'POST') {
     // --- 設定 ---------------------------------------------------------------
     if (action === 'settings') {
       const hours = Math.min(Math.max(parseInt(get('hours'), 10) || 36, 1), 168);
-      await saveSettings({ reminderEnabled: get('enabled') !== '', reminderHours: hours });
-      return back({ msg: 'リマインド設定を保存しました。' });
+      const cur = await getSettings();
+      await saveSettings({ ...cur, reminderEnabled: get('enabled') !== '', reminderHours: hours, bankInfo: getText('bank', 500) || undefined });
+      return back({ msg: '設定を保存しました。' });
     }
 
     // --- 作品 ---------------------------------------------------------------
@@ -117,12 +151,13 @@ if (Astro.request.method === 'POST') {
           image: get('image').slice(0, 200) || undefined,
           durationMin: parseInt(get('duration'), 10) || undefined,
           defaultCapacity: Math.min(Math.max(parseInt(get('capacity'), 10) || 1, 1), 500),
-          defaultPrice: get('price').slice(0, 200) || undefined,
+          defaultPrice: get('price').slice(0, 100) || undefined,
+          defaultFormat: get('format') === 'online' ? 'online' : 'offline',
           active: get('active') !== '',
           createdAt: existing?.createdAt ?? new Date().toISOString(),
         };
         await saveWork(w);
-        return back({ msg: `作品「${w.title}」を保存しました。既存の公演回の定員・料金は変わりません。` });
+        return back({ msg: `作品「${w.title}」を保存しました。既存の公演回の定員・料金・文面は変わりません。` });
       }
     }
 
@@ -134,7 +169,7 @@ if (Astro.request.method === 'POST') {
         const src = await getSession(get('session'));
         if (!src) error = '複製元の公演回が見つかりません。';
         else {
-          base = { ...src };
+          base = src;
           work = await getWork(src.workId);
         }
       } else {
@@ -145,29 +180,44 @@ if (Astro.request.method === 'POST') {
         const start = get('start') || base.start || '';
         if (!validStart(start)) error = '開催日時を入力してください。';
         else {
+          const f = get('format');
+          const format: HtFormat = f === 'online' || f === 'offline' ? f : base.format ?? work.defaultFormat ?? 'offline';
+          const goKind: GoKind = format === 'online' ? 'online' : get('prep') !== '' ? 'offline-prep' : 'offline';
+          const capacity = Math.min(Math.max(parseInt(get('capacity'), 10) || base.capacity || work.defaultCapacity, 1), 500);
+          const minIn = parseInt(get('min'), 10);
           const s: HtSession = {
             id: newSessionId(),
             workId: work.id,
+            format,
             start,
-            venue: (get('venue') || base.venue || '').slice(0, 120) || '会場未定（後日ご案内）',
+            venue: (get('venue') || base.venue || '').slice(0, 120) || (format === 'online' ? DEFAULT_ONLINE_VENUE : DEFAULT_OFFLINE_VENUE),
             meeting: base.meeting,
             // 作品の標準定員・料金は「初期値」としてコピーするだけなので、
             // 後から作品側を変えても既存の公演回には影響しない。
-            price: (get('price') || base.price || work.defaultPrice || '').slice(0, 200) || '当日ご案内します',
-            capacity: Math.min(Math.max(parseInt(get('capacity'), 10) || base.capacity || work.defaultCapacity, 1), 500),
-            deadline: base.deadline && action === 'session-clone' ? undefined : undefined,
+            price: (get('price') || base.price || work.defaultPrice || '').slice(0, 100) || '未定',
+            capacity,
+            minPlayers: Math.min(Number.isInteger(minIn) && minIn >= 1 ? minIn : base.minPlayers ?? capacity, capacity),
+            autoGo: base.autoGo ?? format === 'offline',
+            discordUrl: undefined, // Discord は卓ごとに発行し直す運用なので複製しない
             notes: base.notes,
+            ...(action === 'session-clone'
+              ? { acceptTemplate: base.acceptTemplate, goTemplate: base.goTemplate, flopTemplate: base.flopTemplate }
+              : initialTemplates(work.id, goKind)),
             status: 'draft',
             createdAt: new Date().toISOString(),
           };
           await saveSession(s);
-          return back({ session: s.id, msg: action === 'session-clone' ? '公演回を複製しました（非公開の状態です）。内容を確認して公開してください。' : '公演回を作成しました（非公開の状態です）。内容を確認して公開してください。' });
+          return back({
+            session: s.id,
+            msg: `公演回を${action === 'session-clone' ? '複製' : '作成'}しました（非公開の状態です）。下の「メール文面」も確認してから公開してください。${format === 'online' ? ' オンライン公演はDiscordリンクを入れてから開催決定してください。' : ''}`,
+          });
         }
       }
     }
 
     // --- 公演回の編集・状態変更 -------------------------------------------------
-    if (['session-save', 'session-status', 'session-delete', 'session-recount'].includes(action)) {
+    const sessionActions = ['session-save', 'session-status', 'session-delete', 'session-recount', 'tpl-reset', 'go', 'ungo', 'flop'];
+    if (sessionActions.includes(action)) {
       const s = await getSession(get('session'));
       if (!s) {
         error = '公演回が見つかりません。';
@@ -178,11 +228,31 @@ if (Astro.request.method === 'POST') {
         const ok = await deleteSessionIfEmpty(s.id);
         if (ok) return back({ msg: '公演回を削除しました。' });
         error = '予約履歴のある公演回は削除できません。「中止」にして履歴を残してください。';
+      } else if (action === 'go') {
+        await markGo(s.id);
+        return back({ session: s.id, notice: 'go', msg: '開催決定にしました。下の開催案内メールを確認して一斉送信してください。以降の新しい申し込みには開催案内が自動で届きます。' });
+      } else if (action === 'ungo') {
+        await unmarkGo(s.id);
+        return back({ session: s.id, msg: '開催決定を取り消しました（送信済みの開催案内は取り消せません）。' });
+      } else if (action === 'flop') {
+        await saveSession({ ...s, status: 'cancelled', flop: true });
+        return back({ session: s.id, notice: 'flop', msg: '開催見送り（流卓）にしました。受付は止まっています。下の見送りメールを確認して送信してください。' });
+      } else if (action === 'tpl-reset') {
+        const work = await getWork(s.workId);
+        const which = get('which');
+        if (which === 'accept') await saveSession({ ...s, acceptTemplate: defaultAcceptTemplate(s.workId) });
+        else if (which === 'flop') await saveSession({ ...s, flopTemplate: FLOP_TEMPLATE });
+        else {
+          const k = get('kind') as GoKind;
+          const kind: GoKind = ['offline', 'offline-prep', 'online'].includes(k) ? k : sessionFormat(s, work) === 'online' ? 'online' : 'offline';
+          await saveSession({ ...s, goTemplate: defaultGoTemplate(kind) });
+        }
+        return back({ session: s.id, msg: '文面を既定に戻しました。' });
       } else if (action === 'session-status') {
         const status = get('status') as HtSessionStatus;
         if (!['draft', 'open', 'closed', 'cancelled'].includes(status)) error = '状態が不正です。';
         else {
-          await saveSession({ ...s, status });
+          await saveSession({ ...s, status, flop: status === 'cancelled' ? s.flop : undefined });
           const confirmed = (await getReservations(s.id)).filter((r) => r.status === 'confirmed');
           if (status === 'cancelled' && confirmed.length > 0) {
             return back({ session: s.id, notice: 'cancelled', msg: `公演を中止にしました。確定済みの予約が${confirmed.length}件あります。下の案内メールを確認して送信してください。` });
@@ -193,22 +263,33 @@ if (Astro.request.method === 'POST') {
         // session-save
         const start = get('start');
         const capacity = parseInt(get('capacity'), 10);
+        const minPlayers = parseInt(get('min'), 10);
+        const discordUrl = get('discord');
         const booked = await bookedSeats(s.id);
         if (!validStart(start)) error = '開催日時の形式が正しくありません。';
         else if (!Number.isInteger(capacity) || capacity < 1 || capacity > 500) error = '定員は1〜500で入力してください。';
         else if (capacity < booked) error = `確定済みの予約が${booked}名分あるため、定員を${booked}名未満にはできません。`;
+        else if (!Number.isInteger(minPlayers) || minPlayers < 1 || minPlayers > capacity) error = '開催最少人数は1〜定員の範囲で入力してください。';
         else if (get('deadline') && !validStart(get('deadline'))) error = '受付期限の形式が正しくありません。';
+        else if (discordUrl && !validUrl(discordUrl)) error = 'Discordリンクは https:// から始まるURLを入力してください。';
         else {
           const updated: HtSession = {
             ...s,
             workId: (await getWork(get('work'))) ? get('work') : s.workId,
+            format: get('format') === 'online' ? 'online' : 'offline',
             start,
             venue: get('venue').slice(0, 120) || s.venue,
             meeting: get('meeting').slice(0, 200) || undefined,
-            price: get('price').slice(0, 200) || '当日ご案内します',
+            price: get('price').slice(0, 100) || '未定',
             capacity,
+            minPlayers,
+            autoGo: get('autogo') !== '',
+            discordUrl: discordUrl || undefined,
             deadline: get('deadline') || undefined,
-            notes: get('notes').slice(0, 2000) || undefined,
+            notes: getText('notes', 2000) || undefined,
+            acceptTemplate: getText('tpl_accept', 6000) || undefined,
+            goTemplate: getText('tpl_go', 6000) || undefined,
+            flopTemplate: getText('tpl_flop', 6000) || undefined,
           };
           await saveSession(updated);
           const confirmed = (await getReservations(s.id)).filter((r) => r.status === 'confirmed');
@@ -221,85 +302,121 @@ if (Astro.request.method === 'POST') {
       }
     }
 
-    // --- 予約の操作 -------------------------------------------------------------
-    if (['res-add', 'res-cancel', 'res-count', 'res-resend', 'notice', 'remind-now'].includes(action)) {
+    // --- 一斉送信・予約の操作 ---------------------------------------------------
+    const resActions = ['res-add', 'res-cancel', 'res-count', 'res-resend', 'res-resend-go', 'notice', 'go-send', 'flop-send', 'remind-now'];
+    if (resActions.includes(action)) {
       const s = await getSession(get('session'));
+      const settings = await getSettings();
       if (!s) {
         error = '公演回が見つかりません。';
-      } else if (action === 'res-add') {
-        // 電話・LINEで受けた予約の手動登録。定員チェックは Web と同じ経路。
-        const name = get('name').slice(0, 40);
-        const email = get('email').slice(0, 254);
-        const phone = normalizePhone(get('phone')).slice(0, 20);
-        const count = parseInt(get('count'), 10);
-        if (!name || !Number.isInteger(count) || count < 1) error = 'お名前と人数を入力してください。';
-        else if (email && !validEmail(email)) error = 'メールアドレスの形式をご確認ください。';
-        else if (phone && !validPhone(phone)) error = '電話番号の形式をご確認ください。';
-        else {
-          const settings = await getSettings();
-          const r: HtReservation = {
-            id: newReservationId(),
-            sessionId: s.id,
-            name,
-            email: email || '',
-            phone: phone || '',
-            xId: get('x').replace(/^@/, '').slice(0, 30) || undefined,
-            count,
-            note: get('note').slice(0, 500) || undefined,
-            status: 'confirmed',
-            source: 'manual',
-            createdAt: new Date().toISOString(),
-            reminderSkipped: hoursUntil(s.start, jstNow()) <= settings.reminderHours ? 'リマインド設定時刻より後の手動登録' : undefined,
-          };
-          const result = await reserveSeats(s, r);
-          if (result < 0) error = `残席が足りません（定員${s.capacity}名）。定員を増やすか人数を減らしてください。`;
-          else {
-            let msg = `予約 ${r.id}（${name}様 ${count}名）を登録しました。`;
-            if (get('sendmail') !== '' && email) {
-              const ok = await sendConfirmMail(await getWork(s.workId), s, r);
-              msg += ok ? ' 確認メールを送信しました。' : ' ※確認メールの送信に失敗しました（あとで再送できます）。';
-            }
-            return back({ session: s.id, msg });
-          }
-        }
-      } else if (action === 'remind-now') {
-        const works = new Map((await getWorks()).map((w) => [w.id, w]));
-        const r = await remindSession(works, s.id, await getSettings(), true);
-        return back({ session: s.id, msg: `リマインドを送信しました（対象${r.due}件／成功${r.sent}件${r.failed ? `／失敗${r.failed}件` : ''}）。送信済みの予約には再送しません。` });
-      } else if (action === 'notice') {
-        const subject = get('subject').slice(0, 120);
-        const body = get('body').slice(0, 4000);
-        if (!subject || !body) error = '件名と本文を入力してください。';
-        else {
-          const confirmed = (await getReservations(s.id)).filter((r) => r.status === 'confirmed');
-          let sent = 0;
-          let failed = 0;
-          for (const r of confirmed) {
-            if (!r.email) continue;
-            (await sendNoticeMail(s, r, subject, body)) ? sent++ : failed++;
-          }
-          return back({ session: s.id, msg: `案内メールを送信しました（成功${sent}件${failed ? `／失敗${failed}件` : ''}／メールアドレスなし${confirmed.length - sent - failed}件）。` });
-        }
       } else {
-        const r = await getReservation(s.id, get('res'));
-        if (!r) error = '予約が見つかりません。';
-        else if (action === 'res-cancel') {
-          await cancelReservation(s, r);
-          return back({ session: s.id, msg: `予約 ${r.id} をキャンセルし、${r.count}名分の枠を戻しました。` });
-        } else if (action === 'res-count') {
-          const newCount = parseInt(get('count'), 10);
-          if (!Number.isInteger(newCount) || newCount < 1) error = '人数が不正です。';
-          else if (r.status !== 'confirmed') error = 'キャンセル済みの予約は変更できません。';
-          else {
-            const ok = await changeReservationCount(s, r, newCount);
-            if (ok) return back({ session: s.id, msg: `予約 ${r.id} の人数を${r.count}名 → ${newCount}名に変更しました。` });
-            error = '残席が足りないため人数を増やせません。';
+        const work = await getWork(s.workId);
+        if (action === 'go-send') {
+          const body = getText('body', 6000);
+          const missing = missingPlaceholders(body, { discordUrl: s.discordUrl, bankInfo: settings.bankInfo });
+          if (!body) error = '本文を入力してください。';
+          else if (missing.length > 0) {
+            error = `送信できません。${missing.join('、')}が未入力です。入力してから送信してください。`;
+            noticeMode = 'go';
+          } else {
+            // 手直しした文面を公演回に保存し、あとから申し込んだ人にも同じ案内が届くようにする
+            await saveSession({ ...s, goTemplate: body });
+            const fresh = (await getSession(s.id)) ?? s;
+            const res = await sendGoMailAll(work, fresh, settings, body);
+            return back({ session: s.id, msg: `開催案内を送信しました（${sendSummary(res)}）。` });
           }
-        } else if (action === 'res-resend') {
-          if (!r.email) error = 'この予約にはメールアドレスが登録されていません。';
+        } else if (action === 'flop-send') {
+          const subject = get('subject').slice(0, 120);
+          const body = getText('body', 6000);
+          if (!subject || !body) error = '件名と本文を入力してください。';
           else {
-            const ok = await sendConfirmMail(await getWork(s.workId), s, r);
-            return back({ session: s.id, msg: ok ? `予約 ${r.id} に確認メールを再送しました。` : '再送に失敗しました。メール設定（SMTP/Resend）を確認してください。' });
+            await saveSession({ ...s, flopTemplate: body });
+            const res = await sendFlopMailAll(work, s, settings, subject, body);
+            return back({ session: s.id, msg: `見送りメールを送信しました（${sendSummary(res)}）。` });
+          }
+        } else if (action === 'res-add') {
+          // 電話・LINEで受けた予約の手動登録。定員チェックは Web と同じ経路。
+          const name = get('name').slice(0, 40);
+          const email = get('email').slice(0, 254);
+          const phone = normalizePhone(get('phone')).slice(0, 20);
+          const count = parseInt(get('count'), 10);
+          if (!name || !Number.isInteger(count) || count < 1) error = 'お名前と人数を入力してください。';
+          else if (email && !validEmail(email)) error = 'メールアドレスの形式をご確認ください。';
+          else if (phone && !validPhone(phone)) error = '電話番号の形式をご確認ください。';
+          else {
+            const r: HtReservation = {
+              id: newReservationId(),
+              sessionId: s.id,
+              name,
+              email: email || '',
+              phone: phone || '',
+              xId: get('x').replace(/^@/, '').slice(0, 30) || undefined,
+              count,
+              note: get('note').slice(0, 500) || undefined,
+              status: 'confirmed',
+              source: 'manual',
+              createdAt: new Date().toISOString(),
+              reminderSkipped: hoursUntil(s.start, jstNow()) <= settings.reminderHours ? 'リマインド設定時刻より後の手動登録' : undefined,
+            };
+            const result = await reserveSeats(s, r);
+            if (result < 0) error = `残席が足りません（定員${s.capacity}名）。定員を増やすか人数を減らしてください。`;
+            else {
+              const mail = await afterReservation(s.id, r, get('sendmail') !== '');
+              const mailMsg = mail.kind === 'none' ? '' : mail.ok ? `（${mail.kind === 'go' ? '開催案内' : '受付メール'}を送信しました）` : '（※メール送信に失敗しました。予約一覧から再送できます）';
+              return back({ session: s.id, msg: `予約 ${r.id}（${name}様 ${count}名）を登録しました${mailMsg}。` });
+            }
+          }
+        } else if (action === 'remind-now') {
+          const works = new Map((await getWorks()).map((w) => [w.id, w]));
+          if (!s.go) error = '開催決定していない公演にはリマインドを送れません。';
+          else {
+            const r = await remindSession(works, s.id, settings, true);
+            return back({ session: s.id, msg: `リマインドを送信しました（対象${r.due}件／成功${r.sent}件${r.failed ? `／失敗${r.failed}件` : ''}）。送信済みの予約には再送しません。` });
+          }
+        } else if (action === 'notice') {
+          const subject = get('subject').slice(0, 120);
+          const body = getText('body', 6000);
+          if (!subject || !body) error = '件名と本文を入力してください。';
+          else {
+            const confirmed = (await getReservations(s.id)).filter((r) => r.status === 'confirmed');
+            let sent = 0;
+            let failed = 0;
+            for (const r of confirmed) {
+              if (!r.email) continue;
+              (await sendNoticeMail(work, s, r, subject, body, settings)) ? sent++ : failed++;
+            }
+            return back({ session: s.id, msg: `案内メールを送信しました（成功${sent}件${failed ? `／失敗${failed}件` : ''}／メールアドレスなし${confirmed.length - sent - failed}件）。` });
+          }
+        } else {
+          const r = await getReservation(s.id, get('res'));
+          if (!r) error = '予約が見つかりません。';
+          else if (action === 'res-cancel') {
+            await cancelReservation(s, r);
+            return back({ session: s.id, msg: `予約 ${r.id} をキャンセルし、${r.count}名分の枠を戻しました。` });
+          } else if (action === 'res-count') {
+            const newCount = parseInt(get('count'), 10);
+            if (!Number.isInteger(newCount) || newCount < 1) error = '人数が不正です。';
+            else if (r.status !== 'confirmed') error = 'キャンセル済みの予約は変更できません。';
+            else {
+              const ok = await changeReservationCount(s, r, newCount);
+              if (ok) return back({ session: s.id, msg: `予約 ${r.id} の人数を${r.count}名 → ${newCount}名に変更しました。` });
+              error = '残席が足りないため人数を増やせません。';
+            }
+          } else if (action === 'res-resend') {
+            if (!r.email) error = 'この予約にはメールアドレスが登録されていません。';
+            else {
+              const ok = await sendAcceptMail(work, s, r, settings);
+              return back({ session: s.id, msg: ok ? `予約 ${r.id} に受付メールを再送しました。` : '再送に失敗しました。メール設定（SMTP/Resend）を確認してください。' });
+            }
+          } else if (action === 'res-resend-go') {
+            const missing = missingPlaceholders(sessionTemplates(s, work).go, { discordUrl: s.discordUrl, bankInfo: settings.bankInfo });
+            if (!r.email) error = 'この予約にはメールアドレスが登録されていません。';
+            else if (!s.go) error = '開催決定していない公演です。';
+            else if (missing.length > 0) error = `送信できません。${missing.join('、')}が未入力です。`;
+            else {
+              const ok = await resendGoMail(work, s, r, settings);
+              return back({ session: s.id, msg: ok ? `予約 ${r.id} に開催案内を再送しました。` : '再送に失敗しました。メール設定（SMTP/Resend）を確認してください。' });
+            }
           }
         }
       }
@@ -315,7 +432,7 @@ if (authed() && configured && sessionId && Astro.url.searchParams.get('csv') ===
     const list = await getReservations(sessionId);
     const esc = (v: string) => `"${v.replace(/"/g, '""')}"`;
     const rows = [
-      ['予約番号', '状態', 'お名前', 'メールアドレス', '電話番号', 'X', '人数', '備考', '受付経路', '予約日時', 'リマインド', '完了メール'],
+      ['予約番号', '状態', 'お名前', 'メールアドレス', '電話番号', 'X', '人数', '備考', '受付経路', '予約日時', '受付メール', '開催案内', 'リマインド'],
       ...list.map((r) => [
         r.id,
         r.status === 'confirmed' ? '確定' : 'キャンセル',
@@ -327,8 +444,9 @@ if (authed() && configured && sessionId && Astro.url.searchParams.get('csv') ===
         r.note ?? '',
         r.source === 'web' ? 'Web' : '手動',
         r.createdAt,
-        r.remindedAt ? '送信済み' : r.reminderSkipped ? '対象外' : '未送信',
         r.confirmMailAt ? '送信済み' : r.confirmMailError ? '失敗' : '未送信',
+        r.goMailAt ? '送信済み' : r.goMailError ? '失敗' : '未送信',
+        r.remindedAt ? '送信済み' : r.reminderSkipped ? '対象外' : '未送信',
       ]),
     ];
     const csv = '﻿' + rows.map((row) => row.map(esc).join(',')).join('\r\n');
@@ -346,13 +464,17 @@ if (authed() && configured && sessionId && Astro.url.searchParams.get('csv') ===
 // --- 表示用データ ----------------------------------------------------------------
 let works: HtWorkRec[] = [];
 let sessions: (HtSession & { booked: number })[] = [];
-let settings = { reminderEnabled: true, reminderHours: 36 };
+let settings: HtSettings = { reminderEnabled: true, reminderHours: 36 };
 let detail: {
   s: HtSession;
   work: HtWorkRec | null;
+  format: HtFormat;
   booked: number;
+  min: number;
+  tpl: { accept: string; go: string; flop: string };
+  missingGo: string[];
   reservations: HtReservation[];
-  maillog: { at: string; kind: string; to: string; subject: string; ok: boolean }[];
+  maillog: HtMailLog[];
 } | null = null;
 const showPast = Astro.url.searchParams.get('past') === '1';
 const now = jstNow();
@@ -369,34 +491,64 @@ if (authed() && configured) {
   if (sessionId) {
     const s = await getSession(sessionId);
     if (s) {
+      const work = works.find((w) => w.id === s.workId) ?? null;
+      const tpl = sessionTemplates(s, work);
       detail = {
         s,
-        work: works.find((w) => w.id === s.workId) ?? null,
+        work,
+        format: sessionFormat(s, work),
         booked: seats.get(s.id) ?? (await bookedSeats(s.id)),
+        min: minPlayersOf(s),
+        tpl,
+        missingGo: missingPlaceholders(tpl.go, { discordUrl: s.discordUrl, bankInfo: settings.bankInfo }),
         reservations: await getReservations(s.id),
-        maillog: (await getMailLog(200)).filter((m) => m.sessionId === s.id).slice(0, 30),
+        maillog: (await getMailLog(300)).filter((m) => m.sessionId === s.id).slice(0, 40),
       };
     }
   }
 }
 
 const workTitle = (id: string) => works.find((w) => w.id === id)?.title ?? id;
-const dtLocal = (v?: string) => v ?? '';
 const confirmedOf = (list: HtReservation[]) => list.filter((r) => r.status === 'confirmed');
 
-// 変更・中止の案内メールのひな形
+// 一斉送信フォームの件名・本文と、1人目の予約者での差し込みプレビュー
 let noticeSubject = '';
 let noticeBody = '';
+let preview = '';
 if (detail && noticeMode) {
   const t = workTitle(detail.s.workId);
-  if (noticeMode === 'cancelled') {
-    noticeSubject = `【HACKTALE】公演中止のお知らせ（${t}）`;
-    noticeBody = `ご予約いただいていた下記の公演は、誠に申し訳ありませんが中止となりました。\n\n■ 公演\n${t}\n${formatStartJa(detail.s.start)}\n${detail.s.venue}\n\n楽しみにお待ちいただいていたところ、大変申し訳ございません。今後の公演情報はNEWS・Xでお知らせいたします。`;
-  } else {
-    noticeSubject = `【HACKTALE】公演内容変更のお知らせ（${t}）`;
-    noticeBody = `ご予約いただいている公演の開催内容が変更になりましたのでお知らせします。\n\n■ 変更後の内容\n${t}\n${formatStartJa(detail.s.start)}\n会場: ${detail.s.venue}${detail.s.meeting ? `（集合: ${detail.s.meeting}）` : ''}\n\nご都合が合わなくなった場合は、このメールへの返信でキャンセル・変更を承ります。`;
+  if (noticeMode === 'go') {
+    noticeSubject = SUBJECTS.go;
+    noticeBody = detail.tpl.go;
+  } else if (noticeMode === 'flop') {
+    noticeSubject = SUBJECTS.flop;
+    noticeBody = detail.tpl.flop;
+  } else if (noticeMode === 'cancelled') {
+    noticeSubject = `【HACKTALE】公演中止のお知らせ（{日付}「{作品名}」）`;
+    noticeBody = `ご予約いただいていた下記の公演は、誠に申し訳ありませんが中止となりました。\n\n■ 公演\n${t}\n{日時}\n${detail.s.venue}\n\n楽しみにお待ちいただいていたところ、大変申し訳ございません。今後の公演情報はNEWS・Xでお知らせいたします。`;
+  } else if (noticeMode === 'changed') {
+    noticeSubject = `【HACKTALE】公演内容変更のお知らせ（{日付}「{作品名}」）`;
+    noticeBody = `ご予約いただいている公演の開催内容が変更になりましたのでお知らせします。\n\n■ 変更後の内容\n{作品名}\n{日時}\n会場: ${detail.s.venue}${detail.s.meeting ? `（集合: ${detail.s.meeting}）` : ''}\n\nご都合が合わなくなった場合は、このメールへの返信でキャンセル・変更を承ります。`;
   }
+  const sample = confirmedOf(detail.reservations)[0];
+  preview = renderTemplate(noticeBody, {
+    workTitle: t,
+    start: detail.s.start,
+    price: detail.s.price,
+    discordUrl: detail.s.discordUrl,
+    bankInfo: settings.bankInfo,
+    name: sample?.name ?? '（お名前）',
+    count: sample?.count ?? 1,
+    reservationId: sample?.id ?? 'HT-000000-XXXX',
+  });
 }
+const noticeTarget = detail
+  ? noticeMode === 'go'
+    ? confirmedOf(detail.reservations).filter((r) => r.email && !r.goMailAt).length
+    : confirmedOf(detail.reservations).filter((r) => r.email).length
+  : 0;
+const decisionLabel = (s: HtSession, booked: number) =>
+  s.flop ? '見送り' : s.go ? '開催決定' : booked >= minPlayersOf(s) ? `人数到達（${booked}/${minPlayersOf(s)}）` : `未決定（${booked}/${minPlayersOf(s)}）`;
 ---
 
 <!DOCTYPE html>
@@ -436,21 +588,24 @@ if (detail && noticeMode) {
 
   {!detail ? (
     <>
+    {!settings.bankInfo && <p class="warn">振込先が未設定です。オンライン公演の開催案内に差し込むため、ページ下の「設定」で入力してください。</p>}
+
     {/* ============ 公演回一覧 ============ */}
     <section class="card">
       <div class="cardhead"><h1>公演回</h1><a class="linkbtn" href={showPast ? BASE : `${BASE}?past=1`}>{showPast ? '今後の公演だけ表示' : '過去の公演も表示'}</a></div>
       {sessions.length === 0 && <p class="dim">公演回がありません。下のフォームから作成してください。</p>}
       {sessions.length > 0 && (
         <table class="tbl">
-          <thead><tr><th>開催日時</th><th>作品</th><th>状態</th><th>予約</th><th>受付表示</th><th></th></tr></thead>
+          <thead><tr><th>開催日時</th><th>作品</th><th>形式</th><th>公開</th><th>開催</th><th>予約/定員</th><th></th></tr></thead>
           <tbody>
           {sessions.map((s) => (
             <tr>
               <td class="nowrap">{formatStartJa(s.start)}</td>
               <td>{workTitle(s.workId)}</td>
-              <td class="nowrap">{SESSION_STATUS_LABEL[s.status]}</td>
+              <td class="nowrap">{FORMAT_LABEL[sessionFormat(s, works.find((w) => w.id === s.workId) ?? null)]}</td>
+              <td class="nowrap">{SESSION_STATUS_LABEL[s.status]}<br><span class="dim2">{AVAILABILITY_LABEL(availability(s, s.booked, now))}</span></td>
+              <td class="nowrap">{decisionLabel(s, s.booked)}</td>
               <td class="nowrap">{s.booked}／{s.capacity}名</td>
-              <td class="nowrap">{AVAILABILITY_LABEL(availability(s, s.booked, now))}</td>
               <td class="nowrap"><a class="btn small" href={`${BASE}?session=${s.id}`}>管理</a></td>
             </tr>
           ))}
@@ -462,18 +617,27 @@ if (detail && noticeMode) {
     {/* ============ 公演回の新規作成 ============ */}
     <section class="card">
       <h2>公演回を作成</h2>
-      <p class="dim">定員・料金は空欄なら作品の標準値が入ります（作成後にいつでも変更できます）。作成直後は「非公開」なので、内容を確認してから公開してください。</p>
+      <p class="dim">空欄の項目は作品の標準値が入ります。メール文面は形式に合わせた既定文が入り、作成後の画面で手直しできます。作成直後は「非公開」です。</p>
       <form method="POST" class="grid">
         <input type="hidden" name="action" value="session-create">
         <label>作品
           <select name="work" required>
-            {works.filter((w) => w.active).map((w) => <option value={w.id}>{w.title}（標準{w.defaultCapacity}名）</option>)}
+            {works.filter((w) => w.active).map((w) => <option value={w.id}>{w.title}（標準{w.defaultCapacity}名・{FORMAT_LABEL[w.defaultFormat ?? 'offline']}）</option>)}
+          </select>
+        </label>
+        <label>形式
+          <select name="format">
+            <option value="">作品の標準に合わせる</option>
+            <option value="offline">対面</option>
+            <option value="online">オンライン</option>
           </select>
         </label>
         <label>開催日時<input type="datetime-local" name="start" required></label>
-        <label>会場<input type="text" name="venue" placeholder="例: 新宿会場（詳細はメールでご案内）"></label>
-        <label>定員（空欄=作品の標準）<input type="number" name="capacity" min="1" max="500" placeholder="標準値を使う"></label>
-        <label class="wide">料金・支払い方法（空欄=作品の標準）<input type="text" name="price" placeholder="例: 4,500円（当日現金またはPayPay）"></label>
+        <label>会場（空欄=形式ごとの標準）<input type="text" name="venue" placeholder="対面: 神田三崎町／オンライン: Discord"></label>
+        <label>定員（空欄=作品の標準）<input type="number" name="capacity" min="1" max="500"></label>
+        <label>開催最少人数（空欄=定員と同じ）<input type="number" name="min" min="1" max="500"></label>
+        <label class="wide">料金（空欄=作品の標準。メールの {'{料金}'} に入ります。例: 4,500円）<input type="text" name="price" maxlength="100"></label>
+        <label class="check"><input type="checkbox" name="prep">事前読み込みあり（対面の開催案内にDiscordサーバー案内を入れる）</label>
         <button class="btn" type="submit">作成する（非公開で保存）</button>
       </form>
     </section>
@@ -481,18 +645,19 @@ if (detail && noticeMode) {
     {/* ============ 作品 ============ */}
     <section class="card">
       <h2>作品</h2>
-      <p class="dim">「標準の定員」「料金の初期値」は新しい公演回を作るときの初期値です。変更しても登録済みの公演回には影響しません。</p>
+      <p class="dim">「標準の定員」「料金」「形式」は新しい公演回を作るときの初期値です。変更しても登録済みの公演回には影響しません。</p>
       {works.map((w) => (
         <details class="wk">
-          <summary>{w.title}（標準{w.defaultCapacity}名{w.durationMin ? `・約${w.durationMin}分` : ''}）{!w.active && '｜停止中'}</summary>
+          <summary>{w.title}（標準{w.defaultCapacity}名・{FORMAT_LABEL[w.defaultFormat ?? 'offline']}{w.durationMin ? `・約${w.durationMin}分` : ''}）{!w.active && '｜停止中'}</summary>
           <form method="POST" class="grid">
             <input type="hidden" name="action" value="work-save">
             <input type="hidden" name="id" value={w.id}>
             <label>作品名<input type="text" name="title" value={w.title} required maxlength="60"></label>
             <label>所要時間（分）<input type="number" name="duration" value={w.durationMin ?? ''} min="0"></label>
             <label>標準の定員<input type="number" name="capacity" value={w.defaultCapacity} min="1" max="500" required></label>
+            <label>標準の形式<select name="format"><option value="offline" selected={(w.defaultFormat ?? 'offline') === 'offline'}>対面</option><option value="online" selected={w.defaultFormat === 'online'}>オンライン</option></select></label>
+            <label>料金の初期値<input type="text" name="price" value={w.defaultPrice ?? ''} maxlength="100"></label>
             <label>画像パス<input type="text" name="image" value={w.image ?? ''} placeholder="/assets/hacktale/kv-xxx.webp"></label>
-            <label class="wide">料金・支払い方法の初期値<input type="text" name="price" value={w.defaultPrice ?? ''}></label>
             <label class="wide">紹介文<textarea name="desc" rows="2">{w.desc ?? ''}</textarea></label>
             <label class="check"><input type="checkbox" name="active" checked={w.active}>新しい公演回の作成対象にする</label>
             <button class="btn" type="submit">保存</button>
@@ -508,7 +673,8 @@ if (detail && noticeMode) {
           <label>作品名<input type="text" name="title" required maxlength="60"></label>
           <label>所要時間（分）<input type="number" name="duration" min="0"></label>
           <label>標準の定員<input type="number" name="capacity" min="1" max="500" value="8" required></label>
-          <label class="wide">料金・支払い方法の初期値<input type="text" name="price"></label>
+          <label>標準の形式<select name="format"><option value="offline">対面</option><option value="online">オンライン</option></select></label>
+          <label>料金の初期値<input type="text" name="price" maxlength="100"></label>
           <label class="wide">紹介文<textarea name="desc" rows="2"></textarea></label>
           <label class="check"><input type="checkbox" name="active" checked>新しい公演回の作成対象にする</label>
           <button class="btn" type="submit">登録</button>
@@ -516,16 +682,19 @@ if (detail && noticeMode) {
       </details>
     </section>
 
-    {/* ============ リマインド設定 ============ */}
+    {/* ============ 設定 ============ */}
     <section class="card">
-      <h2>リマインドメール設定</h2>
+      <h2>設定</h2>
       <form method="POST" class="grid">
         <input type="hidden" name="action" value="settings">
-        <label class="check"><input type="checkbox" name="enabled" checked={settings.reminderEnabled}>リマインドメールを自動送信する</label>
-        <label>送信タイミング：開始まで何時間以内になったら送るか
+        <label class="wide">振込先（オンライン公演の開催案内の {'{振込先}'} に入ります。改行もそのまま反映）
+          <textarea name="bank" rows="4" placeholder={'銀行名\n支店名(番号)\n普通 口座番号\n口座名義'}>{settings.bankInfo ?? ''}</textarea>
+        </label>
+        <label class="check"><input type="checkbox" name="enabled" checked={settings.reminderEnabled}>開催決定した公演のリマインドメールを自動送信する</label>
+        <label>リマインド：開始まで何時間以内になったら送るか
           <input type="number" name="hours" value={settings.reminderHours} min="1" max="168">
         </label>
-        <p class="dim wide">送信は毎朝9時（日本時間）の定期実行です（無料プランは1日1回のため、時刻ではなく時間幅で指定します）。既定の36時間なら実質「前日の朝9時」に届きます。設定時刻を過ぎてから入った予約には完了メールのみ送り、リマインドは重複させません。各公演の画面から「今すぐ送信」もできます。</p>
+        <p class="dim wide">リマインドは毎朝9時（日本時間）の定期実行です。既定の36時間なら実質「前日の朝9時」に届きます。同じ定期実行で、まだ開催決定していない8日以内の公演を管理者宛にお知らせします。</p>
         <button class="btn" type="submit">設定を保存</button>
       </form>
     </section>
@@ -537,18 +706,26 @@ if (detail && noticeMode) {
     <section class="card">
       <div class="cardhead">
         <h1>{workTitle(detail.s.workId)}｜{formatStartJa(detail.s.start)}</h1>
+        <span class="badge">{FORMAT_LABEL[detail.format]}</span>
         <span class="badge">{SESSION_STATUS_LABEL[detail.s.status]}</span>
+        <span class:list={['badge', { goB: detail.s.go }]}>{decisionLabel(detail.s, detail.booked)}</span>
       </div>
-      <p class="dim">確定 {confirmedOf(detail.reservations).reduce((n, r) => n + r.count, 0)}名／定員 {detail.s.capacity}名（残り{Math.max(detail.s.capacity - detail.booked, 0)}席）｜お客様側の表示: {AVAILABILITY_LABEL(availability(detail.s, detail.booked, now))}</p>
+      <p class="dim">確定 {detail.booked}名／開催最少 {detail.min}名／定員 {detail.s.capacity}名（残り{Math.max(detail.s.capacity - detail.booked, 0)}席）｜お客様側の表示: {AVAILABILITY_LABEL(availability(detail.s, detail.booked, now))}｜自動開催決定: {detail.s.autoGo ? 'ON' : 'OFF'}</p>
+      {detail.missingGo.length > 0 && !detail.s.flop && <p class="warn">開催案内の差し込みが未入力です: {detail.missingGo.join('、')}。このままでは開催案内を送れません。</p>}
 
       <div class="btnrow">
-        {detail.s.status !== 'open' && <form method="POST" class="inline"><input type="hidden" name="action" value="session-status"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="status" value="open"><button class="btn small" type="submit">公開する</button></form>}
+        {detail.s.status !== 'open' && !detail.s.flop && <form method="POST" class="inline"><input type="hidden" name="action" value="session-status"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="status" value="open"><button class="btn small" type="submit">公開する</button></form>}
+        {!detail.s.go && !detail.s.flop && <form method="POST" class="inline" onsubmit="return confirm('開催決定にしますか？次の画面で開催案内メールを確認して送信します。')"><input type="hidden" name="action" value="go"><input type="hidden" name="session" value={detail.s.id}><button class="btn small" type="submit">開催決定（立卓）</button></form>}
+        {detail.s.go && !detail.s.flop && <a class="btn small" href={`${BASE}?session=${detail.s.id}&notice=go`}>開催案内を一斉送信</a>}
+        {!detail.s.flop && detail.s.status !== 'cancelled' && <form method="POST" class="inline" onsubmit="return confirm('人数未達で開催見送り（流卓）にしますか？受付は止まり、次の画面で見送りメールを確認して送信します。')"><input type="hidden" name="action" value="flop"><input type="hidden" name="session" value={detail.s.id}><button class="btn small danger" type="submit">開催見送り（流卓）</button></form>}
+        {detail.s.flop && <a class="btn small ghost" href={`${BASE}?session=${detail.s.id}&notice=flop`}>見送りメールを送信</a>}
         {detail.s.status === 'open' && <form method="POST" class="inline"><input type="hidden" name="action" value="session-status"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="status" value="closed"><button class="btn small ghost" type="submit">受付停止</button></form>}
         {detail.s.status !== 'draft' && detail.s.status !== 'cancelled' && <form method="POST" class="inline"><input type="hidden" name="action" value="session-status"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="status" value="draft"><button class="btn small ghost" type="submit">非公開に戻す</button></form>}
-        {detail.s.status !== 'cancelled' && <form method="POST" class="inline" onsubmit="return confirm('この公演を中止にしますか？予約は履歴として残ります。')"><input type="hidden" name="action" value="session-status"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="status" value="cancelled"><button class="btn small danger" type="submit">中止にする</button></form>}
+        {detail.s.status !== 'cancelled' && <form method="POST" class="inline" onsubmit="return confirm('この公演を中止にしますか？（人数未達の場合は「開催見送り」を使ってください）')"><input type="hidden" name="action" value="session-status"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="status" value="cancelled"><button class="btn small danger" type="submit">中止（その他の理由）</button></form>}
         <form method="POST" class="inline"><input type="hidden" name="action" value="session-clone"><input type="hidden" name="session" value={detail.s.id}><button class="btn small ghost" type="submit">複製</button></form>
         <a class="btn small ghost" href={`${BASE}?session=${detail.s.id}&csv=1`}>CSV出力</a>
-        <form method="POST" class="inline"><input type="hidden" name="action" value="remind-now"><input type="hidden" name="session" value={detail.s.id}><button class="btn small ghost" type="submit" onclick="return confirm('未送信の確定予約にリマインドメールを今すぐ送信します。よろしいですか？')">リマインドを今すぐ送信</button></form>
+        {detail.s.go && <form method="POST" class="inline"><input type="hidden" name="action" value="remind-now"><input type="hidden" name="session" value={detail.s.id}><button class="btn small ghost" type="submit" onclick="return confirm('未送信の確定予約にリマインドメールを今すぐ送信します。よろしいですか？')">リマインドを今すぐ送信</button></form>}
+        {detail.s.go && !detail.s.flop && <form method="POST" class="inline" onsubmit="return confirm('開催決定を取り消しますか？（送信済みの開催案内は取り消せません）')"><input type="hidden" name="action" value="ungo"><input type="hidden" name="session" value={detail.s.id}><button class="linkbtn" type="submit">開催決定を取り消す</button></form>}
         {detail.reservations.length === 0 && <form method="POST" class="inline" onsubmit="return confirm('この公演回を削除しますか？')"><input type="hidden" name="action" value="session-delete"><input type="hidden" name="session" value={detail.s.id}><button class="btn small danger" type="submit">削除</button></form>}
       </div>
       <p class="dim">公開ページ: <a href={`/hacktale/reservation/${detail.s.id}/`} target="_blank" rel="noopener">/hacktale/reservation/{detail.s.id}/</a></p>
@@ -556,14 +733,22 @@ if (detail && noticeMode) {
 
     {noticeMode && (
       <section class="card notice">
-        <h2>{noticeMode === 'cancelled' ? '中止のご案内メール' : '変更のご案内メール'}</h2>
-        <p class="dim">確定済みの予約 {confirmedOf(detail.reservations).length}件に送信します。内容を確認・編集してから送信してください。</p>
+        <h2>{noticeMode === 'go' ? '開催案内メール（一斉送信）' : noticeMode === 'flop' ? '開催見送りメール' : noticeMode === 'cancelled' ? '中止のご案内メール' : '変更のご案内メール'}</h2>
+        <p class="dim">
+          {noticeMode === 'go'
+            ? `開催案内をまだ受け取っていない確定予約 ${noticeTarget}件に送信します。ここで手直しした本文は公演回に保存され、この後に申し込んだ方にも同じ案内が自動で届きます。`
+            : `確定済みの予約 ${noticeTarget}件に送信します。`}
+          宛名（〇〇 様）と予約番号・問い合わせ先は自動で付きます。
+        </p>
         <form method="POST" class="grid">
-          <input type="hidden" name="action" value="notice">
+          <input type="hidden" name="action" value={noticeMode === 'go' ? 'go-send' : noticeMode === 'flop' ? 'flop-send' : 'notice'}>
           <input type="hidden" name="session" value={detail.s.id}>
-          <label class="wide">件名<input type="text" name="subject" value={noticeSubject} required maxlength="120"></label>
-          <label class="wide">本文（宛名と予約番号・問い合わせ先は自動で付きます）<textarea name="body" rows="8" required>{noticeBody}</textarea></label>
-          <button class="btn" type="submit" onclick="return confirm('確定済みの全予約者に案内メールを送信します。よろしいですか？')">案内メールを送信</button>
+          {noticeMode === 'go'
+            ? <p class="wide dim">件名: {renderTemplate(noticeSubject, { workTitle: workTitle(detail.s.workId), start: detail.s.start, price: detail.s.price })}</p>
+            : <label class="wide">件名<input type="text" name="subject" value={noticeSubject} required maxlength="120"></label>}
+          <label class="wide">本文<textarea name="body" rows="16" required>{noticeBody}</textarea></label>
+          <details class="wide pv"><summary>差し込み後のプレビュー（{confirmedOf(detail.reservations)[0]?.name ?? '見本'}様あて）</summary><pre>{preview}</pre></details>
+          <button class="btn" type="submit" onclick="return confirm('この内容で一斉送信します。よろしいですか？')">この内容で送信する</button>
         </form>
       </section>
     )}
@@ -577,16 +762,38 @@ if (detail && noticeMode) {
         <label>作品
           <select name="work">{works.map((w) => <option value={w.id} selected={w.id === detail!.s.workId}>{w.title}</option>)}</select>
         </label>
-        <label>開催日時<input type="datetime-local" name="start" value={dtLocal(detail.s.start)} required></label>
-        <label>会場<input type="text" name="venue" value={detail.s.venue} required maxlength="120"></label>
+        <label>形式
+          <select name="format"><option value="offline" selected={detail.format === 'offline'}>対面</option><option value="online" selected={detail.format === 'online'}>オンライン</option></select>
+        </label>
+        <label>開催日時<input type="datetime-local" name="start" value={detail.s.start} required></label>
+        <label>受付期限（空欄=開始時刻まで）<input type="datetime-local" name="deadline" value={detail.s.deadline ?? ''}></label>
+        <label>会場（一覧・予約ページに表示）<input type="text" name="venue" value={detail.s.venue} required maxlength="120"></label>
         <label>集合場所（任意）<input type="text" name="meeting" value={detail.s.meeting ?? ''} maxlength="200"></label>
         <label>定員<input type="number" name="capacity" value={detail.s.capacity} min="1" max="500" required></label>
-        <label>受付期限（空欄=開始時刻まで）<input type="datetime-local" name="deadline" value={dtLocal(detail.s.deadline)}></label>
-        <label class="wide">料金・お支払い方法<input type="text" name="price" value={detail.s.price} maxlength="200"></label>
-        <label class="wide">当日の注意事項（予約ページ・確認/リマインドメールに掲載）<textarea name="notes" rows="4">{detail.s.notes ?? ''}</textarea></label>
+        <label>開催最少人数<input type="number" name="min" value={detail.min} min="1" max="500" required></label>
+        <label>料金（{'{料金}'}）<input type="text" name="price" value={detail.s.price} maxlength="100"></label>
+        <label>Discordリンク（{'{Discordリンク}'}）<input type="url" name="discord" value={detail.s.discordUrl ?? ''} placeholder="https://discord.gg/..."></label>
+        <label class="check"><input type="checkbox" name="autogo" checked={!!detail.s.autoGo}>開催最少人数に達したら自動で開催決定し、開催案内を送る（差し込みが揃っている場合のみ）</label>
+        <label class="wide">予約ページに出す注意事項（任意）<textarea name="notes" rows="3">{detail.s.notes ?? ''}</textarea></label>
+
+        <div class="wide tplhead">
+          <h3>メール文面</h3>
+          <p class="dim">次の差し込みは送信時に自動で置き換わります: {PLACEHOLDERS.map((p) => <span class="ph" title={p.desc}>{p.key}</span>)}</p>
+        </div>
+        <label class="wide">① 受付メール（申し込み直後に自動送信）<textarea name="tpl_accept" rows="10">{detail.tpl.accept}</textarea></label>
+        <label class="wide">② 開催案内メール（開催決定時に一斉送信／開催決定後の申し込みには自動送信）<textarea name="tpl_go" rows="16">{detail.tpl.go}</textarea></label>
+        <label class="wide">③ 開催見送りメール（流卓時）<textarea name="tpl_flop" rows="8">{detail.tpl.flop}</textarea></label>
         <p class="dim wide">確定済みの予約人数より少ない定員には変更できません。日時・会場を変更すると、確定済み予約への案内メール送信フォームが表示されます。</p>
         <button class="btn" type="submit">保存</button>
       </form>
+      <div class="btnrow">
+        <span class="dim">文面を既定に戻す:</span>
+        <form method="POST" class="inline"><input type="hidden" name="action" value="tpl-reset"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="which" value="accept"><button class="linkbtn" type="submit" onclick="return confirm('受付メールを既定の文面に戻しますか？')">①受付</button></form>
+        <form method="POST" class="inline"><input type="hidden" name="action" value="tpl-reset"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="which" value="go"><input type="hidden" name="kind" value="offline"><button class="linkbtn" type="submit" onclick="return confirm('開催案内を「対面」の既定文面に戻しますか？')">②対面</button></form>
+        <form method="POST" class="inline"><input type="hidden" name="action" value="tpl-reset"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="which" value="go"><input type="hidden" name="kind" value="offline-prep"><button class="linkbtn" type="submit" onclick="return confirm('開催案内を「対面＋事前読み込み」の既定文面に戻しますか？')">②対面＋事前読み込み</button></form>
+        <form method="POST" class="inline"><input type="hidden" name="action" value="tpl-reset"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="which" value="go"><input type="hidden" name="kind" value="online"><button class="linkbtn" type="submit" onclick="return confirm('開催案内を「オンライン」の既定文面に戻しますか？')">②オンライン</button></form>
+        <form method="POST" class="inline"><input type="hidden" name="action" value="tpl-reset"><input type="hidden" name="session" value={detail.s.id}><input type="hidden" name="which" value="flop"><button class="linkbtn" type="submit" onclick="return confirm('見送りメールを既定の文面に戻しますか？')">③見送り</button></form>
+      </div>
     </section>
 
     {/* ============ 予約一覧 ============ */}
@@ -605,7 +812,12 @@ if (detail && noticeMode) {
               <td class="small2">{r.email || '（メールなし）'}<br>{r.phone}{r.xId && <><br>@{r.xId}</>}</td>
               <td class="nowrap">{r.count}名</td>
               <td class="nowrap">{r.status === 'confirmed' ? '確定' : 'キャンセル'}</td>
-              <td class="small2">完了: {r.confirmMailAt ? '済' : r.confirmMailError ? <b class="fail">失敗</b> : '未'}<br>リマインド: {r.remindedAt ? '済' : r.reminderSkipped ? '対象外' : '未'}</td>
+              <td class="small2 nowrap">
+                受付: {r.confirmMailAt ? '済' : r.confirmMailError ? <b class="fail">失敗</b> : '―'}<br>
+                開催案内: {r.goMailAt ? '済' : r.goMailError ? <b class="fail">失敗</b> : '未'}<br>
+                リマインド: {r.remindedAt ? '済' : r.reminderSkipped ? '対象外' : '未'}
+                {r.flopMailAt && <><br>見送り: 済</>}
+              </td>
               <td class="ops">
                 {r.status === 'confirmed' && (
                   <>
@@ -613,7 +825,8 @@ if (detail && noticeMode) {
                   <form method="POST" class="inline" onsubmit={`return confirm('予約 ${r.id}（${r.name}様 ${r.count}名）をキャンセルしますか？枠は戻ります。')`}><input type="hidden" name="action" value="res-cancel"><input type="hidden" name="session" value={detail!.s.id}><input type="hidden" name="res" value={r.id}><button class="linkbtn danger2" type="submit">キャンセル</button></form>
                   </>
                 )}
-                {r.email && <form method="POST" class="inline"><input type="hidden" name="action" value="res-resend"><input type="hidden" name="session" value={detail!.s.id}><input type="hidden" name="res" value={r.id}><button class="linkbtn" type="submit">確認メール再送</button></form>}
+                {r.email && <form method="POST" class="inline"><input type="hidden" name="action" value="res-resend"><input type="hidden" name="session" value={detail!.s.id}><input type="hidden" name="res" value={r.id}><button class="linkbtn" type="submit">受付メール再送</button></form>}
+                {r.email && r.status === 'confirmed' && detail!.s.go && <form method="POST" class="inline"><input type="hidden" name="action" value="res-resend-go"><input type="hidden" name="session" value={detail!.s.id}><input type="hidden" name="res" value={r.id}><button class="linkbtn" type="submit">開催案内{r.goMailAt ? '再送' : '送信'}</button></form>}
               </td>
             </tr>
           ))}
@@ -634,21 +847,21 @@ if (detail && noticeMode) {
         <label>電話（任意）<input type="tel" name="phone" maxlength="20"></label>
         <label>X ID（任意）<input type="text" name="x" maxlength="30"></label>
         <label class="wide">備考<input type="text" name="note" maxlength="500" placeholder="例: LINEで受付"></label>
-        <label class="check"><input type="checkbox" name="sendmail" checked>確認メールを送る（メールアドレスがある場合）</label>
+        <label class="check"><input type="checkbox" name="sendmail" checked>メールを送る（開催決定前は受付メール、決定後は開催案内）</label>
         <button class="btn" type="submit">登録する（定員チェックあり）</button>
       </form>
     </section>
 
     {/* ============ 送信履歴 ============ */}
     <section class="card">
-      <h2>メール送信履歴（この公演・直近30件）</h2>
+      <h2>メール送信履歴（この公演・直近40件）</h2>
       {detail.maillog.length === 0 && <p class="dim">送信履歴はまだありません。</p>}
       {detail.maillog.length > 0 && (
         <table class="tbl">
-          <thead><tr><th>日時</th><th>種類</th><th>宛先</th><th>件名</th><th>結果</th></tr></thead>
+          <thead><tr><th>日時(UTC)</th><th>種類</th><th>宛先</th><th>件名</th><th>結果</th></tr></thead>
           <tbody>
           {detail.maillog.map((m) => (
-            <tr><td class="nowrap">{m.at.slice(0, 16).replace('T', ' ')}</td><td class="nowrap">{m.kind === 'confirm' ? '完了' : m.kind === 'remind' ? 'リマインド' : '案内'}</td><td class="small2">{m.to}</td><td class="small2">{m.subject}</td><td>{m.ok ? '成功' : <b class="fail">失敗</b>}</td></tr>
+            <tr><td class="nowrap">{m.at.slice(0, 16).replace('T', ' ')}</td><td class="nowrap">{MAIL_KIND_LABEL[m.kind] ?? m.kind}</td><td class="small2">{m.to}</td><td class="small2">{m.subject}</td><td>{m.ok ? '成功' : <b class="fail">失敗</b>}</td></tr>
           ))}
           </tbody>
         </table>
@@ -670,32 +883,36 @@ body{margin:0;background:#111113;color:#f1efe9;font-family:'Hiragino Kaku Gothic
 .brand span{font-weight:400;font-size:12px;color:#9b978c;margin-left:12px;letter-spacing:.08em}
 h1{font-size:18px;margin:0 0 4px;line-height:1.5}
 h2{font-size:15px;margin:0 0 10px}
+h3{font-size:14px;margin:8px 0 4px}
 a{color:#d9e63b}
 .card{background:#18181b;border:1px solid rgba(255,255,255,.12);padding:20px 22px;margin:0 0 18px}
 .card.notice{border-color:#d9e63b}
-.cardhead{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.cardhead{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;margin-bottom:6px}
+.cardhead h1,.cardhead h2{margin-right:auto}
 .login{max-width:420px;margin:60px auto}
 .ok{border:1px solid rgba(217,230,59,.6);color:#e9f28d;padding:12px 16px;margin:0 0 16px;background:rgba(217,230,59,.06)}
 .err{border:1px solid #e5484d;color:#e08a8a;padding:12px 16px;margin:0 0 16px}
+.warn{border:1px solid #d9a13b;color:#f0c987;padding:10px 14px;margin:8px 0 12px;font-size:13px}
 .dim{color:#9b978c;font-size:12.5px;margin:0 0 12px}
 .dim2{color:#6f6c64;font-size:11.5px}
 .small2{font-size:12px;word-break:break-all}
 .fail{color:#e5484d}
 label{display:block;font-size:12.5px;font-weight:700;margin:0}
-input[type=text],input[type=email],input[type=tel],input[type=number],input[type=password],input[type=datetime-local],select,textarea{width:100%;margin-top:5px;padding:9px 11px;font:inherit;font-size:14px;background:#0d0d0e;border:1px solid rgba(255,255,255,.2);color:#f1efe9}
+input[type=text],input[type=email],input[type=tel],input[type=url],input[type=number],input[type=password],input[type=datetime-local],select,textarea{width:100%;margin-top:5px;padding:9px 11px;font:inherit;font-size:14px;background:#0d0d0e;border:1px solid rgba(255,255,255,.2);color:#f1efe9}
+textarea{font-size:13px;line-height:1.7;resize:vertical}
 input:focus,select:focus,textarea:focus{outline:none;border-color:#d9e63b}
-textarea{resize:vertical}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:end}
 .grid .wide{grid-column:1/-1}
 .grid .btn{grid-column:1/-1;justify-self:start}
 .check{display:flex;align-items:center;gap:8px;font-weight:400;grid-column:1/-1}
 .check input{width:auto;margin:0;accent-color:#d9e63b}
-.btn{display:inline-flex;align-items:center;background:#d9e63b;color:#0d0d0e;border:1px solid #d9e63b;padding:10px 22px;font:inherit;font-size:13px;font-weight:700;letter-spacing:.06em;cursor:pointer}
+.btn{display:inline-flex;align-items:center;background:#d9e63b;color:#0d0d0e;border:1px solid #d9e63b;padding:10px 22px;font:inherit;font-size:13px;font-weight:700;letter-spacing:.06em;cursor:pointer;text-decoration:none}
 .btn.small{padding:5px 14px;font-size:12px}
 .btn.ghost{background:transparent;color:#f1efe9;border-color:rgba(255,255,255,.3)}
 .btn.danger{background:transparent;color:#e5484d;border-color:#e5484d}
-.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.btnrow{display:flex;gap:8px 12px;flex-wrap:wrap;align-items:center;margin:12px 0}
 .badge{font-size:11px;letter-spacing:.1em;border:1px solid rgba(255,255,255,.3);padding:3px 10px;color:#c9c5ba;white-space:nowrap}
+.badge.goB{background:#d9e63b;color:#0d0d0e;border-color:#d9e63b;font-weight:700}
 .tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
 .tbl th{color:#9b978c;font-size:11px;letter-spacing:.06em;font-weight:500}
 .tbl th,.tbl td{text-align:left;padding:9px 10px 9px 0;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
@@ -710,6 +927,10 @@ textarea{resize:vertical}
 .wk{border-top:1px solid rgba(255,255,255,.08);padding:10px 0}
 .wk summary{cursor:pointer;font-weight:700;font-size:13px}
 .wk form{margin-top:14px}
+.tplhead{border-top:1px solid rgba(255,255,255,.1);padding-top:12px}
+.ph{display:inline-block;font-family:ui-monospace,monospace;font-size:11.5px;border:1px solid rgba(255,255,255,.2);padding:0 6px;margin:2px 4px 2px 0;color:#e9f28d;cursor:help}
+.pv summary{cursor:pointer;font-size:12.5px;color:#c9c5ba}
+.pv pre{white-space:pre-wrap;font-family:inherit;font-size:12.5px;line-height:1.8;background:#0d0d0e;border:1px solid rgba(255,255,255,.12);padding:14px;margin:8px 0 0;max-height:420px;overflow:auto}
 .foot{color:#6f6c64;font-size:11px;text-align:center;margin-top:40px}
 @media(max-width:720px){.grid{grid-template-columns:1fr}.tbl{display:block;overflow-x:auto;white-space:nowrap}.wrap{padding:20px 14px 60px}}
 </style>

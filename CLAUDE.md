@@ -79,6 +79,7 @@
 - データ層は src/lib/hacktaleBooking.ts。残席確保・人数変更・キャンセルは EVAL（Lua）で原子的に行う。**残席カウンタ（ht:seats:*）を直接いじらない**（狂ったら管理画面の「確定人数を再集計」）。
 - リマインドは毎日 9:10 JST の Vercel Cron（/api/hacktale/reminder）。Hobby プランの cron 上限（1日1回×2本）を /api/yoyaku/reminder と使い切っているので、**3本目の cron は追加できない**。
 - 貸切相談の導線（フォーム・LINE）は残してある。公開公演と貸切は別導線。
+- 開催は「最少人数で開催決定（立卓）／未達なら開催見送り（流卓）」。メール文面3種（受付・開催案内・見送り）は公演回ごとに保存・編集でき、既定文面は src/lib/hacktaleTemplates.ts。**振込先はリポジトリが公開なのでコードに書かない**（管理画面の設定＝KV）。
 
 ## 公演検索サービス /events/（2026-09-13〜）
 - 正本は `src/data/events/`（主催者・作品・会場・公演回・販売先・情報源を分けて管理）。運用手順と公開前の不足は `docs/events-setup.md`。`src/data/shows.ts` は変換層なので手で編集しない。

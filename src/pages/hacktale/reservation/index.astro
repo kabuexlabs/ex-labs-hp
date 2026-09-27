@@ -14,9 +14,12 @@ import {
   AVAILABILITY_LABEL,
   formatStartJa,
   jstNow,
+  sessionFormat,
+  minPlayersOf,
   type HtSession,
   type HtAvailability,
 } from '../../../lib/hacktaleBooking';
+import { FORMAT_LABEL, type HtFormat } from '../../../lib/hacktaleTemplates';
 
 Astro.response.headers.set('Cache-Control', 'no-store');
 
@@ -26,7 +29,16 @@ const err = Astro.url.searchParams.get('err') ?? '';
 const now = jstNow();
 const today = now.slice(0, 10);
 
-let rows: { s: HtSession; workTitle: string; image?: string; durationMin?: number; avail: HtAvailability }[] = [];
+let rows: {
+  s: HtSession;
+  workTitle: string;
+  image?: string;
+  durationMin?: number;
+  format: HtFormat;
+  booked: number;
+  min: number;
+  avail: HtAvailability;
+}[] = [];
 let filterTitle = '';
 const configured = isKvConfigured();
 
@@ -40,12 +52,16 @@ if (configured) {
   const seats = await bookedSeatsMap(sessions.map((s) => s.id));
   rows = sessions.map((s) => {
     const w = works.get(s.workId);
+    const booked = seats.get(s.id) ?? 0;
     return {
       s,
       workTitle: w?.title ?? s.workId,
       image: w?.image,
       durationMin: w?.durationMin,
-      avail: availability(s, seats.get(s.id) ?? 0, now),
+      format: sessionFormat(s, w ?? null),
+      booked,
+      min: minPlayersOf(s),
+      avail: availability(s, booked, now),
     };
   });
   if (workFilter) filterTitle = works.get(workFilter)?.title ?? '';
@@ -82,17 +98,24 @@ const openCount = rows.filter((r) => r.avail.state === 'open').length;
 
 {rows.length > 0 && (
   <div class="list">
-  {rows.map(({ s, workTitle, image, durationMin, avail }) => (
+  {rows.map(({ s, workTitle, image, durationMin, format, booked, min, avail }) => (
     <div class="row">
       {image && <img class="thumb" src={image} alt="" loading="lazy" decoding="async">}
       <div class="body">
         <div class="chips">
           <span class:list={['stat', avail.state]}>{AVAILABILITY_LABEL(avail)}</span>
-          {durationMin && <span class="chip">約{durationMin}分</span>}
+          <span class="chip">{FORMAT_LABEL[format]}</span>
+          {avail.state !== 'cancelled' && (s.go
+            ? <span class="chip gochip">開催決定</span>
+            : booked < min && <span class="chip">あと{min - booked}名で開催決定</span>)}
         </div>
         <p class="wt">{workTitle}</p>
         <p class="dt">{formatStartJa(s.start)}</p>
-        <p class="meta">{s.venue}｜{s.price}</p>
+        <dl class="spec">
+          <div><dt>プレイ人数</dt><dd>{min < s.capacity ? `${min}〜${s.capacity}名` : `${s.capacity}名`}{durationMin ? `／約${durationMin}分` : ''}</dd></div>
+          <div><dt>料金</dt><dd>{s.price}{format === 'offline' && /円$/.test(s.price) ? '/名' : ''}</dd></div>
+          <div><dt>形式</dt><dd>{FORMAT_LABEL[format]}（{s.venue}）</dd></div>
+        </dl>
         {s.deadline && avail.state === 'open' && <p class="meta dim2">受付期限: {formatStartJa(s.deadline)} まで</p>}
       </div>
       <div class="act">
@@ -141,6 +164,11 @@ const openCount = rows.filter((r) => r.avail.state === 'open').length;
 .wt{font-size:17px;font-weight:900;margin:0 0 4px}
 .dt{font-size:15px;font-weight:700;color:var(--acc);margin:0 0 6px;letter-spacing:.04em}
 .meta{font-size:12px;color:#9b978c;margin:0;line-height:1.8}
+.gochip{border-color:var(--acc);color:var(--acc)}
+.spec{margin:0;display:flex;flex-direction:column;gap:2px}
+.spec div{display:flex;gap:10px;font-size:12.5px;line-height:1.8}
+.spec dt{color:#9b978c;min-width:5.5em;flex-shrink:0}
+.spec dd{margin:0;color:#c9c5ba}
 .dim2{color:#6f6c64}
 .act .btn{white-space:nowrap}
 .dead{border-color:rgba(255,255,255,.15);color:#6f6c64;cursor:default}

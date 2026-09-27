@@ -1,17 +1,36 @@
-import { randomBytes } from 'node:crypto';
+import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { sendMail, adminEmail } from './yoyaku';
+import { HT_CONTACT_EMAIL } from '../data/hacktale';
+import {
+  type HtFormat,
+  type GoKind,
+  defaultAcceptTemplate,
+  defaultGoTemplate,
+  FLOP_TEMPLATE,
+  SUBJECTS,
+  renderTemplate,
+  missingPlaceholders,
+} from './hacktaleTemplates';
 
 // ---------------------------------------------------------------------------
 // HACKTALE 公演予約（/hacktale/reservation/ と /hacktale/admin/）のデータ層。
 //
 // 「作品」と「公演回」を分けて管理する：
 //   ・作品   … 作品名・紹介文・画像・所要時間・標準の定員（公演回の初期値）
-//   ・公演回 … 作品ID・開催日時・会場・料金・定員・受付期限・状態
+//   ・公演回 … 作品ID・形式（対面/オンライン）・開催日時・会場・料金・定員・
+//              開催最少人数・受付期限・状態・メール文面
 // 残席は「公演回の定員 − 確定済み予約の合計人数」。確定人数は Redis の
 // カウンタ（ht:seats:<id>）で持ち、予約の作成・変更・キャンセルは EVAL
 // （Luaスクリプト）で人数チェックと書き込みを1コマンドにまとめる。
 // Redis のコマンドは直列に実行されるため、残り1席への同時申し込みでも
 // 定員を超えない（確定するのは先に処理された1件だけ）。
+//
+// 開催の流れ（HACKTALE の実運用）:
+//   申し込み → 受付メール「開催人数に達したら改めてご案内」
+//   → 最少人数に達したら「開催決定（立卓）」→ 開催案内メール（会場・支払い等）
+//   → 達しなければ「開催見送り（流卓）」→ 見送りメール
+// 対面は最少人数に達した時点で自動で開催決定・案内送信できる（autoGo）。
+// オンラインは Discord リンクを公演回ごとに入れてから手動で一斉送信する。
 //
 // ストレージ: Upstash Redis（/yoyaku・/api/contact と同じ無料インフラ）。
 // メール:     lib/yoyaku.ts の sendMail を共用（自社SMTP優先・Resend予備）。
@@ -26,8 +45,10 @@ export interface HtWorkRec {
   durationMin?: number;
   /** 標準の定員。公演回を新規作成するときの初期値（既存の公演回には影響しない） */
   defaultCapacity: number;
-  /** 料金・支払い方法の初期値（公演回作成時にコピーされる） */
+  /** 料金の初期値（公演回作成時にコピーされる） */
   defaultPrice?: string;
+  /** 形式の初期値 */
+  defaultFormat?: HtFormat;
   active: boolean; // false: 新しい公演回の作成対象から外す（既存回はそのまま）
   createdAt: string;
 }
@@ -43,13 +64,27 @@ export const SESSION_STATUS_LABEL: Record<HtSessionStatus, string> = {
 export interface HtSession {
   id: string;
   workId: string;
+  format?: HtFormat; // 未設定の旧データは作品の既定値
   start: string; // 'YYYY-MM-DDTHH:mm'（日本時間）
   venue: string;
   meeting?: string; // 集合場所
-  price: string; // 料金と支払い方法（例: 4,500円／当日現金またはPayPay）
+  price: string; // 料金（例: 4,500円）
   capacity: number;
+  /** 開催に必要な最少人数（未設定なら定員と同じ） */
+  minPlayers?: number;
+  /** 最少人数に達したら自動で開催決定し、開催案内を送る */
+  autoGo?: boolean;
+  /** 開催決定（立卓）済み */
+  go?: boolean;
+  goAt?: string;
+  /** 人数未達による開催見送り（流卓）。status は cancelled になる */
+  flop?: boolean;
+  discordUrl?: string;
+  acceptTemplate?: string;
+  goTemplate?: string;
+  flopTemplate?: string;
   deadline?: string; // 受付期限（省略時は開始時刻まで）
-  notes?: string; // 当日の注意事項（予約ページとメールに掲載）
+  notes?: string; // 当日の注意事項（予約ページに掲載）
   status: HtSessionStatus;
   createdAt: string;
   updatedAt?: string;
@@ -72,9 +107,14 @@ export interface HtReservation {
   remindedAt?: string;
   /** リマインド対象外の理由（例: 送信タイミングを過ぎてからの予約） */
   reminderSkipped?: string;
-  /** 予約完了メールの送信成功時刻。未送信・失敗なら undefined */
+  /** 受付メールの送信成功時刻。未送信・失敗なら undefined */
   confirmMailAt?: string;
   confirmMailError?: string;
+  /** 開催案内メールの送信成功時刻 */
+  goMailAt?: string;
+  goMailError?: string;
+  /** 見送りメールの送信成功時刻 */
+  flopMailAt?: string;
 }
 
 export interface HtSettings {
@@ -85,13 +125,20 @@ export interface HtSettings {
    * 既定36時間 ＝ 実質「前日の朝9時」（例: 翌日19時開演 → 前日9時に送信）。
    */
   reminderHours: number;
+  /** 振込先（オンライン公演の開催案内に {振込先} として差し込む）。公開リポジトリに置かないため KV に保存 */
+  bankInfo?: string;
 }
 
 export const DEFAULT_SETTINGS: HtSettings = { reminderEnabled: true, reminderHours: 36 };
 
+export type HtMailKind = 'confirm' | 'go' | 'flop' | 'remind' | 'notice' | 'admin';
+export const MAIL_KIND_LABEL: Record<HtMailKind, string> = {
+  confirm: '受付', go: '開催案内', flop: '見送り', remind: 'リマインド', notice: '案内', admin: '管理者',
+};
+
 export interface HtMailLog {
   at: string;
-  kind: 'confirm' | 'remind' | 'notice' | 'admin';
+  kind: HtMailKind;
   sessionId: string;
   reservationId?: string;
   to: string;
@@ -202,15 +249,33 @@ export async function saveWork(w: HtWorkRec): Promise<void> {
   await redis('HSET', WORKS_KEY, w.id, JSON.stringify(w));
 }
 
-/** サイト掲載中の3作品を初期データとして投入（既存があれば何もしない）。 */
+// 初版の既定料金は長い説明文で、メールの {料金} 差し込みに向かないため置き換える。
+const LEGACY_PRICE: Record<string, string> = {
+  '4,500円（1名様あたり）／お支払い方法は当日ご案内します': '4,500円',
+  '4,500円（オフライン）／3,500円（オンライン）／お支払い方法は当日ご案内します': '3,500円',
+};
+
+/** サイト掲載中の3作品を初期データとして投入（既存があれば初版の既定値だけ補正）。 */
 export async function seedWorks(): Promise<void> {
-  const count = Number(await redis('HLEN', WORKS_KEY)) || 0;
-  if (count > 0) return;
+  const existing = await getWorks();
+  if (existing.length > 0) {
+    for (const w of existing) {
+      const fixed = w.defaultPrice && LEGACY_PRICE[w.defaultPrice];
+      if (fixed || !w.defaultFormat) {
+        await saveWork({
+          ...w,
+          defaultPrice: fixed || w.defaultPrice,
+          defaultFormat: w.defaultFormat ?? (w.id === 'werewolf-theorem' ? 'online' : 'offline'),
+        });
+      }
+    }
+    return;
+  }
   const now = new Date().toISOString();
   const seeds: HtWorkRec[] = [
-    { id: 'present-poker', title: 'プレゼント・ポーカー', desc: '交渉/閃き/論理を駆使し、勝利を目指せ。公演終了時、明確に1名の勝利者が出る。', image: '/assets/hacktale/kv-poker.webp', durationMin: 180, defaultCapacity: 6, defaultPrice: '4,500円（1名様あたり）／お支払い方法は当日ご案内します', active: true, createdAt: now },
-    { id: 'werewolf-theorem', title: '人狼定理', desc: '論理と交渉の頭脳戦。勝利者は2名、途中脱落なし。人狼のルールを知らなくても遊べる。', image: '/assets/hacktale/kv-werewolf.webp', durationMin: 240, defaultCapacity: 8, defaultPrice: '4,500円（オフライン）／3,500円（オンライン）／お支払い方法は当日ご案内します', active: true, createdAt: now },
-    { id: 'dice-box', title: 'ダイスボックス', desc: '閃きが試される、ダイスの箱。', image: '/assets/hacktale/kv-dicebox.webp', durationMin: 240, defaultCapacity: 9, defaultPrice: '近日公開', active: true, createdAt: now },
+    { id: 'present-poker', title: 'プレゼント・ポーカー', desc: '交渉/閃き/論理を駆使し、勝利を目指せ。公演終了時、明確に1名の勝利者が出る。', image: '/assets/hacktale/kv-poker.webp', durationMin: 180, defaultCapacity: 6, defaultPrice: '4,500円', defaultFormat: 'offline', active: true, createdAt: now },
+    { id: 'werewolf-theorem', title: '人狼定理', desc: '論理と交渉の頭脳戦。勝利者は2名、途中脱落なし。人狼のルールを知らなくても遊べる。', image: '/assets/hacktale/kv-werewolf.webp', durationMin: 240, defaultCapacity: 8, defaultPrice: '3,500円', defaultFormat: 'online', active: true, createdAt: now },
+    { id: 'dice-box', title: 'ダイスボックス', desc: '閃きが試される、ダイスの箱。', image: '/assets/hacktale/kv-dicebox.webp', durationMin: 240, defaultCapacity: 9, defaultPrice: '未定', defaultFormat: 'offline', active: true, createdAt: now },
   ];
   for (const w of seeds) await saveWork(w);
 }
@@ -241,8 +306,37 @@ export async function deleteSessionIfEmpty(id: string): Promise<boolean> {
   const n = Number(await redis('HLEN', resKey(id))) || 0;
   if (n > 0) return false;
   await redis('HDEL', SESSIONS_KEY, id);
-  await redis('DEL', seatsKey(id));
+  await redis('DEL', seatsKey(id), `ht:golock:${id}`);
   return true;
+}
+
+/** 形式（旧データは作品の既定値、なければ人狼定理=オンライン・他=対面） */
+export function sessionFormat(s: HtSession, work: HtWorkRec | null): HtFormat {
+  return s.format ?? work?.defaultFormat ?? (s.workId === 'werewolf-theorem' ? 'online' : 'offline');
+}
+
+/** 開催に必要な最少人数（未設定なら定員） */
+export function minPlayersOf(s: HtSession): number {
+  return Math.min(s.minPlayers ?? s.capacity, s.capacity);
+}
+
+/** 公演回に保存された文面。未設定の旧データは既定文面を使う。 */
+export function sessionTemplates(s: HtSession, work: HtWorkRec | null): { accept: string; go: string; flop: string } {
+  const format = sessionFormat(s, work);
+  return {
+    accept: s.acceptTemplate ?? defaultAcceptTemplate(s.workId),
+    go: s.goTemplate ?? defaultGoTemplate(format === 'online' ? 'online' : 'offline'),
+    flop: s.flopTemplate ?? FLOP_TEMPLATE,
+  };
+}
+
+/** 新しい公演回に入れる文面一式 */
+export function initialTemplates(workId: string, goKind: GoKind): Pick<HtSession, 'acceptTemplate' | 'goTemplate' | 'flopTemplate'> {
+  return {
+    acceptTemplate: defaultAcceptTemplate(workId),
+    goTemplate: defaultGoTemplate(goKind),
+    flopTemplate: FLOP_TEMPLATE,
+  };
 }
 
 const SESSION_ALPHABET = 'abcdefghjkmnpqrstuvwxyz23456789';
@@ -283,14 +377,22 @@ export type HtAvailability =
   | { state: 'open'; remaining: number }
   | { state: 'full' }
   | { state: 'closed' }
-  | { state: 'cancelled' };
+  | { state: 'cancelled'; flop?: boolean };
 
 export const AVAILABILITY_LABEL = (a: HtAvailability): string =>
-  a.state === 'open' ? `受付中：残り${a.remaining}席` : a.state === 'full' ? '満席' : a.state === 'closed' ? '受付終了' : '公演中止';
+  a.state === 'open'
+    ? `受付中：残り${a.remaining}席`
+    : a.state === 'full'
+      ? '満席'
+      : a.state === 'closed'
+        ? '受付終了'
+        : a.flop
+          ? '開催見送り'
+          : '公演中止';
 
-/** 公演回の受付状態。satisfies: 受付中(残り○席)/満席/受付終了/公演中止 */
+/** 公演回の受付状態。受付中(残り○席)/満席/受付終了/公演中止（開催見送り） */
 export function availability(s: HtSession, booked: number, now = jstNow()): HtAvailability {
-  if (s.status === 'cancelled') return { state: 'cancelled' };
+  if (s.status === 'cancelled') return { state: 'cancelled', flop: !!s.flop };
   if (s.status === 'closed' || s.status === 'draft') return { state: 'closed' };
   const deadline = s.deadline || s.start;
   if (now >= deadline || now >= s.start) return { state: 'closed' };
@@ -316,9 +418,15 @@ export async function getReservation(sessionId: string, id: string): Promise<HtR
   }
 }
 
-/** 予約レコードの上書き保存（人数を変えるときは changeReservationCount を使うこと）。 */
-export async function saveReservation(r: HtReservation): Promise<void> {
-  await redis('HSET', resKey(r.sessionId), r.id, JSON.stringify(r));
+/**
+ * 予約レコードの一部だけを更新する（メール送信状況の記録用）。
+ * 最新のレコードを読み直してから書くので、並行する人数変更・キャンセルを
+ * 古い内容で上書きしない。人数・状態の変更は必ず EVAL 経由の関数を使うこと。
+ */
+async function patchReservation(sessionId: string, id: string, patch: Partial<HtReservation>): Promise<void> {
+  const cur = await getReservation(sessionId, id);
+  if (!cur) return;
+  await redis('HSET', resKey(sessionId), id, JSON.stringify({ ...cur, ...patch }));
 }
 
 // 予約確定：人数チェック → カウンタ加算 → 予約保存 を1つの Lua で原子的に行う。
@@ -342,7 +450,7 @@ export async function reserveSeats(session: HtSession, r: HtReservation): Promis
   return Number(result);
 }
 
-// 予約人数の増減・キャンセル・キャンセル取り消しを原子的に行う。
+// 予約人数の増減・キャンセルを原子的に行う。
 // delta が正のときだけ定員チェックする（減らす・キャンセルは常に成功）。
 const ADJUST_LUA = `
 local booked = tonumber(redis.call('GET', KEYS[1]) or '0')
@@ -453,71 +561,238 @@ export async function getMailLog(limit = 100): Promise<HtMailLog[]> {
   return out;
 }
 
-const CONTACT_LINE = `ご不明な点や変更・キャンセルのご希望は、このメールへの返信、または ${'info@kabuexlabs.com'} までご連絡ください。`;
-
-function sessionBlock(work: HtWorkRec | null, s: HtSession, count: number): string {
-  const lines = [
-    `■ 作品\n${work?.title ?? s.workId}`,
-    `■ 開催日時\n${formatStartJa(s.start)}${work?.durationMin ? `（所要 約${work.durationMin}分）` : ''}`,
-    `■ 会場\n${s.venue}${s.meeting ? `\n（集合場所）${s.meeting}` : ''}`,
-    `■ ご参加人数\n${count}名`,
-    `■ 料金・お支払い方法\n${s.price || '当日ご案内します'}`,
-  ];
-  if (s.notes) lines.push(`■ 当日の注意事項\n${s.notes}`);
-  return lines.join('\n\n');
+function renderVars(work: HtWorkRec | null, s: HtSession, r: HtReservation | null, settings: HtSettings) {
+  return {
+    workTitle: work?.title ?? s.workId,
+    start: s.start,
+    price: s.price,
+    discordUrl: s.discordUrl,
+    bankInfo: settings.bankInfo,
+    name: r?.name,
+    count: r?.count,
+    reservationId: r?.id,
+  };
 }
 
-/** 予約完了メール（お客様宛）＋管理者通知。送信結果は予約レコードと送信履歴に残す。 */
-export async function sendConfirmMail(work: HtWorkRec | null, s: HtSession, r: HtReservation): Promise<boolean> {
-  const subject = `【HACKTALE】ご予約を承りました（予約番号 ${r.id}）`;
-  const body =
-    `${r.name} 様\n\nHACKTALE公演のご予約を承りました。\n\n` +
-    `■ 予約番号\n${r.id}\n\n` +
-    sessionBlock(work, s, r.count) +
-    `\n\n${CONTACT_LINE}\n\n当日お会いできることを楽しみにしております。\n\nHACKTALE（株式会社ex Labs）`;
-  const ok = await sendMail(r.email, subject, body);
-  const updated: HtReservation = ok
-    ? { ...r, confirmMailAt: new Date().toISOString(), confirmMailError: undefined }
-    : { ...r, confirmMailError: `送信失敗（${new Date().toISOString()}）` };
-  await saveReservation(updated);
-  await logMail({ at: new Date().toISOString(), kind: 'confirm', sessionId: s.id, reservationId: r.id, to: r.email, subject, ok });
-
-  // 管理者への通知（お客様への送信可否に関わらず送る）
-  const adminSubject = `【HACKTALE予約】${work?.title ?? s.workId} ${formatStartJa(s.start)}｜${r.name}様 ${r.count}名`;
-  await sendMail(
-    adminEmail(),
-    adminSubject,
-    `新しい予約が入りました。\n\n■ 予約番号\n${r.id}\n\n■ 公演\n${work?.title ?? s.workId}\n${formatStartJa(s.start)}｜${s.venue}\n\n` +
-      `■ お客様\nお名前: ${r.name}\nメール: ${r.email}\n電話: ${r.phone}\nX: ${r.xId || '（未記入）'}\n人数: ${r.count}名\n備考: ${r.note || '（なし）'}\n受付経路: ${r.source === 'web' ? 'Webフォーム' : '手動登録'}\n\n` +
-      `■ この公演の状況\n確定 ${await bookedSeats(s.id)}名／定員 ${s.capacity}名\n\n` +
-      (ok ? 'お客様には確認メールを送信済みです。' : '※お客様への確認メール送信に失敗しています。管理画面から再送してください。'),
-  );
-  return ok;
-}
-
-/** リマインドメール（お客様1件分）。成功時に remindedAt を記録する。 */
-export async function sendRemindMail(work: HtWorkRec | null, s: HtSession, r: HtReservation): Promise<boolean> {
-  const subject = `【HACKTALE】まもなく公演です — ${formatStartJa(s.start)}`;
-  const body =
-    `${r.name} 様\n\nご予約いただいた公演のリマインドです。\n\n` +
-    `■ 予約番号\n${r.id}\n\n` +
-    sessionBlock(work, s, r.count) +
-    `\n\n${CONTACT_LINE}\n\n当日はどうぞお気をつけてお越しください。\n\nHACKTALE（株式会社ex Labs）`;
-  const ok = await sendMail(r.email, subject, body);
-  if (ok) await saveReservation({ ...r, remindedAt: new Date().toISOString() });
-  await logMail({ at: new Date().toISOString(), kind: 'remind', sessionId: s.id, reservationId: r.id, to: r.email, subject, ok });
-  return ok;
-}
-
-/** 日時変更・中止などの案内メール（管理画面で本文を確認してから送る）。 */
-export async function sendNoticeMail(s: HtSession, r: HtReservation, subject: string, body: string): Promise<boolean> {
-  const text = `${r.name} 様\n\n${body}\n\n■ 予約番号\n${r.id}\n\n${CONTACT_LINE}\n\nHACKTALE（株式会社ex Labs）`;
+/** 文面テンプレートを予約者ごとに差し込んで送る。宛名と署名は自動で付く。 */
+async function sendTemplated(
+  kind: HtMailKind,
+  work: HtWorkRec | null,
+  s: HtSession,
+  r: HtReservation,
+  subjectTpl: string,
+  bodyTpl: string,
+  settings: HtSettings,
+): Promise<boolean> {
+  const vars = renderVars(work, s, r, settings);
+  const subject = renderTemplate(subjectTpl, vars);
+  const text =
+    `${r.name} 様\n\n${renderTemplate(bodyTpl, vars)}\n\n` +
+    `――――――――――\n予約番号: ${r.id}\nHACKTALE（株式会社ex Labs）\nお問い合わせ: ${HT_CONTACT_EMAIL}`;
   const ok = await sendMail(r.email, subject, text);
-  await logMail({ at: new Date().toISOString(), kind: 'notice', sessionId: s.id, reservationId: r.id, to: r.email, subject, ok });
+  await logMail({ at: new Date().toISOString(), kind, sessionId: s.id, reservationId: r.id, to: r.email, subject, ok });
   return ok;
 }
 
-// --- リマインドの本体（cron と管理画面の両方から使う） ---------------------------
+/** 管理者宛の通知（件名・本文そのまま） */
+export async function notifyAdmin(sessionId: string, subject: string, text: string): Promise<void> {
+  const ok = await sendMail(adminEmail(), subject, text);
+  await logMail({ at: new Date().toISOString(), kind: 'admin', sessionId, to: adminEmail(), subject, ok });
+}
+
+/** 受付メール（申し込み直後。「開催人数に達したら改めてご案内」） */
+export async function sendAcceptMail(work: HtWorkRec | null, s: HtSession, r: HtReservation, settings: HtSettings): Promise<boolean> {
+  const tpl = sessionTemplates(s, work);
+  const ok = await sendTemplated('confirm', work, s, r, SUBJECTS.accept, tpl.accept, settings);
+  await patchReservation(s.id, r.id, ok
+    ? { confirmMailAt: new Date().toISOString(), confirmMailError: undefined }
+    : { confirmMailError: `送信失敗（${new Date().toISOString()}）` });
+  return ok;
+}
+
+/**
+ * 開催案内メールを1件送る。予約ごとに SET NX で「送信権」を取るので、
+ * 自動開催決定と手動一斉送信が重なっても同じ人に二重送信しない。
+ * 失敗したら送信権を返し、再送できるようにする。
+ * 戻り値: 'sent' | 'failed' | 'skipped'（送信済み・送信中）
+ */
+export async function sendGoMailTo(
+  work: HtWorkRec | null,
+  s: HtSession,
+  r: HtReservation,
+  settings: HtSettings,
+  bodyTpl?: string,
+): Promise<'sent' | 'failed' | 'skipped'> {
+  if (!r.email || r.status !== 'confirmed' || r.goMailAt) return 'skipped';
+  const lockKey = `ht:gomail:${r.id}`;
+  const claimed = await redis('SET', lockKey, '1', 'NX', 'EX', 90 * 86400);
+  if (claimed !== 'OK') return 'skipped';
+  const tpl = bodyTpl ?? sessionTemplates(s, work).go;
+  const ok = await sendTemplated('go', work, s, r, SUBJECTS.go, tpl, settings);
+  if (ok) {
+    await patchReservation(s.id, r.id, { goMailAt: new Date().toISOString(), goMailError: undefined });
+    return 'sent';
+  }
+  await redis('DEL', lockKey);
+  await patchReservation(s.id, r.id, { goMailError: `送信失敗（${new Date().toISOString()}）` });
+  return 'failed';
+}
+
+/** 管理画面の「開催案内を再送」用：送信済み記録を消して送り直す。 */
+export async function resendGoMail(work: HtWorkRec | null, s: HtSession, r: HtReservation, settings: HtSettings): Promise<boolean> {
+  await redis('DEL', `ht:gomail:${r.id}`);
+  const fresh = { ...r, goMailAt: undefined };
+  return (await sendGoMailTo(work, s, fresh, settings)) === 'sent';
+}
+
+/** 開催案内を、まだ受け取っていない確定予約の全員に送る。 */
+export async function sendGoMailAll(
+  work: HtWorkRec | null,
+  s: HtSession,
+  settings: HtSettings,
+  bodyTpl?: string,
+): Promise<{ sent: number; failed: number; skipped: number }> {
+  const out = { sent: 0, failed: 0, skipped: 0 };
+  for (const r of await getReservations(s.id)) {
+    if (r.status !== 'confirmed') continue;
+    if (!r.email) {
+      out.skipped++;
+      continue;
+    }
+    out[await sendGoMailTo(work, s, r, settings, bodyTpl)]++;
+  }
+  return out;
+}
+
+/** 見送りメールを確定予約の全員に送る。 */
+export async function sendFlopMailAll(
+  work: HtWorkRec | null,
+  s: HtSession,
+  settings: HtSettings,
+  subjectTpl: string,
+  bodyTpl: string,
+): Promise<{ sent: number; failed: number; skipped: number }> {
+  const out = { sent: 0, failed: 0, skipped: 0 };
+  for (const r of await getReservations(s.id)) {
+    if (r.status !== 'confirmed') continue;
+    if (!r.email || r.flopMailAt) {
+      out.skipped++;
+      continue;
+    }
+    const ok = await sendTemplated('flop', work, s, r, subjectTpl, bodyTpl, settings);
+    if (ok) {
+      await patchReservation(s.id, r.id, { flopMailAt: new Date().toISOString() });
+      out.sent++;
+    } else out.failed++;
+  }
+  return out;
+}
+
+/** 日時変更・中止などの案内メール（管理画面で本文を確認してから送る）。差し込み可。 */
+export async function sendNoticeMail(
+  work: HtWorkRec | null,
+  s: HtSession,
+  r: HtReservation,
+  subject: string,
+  body: string,
+  settings: HtSettings,
+): Promise<boolean> {
+  return sendTemplated('notice', work, s, r, subject, body, settings);
+}
+
+/**
+ * 開催決定（立卓）の状態遷移。SET NX で「最初の1回」だけが true を返すので、
+ * 同時に最少人数を満たす申し込みが来ても開催案内の一斉送信は1回だけ走る。
+ */
+export async function markGo(sessionId: string): Promise<boolean> {
+  const claimed = await redis('SET', `ht:golock:${sessionId}`, '1', 'NX');
+  if (claimed !== 'OK') return false;
+  const s = await getSession(sessionId);
+  if (!s) return false;
+  await saveSession({ ...s, go: true, goAt: new Date().toISOString() });
+  return true;
+}
+
+/** 開催決定の取り消し（誤操作用）。送信済みの開催案内は取り消せない。 */
+export async function unmarkGo(sessionId: string): Promise<void> {
+  await redis('DEL', `ht:golock:${sessionId}`);
+  const s = await getSession(sessionId);
+  if (s) await saveSession({ ...s, go: false, goAt: undefined });
+}
+
+/** 新しい予約の管理者通知 */
+async function notifyAdminNewReservation(work: HtWorkRec | null, s: HtSession, r: HtReservation, mailNote: string): Promise<void> {
+  const booked = await bookedSeats(s.id);
+  const min = minPlayersOf(s);
+  await notifyAdmin(
+    s.id,
+    `【HACKTALE予約】${work?.title ?? s.workId} ${formatStartJa(s.start)}｜${r.name}様 ${r.count}名`,
+    `新しい予約が入りました。\n\n■ 予約番号\n${r.id}\n\n■ 公演\n${work?.title ?? s.workId}\n${formatStartJa(s.start)}｜${s.venue}\n\n` +
+      `■ お客様\nお名前: ${r.name}\nメール: ${r.email || '（なし）'}\n電話: ${r.phone || '（なし）'}\nX: ${r.xId ? `@${r.xId}` : '（未記入）'}\n人数: ${r.count}名\n備考: ${r.note || '（なし）'}\n受付経路: ${r.source === 'web' ? 'Webフォーム' : '手動登録'}\n\n` +
+      `■ この公演の状況\n確定 ${booked}名／開催最少 ${min}名／定員 ${s.capacity}名\n\n${mailNote}`,
+  );
+}
+
+/**
+ * 予約確定直後のメール処理（Web申し込み・手動登録の共通）。
+ *   ・開催決定済みの公演 → 開催案内を直接送る（受付メールは送らない）
+ *   ・自動開催決定ONで最少人数に達した → 開催決定にし、全員に開催案内
+ *   ・それ以外 → 受付メール。最少人数に達していれば管理者に開催判断を促す
+ * 戻り値はお客様へのメール送信が成功したか。
+ */
+export async function afterReservation(sessionId: string, r: HtReservation, sendCustomerMail = true): Promise<{ ok: boolean; kind: 'accept' | 'go' | 'none' }> {
+  const s = await getSession(sessionId);
+  if (!s) return { ok: false, kind: 'none' };
+  const work = await getWork(s.workId);
+  const settings = await getSettings();
+  const tpl = sessionTemplates(s, work);
+  const missing = missingPlaceholders(tpl.go, { discordUrl: s.discordUrl, bankInfo: settings.bankInfo });
+  const booked = await bookedSeats(s.id);
+  const reached = booked >= minPlayersOf(s);
+
+  let kind: 'accept' | 'go' | 'none' = 'none';
+  let ok = false;
+  let note = '';
+
+  const autoCase = !s.go && !!s.autoGo && reached && missing.length === 0;
+
+  if (!sendCustomerMail || !r.email) {
+    note = 'お客様へのメールは送っていません（手動登録・メールなし）。';
+  } else if ((s.go || autoCase) && missing.length === 0) {
+    kind = 'go';
+    if (autoCase && (await markGo(s.id))) {
+      const fresh = (await getSession(s.id)) ?? s;
+      const res = await sendGoMailAll(work, fresh, settings);
+      ok = !!(await getReservation(s.id, r.id))?.goMailAt;
+      note = `開催最少人数に達したため、自動で開催決定にしました。開催案内を送信: 成功${res.sent}件${res.failed ? `／失敗${res.failed}件（管理画面から再送してください）` : ''}。`;
+    } else {
+      // 開催決定済み、または同時の申し込みが先に開催決定を取った。どちらも
+      // 受付メール（開催人数に達したら改めて…）は送らず開催案内だけにする。
+      // 一斉送信側と重なっても予約ごとの送信権で1通に収まる（skipped＝相手が送信中）。
+      const res = await sendGoMailTo(work, s, r, settings);
+      ok = res !== 'failed';
+      note = ok
+        ? s.go ? '開催決定済みの公演のため、開催案内を送信しました。' : '同時の申し込みで開催決定となったため、開催案内を送信しました。'
+        : '※開催案内の送信に失敗しました。管理画面から再送してください。';
+    }
+  } else {
+    kind = 'accept';
+    ok = await sendAcceptMail(work, s, r, settings);
+    note = ok ? 'お客様には受付メールを送信済みです。' : '※お客様への受付メール送信に失敗しました。管理画面から再送してください。';
+    if (s.go && missing.length > 0) {
+      note += `\n※開催決定済みですが、開催案内の差し込み（${missing.join('、')}）が未入力のため、開催案内は送れていません。入力して一斉送信してください。`;
+    } else if (!s.go && reached) {
+      note += s.autoGo && missing.length > 0
+        ? `\n★開催最少人数に達しました。自動開催決定がONですが、${missing.join('、')}が未入力のため止めています。入力後、管理画面で「開催決定」を押してください。`
+        : '\n★開催最少人数に達しました。管理画面で「開催決定」を押すと開催案内を一斉送信できます。';
+    }
+  }
+
+  await notifyAdminNewReservation(work, s, r, note);
+  return { ok, kind };
+}
+
+// --- リマインド（cron と管理画面の両方から使う） ---------------------------------
 
 export interface RemindResult {
   due: number;
@@ -526,8 +801,20 @@ export interface RemindResult {
   lines: string[];
 }
 
+/** リマインドメール（お客様1件分）。成功時に remindedAt を記録する。 */
+async function sendRemindMail(work: HtWorkRec | null, s: HtSession, r: HtReservation, settings: HtSettings): Promise<boolean> {
+  const body =
+    `ご予約いただいた公演のリマインドです。\n\n■ 作品\n{作品名}\n\n■ 開催日時\n{日時}\n\n■ 会場\n${s.venue}${s.meeting ? `\n（集合場所）${s.meeting}` : ''}\n\n` +
+    `■ ご参加人数\n{人数}\n\n■ 料金\n{料金}` +
+    (s.discordUrl ? `\n\n■ Discord\n{Discordリンク}` : '') +
+    `\n\n詳細は先日お送りした開催のご案内メールをご確認ください。当日はどうぞよろしくお願いいたします。`;
+  const ok = await sendTemplated('remind', work, s, r, '【HACKTALE】まもなく公演です — {日時}', body, settings);
+  if (ok) await patchReservation(s.id, r.id, { remindedAt: new Date().toISOString() });
+  return ok;
+}
+
 /**
- * 1公演分のリマインド送信。
+ * 1公演分のリマインド送信。開催決定（立卓）済みの公演だけが対象。
  * force=false（cron）: 設定が有効で、開始まで settings.reminderHours 以内のときだけ送る。
  * force=true（管理画面の「今すぐ送信」）: 時間条件を無視して未送信の確定予約に送る。
  * どちらも remindedAt / reminderSkipped 済みには送らない（二重送信防止）。
@@ -540,21 +827,19 @@ export async function remindSession(
   force = false,
 ): Promise<RemindResult> {
   const result: RemindResult = { due: 0, sent: 0, failed: 0, lines: [] };
-  // 送信直前に最新の公演情報を読む（中止・日時変更を反映）
   const s = await getSession(sessionId);
-  if (!s || s.status === 'cancelled') return result;
+  if (!s || s.status === 'cancelled' || !s.go) return result;
   const now = jstNow();
-  if (now >= s.start) return result; // 開始後は送らない
+  if (now >= s.start) return result;
   if (!force) {
     if (!settings.reminderEnabled) return result;
     if (hoursUntil(s.start, now) > settings.reminderHours) return result;
   }
   const work = works.get(s.workId) ?? null;
-  const list = await getReservations(sessionId);
-  for (const r of list) {
-    if (r.status !== 'confirmed' || r.remindedAt || r.reminderSkipped) continue;
+  for (const r of await getReservations(sessionId)) {
+    if (r.status !== 'confirmed' || !r.email || r.remindedAt || r.reminderSkipped) continue;
     result.due++;
-    const ok = await sendRemindMail(work, s, r);
+    const ok = await sendRemindMail(work, s, r, settings);
     if (ok) result.sent++;
     else result.failed++;
     result.lines.push(`・${work?.title ?? s.workId}｜${formatStartJa(s.start)}｜${r.name}様 ${r.count}名｜${r.email}${ok ? '' : '｜※送信失敗'}`);
@@ -563,8 +848,6 @@ export async function remindSession(
 }
 
 // --- 認証 -----------------------------------------------------------------------
-
-import { timingSafeEqual } from 'node:crypto';
 
 function safeEqual(a: string, b: string): boolean {
   const ab = Buffer.from(a);

@@ -8,13 +8,14 @@ export const prerender = false;
 //      連打・通信再試行では最初に確定した予約番号の完了画面へ流す。
 //   2. 残席の確保は Lua（reserveSeats）で人数チェックと書き込みを
 //      原子的に行う。残り1席への同時申し込みは片方だけが成功する。
-// メール送信に失敗しても予約は保持し（confirmMailError に記録）、
-// 管理画面から再送できる。
+// 確定後のメールは afterReservation が振り分ける：
+//   開催決定前 → 受付メール（開催人数に達したら改めてご案内）
+//   開催決定済み／この申し込みで最少人数に達し自動開催決定 → 開催案内
+// メール送信に失敗しても予約は保持し、管理画面から再送できる。
 import type { APIRoute } from 'astro';
 import {
   isKvConfigured,
   getSession,
-  getWork,
   getSettings,
   bookedSeats,
   availability,
@@ -23,7 +24,7 @@ import {
   releaseIdempotency,
   reserveRateLimited,
   newReservationId,
-  sendConfirmMail,
+  afterReservation,
   hoursUntil,
   jstNow,
   type HtReservation,
@@ -115,13 +116,12 @@ export const POST: APIRoute = async ({ request }) => {
       return redirect(`${formUrl}?err=full`);
     }
 
-    // --- 予約完了メール（失敗しても予約は保持し、管理画面から再送できる） ----
-    const work = await getWork(session.workId);
+    // --- メール（失敗しても予約は保持し、管理画面から再送できる） ---------
     let mailOk = false;
     try {
-      mailOk = await sendConfirmMail(work, session, reservation);
+      mailOk = (await afterReservation(session.id, reservation)).ok;
     } catch (e) {
-      console.error('[hacktale] confirm mail failed:', e);
+      console.error('[hacktale] mail after reservation failed:', e);
     }
 
     return redirect(`/hacktale/reservation/done/?no=${encodeURIComponent(reservationId)}&mail=${mailOk ? '1' : '0'}`);
