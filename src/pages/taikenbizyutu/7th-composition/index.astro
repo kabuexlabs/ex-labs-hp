@@ -1,0 +1,668 @@
+---
+// 体験する美術館「7枚目のコンポジション」公式LP（2026.11.21–23／京都市京セラ美術館）。
+// デザインはハンドオフ（design_handoff_7th_composition）の再実装。コーポレートサイトとも
+// 既存の体験する美術館LP（TaikenbizyutuLayout）ともデザイン系統が別なので、このファイルだけで完結させている。
+// 限定公開（URLを知っている人だけが見る前提）：noindex, nofollow。sitemap・llms.txt・ナビには載せない。
+// 検索に出すときは INDEXABLE を true にし、sitemap・llms.txt・seo-audit のサブブランド一覧に追加する。
+// ［ ］で囲んだ文言は未確定のプレースホルダー（ハンドオフのまま）。決まったら下のデータを書き換える。
+const INDEXABLE = false;
+import SiteGuard from '../../../components/SiteGuard.astro';
+
+// ---- 未定の項目（決まったらここを埋める） ----
+// 購入先URL。null の間はチケットボタンをすべて #ticket へのアンカーにする
+const TICKET_URL: string | null = null;
+// 地図の埋め込みURL（Google マップの「地図を埋め込む」の src）。null の間は枠だけ表示
+const MAP_EMBED_URL: string | null = null;
+
+const ticketHref = TICKET_URL ?? '#ticket';
+const ticketAttrs = TICKET_URL
+  ? { target: '_blank', rel: 'noopener', 'data-track': 'ticket', 'data-show': '7th-composition' }
+  : {};
+
+const title = '体験する美術館「7枚目のコンポジション」公式サイト｜京都市京セラ美術館 2026.11.21–23';
+const canonical = 'https://kabuexlabs.com/taikenbizyutu/7th-composition/';
+const ogImage = 'https://kabuexlabs.com/assets/7th-composition/og.jpg';
+const description =
+  '絵画×イマーシブ。体験する美術館「7枚目のコンポジション」2026年11月21日（土）〜23日（月）京都市京セラ美術館にて開催。絵画を鑑賞することで物語の中に巻き込まれていく60分のイマーシブ体験。1名4,500円、各回最大30名、1名から参加可能。';
+
+const nav = [
+  ['story', 'ストーリー', 'Story'], ['experience', '体験について', 'Experience'], ['team', '制作チーム', 'Creators'],
+  ['cast', 'キャスト', 'Cast'], ['ticket', 'チケット', 'Ticket'], ['flow', '当日の流れ', 'Flow'],
+  ['access', 'アクセス', 'Access'], ['faq', 'よくある質問', 'Q&A'], ['contact', 'お問い合わせ', 'Contact'],
+].map(([id, ja, en]) => ({ href: '#' + id, ja, en }));
+
+// お知らせ（日付が確定したものを載せる）
+const news: { date: string; text: string }[] = [{ date: '2026.—.—', text: '［お知らせ内容 未定］' }];
+
+// キャスト（写真・プロフィールは荒巻まりの より提供予定）
+const cast: { name: string; roman: string; profile: string; photo?: string }[] = [1, 2, 3].map(() => ({
+  name: '［出演者名］',
+  roman: 'Name',
+  profile: '［プロフィール　荒巻まりの より提供予定］',
+}));
+
+const kv = (arr: string[][]) => arr.map(([k, v]) => ({ k, v }));
+const ticketRows = kv([
+  ['開催日', '2026年11月21日（土）・22日（日）・23日（月）'], ['料金', '1名4,500円［税込・税別は要確認］'],
+  ['割引', 'なし'], ['別途入館料', 'なし'], ['公演時間', '60分'], ['公演回数', '各日7公演'],
+  ['定員', '各回30名'], ['最少催行人数', '各回12名'], ['対象年齢', '18歳以上'], ['1名での参加', '可能'],
+  ['服装', '動きやすい服装でお越しください'], ['私物の持ち込み', '不可'], ['販売開始日時', '［未定］'],
+  ['購入先URL', TICKET_URL ?? '［未定］'], ['販売締切', '開演1時間前'],
+]);
+const schedule = [
+  ['第1回', '12:00', '13:00'], ['第2回', '12:45', '13:45'], ['第3回', '13:30', '14:30'], ['第4回', '14:15', '15:15'],
+  ['第5回', '15:00', '16:00'], ['第6回', '15:45', '16:45'], ['第7回', '16:30', '17:30'],
+];
+const notes = [
+  '本公演は18歳以上の方を対象としています。', '動きやすい服装でお越しください。',
+  '遅刻は厳禁です。指定時刻に1分でも遅れた場合はご参加いただけません。', '体験中の撮影はできません。',
+  '公演内容のネタバレは禁止です。', 'チケット購入後のお客様都合によるキャンセルはお受けできません。',
+];
+const ngList = ['途中退出・再入場', '録音', '日時変更', '主催者都合で中止した場合の返金', '最少催行人数に満たない場合の実施判断・連絡・返金'];
+const accessRows = kv([
+  ['会場名', '京都市京セラ美術館'], ['使用会場', '講演室・多目的ホール'],
+  ['受付・集合場所', '［確認中｜松崎圭佑］'], ['使用室の階・館内経路', '［確認中｜松崎圭佑］'],
+  ['住所・最寄り駅・地図', '［確認中｜松崎圭佑］'], ['バリアフリー対応', 'なし'], ['荷物預かり', 'なし'],
+]);
+const faqs = [
+  ['1人でも参加できますか？', 'はい。1名様からご参加いただけます。'],
+  ['年齢制限はありますか？', '18歳以上の方を対象としています。'],
+  ['公演時間はどのくらいですか？', '60分です。'],
+  ['チケット代以外に入館料はかかりますか？', '本公演への参加にあたり、別途入館料はかかりません。'],
+  ['割引はありますか？', '割引はございません。'],
+  ['服装の指定はありますか？', '動きやすい服装でお越しください。'],
+  ['私物は持ち込めますか？', '体験エリアへの私物の持ち込みは可能ですが、クロークはございません。可能な限り身軽な格好でお越しください。'],
+  ['遅刻しても参加できますか？', '指定時刻に1分でも遅れた場合はご参加いただけません。'],
+  ['体験中に撮影できますか？', '体験中の撮影はできません。また、公演内容のネタバレは禁止です。'],
+  ['購入後にキャンセルできますか？', 'お客様都合によるキャンセルはお受けできません。'],
+];
+const credits = kv([
+  ['絵画', '伊藤ゆきの'], ['ディレクター・シナリオ・デザイン', '荒巻まりの'], ['ゲームデザイン', '御湯波ライト'],
+  ['プロデューサー', 'かるら'], ['企画', '株式会社ex Labs'],
+]);
+const [leadCredit, ...restCredits] = credits;
+
+const eventLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: '体験する美術館「7枚目のコンポジション」',
+  alternateName: 'The 7th Composition',
+  description,
+  image: 'https://kabuexlabs.com/assets/7th-composition/kv.webp',
+  url: canonical,
+  startDate: '2026-11-21T12:00:00+09:00',
+  endDate: '2026-11-23T17:30:00+09:00',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  eventStatus: 'https://schema.org/EventScheduled',
+  location: { '@type': 'Place', name: '京都市京セラ美術館', address: { '@type': 'PostalAddress', addressLocality: '京都市', addressRegion: '京都府', addressCountry: 'JP' } },
+  organizer: { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' },
+  offers: { '@type': 'Offer', price: 4500, priceCurrency: 'JPY', url: TICKET_URL ?? canonical },
+};
+---
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+{!INDEXABLE && <meta name="robots" content="noindex, nofollow">}
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:url" content={canonical}>
+<meta property="og:image" content={ogImage}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="体験する美術館「7枚目のコンポジション」">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#861E3E">
+{INDEXABLE && <script type="application/ld+json" set:html={JSON.stringify(eventLd)} />}
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Italiana&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/assets/7th-composition/kv.webp">
+<SiteGuard />
+</head>
+<body>
+<div class="page">
+
+<header class="hd">
+  <div class="hd-in">
+    <a href="#top" class="logo">
+      <span class="logo-s">体験する美術館</span>
+      <span class="logo-m">7枚目のコンポジション</span>
+    </a>
+    <nav class="hd-nav" aria-label="ページ内メニュー">
+      {nav.map((n) => <a href={n.href}>{n.ja}</a>)}
+    </nav>
+    <span class="hd-sp"></span>
+    <a href={ticketHref} {...ticketAttrs} data-place="header" class="btn glow hd-buy">チケットを購入する</a>
+    <button type="button" class="circ hd-menu" aria-label="メニュー" aria-controls="menu" aria-expanded="false" data-menu-open>
+      <span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div id="menu" class="menu" hidden>
+  <div class="menu-hd">
+    <span class="menu-t">Menu</span>
+    <button type="button" class="circ menu-x" aria-label="閉じる" data-menu-close>×</button>
+  </div>
+  <nav class="menu-nav" aria-label="メニュー">
+    {nav.map((n) => (
+      <a href={n.href} data-menu-close><span class="ja">{n.ja}</span><span class="en">{n.en}</span></a>
+    ))}
+  </nav>
+  <a href={ticketHref} {...ticketAttrs} data-place="menu" class="btn glow menu-buy" data-menu-close>チケットを購入する</a>
+</div>
+
+<main>
+<section id="top" class="hero">
+  <div class="hero-in">
+    <div class="hero-vis">
+      <img src="/assets/7th-composition/kv.webp" alt="7枚目のコンポジション 公演ビジュアル" width="1075" height="1523" fetchpriority="high">
+    </div>
+    <div class="hero-txt">
+      <div class="hero-tate">
+        <h1>体験する美術館<span class="sr">「7枚目のコンポジション」</span></h1>
+        <p class="bodoni">The 7th Composition</p>
+      </div>
+      <div class="hero-main">
+        <p class="genre"><span>絵画</span><span class="bodoni x">×</span><span>イマーシブ</span></p>
+        <div class="date bodoni">
+          <div class="yr">2026</div>
+          <div class="big">11.21<span class="badge"><span>Sat</span></span></div>
+          <div class="row2">
+            <div class="at"><span class="bodoni">at</span>京都市<br>京セラ美術館</div>
+            <div class="slash"></div>
+            <div class="big">23<span class="badge"><span>Mon</span></span></div>
+          </div>
+        </div>
+        <p class="catch">あるはずのない記憶に導かれ、<br>交錯する未来へ——</p>
+        <p class="en-detail bodoni">Taiken-suru Bijutsukan<br>THE 7TH COMPOSITION<br>2026.11.21(Sat) - 11.23(Mon)<br>at Kyoto City KYOCERA Museum of Art</p>
+        <div>
+          <a href={ticketHref} {...ticketAttrs} data-place="hero" class="btn glow btn-l">チケットを購入する<span class="bodoni">→</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="news" class="news">
+  <div class="w880">
+    <div class="news-hd">
+      <h2 class="italiana">News</h2>
+      <span>お知らせ</span>
+    </div>
+    {news.map((n) => (
+      <div class="news-row"><span class="bodoni d">{n.date}</span><span>{n.text}</span></div>
+    ))}
+  </div>
+</section>
+
+<section id="story" class="sec story">
+  <div class="story-circle" aria-hidden="true"></div>
+  <div class="story-line" aria-hidden="true"></div>
+  <div class="w880 rel">
+    <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Story</h2><span class="orn">+·◎·</span></div><p>ストーリー</p></div>
+    <p class="story-lead">あるはずのない記憶に導かれ、交錯する未来へ——</p>
+    <p class="story-h glow-t">［あらすじ 見出し］</p>
+    <p class="body">［あらすじ本文　荒巻まりの・right より提供予定］</p>
+  </div>
+</section>
+
+<section id="experience" class="sec">
+  <div class="w1080">
+    <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Experience</h2><span class="orn">+·◎·</span></div><p>体験について</p></div>
+    <div class="exp-lead">
+      <p class="exp-h glow-t">『鑑賞するアート』から<br>『体験するアート』へ</p>
+      <p class="body">体験する美術館は、「『鑑賞するアート』から『体験するアート』へ」をテーマにした、絵画を鑑賞することで物語の中に観客が巻き込まれていくイマーシブ体験です。</p>
+    </div>
+    <div class="spec">
+      <div><span class="lb">+・体験ジャンル</span><span class="genre-v">絵画 × イマーシブ</span></div>
+      <div><span class="lb">+・公演時間</span><span class="num"><span class="bodoni n">60</span><span>分</span></span></div>
+      <div><span class="lb">+・参加人数</span><span class="num"><span>各回最大</span><span class="bodoni n">30</span><span>名</span></span></div>
+      <div><span class="lb">+・おひとりさま</span><span class="num"><span class="bodoni n">1</span><span>名から参加可能</span></span></div>
+    </div>
+    <div class="hl">
+      <div class="hl-img" aria-hidden="true"></div>
+      <div class="hl-txt">
+        <p class="hl-t italiana">Highlights<span></span></p>
+        <p class="hl-h">具体的な体験方法・見どころ</p>
+        <p class="hl-b">京都市京セラ美術館の2部屋を活用した物語体験コンテンツ。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="team" class="sec">
+  <div class="w880">
+    <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Creators</h2><span class="orn">+·◎·</span></div><p>制作チーム</p></div>
+    <div class="team">
+      <div class="team-lead">
+        <span class="role">+・{leadCredit.k}・+</span>
+        <span class="name">{leadCredit.v}</span>
+      </div>
+      <div class="team-grid">
+        {restCredits.map((c) => (
+          <div><span class="role">+・{c.k}・+</span><span class="name">{c.v}</span></div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cast" class="sec">
+  <div class="w1160">
+    <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Cast</h2><span class="orn">+·◎·</span></div><p>キャスト</p></div>
+    <div class="cast">
+      {cast.map((c) => (
+        <div class="card">
+          <div class="card-tab"></div>
+          <div class="card-body">
+            {c.photo
+              ? <img class="card-ph" src={c.photo} alt={c.name} loading="lazy">
+              : <div class="card-ph ph">cast photo</div>}
+            <p class="card-pf italiana">Profile<span></span></p>
+            <div>
+              <p class="card-name">{c.name}</p>
+              <p class="card-roman bodoni">{c.roman}</p>
+            </div>
+            <p class="card-txt">{c.profile}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section id="ticket" class="sec panel-sec">
+  <div class="panel">
+    <div class="sh sh-56"><div class="sh-r"><span class="orn">+·◎·</span><h2>Ticket</h2><span class="orn">+·◎·</span></div><p>チケット・開催情報</p></div>
+    <div class="price">
+      <span class="lb">+・料金・+</span>
+      <span class="price-v"><span class="p1">1名</span><span class="bodoni pn">4,500</span><span class="p2">円</span></span>
+      <span class="price-note">［税込・税別は要確認］</span>
+    </div>
+    <div class="info">
+      {ticketRows.map((r) => (
+        <div class="info-row"><span class="k">+・{r.k}</span><span class="v">{r.v}</span></div>
+      ))}
+    </div>
+    <div class="sched">
+      <p class="sched-t italiana">Schedule</p>
+      <p class="sched-s">3日間共通の公演スケジュール</p>
+      <div class="sched-tb">
+        <div class="sched-hd"><span>公演回</span><span>開始</span><span>終演</span></div>
+        {schedule.map(([no, s, e]) => (
+          <div class="sched-row"><span class="no">{no}</span><span class="bodoni t">{s}</span><span class="bodoni t e">{e}</span></div>
+        ))}
+        <p class="sched-note">※受付・事前説明・退場を含む総所要時間は60分間です。</p>
+      </div>
+    </div>
+    <div class="ticket-cta">
+      <a href={ticketHref} {...ticketAttrs} data-place="ticket" class="btn glow btn-xl">チケットを購入する<span class="bodoni">→</span></a>
+    </div>
+  </div>
+</section>
+
+<section id="flow" class="sec">
+  <div class="w1160">
+    <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Flow</h2><span class="orn">+·◎·</span></div><p>当日の流れ</p></div>
+    <div class="flow">
+      <div><span class="bodoni fn">01</span><span class="fh">受付</span></div>
+      <div><span class="bodoni fn">02</span><span class="fh">参加準備・事前説明</span></div>
+      <div class="gold"><span class="bodoni fn">03</span><span class="fh">体験開始</span><span class="fd">絵画を通して物語に巻き込まれていく、60分のイマーシブ体験</span></div>
+      <div><span class="bodoni fn">04</span><span class="fh">体験終了・退場</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="attention" class="sec">
+  <div class="w820">
+    <div class="sh sh-40"><div class="sh-r"><span class="orn">+·◎·</span><h2>Attention</h2><span class="orn">+·◎·</span></div><p>注意事項</p></div>
+    <div class="deco" aria-hidden="true"><span class="l"></span><span class="bodoni">+·◇·+</span><span class="r"></span></div>
+    <ul class="att">{notes.map((t) => <li>{t}</li>)}</ul>
+    <p class="att-h">以下の扱いは不可能です。</p>
+    <ul class="att">{ngList.map((t) => <li>{t}</li>)}</ul>
+    <div class="deco deco-b" aria-hidden="true"><span class="l"></span><span class="bodoni">+·◇·+</span><span class="r"></span></div>
+  </div>
+</section>
+
+<section id="access" class="sec panel-sec">
+  <div class="panel">
+    <div class="sh sh-56"><div class="sh-r"><span class="orn">+·◎·</span><h2>Access</h2><span class="orn">+·◎·</span></div><p>会場・アクセス</p></div>
+    <div class="acc">
+      <div class="acc-info">
+        {accessRows.map((r) => (
+          <div class="info-row"><span class="k">+・{r.k}</span><span class="v">{r.v}</span></div>
+        ))}
+      </div>
+      {MAP_EMBED_URL
+        ? <iframe class="map" src={MAP_EMBED_URL} title="京都市京セラ美術館の地図" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        : <div class="map ph">map embed</div>}
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="sec">
+  <div class="w880">
+    <div class="sh sh-56"><div class="sh-r"><span class="orn">+·◎·</span><h2>Q&amp;A</h2><span class="orn">+·◎·</span></div><p>よくある質問</p></div>
+    <div class="faq">
+      {faqs.map(([q, a], i) => (
+        <details open={i === 0}>
+          <summary><span class="bodoni q">Q.</span><span class="qt">{q}</span><span class="bodoni sign" aria-hidden="true"></span></summary>
+          <div class="ans"><span class="bodoni a">A.</span><p>{a}</p></div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="sec contact">
+  <div class="w880 center">
+    <div class="sh sh-48"><div class="sh-r"><span class="orn">+·◎·</span><h2>Contact</h2><span class="orn">+·◎·</span></div><p>お問い合わせ</p></div>
+    <p class="contact-t">公演に関するお問い合わせは、下記メールアドレスまでご連絡ください。</p>
+    <a href="mailto:info@kabuexlabs.com" class="mail bodoni">info@kabuexlabs.com<span class="ic">↗</span></a>
+  </div>
+</section>
+</main>
+
+<footer class="ft">
+  <span aria-hidden="true" class="ft-big ft-big1">7枚目の</span>
+  <span aria-hidden="true" class="ft-big ft-big2">コンポジション</span>
+  <span aria-hidden="true" class="ft-v ft-vl bodoni">THE 7TH COMPOSITION</span>
+  <span aria-hidden="true" class="ft-v ft-vr">体験する美術館</span>
+  <div class="ft-in">
+    <a href={ticketHref} {...ticketAttrs} data-place="footer" class="ft-btn glow">
+      <span class="s">体験する美術館</span>
+      <span class="m">7枚目のコンポジション</span>
+      <span class="b">チケットを購入する<span class="bodoni">→</span></span>
+    </a>
+    <div class="ft-cr">
+      {credits.map((c) => (
+        <div><span class="k">+・{c.k}・+</span><span class="v">{c.v}</span></div>
+      ))}
+    </div>
+    <a href="#contact" class="ft-ct">公演に関するお問い合わせ<span class="bodoni">↗</span></a>
+    <p class="ft-copy bodoni">© ［権利者名・表記未確認］</p>
+  </div>
+</footer>
+
+<a href={ticketHref} {...ticketAttrs} data-place="float" class="btn glow float">チケットを購入する<span class="bodoni">→</span></a>
+
+</div>
+
+<script is:inline>
+(function(){
+  var menu=document.getElementById('menu'),openBtn=document.querySelector('[data-menu-open]');
+  function set(open){
+    if(open){menu.removeAttribute('hidden')}else{menu.setAttribute('hidden','')}
+    document.documentElement.classList.toggle('menu-open',open);
+    openBtn.setAttribute('aria-expanded',open?'true':'false');
+  }
+  openBtn.addEventListener('click',function(){set(true)});
+  menu.querySelectorAll('[data-menu-close]').forEach(function(el){el.addEventListener('click',function(){set(false)})});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!menu.hasAttribute('hidden'))set(false)});
+  window.matchMedia('(min-width:1200px)').addEventListener('change',function(m){if(m.matches)set(false)});
+})();
+</script>
+
+<style is:global>
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+*{box-sizing:border-box}
+body{margin:0;background:#861E3E;color:#FFF7F2;font-family:'Shippori Mincho',serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+a{color:#FFF7F2;text-decoration:none}
+a:hover{color:#EACF6C}
+h1,h2,p{margin:0}
+@keyframes ticketGlow{0%,100%{filter:drop-shadow(0 0 4px rgba(255,226,208,.45))}50%{filter:drop-shadow(0 0 14px rgba(255,222,198,.95)) drop-shadow(0 0 32px rgba(234,207,108,.65))}}
+</style>
+
+<style>
+.page{position:relative;overflow-x:hidden;background:#861E3E;min-height:100vh}
+.bodoni{font-family:'Bodoni Moda',serif}
+.italiana{font-family:'Italiana',serif;font-weight:400}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.rel{position:relative}
+.center{text-align:center}
+.w820{max-width:820px;margin:0 auto}
+.w880{max-width:880px;margin:0 auto}
+.w1080{max-width:1080px;margin:0 auto}
+.w1160{max-width:1160px;margin:0 auto}
+.glow{animation:ticketGlow 2.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.glow{animation:none}html{scroll-behavior:auto}}
+.glow-t{text-shadow:0 0 22px rgba(255,200,218,.6)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:14px;background:#FFF7F2;color:#861E3E;font-weight:600;outline:1px solid rgba(255,247,242,.6);white-space:nowrap}
+.btn:hover{background:#EACF6C;color:#1E0A10}
+.btn-l{font-size:16px;letter-spacing:.18em;padding:18px 36px;outline-offset:4px}
+.btn-xl{font-size:17px;letter-spacing:.2em;padding:20px 44px;outline-offset:4px}
+.circ{flex-shrink:0;width:46px;height:46px;border:1px solid rgba(255,247,242,.5);border-radius:50%;background:transparent;color:#FFF7F2;cursor:pointer;padding:0}
+
+/* Header */
+.hd{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(134,30,62,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,247,242,.14)}
+.hd-in{max-width:1440px;margin:0 auto;padding:10px clamp(16px,3vw,32px);display:flex;align-items:center;gap:24px;min-height:62px}
+.logo{display:flex;flex-direction:column;gap:2px;color:#FFF7F2;flex-shrink:0}
+.logo-s{font-size:11px;letter-spacing:.32em}
+.logo-m{font-size:18px;font-weight:600;letter-spacing:.1em;line-height:1.3}
+.hd-nav{flex:1;display:flex;justify-content:center;flex-wrap:wrap;gap:4px 22px}
+.hd-nav a{font-size:13px;letter-spacing:.12em;padding:6px 0;white-space:nowrap}
+.hd-sp{flex:1;display:none}
+.hd-buy{flex-shrink:0;font-size:13px;letter-spacing:.14em;padding:11px 20px;outline-offset:3px}
+.hd-menu{display:none;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.hd-menu span{display:block;width:18px;height:1px;background:#FFF7F2}
+@media (max-width:1199.98px){.hd-nav{display:none}.hd-sp{display:block}.hd-menu{display:flex}}
+@media (max-width:599.98px){.hd-buy{display:none}}
+
+/* Menu */
+.menu{position:fixed;inset:0;z-index:60;background:#6A1430;overflow-y:auto;padding:24px clamp(24px,6vw,64px) 48px}
+.menu[hidden]{display:none}
+.menu-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+.menu-t{font-family:'Italiana',serif;font-size:28px;letter-spacing:.06em}
+.menu-x{font-size:22px;font-family:'Bodoni Moda',serif}
+.menu-nav{display:flex;flex-direction:column}
+.menu-nav a{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:18px 0;border-bottom:1px solid rgba(255,247,242,.18)}
+.menu-nav .ja{font-size:20px;letter-spacing:.14em}
+.menu-nav .en{font-family:'Italiana',serif;font-size:16px;color:#F2C9D4;letter-spacing:.08em}
+.menu-buy{display:flex;margin-top:40px;font-size:16px;letter-spacing:.18em;padding:18px;outline-offset:4px}
+:global(html.menu-open) .float{display:none}
+:global(html.menu-open) body{overflow:hidden}
+
+/* Hero */
+.hero{position:relative;padding:clamp(96px,10vw,128px) 0 clamp(64px,8vw,112px)}
+.hero-in{max-width:1360px;margin:0 auto;padding:0 clamp(20px,4vw,48px);display:flex;flex-wrap:wrap;gap:clamp(28px,5vw,72px);align-items:flex-end}
+.hero-vis{flex:1 1 560px;min-width:0}
+.hero-vis img{display:block;width:100%;height:auto;aspect-ratio:1075/880;object-fit:cover;object-position:top;-webkit-mask-image:linear-gradient(#000 76%,transparent);mask-image:linear-gradient(#000 76%,transparent)}
+.hero-txt{flex:1 1 400px;min-width:0;display:flex;gap:clamp(18px,3vw,40px);align-items:flex-start}
+.hero-tate{writing-mode:vertical-rl;display:flex;gap:12px;flex-shrink:0}
+.hero-tate h1{font-size:clamp(30px,3.4vw,44px);font-weight:500;letter-spacing:.14em;line-height:1}
+.hero-tate .bodoni{font-size:14px;letter-spacing:.24em;color:#F2C9D4}
+.hero-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:28px}
+.genre{font-size:15px;letter-spacing:.3em;display:flex;align-items:center;gap:12px}
+.genre .x{font-size:18px}
+.date{line-height:.92}
+.yr{font-size:clamp(28px,3.2vw,42px);letter-spacing:.04em}
+.big{position:relative;display:inline-block;font-size:clamp(72px,9.6vw,148px);letter-spacing:-.02em;margin-right:64px}
+.badge{position:absolute;top:-4px;right:-64px;width:56px;height:56px;border:1px solid #FFF7F2;border-right-color:transparent;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-style:italic;letter-spacing:.02em;transform:rotate(-20deg)}
+.badge span{transform:rotate(20deg)}
+.row2{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.at{font-family:'Shippori Mincho',serif;font-size:clamp(17px,1.8vw,22px);line-height:1.5;letter-spacing:.12em;padding-bottom:.9em}
+.at .bodoni{font-style:italic;font-size:1.2em;margin-right:6px}
+.slash{width:clamp(40px,5vw,72px);height:1px;background:#FFF7F2;transform:rotate(40deg);margin-bottom:2.2em}
+.catch{font-size:clamp(19px,2vw,24px);font-weight:500;line-height:1.8;letter-spacing:.12em;text-shadow:0 0 18px rgba(255,210,225,.55)}
+.en-detail{font-size:13px;line-height:1.5;letter-spacing:.14em;color:#F2C9D4}
+
+/* Section heading */
+.sec{position:relative;padding:clamp(80px,10vw,140px) clamp(20px,4vw,48px)}
+.sh{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:64px}
+.sh-56{margin-bottom:56px}.sh-48{margin-bottom:48px}.sh-40{margin-bottom:40px}
+.sh-r{display:flex;align-items:center;gap:clamp(12px,3vw,28px)}
+.sh h2{font-family:'Italiana',serif;font-weight:400;font-size:clamp(52px,9vw,100px);line-height:1}
+.sh p{font-size:14px;letter-spacing:.4em}
+.orn{font-family:'Bodoni Moda',serif;font-size:14px;letter-spacing:.3em;color:#F2C9D4}
+.body{font-size:17px;line-height:2.3;letter-spacing:.14em;text-wrap:pretty}
+
+/* News */
+.news{padding:clamp(56px,8vw,96px) clamp(20px,4vw,48px)}
+.news-hd{display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid rgba(255,247,242,.4);padding-bottom:16px;flex-wrap:wrap}
+.news-hd h2{font-size:clamp(40px,6vw,64px);line-height:1}
+.news-hd span{font-size:14px;letter-spacing:.4em}
+.news-row{display:flex;gap:24px;flex-wrap:wrap;padding:22px 0;border-bottom:1px solid rgba(255,247,242,.2);font-size:16px;letter-spacing:.08em}
+.news-row .d{font-size:16px;letter-spacing:.1em;color:#F2C9D4}
+
+/* Story */
+.story{overflow:hidden}
+.story-circle{position:absolute;left:-80px;bottom:40px;width:380px;height:380px;background:url(/assets/7th-composition/kv.webp) 4% 3%/420% auto no-repeat;-webkit-mask-image:radial-gradient(closest-side,#000 35%,transparent);mask-image:radial-gradient(closest-side,#000 35%,transparent);opacity:.85}
+.story-line{position:absolute;left:-10%;right:-10%;bottom:120px;height:1px;background:rgba(255,247,242,.35);transform:rotate(-8deg)}
+.story-lead{margin-bottom:20px;font-size:clamp(16px,1.8vw,20px);letter-spacing:.1em}
+.story-h{margin-bottom:48px;font-size:clamp(28px,4.4vw,48px);font-weight:600;line-height:1.55;letter-spacing:.06em;text-wrap:pretty}
+
+/* Experience */
+.exp-lead{max-width:880px;margin:0 auto 72px}
+.exp-h{margin-bottom:40px;font-size:clamp(26px,4vw,44px);font-weight:600;line-height:1.6;letter-spacing:.04em;text-wrap:pretty}
+.spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));border-top:1px solid rgba(255,247,242,.3);border-left:1px solid rgba(255,247,242,.3)}
+.spec>div{padding:32px 24px;border-right:1px solid rgba(255,247,242,.3);border-bottom:1px solid rgba(255,247,242,.3);display:flex;flex-direction:column;gap:14px}
+.lb{font-size:13px;letter-spacing:.24em;color:#F2C9D4}
+.genre-v{font-size:26px;font-weight:600;letter-spacing:.08em;line-height:1.4}
+.num{display:flex;align-items:baseline;gap:6px;font-size:18px}
+.num .n{font-size:64px;line-height:.9}
+.hl{margin-top:72px;display:flex;flex-wrap:wrap;gap:clamp(24px,5vw,64px);align-items:center}
+.hl-img{flex:1 1 360px;min-width:0;aspect-ratio:4/3;background:url(/assets/7th-composition/kv.webp) 96% 42%/300% auto no-repeat;-webkit-mask-image:linear-gradient(90deg,#000 70%,transparent);mask-image:linear-gradient(90deg,#000 70%,transparent)}
+.hl-txt{flex:1 1 360px;min-width:0}
+.hl-t{margin-bottom:20px;font-size:22px;letter-spacing:.1em;color:#EACF6C;display:flex;align-items:center;gap:16px}
+.hl-t span{flex:1;height:1px;background:#EACF6C}
+.hl-h{margin-bottom:20px;font-size:22px;font-weight:600;letter-spacing:.14em}
+.hl-b{font-size:17px;line-height:2.2;letter-spacing:.12em;text-wrap:pretty}
+
+/* Creators */
+.team{display:flex;flex-direction:column;align-items:center;gap:44px;text-align:center}
+.team-lead{display:flex;flex-direction:column;gap:14px}
+.team-lead .role{font-size:15px;letter-spacing:.24em;color:#F2C9D4}
+.team-lead .name{font-size:clamp(34px,5vw,52px);font-weight:600;letter-spacing:.2em}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:44px 32px;width:100%}
+.team-grid>div{display:flex;flex-direction:column;gap:12px}
+.team-grid .role{font-size:14px;letter-spacing:.2em;color:#F2C9D4}
+.team-grid .name{font-size:26px;font-weight:500;letter-spacing:.2em}
+
+/* Cast */
+.cast{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:40px 32px}
+.card{display:flex;flex-direction:column;filter:drop-shadow(10px 12px 0 rgba(60,8,24,.35))}
+.card-tab{margin:0 12%;height:26px;background:#F7EFE6;border-radius:26px 26px 0 0}
+.card-body{background:#F7EFE6;color:#861E3E;padding:28px 28px 36px;display:flex;flex-direction:column;gap:18px}
+.card-ph{display:block;width:100%;aspect-ratio:1/1;object-fit:cover}
+.card-ph.ph{background:repeating-linear-gradient(135deg,#EFDFD2 0 10px,#F7EFE6 10px 20px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:.1em;color:#9C5A6E}
+.card-pf{font-size:15px;color:#A8862A;letter-spacing:.08em;display:flex;align-items:center;gap:14px}
+.card-pf span{flex:1;height:1px;background:#C9A94A}
+.card-name{font-size:30px;font-weight:600;letter-spacing:.16em}
+.card-roman{margin-top:4px;font-size:18px;letter-spacing:.06em;color:#B7667D}
+.card-txt{font-family:'Zen Kaku Gothic New',sans-serif;font-size:15px;line-height:1.9;letter-spacing:.08em}
+
+/* Panels (Ticket / Access) */
+.panel-sec{padding-left:clamp(12px,3vw,48px);padding-right:clamp(12px,3vw,48px)}
+.panel{max-width:1160px;margin:0 auto;background:#6A1430;padding:clamp(56px,7vw,96px) clamp(20px,5vw,72px)}
+.price{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:56px;text-align:center}
+.price .lb{font-size:14px;letter-spacing:.3em}
+.price-v{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;justify-content:center}
+.price-v .p1{font-size:18px;letter-spacing:.1em}
+.price-v .pn{font-size:clamp(64px,9vw,104px);line-height:1}
+.price-v .p2{font-size:22px}
+.price-note{font-size:13px;letter-spacing:.1em;color:#F2C9D4}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));column-gap:56px;border-top:1px solid rgba(255,247,242,.22)}
+.info-row{padding:20px 0;border-bottom:1px solid rgba(255,247,242,.22);display:flex;flex-direction:column;gap:8px}
+.info-row .k{font-size:14px;font-weight:700;letter-spacing:.2em}
+.info-row .v{font-size:17px;line-height:1.8;letter-spacing:.08em;overflow-wrap:anywhere}
+.sched{margin-top:72px}
+.sched-t{margin-bottom:8px;font-size:32px;text-align:center}
+.sched-s{margin-bottom:32px;font-size:14px;letter-spacing:.24em;text-align:center}
+.sched-tb{max-width:640px;margin:0 auto}
+.sched-hd,.sched-row{display:grid;grid-template-columns:1fr 1fr 1fr}
+.sched-hd{padding:0 0 12px;border-bottom:1px solid rgba(255,247,242,.6);font-size:13px;letter-spacing:.24em;color:#F2C9D4}
+.sched-row{align-items:baseline;padding:14px 0;border-bottom:1px solid rgba(255,247,242,.2)}
+.sched-row .no{font-size:16px;letter-spacing:.14em}
+.sched-row .t{font-size:24px;letter-spacing:.04em}
+.sched-row .e{color:#F2C9D4}
+.sched-note{margin-top:20px;font-size:14px;line-height:1.9;letter-spacing:.08em}
+.ticket-cta{margin-top:64px;display:flex;justify-content:center}
+@media (max-width:420px){.btn-xl{padding:20px 28px;letter-spacing:.14em}}
+
+/* Flow */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:40px 28px}
+.flow>div{display:flex;flex-direction:column;gap:16px;padding-top:24px;border-top:1px solid rgba(255,247,242,.5)}
+.flow .fn{font-size:64px;line-height:.9;color:#F2C9D4}
+.flow .fh{font-size:22px;font-weight:600;letter-spacing:.14em}
+.flow .fd{font-size:15px;line-height:1.9;letter-spacing:.08em}
+.flow .gold{border-top-color:#EACF6C}
+.flow .gold .fn{color:#EACF6C}
+
+/* Attention */
+.deco{display:flex;align-items:center;gap:16px;color:#F2C9D4;margin-bottom:40px}
+.deco-b{margin:48px 0 0}
+.deco .l,.deco .r{flex:1;height:1px}
+.deco .l{background:linear-gradient(90deg,transparent,#E9A6BA)}
+.deco .r{background:linear-gradient(270deg,transparent,#E9A6BA)}
+.deco .bodoni{font-size:14px;letter-spacing:.4em}
+.att{margin:0;padding:0 0 0 1.4em;font-family:'Zen Kaku Gothic New',sans-serif;font-size:16px;line-height:2;letter-spacing:.1em;display:flex;flex-direction:column;gap:10px}
+.att-h{margin:48px 0 16px;font-size:18px;font-weight:600;letter-spacing:.16em}
+
+/* Access */
+.acc{display:flex;flex-wrap:wrap;gap:40px 56px}
+.acc-info{flex:1 1 380px;min-width:0;border-top:1px solid rgba(255,247,242,.22)}
+.map{flex:1 1 380px;min-width:0;min-height:360px;border:1px solid rgba(255,247,242,.25)}
+.map.ph{background:repeating-linear-gradient(135deg,#5C1029 0 10px,#661430 10px 20px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,Menlo,monospace;font-size:12px;letter-spacing:.1em;color:#F2C9D4}
+
+/* FAQ */
+.faq{border-top:1px solid rgba(255,247,242,.3)}
+.faq details{border-bottom:1px solid rgba(255,247,242,.3)}
+.faq summary{list-style:none;padding:22px 0;display:flex;align-items:baseline;gap:18px;cursor:pointer;color:#FFF7F2}
+.faq summary::-webkit-details-marker{display:none}
+.faq .q,.faq .a{font-style:italic;font-size:26px;line-height:1}
+.faq .q{color:#F2C9D4}
+.faq .a{color:#EACF6C}
+.faq .qt{flex:1;font-size:18px;font-weight:600;line-height:1.7;letter-spacing:.1em}
+.faq .sign{font-size:24px;line-height:1}
+.faq .sign::before{content:'+'}
+.faq details[open] .sign::before{content:'−'}
+.faq summary:hover .qt{color:#EACF6C}
+.ans{display:flex;align-items:baseline;gap:18px;padding:0 0 26px}
+.ans p{flex:1;font-family:'Zen Kaku Gothic New',sans-serif;font-size:16px;line-height:2;letter-spacing:.08em}
+
+/* Contact */
+.contact{padding-bottom:clamp(96px,12vw,160px)}
+.contact-t{margin-bottom:32px;font-size:17px;line-height:2;letter-spacing:.12em}
+.mail{display:inline-flex;align-items:center;gap:16px;font-size:clamp(24px,4vw,40px);letter-spacing:.04em;padding-bottom:10px;border-bottom:1px solid rgba(255,247,242,.6);overflow-wrap:anywhere}
+.mail .ic{flex-shrink:0;width:36px;height:36px;border:1px solid currentColor;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+
+/* Footer */
+.ft{position:relative;background:#EACF6C;color:#1E0A10;overflow:hidden;padding:clamp(130px,15vw,220px) clamp(20px,4vw,48px)}
+.ft-big{position:absolute;font-family:'Shippori Mincho',serif;line-height:1;font-weight:500;letter-spacing:-.02em;white-space:nowrap;color:#1E0A10}
+.ft-big1{left:-0.06em;top:-0.24em;font-size:clamp(96px,13vw,200px)}
+.ft-big2{right:-0.08em;bottom:-0.26em;font-size:clamp(64px,13vw,200px)}
+.ft-v{position:absolute;writing-mode:vertical-rl;font-size:12px}
+.ft-vl{left:clamp(12px,3vw,40px);top:50%;letter-spacing:.3em}
+.ft-vr{right:clamp(12px,3vw,40px);top:24%;letter-spacing:.4em}
+.ft-in{position:relative;max-width:720px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:56px;text-align:center}
+.ft-btn{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;max-width:560px;background:#1E0A10;color:#FFF7F2;padding:36px 24px;outline:2px solid #1E0A10;outline-offset:6px;box-shadow:inset 0 0 0 6px #1E0A10,inset 0 0 0 7px rgba(255,247,242,.7)}
+.ft-btn:hover{background:#861E3E;color:#FFF7F2;box-shadow:inset 0 0 0 6px #861E3E,inset 0 0 0 7px rgba(255,247,242,.7)}
+.ft-btn .s{font-size:13px;letter-spacing:.3em}
+.ft-btn .m{font-size:clamp(24px,3.6vw,34px);font-weight:600;letter-spacing:.12em}
+.ft-btn .b{margin-top:10px;font-size:15px;letter-spacing:.24em;display:flex;align-items:center;gap:10px}
+.ft-cr{display:flex;flex-direction:column;gap:32px}
+.ft-cr>div{display:flex;flex-direction:column;gap:10px}
+.ft-cr .k{font-size:15px;letter-spacing:.2em}
+.ft-cr .v{font-size:22px;font-weight:500;letter-spacing:.2em}
+.ft-ct{display:inline-flex;align-items:center;gap:14px;color:#1E0A10;font-family:'Zen Kaku Gothic New',sans-serif;font-weight:500;font-size:16px;letter-spacing:.16em}
+.ft-ct:hover{color:#861E3E}
+.ft-ct .bodoni{width:32px;height:32px;border:1px solid #1E0A10;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+.ft-copy{font-size:16px;letter-spacing:.14em}
+
+/* Floating CTA */
+.float{position:fixed;right:clamp(14px,2.4vw,32px);bottom:clamp(14px,2.4vw,32px);z-index:40;gap:12px;font-size:15px;letter-spacing:.16em;padding:16px 26px;outline:1px solid rgba(255,247,242,.7);outline-offset:4px;box-shadow:0 10px 28px rgba(40,4,16,.4)}
+</style>
+</body>
+</html>
