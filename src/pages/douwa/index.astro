@@ -2,7 +2,8 @@
 // 公演「午前零時の童話集 × 夢の島熱帯植物館」公式LP（douwa.kabuexlabs.com → /douwa/ へ転送）。
 // デザインはハンドオフ（design_handoff_yumenoshima_lp）の再実装。コーポレートサイトとは
 // デザイン系統が別物なので BaseLayout は使わず、このファイルだけで完結させている。
-// 検索インデックス許可（sitemap.xml の STATIC_PATHS にも掲載）。
+// 公開前のため noindex（sitemap・llms.txt にも未掲載）。検索に出すときは INDEXABLE を true にし、sitemap・llms.txt に戻す。
+const INDEXABLE = false;
 import SiteGuard from '../../components/SiteGuard.astro';
 import SecHead from '../../components/douwa/SecHead.astro';
 
@@ -132,6 +133,7 @@ const faqLd = {
 <title>{title}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={canonical}>
+{!INDEXABLE && <meta name="robots" content="noindex, nofollow">}
 <meta property="og:title" content={title}>
 <meta property="og:description" content={description}>
 <meta property="og:type" content="website">

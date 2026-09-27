@@ -122,7 +122,6 @@ const STATIC_PATHS = [
   '/anator/',
   '/karma/',
   '/kaitou/',
-  '/douwa/',
   ...htPaths,
 ];
 
@@ -137,7 +136,6 @@ export const GET: APIRoute = async ({ site }) => {
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {
-    '/douwa/': '2026-09-27',
     '/guide/shibuya-rainy-date/': '2026-09-26',
     '/guide/tokyo-date-under-5000/': '2026-09-26',
     '/guide/tokyo-nazo-date/': '2026-09-22',
