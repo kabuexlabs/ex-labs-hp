@@ -1,14 +1,22 @@
 ---
 // 日本語の文節区切りに <wbr> を入れる（ビルド時に BudouX で分割）。
 // CSS 側は word-break:keep-all なので、<wbr> と句読点の位置だけで改行される（iPhone の Safari でも有効）。
-// t の中の「\n」は <br> になる。
+// t の中の「\n」は <br> になり、「**語句**」は強調（.mk：色付きの下線）になる。
 import { loadDefaultJapaneseParser } from 'budoux';
 interface Props { t: string }
 const parser = loadDefaultJapaneseParser();
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 // 途中で切りたくない語（固有名詞・慣用句）
 const KEEP = ['夢の島熱帯植物館', '夜の植物館', '決まり次第', 'お手洗い', 'escape.id'];
-const line = (s: string) => {
+const line = (raw: string) => {
+  // 「**」を外して強調範囲を記録
+  const marks: [number, number][] = [];
+  let s = '';
+  raw.split('**').forEach((part, i) => {
+    // 末尾の句読点には下線を引かない
+    if (i % 2 === 1) marks.push([s.length, s.length + part.replace(/[、。]+$/, '').length]);
+    s += part;
+  });
   const out: string[] = [];
   for (const c of parser.parse(s)) {
     const prev = out[out.length - 1];
@@ -16,15 +24,21 @@ const line = (s: string) => {
     if (prev && (/[0-9A-Za-z.,:]$/.test(prev) && /^[0-9A-Za-z]/.test(c) || /^[）」』、。・〜]/.test(c) || /〜$/.test(prev))) out[out.length - 1] = prev + c;
     else out.push(c);
   }
-  // KEEP の語の内側に落ちた区切りを消す
+  // KEEP の語と短い強調語句の内側に落ちた区切りを消す
   const keep = new Set<number>();
-  for (const w of KEEP) for (let i = s.indexOf(w); i >= 0; i = s.indexOf(w, i + 1)) for (let k = i + 1; k < i + w.length; k++) keep.add(k);
-  let pos = 0, html = '';
-  out.forEach((c, i) => {
-    if (i > 0 && !keep.has(pos)) html += '<wbr>';
-    html += esc(c);
-    pos += c.length;
-  });
+  const ranges: [number, number][] = [...marks.filter(([a, b]) => b - a <= 16)];
+  for (const w of KEEP) for (let i = s.indexOf(w); i >= 0; i = s.indexOf(w, i + 1)) ranges.push([i, i + w.length]);
+  for (const [a, b] of ranges) for (let k = a + 1; k < b; k++) keep.add(k);
+  const breaks = new Set<number>();
+  let pos = 0;
+  out.forEach((c, i) => { if (i > 0 && !keep.has(pos)) breaks.add(pos); pos += c.length; });
+  let html = '';
+  for (let k = 0; k <= s.length; k++) {
+    if (marks.some(([, b]) => b === k)) html += '</span>';
+    if (breaks.has(k)) html += '<wbr>';
+    if (marks.some(([a]) => a === k)) html += '<span class="mk">';
+    if (k < s.length) html += esc(s[k]);
+  }
   return html;
 };
 const html = Astro.props.t.split('\n').map(line).join('<br>');
