@@ -248,6 +248,12 @@ const eventLd = {
   </div>
 </section>
 
+<!-- 絵画（伊藤ゆきの）の部分切り抜き：軒先の看板と旗飾りを帯として見せる -->
+<figure class="art-band">
+  <img src="/assets/7th-composition/art-awning.webp" alt="伊藤ゆきのによる絵画（部分）。赤い看板と旗飾りのある店先" width="1800" height="455" loading="lazy">
+  <figcaption>絵画：伊藤ゆきの（部分）</figcaption>
+</figure>
+
 <section id="experience" class="sec">
   <div class="w1080">
     <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Experience</h2><span class="orn">+·◎·</span></div><p>体験について</p></div>
@@ -256,13 +262,13 @@ const eventLd = {
       <p class="body lines">体験する美術館は、<br>「『鑑賞するアート』から<wbr>『体験するアート』へ」<br>をテーマにした、<br>絵画を鑑賞することで<br>物語の中に観客が巻き込まれていく<br>イマーシブ体験です。</p>
     </div>
     <div class="spec">
-      <div><span class="lb">+・体験ジャンル</span><span class="genre-v">絵画 × イマーシブ</span></div>
+      <div><span class="lb">+・体験ジャンル</span><span class="genre-v">絵画 ×<wbr> イマーシブ</span></div>
       <div><span class="lb">+・公演時間</span><span class="num"><span class="bodoni n">60</span><span>分</span></span></div>
       <div><span class="lb">+・参加人数</span><span class="num"><span>各回最大</span><span class="bodoni n">30</span><span>名</span></span></div>
       <div><span class="lb">+・おひとりさま</span><span class="num"><span class="bodoni n">1</span><span>名から参加可能</span></span></div>
     </div>
     <div class="hl">
-      <div class="hl-img" aria-hidden="true"></div>
+      <img class="hl-img" src="/assets/7th-composition/art-shop.webp" alt="伊藤ゆきのによる絵画（部分）。旗飾りの下の入口と吊るされた服" width="1200" height="900" loading="lazy">
       <div class="hl-txt">
         <p class="hl-t italiana">Highlights<span></span></p>
         <p class="hl-h">具体的な体験方法・見どころ</p>
@@ -272,7 +278,8 @@ const eventLd = {
   </div>
 </section>
 
-<section id="team" class="sec">
+<section id="team" class="sec team-sec">
+  <img class="team-art" src="/assets/7th-composition/art-mannequin.webp" alt="" width="600" height="970" loading="lazy" aria-hidden="true">
   <div class="w880">
     <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Creators</h2><span class="orn">+·◎·</span></div><p>制作チーム</p></div>
     <div class="team">
@@ -568,10 +575,10 @@ h1,h2,p{margin:0}
 
 /* Story */
 .story{overflow:hidden}
-.story-circle{position:absolute;left:-80px;bottom:40px;width:380px;height:380px;background:url(/assets/7th-composition/kv.webp) 4% 3%/420% auto no-repeat;-webkit-mask-image:radial-gradient(closest-side,#000 35%,transparent);mask-image:radial-gradient(closest-side,#000 35%,transparent);opacity:.85}
+.story-circle{position:absolute;left:-60px;bottom:40px;width:400px;height:400px;background:url(/assets/7th-composition/art-person.webp) 50% 40%/cover no-repeat;-webkit-mask-image:radial-gradient(closest-side,#000 55%,transparent);mask-image:radial-gradient(closest-side,#000 55%,transparent);opacity:.9}
 .story-line{position:absolute;left:-10%;right:-10%;bottom:120px;height:1px;background:rgba(255,247,242,.35);transform:rotate(-8deg)}
 .story-txt{word-break:auto-phrase;padding-bottom:clamp(120px,16vw,200px)}
-@media (max-width:599.98px){.story-circle{width:240px;height:240px;left:-90px;bottom:0;opacity:.6}.story-line{bottom:80px}}
+@media (max-width:599.98px){.story-circle{width:240px;height:240px;left:-40px;bottom:0;opacity:.6}.story-line{bottom:80px}}
 /* 文章は指定した位置（読点・句点・文節）でだけ改行する。入りきらない時だけ <wbr> か最終手段で折り返す */
 .lines{word-break:keep-all;overflow-wrap:anywhere}
 .story-b{margin-bottom:clamp(40px,6vw,64px);color:rgba(255,247,242,.9)}
@@ -583,11 +590,11 @@ h1,h2,p{margin:0}
 .spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));border-top:1px solid rgba(255,247,242,.3);border-left:1px solid rgba(255,247,242,.3)}
 .spec>div{padding:32px 24px;border-right:1px solid rgba(255,247,242,.3);border-bottom:1px solid rgba(255,247,242,.3);display:flex;flex-direction:column;gap:14px}
 .lb{font-size:13px;letter-spacing:.24em;color:#F2C9D4}
-.genre-v{font-size:26px;font-weight:600;letter-spacing:.08em;line-height:1.4}
+.genre-v{word-break:keep-all;font-size:26px;font-weight:600;letter-spacing:.08em;line-height:1.4}
 .num{display:flex;align-items:baseline;gap:6px;font-size:18px}
 .num .n{font-size:64px;line-height:.9}
 .hl{margin-top:72px;display:flex;flex-wrap:wrap;gap:clamp(24px,5vw,64px);align-items:center}
-.hl-img{flex:1 1 360px;min-width:0;aspect-ratio:4/3;background:url(/assets/7th-composition/kv.webp) 96% 42%/300% auto no-repeat;-webkit-mask-image:linear-gradient(90deg,#000 70%,transparent);mask-image:linear-gradient(90deg,#000 70%,transparent)}
+.hl-img{flex:1 1 360px;min-width:0;display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,#000 70%,transparent);mask-image:linear-gradient(90deg,#000 70%,transparent)}
 .hl-txt{flex:1 1 360px;min-width:0}
 .hl-t{margin-bottom:20px;font-size:22px;letter-spacing:.1em;color:#EACF6C;display:flex;align-items:center;gap:16px}
 .hl-t span{flex:1;height:1px;background:#EACF6C}
@@ -595,7 +602,13 @@ h1,h2,p{margin:0}
 .hl-b{font-size:17px;line-height:2.2;letter-spacing:.12em;text-wrap:pretty}
 
 /* Creators */
-.team{display:flex;flex-direction:column;align-items:center;gap:36px;text-align:center}
+.art-band{position:relative;margin:0;padding:0 0 clamp(8px,2vw,24px)}
+.art-band img{display:block;width:100%;height:clamp(140px,20vw,300px);object-fit:cover;object-position:50% 55%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.art-band figcaption{margin:10px clamp(20px,4vw,48px) 0 auto;width:max-content;font-size:11px;letter-spacing:.2em;color:#F2C9D4;opacity:.8}
+.team-sec{overflow:hidden}
+.team-art{position:absolute;right:clamp(8px,3vw,56px);top:50%;transform:translateY(-50%);width:clamp(160px,15vw,240px);height:auto;opacity:.85;-webkit-mask-image:radial-gradient(closest-side,#000 58%,transparent);mask-image:radial-gradient(closest-side,#000 58%,transparent);pointer-events:none}
+@media (max-width:1099.98px){.team-art{display:none}}
+.team{position:relative;display:flex;flex-direction:column;align-items:center;gap:36px;text-align:center}
 .team-lead{display:flex;flex-direction:column;gap:10px}
 .team-lead .role{font-size:12px;letter-spacing:.24em;color:#F2C9D4}
 .team-lead .name{font-size:clamp(24px,3.2vw,34px);font-weight:600;letter-spacing:.2em}
