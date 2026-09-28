@@ -181,9 +181,12 @@ export const works: Work[] = [
     ticketUrl: 'https://escape.id/factroom-org/e-fact-karma/',
     venueId: 'anator-kanda',
     duration: { minutes: 50, text: '約50分（公式チケットページの案内）' },
-    // 料金・開催日時は貼付内容に無く未確認。公式ページで確認して入力する
-    price: { unit: 'unknown', text: '公式チケットページで確認', taxIncluded: true, feeNote: '料金・手数料は公式チケットページ（escape.id）で確認してください' },
-    party: { min: 1, max: 6, soloAllowed: true, format: 'unknown', text: '1〜6人（escape.id の案内）。相席・貸切の別は公式で確認' },
+    // 料金は自社制作の公演LP（/karma/）の「全日程共通 ¥4,500／1枚」。1枚で何人参加できるか（1人券か1組券か）は
+    // LPにもチケットページ貼付にも無いため unit は unknown のまま（1人あたり・総額は計算しない）。開催日時の回別の表も未確認
+    price: { unit: 'unknown', text: '全日程共通 1枚 ¥4,500（1枚で参加できる人数は公式チケットページで確認）', taxIncluded: true, feeNote: '手数料・1枚あたりの人数は公式チケットページ（escape.id）で確認してください' },
+    party: { min: 1, max: 6, soloAllowed: true, format: 'unknown', text: '1〜6人' },
+    // 期間は自社制作の公演LP（/karma/）の「2026.10.10（土）〜 11.8（日）」。回ごとの日時は未確認のため occurrences は入れない（◯は付かない）
+    period: { text: '2026年10月10日〜11月8日（回ごとの日時は公式チケットページで確認）', from: '2026-10-10', to: '2026-11-08' },
     info: {
       beginner: '謎解きやイマーシブ公演が初めての方でも参加できると案内（先輩刑事・沖田が導く）',
       participation: '刑事として容疑者に問いを投げかける対話型。キャストとの会話や参加者同士で協力する場面があります',
@@ -201,9 +204,9 @@ export const works: Work[] = [
       ],
     },
     sourceIds: ['escape-id-factroom'],
-    verified: { at: '2026-09-18T11:10:00+09:00', by: 'Claude（ユーザー貼付の公式チケットページ本文を転記。開催日時・料金は未確認）' },
+    verified: { at: '2026-09-28T10:00:00+09:00', by: 'Claude（公式チケットページ貼付＋自社制作の公演LP /karma/ の料金・期間・人数。1枚あたりの人数・回別日時は未確認）' },
     verifyTtlDays: 14,
     published: true,
-    updatedAt: '2026-09-18',
+    updatedAt: '2026-09-28',
   },
 ];

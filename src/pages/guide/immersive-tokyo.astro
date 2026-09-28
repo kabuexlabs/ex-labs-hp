@@ -71,6 +71,8 @@ const rows = eventsData.works.filter((w) => w.published).map((w) => {
   return { w, venue, occ, dates, futureDates, from, to, status, ticketUrl, channel, perPersonText, stale, datesText };
 });
 const compareRows = rows.filter((r) => r.status !== 'ended');
+// カード下部（予約ボタンの直前）に出す要約：料金・時間・形式
+const sumPrice = (w: (typeof rows)[number]['w']) => w.price.unit === 'per-person' && w.price.amount !== undefined ? `1人 ${fmtYen(w.price.amount)}` : w.price.unit === 'per-group' && w.price.tiers?.length ? `${w.price.tiers[0].party}人 ${fmtYen(w.price.tiers[0].amount)}〜` : w.price.text.replace(/（.*$/, '');
 const endedRows = rows.filter((r) => r.status === 'ended');
 const names = (xs: typeof rows) => xs.map((r) => r.w.title).join('、');
 const none = '確認できた公演なし';
@@ -220,7 +222,7 @@ const articleLd = {
       <div><dt>参加者がすること</dt><dd class="dd-normal">{r.w.info.participation ?? '公式ページで確認'}</dd></div>
       <div><dt>進み方</dt><dd class="dd-normal">{r.w.info.movement ? MOVEMENT_LABEL[r.w.info.movement] : '公式ページで確認'}{r.w.info.choice ? `。${r.w.info.choice}` : ''}</dd></div>
       <div><dt>申込人数・形式</dt><dd class="dd-normal">{r.w.party.text}（{FORMAT_LABEL[r.w.party.format]}）</dd></div>
-      <div><dt>料金</dt><dd class="dd-normal">{r.w.price.unit === 'per-group' ? `1組 ${r.w.price.text}` : r.w.price.text}<br><span class="tw-note">1人あたり：{r.perPersonText}。{r.w.price.feeNote}</span></dd></div>
+      <div><dt>料金</dt><dd class="dd-normal">{r.w.price.unit === 'per-group' ? `1組 ${r.w.price.text}` : r.w.price.text}<br><span class="tw-note">{r.w.price.unit === 'unknown' ? r.w.price.feeNote : `1人あたり：${r.perPersonText}。${r.w.price.feeNote}`}</span></dd></div>
       <div><dt>所要時間</dt><dd class="dd-normal">{r.w.duration.text}</dd></div>
       <div><dt>開催日</dt><dd class="dd-normal">{r.datesText}</dd></div>
       <div><dt>年齢・言語</dt><dd class="dd-normal">{r.w.info.ageRule ?? '年齢条件は公式ページで確認'}／{r.w.info.language ?? '言語は公式ページで確認'}</dd></div>
@@ -232,6 +234,7 @@ const articleLd = {
         <ul class="tw-cond">{r.w.info.scary && <li>{r.w.info.scary}</li>}{(r.w.info.requirements ?? []).map((c) => <li>{c}</li>)}</ul>
       </>
     )}
+    <p class="tw-sum">{sumPrice(r.w)}・{r.w.duration.minutes ? `約${r.w.duration.minutes}分` : '時間は公式で確認'}・{r.w.party.format === 'private' ? '申込単位で貸切' : r.w.party.format === 'shared' ? '他の参加者と相席' : '相席・貸切は公式で確認'}</p>
     <div class="tw-actions">
       {r.ticketUrl && <a class="btn tw-btn" href={r.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={r.w.id} data-place="guide-card">予約サイトで空席を見る（{r.channel?.name ?? '公式'}）</a>}
       <a class="tw-sub" href={r.w.officialUrl} target={r.w.officialUrl.startsWith('/') ? undefined : '_blank'} rel={r.w.officialUrl.startsWith('/') ? undefined : 'noopener'} data-track="show" data-show={r.w.id} data-place="guide-card">公式ページで公演内容を見る →</a>
@@ -400,4 +403,5 @@ const articleLd = {
 .tw-sub{font-size:13.5px;font-weight:700;color:var(--accent)}
 ol.bullets{padding-left:1.4em}
 @media(max-width:640px){.section.cards{padding:26px 0 34px}.section.acc-wrap{padding:34px 0 48px}.cards-h{font-size:18px}.tw-name{font-size:19px}.tw-btn{width:100%;text-align:center}.sc-card{padding:18px 14px}.sc-card .tw-dl{grid-template-columns:1fr}.acc summary{padding:16px 18px}.acc-b{padding:0 16px 18px}}
+.tw-sum{margin:12px 0 0;font-size:13px;font-weight:700;color:var(--ink);line-height:1.6}
 </style>

@@ -19,16 +19,19 @@ const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const pageUrl = new URL('/guide/tokyo-friends-activities/', site).toString();
 const SIZES = [2, 3, 4];
 
-type Row = { id: string; name: string; area: string; kind: string; party: string; totals: string[]; together: string; privacy: string; talk: string; time: string; weather: string; note: string; href: string; own: boolean; siteId: string; privateGroup?: boolean; talkHeavy?: boolean };
+type Row = { id: string; name: string; area: string; kind: string; party: string; totals: string[]; priceOne?: string; together: string; groupShort: string; timeShort: string; talk: string; time: string; weather: string; note: string; href: string; own: boolean; siteId: string; privateGroup?: boolean; talkHeavy?: boolean };
 
 const own: Row[] = buildGuideRows(now).filter((r) => r.status !== 'ended').map((r) => ({
   id: r.w.id, name: r.w.title, area: r.venue?.listName ?? r.venue?.name ?? '東京', kind: `物語参加型（${r.organizer.relationLabel}）`,
   party: r.w.party.text,
   totals: SIZES.map((n) => { const t = r.totalFor(n); return t !== undefined ? fmtYen(t) : r.w.party.min > n || (r.w.party.max !== undefined && r.w.party.max < n) ? '申込不可' : '公式で確認'; }),
-  together: r.w.party.format === 'private' ? '全員が同じ組（申込単位で貸切）' : r.w.party.format === 'shared' ? '同じ回に参加（途中で一時的に離れる場面あり）' : '公式ページで確認',
-  privacy: r.formatLabel,
+  // 人数ごとの総額が1つも計算できない（料金単位が未確認）ときは、「公式で確認」を3回並べず料金の案内を1つだけ出す
+  priceOne: [2, 3, 4].every((n) => r.totalFor(n) === undefined) ? r.w.price.text : undefined,
+  together: r.w.party.format === 'private' ? '全員が同じ組（申込単位で貸切）' : r.w.party.format === 'shared' ? '同じ回に参加（他の参加者と相席）' : r.formatLabel,
+  groupShort: r.w.party.format === 'private' ? '申込単位で貸切' : r.w.party.format === 'shared' ? '他の参加者と相席' : '',
   talk: r.w.info.participation ?? '公式ページで確認',
   time: r.w.duration.minutes ? `約${r.w.duration.minutes}分（集合・受付は別）` : r.w.duration.text,
+  timeShort: r.w.duration.minutes ? `約${r.w.duration.minutes}分` : '',
   weather: r.venue?.setting === 'indoor' ? '屋内で完結' : r.venue?.setting === 'mixed' ? '受付後に屋外の徒歩移動あり' : '公式ページで確認',
   note: [r.w.info.ageRule, r.w.info.scary].filter(Boolean).join('。'),
   href: r.ticketUrl ?? r.w.officialUrl, own: true, siteId: r.w.id,
@@ -40,11 +43,14 @@ const ext: Row[] = publishedNazoItems.filter((i) => i.privacy === 'room').map((i
     if (n === 2) return i.perPerson2 ? `${(i.perPerson2.low * 2).toLocaleString('ja-JP')}〜${(i.perPerson2.high * 2).toLocaleString('ja-JP')}円` : '公式で確認';
     return i.id === 'zettai-kukan-ikebukuro' && i.perPerson2 ? `${(i.perPerson2.low * n).toLocaleString('ja-JP')}〜${(i.perPerson2.high * n).toLocaleString('ja-JP')}円（1人料金×人数）` : '公式の料金表で確認';
   }),
-  together: '全員が同じチーム', privacy: '部屋を一組で貸切',
-  talk: '全員で相談しながら謎を解く（キャストとの会話はなし）', time: i.totalMinutes !== undefined ? i.totalTime : `本編 ${i.timeLimit}（受付を含む時間は公式で確認）`,
+  together: '全員が同じチーム（部屋を一組で貸切）', groupShort: '部屋を一組で貸切',
+  talk: '全員で相談しながら謎を解く（キャストとの会話はなし）', time: i.totalMinutes !== undefined ? i.totalTime : `${i.timeLimit.startsWith('本編') ? '' : '本編 '}${i.timeLimit}（受付を含む時間は公式で確認）`,
+  timeShort: i.totalMinutes !== undefined ? `全体 約${i.totalMinutes}分` : `${i.timeLimit.startsWith('本編') ? '' : '本編 '}${i.timeLimit}`,
   weather: i.indoor, note: i.tax, href: i.officialUrl, own: false, siteId: i.siteId, privateGroup: true, talkHeavy: false,
 }));
 const rows = [...own, ...ext];
+// 同じ値が続く人数（例：3名・4名とも「公式の料金表で確認」）はまとめて1回だけ出す
+const runs = (ts: string[]) => ts.reduce<{ t: string; i: number; n: number }[]>((a, t, i) => { const l = a[a.length - 1]; if (l && l.t === t && !/円|¥/.test(t)) l.n++; else a.push({ t, i, n: 1 }); return a; }, []);
 const names = (xs: Row[]) => xs.map((r) => r.name).join('、');
 const privateRows = rows.filter((r) => r.privateGroup);
 const castRows = rows.filter((r) => r.talkHeavy);
@@ -99,7 +105,7 @@ const chips = [`${rows.length}件を比較`, '2〜4人の総額', ...(privateRow
 {rows.map((r) => (
   <tr>
     <th scope="row"><a href={`#item-${r.id}`} style="color:var(--ink)">{r.name}</a><span class="cmp-sub">{r.area}／{r.kind}</span></th>
-    <td>{r.party}</td>{r.totals.map((t) => <td>{t}</td>)}<td>{r.together}</td><td>{r.talk}</td><td>{r.time}</td><td>{r.weather}</td>
+    <td>{r.party}</td>{r.priceOne ? <td colspan="3">{r.priceOne}</td> : runs(r.totals).map((g) => <td colspan={g.n > 1 ? String(g.n) : undefined}>{g.n > 1 && /確認/.test(g.t) ? `${SIZES.slice(g.i, g.i + g.n).join('・')}名は${g.t}` : g.t}</td>)}<td>{r.together}</td><td>{r.talk}</td><td>{r.time}</td><td>{r.weather}</td>
     <td><a class="cmp-btn" href={r.href} target="_blank" rel={r.own ? 'noopener' : 'noopener nofollow'} data-track={r.own ? 'ticket' : 'ev-ext'} data-show={r.siteId} data-place="friends-table">{r.own ? '予約サイト →' : '公式ページ →'}</a></td>
   </tr>
 ))}
@@ -125,12 +131,13 @@ const chips = [`${rows.length}件を比較`, '2〜4人の総額', ...(privateRow
     <p class="tw-area">{r.area}　｜　{r.kind}</p>
     <h3 class="tw-name serif">{r.name}</h3>
     <dl class="tw-dl">
-      <div><dt>人数・同じ組か</dt><dd class="dd-normal">{r.party}。{r.together}（{r.privacy}）</dd></div>
-      <div><dt>総額（2名／3名／4名）</dt><dd class="dd-normal">{r.totals.join('／')}</dd></div>
+      <div><dt>人数・同じ組か</dt><dd class="dd-normal">{r.party}。{r.together}</dd></div>
+      {r.priceOne ? <div><dt>料金</dt><dd class="dd-normal">{r.priceOne}</dd></div> : <div><dt>総額（2名／3名／4名）</dt><dd class="dd-normal">{runs(r.totals).map((g) => /確認/.test(g.t) ? `${SIZES.slice(g.i, g.i + g.n).join('・')}名は${g.t}` : SIZES.slice(g.i, g.i + g.n).map((n) => `${n}名 ${g.t}`).join('／')).join('／')}</dd></div>}
       <div><dt>参加者がすること</dt><dd class="dd-normal">{r.talk}</dd></div>
       <div><dt>時間／雨の日</dt><dd class="dd-normal">{r.time}／{r.weather}</dd></div>
       {r.note && <div><dt>注意点</dt><dd class="dd-normal">{r.note}</dd></div>}
     </dl>
+    <p class="fr-sum">{[r.priceOne ? r.priceOne.replace(/（.*$/, '') : /確認|不可/.test(r.totals[0]) ? '' : `2名 ${r.totals[0]}`, r.timeShort, r.groupShort].filter(Boolean).join('・')}</p>
     <div class="tw-actions"><a class={`btn tw-btn${r.own ? '' : ' ghost'}`} href={r.href} target="_blank" rel={r.own ? 'noopener' : 'noopener nofollow'} data-track={r.own ? 'ticket' : 'ev-ext'} data-show={r.siteId} data-place="friends-card">{r.own ? '予約サイトで空席を見る' : '公式ページで料金・予約を見る'}</a></div>
   </article>
 ))}
@@ -195,4 +202,5 @@ ul.bullets{text-align:left}
 #compare,#pick,#items,#check,#faq{scroll-margin-top:88px}
 .section.tinted,.section{padding:44px 0}
 @media(max-width:640px){.section.tinted,.section{padding:32px 0}.cards-h{font-size:18px}.sc-card{padding:16px 14px}.tw-btn{width:100%;text-align:center}}
+.fr-sum{margin:12px 0 0;font-size:13px;font-weight:700;color:var(--ink);line-height:1.6}
 </style>

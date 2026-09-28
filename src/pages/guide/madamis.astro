@@ -16,14 +16,14 @@ const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'about', label: 'マダミスとは' },
-  { id: 'history', label: 'マダミスの歴史・発祥' },
   { id: 'play', label: '遊び方・必要なもの・初心者のコツ' },
+  { id: 'where', label: '遊ぶには（店舗・オンライン）' },
+  { id: 'cost', label: '遊ぶときの費用の目安' },
+  { id: 'diff', label: '謎解き・人狼との違い' },
   { id: 'types', label: 'マダミスの種類' },
   { id: 'words', label: 'マダミス用語ミニ辞典' },
-  { id: 'diff', label: '謎解きとの違い' },
-  { id: 'where', label: '遊ぶには（店舗・オンライン）' },
-  { id: 'make', label: 'マダミスを制作・依頼するには' },
-  { id: 'cost', label: '費用の目安' },
+  { id: 'history', label: 'マダミスの歴史・発祥' },
+  { id: 'make', label: 'マダミスを制作・依頼するには（法人の費用）' },
   { id: 'faq', label: 'よくある質問' },
 ];
 
@@ -123,13 +123,13 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
-  dateModified: '2026-09-07',
+  dateModified: '2026-09-28',
   mainEntityOfPage: new URL('/guide/madamis/', Astro.site).toString(),
 };
 ---
 <BaseLayout
   title="マダミスとは？意味・遊び方・種類・費用｜マーダーミステリー完全ガイド - 株式会社ex Labs"
-  description="マダミスとは？マーダーミステリーの略称・通称で、参加者が登場人物になりきり推理する体験型ゲームです。意味・遊び方・種類・謎解きとの違い・費用・始め方・制作依頼まで、制作会社がまとめて解説します。"
+  description="マダミス（マーダーミステリー）は、物語の登場人物になって会話と推理を楽しむゲーム。遊び方と当日の流れ、人狼・謎解きとの違い、人数・時間・料金の目安、一人で参加する方法、企業・施設向けの制作費用まで紹介します。"
   ogImage="/assets/guide/madamis.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
@@ -148,7 +148,7 @@ const articleLd = {
 <div class="key-points"><p class="key-points-h">この記事の要点</p><ul>
 <li>マダミスとは、マーダーミステリーの略称。参加者が登場人物になりきり、会話と推理で犯人を突き止める体験型の推理ゲームです。</li>
 <li>遊ぶには店舗公演・オンライン・パッケージの3つ。1作品4〜10人程度、所要2〜4時間が中心で、店舗公演の目安は1名3,500〜5,000円前後です。</li>
-<li>企業・施設で使うなら、既存作品の貸切・出張は数十万円台〜、オリジナル制作は100万円前後〜。企画・制作は株式会社ex Labsが相談から対応します。</li>
+<li>謎解きは用意された答えを探す協力型のパズル、人狼は正体を隠す心理戦を繰り返し遊ぶゲーム。マダミスは作品ごとの物語と役があり、同じ作品は基本的に一度きりです。</li>
 </ul></div>
 
 <nav class="toc" aria-label="目次">
@@ -163,21 +163,14 @@ const articleLd = {
 <p class="eyebrow">ABOUT</p><h2 class="h2 serif">マダミスとは</h2>
 <p class="lede"><strong>マダミス</strong>は<strong>マーダーミステリー（Murder Mystery）</strong>の略称・通称です。参加者はそれぞれ配られたキャラクター（登場人物）になりきり、殺人事件などの物語の中で、会話・情報交換・推理を通じて「犯人は誰か」を突き止めたり、自分に与えられた秘密やミッションの達成を目指します。</p>
 <p class="lede">最大の特徴は、<strong>結末を知ると遊べなくなる「一度きりの体験」</strong>であること。だからこそ、その一回に全力で没入できる特別なエンターテインメントとして人気を集めています。</p>
-</div></section>
-
-<section class="section" id="history"><div class="wrap narrow">
-<p class="eyebrow">HISTORY</p><h2 class="h2 serif">マダミスの歴史・発祥</h2>
-<p class="lede">マダミスの源流は、欧米で親しまれてきた<strong>マーダーミステリーパーティー</strong>（参加者が容疑者を演じ合うパーティーゲーム）にあります。これがゲームとして体系化され、中国で<strong>「剧本殺（ジューベンシャー）」</strong>として専門店が数万店規模に広がる爆発的なブームとなり、日本には2019年前後に上陸。専門店の公演やオンラインアプリを通じて急速に広がりました。</p>
-<p class="lede">現在の日本では、店舗公演・オンライン・パッケージ販売・動画配信企画と遊び方が多様化し、<strong>企業の集客イベントや研修への活用</strong>という新しい広がりも生まれています。</p>
-<h3 class="def-sub serif">2026年のマダミス最新動向</h3>
 <ul class="bullets">
-<li><strong>①初心者層の拡大</strong>：専門店の初心者向け公演やGM（進行役）付きの作品が増え、「演技が恥ずかしい」「一人でも大丈夫？」という不安を持つ層が入りやすくなりました。<a href="/guide/madamis-shoshinsha/" style="color:var(--accent)">マダミス初心者ガイド →</a></li>
-<li><strong>②企業・施設での活用が本格化</strong>：懇親会・研修だけでなく、宿泊施設の体験付きプラン、商業施設の集客イベントとしてオリジナル作品を制作する動きが広がっています。<a href="/guide/madamis-business/" style="color:var(--accent)">企業・店舗のマダミス活用 →</a></li>
-<li><strong>③イマーシブ（没入型）との融合</strong>：会場そのものを物語の舞台にし、俳優や仕掛けを組み合わせた公演型マダミスが増加。「遊ぶ」から「体験する」へ、ジャンルの境界が溶けつつあります。<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは →</a></li>
+<li><strong>何をするか</strong>：配られた資料で自分の役を知り、他の参加者と話して手がかりを集め、最後に犯人を推理して投票します。</li>
+<li><strong>どう参加するか</strong>：専門店やイベントの公演に申し込む（一人で相席参加／友人と貸切）か、作品を買ってオンライン・自宅で遊びます。</li>
+<li><strong>人数・時間・料金</strong>：1作品4〜10人程度、所要2〜4時間が中心。店舗公演は1名3,500〜5,000円前後が目安です（作品ごとに異なります）。</li>
 </ul>
 </div></section>
 
-<section class="section tinted" id="play"><div class="wrap narrow">
+<section class="section" id="play"><div class="wrap narrow">
 <p class="eyebrow">HOW TO PLAY</p><h2 class="h2 serif">マダミスの遊び方・当日の流れ</h2>
 <ul class="bullets">
 <li><strong>キャラクター配布</strong>：各自に「あなたは誰で、何を知っていて、何を目的とするか」が書かれた資料が配られます。</li>
@@ -210,6 +203,25 @@ const articleLd = {
 <p class="vc-line"><a href="/guide/madamis-asobikata/" style="color:var(--accent)">遊び方・所要時間・必要なものを初心者向けにさらに詳しく →</a></p>
 </div></section>
 
+<section class="section tinted" id="where"><div class="wrap narrow">
+<p class="eyebrow">WHERE TO PLAY</p><h2 class="h2 serif">マダミスを遊ぶには</h2>
+<p class="lede">マダミス専門店の公演に申し込むのが一般的です。友人同士で貸切予約する方法と、一人でオープン公演（相席）に参加する方法があります。</p>
+<p class="lede"><strong>オンラインで遊ぶ</strong>方法も広がっています。ビデオ通話やオンラインセッションツールを使えば、遠方の友人とも自宅から参加できます。店舗より安価な作品が多く、初めての1作にもおすすめです。</p>
+<p class="lede">現役東大生と有名作家のチームによる<strong>東大マーダーミステリーサークル（UNLIMITED MYSTERY）</strong>では、推理を重視した本格派のオリジナル作品を店舗・オンラインで公演しています。<a href="/toudaimurder/works/" style="color:var(--accent)">マダミス作品一覧を見る →</a></p>
+</div></section>
+
+<section class="section" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif">遊ぶときの費用の目安</h2>
+<p class="lede"><strong>遊ぶ場合</strong>は、店舗公演でおおむね1名あたり3,500〜5,000円前後が目安です。オンラインはやや安価な傾向があります。</p>
+<p class="lede">料金は作品・店舗・人数で変わるため、申し込む公演の案内で確認してください。企業・施設での制作費用は<a href="#make" style="color:var(--accent)">制作・依頼の項目</a>にまとめています。</p>
+</div></section>
+
+<section class="section tinted" id="diff"><div class="wrap narrow">
+<p class="eyebrow">VS</p><h2 class="h2 serif">マダミスと謎解き・人狼の違い</h2>
+<p class="lede">よく比較される「謎解き」との違いは、<strong>ゴールの形</strong>にあります。謎解きは用意された答えにたどり着く<strong>協力型のパズル</strong>。一方マダミスは、各自が異なる情報と目的を持ち、<strong>会話と役割演技（ロールプレイ）で真相を組み立てる体験型ドラマ</strong>です。同じ「推理」でも、謎解きは正解探し、マダミスは物語への没入と読み合いが中心になります。</p>
+<p class="lede"><strong>人狼</strong>は、正体を隠した人を会話で見つけ出す心理戦を、同じルールで何度も繰り返し遊ぶゲームです。固有の物語や役ごとの資料はありません。マダミスは作品ごとに物語と登場人物が決まっており、一度遊ぶと結末を知ってしまうため同じ作品は基本的に一度きりです。</p>
+</div></section>
+
 <section class="section" id="types"><div class="wrap">
 <p class="eyebrow">TYPES</p><h2 class="h2 serif">マダミスの種類</h2>
 <p class="h2sub">マダミスは、形式や作風によっていくつかのタイプに分かれます。</p>
@@ -232,30 +244,25 @@ const articleLd = {
 </div>
 </div></section>
 
-<section class="section" id="diff"><div class="wrap narrow">
-<p class="eyebrow">VS</p><h2 class="h2 serif">マダミスと謎解きの違い</h2>
-<p class="lede">よく比較される「謎解き」との違いは、<strong>ゴールの形</strong>にあります。謎解きは用意された答えにたどり着く<strong>協力型のパズル</strong>。一方マダミスは、各自が異なる情報と目的を持ち、<strong>会話と役割演技（ロールプレイ）で真相を組み立てる体験型ドラマ</strong>です。同じ「推理」でも、謎解きは正解探し、マダミスは物語への没入と読み合いが中心になります。</p>
+<section class="section" id="history"><div class="wrap narrow">
+<p class="eyebrow">HISTORY</p><h2 class="h2 serif">マダミスの歴史・発祥</h2>
+<p class="lede">マダミスの源流は、欧米で親しまれてきた<strong>マーダーミステリーパーティー</strong>（参加者が容疑者を演じ合うパーティーゲーム）にあります。これがゲームとして体系化され、中国で<strong>「剧本殺（ジューベンシャー）」</strong>として専門店が数万店規模に広がる爆発的なブームとなり、日本には2019年前後に上陸。専門店の公演やオンラインアプリを通じて急速に広がりました。</p>
+<p class="lede">現在の日本では、店舗公演・オンライン・パッケージ販売・動画配信企画と遊び方が多様化し、<strong>企業の集客イベントや研修への活用</strong>という新しい広がりも生まれています。</p>
+<h3 class="def-sub serif">2026年のマダミス最新動向</h3>
+<ul class="bullets">
+<li><strong>①初心者層の拡大</strong>：専門店の初心者向け公演やGM（進行役）付きの作品が増え、「演技が恥ずかしい」「一人でも大丈夫？」という不安を持つ層が入りやすくなりました。<a href="/guide/madamis-shoshinsha/" style="color:var(--accent)">マダミス初心者ガイド →</a></li>
+<li><strong>②企業・施設での活用が本格化</strong>：懇親会・研修だけでなく、宿泊施設の体験付きプラン、商業施設の集客イベントとしてオリジナル作品を制作する動きが広がっています。<a href="/guide/madamis-business/" style="color:var(--accent)">企業・店舗のマダミス活用 →</a></li>
+<li><strong>③イマーシブ（没入型）との融合</strong>：会場そのものを物語の舞台にし、俳優や仕掛けを組み合わせた公演型マダミスが増加。「遊ぶ」から「体験する」へ、ジャンルの境界が溶けつつあります。<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは →</a></li>
+</ul>
 </div></section>
 
-<section class="section tinted" id="where"><div class="wrap narrow">
-<p class="eyebrow">WHERE TO PLAY</p><h2 class="h2 serif">マダミスを遊ぶには</h2>
-<p class="lede">マダミス専門店の公演に申し込むのが一般的です。友人同士で貸切予約する方法と、一人でオープン公演（相席）に参加する方法があります。</p>
-<p class="lede"><strong>オンラインで遊ぶ</strong>方法も広がっています。ビデオ通話やオンラインセッションツールを使えば、遠方の友人とも自宅から参加できます。店舗より安価な作品が多く、初めての1作にもおすすめです。</p>
-<p class="lede">現役東大生と有名作家のチームによる<strong>東大マーダーミステリーサークル（UNLIMITED MYSTERY）</strong>では、推理を重視した本格派のオリジナル作品を店舗・オンラインで公演しています。<a href="/toudaimurder/works/" style="color:var(--accent)">マダミス作品一覧を見る →</a></p>
-</div></section>
-
-<section class="section" id="make"><div class="wrap narrow">
+<section class="section tinted" id="make"><div class="wrap narrow">
 <p class="eyebrow">PRODUCTION</p><h2 class="h2 serif">マダミスを制作・依頼するには</h2>
 <p class="lede">動画・配信企画、店舗や施設の集客、イベント、社内研修など、目的に合わせた<strong>オリジナルのマダミス制作</strong>も依頼できます。株式会社ex Labsは、マダミスアンケート1位の実績を持つチームで、企画からシナリオ制作・デバッグ・当日運営まで一貫して対応します。</p>
+<p class="lede"><strong>制作を依頼する場合の費用</strong>は、作品の形式・規模・利用範囲によって変わります。株式会社ex Labsにご依頼いただく場合、既存作品の貸切・出張実施は数十万円台〜、店舗・施設向けのオリジナル制作は100万円前後〜が目安です。案件によっては初期費用を抑えたご提案やレベニューシェア型にも対応しています。</p>
+<p class="vc-line"><a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場を詳しく見る →</a></p>
 <p class="vc-line"><a href="/services/murder-mystery/" style="color:var(--accent)">マダミスの制作依頼・お見積り（無料）はこちら →</a></p>
 <p class="vc-line"><a href="/guide/madamis-seisaku/" style="color:var(--accent)">マダミス制作とは？依頼の流れ・費用・制作事例 →</a></p>
-</div></section>
-
-<section class="section tinted" id="cost"><div class="wrap narrow">
-<p class="eyebrow">COST</p><h2 class="h2 serif">費用の目安</h2>
-<p class="lede"><strong>遊ぶ場合</strong>は、店舗公演でおおむね1名あたり3,500〜5,000円前後が目安です。オンラインはやや安価な傾向があります。</p>
-<p class="lede"><strong>制作を依頼する場合</strong>は、作品の形式・規模・利用範囲によって変わります。案件によっては初期費用を抑えたご提案やレベニューシェア型にも対応しています。</p>
-<p class="vc-line"><a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場を詳しく見る →</a></p>
 </div></section>
 
 <section class="section" id="field"><div class="wrap narrow">
