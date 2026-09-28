@@ -1150,3 +1150,10 @@
 - 表現：読者向けでない裏側の説明（「公式ページで確認できた〜」「〜の案内をもとにしています」「（自社公式の案内）」「確認中のため断定しません」「確認できた公演なし」など）を、読者に必要な案内だけの文に書き換え（東京ガイド系・事例・準備・マジックショー比較ほか）。二人分料金FAQの「税込、税込」重複を修正。
 - タイトル画像：public/assets/guide/*.webp（76枚、1200×630、同じパス）を新デザイン（青地・Italiana のカテゴリ名・明朝タイトル・ライムの副題）で作り直し。用語集に og:image を追加。解説記事一覧のサムネイルを切り抜かずに全体表示。
 - 観察：画像差し替えで OGP キャッシュが更新されるまで SNS では旧画像が出ることがある。記事の順位は 14〜28日観察。
+
+## 2026-09-28 公開URLのクロール点検（本番ビルドをローカルで本番同等の経路で配信し、実ブラウザで全ページ確認）
+- 範囲：sitemap 134URL＋内部リンクから辿れる計379URL（HTTP・canonical・robots・構造化データ）、sitemap 全URLを Chromium（390/1280px）で読み込み（コンソールエラー・CSP違反・失敗リクエスト・横はみ出し）。
+- 結果：意図しない404・5xx・リダイレクトループなし（内部リンク切れなし。/_vercel/insights は Vercel 上でのみ存在）。sitemap の全URLが200・自己canonical・index可、非正規URL（クエリ付き・リダイレクト元）の混入なし。管理・予約ページは noindex＋X-Robots-Tag。?c= や /events/?when= は正規URLへ canonical。未知のスラッグは 404。
+- /events/・/works/ のタイムアウト：ローカルでは描画 16〜30ms・読み込み約1秒で再現せず、外部APIの呼び出しもなし。SSR ページにキャッシュ指定がなく毎回関数が動くため、アクセスが少ない時間帯のコールドスタートが一因と考えられる。対策として公開ページの SSR 応答に CDN キャッシュ（通常 s-maxage=600・SWR 1日、日付で変わる /・/events/・東京ガイド系は s-maxage=300・SWR 1時間）を付与し、/works/ は静的生成に変更。管理・予約・API・会員向けは対象外（no-store のまま）。
+- 構造化データ：解説記事13本で Article の headline が title と食い違っていたため title に合わせた（immersive・immersive-cost・immersive-theater・immersive-tokyo・immersive-vr・event-hiyou・halloween-event・hotel-event・kisetsu-event・museum-event・saiji・shinrisen・shisetsu-katsuyo）。
+- 未確認：本番ドメインは作業環境から接続できず、Vercel のサーバーログも参照していない。デプロイ後に Vercel の Logs（/events/・/works/ の Duration と 5xx）と Search Console の「ページのインデックス登録」を確認する。

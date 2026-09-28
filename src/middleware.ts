@@ -33,8 +33,24 @@ export const onRequest = defineMiddleware((context, next) => {
       const html = enhanceArticleHtml(await res.text());
       const headers = new Headers(res.headers);
       headers.delete('content-length');
-      return new Response(html, { status: res.status, headers });
+      return withEdgeCache(pathname, new Response(html, { status: res.status, headers }));
     });
   }
+  if (isGet) return next().then((res) => withEdgeCache(pathname, res));
   return next();
 });
+
+// 公開ページの SSR 結果を Vercel の CDN に短時間キャッシュさせる。
+// キャッシュ指定がないと毎回関数が動き、アクセスの少ない時間帯はコールドスタートで応答が遅れる
+// （外部クローラーで /events/ などがタイムアウトした一因と考えられる）。デプロイ時に CDN キャッシュは破棄される。
+// 管理・予約・API・会員向けなど、人ごとに内容が変わるページは対象外。
+const PRIVATE = /^\/(api|_|contact|yoyaku|bihin|shimokita|kaitou\/secret|hacktale\/(admin|reservation))(\/|$)/;
+// 日付で表示が変わるページ（開催日・今週の公演）は短めに持つ
+const DATED = /^\/($|events\/|guide\/(immersive-tokyo|tokyo-|shibuya-)|hacktale\/$)/;
+function withEdgeCache(pathname: string, res: Response): Response {
+  if (res.status !== 200 || PRIVATE.test(pathname) || res.headers.has('set-cookie') || res.headers.has('cache-control')) return res;
+  if (!(res.headers.get('content-type') ?? '').includes('text/html')) return res;
+  const headers = new Headers(res.headers);
+  headers.set('Cache-Control', DATED.test(pathname) ? 'public, max-age=0, s-maxage=300, stale-while-revalidate=3600' : 'public, max-age=0, s-maxage=600, stale-while-revalidate=86400');
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+}
