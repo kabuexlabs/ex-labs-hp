@@ -78,7 +78,6 @@ const pageLd = {
 
 const relax: { label: string; q: string }[] = [];
 if (c.party) relax.push({ label: '人数の指定を外す', q: criteriaToQuery({ ...c, party: undefined }) });
-if (c.when !== 'all') relax.push({ label: `日付の指定を外す（これから${LIST_DAYS}日）`, q: criteriaToQuery({ ...c, when: 'all', date: undefined }) });
 if (c.area || c.region) relax.push({ label: 'エリアの指定を外す', q: criteriaToQuery({ ...c, area: undefined, region: undefined }) });
 if (c.genre) relax.push({ label: 'ジャンルの指定を外す', q: criteriaToQuery({ ...c, genre: '' }) });
 if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時刻・予算の指定を外す', q: criteriaToQuery({ ...c, start: '', endBy: undefined, budget: undefined }) });
@@ -95,8 +94,9 @@ const whens: { k: Criteria['when']; label: string; sub: string }[] = [
   { k: 'tomorrow', label: '明日', sub: fmtDateShort(tomorrow) },
   { k: 'weekend', label: '今週末', sub: weekendLabel },
   { k: 'date', label: '日付を指定', sub: 'カレンダーから' },
-  { k: 'all', label: `これから${LIST_DAYS}日`, sub: `〜${fmtDateShort(limit)}` },
 ];
+// 「これから90日」の一覧は出さない（2026-09-28 クライアント指示）。日付の条件（今日・明日・今週末・日付指定）を選んだときだけ公演回の一覧を表示する
+const noWhen = c.when === 'all';
 const scheduleShows = calendarShows.filter((s) => s.published && s.occurrences.some((o) => o.date >= today));
 const areaOf = (r: AnyResolved) => place(r);
 const worksCards = eventsData.works.filter((w) => w.published).map((w) => {
@@ -173,7 +173,7 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
         <p class="xe-adv-note"><Ph list={['開演時刻・終了時刻・上限人数が', '未確認の公演は、', 'これらの条件に「合う」とは扱わず、', '結果の下に', '「条件を判定できない公演」として', '分けて表示します。']} /></p>
       </details>
       <div class="xe-submit">
-        <button type="submit" class="xe-go">この条件で探す（<span data-count>{result.matched.length}</span>件）</button>
+        <button type="submit" class="xe-go"><span data-go-when hidden={!noWhen ? true : undefined}>いつ遊ぶかを選んで探す</span><span data-go-count hidden={noWhen ? true : undefined}>この条件で探す（<span data-count>{result.matched.length}</span>件）</span></button>
         <a class="xe-reset" href="/events/">条件をリセット</a>
       </div>
     </form>
@@ -204,6 +204,8 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
     </div>
     <p class="xe-gl-note">販売・空席は各公演の公式ページの表示が最新です。{anyStale && <strong>日程が変わっている場合があるため、予約前に公式ページをご確認ください。</strong>}</p>
 
+    <p class="xe-pick" id="ev-pick" hidden={!noWhen ? true : undefined}><Ph list={['「いつ遊ぶ？」で', '今日・明日・今週末・日付を選ぶと、', 'その日の公演回が並びます。']} /></p>
+    <div id="ev-res-block" hidden={noWhen ? true : undefined}>
     <div class="xe-res-h">
       <p class="xe-res-en">Results</p>
       <h2 class="xe-res-t"><span data-window-label>{windowLabel}</span>の公演回<span class="xe-res-n"><span data-count>{result.matched.length}</span>件</span></h2>
@@ -231,6 +233,7 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
         {result.unknown.map((r) => <li><SessionCard r={r} place="events-unknown" /></li>)}
       </ul>
     </details>
+    </div>
     <ul class="xe-list" id="ev-rest" hidden>
       {all.filter((r) => !result.matched.includes(r) && !result.unknown.includes(r) && !['ended', 'cancelled'].includes(r.eventState)).map((r) => <li><SessionCard r={r} place="events" /></li>)}
     </ul>
@@ -352,6 +355,11 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
       document.querySelectorAll('[data-count]').forEach((el) => { el.textContent = String(nMatch); });
       const uc = document.querySelector('[data-unknown-count]'); if (uc) uc.textContent = String(nUnknown);
       const wl = document.querySelector('[data-window-label]'); if (wl) wl.textContent = win ? win.map(fmtDateJa).join('・') : `これから${LIST_DAYS}日以内`;
+      const noWhen = c.when === 'all';
+      const blk = document.getElementById('ev-res-block'); if (blk) blk.hidden = noWhen;
+      const pick = document.getElementById('ev-pick'); if (pick) pick.hidden = !noWhen;
+      form.querySelectorAll<HTMLElement>('[data-go-when]').forEach((el) => { el.hidden = !noWhen; });
+      form.querySelectorAll<HTMLElement>('[data-go-count]').forEach((el) => { el.hidden = noWhen; });
       zero.hidden = nMatch > 0;
       unknownBox.hidden = nUnknown === 0;
       if (nMatch === 0 && nUnknown > 0) unknownBox.open = true;
@@ -370,7 +378,7 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
       }
     };
     const toResults = () => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    form.addEventListener('submit', (e) => { e.preventDefault(); apply(true); toResults(); });
+    form.addEventListener('submit', (e) => { e.preventDefault(); if (!form.querySelector('input[name=when]:checked')) { form.querySelector<HTMLInputElement>('input[name=when]')?.focus(); return; } apply(true); toResults(); });
     // 「今日／明日／今週末」の件数・リンク：ページを読み直さずにその条件へ切り替えて結果へ
     document.querySelectorAll<HTMLAnchorElement>('[data-when-go]').forEach((a) => a.addEventListener('click', (e) => {
       const r = form.querySelector<HTMLInputElement>(`input[name=when][value="${a.dataset.whenGo}"]`);
@@ -419,7 +427,7 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
 .xe-form{margin-top:40px;border:1px solid rgba(255,255,255,.35);padding:clamp(22px,4vw,40px) clamp(16px,4vw,40px);display:grid;gap:28px}
 .xe-when-fs{margin:0;padding:0;border:0;display:grid;gap:12px;min-width:0}
 .xe-lbl{padding:0;margin:0 0 12px;font-family:var(--x-min);font-weight:700;font-size:16px}
-.xe-whens{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.xe-whens{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .xe-when{position:relative;border:1px solid rgba(255,255,255,.5);padding:12px 10px;cursor:pointer;display:grid;gap:3px;justify-items:center;text-align:center;min-width:110px}
 .xe-when input{position:absolute;opacity:0;pointer-events:none}
 .xe-when-l{font-family:var(--x-min);font-weight:700;font-size:15px;white-space:nowrap}
@@ -467,6 +475,8 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
 .xe-res-note{margin:0;font-size:13px;line-height:1.8;color:var(--x-pale)}
 .xe-zero{margin-top:32px;border:1px dashed rgba(255,255,255,.5);padding:36px 24px;text-align:center;display:grid;gap:14px;justify-items:center}
 .xe-zero[hidden]{display:none}
+.xe-pick{margin:40px auto 0;max-width:36em;border:1px dashed rgba(255,255,255,.5);padding:24px;text-align:center;font-family:var(--x-min);font-weight:700;font-size:15px;line-height:1.9}
+.xe-pick[hidden],#ev-res-block[hidden]{display:none}
 .xe-zero-t{margin:0;font-family:var(--x-min);font-weight:700;font-size:16px;line-height:1.8}
 .xe-zero-s{margin:0;font-size:13px;color:var(--x-pale)}
 .xe-zero-btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
