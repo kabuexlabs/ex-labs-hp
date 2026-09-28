@@ -35,6 +35,21 @@ const KEEP = [...new Set([...mediaItems.map((m) => m.outlet), '会員制バー',
 const esc = (t: string) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 const reEsc = (k: string) => k.replace(/[.*+?^$()|[\]\\{}]/g, '\\$&');
 const KEEP_RE = new RegExp('(' + KEEP.map(reEsc).join('|') + ')');
+// 見出し：「記事タイトル」＋「として／が紹介されました」。記事タイトルは空白と助詞の切れ目でだけ区切り、
+// 助詞（として・が）は閉じ括弧に付けたまま、「紹介されました」は1かたまりにする（各かたまりは途中で折らない）。
+const headChunks = (t: string): string[] => {
+  const m = t.match(/^「(.*)」(として|が|を)?(.*)$/);
+  if (!m) return [t];
+  const out: string[] = [];
+  const words = m[1].split(/\s+(?=[^\x00-\x7F])/); // 英字どうしの空白（ex Labs）では区切らない
+  words.forEach((w, wi) => {
+    const pieces = [...w].length <= 12 ? [w] : w.split(/(?<=[ぁ-ゟ])(?=[^ぁ-ゟ、。])/);
+    pieces.forEach((p, pi) => out.push((wi === 0 && pi === 0 ? '「' : '') + p + (wi < words.length - 1 && pi === pieces.length - 1 ? ' ' : '')));
+  });
+  out[out.length - 1] += '」' + (m[2] ?? '');
+  if (m[3]) out.push(m[3]);
+  return out;
+};
 const brk = (t: string): string => {
   const parts = t.split(KEEP_RE);
   return parts.map((p, i) => {
@@ -69,7 +84,7 @@ const brk = (t: string): string => {
         <div class="xm-body">
           {i === 0 && <p class="xm-pick">Pick up</p>}
           <div class="xm-top"><span class="xm-outlet">{m.outlet}</span><span class="xm-date">{m.date}</span></div>
-          <h2 class="xm-h" set:html={brk(m.title)} />
+          <h2 class="xm-h">{headChunks(m.title).map((c) => <span class="xm-hc">{c}</span>)}</h2>
           <p class="xm-d" set:html={brk(m.desc)} />
           <div class="xm-actions">
             {m.url && <a class="xm-btn" href={m.url} target="_blank" rel="noopener">記事を読む<span class="xm-ext">外部サイト ↗</span></a>}
@@ -99,6 +114,7 @@ const brk = (t: string): string => {
 .xm-img::before{content:"";position:absolute;inset:-24px;background:var(--bg) center/cover no-repeat;filter:blur(18px) brightness(.55);transform:scale(1.1)}
 .xm-img img{position:relative;display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;box-shadow:0 8px 28px rgba(0,0,0,.45)}
 :global(.xm-nb){white-space:nowrap}
+.xm-hc{display:inline-block;white-space:pre}
 .xm-h,.xm-d{word-break:keep-all;overflow-wrap:anywhere}
 .xm-body{padding:clamp(24px,5vw,44px) clamp(20px,5vw,48px);display:grid;gap:14px;align-content:start}
 .xm-pick{margin:0;justify-self:start;background:var(--x-lime);color:var(--x-ink);font-family:var(--x-en);font-size:15px;letter-spacing:.12em;padding:4px 12px}
