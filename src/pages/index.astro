@@ -8,6 +8,7 @@ import SecHead from '../components/x/SecHead.astro';
 import Ph from '../components/x/Ph.astro';
 import Cls from '../components/x/Cls.astro';
 import { eventsData } from '../data/events/index';
+import { guideArticles } from '../data/guides';
 import { jstDateString } from '../lib/thisWeek';
 
 
@@ -106,11 +107,18 @@ const services = [
   { no: '04', href: '/services/immersive/', title: 'イマーシブ制作', desc: '実在する街・空間・ブランドを舞台にした没入型体験を企画・制作。イマーシブの制作依頼・お見積りは無料です。' },
   { no: '05', href: '/services/zunousen/', title: '頭脳戦制作', desc: '交渉・心理戦・閃きのゲームに特化したレーベル「HACKTALE」を運営。ルール設計からバランス調整・運営までオリジナル頭脳戦コンテンツを制作。' },
 ];
+// 最新の解説記事（旧トップの「最新記事」枠の代わり。内部リンクを保つ）
+const latestGuides = [...guideArticles].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
 const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc:${gtc};--gap:${gap};--col:${col};${mt ? `margin-top:${mt};` : ''}`;
 
 ---
 <BaseLayout renewal cutin={[['場所やIP、', 'ブランドに合った'], ['体験型イベントを', '実施しませんか？']]} contact={{}}>
-<style is:global>.x-end.has-contact footer.x-foot{--foot-gap:120px}</style>
+<style is:global>.x-end.has-contact footer.x-foot{--foot-gap:120px}.xt-guides{margin-top:44px;border-top:1px solid rgba(255,255,255,.3)}
+.xt-guides a{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 18px;align-items:baseline;padding:18px 0;border-bottom:1px solid rgba(255,255,255,.3)}
+.xt-g-date{white-space:nowrap;font-family:var(--x-en);font-size:15px;color:var(--x-lime)}
+.xt-g-t{font-family:var(--x-min);font-weight:600;font-size:15px;line-height:1.7}
+@media(max-width:560px){.xt-guides a{grid-template-columns:minmax(0,1fr)}}
+</style>
 
 <section class="xt-hero">
   <div class="xt-hero-top">
@@ -168,11 +176,11 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 
     <p class="xt-mq-label" style="margin-top:56px"><Ph list={['+ · お取引先、', 'ご協力企業様']} /></p>
     <div class="xt-mq-wrap"><div class="x-mq" style="--dur:40s;gap:28px">
-      {partnerRow1Items.map((p, i) => <div class="xt-mq-cell"><img src={p.logo} alt={i < partnersRow1.length ? p.name : ''} loading="lazy" decoding="async"></div>)}
+      {partnerRow1Items.map((p, i) => <div class="xt-mq-cell"><img src={p.logo} alt={i < partnersRow1.length ? p.name : ''} decoding="async"></div>)}
     </div></div>
     <p class="xt-mq-label" style="margin-top:36px">+ · 展開団体</p>
     <div class="xt-mq-wrap"><div class="x-mq is-rev" style="--dur:60s;gap:28px">
-      {marqueeItems.map((g, i) => <div class="xt-mq-cell is-round"><img src={g.logo} alt={i < groups.length ? g.name : ''} loading="lazy" decoding="async"></div>)}
+      {marqueeItems.map((g, i) => <div class="xt-mq-cell is-round"><img src={g.logo} alt={i < groups.length ? g.name : ''} decoding="async"></div>)}
     </div></div>
   </div>
 </section>
@@ -275,12 +283,12 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
   <div class="x-wcard xt-card is-perf">
     <div class="x-kicker">Performance</div>
     <h2 class="xt-perf-h"><Ph list={['自社イベント', '「ヌル・アーデン展」', 'の実績']} /></h2>
-    <div class="xt-perf-grid">
+    <div class="xt-perf-row">
       <div class="xt-perf-c"><div><div class="xt-perf-l">チケット販売枚数</div><div class="xt-perf-n"><span class="xt-perf-pre">約</span>1,000</div></div><div class="xt-perf-u">枚</div></div>
       <div class="xt-perf-c"><div><div class="xt-perf-l">チケット価格</div><div class="xt-perf-n">4,000</div></div><div class="xt-perf-u">円</div></div>
     </div>
     <p class="xt-perf-cond"><Cls text="しかも、以下の条件下での実績です。" emph={false} /></p>
-    <div class="xt-perf-pills"><span>✓ SNSアカウントをゼロから立ち上げ</span><span>✓ プレスリリース未実施</span><span>✓ 広告宣伝費0円</span><span>✓ Xのみで集客</span></div>
+    <div class="xt-perf-pills"><span><Ph list={['✓ SNSアカウントを', 'ゼロから立ち上げ']} /></span><span><Ph list={['✓ プレスリリース未実施']} /></span><span><Ph list={['✓ 広告宣伝費0円']} /></span><span><Ph list={['✓ Xのみで集客']} /></span></div>
   </div>
 </section>
 
@@ -346,6 +354,16 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 
 <section class="xt-pad16">
   <div style="max-width:880px;margin:0 auto">
+    <SecHead en="Guide" size="top" ja="解説記事" />
+    <div class="xt-guides">
+      {latestGuides.map((g) => <a href={g.href}><span class="xt-g-date">{g.date.replace(/-/g, '.')}</span><span class="xt-g-t"><Cls text={g.title} emph={false} /></span></a>)}
+    </div>
+    <div class="xt-works-more" style="margin-top:36px"><a href="/guide/" class="x-btn is-line xt-more">解説記事の一覧を見る&nbsp;→</a></div>
+  </div>
+</section>
+
+<section class="xt-pad16">
+  <div style="max-width:880px;margin:0 auto">
     <SecHead en="Company" size="top" />
     <div class="xt-co">
       <div class="xt-co-r"><p class="xt-co-k">+ · 法人名</p><p class="xt-co-v">株式会社ex Labs</p></div>
@@ -373,7 +391,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-hero-logo img{width:min(52vw,620px);height:auto;display:block}
 .xt-stat{display:flex;align-items:flex-end;justify-content:center;gap:14px}
 .xt-stat-l{font-family:var(--x-min);font-size:clamp(14px,2vw,20px);letter-spacing:.08em}
-.xt-stat-n{font-family:var(--x-en);font-size:clamp(80px,15vw,180px);line-height:.9;letter-spacing:-.01em}
+.xt-stat-n{white-space:nowrap;overflow-wrap:normal;font-family:var(--x-en);font-size:clamp(80px,15vw,180px);line-height:.9;letter-spacing:-.01em}
 .xt-stat-u{font-family:var(--x-min);font-size:clamp(18px,2.6vw,28px);margin-bottom:clamp(12px,2.2vw,28px);flex-shrink:0}
 .xt-hero-body{max-width:880px;margin:0 auto;padding:56px 24px 96px}
 .xt-hero-kick{margin:0 0 20px;font-family:var(--x-min);font-size:clamp(16px,2.2vw,21px);letter-spacing:.04em;display:flex;align-items:center;gap:14px}
@@ -454,12 +472,12 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-works-more{margin-top:56px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center}
 .xt-more{padding:14px 28px}
 .xt-perf-h{margin:18px 0 0;font-family:var(--x-min);font-weight:500;font-size:clamp(22px,3.6vw,38px);line-height:1.5}
-.xt-perf-grid{margin-top:40px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,4vw,32px)}
-.xt-perf-c{display:flex;align-items:flex-end;gap:12px}
+.xt-perf-row{margin-top:40px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,4vw,32px)}
+.xt-perf-c{display:flex;align-items:flex-end;gap:clamp(4px,1.5vw,12px);min-width:0}
 .xt-perf-l{font-family:var(--x-min);font-weight:600;font-size:clamp(12px,3.4vw,15px)}
-.xt-perf-n{font-family:var(--x-en);font-size:clamp(46px,12vw,120px);line-height:1}
+.xt-perf-n{font-family:var(--x-en);font-size:clamp(38px,11vw,120px);line-height:1;white-space:nowrap;overflow-wrap:normal}
 .xt-perf-pre{font-family:var(--x-min);font-size:.26em;margin-right:.12em}
-.xt-perf-u{font-family:var(--x-min);font-size:clamp(20px,3vw,28px);margin-bottom:clamp(10px,1.6vw,18px);flex-shrink:0}
+.xt-perf-u{font-family:var(--x-min);font-size:clamp(18px,3vw,28px);margin-bottom:clamp(10px,1.6vw,18px);flex-shrink:0}
 .xt-perf-cond{margin:36px 0 14px;font-weight:700;font-size:15px}
 .xt-perf-pills{display:flex;flex-wrap:wrap;gap:10px}
 .xt-perf-pills span{background:var(--x-blue);color:#fff;border-radius:999px;padding:10px 20px;font-size:14px;font-weight:500}
@@ -499,6 +517,6 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-co-k{margin:0;font-weight:700;font-size:17px}
 .xt-co-v{margin:14px 0 0;font-size:19px}
 .xt-co-media{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:10px;font-size:16px;line-height:1.7}
-@media(max-width:360px){.xt-card{padding-left:16px;padding-right:16px}.xt-model-c{padding:24px 16px}.xt-model{padding:24px 18px}}
+@media(max-width:360px){.xt-perf-pills span{padding:9px 14px;font-size:13px}.xt-card{padding-left:16px;padding-right:16px}.xt-model-c{padding:24px 16px}.xt-model{padding:24px 18px}}
 @media(max-width:400px){.xt-biz-c{padding:24px 18px}.xt-biz-c p{font-size:16px}}
 </style>

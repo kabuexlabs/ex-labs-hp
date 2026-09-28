@@ -261,7 +261,29 @@ export const SERVICES: Record<ServiceSlug, any> = {
    ],
    "label": "謎解き研修について相談する",
    "note": ""
-  }
+  },
+  "guides": [
+   {
+    "href": "/guide/nazotoki-kenshu/",
+    "label": "謎解き研修とは？効果・進め方"
+   },
+   {
+    "href": "/guide/nazotoki-event/",
+    "label": "謎解きイベントの企画・制作ガイド"
+   },
+   {
+    "href": "/guide/nazotoki-company/",
+    "label": "謎解き制作会社の選び方・費用相場"
+   },
+   {
+    "href": "/guide/madamis-kenshu/",
+    "label": "マダミス研修という選択肢"
+   },
+   {
+    "href": "/guide/shanai-event/",
+    "label": "社内イベントの企画アイデア"
+   }
+  ]
  },
  "murder": {
   "crumb": "マーダーミステリー制作",
@@ -299,7 +321,44 @@ export const SERVICES: Record<ServiceSlug, any> = {
    "body": [
     "株式会社ex Labsは、オンライン・オフラインを問わず**マーダーミステリー作品の企画・シナリオ制作**を承っています。物語への没入と推理の面白さを両立させた、**目的に合わせたオリジナル作品**をお届けします。"
    ],
-   "facts": [],
+   "facts": [
+    {
+     "k": "ご依頼いただける内容",
+     "items": [
+      "オリジナルのシナリオ・キャラクター資料",
+      "GM進行台本・証拠カード等の制作物",
+      "告知素材",
+      "当日運営",
+      "既存作品の貸切実施"
+     ]
+    },
+    {
+     "k": "こんな方におすすめ",
+     "items": [
+      "店舗・宿泊施設・商業施設の集客担当の方",
+      "動画・配信の企画者の方",
+      "イベント主催者の方",
+      "企業の研修・社内イベント担当の方"
+     ]
+    },
+    {
+     "k": "実施形式",
+     "items": [
+      "対面（店舗・施設・イベント会場）",
+      "オンライン・配信",
+      "宿泊プラン組み込み型"
+     ],
+     "note": "新規オリジナル制作と既存作品の導入、シナリオのみと運営込みを選べます。"
+    },
+    {
+     "k": "これまでの実績",
+     "items": [
+      "宿泊施設向けオリジナル作品（新規宿泊予約**20件以上**、告知はXのみ）",
+      "評価サイト「毎月マダミスアンケート」**3か月連続1位**の作品",
+      "20作品以上の制作"
+     ]
+    }
+   ],
    "definition": "マダミスとはマーダーミステリーの略称・通称で、参加者が物語の登場人物になりきり、会話と推理を通じて事件の犯人を突き止める体験型ゲームです。当社では、このマダミスの制作・シナリオ依頼を、動画企画から店舗集客・イベントまで目的に応じてお受けしています。"
   },
   "sections": [
@@ -332,7 +391,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "01",
       "title": "サーマル​クライム​スタジオ様（宿泊施設）",
-      "sub": "宿泊者向けマーダーミステリー\u200Bコンテンツを制作。",
+      "sub": "宿泊者向けマーダーミステリー​コンテンツを制作。",
       "bullets": [
        "実施後、新規宿泊予約20件以上の獲得につながった実績",
        "コンテンツによる集客効果を実証"
@@ -400,6 +459,42 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ]
    },
    {
+    "id": "terms",
+    "en": "Terms",
+    "ja": [
+     "ご依頼の条件"
+    ],
+    "lead": "「何を、いくらで、どこまで頼めるか」を先にお伝えします。当社にご依頼いただく場合の目安です。",
+    "type": "kv",
+    "items": [
+     {
+      "k": "対応範囲",
+      "v": "①シナリオ・キャラクター資料のみ／②制作物込み（印刷データ・小道具・GM進行台本）／③集客・当日運営込み（フルパッケージ）。企業・施設向けのオリジナル制作と、既存作品の貸切実施の両方に対応"
+     },
+     {
+      "k": "参考価格（前提つき）",
+      "v": "①6〜8人・2〜3時間の1作品で数十万円台〜／②①に制作物を含めて100万円前後まで／③施設・宿泊施設向けオリジナル＋当日運営で100万円前後〜（公演回数・キャスト有無で変動）。集客型（有料チケット）はレベニューシェア（初期費用0円）も選択可"
+     },
+     {
+      "k": "納期",
+      "v": "既存作品の貸切実施：2〜4週間／オリジナル制作：最短1ヶ月、標準1〜3ヶ月（テストプレイ2回以上を含む）。日程はご相談に応じます"
+     },
+     {
+      "k": "納品物",
+      "v": "シナリオ、各キャラクターのハンドアウト（HO）、GM進行台本、証拠カード等の印刷データ、運営マニュアル、必要に応じて告知用ビジュアル"
+     },
+     {
+      "k": "利用条件",
+      "v": "継続公演・再演・改変・動画配信・他会場での再利用の扱いは契約時に個別に取り決めます。参加者の個人情報や施設の機密は当社が保護します"
+     },
+     {
+      "k": "ご準備いただくもの",
+      "v": "会場（個室または区画）、実施日程、想定人数・参加者層、当日の受付・誘導（運営込みプランでは不要）、施設内での告知協力"
+     }
+    ],
+    "note": "参考価格は当社の過去案件をもとにした目安で、人数・時間・制作物の量・公演回数・会場条件で変わります。正式なお見積りは、ヒアリング（無料）後に前提条件を明記してご提示します。"
+   },
+   {
     "id": "faq",
     "en": "FAQ",
     "ja": [
@@ -441,7 +536,41 @@ export const SERVICES: Record<ServiceSlug, any> = {
    ],
    "label": "マーダーミステリー制作について相談する",
    "note": ""
-  }
+  },
+  "guides": [
+   {
+    "href": "/guide/madamis/",
+    "label": "マダミスとは？完全ガイド"
+   },
+   {
+    "href": "/guide/madamis-seisaku/",
+    "label": "マダミス制作とは（依頼の流れ・事例）"
+   },
+   {
+    "href": "/guide/madamis-cost/",
+    "label": "マダミス制作の費用相場"
+   },
+   {
+    "href": "/guide/madamis-company/",
+    "label": "マダミス制作会社の選び方"
+   },
+   {
+    "href": "/guide/madamis-business/",
+    "label": "企業・店舗のマダミス活用"
+   },
+   {
+    "href": "/guide/madamis-haishin/",
+    "label": "動画・配信用マダミスの制作依頼"
+   },
+   {
+    "href": "/guide/madamis-making/",
+    "label": "マダミスの作り方"
+   },
+   {
+    "href": "/guide/hotel-event/",
+    "label": "宿泊施設の集客イベント"
+   }
+  ]
  },
  "shisetsu": {
   "crumb": "施設活用イベント",
@@ -865,7 +994,41 @@ export const SERVICES: Record<ServiceSlug, any> = {
    ],
    "label": "施設で実施できる企画を相談する",
    "note": ""
-  }
+  },
+  "guides": [
+   {
+    "href": "/guide/shisetsu-katsuyo/",
+    "label": "施設活用イベントとは"
+   },
+   {
+    "href": "/guide/case-uwasabanashi/",
+    "label": "渋谷サクラステージの制作事例"
+   },
+   {
+    "href": "/guide/shogyoshisetsu-event/",
+    "label": "商業施設の集客イベントアイデア"
+   },
+   {
+    "href": "/guide/shuyu-event-seisaku/",
+    "label": "周遊イベントの制作依頼"
+   },
+   {
+    "href": "/guide/event-revenue-share/",
+    "label": "レベニューシェアの仕組みと計算例"
+   },
+   {
+    "href": "/guide/eigyo-jikangai/",
+    "label": "営業時間外・閉店後の施設活用"
+   },
+   {
+    "href": "/guide/event-hiyou/",
+    "label": "体験型イベントの費用相場"
+   },
+   {
+    "href": "/guide/saiji/",
+    "label": "催事とは"
+   }
+  ]
  },
  "zunousen": {
   "crumb": "頭脳戦制作",
@@ -951,7 +1114,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      ]
     }
    ],
-   "definition": "頭脳戦とは、交渉・推理・駆け引きといった「頭脳」を武器に、参加者同士が勝敗を競う対戦型ゲームの総称です。相手の思考を読み合う心理戦はその中核要素にあたり、「頭脳戦＝ルールと論理を使った戦い全体」「心理戦＝相手の心を読み合う駆け引き」という関係にあります。"
+   "definition": "頭脳戦とは、交渉・推理・駆け引きといった「頭脳」を武器に、参加者同士が勝敗を競う対戦型ゲームの総称です。相手の思考を読み合う心理戦はその中核要素にあたり、「頭脳戦＝ルールと論理を使った戦い全体」「心理戦＝相手の心を読み合う駆け引き」という関係にあります。英語では mind game（心理的な駆け引き）、strategy game（戦略ゲーム）が近い表現です。"
   },
   "sections": [
    {
@@ -1214,7 +1377,37 @@ export const SERVICES: Record<ServiceSlug, any> = {
    ],
    "label": "頭脳戦ゲームの制作を相談する",
    "note": ""
-  }
+  },
+  "guides": [
+   {
+    "href": "/guide/zunousen/",
+    "label": "頭脳戦とは？意味・種類・ゲーム例"
+   },
+   {
+    "href": "/guide/zunousen-seisaku/",
+    "label": "頭脳戦制作とは？作り方・依頼の流れ"
+   },
+   {
+    "href": "/guide/zunousen-cost/",
+    "label": "頭脳戦・心理戦ゲームの制作費用"
+   },
+   {
+    "href": "/guide/zunousen-game/",
+    "label": "頭脳戦ゲームの種類と選び方"
+   },
+   {
+    "href": "/guide/zunousen-tournament/",
+    "label": "大人数の頭脳戦イベント・大会の企画"
+   },
+   {
+    "href": "/guide/shinrisen/",
+    "label": "心理戦とは"
+   },
+   {
+    "href": "/guide/shinrisen-game/",
+    "label": "心理戦ゲームとは？おすすめ10選"
+   }
+  ]
  },
  "immersive": {
   "crumb": "イマーシブ制作",
@@ -1582,7 +1775,41 @@ export const SERVICES: Record<ServiceSlug, any> = {
    ],
    "label": "イマーシブ制作を相談する",
    "note": ""
-  }
+  },
+  "guides": [
+   {
+    "href": "/guide/immersive/",
+    "label": "イマーシブとは？完全ガイド"
+   },
+   {
+    "href": "/guide/immersive-seisaku/",
+    "label": "イマーシブ制作とは（工程・費用・依頼方法）"
+   },
+   {
+    "href": "/guide/immersive-cost/",
+    "label": "イマーシブ制作の費用相場"
+   },
+   {
+    "href": "/guide/immersive-company/",
+    "label": "イマーシブ制作会社の選び方"
+   },
+   {
+    "href": "/guide/immersive-making/",
+    "label": "イマーシブイベントの作り方"
+   },
+   {
+    "href": "/guide/immersive-event/",
+    "label": "イマーシブの企業活用事例"
+   },
+   {
+    "href": "/guide/ip-event/",
+    "label": "IP・キャラクターの体験型イベント制作"
+   },
+   {
+    "href": "/guide/case-uwasabanashi/",
+    "label": "渋谷サクラステージの制作事例"
+   }
+  ]
  }
 };
 export const SERVICE_LINKS: { slug: ServiceSlug; label: string; href: string }[] = [

@@ -35,7 +35,7 @@ const {
   contact,
   footer = 'full',
 } = Astro.props;
-const cutKey = 'exl_cut:' + Astro.url.pathname;
+const cutKey = 'exl_cut:' + Astro.url.pathname.replace(/[^A-Za-z0-9/_-]/g, '').slice(0, 120);
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 // Canonical always uses the trailing-slash form: SSR routes answer
@@ -167,11 +167,12 @@ const orgLd = {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 {/* ヘッダー・ヒーローの白ロゴ（LCP候補）を最優先で先読み。 */}
 <link rel="preload" as="image" href="/assets/exlabs-logo-w.png" fetchpriority="high">
+<link rel="preload" as="font" type="font/woff2" href="/fonts/italiana-latin.woff2" crossorigin>
 {/* Webフォントは非同期読み込み（media=print→onloadでall）。display=swap で取得前もフォールバックで即表示。
     Italiana・しっぽり明朝・Zen Kaku Gothic New は 2026-09 リニューアルの書体、Noto・Montserrat は既存の解説記事用。 */}
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Italiana&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Montserrat:wght@600;700;800&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Montserrat:wght@600;700;800&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Montserrat:wght@600;700;800&display=swap"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Montserrat:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Montserrat:wght@600;700;800&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Montserrat:wght@600;700;800&display=swap"></noscript>
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <script type="application/ld+json" set:html={jsonLd(websiteLd)} />
 <SiteGuard />

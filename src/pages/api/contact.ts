@@ -86,12 +86,24 @@ export const POST: APIRoute = async ({ request }) => {
   const catLabel = CATEGORY_LABEL[category] ?? '';
   const baseSubject = ((get('_subject') || '【ex Labs】サイトからのお問い合わせ') + (catLabel ? `（${catLabel}）` : '')).slice(0, 150);
   const source = get('_source').slice(0, 1500);
+  // 営業・スパムの判定は記録（管理画面の集計）にだけ使う。2026-09-28 以降は件名に印を付けず、
+  // 控えメールも止めない（件名の印でメールソフトの迷惑メールに振り分けられ、重要な問い合わせを見落としたため）。
   const spam = spamCheck(`${baseSubject}\n${lines.join('\n')}`, source, email, totalLen);
-  const subject = spam ? `【営業・スパムの疑い】${baseSubject}` : baseSubject;
+  const subject = baseSubject;
+  // 同じ内容の再送（連打・同じ営業文の繰り返し送信）だけは通知メールを送らない。
+  // 判定はメールアドレスに関係なく「入力内容そのもの」が過去30日に届いたものと同じかどうか。
+  // 記録（KV）が使えない場合は判定できないので、通常どおりメールを送る。
+  const norm = lines.join('\n').replace(/\s+/g, ' ').trim().toLowerCase();
+  const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(norm)))).map((b) => b.toString(16).padStart(2, '0')).join('');
+  // INCR は初回 1。KV 未設定・障害時は null（→ 重複扱いにしない）
+  const seen = await redis('INCR', `contact:dup:${digest}`);
+  if (seen === 1) await redis('EXPIRE', `contact:dup:${digest}`, String(60 * 60 * 24 * 30));
+  const duplicate = typeof seen === 'number' && seen > 1;
   const record = {
     id: crypto.randomUUID(),
     subject,
     spam,
+    duplicate,
     email,
     fields: lines.join('\n\n'),
     source,
@@ -109,10 +121,10 @@ export const POST: APIRoute = async ({ request }) => {
     await redis('LTRIM', CONTACT_LOG_KEY, '0', '499');
   }
 
+  // 同じ内容の再送は記録だけ残し、通知・控えメールは送らない（受付済みとして完了画面へ）
+  if (duplicate && stored) return redirect();
+
   const body =
-    (spam
-      ? `※自動判定: 営業・スパムの可能性が高い送信です（送信者への自動控えメールは送っていません）。\n\n`
-      : '') +
     `サイトのお問い合わせフォームから送信がありました。\n\n${record.fields}\n\n` +
     `——\n送信者メールアドレス: ${email}\n受信日時: ${record.createdAt}\n` +
     (source ? `流入元:\n${source}\n` : '') +
@@ -121,12 +133,13 @@ export const POST: APIRoute = async ({ request }) => {
 
   // 送信者への自動控えメール。受付が成立した場合のみ送る。
   // 返信先は info@ なので、送信者がこのメールに返信すればそのまま届く。
-  // 営業スパム判定時は送らない（営業リストに「生きているアドレス」と
-  // 認識させないため。誤判定でも本人には後から手動で返信できる）。
-  if (!spam && (stored || mailed)) {
+  if (stored || mailed) {
+    // 控えメールは入力者以外のアドレスにも送れてしまうため、第三者宛の迷惑メール・フィッシングの踏み台に
+    // されないよう、本文中の URL は伏せ、長さも抑える（管理者宛の通知メールには原文を載せる）。
+    const receiptFields = record.fields.replace(/(https?:\/\/|www\.)\S+/gi, '［URLは省略］').slice(0, 3000);
     const receipt =
       `お問い合わせありがとうございます。\n以下の内容で受け付けました。\n\n` +
-      `${record.fields}\n\n——\n` +
+      `${receiptFields}\n\n——\n` +
       `担当者より2営業日以内に折り返しご連絡いたします。\n` +
       `お急ぎの場合は info@kabuexlabs.com までご連絡ください。\n\n` +
       `株式会社ex Labs\nhttps://kabuexlabs.com/`;
@@ -134,7 +147,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   // 送信成功の計測（個人情報なし：送信ページのパスとカテゴリのみ）
-  if (!spam && (stored || mailed)) {
+  if (stored || mailed) {
     const sentFrom = (/送信したページ: (\S+)/.exec(source)?.[1] ?? '').replace(/^https?:\/\/[^/]+/, '').split('?')[0].split('#')[0] || '/';
     await recordMetric('submit', sentFrom.slice(0, 120), /^[a-z][a-z0-9-]{0,39}$/.test(category) ? category : '');
   }

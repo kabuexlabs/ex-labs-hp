@@ -6,6 +6,8 @@
   --x-glow:0 0 14px rgba(255,255,255,.55),0 0 36px rgba(214,160,255,.55);
   --x-mask28:radial-gradient(circle at 0 0,#0000 28px,#000 29px) top left/51% 51% no-repeat,radial-gradient(circle at 100% 0,#0000 28px,#000 29px) top right/51% 51% no-repeat,radial-gradient(circle at 0 100%,#0000 28px,#000 29px) bottom left/51% 51% no-repeat,radial-gradient(circle at 100% 100%,#0000 28px,#000 29px) bottom right/51% 51% no-repeat;
   --x-mask22:radial-gradient(circle at 0 0,#0000 22px,#000 23px) top left/51% 51% no-repeat,radial-gradient(circle at 100% 0,#0000 22px,#000 23px) top right/51% 51% no-repeat,radial-gradient(circle at 0 100%,#0000 22px,#000 23px) bottom left/51% 51% no-repeat,radial-gradient(circle at 100% 100%,#0000 22px,#000 23px) bottom right/51% 51% no-repeat}
+/* Italiana（英字見出し・数字）は自社配信（OFL）。先読み＋block で、読み込み途中に代替書体で数字が崩れて見えるのを防ぐ */
+@font-face{font-family:'Italiana';font-style:normal;font-weight:400;font-display:block;src:url('/fonts/italiana-latin.woff2') format('woff2')}
 html{scroll-padding-top:104px}
 @keyframes exMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes exCutBand{0%{transform:translateX(-110%) skewX(-14deg)}45%{transform:translateX(0) skewX(-14deg)}100%{transform:translateX(110%) skewX(-14deg)}}
@@ -90,7 +92,7 @@ body.x-legacy .breadcrumb{padding-top:28px}
 /* ---- マーキー ---- */
 .x-mq{display:flex;width:max-content;animation:exMarquee var(--dur,40s) linear infinite}
 .x-mq.is-rev{animation-direction:reverse}
-.x-mq:hover{animation-play-state:paused}
+@media(hover:hover){.x-mq:hover{animation-play-state:paused}}
 @media(prefers-reduced-motion:reduce){.x-mq{animation:none}}
 
 /* ---- RichText ---- */
@@ -141,3 +143,7 @@ footer.x-foot::before{content:none}
 .x-foot-top{justify-self:center;margin-top:12px;padding:8px 4px;border-bottom:1px solid var(--x-ink);font-family:var(--x-en);font-size:15px;letter-spacing:.14em}
 /* 幅360px以下：狭い列だと長いカタカナ語（コミュニケーション等）が途中で折れるため、横スクロールのカード幅を広げる（次のカードは少し見えたまま） */
 @media(max-width:360px){.x-rail{grid-auto-columns:max(var(--col),86%)}}
+/* 旧デザインの「クラス名が -grid で終わる要素の子を、旧セクションの表示時まで透明にする」演出（global.css）を、新デザインの領域では無効にする */
+.x-root [class$="-grid"]>*,.x-end [class$="-grid"]>*{opacity:1;transform:none}
+/* 数字・英字の見出し（Italiana）は途中で折り返さない */
+.x-root .x-sh-en,.x-plate-en,.x-foot-copy{overflow-wrap:normal}

@@ -25,7 +25,6 @@ const dm = def.match(/^\**([^、。*]+?)\**とは/);
 const defTitle = dm ? dm[1] + 'とは' : '';
 const CONTACT: Record<ServiceSlug, ContactType> = { nazotoki: 'kenshu', murder: 'madamis', shisetsu: 'shisetsu', immersive: 'immersive', zunousen: 'zunousen' };
 const related = SERVICE_LINKS.filter((l) => l.slug !== slug);
-const marquee = ['work-2.webp', 'work-1.webp', 'work-8.webp', 'work-3.webp', 'events/atelier-copel.webp', 'events/uwasabanashi-kv.webp', 'events/kaitou-kv.webp'].map((f) => '/assets/' + f);
 const faqSec = sections.find((s) => s.type === 'faq');
 const faqLd = faqSec ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqSec.items.map((f: any) => ({ '@type': 'Question', name: flat(f.q), acceptedAnswer: { '@type': 'Answer', text: flat(f.a) } })) } : null;
 const crumbLd = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
@@ -65,9 +64,6 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
       </div>
     </nav>
   </div>
-  <div class="xs-mq-wrap" aria-hidden="true"><div class="x-mq" style="--dur:60s;gap:12px">
-    {[...marquee, ...marquee].map((src) => <img src={src} alt="" loading="lazy" decoding="async">)}
-  </div></div>
 </section>
 
 <section id="about" class="xs-intro">
@@ -215,6 +211,15 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
 
 <section class="xs-related">
   <div class="xs-sec-in">
+    {raw.guides?.length > 0 && (
+      <div style="margin-bottom:72px">
+        <p class="xs-rel-en">Guide</p>
+        <p class="xs-rel-ja">関連する解説記事</p>
+        <div class="xs-rel-list">
+          {(raw.guides as { href: string; label: string }[]).map((g) => <a href={g.href}><span><span class="x-c">+ ·</span> <Cls text={g.label} emph={false} /></span><span aria-hidden="true">→</span></a>)}
+        </div>
+      </div>
+    )}
     <p class="xs-rel-en">Other Services</p>
     <p class="xs-rel-ja">関連サービス</p>
     <div class="xs-rel-list">
@@ -234,13 +239,11 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
 .xs-ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:40px}
 .xs-cta{font-size:clamp(14px,4vw,16px);padding:16px 26px}
 .xs-note{margin:18px 0 0;font-size:13px;line-height:1.9;color:var(--x-pale3)}
-.xs-toc{margin-top:56px;padding-top:24px;border-top:1px solid rgba(255,255,255,.3)}
+.xs-toc{margin-top:56px;margin-bottom:0;padding-top:24px;border-top:1px solid rgba(255,255,255,.3)}
 .xs-toc-h{margin:0;font-family:var(--x-en);font-size:16px;letter-spacing:.16em;color:var(--x-lime)}
 .xs-toc-h span{font-family:var(--x-min);font-size:13px;letter-spacing:.06em;color:#fff;margin-left:12px}
 .xs-toc-a{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:baseline;padding:14px 16px;background:var(--x-panel);font-family:var(--x-min);font-weight:600;font-size:14px;line-height:1.6}
 .xs-toc-no{white-space:nowrap;font-family:var(--x-en);font-size:18px;color:var(--x-lime)}
-.xs-mq-wrap{margin-top:clamp(56px,8vw,96px);overflow:hidden}
-.xs-mq-wrap img{height:clamp(140px,22vw,220px);width:auto;display:block}
 .xs-intro{padding:clamp(72px,10vw,120px) 16px 120px}
 .xs-card{max-width:960px;margin:0 auto;padding:clamp(48px,7vw,88px) clamp(20px,6vw,80px)}
 .xs-intro-h{margin:18px 0 0;font-family:var(--x-min);font-weight:500;font-size:clamp(23px,4.4vw,44px);line-height:1.45;letter-spacing:.04em}
