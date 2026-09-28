@@ -1,0 +1,44 @@
+---
+// /events/ 検索結果：同じ公演の公演回を1枚にまとめたカード（2026-09-28 クライアント指示：公演概要とチケットサイトへのボタンのみ）。
+// 開催日は日付チップで並べ、条件に合う日だけ表示する。data-rows はブラウザ側の即時絞り込み用（個人情報なし）。
+import type { AnyResolved } from '../../lib/events';
+import { isListing } from '../../lib/events';
+import { fmtDateShort } from '../../lib/thisWeek';
+import { genreName, areaName, regionName } from '../../data/events/areas';
+import Cls from './Cls.astro';
+
+interface Props { rows: AnyResolved[]; show: string[]; place: string }
+const { rows, show, place } = Astro.props;
+const first = rows[0];
+const showSet = new Set(show);
+let title = '', summary = '', where = '', ticket = '', track = 'ticket', showId = '', btn = 'チケットサイトで空席を見る ↗', rel = 'noopener';
+if (isListing(first)) {
+  const l = first.listing;
+  title = l.title; summary = `${l.genres.map(genreName).join('・')}｜${l.organizerName}`; where = `${regionName(l.regionId)}・${areaName(l.areaId)}${l.venueName ? `／${l.venueName}` : ''}`;
+  ticket = l.url; track = 'ev-ext'; showId = first.site.id; btn = `${first.site.name}で詳細・予約を見る ↗`; rel = 'noopener nofollow';
+} else {
+  const { work, venue } = first;
+  const next = rows.find((r) => !isListing(r) && !['ended', 'cancelled'].includes(r.cta)) ?? first;
+  title = work.title; summary = work.summary; where = `${regionName(venue.regionId)}・${areaName(venue.areaId)}／${venue.name}`;
+  ticket = !isListing(next) ? (next.occ.sales.channels[0]?.url ?? work.ticketUrl ?? work.officialUrl) : work.officialUrl; showId = work.id;
+}
+---
+<article class="xgc" data-rows={JSON.stringify(rows.map((r) => r.row))}>
+  <ul class="xgc-dates" aria-label="開催日">
+    {rows.map((r) => <li data-rid={r.row.id} hidden={showSet.has(r.row.id) ? undefined : true}><time datetime={r.row.date}>{fmtDateShort(r.row.date)}</time></li>)}
+  </ul>
+  <h3 class="xgc-t">{title}</h3>
+  <p class="xgc-where"><Cls text={where} emph={false} /></p>
+  <p class="xgc-sum"><Cls text={summary} emph={false} /></p>
+  {ticket && <a class="xgc-btn" href={ticket} target="_blank" rel={rel} data-track={track} data-show={showId} data-place={place}><Cls text={btn} emph={false} /></a>}
+</article>
+<style>
+.xgc{background:var(--x-panel);padding:clamp(20px,3vw,32px);display:grid;gap:12px;align-content:start}
+.xgc-dates{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.xgc-dates li{background:var(--x-card);color:var(--x-blue);font-family:var(--x-min);font-weight:700;font-size:14px;padding:6px 12px;white-space:nowrap}
+.xgc-dates li[hidden]{display:none}
+.xgc-t{margin:4px 0 0;font-family:var(--x-min);font-weight:700;font-size:clamp(21px,2.6vw,26px);line-height:1.4}
+.xgc-where{margin:-4px 0 0;font-size:12px;line-height:1.7;color:var(--x-pale2)}
+.xgc-sum{margin:0;font-size:14px;line-height:1.9;color:var(--x-pale)}
+.xgc-btn{justify-self:start;margin-top:4px;background:var(--x-lime);color:var(--x-ink)!important;border-radius:999px;padding:12px 22px;font-family:var(--x-min);font-weight:700;font-size:14px}
+</style>

@@ -12,7 +12,7 @@ import SecHead from '../../components/x/SecHead.astro';
 import Ph from '../../components/x/Ph.astro';
 import Cls from '../../components/x/Cls.astro';
 import ScheduleCard from '../../components/x/ScheduleCard.astro';
-import SessionCard from '../../components/x/SessionCard.astro';
+import ShowGroupCard from '../../components/x/ShowGroupCard.astro';
 import { shows as calendarShows } from '../../data/shows';
 import { eventsData, EVENTS_CONTACT, LIST_DAYS } from '../../data/events/index';
 import { AREAS, GENRES, REGIONS, areaName, regionName } from '../../data/events/areas';
@@ -97,6 +97,18 @@ const whens: { k: Criteria['when']; label: string; sub: string }[] = [
 ];
 // 「これから90日」の一覧は出さない（2026-09-28 クライアント指示）。日付の条件（今日・明日・今週末・日付指定）を選んだときだけ公演回の一覧を表示する
 const noWhen = c.when === 'all';
+// 検索結果は同じ公演の公演回を1枚にまとめる（2026-09-28 クライアント指示）。自社公演は作品ごと、外部掲載は1件ずつ
+const live = all.filter((r) => !['ended', 'cancelled'].includes(r.eventState));
+const groupKey = (r: AnyResolved) => (isListing(r) ? r.row.id : `w:${r.row.workId}`);
+const groups = [...live.reduce((m, r) => m.set(groupKey(r), [...(m.get(groupKey(r)) ?? []), r]), new Map<string, AnyResolved[]>()).values()];
+const idsOf = (xs: AnyResolved[]) => new Set(xs.map((r) => r.row.id));
+const mIds = idsOf(result.matched), uIds = idsOf(result.unknown);
+const gMatched = groups.filter((g) => g.some((r) => mIds.has(r.row.id)));
+const gUnknown = groups.filter((g) => !g.some((r) => mIds.has(r.row.id)) && g.some((r) => uIds.has(r.row.id)));
+const gRest = groups.filter((g) => !gMatched.includes(g) && !gUnknown.includes(g));
+const firstShown = (g: AnyResolved[], ids: Set<string>) => g.find((r) => ids.has(r.row.id))?.row.date ?? '9999';
+gMatched.sort((a, b) => firstShown(a, mIds).localeCompare(firstShown(b, mIds)));
+gUnknown.sort((a, b) => firstShown(a, uIds).localeCompare(firstShown(b, uIds)));
 const scheduleShows = calendarShows.filter((s) => s.published && s.occurrences.some((o) => o.date >= today));
 const areaOf = (r: AnyResolved) => place(r);
 const worksCards = eventsData.works.filter((w) => w.published).map((w) => {
@@ -128,7 +140,6 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
           <a href={`/events/?when=${x.k}#results`} class="xe-count" data-when-go={x.k}><span class="xe-count-l">{x.label}</span><span class="xe-count-n">{x.n}<span>件</span></span><span class="xe-count-s">{x.sub}</span></a>
         ))}
       </div>
-      <div class="xe-tags"><span class="is-fill">日本時間で毎日更新</span><span>予約は各公式販売ページ</span></div>
     </div>
   </div>
 </section>
@@ -173,7 +184,7 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
         <p class="xe-adv-note"><Ph list={['開演時刻・終了時刻・上限人数が', '未確認の公演は、', 'これらの条件に「合う」とは扱わず、', '結果の下に', '「条件を判定できない公演」として', '分けて表示します。']} /></p>
       </details>
       <div class="xe-submit">
-        <button type="submit" class="xe-go"><span data-go-when hidden={!noWhen ? true : undefined}>いつ遊ぶかを選んで探す</span><span data-go-count hidden={noWhen ? true : undefined}>この条件で探す（<span data-count>{result.matched.length}</span>件）</span></button>
+        <button type="submit" class="xe-go"><span data-go-when hidden={!noWhen ? true : undefined}>いつ遊ぶかを選んで探す</span><span data-go-count hidden={noWhen ? true : undefined}>この条件で探す（<span data-gcount>{gMatched.length}</span>件）</span></button>
         <a class="xe-reset" href="/events/">条件をリセット</a>
       </div>
     </form>
@@ -191,12 +202,12 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
           {g.rows.length === 0 ? (
             <>
               <p class="xe-gl-msg"><Cls text={g.empty} emph={false} /></p>
-              {g.next && <a class="xe-gl-go" href={`/events/?when=date&date=${g.next}#results`}>その日の公演回を見る →</a>}
+              {g.next && <a class="xe-gl-go" href="#schedule">開催日カレンダーからチケットサイトへ →</a>}
             </>
           ) : (
             <>
               <ul class="xe-gl-ul">{g.rows.map((r) => <li><span class="xe-gl-d">{fmtDateShort(r.row.date)}</span><span><strong>{label(r)}</strong><span class="xe-gl-a">{areaOf(r)}</span><span class="xe-gl-a">{timeOf(r)}</span></span></li>)}</ul>
-              <a class="xe-gl-go" href={`/events/?when=${g.when}#results`} data-when-go={g.when}>{g.en === 'Today' ? '今日' : g.en === 'Tomorrow' ? '明日' : '今週末'}の公演回を見る →</a>
+              <a class="xe-gl-go" href="#schedule">{g.en === 'Today' ? '今日' : g.en === 'Tomorrow' ? '明日' : '今週末'}の公演のチケットサイトへ →</a>
             </>
           )}
         </div>
@@ -208,12 +219,12 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
     <div id="ev-res-block" hidden={noWhen ? true : undefined}>
     <div class="xe-res-h">
       <p class="xe-res-en">Results</p>
-      <h2 class="xe-res-t"><span data-window-label>{windowLabel}</span>の公演回<span class="xe-res-n"><span data-count>{result.matched.length}</span>件</span></h2>
+      <h2 class="xe-res-t"><span data-window-label>{windowLabel}</span>の公演<span class="xe-res-n"><span data-gcount>{gMatched.length}</span>件</span></h2>
       <p class="xe-res-note"><Ph list={['開催日時順。', '主催者による優先表示はしていません。']} /><span class="x-c">掲載基準と修正依頼は<a href="/events/about/" style="border-bottom:1px solid;color:#fff">サービスについて</a>をご覧ください。</span></p>
     </div>
 
-    <div id="ev-zero" class="xe-zero" hidden={result.matched.length > 0}>
-      <p class="xe-zero-t"><Ph list={['この条件に合う公演回は', '見つかりませんでした。']} /></p>
+    <div id="ev-zero" class="xe-zero" hidden={gMatched.length > 0}>
+      <p class="xe-zero-t"><Ph list={['この条件に合う公演は', '見つかりませんでした。']} /></p>
       <p class="xe-zero-s">条件に合わない公演は表示していません。日付や人数を変えるか、次の候補日をお試しください。</p>
       <div class="xe-zero-btns">
         <a class="xe-zero-next" hidden={!nextDate} href={nextDate ? `/events/${criteriaToQuery({ ...c, when: 'date', date: nextDate })}#results` : '/events/'} data-next-date>{nextDate ? `次に候補がある日：${fmtDateJa(nextDate)}` : ''}</a>
@@ -223,19 +234,19 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
     </div>
 
     <ul class="xe-list" id="ev-matched">
-      {result.matched.map((r) => <li><SessionCard r={r} place="events" /></li>)}
+      {gMatched.map((g) => <li><ShowGroupCard rows={g} show={g.filter((r) => mIds.has(r.row.id)).map((r) => r.row.id)} place="events" /></li>)}
     </ul>
 
-    <details class="xe-unknown" id="ev-unknown" hidden={result.unknown.length === 0} open={result.matched.length === 0 && result.unknown.length > 0}>
-      <summary><span>条件を判定できない公演<span class="xe-unk-n" data-unknown-count>{result.unknown.length}</span>件</span><span class="x-faq-plus" aria-hidden="true">+</span></summary>
+    <details class="xe-unknown" id="ev-unknown" hidden={gUnknown.length === 0} open={gMatched.length === 0 && gUnknown.length > 0}>
+      <summary><span>条件を判定できない公演<span class="xe-unk-n" data-unknown-count>{gUnknown.length}</span>件</span><span class="x-faq-plus" aria-hidden="true">+</span></summary>
       <p class="xe-unk-note"><Ph list={['開演時刻・終了時刻・上限人数・', '開催の確認が取れていないため、', '条件に合うかを判定できません。', '公式ページでご確認ください。']} /></p>
       <ul class="xe-list" id="ev-unknown-list">
-        {result.unknown.map((r) => <li><SessionCard r={r} place="events-unknown" /></li>)}
+        {gUnknown.map((g) => <li><ShowGroupCard rows={g} show={g.filter((r) => uIds.has(r.row.id)).map((r) => r.row.id)} place="events-unknown" /></li>)}
       </ul>
     </details>
     </div>
     <ul class="xe-list" id="ev-rest" hidden>
-      {all.filter((r) => !result.matched.includes(r) && !result.unknown.includes(r) && !['ended', 'cancelled'].includes(r.eventState)).map((r) => <li><SessionCard r={r} place="events" /></li>)}
+      {gRest.map((g) => <li><ShowGroupCard rows={g} show={[]} place="events" /></li>)}
     </ul>
   </div>
 </section>
@@ -333,26 +344,27 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
       const win = dateWindow(c, now);
       let nMatch = 0, nUnknown = 0;
       const nextDates: string[] = [];
+      const firstDate = new Map<HTMLLIElement, string>();
+      // 同じ公演の公演回を1枚にまとめたカード：条件に合う日だけ日付チップを出し、合う日が1つでもあれば結果に並べる
       for (const li of items()) {
-        const card = li.querySelector<HTMLElement>('.ev-card');
+        const card = li.querySelector<HTMLElement>('.xgc');
         if (!card) continue;
-        let row: any;
-        try { row = JSON.parse(card.dataset.row || ''); } catch { continue; }
-        const es = eventState(row, now);
-        if (es === 'ended' || es === 'cancelled') { li.remove(); continue; }
-        const m = matchCriteria(row, c, now, win);
-        if (m === 'match') { matched.appendChild(li); nMatch++; }
-        else if (m === 'unknown') { unknownList.appendChild(li); nUnknown++; }
-        else { rest.appendChild(li); if (row.date >= today && matchCriteria(row, { ...c, when: 'all', date: undefined }, now, null) === 'match') nextDates.push(row.date); }
+        let rows: any[];
+        try { rows = JSON.parse(card.dataset.rows || '[]'); } catch { continue; }
+        const live = rows.filter((r) => { const es = eventState(r, now); return es !== 'ended' && es !== 'cancelled'; });
+        if (!live.length) { li.remove(); continue; }
+        const mm = live.filter((r) => matchCriteria(r, c, now, win) === 'match');
+        const uu = mm.length ? [] : live.filter((r) => matchCriteria(r, c, now, win) === 'unknown');
+        const shown = new Set((mm.length ? mm : uu).map((r) => r.id));
+        card.querySelectorAll<HTMLElement>('[data-rid]').forEach((el) => { el.hidden = !shown.has(el.dataset.rid || ''); });
+        if (mm.length) { matched.appendChild(li); nMatch++; firstDate.set(li, mm[0].date); }
+        else if (uu.length) { unknownList.appendChild(li); nUnknown++; firstDate.set(li, uu[0].date); }
+        else { rest.appendChild(li); for (const r of live) if (r.date >= today && matchCriteria(r, { ...c, when: 'all', date: undefined }, now, null) === 'match') nextDates.push(r.date); }
       }
       for (const ul of [matched, unknownList]) {
-        Array.from(ul.children).sort((a, b) => {
-          const ra = JSON.parse((a.querySelector('.ev-card') as HTMLElement).dataset.row || '{}');
-          const rb = JSON.parse((b.querySelector('.ev-card') as HTMLElement).dataset.row || '{}');
-          return ra.date !== rb.date ? (ra.date < rb.date ? -1 : 1) : (ra.start ?? 1e9) - (rb.start ?? 1e9);
-        }).forEach((el) => ul.appendChild(el));
+        Array.from(ul.children as HTMLCollectionOf<HTMLLIElement>).sort((x, y) => (firstDate.get(x) ?? '').localeCompare(firstDate.get(y) ?? '')).forEach((el) => ul.appendChild(el));
       }
-      document.querySelectorAll('[data-count]').forEach((el) => { el.textContent = String(nMatch); });
+      document.querySelectorAll('[data-gcount]').forEach((el) => { el.textContent = String(nMatch); });
       const uc = document.querySelector('[data-unknown-count]'); if (uc) uc.textContent = String(nUnknown);
       const wl = document.querySelector('[data-window-label]'); if (wl) wl.textContent = win ? win.map(fmtDateJa).join('・') : `これから${LIST_DAYS}日以内`;
       const noWhen = c.when === 'all';
@@ -417,9 +429,6 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
 .xe-count-n{white-space:nowrap;font-family:var(--x-en);font-size:clamp(38px,6vw,54px);line-height:1}
 .xe-count-n span{font-family:var(--x-min);font-size:14px;font-weight:700;margin-left:4px}
 .xe-count-s{font-size:12px;color:#4A68D6}
-.xe-tags{margin-top:22px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;font-size:12px;font-weight:700}
-.xe-tags span{border:1px solid var(--x-blue);padding:4px 12px}
-.xe-tags .is-fill{background:var(--x-blue);color:#fff;padding:5px 12px;border:0}
 .xe-sec{padding:0 16px clamp(96px,12vw,130px)}
 .xe-in{max-width:1100px;margin:0 auto}
 .xe-lead{margin:10px 0 0;text-align:center;font-size:14px;color:var(--x-pale)}
@@ -471,7 +480,7 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
 .xe-res-en{margin:0;white-space:nowrap;font-family:var(--x-en);font-size:clamp(22px,3vw,30px);letter-spacing:.1em;color:var(--x-lime)}
 .xe-res-t{margin:0;font-family:var(--x-min);font-weight:700;font-size:clamp(20px,2.8vw,28px);line-height:1.5}
 .xe-res-n{display:inline-block;margin-left:.5em;white-space:nowrap}
-.xe-res-n [data-count]{font-family:var(--x-en);font-size:1.3em}
+.xe-res-n [data-gcount]{font-family:var(--x-en);font-size:1.3em}
 .xe-res-note{margin:0;font-size:13px;line-height:1.8;color:var(--x-pale)}
 .xe-zero{margin-top:32px;border:1px dashed rgba(255,255,255,.5);padding:36px 24px;text-align:center;display:grid;gap:14px;justify-items:center}
 .xe-zero[hidden]{display:none}
