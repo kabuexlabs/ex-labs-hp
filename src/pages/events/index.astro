@@ -193,27 +193,6 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
 
 <section id="results" class="xe-sec" aria-live="polite">
   <div class="xe-in">
-    <div class="xe-glance">
-      {[{ en: 'Today', ja: fmtDateJa(today), rows: todayRows, when: 'today', empty: `今日の開催は確認できていません（今日開催なしと断定するものではありません）。${nextAny ? `次に開催を確認できている日は${fmtDateJa(nextAny)}です。` : ''}`, next: nextAny },
-        { en: 'Tomorrow', ja: fmtDateJa(tomorrow), rows: tomorrowRows, when: 'tomorrow', empty: '明日の開催は確認できていません。', next: null },
-        { en: 'Weekend', ja: weekend.map(fmtDateShort).join('・'), rows: weekendRows, when: 'weekend', empty: '今週末の開催は確認できていません。', next: null }].map((g) => (
-        <div class="xe-gl">
-          <div class="xe-gl-h"><span class="xe-gl-en">{g.en}</span><span class="xe-gl-ja"><Cls text={g.ja} emph={false} /></span></div>
-          {g.rows.length === 0 ? (
-            <>
-              <p class="xe-gl-msg"><Cls text={g.empty} emph={false} /></p>
-              {g.next && <a class="xe-gl-go" href="#schedule">開催日カレンダーからチケットサイトへ →</a>}
-            </>
-          ) : (
-            <>
-              <ul class="xe-gl-ul">{g.rows.map((r) => <li><span class="xe-gl-d">{fmtDateShort(r.row.date)}</span><span><strong>{label(r)}</strong><span class="xe-gl-a">{areaOf(r)}</span><span class="xe-gl-a">{timeOf(r)}</span></span></li>)}</ul>
-              <a class="xe-gl-go" href="#schedule">{g.en === 'Today' ? '今日' : g.en === 'Tomorrow' ? '明日' : '今週末'}の公演のチケットサイトへ →</a>
-            </>
-          )}
-        </div>
-      ))}
-    </div>
-    <p class="xe-gl-note">販売・空席は各公演の公式ページの表示が最新です。{anyStale && <strong>日程が変わっている場合があるため、予約前に公式ページをご確認ください。</strong>}</p>
 
     <p class="xe-pick" id="ev-pick" hidden={!noWhen ? true : undefined}><Ph list={['「いつ遊ぶ？」で', '今日・明日・今週末・日付を選ぶと、', 'その日の公演回が並びます。']} /></p>
     <div id="ev-res-block" hidden={noWhen ? true : undefined}>
@@ -221,6 +200,7 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
       <p class="xe-res-en">Results</p>
       <h2 class="xe-res-t"><span data-window-label>{windowLabel}</span>の公演<span class="xe-res-n"><span data-gcount>{gMatched.length}</span>件</span></h2>
       <p class="xe-res-note"><Ph list={['開催日時順。', '主催者による優先表示はしていません。']} /><span class="x-c">掲載基準と修正依頼は<a href="/events/about/" style="border-bottom:1px solid;color:#fff">サービスについて</a>をご覧ください。</span></p>
+      <p class="xe-res-note">販売・空席は各公演の公式ページの表示が最新です。{anyStale && <strong>日程が変わっている場合があるため、予約前に公式ページをご確認ください。</strong>}</p>
     </div>
 
     <div id="ev-zero" class="xe-zero" hidden={gMatched.length > 0}>
@@ -463,20 +443,7 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
 .xe-submit{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 24px}
 .xe-go{background:var(--x-lime);color:var(--x-ink);border:0;border-radius:999px;padding:16px 36px;font-family:var(--x-min);font-weight:700;font-size:15px;cursor:pointer}
 .xe-reset{border-bottom:1px solid #fff;padding:4px 2px;font-family:var(--x-min);font-weight:700;font-size:14px}
-.xe-glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
-.xe-gl{background:var(--x-panel);padding:22px 22px 24px;display:grid;gap:10px;align-content:start}
-.xe-gl-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
-.xe-gl-en{white-space:nowrap;font-family:var(--x-en);font-size:30px;line-height:1;color:var(--x-lime)}
-.xe-gl-ja{font-family:var(--x-min);font-weight:700;font-size:14px}
-.xe-gl-msg{margin:0;font-size:14px;line-height:1.85;color:var(--x-pale)}
-.xe-gl-go{justify-self:start;color:var(--x-lime)!important;border-bottom:1px solid var(--x-lime);padding:0 0 2px;font-family:var(--x-min);font-weight:700;font-size:14px}
-.xe-gl-ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
-.xe-gl-ul li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline;font-size:14px;line-height:1.6}
-.xe-gl-d{white-space:nowrap;font-family:var(--x-en);font-size:16px}
-.xe-gl-ul strong{font-family:var(--x-min)}
-.xe-gl-a{color:var(--x-pale2);font-size:12px;margin-left:6px;white-space:nowrap}
-.xe-gl-note{margin:12px 0 0;font-size:12px;color:var(--x-pale2)}
-.xe-res-h{margin-top:clamp(56px,8vw,80px);display:grid;gap:10px;justify-items:center;text-align:center}
+.xe-res-h{margin-top:0;display:grid;gap:10px;justify-items:center;text-align:center}
 .xe-res-en{margin:0;white-space:nowrap;font-family:var(--x-en);font-size:clamp(22px,3vw,30px);letter-spacing:.1em;color:var(--x-lime)}
 .xe-res-t{margin:0;font-family:var(--x-min);font-weight:700;font-size:clamp(20px,2.8vw,28px);line-height:1.5}
 .xe-res-n{display:inline-block;margin-left:.5em;white-space:nowrap}
