@@ -19,6 +19,8 @@ export interface MediaItem {
   url?: string;
   /** 掲載対象の公演・事例のキービジュアル（/media/ のカードに表示） */
   img?: string;
+  /** img が横長の写真なら true（PC ではカード上部に帯で表示） */
+  imgWide?: boolean;
   /** 掲載対象の公演・事例のサイト内ページ（/media/ のカードからの導線） */
   related?: { label: string; href: string }[];
 }
@@ -40,6 +42,7 @@ export const mediaItems: MediaItem[] = [
     desc: '渋谷サクラステージ全体を周遊する都市伝説×イマーシブ×謎解きの体験型イベント「ウワサバナシ調査委員会」が、ゲーム・エンタメメディアの電ファミニコゲーマーで紹介されました。',
     url: 'https://news.denfaminicogamer.jp/news/2608032x',
     img: '/assets/uwasabanashi/story-venue.webp',
+    imgWide: true,
     related: [{ label: '公演ページ', href: '/uwasabanashi/' }],
   },
   {

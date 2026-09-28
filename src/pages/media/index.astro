@@ -29,10 +29,24 @@ const mediaLd = {
   })),
 };
 const outlets = [...new Set(mediaItems.map((m) => m.outlet))];
-// 見出しは「記事タイトル」＋「として紹介されました」の形。かぎ括弧内は自然に折り返し、後ろの定型句は途中で折らない
-const splitTitle = (t: string): [string, boolean][] => {
-  const m = t.match(/^(「[^」]*」)(.*)$/);
-  return m ? [[seg(m[1]), false], ...(m[2] ? [[m[2], true] as [string, boolean]] : [])] : [[t, false]];
+// 改行位置：固有名詞・複合語は途中で折らず、それ以外は文節の切れ目（jpbreak の seg）と句読点の後でだけ折る。
+// word-break:keep-all と組み合わせ、スマホの狭い幅でも「電／ファミニコゲーマー」「会員制／バー」のような折れ方をしない。
+const KEEP = [...new Set([...mediaItems.map((m) => m.outlet), '会員制バー', '体験型イベント', 'マジシャン様', 'コラボレーション', '東急不動産株式会社', '404 Not Found', 'TSUTAYA協力', '渋谷サクラステージ', 'イマーシブ公演', 'エンタメメディア', 'ex Labs', '2026年9月', '取り組み'])].sort((a, b) => b.length - a.length);
+const esc = (t: string) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+const reEsc = (k: string) => k.replace(/[.*+?^$()|[\]\\{}]/g, '\\$&');
+const KEEP_RE = new RegExp('(' + KEEP.map(reEsc).join('|') + ')');
+const brk = (t: string): string => {
+  const parts = t.split(KEEP_RE);
+  return parts.map((p, i) => {
+    if (i % 2 === 1) {
+      // 固有名詞の前は折ってよい（直前が開き括弧のときを除く）。後ろは助詞が続くなら助詞の後で折る
+      const prev = parts[i - 1] ?? '', next = parts[i + 1] ?? '';
+      const before = prev && !/[「（“]$/.test(prev) ? '<wbr>' : '';
+      const after = next && !/^[ぁ-ゟ、。・）」”]/.test(next) ? '<wbr>' : '';
+      return `${before}<span class="xm-nb">${esc(p)}</span>${after}`;
+    }
+    return esc(seg(p)).replace(/\u200b/g, '<wbr>').replace(/([、。・／×])(?!$)/g, '$1<wbr>').replace(/([）」])(?=[^ぁ-ゟ、。）」]|$)(?!$)/g, '$1<wbr>').replace(/(?<!^)([「（])/g, '<wbr>$1');
+  }).join('').replace(/(<wbr>)+/g, '<wbr>').replace(/([）」])(?=[ぁ-ゟ])/g, '$1\u2060');
 };
 ---
 <BaseLayout
@@ -50,13 +64,13 @@ const splitTitle = (t: string): [string, boolean][] => {
   <p class="xm-count"><span class="xm-num">{mediaItems.length}</span><span>件の掲載</span><span class="xm-outlets">{outlets.join('／')}</span></p>
   <div class="xm-list">
     {mediaItems.map((m, i) => (
-      <article class={`x-wcard is-s xm-card${i === 0 ? ' is-lead' : ''}${m.img ? ' has-img' : ''}`}>
-        {m.img && <div class="xm-img"><img src={m.img} alt="" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" /></div>}
+      <article class={`x-wcard is-s xm-card${i === 0 ? ' is-lead' : ''}${m.img ? (m.imgWide ? ' has-img is-wide' : ' has-img') : ''}`}>
+        {m.img && <div class="xm-img" style={`--bg:url(${m.img})`}><img src={m.img} alt="" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" /></div>}
         <div class="xm-body">
           {i === 0 && <p class="xm-pick">Pick up</p>}
           <div class="xm-top"><span class="xm-outlet">{m.outlet}</span><span class="xm-date">{m.date}</span></div>
-          <h2 class="xm-h">{splitTitle(m.title).map(([t, keep]) => keep ? <span class="x-c">{t}</span> : <span>{t}</span>)}</h2>
-          <p class="xm-d"><Cls text={m.desc} emph={false} /></p>
+          <h2 class="xm-h" set:html={brk(m.title)} />
+          <p class="xm-d" set:html={brk(m.desc)} />
           <div class="xm-actions">
             {m.url && <a class="xm-btn" href={m.url} target="_blank" rel="noopener">記事を読む<span class="xm-ext">外部サイト ↗</span></a>}
             {m.related && m.related.length > 0 && <p class="xm-rel">{m.related.map((r) => <a href={r.href}>{r.label} →</a>)}</p>}
@@ -80,14 +94,18 @@ const splitTitle = (t: string): [string, boolean][] => {
 .xm-outlets{flex-basis:100%;text-align:center;font-size:12.5px;color:var(--x-pale2)}
 .xm-list{max-width:960px;margin:0 auto;display:grid;gap:16px}
 .xm-card{padding:0;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr)}
-.xm-img{background:var(--x-panel);aspect-ratio:16/10;overflow:hidden}
-.xm-img img{width:100%;height:100%;object-fit:cover;object-position:center 22%;display:block}
+/* キービジュアルは切り抜かずに全体を見せ、余白は同じ画像をぼかして埋める */
+.xm-img{position:relative;background:var(--x-ink);height:clamp(240px,78vw,360px);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.xm-img::before{content:"";position:absolute;inset:-24px;background:var(--bg) center/cover no-repeat;filter:blur(18px) brightness(.55);transform:scale(1.1)}
+.xm-img img{position:relative;display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;box-shadow:0 8px 28px rgba(0,0,0,.45)}
+:global(.xm-nb){white-space:nowrap}
+.xm-h,.xm-d{word-break:keep-all;overflow-wrap:anywhere}
 .xm-body{padding:clamp(24px,5vw,44px) clamp(20px,5vw,48px);display:grid;gap:14px;align-content:start}
 .xm-pick{margin:0;justify-self:start;background:var(--x-lime);color:var(--x-ink);font-family:var(--x-en);font-size:15px;letter-spacing:.12em;padding:4px 12px}
 .xm-top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px;padding-bottom:14px;border-bottom:1px solid #D6DFFB}
 .xm-outlet{font-family:var(--x-min);font-weight:700;font-size:clamp(20px,3vw,26px);color:var(--x-blue);line-height:1.4}
 .xm-date{white-space:nowrap;font-family:var(--x-en);font-size:clamp(20px,2.6vw,26px);line-height:1;color:var(--x-blue)}
-.xm-h{margin:0;line-break:strict;text-wrap:pretty;word-break:keep-all;overflow-wrap:anywhere;font-family:var(--x-min);font-weight:700;font-size:clamp(18px,2.4vw,23px);line-height:1.65;color:var(--x-ink)}
+.xm-h{margin:0;line-break:strict;text-wrap:pretty;font-family:var(--x-min);font-weight:700;font-size:clamp(18px,2.4vw,23px);line-height:1.65;color:var(--x-ink)}
 .xm-card.is-lead .xm-h{font-size:clamp(20px,3vw,28px)}
 .xm-d{margin:0;font-size:14.5px;line-height:1.95;color:rgba(11,11,20,.78)}
 .xm-actions{display:grid;gap:14px;margin-top:6px}
@@ -105,7 +123,10 @@ const splitTitle = (t: string): [string, boolean][] => {
 }
 @media(min-width:760px){
   .xm-card.has-img{grid-template-columns:260px minmax(0,1fr)}
-  .xm-card.has-img .xm-img{aspect-ratio:auto}
+  .xm-card.has-img .xm-img{height:auto;min-height:100%;padding:28px 22px}
   .xm-card.is-lead.has-img{grid-template-columns:340px minmax(0,1fr)}
+  /* 横長の写真は左列に入れると小さくなるので、カード上部に帯で全体を見せる */
+  .xm-card.has-img.is-wide{grid-template-columns:minmax(0,1fr)}
+  .xm-card.has-img.is-wide .xm-img{height:320px;min-height:0;padding:0}
 }
 </style>
