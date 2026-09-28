@@ -111,12 +111,6 @@ gMatched.sort((a, b) => firstShown(a, mIds).localeCompare(firstShown(b, mIds)));
 gUnknown.sort((a, b) => firstShown(a, uIds).localeCompare(firstShown(b, uIds)));
 const scheduleShows = calendarShows.filter((s) => s.published && s.occurrences.some((o) => o.date >= today));
 const areaOf = (r: AnyResolved) => place(r);
-const worksCards = eventsData.works.filter((w) => w.published).map((w) => {
-  const nxt = own.find((r) => r.work.id === w.id && !['ended', 'cancelled'].includes(r.eventState));
-  const v = eventsData.venues.find((x) => x.id === (nxt?.venue.id ?? eventsData.occurrences.find((o) => o.workId === w.id)?.venueId ?? w.venueId)) ?? null;
-  const org = eventsData.organizers.find((o) => o.id === w.organizerId);
-  return { w, genre: GENRES.find((x) => x.id === w.genres[0])?.name ?? '', area: v ? `${regionName(v.regionId)}・${areaName(v.areaId)}` : '東京', next: nxt ? fmtDateJa(nxt.row.date) : '開催日は公式チケットページで確認', org: org?.relationLabel ?? '', own: org?.relation === 'ex-labs' };
-});
 // 2026-09-28 クライアント指定の文面・改行位置
 const aboutLines = ['「公演を探す」は、', '株式会社ex Labs が運営する', 'マダミス・イマーシブ公演の発見と', '集客を支援する', '無料の公演情報サービスです。'];
 const authorText = 'イマーシブ・マダミス（マーダーミステリー）・謎解き・頭脳戦など、体験型エンターテインメントの企画・制作・集客・運営を一貫して手がける制作会社。東京大学発スタートアップとして2025年設立。累計コンテンツ体験者数15,000人超、渋谷サクラステージでの施設一体型イベントは日本経済新聞に掲載。実際に企画・運営した現場の知見をもとに執筆しています。';
@@ -229,25 +223,6 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
     <ul class="xe-list" id="ev-rest" hidden>
       {gRest.map((g) => <li><ShowGroupCard rows={g} show={[]} place="events" /></li>)}
     </ul>
-  </div>
-</section>
-
-<section id="works" class="xe-sec">
-  <div class="xe-in">
-    <SecHead en="Now Showing" size="m" />
-    <p class="x-sh-ja is-b" style="font-size:clamp(19px,2.6vw,25px)"><Ph list={['掲載中の公演', '（作品一覧）']} /></p>
-    <p class="xe-lead" style="max-width:34em;margin-left:auto;margin-right:auto;line-height:2"><Ph list={['日程が確認できていない作品も、', '作品ページで内容・条件と', '公式チケットページを案内しています。']} /></p>
-    <div class="x-rail is-bleed" style="--gtc:repeat(auto-fit,minmax(min(100%,280px),1fr));--gap:16px;--col:calc(100% - 52px);margin-top:40px">
-      {worksCards.map((x) => (
-        <a href={`/events/${x.w.slug}/`} class="xe-work" data-track="show" data-show={x.w.id} data-place={`events-works-${x.own ? 'own' : '3rd'}`}>
-          {x.genre && <span class="xe-work-g">{x.genre}</span>}
-          <h3 class="xe-work-t"><Cls text={x.w.title} emph={false} /></h3>
-          <dl class="xe-work-dl"><dt>エリア</dt><dd>{x.area}</dd><dt>次回</dt><dd><Cls text={x.next} emph={false} /></dd></dl>
-          <p class="xe-work-o"><Cls text={x.org} emph={false} /></p>
-          <span class="xe-work-go">作品ページ →</span>
-        </a>
-      ))}
-    </div>
   </div>
 </section>
 
@@ -467,14 +442,6 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
 .xe-unknown summary{cursor:pointer;display:flex;justify-content:space-between;gap:12px;font-family:var(--x-min);font-weight:700;font-size:18px}
 .xe-unk-n{margin-left:8px;font-family:var(--x-en);font-size:22px}
 .xe-unk-note{margin:8px 0 0;font-size:13px;color:var(--x-pale2)}
-.xe-work{background:var(--x-card);color:var(--x-blue)!important;padding:26px 24px 24px;display:grid;gap:12px;align-content:start}
-.xe-work-g{justify-self:start;background:var(--x-blue);color:#fff;font-size:11px;font-weight:700;padding:4px 10px}
-.xe-work-t{margin:0;font-family:var(--x-min);font-weight:700;font-size:21px;line-height:1.45}
-.xe-work-dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;font-size:13px;line-height:1.6}
-.xe-work-dl dt{font-weight:700}
-.xe-work-dl dd{margin:0}
-.xe-work-o{margin:4px 0 0;padding-top:12px;border-top:1px solid #D6DFFB;font-size:12px;line-height:1.7}
-.xe-work-go{font-family:var(--x-min);font-weight:700;font-size:14px}
 .xe-faq{margin-top:40px;display:grid;gap:10px}
 .xe-faq details{background:var(--x-panel)}
 .xe-faq summary{cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:baseline;padding:22px clamp(18px,3vw,28px)}
