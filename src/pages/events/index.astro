@@ -3,18 +3,17 @@
 // SSR で毎リクエスト日本時間で判定し、今日・明日・今週末の開催を見出し付きの本文として出す（検索エンジンに日付と作品名が見える）。
 // 絞り込みはクエリ文字列（GET）で動き、JS があれば同じ判定関数で即時反映。絞り込み状態は canonical で /events/ に集約
 // （BaseLayout の canonical はクエリを含まない）。掲載は株式会社ex Labs が確認した公演のみ（データ正本 src/data/events/）。
+// 2026-09-28 リニューアル（デザイン元 Events.dc.html）：表示部品を components/x/ に置き換え。検索・判定のロジックは従来のまま。
+// 旧ページの「探し方と選び方」「要点」「選び方・基礎知識」「関連記事」はクライアント指示で削除。
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Breadcrumb from '../../components/Breadcrumb.astro';
-import EventCard from '../../components/EventCard.astro';
-import ListingCard from '../../components/ListingCard.astro';
-import AuthorBox from '../../components/AuthorBox.astro';
-import ShowCalendar from '../../components/ShowCalendar.astro';
-import VisualHero from '../../components/VisualHero.astro';
+import SecHead from '../../components/x/SecHead.astro';
+import Ph from '../../components/x/Ph.astro';
+import Cls from '../../components/x/Cls.astro';
+import ScheduleCard from '../../components/x/ScheduleCard.astro';
+import SessionCard from '../../components/x/SessionCard.astro';
 import { shows as calendarShows } from '../../data/shows';
-import LatestPosts from '../../components/LatestPosts.astro';
-import '../../styles/events.css';
 import { eventsData, EVENTS_CONTACT, LIST_DAYS } from '../../data/events/index';
 import { AREAS, GENRES, REGIONS, areaName, regionName } from '../../data/events/areas';
 import { parseCriteria, criteriaToQuery, resolveAll, resolveListings, isListing, search, nextAvailableDate, compareRows, BUDGET_OPTIONS, END_BY_OPTIONS, PARTY_MAX, fmtYen, minToHhmm, type AnyResolved, type Criteria } from '../../lib/events';
@@ -83,175 +82,225 @@ if (c.when !== 'all') relax.push({ label: `日付の指定を外す（これか�
 if (c.area || c.region) relax.push({ label: 'エリアの指定を外す', q: criteriaToQuery({ ...c, area: undefined, region: undefined }) });
 if (c.genre) relax.push({ label: 'ジャンルの指定を外す', q: criteriaToQuery({ ...c, genre: '' }) });
 if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時刻・予算の指定を外す', q: criteriaToQuery({ ...c, start: '', endBy: undefined, budget: undefined }) });
+
+// ---- 2026-09 リニューアル：表示用 ----
+const WDE = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const [ty, tm, td] = today.split('-');
+const todayBig = `${tm}.${td}`;
+const todayWd = WDE[new Date(`${today}T12:00:00+09:00`).getUTCDay()];
+const tomorrow = addDays(today, 1);
+const weekendSub = weekend.length ? weekend.map((d) => fmtDateShort(d).replace(/（.*$/, '')).join('・').replace(/^(\d+)\/(\d+)・\1\//, '$1/$2・') : '';
+const whens: { k: Criteria['when']; label: string; sub: string }[] = [
+  { k: 'today', label: '今日', sub: fmtDateShort(today) },
+  { k: 'tomorrow', label: '明日', sub: fmtDateShort(tomorrow) },
+  { k: 'weekend', label: '今週末', sub: weekendLabel },
+  { k: 'date', label: '日付を指定', sub: 'カレンダーから' },
+  { k: 'all', label: `これから${LIST_DAYS}日`, sub: `〜${fmtDateShort(limit)}` },
+];
+const scheduleShows = calendarShows.filter((s) => s.published && s.occurrences.some((o) => o.date >= today));
+const areaOf = (r: AnyResolved) => place(r);
+const worksCards = eventsData.works.filter((w) => w.published).map((w) => {
+  const nxt = own.find((r) => r.work.id === w.id && !['ended', 'cancelled'].includes(r.eventState));
+  const v = eventsData.venues.find((x) => x.id === (nxt?.venue.id ?? eventsData.occurrences.find((o) => o.workId === w.id)?.venueId ?? w.venueId)) ?? null;
+  const org = eventsData.organizers.find((o) => o.id === w.organizerId);
+  return { w, genre: GENRES.find((x) => x.id === w.genres[0])?.name ?? '', area: v ? `${regionName(v.regionId)}・${areaName(v.areaId)}` : '東京', next: nxt ? fmtDateJa(nxt.row.date) : '開催日は公式チケットページで確認', org: org?.relationLabel ?? '', own: org?.relation === 'ex-labs' };
+});
+const aboutText = '「公演を探す」は、株式会社ex Labs が運営する、マダミス・イマーシブ公演の発見と集客を支援する無料の公演情報サービスです。掲載料・予約手数料・利用料はいただいておらず、予約と決済は各公演の公式販売ページで行います。検索結果は利用者の条件への適合と開催日時の順に並び、ex Labs の公演には「ex Labs 企画・制作」と表示しています。将来、広告枠を設ける場合は「広告」「PR」と明示します。';
+const authorText = 'イマーシブ・マダミス（マーダーミステリー）・謎解き・頭脳戦など、体験型エンターテインメントの企画・制作・集客・運営を一貫して手がける制作会社。東京大学発スタートアップとして2025年設立。累計コンテンツ体験者数15,000人超、渋谷サクラステージでの施設一体型イベントは日本経済新聞に掲載。実際に企画・運営した現場の知見をもとに執筆しています。';
+
 ---
-<BaseLayout title={pageTitle} description={pageDesc}>
+<BaseLayout renewal title={pageTitle} description={pageDesc} cutin={[['今日できる', 'イマーシブを'], ['探す']]} contact={{ title: ['掲載・修正のご依頼、', '制作のご相談はこちら'], type: 'other' }} footer="short">
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(pageLd)} />
-<Breadcrumb items={[{ name: 'ホーム', href: '/' }, { name: '今日できるイマーシブ（公演を探す）' }]} />
+<script type="application/ld+json" set:html={jsonLd({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'ホーム', item: new URL('/', site).toString() }, { '@type': 'ListItem', position: 2, name: '今日できるイマーシブ（公演を探す）', item: new URL('/events/', site).toString() }] })} />
 
-<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 60%" eyebrow="TODAY'S IMMERSIVE" catchText={`今日 ${todayRows.length}件・明日 ${tomorrowRows.length}件・今週末 ${weekendRows.length}件`} chips={[`今日 ${fmtDateJa(today)}`, '東京', '日本時間で毎日更新', '予約は各公式販売ページ']} alt="東京で開催中のイマーシブ公演のキービジュアル">
-  <h1 class="h2 serif">今日できるイマーシブを探す<br class="sponly">｜東京の今日・明日・今週末の公演</h1>
-</VisualHero>
+<nav class="xe-crumb" aria-label="パンくずリスト"><a href="/">ホーム</a><span>/</span><span aria-current="page" style="color:#fff">今日できるイマーシブ（公演を探す）</span></nav>
 
-<section class="section cards" id="calendar"><div class="wrap">
-<h2 class="cards-h">今週・来週の開催日<span>◯の日付をタップで予約サイトへ</span></h2>
-<div class="ev-cal-grid">{calendarShows.filter((s) => s.published && s.occurrences.some((o) => o.date >= today)).map((s) => <ShowCalendar show={s} place="events-cal" now={now} />)}</div>
-<p class="ev-meta" style="margin-top:14px">◯は開催日です。空席は予約サイトの表示が最新で、◯があっても満席の場合があります。</p>
-</div></section>
-
-<section class="section ev-hero" data-today={today}><div class="wrap">
-<h2 class="cards-h">日付・人数で絞り込む<span>参加できる公演回だけが並びます</span></h2>
-
-<form class="ev-form" id="ev-form" method="get" action="/events/" aria-label="公演の検索条件">
-  <fieldset>
-    <legend>いつ遊ぶ？</legend>
-    <div class="ev-chips" id="ev-when">
-      <label class="ev-chip"><input type="radio" name="when" value="today" checked={c.when === 'today'}><span>今日 <small data-when-label="today">{fmtDateShort(today)}</small></span></label>
-      <label class="ev-chip"><input type="radio" name="when" value="tomorrow" checked={c.when === 'tomorrow'}><span>明日 <small data-when-label="tomorrow">{fmtDateShort(addDays(today, 1))}</small></span></label>
-      <label class="ev-chip"><input type="radio" name="when" value="weekend" checked={c.when === 'weekend'}><span>今週末 <small data-when-label="weekend">{weekendLabel}</small></span></label>
-      <label class="ev-chip"><input type="radio" name="when" value="date" checked={c.when === 'date'}><span>日付を指定</span></label>
-      <label class="ev-chip"><input type="radio" name="when" value="all" checked={c.when === 'all'}><span>これから{LIST_DAYS}日</span></label>
+<section class="xe-hero">
+  <div class="xe-hero-in">
+    <div class="x-sh"><span class="x-sh-deco" aria-hidden="true">+<span class="x-sh-line"></span></span><p class="x-sh-en" style="font-size:clamp(30px,8vw,96px)" aria-hidden="true">Today's Immersive</p><span class="x-sh-deco" aria-hidden="true"><span class="x-sh-line"></span>+</span></div>
+    <h1 class="xe-h1"><Ph list={['今日できる', 'イマーシブを探す']} /><span class="xe-h1-sub"><Ph list={['東京の今日・明日・', '今週末の公演']} /></span></h1>
+    <div class="x-wcard is-s xe-today">
+      <div class="xe-today-big"><span class="xe-big">{todayBig}</span><span class="xe-wd">{todayWd}</span></div>
+      <p class="xe-today-l"><span class="x-c">今日 {fmtDateJa(today)}</span><span class="x-c" style="margin-left:.6em">東京</span></p>
+      <div class="xe-counts">
+        {[{ k: 'today', label: '今日', n: todayRows.length, sub: fmtDateShort(today) }, { k: 'tomorrow', label: '明日', n: tomorrowRows.length, sub: fmtDateShort(tomorrow) }, { k: 'weekend', label: '今週末', n: weekendRows.length, sub: weekendSub }].map((x) => (
+          <a href={`/events/?when=${x.k}#results`} class="xe-count" data-when-go={x.k}><span class="xe-count-l">{x.label}</span><span class="xe-count-n">{x.n}<span>件</span></span><span class="xe-count-s">{x.sub}</span></a>
+        ))}
+      </div>
+      <div class="xe-tags"><span class="is-fill">日本時間で毎日更新</span><span>予約は各公式販売ページ</span></div>
     </div>
-    <div class="ev-date-in">
-      <label for="ev-date" class="lbl" style="margin:0">日付</label>
-      <input type="date" id="ev-date" name="date" value={c.date ?? ''} min={today} max={limit} style="width:auto">
-    </div>
-  </fieldset>
-  <div class="ev-grid">
-    <div><label class="lbl" for="ev-party">申込人数</label>
-      <select id="ev-party" name="party"><option value="">指定なし</option>{Array.from({ length: PARTY_MAX }, (_, i) => i + 1).map((n) => <option value={n} selected={c.party === n}>{n}人</option>)}</select></div>
-    <div><label class="lbl" for="ev-area">エリア</label>
-      <select id="ev-area" name="area"><option value="">{regionOptions.map((r) => r.name).join('・') || '東京'}すべて</option>{areaOptions.map((a) => <option value={a.id} selected={c.area === a.id}>{a.name}</option>)}</select></div>
-    <div><label class="lbl" for="ev-genre">ジャンル</label>
-      <select id="ev-genre" name="genre"><option value="">すべて</option>{GENRES.map((g) => <option value={g.id} selected={c.genre === g.id}>{g.name}</option>)}</select></div>
   </div>
-  <details open={!!(c.start || c.endBy || c.budget)}>
-    <summary>時間帯・終了時刻・予算で絞り込む</summary>
-    <div class="ev-grid ev-adv">
-      <div><label class="lbl" for="ev-start">開始時間帯</label>
-        <select id="ev-start" name="start"><option value="">指定なし</option><option value="morning" selected={c.start === 'morning'}>午前（〜12:00）</option><option value="afternoon" selected={c.start === 'afternoon'}>午後（12:00〜17:00）</option><option value="evening" selected={c.start === 'evening'}>夜（17:00〜）</option></select></div>
-      <div><label class="lbl" for="ev-end">終了時刻の上限</label>
-        <select id="ev-end" name="end"><option value="">指定なし</option>{END_BY_OPTIONS.map((t) => <option value={t} selected={c.endBy === t}>{t}までに終わる</option>)}</select></div>
-      <div><label class="lbl" for="ev-budget">1人あたり予算（手数料別）</label>
-        <select id="ev-budget" name="budget"><option value="">指定なし</option>{BUDGET_OPTIONS.map((b) => <option value={b} selected={c.budget === b}>{fmtYen(b)}以内</option>)}</select></div>
+</section>
+
+<section id="schedule" class="xe-sec">
+  <div class="xe-in">
+    <SecHead en="Schedule" size="m" />
+    <p class="x-sh-ja is-b" style="font-size:clamp(19px,2.6vw,25px)">今週・来週の開催日</p>
+    <p class="xe-lead"><Ph list={['◯の日付をタップで', '予約サイトへ']} /></p>
+    <div class="x-rail is-bleed" style="--gtc:repeat(auto-fit,minmax(min(100%,420px),1fr));--gap:24px;--col:calc(100% - 40px);margin-top:40px">
+      {scheduleShows.map((s) => <ScheduleCard show={s} place="events-cal" now={now} />)}
     </div>
-    <p class="ev-note" style="margin:8px 0 0">開演時刻・終了時刻・上限人数が未確認の公演は、これらの条件に「合う」とは扱わず、結果の下に「条件を判定できない公演」として分けて表示します。</p>
-  </details>
-  <div class="ev-submit">
-    <button class="btn" type="submit">この条件で探す</button>
-    <a class="ev-reset" href="/events/">条件をリセット</a>
+    <p class="xe-note-c"><Ph list={['◯は開催日です。', '空席は予約サイトの表示が最新で、', '◯があっても満席の場合があります。']} /></p>
   </div>
-</form>
-</div></section>
+</section>
 
-<section class="section tinted ev-today" id="today"><div class="wrap">
-<h2 class="h2 serif">今日（{fmtDateJa(today)}）できるイマーシブ・マダミス（東京）</h2>
-{todayRows.length > 0 ? (
-  <ul class="ev-sum">{todayRows.map((r) => <li><strong>{label(r)}</strong>（{place(r)}）：{timeOf(r)}・{ctaOf(r)} <a href="/events/?when=today#results">今日の公演回を見る →</a></li>)}</ul>
-) : (
-  <p class="ev-sum-none">今日の開催は確認できていません（今日開催なしと断定するものではありません）。{nextAny ? <>次に開催を確認できている日は<strong>{fmtDateJa(nextAny)}</strong>です。<a href={`/events/?when=date&date=${nextAny}#results`}>その日の公演回を見る →</a></> : null}</p>
-)}
-<h3 class="ev-sum-h">明日（{fmtDateJa(addDays(today, 1))}）</h3>
-{tomorrowRows.length > 0 ? <ul class="ev-sum">{tomorrowRows.map((r) => <li><strong>{label(r)}</strong>（{place(r)}）：{timeOf(r)}・{ctaOf(r)} <a href="/events/?when=tomorrow#results">明日の公演回を見る →</a></li>)}</ul> : <p class="ev-sum-none">明日の開催は確認できていません。</p>}
-<h3 class="ev-sum-h">今週末（{weekend.map(fmtDateJa).join('・')}）</h3>
-{weekendRows.length > 0 ? <ul class="ev-sum">{weekendRows.map((r) => <li><strong>{fmtDateShort(r.row.date)} {label(r)}</strong>（{place(r)}）：{timeOf(r)}・{ctaOf(r)} <a href="/events/?when=weekend#results">今週末の公演回を見る →</a></li>)}</ul> : <p class="ev-sum-none">今週末の開催は確認できていません。</p>}
-<p class="ev-meta" style="margin-top:14px">販売・空席は各公演の公式ページの表示が最新です。{anyStale && <strong>日程が変わっている場合があるため、予約前に公式ページをご確認ください。</strong>}</p>
-</div></section>
+<section id="search" class="xe-sec" style="padding-bottom:clamp(80px,10vw,110px)">
+  <div style="max-width:960px;margin:0 auto">
+    <SecHead en="Search" size="m" />
+    <p class="x-sh-ja is-b" style="font-size:clamp(19px,2.6vw,25px)"><Ph list={['日付・人数で', '絞り込む']} /></p>
+    <p class="xe-lead"><Ph list={['参加できる公演回だけが', '並びます']} /></p>
+    <form class="xe-form" id="ev-form" method="get" action="/events/" aria-label="公演の検索条件">
+      <fieldset class="xe-when-fs">
+        <legend class="xe-lbl">いつ遊ぶ？</legend>
+        <div class="xe-whens" id="ev-when">
+          {whens.map((w) => <label class="xe-when"><input type="radio" name="when" value={w.k} checked={c.when === w.k}><span class="xe-when-l">{w.label}</span><span class="xe-when-s" data-when-label={w.k === 'date' || w.k === 'all' ? undefined : w.k}>{w.sub}</span></label>)}
+        </div>
+        <label class="xe-date" data-date-row hidden={c.when !== 'date' ? true : undefined}>日付<input type="date" id="ev-date" name="date" value={c.date ?? ''} min={today} max={limit}></label>
+      </fieldset>
+      <div class="xe-sels">
+        <label class="xe-sel"><span class="xe-lbl-s">申込人数</span><span class="xe-sel-w"><select id="ev-party" name="party"><option value="">指定なし</option>{Array.from({ length: PARTY_MAX }, (_, i) => i + 1).map((n) => <option value={n} selected={c.party === n}>{n}人</option>)}</select></span></label>
+        <label class="xe-sel"><span class="xe-lbl-s">エリア</span><span class="xe-sel-w"><select id="ev-area" name="area"><option value="">{regionOptions.map((r) => r.name).join('・') || '東京'}すべて</option>{areaOptions.map((a) => <option value={a.id} selected={c.area === a.id}>{a.name}</option>)}</select></span></label>
+        <label class="xe-sel"><span class="xe-lbl-s">ジャンル</span><span class="xe-sel-w"><select id="ev-genre" name="genre"><option value="">すべて</option>{GENRES.map((g) => <option value={g.id} selected={c.genre === g.id}>{g.name}</option>)}</select></span></label>
+      </div>
+      <details class="xe-adv" open={!!(c.start || c.endBy || c.budget)}>
+        <summary><span><Ph list={['時間帯・終了時刻・', '予算で絞り込む']} /></span><span class="x-faq-plus" aria-hidden="true">+</span></summary>
+        <div class="xe-sels" style="margin-top:18px">
+          <label class="xe-sel"><span class="xe-lbl-s">開始時間帯</span><span class="xe-sel-w"><select id="ev-start" name="start"><option value="">指定なし</option><option value="morning" selected={c.start === 'morning'}>午前（〜12:00）</option><option value="afternoon" selected={c.start === 'afternoon'}>午後（12:00〜17:00）</option><option value="evening" selected={c.start === 'evening'}>夜（17:00〜）</option></select></span></label>
+          <label class="xe-sel"><span class="xe-lbl-s">終了時刻の上限</span><span class="xe-sel-w"><select id="ev-end" name="end"><option value="">指定なし</option>{END_BY_OPTIONS.map((t) => <option value={t} selected={c.endBy === t}>{t}までに終わる</option>)}</select></span></label>
+          <label class="xe-sel"><span class="xe-lbl-s">1人あたり予算（手数料別）</span><span class="xe-sel-w"><select id="ev-budget" name="budget"><option value="">指定なし</option>{BUDGET_OPTIONS.map((b) => <option value={b} selected={c.budget === b}>{fmtYen(b)}以内</option>)}</select></span></label>
+        </div>
+        <p class="xe-adv-note"><Ph list={['開演時刻・終了時刻・上限人数が', '未確認の公演は、', 'これらの条件に「合う」とは扱わず、', '結果の下に', '「条件を判定できない公演」として', '分けて表示します。']} /></p>
+      </details>
+      <div class="xe-submit">
+        <button type="submit" class="xe-go">この条件で探す（<span data-count>{result.matched.length}</span>件）</button>
+        <a class="xe-reset" href="/events/">条件をリセット</a>
+      </div>
+    </form>
+  </div>
+</section>
 
-<section class="section ev-results" id="results" aria-live="polite"><div class="wrap">
-<h2 class="ev-res-h"><span data-window-label>{windowLabel}</span>の公演回 <span data-count>{result.matched.length}</span>件 <small>（開催日時順。主催者による優先表示はしていません）</small></h2>
-<p class="ev-meta">掲載基準と修正依頼は<a href="/events/about/">サービスについて</a>をご覧ください。</p>
+<section id="results" class="xe-sec" aria-live="polite">
+  <div class="xe-in">
+    <div class="xe-glance">
+      {[{ en: 'Today', ja: fmtDateJa(today), rows: todayRows, when: 'today', empty: `今日の開催は確認できていません（今日開催なしと断定するものではありません）。${nextAny ? `次に開催を確認できている日は${fmtDateJa(nextAny)}です。` : ''}`, next: nextAny },
+        { en: 'Tomorrow', ja: fmtDateJa(tomorrow), rows: tomorrowRows, when: 'tomorrow', empty: '明日の開催は確認できていません。', next: null },
+        { en: 'Weekend', ja: weekend.map(fmtDateShort).join('・'), rows: weekendRows, when: 'weekend', empty: '今週末の開催は確認できていません。', next: null }].map((g) => (
+        <div class="xe-gl">
+          <div class="xe-gl-h"><span class="xe-gl-en">{g.en}</span><span class="xe-gl-ja"><Cls text={g.ja} emph={false} /></span></div>
+          {g.rows.length === 0 ? (
+            <>
+              <p class="xe-gl-msg"><Cls text={g.empty} emph={false} /></p>
+              {g.next && <a class="xe-gl-go" href={`/events/?when=date&date=${g.next}#results`}>その日の公演回を見る →</a>}
+            </>
+          ) : (
+            <>
+              <ul class="xe-gl-ul">{g.rows.map((r) => <li><span class="xe-gl-d">{fmtDateShort(r.row.date)}</span><span><strong>{label(r)}</strong><span class="xe-gl-a">{areaOf(r)}</span><span class="xe-gl-a">{timeOf(r)}</span></span></li>)}</ul>
+              <a class="xe-gl-go" href={`/events/?when=${g.when}#results`} data-when-go={g.when}>{g.en === 'Today' ? '今日' : g.en === 'Tomorrow' ? '明日' : '今週末'}の公演回を見る →</a>
+            </>
+          )}
+        </div>
+      ))}
+    </div>
+    <p class="xe-gl-note">販売・空席は各公演の公式ページの表示が最新です。{anyStale && <strong>日程が変わっている場合があるため、予約前に公式ページをご確認ください。</strong>}</p>
 
-<div id="ev-zero" class="ev-zero" hidden={result.matched.length > 0}>
-  <p class="ev-zero-t">この条件に合う公演回は見つかりませんでした</p>
-  <p>条件に合わない公演は表示していません。日付や人数を変えるか、次の候補日をお試しください。</p>
-  <ul>
-    <li hidden={!nextDate}><a href={nextDate ? `/events/${criteriaToQuery({ ...c, when: 'date', date: nextDate })}#results` : '/events/'} data-next-date>{nextDate ? `次に候補がある日：${fmtDateJa(nextDate)}` : ''}</a></li>
-    {relax.map((x) => <li><a href={`/events/${x.q}#results`}>{x.label}</a></li>)}
-    <li><a href="/guide/immersive-tokyo/">東京のイマーシブ体験の選び方を読む</a>／<a href="/guide/madamis-tokyo/">東京でマダミスを遊ぶには</a></li>
-  </ul>
-</div>
+    <div class="xe-res-h">
+      <p class="xe-res-en">Results</p>
+      <h2 class="xe-res-t"><span data-window-label>{windowLabel}</span>の公演回<span class="xe-res-n"><span data-count>{result.matched.length}</span>件</span></h2>
+      <p class="xe-res-note"><Ph list={['開催日時順。', '主催者による優先表示はしていません。']} /><span class="x-c">掲載基準と修正依頼は<a href="/events/about/" style="border-bottom:1px solid;color:#fff">サービスについて</a>をご覧ください。</span></p>
+    </div>
 
-<ul class="ev-list" id="ev-matched">
-  {result.matched.map((r) => <li>{isListing(r) ? <ListingCard r={r} place="events" /> : <EventCard r={r} place="events" />}</li>)}
-</ul>
+    <div id="ev-zero" class="xe-zero" hidden={result.matched.length > 0}>
+      <p class="xe-zero-t"><Ph list={['この条件に合う公演回は', '見つかりませんでした。']} /></p>
+      <p class="xe-zero-s">条件に合わない公演は表示していません。日付や人数を変えるか、次の候補日をお試しください。</p>
+      <div class="xe-zero-btns">
+        <a class="xe-zero-next" hidden={!nextDate} href={nextDate ? `/events/${criteriaToQuery({ ...c, when: 'date', date: nextDate })}#results` : '/events/'} data-next-date>{nextDate ? `次に候補がある日：${fmtDateJa(nextDate)}` : ''}</a>
+        {relax.map((x) => <a class="xe-zero-rel" href={`/events/${x.q}#results`}>{x.label}</a>)}
+        <a class="xe-zero-rel" href="/events/">条件をリセット</a>
+      </div>
+    </div>
 
-<details class="ev-unknown" id="ev-unknown" hidden={result.unknown.length === 0} open={result.matched.length === 0 && result.unknown.length > 0}>
-  <summary>条件を判定できない公演回 <span data-unknown-count>{result.unknown.length}</span>件（開演時刻・終了時刻・上限人数・開催の確認が取れていないため、条件に合うとは限りません）</summary>
-  <ul class="ev-list" id="ev-unknown-list">
-    {result.unknown.map((r) => <li>{isListing(r) ? <ListingCard r={r} place="events-unknown" /> : <EventCard r={r} place="events-unknown" />}</li>)}
-  </ul>
-</details>
-<ul class="ev-list" id="ev-rest" hidden>
-  {all.filter((r) => !result.matched.includes(r) && !result.unknown.includes(r) && !['ended', 'cancelled'].includes(r.eventState)).map((r) => <li>{isListing(r) ? <ListingCard r={r} place="events" /> : <EventCard r={r} place="events" />}</li>)}
-</ul>
-</div></section>
+    <ul class="xe-list" id="ev-matched">
+      {result.matched.map((r) => <li><SessionCard r={r} place="events" /></li>)}
+    </ul>
 
-<section class="section tinted ev-about" id="guide"><div class="wrap">
-<h2 class="h2 serif">「今日できるイマーシブ」の探し方と選び方</h2>
-<p><strong>今日できるイマーシブとは</strong>、当日または直近の日程で参加できるイマーシブ体験（没入型の公演・街や施設を歩く周遊型イベント・キャストと会話する物語体験・マーダーミステリー）のことです。東京では期間限定の少人数公演が主流で、当日参加できるかは各回の空席で決まります。当サイトでは「開催予定」「受付中」「確認時点で空席あり」を分けて表示し、開催予定があるだけでは予約可能と表示しません。</p>
-<p><strong>目的別の選び方</strong>：一人で参加するなら1人参加可の周遊型（<a href="/events/?party=1#results">1人で参加できる公演</a>）、デートや友人となら少人数の物語体験（<a href="/events/?party=2#results">2人で参加できる公演</a>）、初めてなら謎解き要素のある周遊型が入りやすい形式です。仕事帰りなら<a href="/events/?start=evening#results">夜開演の公演</a>、早く帰りたい日は「終了時刻の上限」で絞り込めます。</p>
-<p><strong>費用・所要時間・人数の目安</strong>：掲載中の公演は1人¥4,000（周遊型「ウワサバナシ調査委員会」、約70分、1人から）と1組¥13,000〜（少人数型「怪盗と秘密の試験」、各回2〜4名）で、いずれも税込・手数料別です。東京のマダミス店舗公演は1人3,000〜6,000円程度、所要時間は周遊型60〜120分、公演型1〜3時間が一般的です。</p>
-<p><strong>掲載している公演について</strong>：株式会社ex Labs が企画・制作するイマーシブ公演を、公式情報で確認したうえで掲載しています。渋谷サクラステージを舞台にした「ウワサバナシ調査委員会」は日本経済新聞で紹介され、「怪盗と秘密の試験」は電ファミニコゲーマーで紹介されました。他社の公演は掲載条件を確認できたものから順次追加します（<a href="/events/about/">掲載基準</a>）。</p>
-</div></section>
+    <details class="xe-unknown" id="ev-unknown" hidden={result.unknown.length === 0} open={result.matched.length === 0 && result.unknown.length > 0}>
+      <summary><span>条件を判定できない公演<span class="xe-unk-n" data-unknown-count>{result.unknown.length}</span>件</span><span class="x-faq-plus" aria-hidden="true">+</span></summary>
+      <p class="xe-unk-note"><Ph list={['開演時刻・終了時刻・上限人数・', '開催の確認が取れていないため、', '条件に合うかを判定できません。', '公式ページでご確認ください。']} /></p>
+      <ul class="xe-list" id="ev-unknown-list">
+        {result.unknown.map((r) => <li><SessionCard r={r} place="events-unknown" /></li>)}
+      </ul>
+    </details>
+    <ul class="xe-list" id="ev-rest" hidden>
+      {all.filter((r) => !result.matched.includes(r) && !result.unknown.includes(r) && !['ended', 'cancelled'].includes(r.eventState)).map((r) => <li><SessionCard r={r} place="events" /></li>)}
+    </ul>
+  </div>
+</section>
 
-<section class="section ev-links" id="works"><div class="wrap">
-<h2 class="h2 serif">掲載中の公演（作品一覧）</h2>
-<p class="ev-lede">日程が確認できていない作品も、作品ページで内容・条件と公式チケットページを案内しています。</p>
-<ul>
-  {eventsData.works.filter((w) => w.published).map((w) => {
-    const nxt = own.find((r) => r.work.id === w.id && !['ended', 'cancelled'].includes(r.eventState));
-    const v = eventsData.venues.find((x) => x.id === (nxt?.venue.id ?? eventsData.occurrences.find((o) => o.workId === w.id)?.venueId ?? w.venueId)) ?? null;
-    const org = eventsData.organizers.find((o) => o.id === w.organizerId);
-    return <li><a href={`/events/${w.slug}/`} data-track="show" data-show={w.id} data-place={`events-works-${org?.relation === 'ex-labs' ? 'own' : '3rd'}`}>{w.title}<span>{w.genres.map((g) => GENRES.find((x) => x.id === g)?.name ?? g).join('・')}{v ? `｜${regionName(v.regionId)}・${areaName(v.areaId)}` : ''}｜{nxt ? `次回 ${fmtDateJa(nxt.occ.date)}` : '開催日は公式チケットページで確認'}｜{org?.relationLabel}</span></a></li>;
-  })}
-</ul>
-</div></section>
+<section id="works" class="xe-sec">
+  <div class="xe-in">
+    <SecHead en="Now Showing" size="m" />
+    <p class="x-sh-ja is-b" style="font-size:clamp(19px,2.6vw,25px)"><Ph list={['掲載中の公演', '（作品一覧）']} /></p>
+    <p class="xe-lead" style="max-width:34em;margin-left:auto;margin-right:auto;line-height:2"><Ph list={['日程が確認できていない作品も、', '作品ページで内容・条件と', '公式チケットページを案内しています。']} /></p>
+    <div class="x-rail is-bleed" style="--gtc:repeat(auto-fit,minmax(min(100%,280px),1fr));--gap:16px;--col:calc(100% - 52px);margin-top:40px">
+      {worksCards.map((x) => (
+        <a href={`/events/${x.w.slug}/`} class="xe-work" data-track="show" data-show={x.w.id} data-place={`events-works-${x.own ? 'own' : '3rd'}`}>
+          {x.genre && <span class="xe-work-g">{x.genre}</span>}
+          <h3 class="xe-work-t"><Cls text={x.w.title} emph={false} /></h3>
+          <dl class="xe-work-dl"><dt>エリア</dt><dd>{x.area}</dd><dt>次回</dt><dd><Cls text={x.next} emph={false} /></dd></dl>
+          <p class="xe-work-o"><Cls text={x.org} emph={false} /></p>
+          <span class="xe-work-go">作品ページ →</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
 
-<section class="section ev-links"><div class="wrap">
-<h2 class="h2 serif">選び方・基礎知識</h2>
-<p class="ev-lede">初めての方は、公演を選ぶ前に形式の違いと参加の準備を確認しておくと失敗しません。</p>
-<ul>
-  <li><a href="/guide/immersive-tokyo/">東京で体験できるイマーシブイベント<span>種類・2026年の動向・初めての選び方</span></a></li>
-  <li><a href="/guide/madamis-tokyo/">東京でマダミスを遊ぶには<span>店舗・公演・オンラインの探し方と初心者の選び方</span></a></li>
-  <li><a href="/guide/immersive-preparation/">イマーシブ体験の服装・持ち物<span>公演別チェック表つき</span></a></li>
-  <li><a href="/guide/immersive-taiken/">イマーシブ体験とは<span>没入型体験の基本</span></a></li>
-  <li><a href="/guide/immersive-theater/">イマーシブシアターとは<span>演劇との違い</span></a></li>
-  <li><a href="/guide/madamis-shoshinsha/">マダミス初心者ガイド<span>はじめての作品選びと当日の流れ</span></a></li>
-</ul>
-</div></section>
+<section id="faq" class="xe-sec">
+  <div style="max-width:960px;margin:0 auto">
+    <SecHead en="FAQ" size="m" />
+    <p class="x-sh-ja is-b" style="font-size:clamp(19px,2.6vw,25px)">よくある質問</p>
+    <div class="xe-faq">
+      {faqs.map((f) => (
+        <details>
+          <summary><span class="xe-q">Q</span><span class="xe-faq-q"><Cls text={f.q} emph={false} /></span><span class="x-faq-plus" aria-hidden="true">+</span></summary>
+          <div class="xe-faq-a"><span class="xe-a">A</span><p><Cls text={f.a} emph={false} /></p></div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
 
-<section class="section tinted" id="faq"><div class="wrap">
-<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
-<div class="faq-list tag-immersive">
-{faqs.map((f) => <div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>)}
-</div>
-</div></section>
-
-<section class="section ev-about" id="about"><div class="wrap">
-<div class="key-points">
-<p class="key-points-h">要点</p>
-<ul>
-<li>「今日できるイマーシブ」＝当日または直近の日程で参加できる没入型の公演・周遊イベント・マダミス。予約制が基本で、当日枠は公式販売ページの空席次第です。</li>
-<li>今日 {todayRows.length}件／明日 {tomorrowRows.length}件／今週末（{weekendLabel}）{weekendRows.length}件。開催・販売・空席の確認状況を分けて表示し、開催予定があるだけでは「予約可」と出しません。</li>
-<li>費用の目安は1人¥4,000（周遊型）〜1組¥13,000（少人数型・2人）。所要時間は周遊型60〜120分、公演型1〜3時間が一般的です。</li>
-</ul>
-</div>
-<h2 class="h2 serif">このサービスについて</h2>
-<p>「公演を探す」は、株式会社ex Labs が運営する、マダミス・イマーシブ公演の発見と集客を支援する無料の公演情報サービスです。掲載料・予約手数料・利用料はいただいておらず、予約と決済は各公演の公式販売ページで行います。検索結果は利用者の条件への適合と開催日時の順に並び、ex Labs の公演には「ex Labs 企画・制作」と表示しています。将来、広告枠を設ける場合は「広告」「PR」と明示します。</p>
-<p>掲載内容の修正・掲載停止のご依頼、公演の掲載のご相談（無料）は <a href={`mailto:${EVENTS_CONTACT}`}>{EVENTS_CONTACT}</a> または<a href="/?c=events#contact">お問い合わせフォーム</a>へ。詳細は<a href="/events/about/">サービスについて（掲載基準・運営者・修正依頼）</a>。</p>
-</div></section>
-
-<section class="section ev-biz"><div class="wrap">
-<div class="cta-mini">
-<p class="cta-mini-title serif">施設・企業向け：イベント制作のご相談（無料）</p>
-<p class="ev-lede" style="margin:0 auto 16px;text-align:center">商業施設・店舗・観光施設を舞台にしたマダミス・イマーシブ・周遊イベントの企画から運営まで、株式会社ex Labs が制作します。</p>
-<a class="btn" href="/services/" data-cta="events-biz">法人向けサービスを見る</a>
-</div>
-</div></section>
-
-<AuthorBox />
-<LatestPosts category="immersive" />
+<section id="about" class="xe-sec">
+  <div style="max-width:960px;margin:0 auto;display:grid;gap:24px">
+    <div class="x-wcard is-s xe-about">
+      <p class="xe-about-en">About this Service</p>
+      <h2 class="xe-about-h">このサービスについて</h2>
+      <p class="xe-about-p"><Cls text={aboutText} emph={false} /></p>
+      <p class="xe-about-c"><Ph list={['掲載内容の修正・掲載停止のご依頼、', '公演の掲載のご相談（無料）は']} /> <a href={`mailto:${EVENTS_CONTACT}`} style="border-bottom:1px solid;font-weight:700">{EVENTS_CONTACT}</a> <span class="x-c">または</span><a href="#contact" style="border-bottom:1px solid;font-weight:700">お問い合わせフォーム</a><span class="x-c">へ。</span><span class="x-c">詳細は</span><a href="/events/about/" style="border-bottom:1px solid;font-weight:700"><Ph list={['サービスについて', '（掲載基準・運営者・修正依頼）']} /></a>。</p>
+    </div>
+    <div class="xe-biz">
+      <div style="display:grid;gap:10px">
+        <p class="xe-biz-en">For Business</p>
+        <h2 class="xe-biz-h"><Ph list={['施設・企業向け：', 'イベント制作のご相談（無料）']} /></h2>
+        <p class="xe-biz-p"><Ph list={['商業施設・店舗・観光施設を舞台にした', 'マダミス・イマーシブ・周遊イベントの', '企画から運営まで、', '株式会社ex Labs が制作します。']} /></p>
+      </div>
+      <a href="/#service" class="xe-biz-btn" data-track="cta" data-show="services" data-place="events-biz">法人向けサービスを見る →</a>
+    </div>
+    <div class="xe-author">
+      <div style="display:grid;gap:10px">
+        <img src="/assets/exlabs-logo-w.png" alt="株式会社ex Labs" width="2048" height="520" loading="lazy" style="height:26px;width:auto;justify-self:start;display:block">
+        <p class="xe-au-k">この記事の執筆</p>
+        <p class="xe-au-n">株式会社ex Labs 編集部</p>
+        <p style="margin:0;font-size:13px"><span class="x-c">発行責任者：</span><span class="x-c">代表取締役 <a href="/company/iida-yuki/" style="border-bottom:1px solid">飯田 雄貴</a></span></p>
+      </div>
+      <div style="display:grid;gap:12px">
+        <p class="xe-au-p"><Cls text={authorText} emph={false} /></p>
+        <p class="xe-au-links"><a href="/company/">会社概要</a><a href="/media/">メディア掲載実績</a><a href="/press/">プレスリリース</a><a href="/#service">サービス一覧</a></p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <script>
   // 絞り込みの即時反映（サーバーと同じ判定関数）。JS が無い場合はフォーム送信（GET）で同じ結果になる。
@@ -300,7 +349,7 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
           return ra.date !== rb.date ? (ra.date < rb.date ? -1 : 1) : (ra.start ?? 1e9) - (rb.start ?? 1e9);
         }).forEach((el) => ul.appendChild(el));
       }
-      const count = document.querySelector('[data-count]'); if (count) count.textContent = String(nMatch);
+      document.querySelectorAll('[data-count]').forEach((el) => { el.textContent = String(nMatch); });
       const uc = document.querySelector('[data-unknown-count]'); if (uc) uc.textContent = String(nUnknown);
       const wl = document.querySelector('[data-window-label]'); if (wl) wl.textContent = win ? win.map(fmtDateJa).join('・') : `これから${LIST_DAYS}日以内`;
       zero.hidden = nMatch > 0;
@@ -320,10 +369,20 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
         if (nMatch === 0) beacon('ev-zero', cat(c));
       }
     };
-    form.addEventListener('submit', (e) => { e.preventDefault(); apply(true); document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+    const toResults = () => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    form.addEventListener('submit', (e) => { e.preventDefault(); apply(true); toResults(); });
+    // 「今日／明日／今週末」の件数・リンク：ページを読み直さずにその条件へ切り替えて結果へ
+    document.querySelectorAll<HTMLAnchorElement>('[data-when-go]').forEach((a) => a.addEventListener('click', (e) => {
+      const r = form.querySelector<HTMLInputElement>(`input[name=when][value="${a.dataset.whenGo}"]`);
+      if (!r) return;
+      e.preventDefault(); r.checked = true;
+      const dr = form.querySelector<HTMLElement>('[data-date-row]'); if (dr) dr.hidden = true;
+      apply(true); toResults();
+    }));
     form.addEventListener('change', (e) => {
       const t = e.target as HTMLInputElement;
       if (t.name === 'date' && t.value) (form.querySelector('input[name=when][value=date]') as HTMLInputElement).checked = true;
+      const dr = form.querySelector<HTMLElement>('[data-date-row]'); if (dr) dr.hidden = (form.querySelector('input[name=when]:checked') as HTMLInputElement | null)?.value !== 'date';
       if (t.name === 'when' && t.value === 'date') { const d = document.getElementById('ev-date') as HTMLInputElement; d.focus(); if (!d.value) return; }
       apply(true);
     });
@@ -333,14 +392,126 @@ if (c.start || c.endBy || c.budget) relax.push({ label: '時間帯・終了時�
 </BaseLayout>
 
 <style>
-.sponly{display:none}
-@media(max-width:640px){.sponly{display:block}}
-.ev-today{padding:44px 0}
-.ev-today .h2{font-size:clamp(18px,2vw,22px)}
-.ev-sum{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
-.ev-sum li{background:#fff;border:var(--bd);border-left:4px solid var(--tag-immersive);border-radius:var(--r-s);padding:10px 14px;font-size:14px;line-height:1.8}
-.ev-sum li a,.ev-sum-none a{color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px}
-.ev-sum-h{font-size:15px;font-weight:800;margin:22px 0 0;color:var(--ink)}
-.ev-sum-none{margin:10px 0 0;font-size:14px;line-height:1.85;color:rgba(29,29,31,.8)}
-.ev-about p strong{color:var(--ink)}
+.xe-crumb{max-width:1100px;margin:0 auto;padding:20px 24px 0;display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--x-pale2)}
+.xe-hero{padding:clamp(56px,9vw,104px) 24px clamp(56px,8vw,88px)}
+.xe-hero-in{max-width:1100px;margin:0 auto;text-align:center}
+.xe-h1{margin:20px 0 0;font-family:var(--x-min);font-weight:700;font-size:clamp(24px,3.6vw,38px);line-height:1.5;letter-spacing:.04em}
+.xe-h1-sub{display:block;margin-top:8px;font-weight:600;font-size:clamp(15px,2vw,18px);color:var(--x-pale);letter-spacing:normal}
+.xe-today{margin:clamp(40px,6vw,60px) auto 0;max-width:820px;padding:clamp(26px,4vw,40px) clamp(18px,4vw,44px)}
+.xe-today-big{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:4px 14px}
+.xe-big{white-space:nowrap;font-family:var(--x-en);font-size:clamp(44px,8vw,72px);line-height:1}
+.xe-wd{white-space:nowrap;font-family:var(--x-en);font-size:clamp(20px,3vw,28px);letter-spacing:.08em}
+.xe-today-l{margin:10px 0 0;font-family:var(--x-min);font-weight:700;font-size:15px}
+.xe-counts{margin-top:24px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #D6DFFB}
+.xe-count{border-right:1px solid #D6DFFB;padding:18px 4px 4px;display:grid;gap:4px;justify-items:center}
+.xe-count:last-child{border-right:0}
+.xe-count-l{font-family:var(--x-min);font-weight:700;font-size:14px}
+.xe-count-n{white-space:nowrap;font-family:var(--x-en);font-size:clamp(38px,6vw,54px);line-height:1}
+.xe-count-n span{font-family:var(--x-min);font-size:14px;font-weight:700;margin-left:4px}
+.xe-count-s{font-size:12px;color:#4A68D6}
+.xe-tags{margin-top:22px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;font-size:12px;font-weight:700}
+.xe-tags span{border:1px solid var(--x-blue);padding:4px 12px}
+.xe-tags .is-fill{background:var(--x-blue);color:#fff;padding:5px 12px;border:0}
+.xe-sec{padding:0 16px clamp(96px,12vw,130px)}
+.xe-in{max-width:1100px;margin:0 auto}
+.xe-lead{margin:10px 0 0;text-align:center;font-size:14px;color:var(--x-pale)}
+.xe-note-c{margin:24px auto 0;max-width:40em;text-align:center;font-size:13px;line-height:1.9;color:var(--x-pale)}
+.xe-form{margin-top:40px;border:1px solid rgba(255,255,255,.35);padding:clamp(22px,4vw,40px) clamp(16px,4vw,40px);display:grid;gap:28px}
+.xe-when-fs{margin:0;padding:0;border:0;display:grid;gap:12px;min-width:0}
+.xe-lbl{padding:0;margin:0 0 12px;font-family:var(--x-min);font-weight:700;font-size:16px}
+.xe-whens{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.xe-when{position:relative;border:1px solid rgba(255,255,255,.5);padding:12px 10px;cursor:pointer;display:grid;gap:3px;justify-items:center;text-align:center;min-width:110px}
+.xe-when input{position:absolute;opacity:0;pointer-events:none}
+.xe-when-l{font-family:var(--x-min);font-weight:700;font-size:15px;white-space:nowrap}
+.xe-when-s{font-size:11px;color:var(--x-pale2);white-space:nowrap}
+.xe-when:has(input:checked){background:var(--x-lime);color:var(--x-ink);border-color:var(--x-lime)}
+.xe-when:has(input:checked) .xe-when-s{color:var(--x-ink);font-weight:700}
+.xe-when:has(input:focus-visible){outline:2px solid var(--x-lime);outline-offset:3px}
+@media(max-width:699px){.xe-whens{display:flex;overflow-x:auto;margin:0 -16px;padding:0 16px 6px;scrollbar-width:none}.xe-whens::-webkit-scrollbar{display:none}.xe-when{flex:0 0 auto}}
+.xe-date{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:13px;font-weight:700}
+.xe-date[hidden]{display:none}
+.xe-date input{background:var(--x-panel);color:#fff;border:1px solid rgba(255,255,255,.45);padding:11px 14px;color-scheme:dark;font-size:15px;font-family:inherit}
+.xe-sels{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px}
+.xe-sel{display:grid;gap:8px}
+.xe-lbl-s{font-family:var(--x-min);font-weight:700;font-size:14px}
+.xe-sel-w{position:relative;display:block}
+.xe-sel-w::after{content:'▼';position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:11px}
+.xe-sel select{width:100%;appearance:none;-webkit-appearance:none;background:var(--x-panel);color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:0;padding:13px 40px 13px 14px;font-size:15px;cursor:pointer;font-family:inherit}
+.xe-sel select option{color:var(--x-ink)}
+.xe-adv{border-top:1px solid rgba(255,255,255,.25);padding-top:20px}
+.xe-adv summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:var(--x-min);font-weight:700;font-size:15px}
+.xe-adv summary .x-faq-plus{font-size:18px;line-height:1}
+.xe-adv[open] summary .x-faq-plus{transform:rotate(45deg)}
+.xe-adv-note{margin:16px 0 0;font-size:12px;line-height:1.9;color:var(--x-pale2)}
+.xe-submit{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 24px}
+.xe-go{background:var(--x-lime);color:var(--x-ink);border:0;border-radius:999px;padding:16px 36px;font-family:var(--x-min);font-weight:700;font-size:15px;cursor:pointer}
+.xe-reset{border-bottom:1px solid #fff;padding:4px 2px;font-family:var(--x-min);font-weight:700;font-size:14px}
+.xe-glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.xe-gl{background:var(--x-panel);padding:22px 22px 24px;display:grid;gap:10px;align-content:start}
+.xe-gl-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.xe-gl-en{white-space:nowrap;font-family:var(--x-en);font-size:30px;line-height:1;color:var(--x-lime)}
+.xe-gl-ja{font-family:var(--x-min);font-weight:700;font-size:14px}
+.xe-gl-msg{margin:0;font-size:14px;line-height:1.85;color:var(--x-pale)}
+.xe-gl-go{justify-self:start;color:var(--x-lime)!important;border-bottom:1px solid var(--x-lime);padding:0 0 2px;font-family:var(--x-min);font-weight:700;font-size:14px}
+.xe-gl-ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.xe-gl-ul li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline;font-size:14px;line-height:1.6}
+.xe-gl-d{white-space:nowrap;font-family:var(--x-en);font-size:16px}
+.xe-gl-ul strong{font-family:var(--x-min)}
+.xe-gl-a{color:var(--x-pale2);font-size:12px;margin-left:6px;white-space:nowrap}
+.xe-gl-note{margin:12px 0 0;font-size:12px;color:var(--x-pale2)}
+.xe-res-h{margin-top:clamp(56px,8vw,80px);display:grid;gap:10px;justify-items:center;text-align:center}
+.xe-res-en{margin:0;white-space:nowrap;font-family:var(--x-en);font-size:clamp(22px,3vw,30px);letter-spacing:.1em;color:var(--x-lime)}
+.xe-res-t{margin:0;font-family:var(--x-min);font-weight:700;font-size:clamp(20px,2.8vw,28px);line-height:1.5}
+.xe-res-n{display:inline-block;margin-left:.5em;white-space:nowrap}
+.xe-res-n [data-count]{font-family:var(--x-en);font-size:1.3em}
+.xe-res-note{margin:0;font-size:13px;line-height:1.8;color:var(--x-pale)}
+.xe-zero{margin-top:32px;border:1px dashed rgba(255,255,255,.5);padding:36px 24px;text-align:center;display:grid;gap:14px;justify-items:center}
+.xe-zero[hidden]{display:none}
+.xe-zero-t{margin:0;font-family:var(--x-min);font-weight:700;font-size:16px;line-height:1.8}
+.xe-zero-s{margin:0;font-size:13px;color:var(--x-pale)}
+.xe-zero-btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.xe-zero-next{background:var(--x-lime);color:var(--x-ink)!important;border-radius:999px;padding:12px 22px;font-family:var(--x-min);font-weight:700;font-size:14px}
+.xe-zero-next[hidden]{display:none}
+.xe-zero-rel{border:1px solid rgba(255,255,255,.6);border-radius:999px;padding:12px 22px;font-family:var(--x-min);font-weight:700;font-size:14px}
+.xe-list{margin:32px 0 0;padding:0;list-style:none;display:grid;gap:16px}
+.xe-list[hidden]{display:none}
+.xe-unknown{margin-top:48px;border-top:1px solid rgba(255,255,255,.3);padding-top:28px}
+.xe-unknown[hidden]{display:none}
+.xe-unknown summary{cursor:pointer;display:flex;justify-content:space-between;gap:12px;font-family:var(--x-min);font-weight:700;font-size:18px}
+.xe-unk-n{margin-left:8px;font-family:var(--x-en);font-size:22px}
+.xe-unk-note{margin:8px 0 0;font-size:13px;color:var(--x-pale2)}
+.xe-work{background:var(--x-card);color:var(--x-blue)!important;padding:26px 24px 24px;display:grid;gap:12px;align-content:start}
+.xe-work-g{justify-self:start;background:var(--x-blue);color:#fff;font-size:11px;font-weight:700;padding:4px 10px}
+.xe-work-t{margin:0;font-family:var(--x-min);font-weight:700;font-size:21px;line-height:1.45}
+.xe-work-dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;font-size:13px;line-height:1.6}
+.xe-work-dl dt{font-weight:700}
+.xe-work-dl dd{margin:0}
+.xe-work-o{margin:4px 0 0;padding-top:12px;border-top:1px solid #D6DFFB;font-size:12px;line-height:1.7}
+.xe-work-go{font-family:var(--x-min);font-weight:700;font-size:14px}
+.xe-faq{margin-top:40px;display:grid;gap:10px}
+.xe-faq details{background:var(--x-panel)}
+.xe-faq summary{cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:baseline;padding:22px clamp(18px,3vw,28px)}
+.xe-q,.xe-a{white-space:nowrap;font-family:var(--x-en);font-size:26px;line-height:1}
+.xe-q{color:var(--x-lime)}
+.xe-faq-q{font-family:var(--x-min);font-weight:700;font-size:clamp(15px,2vw,17px);line-height:1.7}
+.xe-faq .x-faq-plus{font-size:18px;line-height:1}
+.xe-faq-a{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;padding:20px clamp(18px,3vw,28px) 26px;border-top:1px solid rgba(255,255,255,.2)}
+.xe-faq-a p{margin:0;font-size:15px;line-height:1.95}
+.xe-about{padding:clamp(34px,5vw,56px) clamp(22px,5vw,56px)}
+.xe-about-en{white-space:nowrap;margin:0;font-family:var(--x-en);font-size:clamp(22px,3.4vw,30px);letter-spacing:.1em;color:#9DB000}
+.xe-about-h{margin:10px 0 0;font-family:var(--x-min);font-weight:700;font-size:clamp(20px,2.8vw,26px)}
+.xe-about-p{margin:18px 0 0;font-size:15px;line-height:1.95;font-weight:500}
+.xe-about-c{margin:16px 0 0;padding-top:16px;border-top:1px solid #D6DFFB;font-size:14px;line-height:1.95}
+.xe-biz{border:1px solid rgba(255,255,255,.45);padding:clamp(28px,4vw,44px) clamp(20px,4vw,44px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px 40px;align-items:center}
+.xe-biz-en{margin:0;white-space:nowrap;font-family:var(--x-en);font-size:24px;letter-spacing:.1em;color:var(--x-lime)}
+.xe-biz-h{margin:0;font-family:var(--x-min);font-weight:700;font-size:clamp(19px,2.4vw,23px);line-height:1.6}
+.xe-biz-p{margin:0;font-size:14px;line-height:1.95;color:var(--x-pale)}
+.xe-biz-btn{justify-self:start;background:var(--x-lime);color:var(--x-ink)!important;border-radius:999px;padding:16px 30px;font-family:var(--x-min);font-weight:700;font-size:15px}
+.xe-author{background:var(--x-panel);padding:clamp(24px,4vw,36px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:20px 32px;align-items:start}
+.xe-au-k{margin:6px 0 0;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--x-pale2)}
+.xe-au-n{margin:0;font-family:var(--x-min);font-weight:700;font-size:16px}
+.xe-au-p{margin:0;font-size:13px;line-height:1.95;color:var(--x-pale)}
+.xe-au-links{margin:0;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;font-weight:700}
+.xe-au-links a{border-bottom:1px solid}
+@media(max-width:360px){.xe-faq summary{gap:12px;padding:20px 14px}.xe-faq-a{gap:12px;padding:18px 14px 24px}}
 </style>

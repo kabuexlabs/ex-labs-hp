@@ -1,0 +1,123 @@
+---
+// /events/ 検索結果の公演回カード（2026-09 リニューアル。デザイン元 Events.dc.html の Results）。
+// 表示内容と判定は従来の EventCard / ListingCard と同じ：「開催」「販売」「空席」を分けて出し、開催予定があるだけでは予約可と書かない。
+// class="ev-card" と data-row はブラウザ側の即時絞り込み（/events/ のスクリプト）が使う。個人情報なし。
+import type { AnyResolved } from '../../lib/events';
+import { isListing, CTA_LABEL, EVENT_LABEL, EVENT_STATUS_LABEL, SALES_LABEL, SEAT_LABEL, FORMAT_LABEL, fmtYen, perPerson, minToHhmm } from '../../lib/events';
+import { fmtVerified, jstWeekday } from '../../lib/thisWeek';
+import { genreName, areaName, regionName } from '../../data/events/areas';
+import Cls from './Cls.astro';
+
+interface Props { r: AnyResolved; place: string }
+const { r, place } = Astro.props;
+const WD = ['日', '月', '火', '水', '木', '金', '土'];
+const row = r.row;
+const [, mm, dd] = row.date.split('-');
+const md = `${Number(mm)}.${dd}`;
+const wd = `（${WD[jstWeekday(row.date)]}）`;
+const timeText = row.start !== undefined ? `${minToHhmm(row.start)}開演${row.end !== undefined ? `〜${minToHhmm(row.end)}` : ''}` : '';
+
+type Spec = { k: string; v: string; notes: string[] };
+let org = '', title = '', href = '', hrefExt = false, genre = '', placeText = '', desc = '', spec: Spec[] = [], status: { k: string; v: string }[] = [], ctaHref = '', ctaText = '', canGo = true, track = '', trackKind = 'ticket', showId = '';
+if (isListing(r)) {
+  const l = r.listing;
+  org = `${r.site.name} 掲載`; title = l.title; href = l.url; hrefExt = true;
+  genre = l.genres.map(genreName).join('・'); placeText = `${regionName(l.regionId)}・${areaName(l.areaId)}${l.venueName ? `／${l.venueName}` : ''}｜${l.organizerName}`;
+  const unit = l.priceUnit === 'per-person' ? '1人あたり' : l.priceUnit === 'per-group' ? '1組あたり' : l.priceUnit === 'charter' ? '貸切総額' : '';
+  const st = r.cta === 'cancelled' ? '中止' : r.cta === 'ended' ? '終了' : r.cta === 'started' ? '開演済み' : l.status === 'soldout' ? '確認時点で満席' : l.status === 'open' ? `確認時点で募集中${l.remainingText ? `（${l.remainingText}）` : ''}` : '募集状況は掲載元で確認';
+  spec = [
+    { k: '所要時間', v: l.durationMinutes ? `約${l.durationMinutes}分` : l.endTime ? `〜${l.endTime}` : '掲載元で確認', notes: [] },
+    { k: `料金${unit ? `（${unit}）` : ''}`, v: l.priceText ?? '掲載元で確認', notes: l.amount !== undefined ? [`1人 ${fmtYen(l.amount)}（手数料の有無は掲載元で確認）`] : [] },
+    { k: '申込可能な人数', v: l.party ? (l.party.text ?? `${l.party.min}${l.party.max ? `〜${l.party.max}` : ''}名`) : '掲載元で確認', notes: [] },
+    { k: '募集状況', v: st, notes: [`${fmtVerified(l.checkedAt)}に掲載元で確認${r.stale ? '（確認から1週間以上経過）' : ''}`] },
+  ];
+  canGo = !['ended', 'cancelled'].includes(r.cta); ctaHref = l.url; ctaText = `${r.site.name}で詳細・予約を見る`; trackKind = 'ev-ext'; showId = r.site.id; track = `${place}-listing`;
+} else {
+  const { occ, work, venue, organizer } = r;
+  const channel = occ.sales.channels[0];
+  org = organizer.relationLabel; title = work.title; href = `/events/${work.slug}/`;
+  genre = work.genres.map(genreName).join('・'); placeText = `${regionName(venue.regionId)}・${areaName(venue.areaId)}／${venue.name}`;
+  desc = work.summary;
+  const ppList = work.price.unit === 'per-group' && work.price.tiers
+    ? work.price.tiers.map((t) => `${t.party}人 ${fmtYen(perPerson(work.price, t.party)!)}`).join('／')
+    : work.price.unit === 'charter' && work.price.amount !== undefined && work.party.max ? `${work.party.max}人参加で ${fmtYen(perPerson(work.price, work.party.max)!)}` : '';
+  const priceUnit = work.price.unit === 'per-person' ? '1人あたり' : work.price.unit === 'per-group' ? '1組あたり' : work.price.unit === 'charter' ? '貸切総額' : '単位は公式で確認';
+  spec = [
+    { k: '所要時間', v: work.duration.text, notes: [] },
+    { k: `料金（${priceUnit}）`, v: work.price.text, notes: [...(ppList ? [`1人あたりの目安：${ppList}（手数料別）`] : []), work.price.feeNote] },
+    { k: '申込可能な人数', v: work.party.text, notes: [`${work.party.soloAllowed ? '1人参加可' : '1人での申込不可'}${work.party.soloRuns !== undefined ? `・${work.party.soloRuns ? '1人でも開催成立' : '1人では開催成立せず（相席）'}` : ''}`] },
+    { k: '参加形式', v: FORMAT_LABEL[work.party.format], notes: [] },
+  ];
+  const seatText = r.seatState === 'available' && occ.seats.remaining !== undefined
+    ? `確認時点で残り${occ.seats.remaining}席（${fmtVerified(occ.seats.checkedAt!)}確認）`
+    : r.seatState !== 'unknown' && occ.seats.checkedAt ? `${SEAT_LABEL[r.seatState]}（${fmtVerified(occ.seats.checkedAt)}確認）` : SEAT_LABEL[r.seatState];
+  const eventText = r.eventState === 'upcoming' ? EVENT_STATUS_LABEL[occ.eventStatus] : EVENT_LABEL[r.eventState];
+  status = [
+    { k: '開催', v: `${eventText}（${fmtVerified(occ.eventCheckedAt)}確認）` },
+    { k: '販売', v: `${SALES_LABEL[r.salesState]}${occ.sales.closesAt && r.salesState === 'open' ? `（締切 ${fmtVerified(occ.sales.closesAt)}）` : ''}` },
+    { k: '空席', v: seatText },
+  ];
+  canGo = !['ended', 'cancelled'].includes(r.cta) && !!channel; ctaHref = channel?.url ?? ''; ctaText = CTA_LABEL[r.cta];
+  showId = work.id; track = `${place}-${organizer.relation === 'ex-labs' ? 'own' : '3rd'}`;
+}
+const orgParts = (() => { const i = org.indexOf('（'); return i < 0 ? [org] : [org.slice(0, i), org.slice(i)]; })();
+---
+<article class={`ev-card xss is-${r.cta}`} data-row={JSON.stringify(row)} data-occ={row.id}>
+  <div class="xss-date">
+    <time class="xss-md" datetime={row.date}>{md}</time>
+    <span class="xss-wd">{wd}</span>
+    <span class="xss-time">{timeText ? timeText : <><span class="x-c">開演時刻は</span><span class="x-c">{isListing(r) ? '掲載元で確認' : '公式ページで確認'}</span></>}</span>
+  </div>
+  <div class="xss-body">
+    <p class="xss-org">{orgParts.map((p) => <span class="x-c">{p}</span>)}</p>
+    <h3 class="xss-t"><a href={href} target={hrefExt ? '_blank' : undefined} rel={hrefExt ? 'noopener nofollow' : undefined} data-track={hrefExt ? 'ev-ext' : 'show'} data-show={showId} data-place={track}>{title}</a></h3>
+    <p class="xss-sub"><span class="x-c xss-genre">{genre}</span><span style="margin:0 6px">｜</span><Cls text={placeText} emph={false} /></p>
+    {desc && <p class="xss-desc"><Cls text={desc} emph={false} /></p>}
+    <dl class="xss-spec">
+      {spec.map((sp) => (
+        <div>
+          <dt>{sp.k}</dt>
+          <dd class="xss-v"><Cls text={sp.v} emph={false} /></dd>
+          {sp.notes.filter(Boolean).map((n) => <dd class="xss-n"><Cls text={n} emph={false} /></dd>)}
+        </div>
+      ))}
+    </dl>
+    {status.length > 0 && <ul class="xss-status" aria-label="開催・販売・空席の確認状況">{status.map((st) => <li><span class="xss-sk">{st.k}</span><span><Cls text={st.v} emph={false} /></span></li>)}</ul>}
+    <div class="xss-btns">
+      {canGo ? <a class="xss-btn" href={ctaHref} target="_blank" rel={trackKind === 'ev-ext' ? 'noopener nofollow' : 'noopener'} data-track={trackKind} data-show={showId} data-place={track}><Cls text={`${ctaText} ↗`} emph={false} /></a> : <span class="xss-ended">{isListing(r) ? '受付終了' : CTA_LABEL[r.cta]}</span>}
+      {!isListing(r) && <a class="xss-btn2" href={href} data-track="show" data-show={showId} data-place={track}>詳細・ほかの日程 →</a>}
+    </div>
+  </div>
+</article>
+<style>
+.xss{background:var(--x-panel);display:grid;grid-template-columns:170px minmax(0,1fr)}
+.xss-date{background:var(--x-card);color:var(--x-blue);padding:28px 18px;display:grid;align-content:start;justify-items:center;text-align:center;gap:8px}
+.xss-md{white-space:nowrap;font-family:var(--x-en);font-size:clamp(36px,5vw,52px);line-height:1}
+.xss-wd{white-space:nowrap;font-family:var(--x-min);font-weight:700;font-size:15px}
+.xss-time{font-size:11px;line-height:1.6;color:#4A68D6}
+.xss-body{padding:clamp(20px,3vw,32px) clamp(18px,3vw,32px) clamp(24px,3vw,32px);display:grid;gap:14px;align-content:start;min-width:0}
+.xss-org{margin:0;justify-self:start;font-size:11px;font-weight:700;padding:4px 10px;border:1px solid rgba(255,255,255,.5)}
+.xss-t{margin:0;font-family:var(--x-min);font-weight:700;font-size:clamp(21px,2.6vw,26px);line-height:1.4}
+.xss-sub{margin:-6px 0 0;font-size:12px;line-height:1.7;color:var(--x-pale2)}
+.xss-genre{color:var(--x-lime);font-weight:700}
+.xss-desc{margin:0;font-size:14px;line-height:1.9;color:var(--x-pale)}
+.xss-spec{margin:4px 0 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.18)}
+.xss-spec>div{background:var(--x-panel);padding:14px 16px;display:grid;gap:6px;align-content:start}
+.xss-spec dt{font-size:11px;font-weight:700;color:var(--x-pale2);letter-spacing:.06em}
+.xss-spec dd{margin:0}
+.xss-v{font-family:var(--x-min);font-weight:700;font-size:15px;line-height:1.6}
+.xss-n{font-size:11px;line-height:1.7;color:var(--x-pale2)}
+.xss-status{margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:13px}
+.xss-status li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center}
+.xss-sk{white-space:nowrap;font-size:11px;font-weight:700;padding:3px 8px;background:var(--x-card);color:var(--x-blue)}
+.xss-btns{margin-top:4px;display:flex;flex-wrap:wrap;gap:10px}
+.xss-btn{background:var(--x-lime);color:var(--x-ink)!important;border-radius:999px;padding:12px 22px;font-family:var(--x-min);font-weight:700;font-size:14px}
+.xss-btn2{border:1px solid rgba(255,255,255,.6);border-radius:999px;padding:12px 22px;font-family:var(--x-min);font-weight:700;font-size:14px}
+.xss-ended{font-size:13px;font-weight:700;color:var(--x-pale2)}
+.xss.is-ended,.xss.is-cancelled{opacity:.6}
+@media(max-width:699px){
+  .xss{grid-template-columns:minmax(0,1fr)}
+  .xss-date{padding:14px 18px;display:flex;flex-wrap:wrap;align-items:baseline;justify-items:start;text-align:left;gap:4px 10px}
+  .xss-spec{grid-template-columns:minmax(0,1fr)}
+}
+</style>

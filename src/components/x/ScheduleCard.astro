@@ -1,0 +1,104 @@
+---
+// /events/「Schedule」の公演カード（2026-09 リニューアル。デザイン元 Events.dc.html）。
+// 判定は従来の ShowCalendar と同じ：◯は「公式ページで確認できた開催日」で、予約可能とは書かない。日付は日本時間。
+import type { Show } from '../../data/shows';
+import Cls from './Cls.astro';
+import { occurrenceState, weekRange, fmtDateShort, jstDateString, jstWeekday, addDays } from '../../lib/thisWeek';
+
+interface Props { show: Show; place: string; now?: Date }
+const { show: s, place, now = new Date() } = Astro.props;
+const today = jstDateString(now);
+const week = weekRange(now);
+const WD = ['日', '月', '火', '水', '木', '金', '土'];
+const days14 = Array.from({ length: 14 }, (_, i) => addDays(week.start, i));
+type CellState = 'open' | 'today' | 'started' | 'soldout' | 'ended' | 'cancelled' | 'none';
+const byDate = new Map(s.occurrences.map((o) => [o.date, o]));
+const cells = days14.map((d) => {
+  const o = byDate.get(d);
+  if (!o) return { date: d, state: 'none' as CellState };
+  const st = occurrenceState(o, now);
+  const state: CellState = st === 'upcoming' ? 'open' : st === 'today-time-unknown' ? 'today' : st === 'started' ? 'started' : st === 'soldout' ? 'soldout' : st === 'cancelled' ? 'cancelled' : 'ended';
+  return { date: d, state };
+});
+const openCount = cells.filter((c) => c.state === 'open' || c.state === 'today').length;
+const todayOpen = cells.some((c) => c.date === today && (c.state === 'open' || c.state === 'today'));
+const todayTimeUnknown = cells.some((c) => c.date === today && c.state === 'today');
+const nextAfter = s.occurrences.map((o) => o.date).filter((d) => d >= week.end).sort()[0];
+const noDates = s.occurrences.length === 0;
+const badge = noDates ? '日程は公式で確認' : todayOpen ? (todayTimeUnknown ? '本日が開催日' : '本日開催') : openCount > 0 ? `2週間で${openCount}日開催` : nextAfter ? `次回 ${fmtDateShort(nextAfter)}` : '';
+const short = (t: string) => t.replace(/（[^）]*）/g, '').split(/[。．]/)[0].trim();
+const cap = [short(s.duration), short(s.capacity)].filter((c) => c && c.length <= 22 && !/確認/.test(c)).join('・');
+const md = (d: string) => fmtDateShort(d);
+const STATE_SUB: Partial<Record<CellState, string>> = { started: '済', soldout: '満席', cancelled: '中止', ended: '終了' };
+---
+<article class="xsc" data-show={s.id}>
+  <a class="xsc-img" href={s.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={s.id} data-place={`${place}-img`} aria-label={`${s.name} 予約サイトへ`}>
+    {s.image ? <img src={s.image.path} alt={s.image.alt} width="1200" height="675" loading="lazy" decoding="async" /> : <span class="xsc-noimg">{s.name}</span>}
+    {badge && <span class="xsc-badge">{badge}</span>}
+  </a>
+  <div class="xsc-body">
+    <p class="xsc-place"><Cls text={s.area} emph={false} /></p>
+    <h3 class="xsc-t">{s.name}</h3>
+    <div class="xsc-price"><span class="xsc-yen">{s.priceCard.main}</span>{s.priceCard.sub && <span class="xsc-psub"><Cls text={s.priceCard.sub} emph={false} /></span>}</div>
+    {cap && <p class="xsc-cap"><Cls text={cap} emph={false} /></p>}
+    {noDates ? <p class="xsc-cap">開催日は公式ページでご確認ください。</p> : (
+      <div class="xsc-weeks">
+        {[0, 1].map((wk) => (
+          <div class="xsc-week">
+            <p class="xsc-wk"><span class="xsc-wk-l">{wk === 0 ? '今週' : '来週'}</span><span class="xsc-wk-r">{md(days14[wk * 7])}〜{md(days14[wk * 7 + 6])}</span></p>
+            <div class="xsc-days">
+              {cells.slice(wk * 7, wk * 7 + 7).map((c) => {
+                const wd = jstWeekday(c.date);
+                const n = c.date.slice(8).replace(/^0/, '');
+                const clickable = c.state === 'open' || c.state === 'today';
+                const label = `${md(c.date)}${clickable ? ' 開催日・予約サイトで空席を確認' : STATE_SUB[c.state] ? ` ${STATE_SUB[c.state]}` : ' 開催日として確認できていません'}`;
+                return clickable ? (
+                  <a class="xsc-d is-open" href={s.ticketUrl} target="_blank" rel="noopener" title={label} aria-label={label} data-date={c.date} data-track="ticket" data-show={s.id} data-place={place}><span class="xsc-n">{n}</span><span class="xsc-w">{c.date === today ? '今日' : WD[wd]}</span></a>
+                ) : c.date === today ? (
+                  <div class="xsc-d is-today" title={label} data-date={c.date}><span class="xsc-n">{n}</span><span class="xsc-w">今日</span></div>
+                ) : (
+                  <div class="xsc-d is-closed" title={label} data-date={c.date}><span class="xsc-n">{n}</span><span class="xsc-w">{STATE_SUB[c.state] ?? WD[wd]}</span></div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+    <div class="xsc-btns">
+      <a class="xsc-btn" href={s.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={s.id} data-place={`${place}-btn`}>{openCount > 0 ? '予約サイトで空席を見る' : '次回以降の日程を見る'}<span>{s.ticketSite} ↗</span></a>
+      <a class="xsc-btn2" href={s.url} data-track="show" data-show={s.id} data-place={place}>公演内容 →</a>
+    </div>
+  </div>
+</article>
+<style>
+.xsc{background:var(--x-panel);display:grid;align-content:start}
+.xsc-img{position:relative;display:block}
+.xsc-img img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--x-blue)}
+.xsc-noimg{display:grid;place-content:center;aspect-ratio:16/9;background:var(--x-blue);font-family:var(--x-min);font-weight:700}
+.xsc-badge{position:absolute;left:0;bottom:0;background:var(--x-lime);color:var(--x-ink);font-family:var(--x-min);font-weight:700;font-size:13px;padding:7px 14px}
+.xsc-body{padding:22px clamp(16px,3vw,28px) 28px;display:grid;gap:14px}
+.xsc-place{margin:0;font-size:12px;color:var(--x-pale2)}
+.xsc-t{margin:0;font-family:var(--x-min);font-weight:700;font-size:clamp(21px,2.6vw,26px);line-height:1.4}
+.xsc-price{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.xsc-yen{white-space:nowrap;font-family:var(--x-en);font-size:32px;line-height:1;color:var(--x-lime)}
+.xsc-psub{font-size:13px;font-weight:700}
+.xsc-cap{margin:-4px 0 0;font-size:13px;color:var(--x-pale)}
+.xsc-weeks{margin-top:6px;display:grid;gap:14px}
+.xsc-week{display:grid;gap:8px}
+.xsc-wk{margin:0;font-size:12px;font-weight:700;display:flex;flex-wrap:wrap;gap:4px 10px}
+.xsc-wk-l{font-family:var(--x-min);font-size:13px}
+.xsc-wk-r{color:var(--x-pale2);white-space:nowrap}
+.xsc-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.xsc-d{aspect-ratio:1/1;border-radius:50%;display:grid;place-content:center;justify-items:center;gap:1px;line-height:1}
+.xsc-n{font-family:var(--x-en);font-size:clamp(16px,2vw,20px)}
+.xsc-w{font-size:10px}
+.xsc-d.is-open{background:var(--x-lime);color:var(--x-ink)!important}
+.xsc-d.is-open .xsc-n,.xsc-d.is-open .xsc-w{font-weight:700}
+.xsc-d.is-today{border:1px dashed rgba(255,255,255,.7);color:#fff}
+.xsc-d.is-closed{color:rgba(255,255,255,.5)}
+.xsc-btns{margin-top:8px;display:flex;flex-wrap:wrap;gap:10px}
+.xsc-btn{background:var(--x-lime);color:var(--x-ink)!important;border-radius:999px;padding:12px 22px;font-family:var(--x-min);font-weight:700;font-size:14px;display:flex;align-items:baseline;gap:8px}
+.xsc-btn span{font-family:var(--x-en);font-size:13px}
+.xsc-btn2{border:1px solid rgba(255,255,255,.6);border-radius:999px;padding:12px 22px;font-family:var(--x-min);font-weight:700;font-size:14px}
+</style>
