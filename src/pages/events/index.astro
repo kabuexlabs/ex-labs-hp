@@ -117,7 +117,8 @@ const worksCards = eventsData.works.filter((w) => w.published).map((w) => {
   const org = eventsData.organizers.find((o) => o.id === w.organizerId);
   return { w, genre: GENRES.find((x) => x.id === w.genres[0])?.name ?? '', area: v ? `${regionName(v.regionId)}・${areaName(v.areaId)}` : '東京', next: nxt ? fmtDateJa(nxt.row.date) : '開催日は公式チケットページで確認', org: org?.relationLabel ?? '', own: org?.relation === 'ex-labs' };
 });
-const aboutText = '「公演を探す」は、株式会社ex Labs が運営する、マダミス・イマーシブ公演の発見と集客を支援する無料の公演情報サービスです。掲載料・予約手数料・利用料はいただいておらず、予約と決済は各公演の公式販売ページで行います。検索結果は利用者の条件への適合と開催日時の順に並び、ex Labs の公演には「ex Labs 企画・制作」と表示しています。将来、広告枠を設ける場合は「広告」「PR」と明示します。';
+// 2026-09-28 クライアント指定の文面・改行位置
+const aboutLines = ['「公演を探す」は、', '株式会社ex Labs が運営する', 'マダミス・イマーシブ公演の発見と', '集客を支援する', '無料の公演情報サービスです。'];
 const authorText = 'イマーシブ・マダミス（マーダーミステリー）・謎解き・頭脳戦など、体験型エンターテインメントの企画・制作・集客・運営を一貫して手がける制作会社。東京大学発スタートアップとして2025年設立。累計コンテンツ体験者数15,000人超、渋谷サクラステージでの施設一体型イベントは日本経済新聞に掲載。実際に企画・運営した現場の知見をもとに執筆しています。';
 
 ---
@@ -270,7 +271,7 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
     <div class="x-wcard is-s xe-about">
       <p class="xe-about-en">About this Service</p>
       <h2 class="xe-about-h">このサービスについて</h2>
-      <p class="xe-about-p"><Cls text={aboutText} emph={false} /></p>
+      <p class="xe-about-p">{aboutLines.map((l) => <span class="x-bl"><Cls text={l} emph={false} /></span>)}</p>
       <p class="xe-about-c"><Ph list={['掲載内容の修正・掲載停止のご依頼、', '公演の掲載のご相談（無料）は']} /> <a href={`mailto:${EVENTS_CONTACT}`} style="border-bottom:1px solid;font-weight:700">{EVENTS_CONTACT}</a> <span class="x-c">または</span><a href="#contact" style="border-bottom:1px solid;font-weight:700">お問い合わせフォーム</a><span class="x-c">へ。</span><span class="x-c">詳細は</span><a href="/events/about/" style="border-bottom:1px solid;font-weight:700"><Ph list={['サービスについて', '（掲載基準・運営者・修正依頼）']} /></a>。</p>
     </div>
     <div class="xe-biz">
