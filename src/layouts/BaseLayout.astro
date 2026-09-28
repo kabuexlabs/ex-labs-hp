@@ -1,6 +1,11 @@
 ---
 import SiteGuard from '../components/SiteGuard.astro';
+import ContactBlock, { type ContactType } from '../components/x/ContactBlock.astro';
+import Ph from '../components/x/Ph.astro';
+import SiteHeader from '../components/x/SiteHeader.astro';
+import SiteFooter from '../components/x/SiteFooter.astro';
 import '../styles/global.css';
+import '../styles/x.css';
 import { jsonLd } from '../lib/microcms';
 
 export interface Props {
@@ -8,6 +13,14 @@ export interface Props {
   description?: string;
   ogImage?: string;
   ogType?: 'website' | 'article';
+  /** 2026-09 リニューアルのデザイン（青地）で組むページ。本文は各ページ、Contact とフッターはここで描画 */
+  renewal?: boolean;
+  /** 開幕のカットイン（行ごとの文節配列）。同じページはセッション中1回だけ再生 */
+  cutin?: string[][];
+  /** フッター前の Contact（リニューアルページのみ） */
+  contact?: { title?: string[]; note?: string; type?: ContactType; placeholder?: string };
+  /** フッターの種類：full＝キャッチ・リンク付き（トップ・既存ページ）／short＝住所と著作権のみ（サービス・一覧） */
+  footer?: 'full' | 'short';
 }
 
 const {
@@ -17,11 +30,12 @@ const {
   // logo thumbnail — or that ignore query strings — re-fetch the card.
   ogImage = '/assets/share-card.png',
   ogType = 'website',
+  renewal = false,
+  cutin,
+  contact,
+  footer = 'full',
 } = Astro.props;
-
-// The intro curtain only plays on the homepage — repeating a ~1.6s
-// animation on every internal nav click would get old fast.
-const showPreloader = Astro.url.pathname === '/';
+const cutKey = 'exl_cut:' + Astro.url.pathname;
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 // Canonical always uses the trailing-slash form: SSR routes answer
@@ -151,78 +165,56 @@ const orgLd = {
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-{/* ヘッダーロゴ＆ヒーローロゴ（LCP候補）を最優先で先読み。 */}
-<link rel="preload" as="image" href="/assets/logo.png" fetchpriority="high">
-{/* Webフォントはレンダリングをブロックしないよう非同期読み込み
-    （media=print→onloadでall）。未使用の Noto 900 は除外して軽量化。
-    display=swap でフォント取得前もフォールバックで即表示される。 */}
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Noto+Sans+JP:wght@400;500;700;800&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Noto+Sans+JP:wght@400;500;700;800&display=swap"></noscript>
+{/* ヘッダー・ヒーローの白ロゴ（LCP候補）を最優先で先読み。 */}
+<link rel="preload" as="image" href="/assets/exlabs-logo-w.png" fetchpriority="high">
+{/* Webフォントは非同期読み込み（media=print→onloadでall）。display=swap で取得前もフォールバックで即表示。
+    Italiana・しっぽり明朝・Zen Kaku Gothic New は 2026-09 リニューアルの書体、Noto・Montserrat は既存の解説記事用。 */}
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Italiana&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Montserrat:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Montserrat:wght@600;700;800&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Montserrat:wght@600;700;800&display=swap"></noscript>
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <script type="application/ld+json" set:html={jsonLd(websiteLd)} />
 <SiteGuard />
 </head>
-<body>
+<body class={renewal ? 'x-body' : 'x-legacy'}>
 
-{showPreloader && (
-  <script is:inline>
-    /* 演出は同一セッションで1回だけ。2回目以降の訪問はすぐ本文を見せる */
-    try { if (sessionStorage.getItem('exl_pre')) { document.documentElement.classList.add('no-pre'); } else { sessionStorage.setItem('exl_pre', '1'); } } catch (e) {}
-  </script>
-)}
-{showPreloader && (
-  <div class="preloader" aria-hidden="true">
-    <p class="preloader-tagline serif">AI時代に、人間が作る面白さを追求する</p>
-    <img class="preloader-logo" src="/assets/logo-white.png" alt="">
+{cutin && (
+  <>
+  <div class="x-cut" id="x-cut" aria-hidden="true">
+    <div class="x-cut-band"></div>
+    <div class="x-cut-in">
+      <img class="x-cut-logo" src="/assets/exlabs-logo-w.png" alt="" width="2048" height="520">
+      <span class="x-cut-line"></span>
+      <div class="x-cut-txt">{cutin.map((ln, i) => <span class="x-cut-ln" style={`animation-delay:${(0.95 + i * 0.2).toFixed(2)}s`}><Ph list={ln} /></span>)}</div>
+    </div>
   </div>
+  <script is:inline define:vars={{ cutKey }}>
+    /* カットイン（約3.3秒、クリックでスキップ）。視差効果を減らす設定の方と、同じページを同じセッションで2回目以降に開いたときは出さない。 */
+    (function () {
+      var el = document.getElementById('x-cut'); if (!el) return;
+      var seen = false; try { seen = !!sessionStorage.getItem(cutKey); sessionStorage.setItem(cutKey, '1'); } catch (e) {}
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (seen || reduce || location.hash) { el.remove(); return; }
+      document.documentElement.style.overflow = 'hidden';
+      var done = function () { document.documentElement.style.overflow = ''; if (el.parentNode) el.remove(); };
+      el.addEventListener('click', done);
+      setTimeout(done, 3300);
+      window.addEventListener('pageshow', function (e) { if (e.persisted) done(); });
+    })();
+  </script>
+  </>
 )}
 
-<header class="nav" id="top"><div class="wrap navrow">
-<a href="/"><img class="logo-header" src="/assets/logo.png" alt="ex Labs"></a>
-<nav class="navlinks"><a href="/company/">会社概要</a><a href="/#strength">強み</a><a href="/#works">実績</a><a href="/services/">サービス</a><a href="/#message">メッセージ</a><a href="/press/">プレスリリース</a><a href="/blog/">ブログ</a><a href="/game/">過去コンテンツのネタバレ</a></nav>
-<div class="nav-actions">
-<a class="btn dark" href="/#contact" style="padding:12px 24px;font-size:12.5px">お問い合わせ</a>
-<button class="nav-toggle" type="button" aria-label="メニューを開く" aria-expanded="false"><span></span><span></span><span></span></button>
-</div>
-</div></header>
+<SiteHeader ctaHref={renewal ? '#contact' : '/#contact'} />
 
-<main><slot /></main>
+<main class={renewal ? 'x-root' : undefined} lang="ja"><slot /></main>
 
-<a class="totop" href="#top" aria-label="ページの上部へ戻る">TOP</a>
-<footer><div class="wrap">
-<div class="foot-row">
-<div><p class="foot-name">株式会社 ex Labs</p><p class="foot-tag">AI時代に、人間が作る面白さを追求する — 体験型エンターテインメントの企画・制作</p><p class="foot-addr">東京都新宿区西新宿3-3-13 西新宿水間ビル2F</p></div>
-<p class="foot-copy">© 2026 ex Labs Inc.</p>
-<p class="foot-copy">本サイトに掲載の文章・画像等の無断転載・複製を禁じます。</p>
+<div class={`x-end${renewal && contact ? ' has-contact' : ''}`} id={renewal && contact ? 'contact' : undefined}>
+  <div class="x-end-in">
+    {renewal && contact && <ContactBlock {...contact} />}
+    <SiteFooter footer={footer} />
+  </div>
 </div>
-<nav class="foot-links">
-<a href="/services/nazotoki-kenshu/">謎解き研修</a>
-<a href="/services/murder-mystery/">マーダーミステリー制作</a>
-<a href="/services/shisetsu-event/">施設活用イベント</a>
-<a href="/services/immersive/">イマーシブ制作</a>
-<a href="/services/zunousen/">頭脳戦制作</a>
-<a href="/guide/madamis/">マダミスとは</a>
-<a href="/guide/immersive/">イマーシブとは</a>
-<a href="/guide/shisetsu-katsuyo/">施設活用イベントとは</a>
-<a href="/guide/saiji/">催事とは</a>
-<a href="/guide/zunousen/">頭脳戦とは</a>
-<a href="/guide/shinrisen/">心理戦とは</a>
-<a href="/guide/taikengata-event/">体験型イベントとは</a>
-<a href="/guide/shuyu-event/">周遊型イベントとは</a>
-<a href="/works/">制作事例一覧</a>
-<a href="/guide/event-hiyou/">費用相場</a>
-<a href="/guide/yougo/">用語集</a>
-<a href="/game/">過去コンテンツのネタバレ</a>
-<a href="/media/">メディア掲載実績</a>
-<a href="/press/">プレスリリース</a>
-<a href="/events/">今日できるイマーシブ（公演を探す）</a>
-<a href="/guide/">解説記事一覧</a>
-<a href="/blog/">ブログ</a>
-<a href="/company/">会社概要</a>
-<a href="/company/iida-yuki/">代表プロフィール</a>
-</nav>
-</div></footer>
 
 <script is:inline>
 /* Safety net: hero logo/headline/marquee use entrance animations that
@@ -238,32 +230,6 @@ const orgLd = {
   }
   window.addEventListener('pageshow', function (e) { if (e.persisted) ensureHeroVisible(); });
   window.addEventListener('load', function () { setTimeout(ensureHeroVisible, 1800); });
-})();
-(function () {
-  var t = document.querySelector('.totop');
-  if (t) {
-    var tick = false;
-    var upd = function () { t.classList.toggle('is-show', window.scrollY > 600); tick = false; };
-    window.addEventListener('scroll', function () { if (!tick) { tick = true; requestAnimationFrame(upd); } }, { passive: true });
-    upd();
-  }
-})();
-(function () {
-  var header = document.querySelector('header.nav');
-  var toggle = document.querySelector('.nav-toggle');
-  if (header && toggle) {
-    toggle.addEventListener('click', function () {
-      var open = header.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      toggle.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
-    });
-    header.querySelectorAll('.navlinks a').forEach(function (a) {
-      a.addEventListener('click', function () {
-        header.classList.remove('open');
-        toggle.setAttribute('aria-expanded', 'false');
-      });
-    });
-  }
 })();
 /* マーキーのスクロール速度を全トラックで統一する。CSSの固定
    duration だとトラック幅（ロゴ枚数）によって px/秒 が変わるため、

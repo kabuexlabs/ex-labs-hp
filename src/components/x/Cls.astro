@@ -1,0 +1,8 @@
+---
+// 文字列を文節ごとの inline-block に分けて描画する（改行位置の制御）。src/lib/jpbreak.ts 参照。
+import { cls, type Clause } from '../../lib/jpbreak';
+interface Props { text?: string; clauses?: Clause[]; emph?: boolean }
+const { text = '', clauses, emph = true } = Astro.props;
+const list = clauses ?? cls(text, emph);
+---
+{list.map((c) => <span class="x-c">{c.map((p) => p.b ? <strong class="x-mk">{p.t}</strong> : p.t)}</span>)}

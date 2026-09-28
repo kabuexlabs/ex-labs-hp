@@ -1,0 +1,21 @@
+---
+// 本文の自動整形（文単位の改行・「／」区切りの箇条書き・「A：B」のKV表・強調マーカー）。
+import { rich } from '../../lib/jpbreak';
+import Cls from './Cls.astro';
+interface Props { text: string }
+const blocks = rich(Astro.props.text);
+---
+<div class="x-rich">
+{blocks.map((bk) => bk.kind === 'p' ? (
+  <p class="x-rich-p">{bk.lines.map((ln) => <span class="x-rich-l"><Cls clauses={ln} /></span>)}</p>
+) : bk.kind === 'list' ? (
+  <div class="x-rich-list">
+    {bk.title && <p class="x-rich-lt">{bk.title}</p>}
+    <ul>{bk.items.map((it) => <li><span class="x-rich-plus">+</span><span><Cls clauses={it} /></span></li>)}</ul>
+  </div>
+) : (
+  <div class="x-rich-kv">
+    {bk.rows.map((r) => <div class="x-rich-kvr"><span class={r.short ? 'x-rich-k is-short' : 'x-rich-k'}>{r.k}</span><span class="x-rich-v"><Cls clauses={r.v} /></span></div>)}
+  </div>
+))}
+</div>

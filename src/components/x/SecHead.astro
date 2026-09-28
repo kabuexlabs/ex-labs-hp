@@ -1,0 +1,13 @@
+---
+// セクション見出し：Italiana の英字（両側に「+ ―」の装飾）＋明朝の日本語サブ見出し。
+import Cls from './Cls.astro';
+interface Props { en: string; ja?: string; tag?: 'h1' | 'h2'; size?: 'l' | 'm' | 's'; jaTag?: 'p' | 'h1' | 'h2'; jaWeight?: 'n' | 'b' }
+const { en, ja, tag = 'h2', size = 'l', jaTag = 'p', jaWeight = 'n' } = Astro.props;
+const Tag = tag; const JaTag = jaTag;
+---
+<div class="x-sh">
+  <span class="x-sh-deco" aria-hidden="true">+<span class="x-sh-line"></span></span>
+  <Tag class={`x-sh-en is-${size}`}>{en}</Tag>
+  <span class="x-sh-deco" aria-hidden="true"><span class="x-sh-line"></span>+</span>
+</div>
+{ja && <JaTag class={`x-sh-ja${jaWeight === 'b' ? ' is-b' : ''}`}><Cls text={ja} emph={false} /></JaTag>}

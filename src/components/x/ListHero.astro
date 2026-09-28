@@ -1,0 +1,32 @@
+---
+// 一覧ページ（プレス・ブログ・制作事例・ネタバレ）共通のパンくず＋ヒーロー（デザイン元 ListPage.dc.html）。
+import Cls from './Cls.astro';
+import { jsonLd } from '../../lib/microcms';
+interface Props { crumb: string; en: string; ja: string; lead: string }
+const { crumb, en, ja, lead } = Astro.props;
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const crumbLd = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+  { '@type': 'ListItem', position: 1, name: 'ホーム', item: new URL('/', site).toString() },
+  { '@type': 'ListItem', position: 2, name: crumb, item: new URL(Astro.url.pathname, site).toString() },
+] };
+---
+<script type="application/ld+json" set:html={jsonLd(crumbLd)} />
+<nav class="xl-crumb" aria-label="パンくずリスト"><a href="/">ホーム</a><span>/</span><span aria-current="page" style="color:#fff">{crumb}</span></nav>
+<section class="xl-hero">
+  <div class="xl-hero-in">
+    <div class="x-sh">
+      <span class="x-sh-deco" aria-hidden="true">+<span class="x-sh-line"></span></span>
+      <p class="x-sh-en is-hero" aria-hidden="true">{en}</p>
+      <span class="x-sh-deco" aria-hidden="true"><span class="x-sh-line"></span>+</span>
+    </div>
+    <h1 class="xl-ja">{ja}</h1>
+    <p class="xl-lead"><Cls text={lead} emph={false} /></p>
+  </div>
+</section>
+<style>
+.xl-crumb{max-width:1100px;margin:0 auto;padding:20px 24px 0;display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--x-pale2)}
+.xl-hero{padding:clamp(56px,9vw,112px) 24px clamp(56px,8vw,88px)}
+.xl-hero-in{max-width:1100px;margin:0 auto;text-align:center}
+.xl-ja{margin:18px 0 0;font-family:var(--x-min);font-weight:600;font-size:clamp(20px,2.8vw,28px);letter-spacing:.06em}
+.xl-lead{margin:18px auto 0;max-width:34em;font-size:15px;line-height:2;color:var(--x-pale)}
+</style>

@@ -1,0 +1,8 @@
+---
+// デザインで手組みされた文節（配列）をそのまま inline-block で並べる。
+// 各文節には ZWSP（折り返し候補）を入れ、入りきらない幅のときだけ文節内の自然な切れ目で折り返す。
+import { segList } from '../../lib/jpbreak';
+interface Props { list: string[] }
+const list = segList(Astro.props.list);
+---
+{list.map((t) => <span class="x-c">{t}</span>)}

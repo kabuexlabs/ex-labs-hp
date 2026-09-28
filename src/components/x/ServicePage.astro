@@ -1,0 +1,339 @@
+---
+// サービスページ共通テンプレート（2026-09 リニューアル。デザイン元 ServicePage.dc.html）。
+// 本文は src/data/services.ts。title・description・Service 構造化データは各ページから受け取り、
+// FAQPage とパンくずの構造化データはここで本文の FAQ から生成する（表示と構造化データを一致させる）。
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Ph from './Ph.astro';
+import Cls from './Cls.astro';
+import Rich from './Rich.astro';
+import SecHead from './SecHead.astro';
+import { SERVICES, SERVICE_LINKS, type ServiceSlug } from '../../data/services';
+import { flat } from '../../lib/jpbreak';
+import { jsonLd } from '../../lib/microcms';
+import type { ContactType } from './ContactBlock.astro';
+
+interface Props { slug: ServiceSlug; title: string; description: string; serviceLd?: Record<string, unknown> }
+const { slug, title, description, serviceLd } = Astro.props;
+const raw = SERVICES[slug];
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pad = (n: number) => String(n).padStart(2, '0');
+const sections = raw.sections as any[];
+const toc = sections.map((s, i) => ({ no: pad(i + 1), href: '#' + s.id, label: (s.ja as string[]).join('') }));
+const facts = (raw.intro.facts ?? []) as any[];
+const def: string = raw.intro.definition ?? '';
+const dm = def.match(/^\**([^、。*]+?)\**とは/);
+const defTitle = dm ? dm[1] + 'とは' : '';
+const CONTACT: Record<ServiceSlug, ContactType> = { nazotoki: 'kenshu', murder: 'madamis', shisetsu: 'shisetsu', immersive: 'immersive', zunousen: 'zunousen' };
+const related = SERVICE_LINKS.filter((l) => l.slug !== slug);
+const marquee = ['work-2.webp', 'work-1.webp', 'work-8.webp', 'work-3.webp', 'events/atelier-copel.webp', 'events/uwasabanashi-kv.webp', 'events/kaitou-kv.webp'].map((f) => '/assets/' + f);
+const faqSec = sections.find((s) => s.type === 'faq');
+const faqLd = faqSec ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqSec.items.map((f: any) => ({ '@type': 'Question', name: flat(f.q), acceptedAnswer: { '@type': 'Answer', text: flat(f.a) } })) } : null;
+const crumbLd = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+  { '@type': 'ListItem', position: 1, name: 'ホーム', item: new URL('/', site).toString() },
+  { '@type': 'ListItem', position: 2, name: 'サービス', item: new URL('/services/', site).toString() },
+  { '@type': 'ListItem', position: 3, name: raw.crumb, item: new URL(Astro.url.pathname, site).toString() },
+] };
+// モバイルで横スクロールにする並び（デザインの rail 設定と同じ列幅）
+const RAIL: Record<string, { gtc: string; gap: string; col: string; bleed: boolean; bg?: boolean }> = {
+  list: { gtc: 'repeat(auto-fit,minmax(min(100%,420px),1fr))', gap: '12px', col: '76%', bleed: true },
+  numbered: { gtc: 'repeat(auto-fit,minmax(min(100%,230px),1fr))', gap: '1px', col: '62%', bleed: false, bg: true },
+  cards: { gtc: 'repeat(auto-fit,minmax(min(100%,440px),1fr))', gap: '16px', col: 'calc(100% - 52px)', bleed: true },
+  table: { gtc: 'minmax(0,1fr)', gap: '16px', col: 'calc(100% - 52px)', bleed: true },
+  flow: { gtc: 'repeat(auto-fit,minmax(200px,1fr))', gap: '28px', col: '62%', bleed: true },
+};
+const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-rail${r.bleed ? ' is-bleed' : ''}${r.bg ? ' is-bg1' : ''}`, style: `--gtc:${r.gtc};--gap:${r.gap};--col:${r.col};margin-top:44px` }; };
+---
+<BaseLayout renewal title={title} description={description} cutin={raw.hero.lines} contact={{ title: raw.cta.title, note: raw.cta.note || undefined, type: CONTACT[slug] }} footer="short">
+<script type="application/ld+json" set:html={jsonLd(crumbLd)} />
+{faqLd && <script type="application/ld+json" set:html={jsonLd(faqLd)} />}
+{serviceLd && <script type="application/ld+json" set:html={jsonLd(serviceLd)} />}
+
+<nav class="xs-crumb" aria-label="パンくずリスト"><a href="/">ホーム</a><span>/</span><a href="/services/">サービス</a><span>/</span><span aria-current="page" style="color:#fff">{raw.crumb}</span></nav>
+
+<section class="xs-hero">
+  <div class="xs-hero-in">
+    <div class="xs-hero-kick"><span class="x-sh-deco" aria-hidden="true">+<span class="x-sh-line"></span></span><p>{raw.hero.en}</p></div>
+    <h1 class="xs-h1">{(raw.hero.lines as string[][]).map((ln) => <span class="x-bl"><Ph list={ln} /></span>)}</h1>
+    <div class="xs-ctas">
+      {(raw.hero.ctas as any[]).map((c) => <a href={c.href} class={`x-btn xs-cta ${c.primary ? 'is-lime' : 'is-line'}`} data-track={c.href === '#contact' ? 'cta' : undefined} data-show={c.href === '#contact' ? 'contact' : undefined} data-place={c.href === '#contact' ? `svc-${slug}-hero` : undefined}>{c.label}</a>)}
+    </div>
+    {raw.hero.note && <p class="xs-note"><Cls text={raw.hero.note} emph={false} /></p>}
+    <nav class="xs-toc" aria-label="このページの内容">
+      <p class="xs-toc-h">Contents<span>このページの内容</span></p>
+      <div class="x-rail is-bleed" style="--gtc:repeat(auto-fill,minmax(min(100%,230px),1fr));--gap:8px;--col:70%;margin-top:16px">
+        {toc.map((t) => <a href={t.href} class="xs-toc-a"><span class="xs-toc-no">{t.no}</span><span>{t.label}</span></a>)}
+      </div>
+    </nav>
+  </div>
+  <div class="xs-mq-wrap" aria-hidden="true"><div class="x-mq" style="--dur:60s;gap:12px">
+    {[...marquee, ...marquee].map((src) => <img src={src} alt="" loading="lazy" decoding="async">)}
+  </div></div>
+</section>
+
+<section id="about" class="xs-intro">
+  <div class="x-wcard xs-card">
+    <div class="x-kicker">Service</div>
+    <h2 class="xs-intro-h"><Ph list={raw.intro.title} /></h2>
+    {raw.intro.diagram && (
+      <>
+        <p class="xs-dg-lead"><Cls text={raw.intro.diagram.lead} emph={false} /></p>
+        <div class="xs-dg">
+          <div class="xs-dg-from">{raw.intro.diagram.from}</div>
+          <div class="xs-dg-arrow" aria-hidden="true">↓</div>
+          <div class="xs-dg-mids">{(raw.intro.diagram.mids as string[]).map((m) => <div>{m}</div>)}</div>
+          <div class="xs-dg-arrow" aria-hidden="true">↓</div>
+          <div class="xs-dg-to"><Cls text={raw.intro.diagram.to} emph={false} /></div>
+        </div>
+      </>
+    )}
+    <div class="xs-intro-body"><Rich text={(raw.intro.body as string[]).join('')} /></div>
+    {facts.length > 0 && (
+      <>
+        <p class="xs-ov">Overview<span>+ · サービス概要</span></p>
+        <div class="x-rail" style="--gtc:repeat(auto-fit,minmax(min(100%,340px),1fr));--gap:12px;--col:calc(100% - 52px);margin-top:20px">
+          {facts.map((f) => (
+            <div class="xs-fact">
+              <p class="xs-fact-k">{f.k}</p>
+              {f.items && <ul class="xs-fact-ul">{(f.items as string[]).map((it) => <li><span class="xs-dot" aria-hidden="true"></span><span><Cls text={it} emph={false} /></span></li>)}</ul>}
+              {f.venues && <div class="xs-venues"><p class="xs-small">会場</p><div>{(f.venues as string[]).map((v) => <span>{v}</span>)}</div></div>}
+              {f.steps && (
+                <div class="xs-steps"><p class="xs-small">人数・規模</p>
+                  {(f.steps as any[]).map((st) => (
+                    <div class="xs-step">
+                      <div class="xs-icons" aria-hidden="true">{Array.from({ length: st.n }).map(() => <span class="xs-person"><span></span><span></span></span>)}</div>
+                      <p><Cls text={st.label} emph={false} /></p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {f.note && <div class="xs-fact-note"><Rich text={f.note} /></div>}
+            </div>
+          ))}
+        </div>
+      </>
+    )}
+    {def && (
+      <div class="xs-def">
+        <p class="xs-def-h">Keyword<span>{defTitle}</span></p>
+        <div class="xs-def-b"><Rich text={def} /></div>
+      </div>
+    )}
+  </div>
+</section>
+
+{sections.map((s) => (
+  <section id={s.id} class="xs-sec">
+    <div class="xs-sec-in">
+      <SecHead en={s.en} size="l" />
+      <p class="x-sh-ja is-b"><Ph list={s.ja} /></p>
+      {s.lead && <p class="xs-lead"><Cls text={s.lead} emph={false} /></p>}
+
+      {s.type === 'list' && (
+        <div {...railAttrs('list')}>
+          {(s.items as string[]).map((it, i) => <div class="xs-li"><span class="xs-no">{pad(i + 1)}</span><span class="xs-li-t"><Cls text={it} emph={false} /></span></div>)}
+        </div>
+      )}
+      {s.type === 'numbered' && (
+        <div {...railAttrs('numbered')}>
+          {(s.items as string[]).map((it, i) => <div class="xs-num"><span class="xs-num-no">{pad(i + 1)}</span><p><Cls text={it} emph={false} /></p></div>)}
+        </div>
+      )}
+      {s.type === 'cards' && (
+        <>
+          <div {...railAttrs('cards')}>
+            {(s.items as any[]).map((c) => (
+              <div class="xs-cardc">
+                <div class="xs-cardc-h"><span class="xs-cardc-no">{c.no}</span><h3><Cls text={c.title} emph={false} /></h3></div>
+                <div class="xs-cardc-sub"><Rich text={c.sub} /></div>
+                <ul class="xs-cardc-ul">{(c.bullets as string[]).map((b) => <li><span class="xs-plus">+</span><span><Cls text={b} emph={false} /></span></li>)}</ul>
+              </div>
+            ))}
+          </div>
+          {s.photo && <figure class="xs-photo"><img src={s.photo.img} alt={s.photo.cap} loading="lazy" decoding="async"><figcaption><Cls text={s.photo.cap} emph={false} /></figcaption></figure>}
+        </>
+      )}
+      {s.type === 'table' && (
+        <div {...railAttrs('table')}>
+          {(s.rows as string[][]).map((r, i) => (
+            <div class="xs-tr">
+              <div class="xs-tr-h"><span class="xs-tr-no">{pad(i + 1)}</span><p><Cls text={r[0]} emph={false} /></p></div>
+              <div class="xs-tr-b">
+                {r.slice(1).map((v, j) => <div><p class="xs-tr-k">{s.cols[j + 1]}</p><div class="xs-tr-v"><Rich text={v} /></div></div>)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {s.type === 'kv' && (
+        <div class="x-wcard is-s xs-kv">
+          {(s.items as any[]).map((kv) => <div class="xs-kv-r"><p class="xs-kv-k"><Cls text={kv.k} emph={false} /></p><div class="xs-kv-v"><Rich text={kv.v} /></div></div>)}
+        </div>
+      )}
+      {s.type === 'titles' && (
+        <div class="x-hscroll" style="margin-top:44px;gap:20px">
+          {(s.items as any[]).map((t) => (
+            <div class="xs-title">
+              <img src={t.img} alt={t.title} loading="lazy" decoding="async">
+              <div>
+                <h3>{t.title}</h3>
+                {t.meta && <p class="xs-title-meta">{t.meta}</p>}
+                <p class="xs-title-d"><Cls text={t.desc} emph={false} /></p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {s.type === 'gallery' && (
+        <div class="x-hscroll" style="margin-top:44px;gap:16px">
+          {(s.items as any[]).map((g) => (
+            <figure class="xs-gal">
+              <img src={g.img} alt={g.cap ?? ''} loading="lazy" decoding="async" style={`aspect-ratio:${s.square ? '1 / 1' : '4 / 3'}`}>
+              {g.cap && <figcaption><Cls text={g.cap} emph={false} /></figcaption>}
+            </figure>
+          ))}
+        </div>
+      )}
+      {s.type === 'flow' && (
+        <div {...railAttrs('flow')}>
+          {(s.items as any[]).map((fl, i) => <div class="xs-flow"><div class="xs-flow-no">{pad(i + 1)}</div><p class="xs-flow-t">{fl.t}</p><p class="xs-flow-d"><Cls text={fl.d} emph={false} /></p></div>)}
+        </div>
+      )}
+      {s.type === 'faq' && (
+        <div class="xs-faq">
+          {(s.items as any[]).map((q) => (
+            <details>
+              <summary><span class="xs-q">Q</span><span class="xs-faq-q"><Cls text={q.q} emph={false} /></span><span class="x-faq-plus" aria-hidden="true">+</span></summary>
+              <div class="xs-faq-a"><span class="xs-a">A</span><div><Rich text={q.a} /></div></div>
+            </details>
+          ))}
+        </div>
+      )}
+      {s.note && <div class="xs-point"><p class="xs-point-h">Point</p><div class="xs-point-b"><Rich text={s.note} /></div></div>}
+    </div>
+  </section>
+))}
+
+<section class="xs-related">
+  <div class="xs-sec-in">
+    <p class="xs-rel-en">Other Services</p>
+    <p class="xs-rel-ja">関連サービス</p>
+    <div class="xs-rel-list">
+      {related.map((r) => <a href={r.href} data-track="cta" data-show={`services-${r.slug}`} data-place={`svc-${slug}-related`}><span>+ · {r.label}</span><span aria-hidden="true">→</span></a>)}
+    </div>
+  </div>
+</section>
+</BaseLayout>
+
+<style>
+.xs-crumb{max-width:1040px;margin:0 auto;padding:20px 24px 0;display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--x-pale2)}
+.xs-hero{padding:clamp(56px,9vw,112px) 0 0}
+.xs-hero-in{max-width:1040px;margin:0 auto;padding:0 24px}
+.xs-hero-kick{display:flex;align-items:center;gap:clamp(8px,2vw,20px)}
+.xs-hero-kick p{margin:0;font-family:var(--x-en);font-size:clamp(18px,3vw,28px);letter-spacing:.12em}
+.xs-h1{margin:28px 0 0;font-family:var(--x-min);font-weight:600;font-size:clamp(24px,5.2vw,56px);line-height:1.5;letter-spacing:.02em;text-shadow:var(--x-glow)}
+.xs-ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:40px}
+.xs-cta{font-size:clamp(14px,4vw,16px);padding:16px 26px}
+.xs-note{margin:18px 0 0;font-size:13px;line-height:1.9;color:var(--x-pale3)}
+.xs-toc{margin-top:56px;padding-top:24px;border-top:1px solid rgba(255,255,255,.3)}
+.xs-toc-h{margin:0;font-family:var(--x-en);font-size:16px;letter-spacing:.16em;color:var(--x-lime)}
+.xs-toc-h span{font-family:var(--x-min);font-size:13px;letter-spacing:.06em;color:#fff;margin-left:12px}
+.xs-toc-a{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:baseline;padding:14px 16px;background:var(--x-panel);font-family:var(--x-min);font-weight:600;font-size:14px;line-height:1.6}
+.xs-toc-no{white-space:nowrap;font-family:var(--x-en);font-size:18px;color:var(--x-lime)}
+.xs-mq-wrap{margin-top:clamp(56px,8vw,96px);overflow:hidden}
+.xs-mq-wrap img{height:clamp(140px,22vw,220px);width:auto;display:block}
+.xs-intro{padding:clamp(72px,10vw,120px) 16px 120px}
+.xs-card{max-width:960px;margin:0 auto;padding:clamp(48px,7vw,88px) clamp(20px,6vw,80px)}
+.xs-intro-h{margin:18px 0 0;font-family:var(--x-min);font-weight:500;font-size:clamp(23px,4.4vw,44px);line-height:1.45;letter-spacing:.04em}
+.xs-dg-lead{margin:28px 0 0;font-family:var(--x-min);font-weight:700;font-size:clamp(17px,2.4vw,22px);line-height:1.7}
+.xs-dg{margin-top:22px;display:grid;grid-template-columns:minmax(0,1fr);gap:10px;max-width:560px}
+.xs-dg-from{background:#EEF2FE;padding:14px 18px;font-weight:700;font-size:15px;text-align:center}
+.xs-dg-arrow{text-align:center;font-size:14px;line-height:1}
+.xs-dg-mids{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.xs-dg-mids div{background:var(--x-blue);color:#fff;padding:14px 6px;font-family:var(--x-min);font-weight:700;font-size:clamp(14px,3.6vw,16px);text-align:center;white-space:nowrap}
+.xs-dg-to{background:var(--x-lime);color:var(--x-ink);padding:14px 18px;font-family:var(--x-min);font-weight:700;font-size:15px;text-align:center}
+.xs-intro-body{margin-top:28px;max-width:40em;font-size:clamp(15px,1.8vw,17px);line-height:2;letter-spacing:.03em;font-weight:500}
+.xs-ov{margin:56px 0 0;font-family:var(--x-en);font-size:clamp(28px,4vw,40px);line-height:1}
+.xs-ov span{font-family:var(--x-min);font-weight:700;font-size:15px;margin-left:14px}
+.xs-fact{background:var(--x-blue);color:#fff;padding:26px 24px;display:grid;gap:14px;align-content:start}
+.xs-fact-k{margin:0;font-family:var(--x-min);font-weight:700;font-size:18px;color:var(--x-lime)}
+.xs-fact-ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.xs-fact-ul li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:baseline;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.18);font-size:15px;line-height:1.7;font-weight:500}
+.xs-dot{width:6px;height:6px;background:var(--x-lime);transform:translateY(-3px) rotate(45deg)}
+.xs-small{margin:0;font-size:12px;letter-spacing:.08em;color:var(--x-pale2)}
+.xs-venues{display:grid;gap:10px}
+.xs-venues>div{display:flex;flex-wrap:wrap;gap:8px}
+.xs-venues span{background:var(--x-card);color:var(--x-blue);padding:6px 14px;font-size:14px;font-weight:700}
+.xs-steps{display:grid;gap:10px}
+.xs-step{display:grid;gap:8px;padding:12px 14px;background:rgba(255,255,255,.08)}
+.xs-step p{margin:0;font-size:15px;line-height:1.6;font-weight:700}
+.xs-icons{display:flex;flex-wrap:wrap;gap:5px;align-items:end}
+.xs-person{display:inline-grid;justify-items:center;gap:2px}
+.xs-person span:first-child{width:7px;height:7px;border-radius:50%;background:var(--x-lime)}
+.xs-person span:last-child{width:13px;height:8px;border-radius:7px 7px 2px 2px;background:var(--x-lime)}
+.xs-fact-note{font-size:13px;line-height:1.9;color:var(--x-pale)}
+.xs-def{margin-top:48px;padding:28px clamp(20px,4vw,36px);background:#EEF2FE}
+.xs-def-h{margin:0;font-family:var(--x-en);font-size:20px;letter-spacing:.12em}
+.xs-def-h span{font-family:var(--x-min);font-weight:700;font-size:14px;letter-spacing:.04em;margin-left:12px}
+.xs-def-b{margin-top:14px;font-size:15px;line-height:2;font-weight:500}
+.xs-sec{padding:0 16px clamp(96px,12vw,140px)}
+.xs-sec-in{max-width:1040px;margin:0 auto}
+.xs-lead{margin:16px auto 0;max-width:34em;text-align:center;font-size:15px;line-height:2;color:var(--x-pale)}
+.xs-li{background:var(--x-panel);padding:22px 24px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:baseline}
+.xs-no{white-space:nowrap;font-family:var(--x-en);font-size:22px;color:var(--x-lime)}
+.xs-li-t{font-family:var(--x-min);font-weight:600;font-size:clamp(15px,1.9vw,17px);line-height:1.75}
+.xs-num{background:var(--x-blue);padding:28px 22px;display:grid;gap:14px;align-content:start}
+.xs-num-no{white-space:nowrap;font-family:var(--x-en);font-size:44px;line-height:1;color:var(--x-lime)}
+.xs-num p{margin:0;font-family:var(--x-min);font-weight:600;font-size:16px;line-height:1.8}
+.xs-cardc{background:var(--x-panel);padding:clamp(24px,4vw,40px);display:grid;gap:16px;align-content:start}
+.xs-cardc-h{display:flex;align-items:baseline;gap:16px}
+.xs-cardc-no{white-space:nowrap;font-family:var(--x-en);font-size:clamp(44px,6vw,64px);line-height:.8;color:var(--x-lime)}
+.xs-cardc-h h3{margin:0;font-family:var(--x-min);font-weight:600;font-size:clamp(18px,2.4vw,23px);line-height:1.55}
+.xs-cardc-sub{font-size:15px;line-height:1.95}
+.xs-cardc-ul{margin:0;padding:16px 0 0;border-top:1px solid rgba(255,255,255,.3);list-style:none;display:grid;gap:10px;font-size:14px;line-height:1.8;color:var(--x-pale)}
+.xs-cardc-ul li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px}
+.xs-plus{color:var(--x-lime)}
+.xs-photo{margin:40px 0 0}
+.xs-photo img{width:100%;height:auto;display:block}
+.xs-photo figcaption{margin-top:12px;font-size:13px;line-height:1.8;color:var(--x-pale2)}
+.xs-tr{background:var(--x-panel)}
+.xs-tr-h{display:flex;align-items:baseline;gap:16px;padding:22px clamp(20px,4vw,36px);border-bottom:1px solid rgba(255,255,255,.2)}
+.xs-tr-no{white-space:nowrap;font-family:var(--x-en);font-size:32px;line-height:1;color:var(--x-lime)}
+.xs-tr-h p{margin:0;font-family:var(--x-min);font-weight:700;font-size:clamp(18px,2.4vw,22px);line-height:1.5}
+.xs-tr-b{padding:22px clamp(20px,4vw,36px) 26px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:22px 32px}
+.xs-tr-k{margin:0;font-family:var(--x-min);font-weight:700;font-size:13px;letter-spacing:.06em;color:var(--x-lime)}
+.xs-tr-v{margin-top:8px;font-size:15px;line-height:1.9}
+.xs-kv{margin-top:44px;padding:clamp(12px,4vw,40px) clamp(20px,5vw,56px)}
+.xs-kv-r{display:flex;flex-wrap:wrap;gap:12px 32px;padding:26px 0;border-bottom:1px solid #D6DFFB}
+.xs-kv-r:last-child{border-bottom:0}
+.xs-kv-k{margin:0;flex:1 0 clamp(160px,22%,220px);font-family:var(--x-min);font-weight:700;font-size:17px;line-height:1.6}
+.xs-kv-v{flex:999 1 320px;min-width:0;font-size:15px;line-height:1.95;font-weight:500}
+.xs-title{flex:0 0 clamp(240px,68vw,300px);background:var(--x-panel);padding:14px 14px 22px;display:grid;gap:16px;align-content:start}
+.xs-title img{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;display:block}
+.xs-title h3{margin:0;font-family:var(--x-min);font-weight:600;font-size:clamp(16px,4.6vw,19px);line-height:1.5}
+.xs-title-meta{margin:6px 0 0;font-family:var(--x-en);font-size:14px;letter-spacing:.06em;color:var(--x-lime)}
+.xs-title-d{margin:10px 0 0;font-size:13px;line-height:1.85;color:var(--x-pale)}
+.xs-gal{margin:0;flex:0 0 clamp(260px,72vw,420px)}
+.xs-gal img{width:100%;height:auto;object-fit:contain;background:var(--x-panel);display:block}
+.xs-gal figcaption{margin-top:10px;font-size:13px;line-height:1.8;color:var(--x-pale2)}
+.xs-flow{border-top:1px solid #fff;padding-top:18px}
+.xs-flow-no{white-space:nowrap;font-family:var(--x-en);font-size:56px;line-height:1}
+.xs-flow-t{margin:12px 0 6px;font-family:var(--x-min);font-weight:700;font-size:18px}
+.xs-flow-d{margin:0;font-size:14px;line-height:1.8;color:var(--x-pale)}
+.xs-faq{margin-top:44px;display:grid;gap:10px}
+.xs-faq details{background:var(--x-panel)}
+.xs-faq summary{cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:baseline;padding:22px clamp(18px,3vw,28px)}
+.xs-q,.xs-a{white-space:nowrap;font-family:var(--x-en);font-size:26px;line-height:1}
+.xs-q{color:var(--x-lime)}
+.xs-faq-q{font-family:var(--x-min);font-weight:700;font-size:clamp(15px,2vw,17px);line-height:1.7}
+.xs-faq .x-faq-plus{font-size:18px;line-height:1}
+.xs-faq-a{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;padding:20px clamp(18px,3vw,28px) 26px;border-top:1px solid rgba(255,255,255,.2);font-size:15px;line-height:1.95}
+.xs-point{margin:28px auto 0;max-width:820px;padding:24px clamp(20px,4vw,32px);border:1px solid rgba(255,255,255,.35)}
+.xs-point-h{margin:0 0 12px;font-family:var(--x-en);font-size:16px;letter-spacing:.16em;color:var(--x-lime)}
+.xs-point-b{font-size:14px;line-height:2}
+.xs-related{padding:0 16px 120px}
+.xs-rel-en{margin:0;font-family:var(--x-en);font-size:18px;letter-spacing:.14em;color:var(--x-lime)}
+.xs-rel-ja{margin:8px 0 0;font-family:var(--x-min);font-size:20px}
+.xs-rel-list{margin-top:24px;border-top:1px solid rgba(255,255,255,.3)}
+.xs-rel-list a{display:flex;justify-content:space-between;gap:16px;padding:20px 0;border-bottom:1px solid rgba(255,255,255,.3);font-family:var(--x-min);font-weight:600;font-size:17px}
+@media(max-width:360px){.xs-cardc-h{flex-direction:column;gap:10px}.xs-li{padding:18px 14px;gap:12px}.xs-faq-q{font-size:14px}.xs-tr-no{font-size:28px}.xs-tr-h{gap:12px;padding:20px 16px}.xs-tr-b{padding:20px 16px 24px}.xs-faq summary{gap:12px;padding:20px 14px}.xs-faq-a{gap:12px;padding:18px 14px 24px}.xs-fact{padding:22px 16px}.xs-card{padding-left:16px;padding-right:16px}.xs-cardc{padding:22px 18px}}
+</style>

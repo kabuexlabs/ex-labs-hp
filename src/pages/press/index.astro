@@ -1,64 +1,53 @@
 ---
+// プレスリリース一覧（2026-09 リニューアル。デザイン元 ListPage.dc.html の press）。データは src/data/press.ts。
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Breadcrumb from '../../components/Breadcrumb.astro';
+import ListHero from '../../components/x/ListHero.astro';
+import Cls from '../../components/x/Cls.astro';
 import { pressItems } from '../../data/press';
 import { jsonLd } from '../../lib/microcms';
 
 const items = [...pressItems].sort((a, b) => (a.date < b.date ? 1 : -1));
-
-function formatDate(iso: string) {
-  const [y, m, d] = iso.split('-');
-  return `${y}.${m}.${d}`;
-}
+const fmt = (iso: string) => iso.replace(/-/g, '.');
 
 // プレスリリース一覧の ItemList 構造化データ
 const pressListLd = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
   name: '株式会社ex Labs プレスリリース一覧',
-  itemListElement: items.map((p, i) => ({
-    '@type': 'ListItem',
-    position: i + 1,
-    name: p.title,
-    url: p.url,
-  })),
+  itemListElement: items.map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: p.title, url: p.url })),
 };
 ---
 <BaseLayout
+  renewal
   title="プレスリリース｜株式会社 ex Labs"
   description="株式会社ex Labsのプレスリリース一覧。周遊型アートイマーシブ『ロスト・フレーム』、東京都頭脳王決定戦など、体験型エンターテインメントの新作イベント・協業に関する公式発表をまとめています。"
+  cutin={[['株式会社ex Labsからの', '最新の発表']]}
+  contact={{ title: ['取材・お問い合わせは', 'こちら'], type: 'media' }}
+  footer="short"
 >
 <script type="application/ld+json" set:html={jsonLd(pressListLd)} />
-<Breadcrumb items={[
-  { name: 'ホーム', href: '/' },
-  { name: 'プレスリリース' },
-]} />
-
-<section class="section" style="padding-top:56px"><div class="wrap">
-<p class="eyebrow">PRESS RELEASE</p>
-<h1 class="h2 serif">プレスリリース</h1>
-<p class="h2sub">株式会社ex Labsからの最新の発表をご紹介します。</p>
-
-<div class="press-list">
-{items.map((p) => (
-  <a class="press-item" href={p.url} target="_blank" rel="noopener noreferrer">
-    <span class="press-date">{formatDate(p.date)}</span>
-    <h2 class="press-title">{p.title}</h2>
-    <span class="press-src">{p.source ?? 'PR TIMES'} ↗</span>
-  </a>
-))}
-</div>
-
-{items.length === 0 && (
-  <p class="blog-empty">プレスリリースは準備中です。</p>
-)}
-</div></section>
-
-<section class="section" style="padding-top:0"><div class="wrap">
-<div class="cta-mini">
-<p class="cta-mini-title serif">取材・お問い合わせはこちら</p>
-<a class="btn" href="/#contact">お問い合わせ</a>
-</div>
-</div></section>
-
+<ListHero crumb="プレスリリース" en="Press Release" ja="プレスリリース" lead="株式会社ex Labsからの最新の発表をご紹介します。" />
+<section class="xp-sec">
+  <div class="xp-list">
+    {items.map((p) => (
+      <a href={p.url} target="_blank" rel="noopener" class="x-wcard is-s xp-card">
+        <div class="xp-top"><span class="xp-date">{fmt(p.date)}</span><span class="xp-badge">{p.source ?? 'PR TIMES'} ↗</span></div>
+        <h2 class="xp-h"><Cls text={p.head ?? p.title} emph={false} /></h2>
+        {p.points && p.points.length > 0 && <ul class="xp-ul">{p.points.map((r) => <li><span class="xp-dot" aria-hidden="true"></span><span><Cls text={r} emph={false} /></span></li>)}</ul>}
+      </a>
+    ))}
+  </div>
+</section>
 </BaseLayout>
+<style>
+.xp-sec{padding:0 16px 120px}
+.xp-list{max-width:960px;margin:0 auto;display:grid;gap:16px}
+.xp-card{display:grid;gap:18px;padding:clamp(28px,5vw,48px) clamp(22px,5vw,52px)}
+.xp-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.xp-date{white-space:nowrap;font-family:var(--x-en);font-size:clamp(26px,4vw,36px);line-height:1}
+.xp-badge{background:var(--x-blue);color:#fff;font-size:12px;font-weight:700;padding:6px 12px;letter-spacing:.06em}
+.xp-h{margin:0;font-family:var(--x-min);font-weight:700;font-size:clamp(19px,2.6vw,26px);line-height:1.6}
+.xp-ul{margin:0;padding:16px 0 0;border-top:1px solid #D6DFFB;list-style:none;display:grid;gap:8px;font-size:15px;line-height:1.85;font-weight:500}
+.xp-ul li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.xp-dot{width:6px;height:6px;background:var(--x-blue);transform:translateY(-3px) rotate(45deg)}
+</style>

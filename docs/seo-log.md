@@ -1117,3 +1117,10 @@
 - 優先4：/guide/zunousen-tokyo/ は参加先が HACKTALE 貸切予約のみで引き続き見送り。/guide/shinrisen/ に HACKTALE 参加方法（/hacktale/#ticket）への導線を追加。
 - 優先5：/guide/case-uwasabanashi/ の発注者向け表に「使った場所・来場者の行動・施設側の対応」を追加、「実施後の結果」は開催中（〜10/4）の表示で数値は終了後に追記。新しい数値はなし。/services/shisetsu-event/ は初期費用0円の条件表示が既存で揃っていたため変更なし。
 - 検証：npm run check エラーなし、fanout 不足0、375px で横スクロールなし・pageerror なし・canonical 自己参照。
+
+## 2026-09-28 サイトリニューアル（デザイン差し替え：コバルトブルー×ライム、Italiana＋明朝）
+- 対象（デザイン元：design_handoff_kabuexlabs_site_renewal）：/、/services/ 5本（謎解き研修・マダミス・施設活用・頭脳戦・イマーシブ）、/works/、/press/、/blog/、/guide/（ブログと同じ一覧デザイン）、/game/。それ以外（個別記事・会社・メディア・公演・/game/*/ 詳細）は本文据え置きでヘッダー・フッターのみ新デザイン。
+- 維持したもの：各ページの title・description・canonical・Service/FAQ/CollectionPage 構造化データ（FAQ は新しい本文の FAQ から生成して表示と一致）、data-track の計測、お問い合わせは既存 /api/contact（?c= による種類の自動選択も継続）、トップの「現在実施中」は公演データから最終日判定。
+- 実装：本文データ src/data/services.ts（immersive は既存ページの内容を同形式に整理）、共通部品 src/components/x/、スタイル src/styles/x.css、改行制御 src/lib/jpbreak.ts（デザインの seg/cls/rich を移植）。カットインは同じページをセッション内で1回のみ・視差効果を減らす設定では出さない。
+- 検証：npm run check エラーなし。Web フォントを読み込んだ状態で 320/375/1280px の文節内折り返し（行頭の句読点・1〜2文字だけの行）を自動検査し 0 件。横スクロールなし・pageerror なし・h1 は各1。
+- 注意（SEO）：デザイン確定版の本文のため、旧トップの「最新記事」「メディア掲載」「プレスリリース」枠、旧サービスページ本文の解説記事への文脈リンクがなくなった。マダミス制作ページは参考価格（万円）・目的別の記載がデザイン本文にないため fanout 監査で不足（費用・目的別・要点）、頭脳戦制作は「読み・英語」不足。順位の変化を 14〜28日観察し、必要なら同じデザイン形式で「ご依頼の条件」「関連記事」を追加する。復元用タグ：pre-renewal-2026-09-28。

@@ -1,0 +1,97 @@
+---
+// 解説記事の一覧（カテゴリフィルター＋12件ずつ「もっと見る」）。/blog/ と /guide/ で共通（デザイン元 ListPage.dc.html の blog）。
+// 全件を HTML に出力し、絞り込みと「もっと見る」はブラウザ側で表示を切り替えるだけ（検索エンジンは全リンクを辿れる）。
+import Cls from './Cls.astro';
+import { guideArticles } from '../../data/guides';
+
+const CATS: [string, string, RegExp][] = [
+  ['all', 'すべて', /./],
+  ['madamis', 'マダミス', /マダミス|マーダーミステリー/],
+  ['immersive', 'イマーシブ', /イマーシブ|没入/],
+  ['zunousen', '頭脳戦・心理戦', /頭脳戦|心理戦/],
+  ['nazo', '謎解き', /謎解き|脱出/],
+  ['facility', '施設・集客', /施設|商業|催事|商店街|ポップアップ|周遊|美術館|ホテル|季節|ハロウィン|レベニュー|店舗|区画|閉店/],
+  ['office', '社内・研修', /社内|研修/],
+  ['play', '遊びに行く', /デート|友達|遊ぶ|遊び方|初心者|服装|一人で/],
+  ['make', '制作・依頼', /制作|依頼|費用|企画書|KPI|作り方|選び方/],
+];
+const fmt = (iso: string) => iso.replace(/-/g, '.');
+const all = [...guideArticles].sort((a, b) => b.date.localeCompare(a.date)).map((g) => {
+  const txt = g.title + g.desc;
+  const i = g.title.indexOf('｜');
+  return {
+    ...g,
+    main: i < 0 ? g.title : g.title.slice(0, i),
+    sub: i < 0 ? '' : g.title.slice(i + 1),
+    tags: CATS.slice(1).filter((c) => c[2].test(g.title)).map((c) => c[1]).slice(0, 2),
+    keys: CATS.slice(1).filter((c) => c[2].test(txt)).map((c) => c[0]),
+  };
+});
+const cats = CATS.map(([k, label]) => ({ k, label, n: k === 'all' ? all.length : all.filter((g) => g.keys.includes(k)).length }));
+const PAGE = 12;
+---
+<div class="xgl" data-guide-list>
+  <div class="xgl-cats" role="group" aria-label="カテゴリで絞り込む">
+    {cats.map((c) => <button type="button" class={c.k === 'all' ? 'is-on' : ''} data-cat={c.k} aria-pressed={c.k === 'all' ? 'true' : 'false'}>{c.label}<span>{c.n}</span></button>)}
+  </div>
+  <div class="xgl-grid">
+    {all.map((g, i) => (
+      <a href={g.href} class="xgl-card" data-keys={g.keys.join(' ')} hidden={i >= PAGE ? true : undefined}>
+        <img src={g.thumb} alt="" width="1200" height="630" loading="lazy" decoding="async">
+        <div class="xgl-meta"><span class="xgl-date">{fmt(g.date)}</span>{g.tags.map((t) => <span class="xgl-tag">{t}</span>)}</div>
+        <h2 class="xgl-h"><Cls text={g.main} emph={false} /></h2>
+        {g.sub && <p class="xgl-sub"><Cls text={g.sub} emph={false} /></p>}
+        <p class="xgl-d"><Cls text={g.desc} emph={false} /></p>
+      </a>
+    ))}
+  </div>
+  <div class="xgl-more-wrap"><button type="button" class="xgl-more" data-more hidden={all.length <= PAGE ? true : undefined}>もっと見る（残り<span data-remain>{all.length - PAGE}</span>件）</button></div>
+</div>
+<script is:inline define:vars={{ PAGE }}>
+(function () {
+  var root = document.querySelector('[data-guide-list]'); if (!root) return;
+  var cards = [].slice.call(root.querySelectorAll('.xgl-card'));
+  var btns = [].slice.call(root.querySelectorAll('[data-cat]'));
+  var more = root.querySelector('[data-more]'), remain = root.querySelector('[data-remain]');
+  var cat = 'all', shown = PAGE;
+  function render() {
+    var list = cards.filter(function (c) { return cat === 'all' || (' ' + c.dataset.keys + ' ').indexOf(' ' + cat + ' ') >= 0; });
+    cards.forEach(function (c) { c.hidden = true; });
+    list.forEach(function (c, i) { c.hidden = i >= shown; });
+    var r = Math.max(0, list.length - shown);
+    more.hidden = r === 0; remain.textContent = r;
+    btns.forEach(function (b) { var on = b.dataset.cat === cat; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { cat = b.dataset.cat; shown = PAGE; render(); }); });
+  more.addEventListener('click', function () { shown += PAGE; render(); });
+})();
+</script>
+<style>
+.xgl{max-width:1100px;margin:0 auto}
+.xgl-cats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.xgl-cats button{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:999px;padding:9px 18px;font-family:var(--x-min);font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap}
+.xgl-cats button span{margin-left:6px;font-family:var(--x-en);opacity:.8}
+.xgl-cats button.is-on{background:var(--x-lime);color:var(--x-ink);border-color:var(--x-lime)}
+.xgl-cats button.is-on span{opacity:1}
+.xgl-grid{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:36px 24px}
+.xgl-card{display:grid;gap:14px;align-content:start}
+.xgl-card[hidden]{display:none}
+.xgl-card img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--x-panel)}
+.xgl-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.xgl-date{white-space:nowrap;font-family:var(--x-en);font-size:17px;letter-spacing:.06em;color:var(--x-lime)}
+.xgl-tag{font-size:11px;font-weight:700;padding:3px 8px;border:1px solid rgba(255,255,255,.45)}
+.xgl-h{margin:0;font-family:var(--x-min);font-weight:700;font-size:clamp(17px,2vw,19px);line-height:1.55}
+.xgl-sub{margin:-6px 0 0;font-family:var(--x-min);font-weight:600;font-size:14px;line-height:1.6;color:var(--x-pale2)}
+.xgl-d{margin:0;font-size:13px;line-height:1.85;color:var(--x-pale)}
+.xgl-more-wrap{margin-top:48px;display:flex;justify-content:center}
+.xgl-more{background:transparent;color:#fff;border:1px solid #fff;border-radius:999px;padding:16px 40px;font-family:var(--x-min);font-weight:600;font-size:15px;cursor:pointer}
+.xgl-more[hidden]{display:none}
+@media(max-width:699px){
+  .xgl-cats{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;margin:0 -16px;padding:0 16px 10px;scrollbar-width:none}
+  .xgl-cats::-webkit-scrollbar{display:none}
+  .xgl-grid{margin-top:28px;grid-template-columns:minmax(0,1fr);gap:18px}
+  .xgl-card{grid-template-columns:104px minmax(0,1fr);gap:6px 14px;align-items:start;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.2)}
+  .xgl-card img{aspect-ratio:1/1;grid-row:1 / span 4}
+  .xgl-d{display:none}
+}
+</style>

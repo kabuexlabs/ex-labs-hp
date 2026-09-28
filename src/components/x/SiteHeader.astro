@@ -1,0 +1,14 @@
+---
+// 全ページ共通ヘッダー（2026-09 リニューアル）：sticky・青地・白ロゴ・ライムの「お問い合わせ」、2段目は横スクロールのナビ。
+interface Props { ctaHref?: string }
+const { ctaHref = '/#contact' } = Astro.props;
+---
+<header class="x-hd" id="top">
+  <div class="x-hd-row">
+    <a href="/" class="x-hd-logo"><img src="/assets/exlabs-logo-w.png" alt="ex Labs" width="2048" height="520"></a>
+    <a href={ctaHref} class="x-hd-cta">お問い合わせ</a>
+  </div>
+  <nav class="x-hd-nav" aria-label="サイト内のページ">
+    <a href="/#about">会社概要</a><a href="/#strength">強み</a><a href="/#works">実績</a><a href="/#service">サービス</a><a href="/works/">制作事例</a><a href="/#message">メッセージ</a><a href="/press/">プレスリリース</a><a href="/blog/">ブログ</a><a href="/game/">過去コンテンツのネタバレ</a>
+  </nav>
+</header>

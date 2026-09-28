@@ -6,6 +6,9 @@ import SiteGuard from '../components/SiteGuard.astro';
 // 見た目は本体サイトの印刷物テイストに統一（トークンも同値）。BaseLayout は使わず、
 // フォント・配色・フッターをここで完結させる。
 import { jsonLd } from '../lib/microcms';
+import SiteHeader from '../components/x/SiteHeader.astro';
+import SiteFooter from '../components/x/SiteFooter.astro';
+import '../styles/x.css';
 
 export interface Props {
   title?: string;
@@ -63,19 +66,23 @@ const orgLd = {
 <link rel="icon" type="image/png" href="/favicon-ex.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Noto+Sans+JP:wght@400;500;700;800&family=Italiana&family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <slot name="head" />
 <SiteGuard />
 </head>
 <body>
+<SiteHeader />
 <div class="page">
 <slot />
-<footer class="footer"><a class="foot-home" href="/">株式会社ex Labs 公式サイトへ →</a><br><a class="foot-home" href="/services/">このような体験型イベントの制作依頼はこちら →</a><br>
-<span class="foot-home" style="font-size:12.5px">解説記事：<a href="/guide/madamis/">マダミスとは</a>／<a href="/guide/nazotoki-event/">謎解きイベントとは</a>／<a href="/guide/zunousen/">頭脳戦とは</a>／<a href="/guide/immersive/">イマーシブとは</a>／<a href="/guide/taikengata-event/">体験型イベントとは</a>／<a href="/works/">制作事例一覧</a></span><br>© ex Labs Inc. All Rights Reserved.<br>本サイトに掲載の文章・画像等の無断転載・複製を禁じます。</footer>
+
+<p class="game-guides">解説記事：<a href="/guide/madamis/">マダミスとは</a>／<a href="/guide/nazotoki-event/">謎解きイベントとは</a>／<a href="/guide/zunousen/">頭脳戦とは</a>／<a href="/guide/immersive/">イマーシブとは</a>／<a href="/guide/taikengata-event/">体験型イベントとは</a>／<a href="/works/">制作事例一覧</a></p>
 </div>
+<div class="x-end"><div class="x-end-in"><SiteFooter /></div></div>
 
 <style is:global>
+.game-guides{margin:0;padding:32px 24px 40px;text-align:center;font-size:12.5px;line-height:2;color:rgba(51,48,43,.7)}
+.game-guides a{text-decoration:underline;text-underline-offset:3px}
 /* 本体サイトと同じ印刷物ライクな設計言語（方眼紙・墨フチ・ハードな
    オフセット影・Archivo見出し）。トークン値も本体 global.css と揃える。 */
 :root{--accent:#f4581c;--accent-dark:#d43f07;--yellow:#ffd23f;--ink:#33302b;--paper:#f4f2ec;--bd:2px solid var(--ink);--shadow-1:6px 6px 0 -1px #fff,6px 6px 0 1px var(--ink);--shadow-2:9px 9px 0 -1px #fff,9px 9px 0 1px var(--ink)}

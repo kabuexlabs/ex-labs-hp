@@ -1,113 +1,60 @@
 ---
+// ブログ・解説記事一覧（2026-09 リニューアル。デザイン元 ListPage.dc.html の blog）。
+// 解説記事は src/data/guides.ts、ブログ記事は microCMS から取得（公開直後の記事も再デプロイなしで出す）。
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Breadcrumb from '../../components/Breadcrumb.astro';
+import ListHero from '../../components/x/ListHero.astro';
+import GuideList from '../../components/x/GuideList.astro';
+import SecHead from '../../components/x/SecHead.astro';
+import Cls from '../../components/x/Cls.astro';
 import { getPostList, isMicrocmsConfigured } from '../../lib/microcms';
 import { BLOG_REDIRECTS } from '../../data/redirects';
-import { guideArticles } from '../../data/guides';
 
 const configured = isMicrocmsConfigured();
-const PAGE_SIZE = 12;
-const page = Math.max(1, Number(Astro.url.searchParams.get('page') ?? '1') || 1);
-const offset = (page - 1) * PAGE_SIZE;
-
-const { contents: rawContents, totalCount } = configured
-  ? await getPostList(offset, PAGE_SIZE)
-  : { contents: [], totalCount: 0 };
+const { contents: rawContents } = configured ? await getPostList(0, 30) : { contents: [] };
 // 解説記事へ統合（301）した記事は一覧に出さない
-const contents = rawContents.filter((p) => !BLOG_REDIRECTS[p.id]);
-
-const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
-
-// サイト内の解説記事（静的ガイド）。新しい順に表示する。
-const guides = [...guideArticles].sort((a, b) => b.date.localeCompare(a.date));
-
-function formatDate(iso: string) {
-  const d = new Date(iso);
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function excerpt(html: string, length = 80) {
-  const text = html.replace(/<[^>]+>/g, '');
-  return text.length > length ? text.slice(0, length) + '…' : text;
-}
+const posts = rawContents.filter((p) => !BLOG_REDIRECTS[p.id]).map((p) => {
+  const d = new Date(p.publishedAt);
+  const i = p.title.indexOf('｜');
+  return { id: p.id, img: p.eyecatch?.url, date: `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`, main: i < 0 ? p.title : p.title.slice(0, i), sub: i < 0 ? '' : p.title.slice(i + 1), title: p.title };
+});
 ---
-<BaseLayout title="ブログ・解説記事｜謎解き研修・マダミス・イマーシブ・施設活用 - 株式会社ex Labs" description="マダミス（マーダーミステリー）・イマーシブ・施設活用イベントの解説記事と、体験型エンターテインメントの実務ノウハウを制作会社の視点で発信。制作依頼の費用相場・会社の選び方・施設集客の事例まで網羅しています。">
-<Breadcrumb items={[
-  { name: 'ホーム', href: '/' },
-  { name: 'ブログ' },
-]} />
-
-<section class="section" id="blog-top" style="padding-top:56px"><div class="wrap">
-<p class="eyebrow">GUIDE</p><h1 class="h2 serif">解説記事・完全ガイド</h1>
-<p class="h2sub">マダミス・イマーシブ・施設活用の基礎知識から制作依頼の実務まで、制作会社の視点で解説しています。</p>
-
-{page === 1 && (
-  <div class="blog-grid">
-    {guides.map((g) => (
-      <div class="blog-card">
-        <a href={g.href}>
-          <img class="blog-img" src={g.thumb} alt={g.title} width="1200" height="630" loading="lazy" decoding="async" />
-        </a>
-        <p class="blog-date">{formatDate(g.date)}</p>
-        <h2 class="blog-title"><a href={g.href}>{g.title}</a></h2>
-        <p class="blog-excerpt">{g.desc}</p>
+<BaseLayout
+  renewal
+  title="ブログ・解説記事｜謎解き研修・マダミス・イマーシブ・施設活用 - 株式会社ex Labs"
+  description="マダミス（マーダーミステリー）・イマーシブ・施設活用イベントの解説記事と、体験型エンターテインメントの実務ノウハウを制作会社の視点で発信。制作依頼の費用相場・会社の選び方・施設集客の事例まで網羅しています。"
+  cutin={[['マダミス・イマーシブ・', '施設活用の'], ['基礎知識から', '制作依頼の実務まで']]}
+  contact={{ title: ['体験型イベントの', 'ご相談はこちら'] }}
+  footer="short"
+>
+<ListHero crumb="ブログ" en="Guide & Blog" ja="解説記事・ブログ" lead="マダミス・イマーシブ・施設活用の基礎知識から、制作依頼の実務まで、制作会社の視点で解説しています。" />
+<section class="xb-sec"><GuideList /></section>
+{posts.length > 0 && (
+  <section class="xb-posts">
+    <div style="max-width:1100px;margin:0 auto">
+      <SecHead en="Blog" size="m" />
+      <p class="x-sh-ja is-b" style="font-size:clamp(18px,2.4vw,22px)">ブログ記事</p>
+      <div class="x-hscroll" style="margin-top:40px;gap:16px">
+        {posts.map((b) => (
+          <a href={`/blog/${b.id}/`} class="xb-post">
+            {b.img ? <img src={b.img} alt="" loading="lazy" decoding="async"> : <div class="xb-noimg"></div>}
+            <span class="xb-date">{b.date}</span>
+            <p class="xb-t"><Cls text={b.main} emph={false} /></p>
+            {b.sub && <p class="xb-sub"><Cls text={b.sub} emph={false} /></p>}
+          </a>
+        ))}
       </div>
-    ))}
-  </div>
+    </div>
+  </section>
 )}
-{page > 1 && (
-  <p class="vc-line">解説記事の一覧は<a href="/blog/" style="color:var(--accent)">1ページ目</a>に表示しています。</p>
-)}
-</div></section>
-
-<section class="section tinted"><div class="wrap">
-<p class="eyebrow">BLOG</p><h2 class="h2 serif">最新のブログ記事</h2>
-
-{!configured && (
-  <p class="blog-empty">まだブログの準備中です。もうしばらくお待ちください。</p>
-)}
-
-{configured && contents.length === 0 && (
-  <p class="blog-empty">まだ記事がありません。</p>
-)}
-
-{configured && contents.length > 0 && (
-  <>
-  <div class="blog-grid">
-    {contents.map((post) => (
-      <div class="blog-card">
-        <a href={`/blog/${post.id}/`}>
-          {post.eyecatch ? (
-            <img class="blog-img" src={post.eyecatch.url} alt={post.title} />
-          ) : (
-            <div class="blog-img"></div>
-          )}
-        </a>
-        <p class="blog-date">{formatDate(post.publishedAt)}</p>
-        <h3 class="blog-title"><a href={`/blog/${post.id}/`}>{post.title}</a></h3>
-        <p class="blog-excerpt">{excerpt(post.body)}</p>
-      </div>
-    ))}
-  </div>
-
-  <div class="blog-pagination">
-    {page > 1 ? (
-      <a href={`/blog?page=${page - 1}`}>← 前へ</a>
-    ) : (
-      <span class="disabled">← 前へ</span>
-    )}
-    <span>{page} / {totalPages}</span>
-    {page < totalPages ? (
-      <a href={`/blog?page=${page + 1}`}>次へ →</a>
-    ) : (
-      <span class="disabled">次へ →</span>
-    )}
-  </div>
-  </>
-)}
-
-</div></section>
-
 </BaseLayout>
+<style>
+.xb-sec{padding:0 16px 96px}
+.xb-posts{padding:0 16px 120px}
+.xb-post{flex:0 0 clamp(250px,70vw,300px);background:var(--x-panel);padding:12px 12px 20px;display:grid;gap:12px;align-content:start}
+.xb-post img,.xb-noimg{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;display:block;background:var(--x-blue)}
+.xb-date{white-space:nowrap;font-family:var(--x-en);font-size:15px;color:var(--x-lime)}
+.xb-t{margin:0;font-family:var(--x-min);font-weight:700;font-size:16px;line-height:1.6}
+.xb-sub{margin:-4px 0 0;font-size:13px;line-height:1.6;color:var(--x-pale2)}
+</style>

@@ -34,10 +34,26 @@ const strip = (s) => s
   .replace(/<style[\s\S]*?<\/style>/g, '')
   .replace(/<[^>]+>/g, ' ')
   .replace(/\s+/g, ' ');
+// 2026-09 リニューアル後のサービスページは本文を src/data/services.ts に持ち、
+// components/x/ServicePage.astro で描画する。監査ではページ本体＋テンプレート＋該当サービスの本文データを合わせて読む。
+const SVC_SLUG = { 'nazotoki-kenshu': 'nazotoki', 'murder-mystery': 'murder', 'shisetsu-event': 'shisetsu', immersive: 'immersive', zunousen: 'zunousen' };
+const svcSrc = fs.readFileSync('src/data/services.ts', 'utf8');
+const SVC = JSON.parse(svcSrc.slice(svcSrc.indexOf('= {') + 2, svcSrc.indexOf(';\nexport const SERVICE_LINKS')));
+const SVC_LINKS = JSON.parse(svcSrc.slice(svcSrc.indexOf('= [', svcSrc.indexOf('SERVICE_LINKS')) + 2, svcSrc.lastIndexOf(';')));
+const svcTemplate = fs.readFileSync('src/components/x/ServicePage.astro', 'utf8');
+const flatText = (o) => (typeof o === 'string' ? [o] : Array.isArray(o) ? o.flatMap(flatText) : o && typeof o === 'object' ? Object.values(o).flatMap(flatText) : []);
 const rows = [];
 for (const [slug, file] of files) {
   if (PROTECTED.has(slug.replace(/^guide\//, ''))) continue;
-  const raw = fs.readFileSync(file, 'utf8');
+  let raw = fs.readFileSync(file, 'utf8');
+  const svcKey = slug.startsWith('services/') ? SVC_SLUG[slug.slice(9)] : undefined;
+  if (svcKey && raw.includes('components/x/ServicePage.astro')) {
+    const d = SVC[svcKey];
+    const rel = SVC_LINKS.filter((l) => l.slug !== svcKey).map((l) => `<a href="${l.href}">${l.label}</a>`).join(' ');
+    // 本文データの文字列（**強調** 記号は外す）、FAQ の有無、サービス概要（Overview）の有無をテンプレート相当として加える
+    raw += '\n---\n' + svcTemplate.replace(/^---[\s\S]*?---/, '') + '\n<div>' + flatText(d).join(' ').replace(/\*\*/g, '') + '</div>' + rel
+      + (d.sections.some((x) => x.type === 'faq') ? '\nconst faqs = [ {' : '') + ((d.intro.facts ?? []).length ? ' svc-sum ' : '');
+  }
   const text = strip(raw);
   const key = slug.replace(/^(guide|services)\//, '');
   const body = raw.split('---').slice(2).join('---');

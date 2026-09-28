@@ -1,0 +1,56 @@
+---
+// フッター前の Contact（ライム地・黒プレート＋お問い合わせフォーム）。全リニューアルページ共通。
+// 送信先は既存の /api/contact（成功時は /contact/thanks/ へ遷移し、そこで送信完了を計測）。
+import SourceField from '../SourceField.astro';
+import Ph from './Ph.astro';
+import Cls from './Cls.astro';
+export type ContactType = '' | 'immersive' | 'madamis' | 'zunousen' | 'shisetsu' | 'taikengata' | 'kenshu' | 'media' | 'other';
+interface Props { title?: string[]; note?: string; type?: ContactType; placeholder?: string }
+const { title = ['まずは、', 'お気軽にご相談ください'], note, type = '', placeholder = '例）実施時期、人数、会場、ご予算の目安など、分かる範囲でご記入ください。' } = Astro.props;
+const OPTIONS: [ContactType, string][] = [
+  ['', '選択してください（未定でも構いません）'],
+  ['immersive', 'イマーシブ（没入型体験）の制作'],
+  ['madamis', 'マダミス（マーダーミステリー）の制作'],
+  ['zunousen', '頭脳戦・心理戦ゲームの制作'],
+  ['shisetsu', '商業施設・店舗・宿泊施設でのイベント（施設活用）'],
+  ['taikengata', '体験型イベント全般（ジャンル未定）'],
+  ['kenshu', '謎解き研修・社内イベント'],
+  ['media', '取材・登壇・協業'],
+  ['other', 'その他'],
+];
+---
+<div class="x-plate">
+  <h2 class="x-plate-en">Contact</h2>
+  <p class="x-plate-ja"><Ph list={title} /></p>
+</div>
+{note && <p class="x-contact-note"><Cls text={note} emph={false} /></p>}
+<div class="x-form-wrap">
+  <p class="x-form-lead">
+    <span class="x-bl"><Ph list={['お問い合わせ内容をご入力のうえ、', '送信してください。']} /></span>
+    <span class="x-bl"><Ph list={['2〜3営業日以内に', 'ご連絡を差し上げます。']} /></span>
+    <span class="x-bl" style="margin-top:8px"><Ph list={['予算・企画内容が未定の段階でも', 'ご相談いただけます。']} /></span>
+    <span class="x-bl"><span class="x-c">制作に関するご相談・</span><span class="x-c">お見積りは<strong class="x-mk-blue">無料</strong>です。</span></span>
+  </p>
+  <form class="x-form" action="/api/contact" method="POST">
+    <input type="hidden" name="_next" value="/contact/thanks/">
+    <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <input type="hidden" name="_subject" value="【ex Labs HP】お問い合わせ">
+    <SourceField />
+    <label><span>お名前<span class="x-req">必須</span></span><input required name="name" autocomplete="name"></label>
+    <label><span>会社名</span><input name="company" autocomplete="organization"></label>
+    <label><span>メールアドレス<span class="x-req">必須</span></span><input type="email" name="email" required autocomplete="email"></label>
+    <label><span>電話番号</span><input type="tel" name="phone" autocomplete="tel"></label>
+    <label><span>ご相談の種類</span>
+      <select name="category" class="x-contact-category">
+        {OPTIONS.map(([v, l]) => <option value={v} selected={v === type}>{l}</option>)}
+      </select>
+    </label>
+    <label><span>お問い合わせ内容<span class="x-req">必須</span></span><textarea name="message" required rows="6" placeholder={placeholder}></textarea></label>
+    <button type="submit">送信する ↗</button>
+  </form>
+  <p class="x-form-mail"><span class="x-c">メールでのお問い合わせ：</span><a href="mailto:info@kabuexlabs.com">info@kabuexlabs.com</a></p>
+</div>
+<script is:inline>
+// サービスページなどの「◯◯を相談する」から来た場合（/?c=immersive#contact）、ご相談の種類を先に選んでおく。
+try{var m=/[?&]c=([a-z0-9-]{1,40})/.exec(location.search);var sel=document.querySelector('.x-contact-category');if(m&&sel){var map={immersive:'immersive',madamis:'madamis',murder:'madamis',zunousen:'zunousen',shinrisen:'zunousen',shisetsu:'shisetsu',shuyu:'shisetsu',taikengata:'taikengata',kenshu:'kenshu',media:'media'};var v=map[m[1]];if(v)sel.value=v}}catch(_){}
+</script>
