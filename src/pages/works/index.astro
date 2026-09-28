@@ -13,13 +13,13 @@ import { jsonLd } from '../../lib/microcms';
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 type W = { img: string; cat: string; client: string; title: string; place: string; desc: string; result: string; link: string; href: string };
 const W = (img: string, cat: string, client: string, title: string, place: string, desc: string, result: string, link: string, href: string): W => ({ img: '/assets/' + img, cat, client, title, place, desc, result, link, href });
-const genres: { id: string; en: string; ja: string; lead: string; items: W[] }[] = [
-  { id: 'immersive', en: 'Immersive / Facility', ja: 'イマーシブ・施設一体型', lead: '商業施設・書店・街全体を物語の舞台にした没入型イベント。回遊・滞在時間・話題化を同時に設計します。', items: [
+const genres: { id: string; en: string; ja: string; lead: string; svc?: [string, string][]; items: W[] }[] = [
+  { id: 'immersive', en: 'Immersive / Facility', ja: 'イマーシブ・施設一体型', lead: '商業施設・書店・街全体を物語の舞台にした没入型イベント。回遊・滞在時間・話題化を同時に設計します。', svc: [['イマーシブ制作のご依頼', '/services/immersive/'], ['施設活用イベントのご相談', '/services/shisetsu-event/']], items: [
     W('events/uwasabanashi-kv.webp', 'イマーシブ制作', '渋谷サクラステージ', 'ウワサバナシ調査委員会', '東京・渋谷（商業施設）', '東急不動産株式会社様・404 Not Found様・TSUTAYA様のご協力のもと、渋谷サクラステージを周遊する都市伝説イマーシブ体験を企画・制作。施設一体型イベントとして日本経済新聞に掲載されました。', '日本経済新聞掲載／施設全体を周遊する没入体験', '制作事例の詳細を読む', '/guide/case-uwasabanashi/'),
     W('work-1.webp', 'ミステリー原案', '博報堂 × 紀伊國屋書店', '月明かりの書店と呪われた原稿', '東京（書店・閉店後）', '閉店後の紀伊國屋書店を舞台に開催された、一夜限りの体験型イベントの制作を担当。営業時間外の店舗を「入れない時間の特別な場所」として活用した事例です。', '営業時間外の店舗活用／一夜限りの特別公演', '営業時間外の活用について読む', '/guide/eigyo-jikangai/'),
     W('events/kaitou-kv.webp', 'マジック×イマーシブ', '六本木・会員制バー', '怪盗と秘密の試験', '東京・六本木（バー）', '日本一になった実績のあるマジシャン様とのコラボレーションによる、マジック×イマーシブ公演を六本木の会員制バーで企画・制作。小空間でも成立する高密度な没入体験です。', '1空間完結型イマーシブ／店舗の夜間集客', '公演特設サイト', '/kaitou/'),
     W('work-3.webp', '街周遊型アートイマーシブ', '下北沢（自社主催）', 'ロスト・フレーム', '東京・下北沢（街全体）', '下北沢の街に散らばった絵画を探し、隠された物語を辿る周遊型アートイマーシブ。街歩き×謎解き×絵画による参加型アート体験で、店舗を巡る回遊を生みました。', '全公演完売（2026年7月7日〜8月31日）／街全体の回遊設計', '公演ページを見る', '/taikenbizyutu/lostframe/') ] },
-  { id: 'murder', en: 'Murder Mystery', ja: 'マダミス（マーダーミステリー）', lead: '施設・ブランドに合わせたオリジナルシナリオの制作から、公演運営まで。宿泊施設の「泊まる理由」づくりにも活用されています。', items: [
+  { id: 'murder', en: 'Murder Mystery', ja: 'マダミス（マーダーミステリー）', lead: '施設・ブランドに合わせたオリジナルシナリオの制作から、公演運営まで。宿泊施設の「泊まる理由」づくりにも活用されています。', svc: [['マーダーミステリー制作のご依頼', '/services/murder-mystery/']], items: [
     W('mm/aru-mm.webp', '自社レーベル', 'UNLIMITED MYSTERY（東大マーダーミステリーサークル）', '推理系マダミス作品群', '公演・オンライン', '東大マーダーミステリーサークルによる推理系マダミスの制作・公演。ロジックを重視したシナリオ設計のノウハウを、企業・施設向けの制作にも活かしています。', '', '作品一覧を見る', '/toudaimurder/works/') ] },
   { id: 'zunou', en: 'Brain Battle', ja: '頭脳戦・心理戦', lead: '頭脳戦に特化したレーベル「HACKTALE（ハックテイル）」を運営。大会形式の大型イベントから、店舗向けの周遊型コンテンツまで制作します。', items: [
     W('work-8.webp', '企画・制作・運営', '自社主催', '東京都頭脳王決定戦', '東京都内4会場', '「東京都で最も頭の良い人を決める」をコンセプトに、都内4会場を同時に活用した大型の頭脳戦イベントを企画・運営。予選・本戦の大会形式で、リピート参加とコミュニティを生みました。', '全公演チケット完売', '東京都頭脳王決定戦 2026', '/hacktale/event/zunouou/'),
@@ -66,6 +66,7 @@ const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity
       <SecHead en={g.en} size="s" />
       <p class="x-sh-ja is-b"><Cls text={g.ja} emph={false} /></p>
       <p class="xw-lead"><Cls text={g.lead} emph={false} /></p>
+      {g.svc && <p class="xw-svc">{g.svc.map(([t, h]) => <a href={h} class="xw-link" data-track="cta" data-show={h.split('/')[2]} data-place="works-genre">{t} →</a>)}</p>}
       <div class="x-rail is-bleed" style="--gtc:repeat(auto-fill,minmax(min(100%,320px),1fr));--gap:24px;--col:calc(100% - 52px);margin-top:44px">
         {g.items.map((w) => (
           <article class="xw-card">
@@ -127,6 +128,7 @@ const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity
 @media(max-width:699px){.xw-cats{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;margin:0 -16px;padding:0 16px 10px;scrollbar-width:none}.xw-cats::-webkit-scrollbar{display:none}}
 .xw-sec{padding:0 16px clamp(96px,12vw,130px)}
 .xw-in{max-width:1100px;margin:0 auto}
+.xw-svc{margin:14px 0 0;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 24px}
 .xw-lead{margin:14px auto 0;max-width:34em;text-align:center;font-size:14px;line-height:2;color:var(--x-pale)}
 .xw-card{background:var(--x-panel);display:grid;align-content:start}
 .xw-card img{width:100%;height:auto;display:block}

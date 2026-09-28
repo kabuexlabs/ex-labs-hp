@@ -1814,14 +1814,9 @@ export const SERVICES: Record<ServiceSlug, any> = {
 };
 export const SERVICE_LINKS: { slug: ServiceSlug; label: string; href: string }[] = [
  {
-  "slug": "nazotoki",
-  "label": "謎解き研修",
-  "href": "/services/nazotoki-kenshu/"
- },
- {
-  "slug": "murder",
-  "label": "マーダーミステリー制作",
-  "href": "/services/murder-mystery/"
+  "slug": "immersive",
+  "label": "イマーシブ制作",
+  "href": "/services/immersive/"
  },
  {
   "slug": "shisetsu",
@@ -1829,9 +1824,14 @@ export const SERVICE_LINKS: { slug: ServiceSlug; label: string; href: string }[]
   "href": "/services/shisetsu-event/"
  },
  {
-  "slug": "immersive",
-  "label": "イマーシブ制作",
-  "href": "/services/immersive/"
+  "slug": "murder",
+  "label": "マーダーミステリー制作",
+  "href": "/services/murder-mystery/"
+ },
+ {
+  "slug": "nazotoki",
+  "label": "謎解き研修",
+  "href": "/services/nazotoki-kenshu/"
  },
  {
   "slug": "zunousen",

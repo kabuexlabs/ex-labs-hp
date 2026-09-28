@@ -1157,3 +1157,11 @@
 - /events/・/works/ のタイムアウト：ローカルでは描画 16〜30ms・読み込み約1秒で再現せず、外部APIの呼び出しもなし。SSR ページにキャッシュ指定がなく毎回関数が動くため、アクセスが少ない時間帯のコールドスタートが一因と考えられる。対策として公開ページの SSR 応答に CDN キャッシュ（通常 s-maxage=600・SWR 1日、日付で変わる /・/events/・東京ガイド系は s-maxage=300・SWR 1時間）を付与し、/works/ は静的生成に変更。管理・予約・API・会員向けは対象外（no-store のまま）。
 - 構造化データ：解説記事13本で Article の headline が title と食い違っていたため title に合わせた（immersive・immersive-cost・immersive-theater・immersive-tokyo・immersive-vr・event-hiyou・halloween-event・hotel-event・kisetsu-event・museum-event・saiji・shinrisen・shisetsu-katsuyo）。
 - 未確認：本番ドメインは作業環境から接続できず、Vercel のサーバーログも参照していない。デプロイ後に Vercel の Logs（/events/・/works/ の Duration と 5xx）と Search Console の「ページのインデックス登録」を確認する。
+
+## 2026-09-28 社名検索の入口向けにナビ・リンク一覧の並びを事業の優先順に整理
+- 優先順：①イマーシブ制作（/services/immersive/）②制作事例（/works/）③施設活用（/services/shisetsu-event/）④公演を探す（/events/）⑤サービス一覧（/services/・トップ #service）⑥会社概要（/company/・トップ #about）。SEO の Tier・各記事のターゲットは変更なし。
+- ヘッダー：先頭に「イマーシブ制作／制作事例／施設活用／公演を探す」を置き、既存項目（サービス・会社概要・実績・強み・メッセージ・プレスリリース・ブログ・過去コンテンツのネタバレ）はすべて維持。スマホで項目が2行に折れないよう nowrap。
+- フッター：イマーシブ制作 → 制作事例一覧 → 施設活用イベント → 公演を探す → サービス一覧 → 会社概要 → メディア掲載実績 → プレスリリース → 解説記事一覧 → ブログ。
+- 並び替え：トップ「法人向けサービス」、/services/ の一覧と「目的から選ぶ」表、各サービスページの「他のサービス」をイマーシブ → 施設活用 → マダミス → 謎解き研修／頭脳戦の順に。
+- 追加リンク：/works/ のジャンル見出し下にサービスへのリンク（イマーシブ・施設一体型 → イマーシブ制作・施設活用、マダミス → マダミス制作）。公演・ブランドページ（怪盗と秘密の試験・Karma・ANATOR・体験する美術館）のフッターに「東京で開催中の公演を探す」（/events/）。
+- 維持：本文・画像・配色・レイアウト・トップのセクション順・URL・title・H1・description・canonical・robots（本番同等ビルドで148ページ比較し差分なし）。サイトリンクは Google が自動で決めるため、表示順は保証されない。
