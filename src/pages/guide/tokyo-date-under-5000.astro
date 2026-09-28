@@ -62,7 +62,7 @@ const over = own.filter((r) => { const p = r.perPersonFor(2); return p !== undef
 const faqs = [
   { q: 'この5,000円に食事や交通費は入っていますか？', a: '入っていません。このページの予算は体験の料金だけです。食事・交通費・飲み物などは別にかかります。' },
   { q: '二人でいくらになりますか？', a: `${main.map((r) => `${r.name}は二人で${r.pair}`).join('。')}。いずれも二人で申し込んだときの通常料金で、割引やクーポンは含めていません。` },
-  { q: '手数料や税金で5,000円を超えることはありますか？', a: '予約サイトの手数料や税区分は候補ごとに違い、ここでは確認できていないものがあります。各行の「5,000円以内の判定」に確認が必要な点を書いているので、最終的な金額は予約画面でご確認ください。' },
+  { q: '手数料や税金で5,000円を超えることはありますか？', a: '予約サイトの手数料や税区分は候補ごとに違います。各行の「5,000円以内の判定」に確認が必要な点を書いているので、最終的な金額は予約画面でご確認ください。' },
 ];
 const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
 const title = '東京で1人5,000円以内の体験デート｜二人の料金と時間で比較';
@@ -129,7 +129,7 @@ const reasons = [
 {reasons.filter((x) => x.xs.length).map((x) => (
   <div class="pick-col"><p class="pick-h">{x.h}</p><p class="pick-p">{x.xs.map((r, i) => <>{i > 0 && '／'}<a href={`#item-${r.id}`}>{r.name}</a>（1人{yen(r.ppLow)}〜）</>)}</p></div>
 ))}
-<div class="pick-col"><p class="pick-h">一緒に作りたい</p><p class="pick-p">{extCheck.length ? <>{extCheck.map((c) => <a href={`#check-${c.id}`}>{c.name}</a>)}は{extCheck[0].pp}ですが、回によって料金が違うため下の「確認が必要な候補」に入れています。</> : '5,000円以内と確認できた作る体験は現在ありません。'}</p></div>
+<div class="pick-col"><p class="pick-h">一緒に作りたい</p><p class="pick-p">{extCheck.length ? <>{extCheck.map((c) => <a href={`#check-${c.id}`}>{c.name}</a>)}は{extCheck[0].pp}ですが、回によって料金が違うため下の「確認が必要な候補」に入れています。</> : '5,000円以内の作る体験は、いまこのページでは紹介していません。'}</p></div>
 </div>
 </div></section>
 
@@ -167,7 +167,7 @@ const reasons = [
 </div></section>
 
 <section class="section"><div class="wrap">
-<p class="cmp-note-p">掲載内容は各施設・公演の公式ページの案内をもとにしています。物語参加型の公演は株式会社ex Labsが企画・制作しています。</p>
+<p class="cmp-note-p">物語参加型の公演は株式会社ex Labsが企画・制作しています。</p>
 <p class="vc-line" style="margin-top:20px">あわせて読む：<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート（体験のジャンルで選ぶ）</a>／<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)">二人で楽しめる謎解き・脱出ゲーム</a>／<a href="/guide/shibuya-rainy-date/" style="color:var(--accent)">渋谷の雨の日デート</a>／<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/tokyo-friends-activities/" style="color:var(--accent)">友達2〜4人で遊ぶ体験</a></p>
 </div></section>
 
@@ -178,7 +178,7 @@ const reasons = [
 <style>
 .wrap.narrow{max-width:820px}
 .cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
-.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cards-h span{font-size:12.5px;font-weight:700;color:#0B35C8}
 .cards-note{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:rgba(29,29,31,.55);text-align:left}
 .cmp-wrap{margin-top:16px}
 .cmp-x th[scope=row]{min-width:170px;white-space:normal}
@@ -190,7 +190,7 @@ const reasons = [
 .cmp-note-p{max-width:920px;margin:0 auto;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
 .pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px;margin-top:16px}
 .pick-col{background:#fff;border:var(--bd);border-radius:12px;box-shadow:var(--shadow-1);padding:16px 18px;text-align:left}
-.pick-h{margin:0 0 6px;font-size:14px;font-weight:800;color:#e8481c}
+.pick-h{margin:0 0 6px;font-size:14px;font-weight:800;color:#0B35C8}
 .pick-p{margin:0;font-size:13.5px;line-height:1.75;color:var(--ink)}
 .pick-p a{color:var(--accent);font-weight:700}
 .sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:18px;margin:16px auto 0}

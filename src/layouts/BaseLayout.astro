@@ -6,6 +6,7 @@ import SiteHeader from '../components/x/SiteHeader.astro';
 import SiteFooter from '../components/x/SiteFooter.astro';
 import '../styles/global.css';
 import '../styles/x.css';
+import '../styles/xguide.css';
 import { jsonLd } from '../lib/microcms';
 
 export interface Props {
@@ -35,6 +36,8 @@ const {
   contact,
   footer = 'full',
 } = Astro.props;
+// 解説記事・ブログ記事の本文ページ（一覧 /guide/・/blog/ は除く）は記事用の新デザインのスキンを当てる
+const isArticle = !renewal && /^\/(guide|blog)\/[^/]+\/?$/.test(Astro.url.pathname);
 const cutKey = 'exl_cut:' + Astro.url.pathname.replace(/[^A-Za-z0-9/_-]/g, '').slice(0, 120);
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
@@ -177,7 +180,7 @@ const orgLd = {
 <script type="application/ld+json" set:html={jsonLd(websiteLd)} />
 <SiteGuard />
 </head>
-<body class={renewal ? 'x-body' : 'x-legacy'}>
+<body class={renewal ? 'x-body' : isArticle ? 'x-legacy x-guide' : 'x-legacy'}>
 
 {cutin && (
   <>

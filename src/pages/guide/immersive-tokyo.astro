@@ -75,7 +75,7 @@ const compareRows = rows.filter((r) => r.status !== 'ended');
 const sumPrice = (w: (typeof rows)[number]['w']) => w.price.unit === 'per-person' && w.price.amount !== undefined ? `1人 ${fmtYen(w.price.amount)}` : w.price.unit === 'per-group' && w.price.tiers?.length ? `${w.price.tiers[0].party}人 ${fmtYen(w.price.tiers[0].amount)}〜` : w.price.text.replace(/（.*$/, '');
 const endedRows = rows.filter((r) => r.status === 'ended');
 const names = (xs: typeof rows) => xs.map((r) => r.w.title).join('、');
-const none = '確認できた公演なし';
+const none = 'いま該当する公演はありません';
 const pick = {
   soloBook: compareRows.filter((r) => r.w.party.soloAllowed),
   soloRun: compareRows.filter((r) => r.w.party.soloRuns === true),
@@ -90,17 +90,17 @@ const pick = {
 
 const soloShared = pick.soloBook.filter((r) => r.w.party.format === 'shared');
 const soloOther = pick.soloBook.filter((r) => r.w.party.format !== 'shared');
-const soloAnswer = pick.soloBook.length ? `${soloShared.length ? `${names(soloShared)}は1名から申し込めます（相席形式）。` : ''}${soloOther.length ? `${names(soloOther)}も1名から申し込めます（相席か貸切かは公式ページで確認）。` : ''}${compareRows.filter((r) => !r.w.party.soloAllowed).length ? `${names(compareRows.filter((r) => !r.w.party.soloAllowed))}は各回2名以上での申込です。` : ''}` : '確認できた範囲で1名から申し込める公演はありません。';
-const pairAnswer = pick.pairPrivate.length ? `${names(pick.pairPrivate)}は申込単位で貸切のため、2名で申し込めば2名だけで体験できます。` : '2名だけで貸切にできる公演は確認できていません。';
+const soloAnswer = pick.soloBook.length ? `${soloShared.length ? `${names(soloShared)}は1名から申し込めます（相席形式）。` : ''}${soloOther.length ? `${names(soloOther)}も1名から申し込めます（相席か貸切かは公式ページで確認）。` : ''}${compareRows.filter((r) => !r.w.party.soloAllowed).length ? `${names(compareRows.filter((r) => !r.w.party.soloAllowed))}は各回2名以上での申込です。` : ''}` : 'いま紹介している公演には、1名から申し込めるものはありません。';
+const pairAnswer = pick.pairPrivate.length ? `${names(pick.pairPrivate)}は申込単位で貸切のため、2名で申し込めば2名だけで体験できます。` : 'いま紹介している公演には、2名だけで貸切にできるものはありません。';
 const durationAnswer = compareRows.map((r) => `${r.w.title}は${r.w.duration.text}`).join('、') + '。形式の目安は周遊型で60〜120分、公演型で1〜3時間です。';
 const faqs = [
-  { q: '東京ではどんなイマーシブ体験ができますか？', a: '劇場・施設の中を歩き回るイマーシブシアター型、商業施設や街全体を巡る周遊型、バーやレストランでの少人数没入型、劇中セットを歩く展示型などがあります。このページでは、確認できた開催日・料金・参加人数を公演ごとに比較できます。' },
+  { q: '東京ではどんなイマーシブ体験ができますか？', a: '劇場・施設の中を歩き回るイマーシブシアター型、商業施設や街全体を巡る周遊型、バーやレストランでの少人数没入型、劇中セットを歩く展示型などがあります。このページでは、開催日・料金・参加人数を公演ごとに比較できます。' },
   { q: 'イマーシブ体験は一人でも参加できますか？', a: soloAnswer + '公演によって「1名から申し込めるか」と「1名だけで回が成立するか」は別なので、申込条件を確認してください。' },
   { q: '2人だけで参加できますか？', a: pairAnswer + (pick.pair.length ? `${names(pick.pair)}は2名での参加ができます。` : '') },
   { q: '演技をしたことがなくても大丈夫ですか？', a: `演技は求められません。${pick.beginner.map((r) => `${r.w.title}は「${r.w.info.beginner}」と案内しています`).join('。')}。会話や選択で物語が進む形式なので、その場で反応するだけで成立します。` },
   { q: '怖い演出はありますか？雨の日でも参加できますか？', a: `${pick.notScary.length ? `${names(pick.notScary)}はホラー演出なしと公式に案内しています。` : 'ホラー演出の有無は各公演の公式ページで確認してください。'}${pick.indoor.length ? `${names(pick.indoor)}は商業施設内で完結するため、雨天でも体験内容は変わりません。` : ''}${pick.outdoorMove.length ? `${names(pick.outdoorMove)}は受付後に屋外の徒歩移動があります。` : ''}` },
   { q: '所要時間はどのくらいですか？', a: durationAnswer },
-  { q: '空席はどこで確認できますか？', a: 'カレンダーの◯は公式ページで確認できた開催日です。空席・残席は各予約サイト（escape.id など）の表示が最新なので、◯の日付をタップして予約サイトでご確認ください。' },
+  { q: '空席はどこで確認できますか？', a: 'カレンダーの◯は開催日です。空席・残席は各予約サイト（escape.id など）の表示が最新なので、◯の日付をタップして予約サイトでご確認ください。' },
   { q: '開催日や人数で探すにはどうすればいいですか？', a: '公演を探す（/events/）で、今日・明日・今週末や特定の日付、人数・エリア・予算から開催予定の回を絞り込めます。' },
 ];
 
@@ -188,7 +188,7 @@ const articleLd = {
 <details class="acc" id="choose">
 <summary><span class="acc-t">人数・好み・参加形式で選ぶ</span><span class="acc-s">1人／2人／演者と会話／屋内・屋外／怖くない</span></summary>
 <div class="acc-b">
-<p class="lede">各公演の公式ページで確認できた条件から当てはめています。条件に合う公演が確認できない場合は「{none}」と表示します。</p>
+<p class="lede">人数・好み・参加の仕方ごとに、合う公演を並べています。</p>
 <p class="lede">詳しい判断材料は、<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)" data-track="show" data-show="guide-solo" data-place="guide-choose">一人で参加する場合</a>（1名で申し込めるか・1名だけで成立するか・交流の有無）と<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)" data-track="show" data-show="guide-date" data-place="guide-choose">二人で参加する場合</a>（二人分の総額・貸切か・同じ組で行動できるか）に分けてまとめています。{EXPERIENCE_DATE_PUBLISHED && <>イマーシブに決めていない二人が、ものづくり・謎解きも含めて比べるなら<a href="/guide/tokyo-experience-date/" style="color:var(--accent)" data-track="show" data-show="guide-xdate" data-place="guide-choose">東京の非日常デート</a>、謎解き・脱出ゲームに絞るなら<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)" data-track="show" data-show="guide-nazo" data-place="guide-choose">二人で楽しめる謎解き・脱出ゲーム</a>。渋谷で雨の日なら<a href="/guide/shibuya-rainy-date/" style="color:var(--accent)" data-track="show" data-show="guide-shibuya-rain" data-place="guide-choose">渋谷の雨の日デート</a>、体験の予算を1人5,000円以内に抑えるなら<a href="/guide/tokyo-date-under-5000/" style="color:var(--accent)" data-track="show" data-show="guide-u5000" data-place="guide-choose">1人5,000円以内の体験デート</a>。友達3〜4人で行くなら<a href="/guide/tokyo-friends-activities/" style="color:var(--accent)" data-track="show" data-show="guide-friends" data-place="guide-choose">東京で友達と遊ぶ体験</a>で人数ごとの総額を比べられます。</>}</p>
 <div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>条件</th><th>当てはまる公演</th><th>確認するポイント</th></tr></thead><tbody>
 <tr><th scope="row">1人で申し込める</th><td>{pick.soloBook.length ? names(pick.soloBook) : none}</td><td>1名で申し込めても、他の参加者と一緒に体験する「相席」形式の場合があります</td></tr>
@@ -260,7 +260,7 @@ const articleLd = {
 <ul class="bullets">
 <li><strong>「常設」より「期間限定」を探す</strong>：2026年は大型常設施設が閉業し、東京のイマーシブシアターは期間限定公演・小規模劇場が主流です。気になる作品は早めのチケット確保がおすすめです。</li>
 <li><strong>人数と距離感で選ぶ</strong>：数十人規模で歩き回る劇場型か、数名で俳優と向き合う少人数型か。初めてなら少人数型のほうが「物語の当事者」になる感覚を掴みやすいです。</li>
-<li><strong>ほかの公演を探す</strong>：この表には主催者の公式ページで開催期間・料金・参加条件を確認できた公演だけを載せます。ほかの公演は<a href="https://tokyo-immersive.com/" target="_blank" rel="noopener" style="color:var(--accent)">東京イマーシブシアター</a>、<a href="https://natalie.mu/stage/content_tag/388/play" target="_blank" rel="noopener" style="color:var(--accent)">ステージナタリー（イマーシブ・体験型演劇）</a>、<a href="https://www.enjoytokyo.jp/event/list/cat0311/" target="_blank" rel="noopener" style="color:var(--accent)">レッツエンジョイ東京（没入体験）</a>で見つけ、主催者の公式ページで日程と料金を確認してください。</li>
+<li><strong>ほかの公演を探す</strong>：この表では、開催期間・料金・参加条件がはっきりしている公演を紹介しています。ほかの公演は<a href="https://tokyo-immersive.com/" target="_blank" rel="noopener" style="color:var(--accent)">東京イマーシブシアター</a>、<a href="https://natalie.mu/stage/content_tag/388/play" target="_blank" rel="noopener" style="color:var(--accent)">ステージナタリー（イマーシブ・体験型演劇）</a>、<a href="https://www.enjoytokyo.jp/event/list/cat0311/" target="_blank" rel="noopener" style="color:var(--accent)">レッツエンジョイ東京（没入体験）</a>で見つけ、主催者の公式ページで日程と料金を確認してください。</li>
 </ul>
 </div>
 </details>
@@ -358,7 +358,7 @@ const articleLd = {
 .section.cards{padding:36px 0 44px}
 .section.acc-wrap{padding:44px 0 60px}
 .cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
-.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cards-h span{font-size:12.5px;font-weight:700;color:#0B35C8}
 .cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:18px;margin:18px auto 0}
 #compare .cmp-wrap{margin-top:4px}
 /* ---- 比較表 ---- */

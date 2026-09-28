@@ -19,7 +19,7 @@ export const venues: Venue[] = [
     regionId: 'tokyo',
     areaId: 'shibuya',
     setting: 'indoor',
-    station: 'JR「渋谷駅」新南改札より直結（自社公式ページの案内）',
+    station: 'JR「渋谷駅」新南改札より直結',
     access: '商業施設内の複数スポットを歩いて巡る。集合場所は SHIBUYA SIDE 3階（公式ページに記載）',
     sourceIds: ['uwasabanashi-official'],
   },

@@ -117,7 +117,7 @@ const articleLd = {
 <h2 class="cards-h">目的で選ぶ<span>貸切・短時間・初めて・雨の日・街歩き</span></h2>
 <div class="pick-grid">
 <div class="pick-col"><p class="pick-h">二人だけで遊びたい</p><p class="pick-p"><strong>部屋を一組で貸切</strong>：{roomRows.length ? <>{roomRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a></>)}</> : '現在掲載していません'}。<br><strong>同じチームで遊べる（知らない人と組まない）</strong>：{teamRows.length ? <>{teamRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a></>)}。部屋の貸切ではありません</> : '現在掲載していません'}。{sharedRows.length ? <><br>{names(sharedRows)}は他の参加者と一緒に進みます。</> : ''}{unknownRows.length ? <><br>{names(unknownRows)}は作品ページでご確認ください。</> : ''}</p></div>
-<div class="pick-col"><p class="pick-h">短時間で遊びたい（合計約1時間以内）</p><p class="pick-p">{shortRows.length ? <>{shortRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a>（{r.totalTime}）</>)}</> : '約1時間以内の作品は掲載していません。'}{rows.filter((r) => r.totalMinutes === undefined).length ? <>{names(rows.filter((r) => r.totalMinutes === undefined))}は説明・受付を含む合計時間が公式で確認できていないため、ここには含めていません。</> : ''}</p></div>
+<div class="pick-col"><p class="pick-h">短時間で遊びたい（合計約1時間以内）</p><p class="pick-p">{shortRows.length ? <>{shortRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a>（{r.totalTime}）</>)}</> : '約1時間以内の作品は掲載していません。'}{rows.filter((r) => r.totalMinutes === undefined).length ? <>{names(rows.filter((r) => r.totalMinutes === undefined))}は説明・受付を含む合計時間が公式ページに載っていないため、ここには含めていません。</> : ''}</p></div>
 <div class="pick-col"><p class="pick-h">初めての二人</p><p class="pick-p">難易度の表記は施設ごとに違います。短時間の作品や、進行のサポートがある作品から選ぶと安心です。{own.length ? <>{own.map((r) => <a href={`#item-${r.w.id}`}>{r.w.title}</a>)}は「{own[0].w.info.beginner}」と案内しています。</> : ''}</p></div>
 <div class="pick-col"><p class="pick-h">雨の日</p><p class="pick-p">{indoorRows.length ? <>{indoorRows.map((r, i) => <>{i > 0 && '／'}<a href={r.href}>{r.name}</a></>)}は屋内で遊べます。駅から受付までの移動は各公式ページでご確認ください。</> : '屋内の施設は掲載していません。'}</p></div>
 <div class="pick-col"><p class="pick-h">歩きながら解きたい</p><p class="pick-p">{own.length ? <>{own.map((r) => <a href={`#item-${r.w.id}`}>{r.w.title}</a>)}は渋谷サクラステージの館内（屋内）を歩いて巡る周遊型で、屋外の街歩きではありません。</> : ''}屋外を歩く街歩き型の作品は、開催中のものを確認でき次第、追加します。</p></div>
@@ -150,7 +150,7 @@ const articleLd = {
   </article>
 ))}
 </div>
-<p class="cards-note">掲載内容は各施設の公式ページの案内をもとにしています。料金・作品・空き状況は変わることがあるため、最新の情報は公式ページでご確認ください。</p>
+<p class="cards-note">料金・作品・空き状況は変わることがあるため、最新の情報は公式ページでご確認ください。</p>
 </div></section>
 
 <section class="section" id="check"><div class="wrap narrow">
@@ -183,7 +183,7 @@ const articleLd = {
 <style>
 .wrap.narrow{max-width:820px}
 .cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
-.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cards-h span{font-size:12.5px;font-weight:700;color:#0B35C8}
 .cards-note{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:rgba(29,29,31,.55);text-align:left}
 .cmp-wrap{margin-top:16px}
 .cmp-x th[scope=row]{min-width:170px;white-space:normal}
@@ -192,7 +192,7 @@ const articleLd = {
 .cmp-note-p{max-width:920px;margin:0 auto;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
 .pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:14px;margin-top:16px}
 .pick-col{background:#fff;border:var(--bd);border-radius:12px;box-shadow:var(--shadow-1);padding:16px 18px;text-align:left}
-.pick-h{margin:0 0 6px;font-size:14px;font-weight:800;color:#e8481c}
+.pick-h{margin:0 0 6px;font-size:14px;font-weight:800;color:#0B35C8}
 .pick-p{margin:0;font-size:13.5px;line-height:1.75;color:var(--ink)}
 .pick-p a{color:var(--accent);font-weight:700}
 .sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:18px;margin:16px auto 0}

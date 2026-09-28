@@ -113,37 +113,37 @@ const chips = [short(s.duration), short(s.capacity)].filter((c) => c && c.length
 </script>
 
 <style>
-.cal-card{background:#fff;border:var(--bd);border-radius:14px;box-shadow:var(--shadow-1);overflow:hidden;display:flex;flex-direction:column;text-align:left}
+.cal-card{background:#fff;border:1px solid #D6DFFB;border-radius:0;box-shadow:none;overflow:hidden;display:flex;flex-direction:column;text-align:left}
 .cal-img{position:relative;display:block;aspect-ratio:16/10;background:#1d1d1f;overflow:hidden}
 .cal-img img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 22%;transition:transform .3s}
 .cal-img:hover img{transform:scale(1.03)}
 .cal-img-alt{display:flex;align-items:center;justify-content:center;height:100%;padding:20px;color:#fff;font-weight:800;font-size:18px;text-align:center;background:linear-gradient(135deg,#1d1d1f,#3a3f52)}
-.cal-badge{position:absolute;left:0;bottom:12px;background:#e8481c;color:#fff;font-weight:800;font-size:13px;letter-spacing:.04em;padding:6px 12px 6px 14px;border-radius:0 6px 6px 0;box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.cal-badge.is-hot{background:#d9480f}
+.cal-badge{position:absolute;left:0;bottom:12px;background:#E1F73E;color:#0B0B14;font-weight:800;font-size:13px;letter-spacing:.04em;padding:6px 12px 6px 14px;border-radius:0;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.cal-badge.is-hot{background:#E1F73E}
 .cal-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px}
 .cal-area{margin:0;font-size:11.5px;color:rgba(29,29,31,.6);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cal-name{margin:0;font-size:17px;font-weight:800;color:var(--ink);line-height:1.45;letter-spacing:.02em}
+.cal-name{margin:0;font-size:18px;font-weight:700;font-family:'Shippori Mincho',serif;color:#0B35C8;line-height:1.45;letter-spacing:.02em}
 .cal-price{margin:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.cal-yen{font-family:var(--font-en);font-size:26px;font-weight:800;color:#e8481c;line-height:1;letter-spacing:0}
+.cal-yen{font-family:var(--font-en);font-size:26px;font-weight:800;color:#0B35C8;line-height:1;letter-spacing:0}
 .cal-yen.is-unknown{font-size:16px;font-family:inherit;letter-spacing:.02em}
 .cal-unit{font-size:12px;font-weight:700;color:rgba(29,29,31,.65)}
 .cal-chips{margin:0;display:flex;flex-wrap:wrap;gap:6px}
-.cal-chips span{font-size:11.5px;font-weight:700;color:rgba(29,29,31,.75);background:#f3f4f6;border-radius:999px;padding:4px 10px}
+.cal-chips span{font-size:11.5px;font-weight:700;color:#0B35C8;background:#EEF2FE;border-radius:0;padding:4px 10px}
 .cal-meta{margin:0;font-size:12px;line-height:1.6;color:rgba(29,29,31,.65)}
 .cal-weeks{display:flex;flex-direction:column;gap:8px;margin-top:4px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.1)}
 .cal-wk{margin:0 0 4px;font-size:11.5px;font-weight:800;color:rgba(29,29,31,.6)}
 .cal-wk span{font-weight:500;margin-left:6px}
 .cal-row{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.cal-cell{border:1px solid rgba(0,0,0,.08);border-radius:7px;background:#fafafa;min-height:46px}
+.cal-cell{border:1px solid rgba(0,0,0,.08);border-radius:0;background:#fafafa;min-height:46px}
 .cal-cell>a,.cal-cell>span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;height:100%;min-height:46px;padding:4px 1px;text-decoration:none;color:rgba(29,29,31,.4)}
 .cal-d{font-size:12px;font-weight:800;line-height:1;display:flex;flex-direction:column;align-items:center;gap:1px}
 .cal-d small{font-size:8.5px;font-weight:700;opacity:.8}
 .cal-m{font-size:13px;font-weight:800;line-height:1}
 .cal-t{font-size:8.5px;font-weight:700;line-height:1}
-.cal-cell.is-open,.cal-cell.is-today{background:#fff1ea;border-color:#f3a98a}
+.cal-cell.is-open,.cal-cell.is-today{background:#F4FBC8;border-color:#B9CC1F}
 .cal-cell.is-open>a,.cal-cell.is-today>a{color:var(--ink)}
-.cal-cell.is-open .cal-m,.cal-cell.is-today .cal-m{color:#e8481c;font-size:16px}
-.cal-cell.is-open>a:hover,.cal-cell.is-today>a:hover{background:#ffe1d3}
+.cal-cell.is-open .cal-m,.cal-cell.is-today .cal-m{color:#0B35C8;font-size:16px}
+.cal-cell.is-open>a:hover,.cal-cell.is-today>a:hover{background:#E1F73E}
 .cal-cell.is-now{outline:2px solid var(--ink);outline-offset:-2px}
 .cal-cell.is-soldout{background:#f3f3f3}
 .cal-cell.is-soldout .cal-m,.cal-cell.is-started .cal-m{color:rgba(29,29,31,.55)}

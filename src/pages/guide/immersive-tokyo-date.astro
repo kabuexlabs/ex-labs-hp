@@ -47,8 +47,8 @@ const heroChips = [
 ];
 
 const faqs = [
-  { q: '二人で申し込めば、二人だけで体験できますか？', a: `${pairPrivate.length ? `${names(pairPrivate)}は申込単位で貸切なので、2名で申し込めば2名だけで体験できます。` : '2名だけで貸切にできる公演は確認できていません。'}${pairShared.length ? `${names(pairShared)}は1名ずつのチケットで、同じ回の他の参加者と一緒に体験します。` : ''}` },
-  { q: '二人分の料金はいくらですか？', a: pair.map((r) => r.totalFor(2) !== undefined ? `${r.w.title}は2名で${total2(r)}（1人あたり${fmtYen(r.perPersonFor(2)!)}、税込、${r.w.price.feeNote}）` : `${r.w.title}は料金単位を確認できていないため公式チケットページで確認`).join('。') + '。' },
+  { q: '二人で申し込めば、二人だけで体験できますか？', a: `${pairPrivate.length ? `${names(pairPrivate)}は申込単位で貸切なので、2名で申し込めば2名だけで体験できます。` : 'いま紹介している公演には、2名だけで貸切にできるものはありません。'}${pairShared.length ? `${names(pairShared)}は1名ずつのチケットで、同じ回の他の参加者と一緒に体験します。` : ''}` },
+  { q: '二人分の料金はいくらですか？', a: pair.map((r) => r.totalFor(2) !== undefined ? `${r.w.title}は2名で${total2(r)}（1人あたり${fmtYen(r.perPersonFor(2)!)}。${r.w.price.feeNote}）` : `${r.w.title}の料金は公式チケットページでご確認ください`).join('。') + '。' },
   { q: '二人が別々の回になることはありますか？', a: `${pairShared.length ? `${names(pairShared)}は1枚ずつのチケットなので、同じ回を選んで代表者がまとめて購入するよう案内されています。` : ''}${pairPrivate.length ? `${names(pairPrivate)}は1組で申し込むため同じ回になります。` : ''}予約時に回（日付・時刻）と枚数を確認してから決済してください。` },
   { q: '服装や待ち合わせ場所はどう決めればいいですか？', a: '集合場所と受付時間は各公式ページに記載があります（「予定の組み方」参照）。服装・靴・持ち物は「イマーシブ体験の服装・持ち物」の記事にまとめています。' },
 ];
@@ -89,7 +89,7 @@ const articleLd = {
 {pairCal.length ? (
   <div class="cal-grid">{pairCal.map(({ r, s }) => <ShowCalendar show={s} place="date-cal" now={now} priceMain={priceMain(r)} priceSub={priceSub(r)} />)}</div>
 ) : (
-  <p class="lede">確認できた範囲で、2名で申し込める公演は現在ありません。開催中の公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京ガイド</a>をご覧ください。</p>
+  <p class="lede">いま2名で申し込める公演はありません。開催中の公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京ガイド</a>をご覧ください。</p>
 )}
 <p class="cards-note">◯は開催日です。空席は予約サイトの表示が最新で、◯があっても満席の場合があります。総額は税込・手数料別。</p>
 </div></section>
@@ -123,7 +123,7 @@ const articleLd = {
 <div class="acc-b">
 <ul class="bullets">
 <li><strong>二人で相談しながら進めたい</strong>：「同じ組で行動」を確認します。{pairPrivate.length ? `${names(pairPrivate)}は申込単位の貸切で、1組だけで体験します（進行中の動き方は公式ページで確認）。` : ''}{pairShared.length ? `${names(pairShared)}は同じ回に参加できますが、公式に「途中で一時的に離れる場面がある」と案内されています。` : ''}</li>
-<li><strong>演者との交流を楽しみたい</strong>：{actor.length ? `${names(actor)}はキャストとの会話が進行の一部です。` : '現在の公演で、キャストとの会話を公式に案内しているものは確認できていません。'}</li>
+<li><strong>演者との交流を楽しみたい</strong>：{actor.length ? `${names(actor)}はキャストとの会話が進行の一部です。` : 'いま紹介している公演には、キャストとの会話が中心のものはありません。'}</li>
 <li><strong>会話の負担を抑えたい</strong>：会話が進行の一部になる公演は避け、証言や手がかりを集めて整理する型を選びます。{rows.filter((r) => r.w.info.actorInteraction !== true).length ? `${names(rows.filter((r) => r.w.info.actorInteraction !== true))}は「${rows.filter((r) => r.w.info.actorInteraction !== true).map((r) => r.w.info.participation).join('」「')}」と案内されています。` : ''}会話量を公式に明記した公演はないため、気になる場合は主催者に確認してください。</li>
 <li><strong>雨の日や歩きやすさが気になる</strong>：{outdoor.length ? `${names(outdoor)}は受付後に屋外の徒歩移動があります。` : ''}{rows.filter((r) => r.venue?.setting === 'indoor').length ? `${names(rows.filter((r) => r.venue?.setting === 'indoor'))}は商業施設内で完結します。` : ''}</li>
 </ul>
@@ -179,7 +179,7 @@ const articleLd = {
 <li>{pairPrivate.length ? `${names(pairPrivate)}は2名で申し込めば二人だけで体験できます。` : '二人だけで貸切にできる公演は現在ありません。'}{pairShared.length ? `${names(pairShared)}は同じ回の他の参加者と一緒に体験します。` : ''}</li>
 <li>料金はカードと表に、二人分の総額と1人あたりの両方を載せています。</li>
 </ul></div>
-<p class="cmp-note-p">掲載内容は各公演の公式ページの案内をもとにしています。日程・料金・空席は変わることがあるため、最新の情報は予約サイトでご確認ください。</p>
+<p class="cmp-note-p">日程・料金・空席は変わることがあるため、最新の情報は予約サイトでご確認ください。</p>
 <p class="vc-line" style="margin-top:16px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)">一人で参加するには</a>／<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物</a>／<a href="/guide/magic-show-immersive-chigai/" style="color:var(--accent)">マジックショーとイマーシブ体験の違い</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="date-cta">公演を探す</a></p>
 </div>
 </details>
@@ -194,7 +194,7 @@ const articleLd = {
 .section.acc-wrap{padding:44px 0 60px}
 #pair-cal,#table{scroll-margin-top:88px}
 .cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
-.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cards-h span{font-size:12.5px;font-weight:700;color:#0B35C8}
 .cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:18px;margin:18px auto 0}
 .cards-note{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:rgba(29,29,31,.55);text-align:left}
 .cmp-wrap{margin-top:8px}

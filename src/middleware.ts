@@ -1,5 +1,6 @@
 import { defineMiddleware } from 'astro:middleware';
 import { BLOG_REDIRECTS } from './data/redirects';
+import { enhanceArticleHtml } from './lib/articleHtml';
 
 // URL の正規化：末尾スラッシュ無しでアクセスされた SSR ページを
 // スラッシュ付きへ 301 リダイレクトする。canonical だけでは Google が
@@ -24,6 +25,16 @@ export const onRequest = defineMiddleware((context, next) => {
   }
   if (needsSlash) {
     return context.redirect(`${pathname}/${search}`, 301);
+  }
+  // 解説記事・ブログ記事（一覧ページは除く）：文節の改行位置とステップ図を整えてから返す
+  if (isGet && /^\/(guide|blog)\/[^/]+\/$/.test(pathname)) {
+    return next().then(async (res) => {
+      if (!(res.headers.get('content-type') ?? '').includes('text/html') || res.status !== 200) return res;
+      const html = enhanceArticleHtml(await res.text());
+      const headers = new Headers(res.headers);
+      headers.delete('content-length');
+      return new Response(html, { status: res.status, headers });
+    });
   }
   return next();
 });

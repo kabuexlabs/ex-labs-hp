@@ -213,7 +213,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
         <div><dt>二人での参加</dt><dd class="dd-normal">{r.w.party.text}（{r.formatLabel}）{r.w.party.text.includes('離れる') ? '' : ''}</dd></div>
         <div><dt>費用（二人分）</dt><dd class="dd-normal">2名で{total2(r)}（{r.w.price.unit === 'per-group' ? '1組料金' : '1人料金×2'}、税込）。{r.w.price.feeNote}</dd></div>
         <div><dt>時間</dt><dd class="dd-normal">{r.w.duration.text}。{(r.w.info.requirements ?? []).find((x) => /遅れ|入場/.test(x)) ?? ''}</dd></div>
-        <div><dt>開催状況</dt><dd class="dd-normal">期間限定。確認できた開催日 {r.datesText}。空き状況は公式予約ページで確認</dd></div>
+        <div><dt>開催状況</dt><dd class="dd-normal">期間限定。開催日 {r.datesText}。空き状況は公式予約ページで確認</dd></div>
         <div><dt>選ぶ理由</dt><dd class="dd-normal">{r.w.info.actorInteraction === true ? 'キャストと会話しながら進めたい二人向け。' : ''}{r.w.party.format === 'private' ? '申込単位で貸切のため、二人だけで体験できます。' : r.w.party.format === 'shared' ? '1名ずつのチケットで同じ回に参加します（他の参加者も一緒）。' : ''}{r.w.info.participation ?? ''}</dd></div>
         <div><dt>注意点</dt><dd class="dd-normal">{r.w.info.ageRule ?? '年齢条件は公式で確認'}。{r.venue?.setting ? SETTING[r.venue.setting] : ''}{r.w.info.walking ? `。${r.w.info.walking}` : ''}{r.w.info.scary ? `。${r.w.info.scary}` : ''}</dd></div>
       </dl>
@@ -238,7 +238,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 <li><strong>物語の中で役割を演じてみたい</strong>：キャストと交流する物語参加型。{story.filter((r) => r.w.info.actorInteraction === true).length ? `${story.filter((r) => r.w.info.actorInteraction === true).map((r) => r.w.title).join('、')}はキャストとの会話が進行の一部です。` : ''}演技は求められませんが、その場で反応する場面があります。</li>
 {byGenre('art').length > 0 && <li><strong>自分のペースで鑑賞したい</strong>：没入型アート・展示。実例：{byGenre('art').map((i) => i.name).join('、')}。他の来場者と一緒で貸切にはなりません。</li>}
 </ul>
-<p class="lede">「二人の会話が多い」ことと「他の人やキャストとの会話が多い」ことは別です。初対面の人と組まずに二人だけで進めたいなら、各部屋が貸切の脱出ゲームや申込単位で貸切の公演が候補になります。効果や相性は人によって違うため、このページでは公式に確認できた条件の違いだけを載せています。</p>
+<p class="lede">「二人の会話が多い」ことと「他の人やキャストとの会話が多い」ことは別です。初対面の人と組まずに二人だけで進めたいなら、各部屋が貸切の脱出ゲームや申込単位で貸切の公演が候補になります。楽しみ方や相性は人によって違うので、二人の好みに合わせて選んでください。</p>
 </div></section>
 
 <section class="section" id="check"><div class="wrap narrow">
@@ -261,7 +261,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 </div></section>
 
 <section class="section"><div class="wrap">
-<p class="cmp-note-p">掲載内容は各体験の公式ページの案内をもとにしています。料金・日程・空席は変わることがあるため、最新の情報は各公式ページでご確認ください。物語参加型の2公演は株式会社ex Labsが企画・制作しています。</p>
+<p class="cmp-note-p">料金・日程・空席は変わることがあるため、最新の情報は各公式ページでご確認ください。物語参加型の2公演は株式会社ex Labsが企画・制作しています。</p>
 <p class="vc-line" style="margin-top:32px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">イマーシブ体験を二人で楽しむには</a>／<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)">一人で参加するには</a>／<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物</a>／<a href="/events/" style="color:var(--accent)">公演を探す</a></p>
 </div></section>
 
@@ -275,7 +275,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 .draft-note{max-width:920px;margin:0 auto;background:#fff4ee;border:1px solid #f0a37f;border-radius:12px;padding:14px 18px;font-size:13.5px;line-height:1.8;color:var(--ink);text-align:left}
 .def-sub{font-size:19px;color:var(--ink);margin:28px 0 6px;text-align:left}
 .cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
-.cards-h span{font-size:12.5px;font-weight:700;color:#e8481c}
+.cards-h span{font-size:12.5px;font-weight:700;color:#0B35C8}
 .cards-note{margin:14px 0 0;font-size:11.5px;line-height:1.7;color:rgba(29,29,31,.55);text-align:left}
 .pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:14px;margin-top:16px}
 .pick-col{background:#fff;border:var(--bd);border-radius:12px;box-shadow:var(--shadow-1);padding:16px 18px;text-align:left}
@@ -284,7 +284,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 .pick-list li{font-size:13.5px;line-height:1.7}
 .pick-list a{color:var(--accent);font-weight:700}
 .pick-list small{font-size:11px;color:rgba(29,29,31,.6);margin-left:3px}
-.pick-k{display:inline-block;min-width:7em;font-size:12px;font-weight:800;color:#e8481c;margin-right:6px}
+.pick-k{display:inline-block;min-width:7em;font-size:12px;font-weight:800;color:#0B35C8;margin-right:6px}
 .cmp-x th[scope=row]{min-width:160px;white-space:normal}
 .cmp-x td{min-width:120px;vertical-align:top;font-size:13px}
 #pick{scroll-margin-top:88px}
