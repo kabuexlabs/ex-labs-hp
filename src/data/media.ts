@@ -17,6 +17,10 @@ export interface MediaItem {
   desc: string;
   /** 記事URL（有料会員限定記事などでもリンクは載せてよい） */
   url?: string;
+  /** 掲載対象の公演・事例のキービジュアル（/media/ のカードに表示） */
+  img?: string;
+  /** 掲載対象の公演・事例のサイト内ページ（/media/ のカードからの導線） */
+  related?: { label: string; href: string }[];
 }
 
 export const mediaItems: MediaItem[] = [
@@ -26,6 +30,8 @@ export const mediaItems: MediaItem[] = [
     title: '「渋谷サクラステージで周遊型ミステリ体験 新興ex Labs」として紹介されました',
     desc: '渋谷サクラステージ全体を周遊する都市伝説×イマーシブ×謎解きの体験型イベント「ウワサバナシ調査委員会」（東急不動産株式会社・404 Not Found・TSUTAYA協力）の取り組みが、日本経済新聞に掲載されました。',
     url: 'https://www.nikkei.com/article/DGXZQOUC222NG0S6A720C2000000/',
+    img: '/assets/events/uwasabanashi-kv.webp',
+    related: [{ label: '制作事例を読む', href: '/guide/case-uwasabanashi/' }, { label: '公演ページ', href: '/uwasabanashi/' }],
   },
   {
     outlet: '電ファミニコゲーマー',
@@ -33,6 +39,8 @@ export const mediaItems: MediaItem[] = [
     title: '「ウワサバナシ調査委員会」が紹介されました',
     desc: '渋谷サクラステージ全体を周遊する都市伝説×イマーシブ×謎解きの体験型イベント「ウワサバナシ調査委員会」が、ゲーム・エンタメメディアの電ファミニコゲーマーで紹介されました。',
     url: 'https://news.denfaminicogamer.jp/news/2608032x',
+    img: '/assets/uwasabanashi/story-venue.webp',
+    related: [{ label: '公演ページ', href: '/uwasabanashi/' }],
   },
   {
     outlet: '電ファミニコゲーマー',
@@ -40,5 +48,7 @@ export const mediaItems: MediaItem[] = [
     title: '「怪盗と秘密の試験」が紹介されました',
     desc: '日本一になった実績のあるマジシャン様とコラボレーションしたマジック×イマーシブ公演「怪盗と秘密の試験」（東京・六本木の会員制バーで2026年9月より開催）が、「会員制バーで“怪盗候補”になれる体験型イベント」として紹介されました。',
     url: 'https://news.denfaminicogamer.jp/news/260807z',
+    img: '/assets/events/kaitou-kv.webp',
+    related: [{ label: '公演ページ', href: '/kaitou/' }],
   },
 ];

@@ -1,10 +1,13 @@
 ---
-// メディア掲載実績の一覧ページ。掲載データは src/data/media.ts で管理し、
-// 追加したらトップページの告知バー・セクションと一緒に自動で反映される。
+// メディア掲載実績の一覧ページ（2026-09 リニューアル。プレスリリース一覧と同じ ListHero＋白カード）。
+// 掲載データは src/data/media.ts で管理し、追加したらトップページの告知バー・会社概要と一緒に自動で反映される。
+// 先頭の1件（最優先の掲載）は「Pick up」として大きめに見せる。Instagram のプロフィールリンクからの来訪が多いのでスマホ優先。
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Breadcrumb from '../../components/Breadcrumb.astro';
+import ListHero from '../../components/x/ListHero.astro';
+import Cls from '../../components/x/Cls.astro';
 import { jsonLd } from '../../lib/microcms';
 import { mediaItems } from '../../data/media';
+import { seg } from '../../lib/jpbreak';
 
 // 掲載実績をマシンリーダブルにする（AI検索が「ex Labsは日経に掲載された」
 // という事実を出典つきで参照できるようにする）。
@@ -25,49 +28,84 @@ const mediaLd = {
     },
   })),
 };
+const outlets = [...new Set(mediaItems.map((m) => m.outlet))];
+// 見出しは「記事タイトル」＋「として紹介されました」の形。かぎ括弧内は自然に折り返し、後ろの定型句は途中で折らない
+const splitTitle = (t: string): [string, boolean][] => {
+  const m = t.match(/^(「[^」]*」)(.*)$/);
+  return m ? [[seg(m[1]), false], ...(m[2] ? [[m[2], true] as [string, boolean]] : [])] : [[t, false]];
+};
 ---
 <BaseLayout
+  renewal
   title="メディア掲載実績 - 株式会社ex Labs"
   description="株式会社ex Labsのメディア掲載実績の一覧です。日本経済新聞への掲載、電ファミニコゲーマーでの紹介など、渋谷サクラステージの体験型イベント「ウワサバナシ調査委員会」をはじめとする取り組みが新聞・Webメディアで紹介されています。"
+  cutin={[['新聞・メディアで', '紹介されました']]}
+  contact={{ title: ['取材・掲載のご相談は', 'こちら'], type: 'media' }}
+  footer="short"
 >
 <script type="application/ld+json" set:html={jsonLd(mediaLd)} />
-<Breadcrumb items={[
-  { name: 'ホーム', href: '/' },
-  { name: 'メディア掲載実績' },
-]} />
+<ListHero crumb="メディア掲載実績" en="Media" ja="メディア掲載実績" lead="株式会社ex Labsの取り組みが紹介された新聞・メディアの一覧です。" />
 
-<section class="section" style="padding-top:40px"><div class="wrap">
-<p class="eyebrow">MEDIA</p>
-<h1 class="h2 serif">メディア掲載実績</h1>
-<p class="h2sub"><span class="nobr">株式会社ex Labsの取り組みが</span><span class="nobr">紹介された</span><span class="nobr">新聞・メディアの一覧です。</span></p>
-
-<div class="media-list" style="margin-top:48px">
-{mediaItems.map((m) => (
-  <article class="media-item">
-    <div class="media-feature-head">
-      <span class="media-outlet serif">{m.outlet}</span>
-      <span class="media-date">{m.date}</span>
-    </div>
-    <h2 class="media-title">{m.title}</h2>
-    <p class="media-desc" style="margin-bottom:0">{m.desc}</p>
-    {m.url && (
-      <div class="media-actions" style="margin-top:22px">
-        <a class="btn" href={m.url} target="_blank" rel="noopener">記事を読む（外部サイト）</a>
-      </div>
-    )}
-  </article>
-))}
-</div>
-
-<p class="media-note">※外部サイトの記事は、媒体側の都合により閲覧に会員登録が必要な場合や、公開が終了する場合があります。</p>
-</div></section>
-
-<section class="section tinted"><div class="wrap">
-<div class="cta-mini">
-<p class="cta-mini-title serif">取材・掲載のご相談はこちら</p>
-<a class="btn" href="/#contact">取材について問い合わせる</a>
-</div>
-<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/press/" style="color:var(--accent)">プレスリリース</a>／<a href="/#works" style="color:var(--accent)">実績紹介</a></p>
-</div></section>
-
+<section class="xm-sec">
+  <p class="xm-count"><span class="xm-num">{mediaItems.length}</span><span>件の掲載</span><span class="xm-outlets">{outlets.join('／')}</span></p>
+  <div class="xm-list">
+    {mediaItems.map((m, i) => (
+      <article class={`x-wcard is-s xm-card${i === 0 ? ' is-lead' : ''}${m.img ? ' has-img' : ''}`}>
+        {m.img && <div class="xm-img"><img src={m.img} alt="" loading={i === 0 ? 'eager' : 'lazy'} decoding="async" /></div>}
+        <div class="xm-body">
+          {i === 0 && <p class="xm-pick">Pick up</p>}
+          <div class="xm-top"><span class="xm-outlet">{m.outlet}</span><span class="xm-date">{m.date}</span></div>
+          <h2 class="xm-h">{splitTitle(m.title).map(([t, keep]) => keep ? <span class="x-c">{t}</span> : <span>{t}</span>)}</h2>
+          <p class="xm-d"><Cls text={m.desc} emph={false} /></p>
+          <div class="xm-actions">
+            {m.url && <a class="xm-btn" href={m.url} target="_blank" rel="noopener">記事を読む<span class="xm-ext">外部サイト ↗</span></a>}
+            {m.related && m.related.length > 0 && <p class="xm-rel">{m.related.map((r) => <a href={r.href}>{r.label} →</a>)}</p>}
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+  <p class="xm-note"><Cls text="※外部サイトの記事は、媒体側の都合により閲覧に会員登録が必要な場合や、公開が終了する場合があります。" emph={false} /></p>
+  <nav class="xm-more" aria-label="関連ページ">
+    <a href="/press/" class="x-btn is-line">プレスリリース&nbsp;→</a>
+    <a href="/works/" class="x-btn is-line">制作事例一覧&nbsp;→</a>
+    <a href="/events/" class="x-btn is-line">開催中の公演を探す&nbsp;→</a>
+  </nav>
+</section>
 </BaseLayout>
+<style>
+.xm-sec{padding:0 16px 120px}
+.xm-count{max-width:960px;margin:-24px auto 28px;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:center;gap:4px 10px;font-family:var(--x-min);font-weight:600;font-size:14px;color:var(--x-pale)}
+.xm-num{font-family:var(--x-en);font-size:40px;line-height:1;color:var(--x-lime)}
+.xm-outlets{flex-basis:100%;text-align:center;font-size:12.5px;color:var(--x-pale2)}
+.xm-list{max-width:960px;margin:0 auto;display:grid;gap:16px}
+.xm-card{padding:0;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr)}
+.xm-img{background:var(--x-panel);aspect-ratio:16/10;overflow:hidden}
+.xm-img img{width:100%;height:100%;object-fit:cover;object-position:center 22%;display:block}
+.xm-body{padding:clamp(24px,5vw,44px) clamp(20px,5vw,48px);display:grid;gap:14px;align-content:start}
+.xm-pick{margin:0;justify-self:start;background:var(--x-lime);color:var(--x-ink);font-family:var(--x-en);font-size:15px;letter-spacing:.12em;padding:4px 12px}
+.xm-top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px;padding-bottom:14px;border-bottom:1px solid #D6DFFB}
+.xm-outlet{font-family:var(--x-min);font-weight:700;font-size:clamp(20px,3vw,26px);color:var(--x-blue);line-height:1.4}
+.xm-date{white-space:nowrap;font-family:var(--x-en);font-size:clamp(20px,2.6vw,26px);line-height:1;color:var(--x-blue)}
+.xm-h{margin:0;line-break:strict;text-wrap:pretty;word-break:keep-all;overflow-wrap:anywhere;font-family:var(--x-min);font-weight:700;font-size:clamp(18px,2.4vw,23px);line-height:1.65;color:var(--x-ink)}
+.xm-card.is-lead .xm-h{font-size:clamp(20px,3vw,28px)}
+.xm-d{margin:0;font-size:14.5px;line-height:1.95;color:rgba(11,11,20,.78)}
+.xm-actions{display:grid;gap:14px;margin-top:6px}
+.xm-btn{justify-self:start;display:inline-flex;flex-direction:column;align-items:center;gap:2px;background:var(--x-blue);color:#fff!important;font-family:var(--x-min);font-weight:700;font-size:15px;padding:13px 36px;line-height:1.3}
+.xm-btn:hover{background:var(--x-panel)}
+.xm-ext{font-size:10.5px;font-weight:500;opacity:.8;letter-spacing:.06em}
+.xm-rel{margin:0;display:flex;flex-wrap:wrap;gap:6px 20px;font-size:14px;font-weight:700}
+.xm-rel a{color:var(--x-blue);border-bottom:1px solid currentColor;padding-bottom:1px}
+.xm-note{max-width:960px;margin:24px auto 0;font-size:12px;line-height:1.8;color:var(--x-pale2)}
+.xm-more{max-width:960px;margin:56px auto 0;display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.xm-more .x-btn{padding:14px 28px}
+@media(max-width:699px){
+  .xm-btn{justify-self:stretch}
+  .xm-more .x-btn{flex:1 1 100%}
+}
+@media(min-width:760px){
+  .xm-card.has-img{grid-template-columns:260px minmax(0,1fr)}
+  .xm-card.has-img .xm-img{aspect-ratio:auto}
+  .xm-card.is-lead.has-img{grid-template-columns:340px minmax(0,1fr)}
+}
+</style>
