@@ -98,6 +98,16 @@ for (const p of subBrand) {
   if (n === 0) errors.push(`${p} に解説記事(/guide/)へのリンクがない`);
 }
 
+// ---------- 2b. 会場名の表記：京都市京セラ美術館 ----------
+// 正式名称は「京都市美術館」、ネーミングライツによる通称が「京都市京セラ美術館」。
+// 「京セラ美術館」単独や「京都市」と分けた表記は美術館から訂正依頼を受けた誤り（2026-09-29）。
+for (const [p, src] of allSrc) {
+  src.split('\n').forEach((line, i) => {
+    if (/(?<!京都市)京セラ美術館/.test(line) || /京都市(?:[\s　]|<[^>]*>)+京セラ/.test(line))
+      errors.push(`${p}:${i + 1} 会場名は「京都市京セラ美術館」と続けて書く（「京セラ美術館」は誤り）`);
+  });
+}
+
 // ---------- 3. サービス・トップ・フッターから軸ピラーへのリンク ----------
 const pillars = ['/guide/immersive/', '/guide/madamis/', '/guide/zunousen/', '/guide/shinrisen/', '/guide/shisetsu-katsuyo/', '/guide/taikengata-event/', '/guide/shuyu-event/'];
 const base = read('src/layouts/BaseLayout.astro');

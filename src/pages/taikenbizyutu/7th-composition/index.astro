@@ -9,6 +9,9 @@ const INDEXABLE = false;
 import SiteGuard from '../../../components/SiteGuard.astro';
 
 // ---- 未定の項目（決まったらここを埋める） ----
+// 会場名は必ず「京都市京セラ美術館」（正式名称は京都市美術館、ネーミングライツによる通称）。
+// 「京都市」を省いた略称や、「京都市」と「京セラ…」を改行・空白で分けた表記は使わない（2026-09-29 美術館総務より指摘）。
+// scripts/seo-audit.mjs が誤表記をエラーにする。
 // 購入先URL。null の間はチケットボタンをすべて #ticket へのアンカーにする
 const TICKET_URL: string | null = null;
 // 地図の埋め込みURL（Google マップ。APIキー不要の検索埋め込み）。null にすると枠だけ表示
@@ -213,7 +216,7 @@ const eventLd = {
           <div class="yr">2026</div>
           <div class="big">11.21<span class="badge"><span>Sat</span></span></div>
           <div class="row2">
-            <div class="at"><span class="at-s"><span class="bodoni">at</span>京都市</span><span class="at-m">京セラ美術館</span></div>
+            <div class="at"><span class="at-s"><span class="bodoni">at</span></span><span class="at-m">京都市京セラ美術館</span></div>
             <div class="slash"></div>
             <div class="big">23<span class="badge"><span>Mon</span></span></div>
           </div>
@@ -244,7 +247,7 @@ const eventLd = {
     <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Story</h2><span class="orn">+·◎·</span></div><p>ストーリー</p></div>
     <!-- あらすじ（2026-09-27 支給、改行は支給どおり）。情景は本文、最後の2行を見出しの大きさで強調する -->
     <div class="story-txt">
-      <p class="body story-b lines">京セラ美術館の一角。<br>三雲彼方展と記された<br>展示のパンフレットを開いた瞬間、<br>あなたの中に<br>知らない記憶が流れ込んできた。</p>
+      <p class="body story-b lines">京都市京セラ美術館の一角。<br>三雲彼方展と記された<br>展示のパンフレットを開いた瞬間、<br>あなたの中に<br>知らない記憶が流れ込んできた。</p>
       <p class="story-h glow-t">あるはずのない<wbr>記憶に<wbr>導かれ、<br>あなたは<wbr>交錯する<wbr>未来へ<wbr>いざなわれていく……</p>
     </div>
   </div>
@@ -550,7 +553,7 @@ h1,h2,p{margin:0}
 .at{font-family:'Shippori Mincho',serif;display:flex;flex-direction:column;gap:6px;line-height:1.3;letter-spacing:.12em;padding-bottom:.7em}
 .at-s{font-size:14px;color:#F2C9D4}
 .at .bodoni{font-style:italic;font-size:1.3em;margin-right:6px}
-.at-m{font-size:clamp(22px,2.3vw,30px);font-weight:600;letter-spacing:.1em}
+.at-m{white-space:nowrap;font-size:clamp(20px,2vw,27px);font-weight:600;letter-spacing:.1em}
 .slash{width:clamp(40px,5vw,72px);height:1px;background:#FFF7F2;transform:rotate(40deg);margin-bottom:2.2em}
 .catch{word-break:keep-all;font-size:clamp(20px,2.2vw,28px);font-weight:600;line-height:1.8;letter-spacing:.12em;text-shadow:0 0 18px rgba(255,210,225,.55)}
 .en-detail{font-size:11px;line-height:1.6;letter-spacing:.14em;color:#F2C9D4;opacity:.7}
