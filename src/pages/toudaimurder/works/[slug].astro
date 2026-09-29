@@ -184,4 +184,6 @@ const metaDesc = metaDescFull.length <= 155 ? metaDescFull : `${work.title}は�
 .oit{border:1px solid var(--ln);padding:8px 20px;font-size:13px;border-radius:999px}
 .oit:hover{border-color:var(--acc);color:var(--acc)}
 @media (max-width:900px){.dt{grid-template-columns:1fr}.fact{grid-template-columns:1fr;gap:2px}}
+/* スマホではキャッチの1行（最長19字程度）が折り返さないよう画面幅に合わせて縮める */
+@media (max-width:700px){.catch{font-size:min(17px,3.9vw);letter-spacing:.04em}}
 </style>
