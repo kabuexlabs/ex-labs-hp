@@ -9,15 +9,20 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
+import NowShowing from '../../components/guide/NowShowing.astro';
+import StudioCta from '../../components/guide/StudioCta.astro';
 import { jsonLd } from '../../lib/microcms';
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'about', label: '没入感とは' },
+  { id: 'immersive-diff', label: '没入感とイマーシブ体験の違い' },
+  { id: 'now-showing', label: '東京でいま体験できる没入型イベント' },
   { id: 'iikae', label: '没入感の言い換え・類語' },
   { id: 'reibun', label: '例文・使い方' },
   { id: 'takameru', label: '没入感を高める方法（体験設計の視点）' },
+  { id: 'studio', label: '没入感のある体験の制作・相談' },
   { id: 'botsunyu', label: '「没入」とは？没入するの意味・使い方' },
   { id: 'faq', label: 'よくある質問' },
 ];
@@ -122,6 +127,11 @@ const articleLd = {
 <p class="def-word"><span class="serif">没入感</span><span class="def-en">immersion</span><span class="def-yomi">読み方：ぼつにゅうかん</span></p>
 <p class="def-body">対象の世界に深く入り込み、<strong>現実を忘れて夢中になっている感覚</strong>のこと。映画・ゲーム・演劇・体験型イベントなどで「その世界の中にいる」と感じられる状態を指す。英語では immersion、形容詞は<strong>immersive（イマーシブ）</strong>。</p>
 </div>
+<p class="gd-lead">没入感は、映画やゲームだけでなく<strong>自分の体で味わう</strong>こともできます。東京では、会員制バーや商業施設、街全体を舞台に、参加者が物語の登場人物として動く<strong>没入型（イマーシブ）イベント</strong>が開かれています。キャストと会話したり、手がかりを追って歩いたりしながら、物語の中に入る感覚を体験できます。</p>
+<div class="gd-jump">
+<a class="is-main" href="#now-showing" data-track="show" data-show="now-showing" data-place="botsunyukan-top">いま予約できる公演を見る ↓</a>
+<a href="#studio" data-track="cta" data-show="immersive" data-place="botsunyukan-top">法人の方：制作の相談 ↓</a>
+</div>
 <p class="lede">このページでは、没入感の意味・言い換え・例文と、イベントや空間の<strong>没入感を高める設計方法</strong>までを、イマーシブ体験の制作会社である株式会社ex Labsが解説します。</p>
 
 <nav class="toc" aria-label="目次">
@@ -137,6 +147,20 @@ const articleLd = {
 <p class="lede">没入感の「没入」は、<strong>水に浸かるように対象へ深く入り込むこと</strong>。ゲームで時間を忘れる、映画の世界から戻ってこられない、物語の登場人物として振る舞ってしまう——そうした「現実との境界が薄れる感覚」が没入感です。近年は映像や音響の進化に加え、<strong>空間や物語そのものに参加するイマーシブ体験</strong>の広がりによって、エンタメ・マーケティング両方のキーワードになっています。</p>
 <p class="vc-line"><a href="/guide/immersive/" style="color:var(--accent)">イマーシブ（immersive）とは？意味を1分で解説 →</a></p>
 </div></section>
+
+<section class="section" id="immersive-diff"><div class="wrap narrow">
+<p class="eyebrow">DIFFERENCE</p><h2 class="h2 serif">没入感とイマーシブ体験の違い</h2>
+<p class="lede"><strong>没入感は「感覚」</strong>、<strong>イマーシブ体験は「その感覚を生むように作られた体験の形式」</strong>です。没入感は映画や読書でも生まれますが、イマーシブ体験では参加者が現実の空間に入り、自分の行動で物語を進めます。</p>
+<div class="cmp-wrap"><table class="cmp-table cmp-stack"><thead><tr><th>項目</th><th>没入感</th><th>イマーシブ体験</th></tr></thead><tbody>
+<tr><th scope="row">指すもの</th><td data-label="没入感">体験している人が感じる状態</td><td data-label="イマーシブ体験">体験の形式・ジャンル</td></tr>
+<tr><th scope="row">使い方</th><td data-label="没入感">「没入感がある」「没入感が高い」</td><td data-label="イマーシブ体験">「イマーシブ体験に参加する」</td></tr>
+<tr><th scope="row">生まれる場面</th><td data-label="没入感">映画・ゲーム・読書・演劇など</td><td data-label="イマーシブ体験">イマーシブシアター、街や施設を巡る周遊型、店舗型の公演など</td></tr>
+<tr><th scope="row">参加者の立場</th><td data-label="没入感">観る側でも感じられる</td><td data-label="イマーシブ体験">登場人物・当事者として参加する</td></tr>
+</tbody></table></div>
+<p class="vc-line"><a href="/guide/immersive-taiken/" style="color:var(--accent)">イマーシブ体験とは？種類と楽しみ方 →</a></p>
+</div></section>
+
+<NowShowing place="botsunyukan-now" title="東京でいま体験できる没入型イベント" lead="物語の中に入る感覚を、実際に味わえる公演です。料金・所要時間・人数を見比べて、予約サイトへ進めます。" />
 
 <section class="section" id="iikae"><div class="wrap narrow">
 <p class="eyebrow">SYNONYMS</p><h2 class="h2 serif">没入感の言い換え・類語</h2>
@@ -171,6 +195,8 @@ const articleLd = {
 <p class="lede">当社はこの設計思想で、渋谷サクラステージの施設一体型イマーシブ（<strong>日本経済新聞掲載</strong>）など、空間全体の没入体験を制作しています。</p>
 <p class="vc-line"><a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作とは？工程・体制の完全ガイド →</a>／<a href="/guide/immersive-making/" style="color:var(--accent)">イマーシブイベントの作り方 →</a></p>
 </div></section>
+
+<StudioCta place="botsunyukan-studio" title="没入感のある体験を、施設やブランドで" lead="没入感は、空間・物語・運営を一体で設計して初めて生まれます。株式会社ex Labsは、商業施設・店舗・街を舞台にしたイマーシブ体験の企画・制作・集客・運営を一貫して担当しています。" />
 
 <section class="section tinted" id="botsunyu"><div class="wrap narrow">
 <p class="eyebrow">VERB</p><h2 class="h2 serif">「没入」とは？没入するの意味・使い方</h2>
@@ -227,6 +253,6 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#about,#iikae,#reibun,#takameru,#botsunyu,#faq{scroll-margin-top:88px}
+#about,#immersive-diff,#now-showing,#iikae,#reibun,#takameru,#studio,#botsunyu,#faq{scroll-margin-top:110px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>

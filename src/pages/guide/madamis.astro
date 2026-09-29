@@ -9,6 +9,16 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
+import { seg } from '../../lib/jpbreak';
+import { tmWorks, TM_LINE_URL } from '../../data/toudaimurderWorks';
+
+// 「マダミスを体験する」：東大マーダーミステリーサークル（UNLIMITED MYSTERY）の作品から、初めてでも申し込みやすいものを出す。
+// 人数・時間・料金は作品データ（src/data/toudaimurderWorks.ts）の値をそのまま使い、手書きしない。
+const detail = (w: (typeof tmWorks)[number], re: RegExp) => w.details?.find((d) => re.test(d.label))?.value;
+const playable = tmWorks
+  .map((w) => ({ w, people: detail(w, /^人数$/), time: detail(w, /^時間$/), price: detail(w, /料金/) }))
+  .filter((x) => x.price && x.people && x.time && !/経験者/.test(`${x.w.play}${x.w.desc}`) && (parseInt(x.people, 10) || 99) <= 8)
+  .slice(0, 4);
 import MadamisPartners from '../../components/MadamisPartners.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -16,6 +26,7 @@ const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
 const toc = [
   { id: 'about', label: 'マダミスとは' },
+  { id: 'experience', label: 'マダミスを体験する（参加できる作品）' },
   { id: 'play', label: '遊び方・必要なもの・初心者のコツ' },
   { id: 'where', label: '遊ぶには（店舗・オンライン）' },
   { id: 'cost', label: '遊ぶときの費用の目安' },
@@ -145,6 +156,20 @@ const articleLd = {
 <h1 class="h2 serif"><span class="nobr">マダミスとは？</span><span class="nobr">意味・遊び方・費用まで</span><span class="nobr">完全ガイド</span></h1>
 <p class="lede"><strong>マダミス</strong>とは<strong>マーダーミステリー</strong>の略称・通称。参加者が物語の登場人物になりきり、会話と推理を通じて事件の犯人を突き止める体験型の推理ゲームです。このページでは、マダミスの意味・遊び方・種類・費用から、遊び方・制作依頼の方法までをまとめて解説します。</p>
 <p class="pick-line">遊びたい方はこちらから：<a href="/guide/madamis-shoshinsha/" data-track="show" data-show="guide-madamis-shoshinsha" data-place="madamis-pick">一人で参加する（初心者の不安と選び方）</a>／<a href="/guide/madamis-tokyo/" data-track="show" data-show="guide-madamis-tokyo" data-place="madamis-pick">友人と参加する（東京の店舗・公演の探し方）</a>／<a href="/guide/madamis-asobikata/" data-track="show" data-show="guide-madamis-asobikata" data-place="madamis-pick">自宅・オンラインで体験する（遊び方・必要なもの）</a></p>
+<div class="mm-facts">
+<p class="mm-facts-h">マダミスの基本</p>
+<dl>
+<div><dt>意味</dt><dd>マーダーミステリーの略。登場人物になりきり、会話と推理で犯人を突き止める推理ゲーム</dd></div>
+<div><dt>人数</dt><dd>1作品4〜10人程度。一人でも、他の参加者と同じ回に入る相席公演に参加できます</dd></div>
+<div><dt>所要時間</dt><dd>2〜4時間が中心（初心者向けの短編は60〜90分）</dd></div>
+<div><dt>料金</dt><dd>店舗公演で1名3,500〜5,000円前後</dd></div>
+<div><dt>初心者</dt><dd>参加できます。最初に進行役（GM）がルールを説明するので、予習は不要です</dd></div>
+</dl>
+</div>
+<div class="gd-jump">
+<a class="is-main" href="#experience" data-track="show" data-show="madamis-experience" data-place="madamis-top">マダミスを体験する ↓</a>
+<a href="/guide/madamis-shoshinsha/" data-track="show" data-show="guide-madamis-shoshinsha" data-place="madamis-top">一人で参加する（初心者ガイド）</a>
+</div>
 <div class="key-points"><p class="key-points-h">この記事の要点</p><ul>
 <li>マダミスとは、マーダーミステリーの略称。参加者が登場人物になりきり、会話と推理で犯人を突き止める体験型の推理ゲームです。</li>
 <li>遊ぶには店舗公演・オンライン・パッケージの3つ。1作品4〜10人程度、所要2〜4時間が中心で、店舗公演の目安は1名3,500〜5,000円前後です。</li>
@@ -168,6 +193,26 @@ const articleLd = {
 <li><strong>どう参加するか</strong>：専門店やイベントの公演に申し込む（一人で相席参加／友人と貸切）か、作品を買ってオンライン・自宅で遊びます。</li>
 <li><strong>人数・時間・料金</strong>：1作品4〜10人程度、所要2〜4時間が中心。店舗公演は1名3,500〜5,000円前後が目安です（作品ごとに異なります）。</li>
 </ul>
+</div></section>
+
+<section class="section" id="experience"><div class="wrap">
+<p class="eyebrow">PLAY NOW</p><h2 class="h2 serif">マダミスを体験する</h2>
+<p class="lede">東大マーダーミステリーサークル（UNLIMITED MYSTERY）の作品は、<strong>メンバーをそろえて貸切で予約</strong>できます。人数・所要時間・料金を見て、遊びたい作品を選んでください。</p>
+<div class="mm-works">
+{playable.map(({ w, people, time, price }) => (
+  <a class="mm-work" href={`/toudaimurder/works/${w.slug}/`} data-track="show" data-show={`tm-${w.slug}`} data-place="madamis-experience">
+    {w.image && <img src={w.image} alt="" loading="lazy" decoding="async" width="880" height="1245" />}
+    <span class="mm-work-t">{seg(w.title)}</span>
+    <span class="mm-work-m">{people}｜{time}</span>
+    <span class="mm-work-m">{price}</span>
+  </a>
+))}
+</div>
+<div class="gd-jump">
+<a class="is-main" href={TM_LINE_URL} target="_blank" rel="noopener" data-track="ticket" data-show="toudaimurder-line" data-place="madamis-experience">公式LINEで予約・相談する ↗</a>
+<a href="/toudaimurder/contact/" data-track="ticket" data-show="toudaimurder-form" data-place="madamis-experience">予約フォームから申し込む</a>
+</div>
+<p class="vc-line">ほかの作品は<a href="/toudaimurder/works/" style="color:var(--accent)">作品一覧</a>から。一人で参加したい方は<a href="/guide/madamis-shoshinsha/" style="color:var(--accent)">初心者ガイド</a>、東京の店舗公演を探すなら<a href="/guide/madamis-tokyo/" style="color:var(--accent)">東京でマダミスを遊ぶには</a>をご覧ください。</p>
 </div></section>
 
 <section class="section" id="play"><div class="wrap narrow">
@@ -309,6 +354,31 @@ const articleLd = {
 </BaseLayout>
 
 <style>
+.mm-facts{margin:24px 0 0;background:#fff;border:1.5px solid var(--x-blue,#0B35C8);padding:18px 20px;text-align:left;color:var(--x-ink,#0B0B14)}
+.mm-facts-h{margin:0 0 10px;font-weight:800;font-size:14px;letter-spacing:.08em;color:var(--x-blue,#0B35C8)}
+.mm-facts dl{margin:0;display:grid;gap:8px}
+.mm-facts dl div{display:grid;grid-template-columns:5.5em minmax(0,1fr);gap:10px;padding-bottom:8px;border-bottom:1px solid #E3E9FC}
+.mm-facts dl div:last-child{border-bottom:0;padding-bottom:0}
+.mm-facts dt{font-weight:800;font-size:13.5px;color:var(--x-blue,#0B35C8)}
+.mm-facts dd{margin:0;font-size:14.5px;line-height:1.75}
+.mm-works{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(46%,190px),1fr));gap:12px;margin-top:20px;text-align:left}
+.mm-work{display:grid;gap:4px;align-content:start;padding:10px;background:#F3F6FE;border:1px solid #D6DFFB;text-decoration:none!important;color:var(--x-ink,#0B0B14)!important}
+.mm-work img{width:100%;height:auto;aspect-ratio:880/1245;object-fit:cover;background:#0B0B14;margin-bottom:4px}
+.mm-work-t{word-break:keep-all;overflow-wrap:anywhere;font-family:var(--x-min,serif);font-weight:700;font-size:15px;line-height:1.5;color:var(--x-blue,#0B35C8)}
+.mm-work-m{font-size:12.5px;line-height:1.6;color:rgba(11,11,20,.72)}
+#experience{scroll-margin-top:110px}
+@media(max-width:640px){
+  /* スマホは1作品1行（左に画像・右に文字）にして、長いカタカナの作品名を途中で折らない */
+  .mm-works{grid-template-columns:minmax(0,1fr)}
+  .mm-work{grid-template-columns:92px minmax(0,1fr);grid-auto-rows:min-content;column-gap:14px;align-items:start}
+  .mm-work img{grid-row:1 / span 4!important}
+}
+@media(max-width:360px){
+  .mm-work{grid-template-columns:60px minmax(0,1fr);column-gap:10px;padding:8px}
+  .mm-work-t{font-size:14px}
+  .mm-work img{grid-row:1 / span 3;margin-bottom:0}
+}
+
 .wrap.narrow{max-width:820px}
 .toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
 .toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}

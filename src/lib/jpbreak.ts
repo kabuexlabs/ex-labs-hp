@@ -30,7 +30,7 @@ export function seg(str: string): string {
       (HIRA.test(c) && /[一-鿿ァ-ヺA-Za-z0-9「（]/.test(n)) ||
       (KAN.test(c) && KT.test(n)) ||
       (/[ァ-ヺー]/.test(c) && KAN.test(n) && !/^[様]/.test(n)) ||
-      (/[はをがにでへ]/.test(c) && /[一-鿿ァ-ヺ]/.test(s[i - 1] || '') && /[ぁ-ゟ一-鿿ァ-ヺ]/.test(n) && !/[、。）」]/.test(n))
+      (/[はをがにでへ]/.test(c) && /[一-鿿ァ-ヺー]/.test(s[i - 1] || '') && /[ぁ-ゟ一-鿿ァ-ヺ]/.test(n) && !/[、。）」]/.test(n) && !(c === 'で' && /[きけ]/.test(n)))
     )) out += ZW;
   }
   return out;

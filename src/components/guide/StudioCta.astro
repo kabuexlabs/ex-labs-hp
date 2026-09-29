@@ -1,0 +1,48 @@
+---
+// 解説記事の中盤に置く「制作実績・制作相談」ブロック（法人・施設の担当者向け）。
+// 実績は公開済みの事実だけ（src/pages/works/ と同じ内容）。相談は各サービスページのお問い合わせフォームへ送る。
+interface Props {
+  title?: string;
+  lead?: string;
+  /** 相談先のサービスページ（例：/services/immersive/） */
+  service?: string;
+  serviceLabel?: string;
+  place: string;
+  id?: string;
+}
+const {
+  title = 'イマーシブ体験の制作も、ご相談いただけます',
+  lead = '株式会社ex Labsは、商業施設・店舗・街を舞台にしたイマーシブ体験の企画・制作・集客・運営を一貫して担当しています。',
+  service = '/services/immersive/',
+  serviceLabel = 'イマーシブ制作',
+  place,
+  id = 'studio',
+} = Astro.props;
+const works = [
+  { t: 'ウワサバナシ調査委員会', d: '渋谷サクラステージ全体を周遊する施設一体型イマーシブ。日本経済新聞に掲載', href: '/guide/case-uwasabanashi/' },
+  { t: '怪盗と秘密の試験', d: '六本木の会員制バーで行うマジック×イマーシブ公演', href: '/events/kaitou/' },
+  { t: '月明かりの書店と呪われた原稿', d: '閉店後の紀伊國屋書店を舞台にした一夜限りの体験型イベント（博報堂×紀伊國屋書店）', href: '/guide/eigyo-jikangai/' },
+];
+---
+<section class="section sc" id={id}><div class="wrap">
+<p class="eyebrow">FOR BUSINESS</p>
+<h2 class="h2 serif">{title}</h2>
+<p class="lede">{lead}</p>
+<ul class="sc-works">
+  {works.map((w) => <li><a href={w.href} data-track="cta" data-show="works" data-place={place}><strong>{w.t}</strong><span>{w.d}</span></a></li>)}
+</ul>
+<div class="sc-actions">
+  <a class="sc-btn" href={`${service}#contact`} data-track="cta" data-show={service.split('/')[2]} data-place={place}>{serviceLabel}を相談する（無料）</a>
+  <a class="sc-sub" href="/works/" data-track="cta" data-show="works" data-place={place}>制作実績をすべて見る →</a>
+</div>
+</div></section>
+<style>
+.sc-works{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:8px;text-align:left}
+.sc-works a{display:grid;gap:2px;padding:14px 16px;background:#F3F6FE;border-left:3px solid var(--x-blue,#0B35C8);text-decoration:none;min-height:48px}
+.sc-works strong{font-family:var(--x-min,serif);font-size:16px;color:var(--x-blue,#0B35C8);background:none!important;padding:0!important}
+.sc-works span{font-size:13px;line-height:1.7;color:rgba(11,11,20,.72)}
+.sc-actions{margin-top:22px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px}
+.sc-btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:14px 28px;background:var(--x-lime,#E1F73E);color:var(--x-ink,#0B0B14)!important;font-weight:700;font-size:15.5px;text-decoration:none}
+.sc-sub{display:inline-block;padding:8px 0;font-size:14px;font-weight:700;color:var(--x-blue,#0B35C8)!important;border-bottom:1px solid currentColor}
+@media(max-width:640px){.sc-btn{width:100%}.sc-actions{justify-content:center}}
+</style>

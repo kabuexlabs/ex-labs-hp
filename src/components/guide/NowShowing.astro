@@ -1,0 +1,67 @@
+---
+// 解説記事に置く「いま参加できる公演」ブロック。正本は src/data/events/（/events/ と同じ）で、料金・所要時間・人数を手書きしない。
+// 開催中・開催予定の公演だけを出し、各公演の予約サイトと詳細ページ（/events/<slug>/）へ送る。
+import { buildGuideRows } from '../../lib/tokyoGuide';
+import { areaName } from '../../data/events/areas';
+
+interface Props {
+  title?: string;
+  lead?: string;
+  /** 計測用（data-place） */
+  place: string;
+  id?: string;
+  eyebrow?: string;
+  /** 主催者の表示（既定は出さない） */
+  showOrganizer?: boolean;
+}
+const { title = '東京でいま参加できるイマーシブ公演', lead, place, id = 'now-showing', eyebrow = 'NOW SHOWING', showOrganizer = false } = Astro.props;
+const rows = buildGuideRows(new Date())
+  .filter((r) => !r.w.guideOnly && (r.status === 'ongoing' || r.status === 'upcoming'))
+  .sort((a, b) => (a.status === b.status ? (a.futureDates[0] ?? '').localeCompare(b.futureDates[0] ?? '') : a.status === 'ongoing' ? -1 : 1));
+---
+{rows.length > 0 && (
+<section class="section tinted ns" id={id}><div class="wrap">
+<p class="eyebrow">{eyebrow}</p>
+<h2 class="h2 serif">{title}</h2>
+{lead && <p class="lede">{lead}</p>}
+<div class="ns-list">
+  {rows.map((r) => (
+    <article class="ns-card">
+      <p class="ns-area">{r.venue ? `東京・${areaName(r.venue.areaId)}` : '東京'}{r.venue?.listName ? `｜${r.venue.listName}` : ''}</p>
+      <h3 class="ns-name"><a href={`/events/${r.w.slug}/`} data-track="show" data-show={r.w.id} data-place={place}>{r.w.title}</a></h3>
+      {showOrganizer && <p class="ns-org">{r.organizer.relationLabel}</p>}
+      <dl class="ns-dl">
+        <div><dt>料金</dt><dd>{r.w.price.text}</dd></div>
+        <div><dt>所要時間</dt><dd>{r.w.duration.text}</dd></div>
+        <div><dt>人数</dt><dd>{r.w.party.text}</dd></div>
+        <div><dt>開催日</dt><dd>{r.datesText}</dd></div>
+        {r.w.info.ageRule && <div><dt>参加条件</dt><dd>{r.w.info.ageRule}</dd></div>}
+      </dl>
+      <div class="ns-actions">
+        {r.ticketUrl && <a class="ns-btn" href={r.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={r.w.id} data-place={place}>予約サイトで空席を見る<span>{r.ticketSite} ↗</span></a>}
+        <a class="ns-more" href={`/events/${r.w.slug}/`} data-track="show" data-show={r.w.id} data-place={`${place}-detail`}>公演の詳細 →</a>
+      </div>
+    </article>
+  ))}
+</div>
+<p class="ns-foot">料金は税込で、別途手数料がかかる場合があります。空席は予約サイトの表示が最新です。<a href="/events/" data-track="show" data-show="events" data-place={place}>日付・人数から公演を探す →</a></p>
+</div></section>
+)}
+<style>
+.ns-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px;margin-top:22px;text-align:left}
+.ns-card{background:#F3F6FE;border:1px solid #D6DFFB;padding:18px 18px 16px;display:flex;flex-direction:column;gap:10px}
+.ns-area{margin:0;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--x-blue,#0B35C8)}
+.ns-name{margin:0;font-family:var(--x-min,serif);font-weight:700;font-size:19px;line-height:1.5}
+.ns-name a{color:var(--x-blue,#0B35C8);text-decoration:none}
+.ns-org{margin:-4px 0 0;font-size:11.5px;color:rgba(11,11,20,.55)}
+.ns-dl{margin:0;display:grid;gap:6px;font-size:13.5px;line-height:1.6}
+.ns-dl div{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:8px}
+.ns-dl dt{font-weight:700;color:rgba(11,11,20,.55)}
+.ns-dl dd{margin:0;color:var(--x-ink,#0B0B14)}
+.ns-actions{margin-top:auto;padding-top:6px;display:grid;gap:10px}
+.ns-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--x-blue,#0B35C8);color:#fff!important;font-weight:700;font-size:15px;line-height:1.3;padding:13px 16px;min-height:48px;text-decoration:none;text-align:center}
+.ns-btn span{font-size:10.5px;font-weight:500;opacity:.85}
+.ns-more{justify-self:center;display:inline-block;padding:8px 6px;font-size:14px;font-weight:700;color:var(--x-blue,#0B35C8)!important;border-bottom:1px solid currentColor}
+.ns-foot{margin:16px 0 0;font-size:12.5px;line-height:1.8;color:rgba(11,11,20,.6);text-align:left}
+.ns-foot a{display:inline-block;padding:6px 0;font-weight:700;color:var(--x-blue,#0B35C8)!important;border-bottom:1px solid currentColor}
+</style>

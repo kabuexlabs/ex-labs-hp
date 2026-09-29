@@ -12,6 +12,7 @@ import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import ShowCalendar from '../../components/ShowCalendar.astro';
 import VisualHero from '../../components/VisualHero.astro';
+import StudioCta from '../../components/guide/StudioCta.astro';
 import { shows } from '../../data/shows';
 import { eventsData } from '../../data/events/index';
 import { areaName, regionName, genreName } from '../../data/events/areas';
@@ -142,7 +143,12 @@ const articleLd = {
 </VisualHero>
 
 <section class="section cards" id="this-week" data-week-end={week.end} data-today={today}><div class="wrap">
-<h2 class="cards-h">今週・来週の開催日<span>◯の日付をタップで予約サイトへ</span></h2>
+<div class="gd-jump" style="margin:0 0 26px">
+<a class="is-main" href="#this-week-cal" data-track="show" data-show="this-week" data-place="guide-top">今週の開催日・予約 ↓</a>
+<a href="#compare-now" data-track="show" data-show="compare" data-place="guide-top">料金・時間・場所を比較 ↓</a>
+<a href="#studio" data-track="cta" data-show="immersive" data-place="guide-top">法人の方：制作の相談 ↓</a>
+</div>
+<h2 class="cards-h" id="this-week-cal">今週・来週の開催日<span>◯の日付をタップで予約サイトへ</span></h2>
 <div class="cal-grid">
 {calShows.map(({ s }) => <ShowCalendar show={s} place="guide-cal" now={now} />)}
 </div>
@@ -160,6 +166,25 @@ const articleLd = {
 </script>
 </div></section>
 
+
+<section class="section" id="compare-now"><div class="wrap">
+<h2 class="cards-h">料金・所要時間・開催場所・参加条件<span>開催中・開催予定の公演</span></h2>
+<div class="cmp-wrap"><table class="cmp-table cmp-now cmp-stack"><thead><tr><th>公演</th><th>料金</th><th>所要時間</th><th>開催場所</th><th>参加条件</th><th>予約</th></tr></thead><tbody>
+{compareRows.map((r) => (
+  <tr>
+    <th scope="row"><a href={`/events/${r.w.slug}/`} data-track="show" data-show={r.w.id} data-place="guide-compare-now">{r.w.title}</a><span class="cmp-sub">{r.datesText}</span></th>
+    <td data-label="料金">{r.w.price.text}</td>
+    <td data-label="所要時間">{r.w.duration.text}</td>
+    <td data-label="開催場所">{r.venue ? `${areaName(r.venue.areaId)}｜${r.venue.listName ?? r.venue.name}` : '公式ページで確認'}{r.venue?.station && <><br><span class="cmp-note">{r.venue.station}</span></>}</td>
+    <td data-label="参加条件">{r.w.party.text}{r.w.info.ageRule && <><br><span class="cmp-note">{r.w.info.ageRule}</span></>}</td>
+    <td class="cmp-stack-btn">{r.ticketUrl && <a class="cmp-btn" href={r.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={r.w.id} data-place="guide-compare-now">予約サイト →</a>}</td>
+  </tr>
+))}
+</tbody></table></div>
+<p class="cmp-note-p">料金は税込で、別途手数料がかかる場合があります。1組料金の公演は人数ごとの総額です。</p>
+</div></section>
+
+<StudioCta place="guide-tokyo-studio" title="東京のイマーシブ公演を、制作しています" lead="このページで紹介している公演の多くは、株式会社ex Labsが企画・制作またはプロデュースしています。商業施設・店舗・ブランドでのイマーシブ体験の制作や、施設での開催のご相談も受け付けています。" />
 
 <section class="section tinted acc-wrap"><div class="wrap">
 <h2 class="cards-h">くわしく知りたい人は<span>タップで開きます</span></h2>
@@ -351,6 +376,10 @@ const articleLd = {
 </BaseLayout>
 
 <style>
+.cmp-now th[scope=row]{min-width:160px;white-space:normal}
+.cmp-now th[scope=row] a{font-weight:700}
+.cmp-now td{min-width:120px;vertical-align:top}
+#this-week-cal,#compare-now,#studio{scroll-margin-top:110px}
 .wrap.narrow{max-width:820px}
 .def-sub{font-size:19px;color:var(--ink);margin:28px 0 6px;text-align:left}
 #compare,#this-week{scroll-margin-top:88px}

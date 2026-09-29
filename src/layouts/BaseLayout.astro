@@ -38,6 +38,9 @@ const {
 } = Astro.props;
 // 解説記事・ブログ記事の本文ページ（一覧 /guide/・/blog/ は除く）は記事用の新デザインのスキンを当てる
 const isArticle = !renewal && /^\/(guide|blog)\/[^/]+\/?$/.test(Astro.url.pathname);
+// Noto Sans JP は旧デザインの本文（会社概要・サービス一覧・公演詳細など）だけで使う。新デザインと解説記事では描画されないため読み込まない
+// （和文フォントは太さごとに @font-face が百以上あり、CSS だけで約1MB。スマホの初回表示を遅らせる）。
+const fontCss = `https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700${renewal || isArticle ? '' : '&family=Noto+Sans+JP:wght@400;500;700;800'}&family=Montserrat:wght@600;700;800&display=swap`;
 const cutKey = 'exl_cut:' + Astro.url.pathname.replace(/[^A-Za-z0-9/_-]/g, '').slice(0, 120);
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
@@ -173,9 +176,9 @@ const orgLd = {
 <link rel="preload" as="font" type="font/woff2" href="/fonts/italiana-latin.woff2" crossorigin>
 {/* Webフォントは非同期読み込み（media=print→onloadでall）。display=swap で取得前もフォールバックで即表示。
     Italiana・しっぽり明朝・Zen Kaku Gothic New は 2026-09 リニューアルの書体、Noto・Montserrat は既存の解説記事用。 */}
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Montserrat:wght@600;700;800&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Montserrat:wght@600;700;800&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;800&family=Montserrat:wght@600;700;800&display=swap"></noscript>
+<link rel="preload" as="style" href={fontCss}>
+<link rel="stylesheet" href={fontCss} media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href={fontCss}></noscript>
 <script type="application/ld+json" set:html={jsonLd(orgLd)} />
 <script type="application/ld+json" set:html={jsonLd(websiteLd)} />
 <SiteGuard />
@@ -193,15 +196,17 @@ const orgLd = {
     </div>
   </div>
   <script is:inline define:vars={{ cutKey }}>
-    /* カットイン（約3.3秒、クリックでスキップ）。視差効果を減らす設定の方と、同じページを同じセッションで2回目以降に開いたときは出さない。 */
+    /* カットイン（約3.3秒）。タップ・スクロール・キー操作ですぐ閉じる。予約や問い合わせの邪魔にならないよう、
+       1回の訪問（セッション）で最初に開いたページだけに出す。視差効果を減らす設定の方には出さない。 */
     (function () {
       var el = document.getElementById('x-cut'); if (!el) return;
-      var seen = false; try { seen = !!sessionStorage.getItem(cutKey); sessionStorage.setItem(cutKey, '1'); } catch (e) {}
+      var seen = false; try { seen = !!(sessionStorage.getItem(cutKey) || sessionStorage.getItem('exl_cut_any')); sessionStorage.setItem(cutKey, '1'); sessionStorage.setItem('exl_cut_any', '1'); } catch (e) {}
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (seen || reduce || location.hash) { el.remove(); return; }
       document.documentElement.style.overflow = 'hidden';
       var done = function () { document.documentElement.style.overflow = ''; if (el.parentNode) el.remove(); };
       el.addEventListener('click', done);
+      ['touchstart', 'wheel', 'keydown'].forEach(function (t) { window.addEventListener(t, done, { once: true, passive: true }); });
       setTimeout(done, 3300);
       window.addEventListener('pageshow', function (e) { if (e.persisted) done(); });
     })();

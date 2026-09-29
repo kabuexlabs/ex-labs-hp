@@ -116,7 +116,8 @@ const aboutLines = ['「公演を探す」は、', '株式会社ex Labs が運�
 const authorText = 'イマーシブ・マダミス（マーダーミステリー）・謎解き・頭脳戦など、体験型エンターテインメントの企画・制作・集客・運営を一貫して手がける制作会社。東京大学発スタートアップとして2025年設立。累計コンテンツ体験者数15,000人超、渋谷サクラステージでの施設一体型イベントは日本経済新聞に掲載。実際に企画・運営した現場の知見をもとに執筆しています。';
 
 ---
-<BaseLayout renewal title={pageTitle} description={pageDesc} cutin={[['今日できる', 'イマーシブを'], ['探す']]} contact={{ title: ['掲載・修正のご依頼、', '制作のご相談はこちら'], type: 'other' }} footer="short">
+{/* 予約のために来る人が多いページなので、画面全体を覆うカットインは出さない */}
+<BaseLayout renewal title={pageTitle} description={pageDesc} contact={{ title: ['掲載・修正のご依頼、', '制作のご相談はこちら'], type: 'other' }} footer="short">
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(pageLd)} />
 <script type="application/ld+json" set:html={jsonLd({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'ホーム', item: new URL('/', site).toString() }, { '@type': 'ListItem', position: 2, name: '今日できるイマーシブ（公演を探す）', item: new URL('/events/', site).toString() }] })} />

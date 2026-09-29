@@ -10,6 +10,7 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
+import StudioCta from '../../components/guide/StudioCta.astro';
 import { jsonLd } from '../../lib/microcms';
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
@@ -19,6 +20,8 @@ const toc = [
   { id: 'diff', label: 'ポップアップストア・物産展との違い' },
   { id: 'types', label: '催事の種類3タイプ' },
   { id: 'taiken', label: 'いま「体験型催事」が注目される理由' },
+  { id: 'cases', label: '商業施設・店舗・文化施設での活用例' },
+  { id: 'kotoba', label: 'イマーシブ・周遊・体験型イベントとの違い' },
   { id: 'table', label: '催事の種類一覧表（目的・期間・向く施設）' },
   { id: 'flow', label: '企画から開催までの流れと費用' },
   { id: 'faq', label: 'よくある質問' },
@@ -141,6 +144,16 @@ const articleLd = {
 </div>
 <p class="lede">このページでは、催事の意味とポップアップストアとの違い、種類3タイプ、いま施設の集客手段として注目される「体験型催事」の企画例と費用までを、渋谷サクラステージでの施設一体型イベント（日本経済新聞掲載）を手がけた株式会社ex Labsが解説します。</p>
 
+<div class="key-points"><p class="key-points-h">ご依頼について</p><ul>
+<li>株式会社ex Labsは、商業施設・店舗・文化施設の催事を<strong>企画から制作・集客・当日運営までまとめて</strong>お引き受けしています。</li>
+<li>謎解き・イマーシブ・マダミスなどの<strong>体験型催事</strong>が中心です。空き区画や営業時間外の活用もご相談ください。</li>
+<li>チケット売上から費用を回収する<strong>レベニューシェア型</strong>にも対応しています（条件あり）。</li>
+</ul></div>
+<div class="gd-jump">
+<a class="is-main" href="/services/shisetsu-event/#contact" data-track="cta" data-show="shisetsu-event" data-place="saiji-top">催事の企画を相談する（無料）</a>
+<a href="#cases" data-track="cta" data-show="saiji-cases" data-place="saiji-top">活用例を見る ↓</a>
+</div>
+
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
 <ol>
@@ -183,6 +196,30 @@ const articleLd = {
 </ul>
 <p class="lede">当社が渋谷サクラステージで開催した施設一体型イベント「ウワサバナシ調査委員会」は、施設全体を体験の舞台に変える取り組みとして<strong>日本経済新聞に掲載</strong>されました。<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベント事例 →</a></p>
 </div></section>
+
+<section class="section tinted" id="cases"><div class="wrap">
+<p class="eyebrow">CASES</p><h2 class="h2 serif">商業施設・店舗・文化施設での活用例</h2>
+<p class="h2sub">当社が手がけた実績と、施設の種類ごとの企画例です。</p>
+<div class="genre-grid">
+<div class="genre-cell"><span class="genre-t serif">商業施設</span><span class="genre-d"><strong>実績：</strong>渋谷サクラステージ全体を周遊する施設一体型イマーシブ「ウワサバナシ調査委員会」。参加者は調査員として施設内を巡り、キャストへの聞き込みを重ねながら物語の真相を追う催事として開催（日本経済新聞に掲載）。<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">制作事例を読む →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">店舗</span><span class="genre-d"><strong>実績：</strong>閉店後の紀伊國屋書店を舞台にした一夜限りの体験型イベント（博報堂×紀伊國屋書店）、六本木の会員制バーでのマジック×イマーシブ公演、カラオケ館の店舗を巡る頭脳戦コンテンツ。<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の活用 →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">文化施設</span><span class="genre-d"><strong>企画例：</strong>美術館・博物館・水族館の展示を読み解く謎解きや、館内を巡る物語体験。展示を「見る」だけでなく「解く・巡る」催事にすることで、滞在時間と再来館のきっかけを作れます。<a href="/guide/museum-event/" style="color:var(--accent)">文化施設の集客イベント →</a></span></div>
+</div>
+</div></section>
+
+<section class="section" id="kotoba"><div class="wrap">
+<p class="eyebrow">WORDS</p><h2 class="h2 serif">イマーシブ・周遊・体験型イベントとの違い</h2>
+<p class="lede"><strong>催事は「いつ・どこで」の枠</strong>、<strong>体験型・周遊・イマーシブは「何をするか」の中身</strong>です。催事の枠に体験型イベントを入れたものが「体験型催事」です。</p>
+<div class="cmp-wrap"><table class="cmp-table cmp-stack"><thead><tr><th>言葉</th><th>意味</th><th>催事との関係</th></tr></thead><tbody>
+<tr><th scope="row">催事</th><td data-label="意味">施設の催事場・共有区画などで期間限定に開く企画の総称</td><td data-label="催事との関係">開催の枠（期間・場所）</td></tr>
+<tr><th scope="row">体験型イベント</th><td data-label="意味">参加者が見るだけでなく、解く・演じる・巡るなど自分で体験するイベント</td><td data-label="催事との関係">催事に入れる中身の一つ</td></tr>
+<tr><th scope="row">周遊イベント</th><td data-label="意味">手がかりやチェックポイントで、施設や街の中を巡ってもらう体験型イベント</td><td data-label="催事との関係">館内の回遊・テナント送客を狙う催事に向く</td></tr>
+<tr><th scope="row">イマーシブイベント</th><td data-label="意味">参加者が物語の世界に入り込み、登場人物として体験するイベント</td><td data-label="催事との関係">話題化・滞在時間を狙う催事に向く。周遊と組み合わせることも</td></tr>
+</tbody></table></div>
+<p class="vc-line"><a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは →</a>／<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントとは →</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントとは →</a></p>
+</div></section>
+
+<StudioCta place="saiji-studio" service="/services/shisetsu-event/" serviceLabel="催事の企画・制作" title="催事の企画・制作・運営を、まとめてご依頼いただけます" lead="空いている催事枠や共有区画に「来館の理由になる体験」を。株式会社ex Labsは、企画・制作・集客・当日運営までを一貫して担当します。まずは施設の条件をお聞かせください。" />
 
 <section class="section" id="table"><div class="wrap">
 <p class="eyebrow">TABLE</p><h2 class="h2 serif">催事の種類一覧表（目的・期間・向く施設）</h2>
@@ -254,7 +291,7 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#about,#diff,#types,#taiken,#table,#flow,#faq{scroll-margin-top:88px}
+#about,#cases,#kotoba,#studio,#diff,#types,#taiken,#table,#flow,#faq{scroll-margin-top:88px}
 .cmp-wrap{overflow-x:auto;margin-top:24px;-webkit-overflow-scrolling:touch}
 .cmp-table{width:100%;min-width:760px;border-collapse:separate;border-spacing:0;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 6px 22px rgba(51,48,43,.06);font-size:13.5px;line-height:1.7}
 .cmp-table th,.cmp-table td{padding:12px 14px;border-bottom:1px solid rgba(51,48,43,.08);vertical-align:top;text-align:left}
