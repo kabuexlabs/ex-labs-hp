@@ -6,12 +6,16 @@ import { jsonLd } from '../../../lib/microcms';
 const base = '/toudaimurder';
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
+// 一覧は新着順。tmNewest にない作品は tmWorks の順で後ろに並ぶ。
+const newestRank = (slug: string, i: number) => (tmNewest.includes(slug) ? tmNewest.indexOf(slug) : tmNewest.length + i);
+const works = tmWorks.map((w, i) => ({ w, rank: newestRank(w.slug, i) })).sort((a, b) => a.rank - b.rank).map(({ w }) => w);
+
 // マダミス作品一覧の ItemList 構造化データ
 const worksListLd = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
   name: 'UNLIMITED MYSTERY（東大マーダーミステリーサークル） マダミス（マーダーミステリー）作品一覧',
-  itemListElement: tmWorks.map((w, i) => ({
+  itemListElement: works.map((w, i) => ({
     '@type': 'ListItem',
     position: i + 1,
     url: new URL(`${base}/works/${w.slug}/`, site).toString(),
@@ -21,10 +25,9 @@ const worksListLd = {
 
 // メタ表記 ('6人／240分' 等) から絞り込み・並び替え用の数値を取り出す。
 // 「4〜8人」は最小人数、時間未記載は末尾送りにする。
-const cardData = tmWorks.map((w, i) => ({
+const cardData = works.map((w, i) => ({
   work: w,
   order: i,
-  newest: tmNewest.includes(w.slug) ? tmNewest.indexOf(w.slug) : tmNewest.length + i,
   players: parseInt(w.meta, 10) || 999,
   minutes: parseInt(w.meta.match(/(\d+)分/)?.[1] ?? '999', 10),
   store: w.play.includes('店舗') || w.play.includes('パンドラ人狼'),
@@ -50,8 +53,7 @@ const cardData = tmWorks.map((w, i) => ({
       </div>
       <label class="sortl">並び替え
         <select class="ssel" id="sortSel">
-          <option value="default">おすすめ順</option>
-          <option value="newest-asc">新着順</option>
+          <option value="order-asc">新着順</option>
           <option value="players-asc">人数が少ない順</option>
           <option value="players-desc">人数が多い順</option>
           <option value="minutes-asc">時間が短い順</option>
@@ -62,8 +64,8 @@ const cardData = tmWorks.map((w, i) => ({
     </div>
 
     <div class="cards rv d1" id="cards">
-      {cardData.map(({ work: w, order, newest, players, minutes, store, online }) => (
-        <div class="wk" data-order={order} data-newest={newest} data-players={players} data-minutes={minutes} data-store={store ? '1' : '0'} data-online={online ? '1' : '0'}>
+      {cardData.map(({ work: w, order, players, minutes, store, online }) => (
+        <div class="wk" data-order={order} data-players={players} data-minutes={minutes} data-store={store ? '1' : '0'} data-online={online ? '1' : '0'}>
           <a href={`${base}/works/${w.slug}/`}><div class="ph pv">{w.image ? <img src={w.image} alt={`${w.title} キービジュアル`} loading="lazy" decoding="async" /> : <span class="mono">作品キービジュアル 407×570</span>}</div></a>
           <div class="cmeta"><span class="badge">{w.badge}</span>{w.meta && <span class="cdate mono">{w.meta}</span>}</div>
           <h2 class="ct"><a href={`${base}/works/${w.slug}/`}>{w.title}</a></h2>
@@ -87,7 +89,6 @@ let filter = 'all';
 function apply() {
   const [key, dir] = sortSel.value.split('-');
   const sorted = [...cards].sort((a, b) => {
-    if (sortSel.value === 'default') return Number(a.dataset.order) - Number(b.dataset.order);
     const va = Number(a.dataset[key]);
     const vb = Number(b.dataset[key]);
     return (dir === 'asc' ? va - vb : vb - va) || Number(a.dataset.order) - Number(b.dataset.order);

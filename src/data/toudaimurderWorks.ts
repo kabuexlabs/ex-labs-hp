@@ -358,8 +358,8 @@ export const tmWorks: TmWork[] = [
   },
 ];
 
-/** 作品一覧の「新着順」(新しい順)。新作は先頭に足す。ここにない作品は tmWorks の順で後ろに並ぶ。 */
-export const tmNewest = ['unreal', 'arumadamisu2', 'frankenstein'];
+/** 作品一覧の並び (新しい順)。新作は先頭に足す。ここにない作品は tmWorks の順で後ろに並ぶ。 */
+export const tmNewest = ['unreal', 'kurenai', 'arumadamisu2', 'frankenstein'];
 
 /** トップページのマーキーに載せる作品 (掲載順)。
  *  殺人鬼Xの独白・あるマーダーミステリーについて はマーキー非掲載。 */
