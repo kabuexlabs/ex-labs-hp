@@ -143,6 +143,24 @@ const ticker = [
   </footer>
 </ToudaimurderLayout>
 
+<script>
+// 作品の帯は読み込み直後から流すと、下までスクロールした頃には先頭の新作が画面外に消えている。
+// 帯の半分が見えてから少し間を置いて流し始める。
+const strip = document.querySelector('.wstrip');
+if (strip) {
+  const stripIo = new IntersectionObserver(
+    (entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        stripIo.disconnect();
+        setTimeout(() => strip.classList.add('run'), 2000);
+      }
+    },
+    { threshold: 0.5 },
+  );
+  stripIo.observe(strip);
+}
+</script>
+
 <style>
 .intro{position:fixed;inset:0;z-index:100;background:#0b0a0c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;animation:introout .6s ease 2s forwards}
 .imark{width:clamp(200px,32vw,320px);height:auto;opacity:0;animation:iin .9s cubic-bezier(.22,.61,.36,1) .25s forwards}
@@ -180,9 +198,12 @@ const ticker = [
 .btnx{display:inline-flex;align-items:center;gap:12px;background:transparent;color:#fff;border:1.5px solid #eae5e1;border-radius:999px;padding:14px 44px;font-size:14px;letter-spacing:.1em;font-weight:700;transition:all .2s}
 .btnx::before{content:"𝕏";font-size:16px}
 .btnx:hover{background:#eae5e1;color:#0b0a0c}
-.wstrip{overflow:hidden;border-top:1px solid var(--ln);border-bottom:1px solid var(--ln);padding:44px 0}
-.wsin{display:flex;gap:40px;width:max-content;animation:mq 60s linear infinite}
-.wstrip:hover .wsin{animation-play-state:paused}
+/* 先頭カードを見出しの左端にそろえる。流れ出すのは帯が画面に入ってから（下の script）。 */
+.wstrip{overflow:hidden;border-top:1px solid var(--ln);border-bottom:1px solid var(--ln);padding:44px 0 44px max(56px,calc((100% - var(--wrapw))/2 + 56px))}
+.wsin{display:flex;gap:40px;width:max-content;animation:mq 100s linear infinite paused}
+.wstrip.run .wsin{animation-play-state:running}
+.wstrip.run:hover .wsin{animation-play-state:paused}
+@media (max-width:700px){.wstrip{padding-left:22px}}
 .wcard{width:300px;flex-shrink:0}
 .nrow{display:grid;grid-template-columns:190px 1fr;gap:28px;padding:26px 0;border-top:1px solid var(--ln);align-items:center}
 .nth{aspect-ratio:16/9;overflow:hidden;background:#0e0c0f}

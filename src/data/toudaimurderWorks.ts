@@ -225,7 +225,7 @@ export const tmWorks: TmWork[] = [
     slug: 'twin',
     title: 'ツイン号沈没事故に関する考察',
     badge: '推理',
-    author: 'あこ',
+    author: 'かるら',
     image: '/assets/toudaimurder/twin.webp',
     meta: '6人／180分',
     play: '店舗公演',
