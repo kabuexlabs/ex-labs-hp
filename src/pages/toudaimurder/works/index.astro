@@ -1,6 +1,6 @@
 ---
 import ToudaimurderLayout from '../../../layouts/ToudaimurderLayout.astro';
-import { tmWorks } from '../../../data/toudaimurderWorks';
+import { tmWorks, tmNewest } from '../../../data/toudaimurderWorks';
 import { jsonLd } from '../../../lib/microcms';
 
 const base = '/toudaimurder';
@@ -24,6 +24,7 @@ const worksListLd = {
 const cardData = tmWorks.map((w, i) => ({
   work: w,
   order: i,
+  newest: tmNewest.includes(w.slug) ? tmNewest.indexOf(w.slug) : tmNewest.length + i,
   players: parseInt(w.meta, 10) || 999,
   minutes: parseInt(w.meta.match(/(\d+)分/)?.[1] ?? '999', 10),
   store: w.play.includes('店舗') || w.play.includes('パンドラ人狼'),
@@ -50,6 +51,7 @@ const cardData = tmWorks.map((w, i) => ({
       <label class="sortl">並び替え
         <select class="ssel" id="sortSel">
           <option value="default">おすすめ順</option>
+          <option value="newest-asc">新着順</option>
           <option value="players-asc">人数が少ない順</option>
           <option value="players-desc">人数が多い順</option>
           <option value="minutes-asc">時間が短い順</option>
@@ -60,8 +62,8 @@ const cardData = tmWorks.map((w, i) => ({
     </div>
 
     <div class="cards rv d1" id="cards">
-      {cardData.map(({ work: w, order, players, minutes, store, online }) => (
-        <div class="wk" data-order={order} data-players={players} data-minutes={minutes} data-store={store ? '1' : '0'} data-online={online ? '1' : '0'}>
+      {cardData.map(({ work: w, order, newest, players, minutes, store, online }) => (
+        <div class="wk" data-order={order} data-newest={newest} data-players={players} data-minutes={minutes} data-store={store ? '1' : '0'} data-online={online ? '1' : '0'}>
           <a href={`${base}/works/${w.slug}/`}><div class="ph pv">{w.image ? <img src={w.image} alt={`${w.title} キービジュアル`} loading="lazy" decoding="async" /> : <span class="mono">作品キービジュアル 407×570</span>}</div></a>
           <div class="cmeta"><span class="badge">{w.badge}</span>{w.meta && <span class="cdate mono">{w.meta}</span>}</div>
           <h2 class="ct"><a href={`${base}/works/${w.slug}/`}>{w.title}</a></h2>
