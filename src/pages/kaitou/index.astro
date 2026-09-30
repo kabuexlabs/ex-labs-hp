@@ -39,7 +39,6 @@ const cast = [
   { slug: 'sugita-maho', name: '杉田真帆', x: 'Maho__0407', bio: '舞台役者、フリーランスで都内で活動中。' },
   { slug: 'kanade-waon', name: '花奏和音', x: 'waonnu', bio: '山形県出身。東北芸術工科大学デザイン工学部卒。18歳から地元劇団で芝居を学び、2020年より東京での活動を開始。小劇場やテーマパークを中心に、現在イマーシブシアター・体験型コンテンツに多く出演中。' },
   { slug: 'mayuri', name: 'まゆり（楯真由子）', x: 'MayuliG_G6', bio: '出てくる度、物騒な事件を起こしがちなお姉さんです。今日はどんな風に君たちを可愛がろうかな。なんてね。' },
-  { slug: 'sasano-ami', name: '佐々野愛美', x: 'Ami_Sasano', bio: '俳優、タレント、モデルなどマルチに活動中。現在はイマーシブシアターを中心に活動しており、マダミスや謎解きなど体験型コンテンツが大好き。' },
   { slug: 'miyasaka-rino', name: '宮坂莉乃', x: 'MiyasakaRino', bio: '長野県出身。2020年、舞台を中心に活動を開始。近年はイマーシブ作品に出演する。趣味はマーダーミステリー、人狼ゲーム、シナリオ制作。' },
   { slug: 'kameda-risa', name: '亀田理紗', x: 'kame_yuto', bio: '俳優・MC。謎解きゲームやイマーシブシアターなど、体験型エンターテインメントを中心に活動。芝居歴18年、キャスト歴12年。演技と進行を通して、物語への没入感を支えることを得意としている。' },
 ];
@@ -296,6 +295,7 @@ const faqs = [
       ))}
     </div>
     <p class="cast-hint">※ 写真をタップするとプロフィールをご覧いただけます</p>
+    <p class="cast-note">本公演におきまして、演目の構成上、当日出演予定とお知らせしておりますキャストと遭遇できない場合がございます。<br>ご理解、ご了承の程何卒よろしくお願いいたします。</p>
   </div>
 </section>
 
@@ -614,6 +614,7 @@ section[id],header[id]{scroll-margin-top:64px}
 .cast-card:hover img{filter:saturate(1.05) brightness(1.06)}
 .cast-name{display:block;margin-top:12px;font-size:16px;letter-spacing:.12em;color:var(--ink)}
 .cast-hint{margin:36px 0 0;font-size:12px;color:var(--cap2);text-align:center}
+.cast-note{margin:20px auto 0;max-width:640px;font-size:12.5px;line-height:2;color:var(--body3);text-align:center}
 
 /* ==== キャスト詳細モーダル ==== */
 .castdlg{background:var(--card);color:var(--ink);border:1px solid rgba(211,171,97,.35);padding:0;max-width:min(760px,calc(100vw - 40px));width:100%;max-height:calc(100vh - 48px);overflow:auto}
