@@ -31,6 +31,8 @@ import {
   getReservation,
   reserveSeats,
   cancelReservation,
+  restoreReservation,
+  sendCancelMail,
   changeReservationCount,
   recountSeats,
   getSettings,
@@ -74,6 +76,7 @@ import {
   defaultAcceptTemplate,
   defaultGoTemplate,
   FLOP_TEMPLATE,
+  CANCEL_TEMPLATE,
   renderTemplate,
   missingPlaceholders,
 } from '../../../lib/hacktaleTemplates';
@@ -96,6 +99,8 @@ let noticeMode = Astro.url.searchParams.get('notice') ?? '';
 let postedSubject: string | null = null;
 let postedBody: string | null = null;
 let postedTo: Set<string> | null = null;
+// キャンセル画面（?session=<id>&cancel=<予約番号>）
+const cancelResId = Astro.url.searchParams.get('cancel') ?? '';
 
 let key = Astro.cookies.get(COOKIE)?.value ?? '';
 const configured = isKvConfigured();
@@ -324,7 +329,7 @@ if (Astro.request.method === 'POST') {
     }
 
     // --- 一斉送信・予約の操作 ---------------------------------------------------
-    const resActions = ['res-add', 'res-cancel', 'res-count', 'res-resend', 'res-resend-go', 'notice', 'notice-test', 'go-send', 'flop-send', 'remind-now'];
+    const resActions = ['res-add', 'res-cancel', 'res-restore', 'res-count', 'res-resend', 'res-resend-go', 'notice', 'notice-test', 'go-send', 'flop-send', 'remind-now'];
     if (resActions.includes(action)) {
       const s = await getSession(get('session'));
       const settings = await getSettings();
@@ -432,8 +437,34 @@ if (Astro.request.method === 'POST') {
           const r = await getReservation(s.id, get('res'));
           if (!r) error = '予約が見つかりません。';
           else if (action === 'res-cancel') {
-            await cancelReservation(s, r);
-            return back({ session: s.id, msg: `予約 ${r.id} をキャンセルし、${r.count}名分の枠を戻しました。` });
+            // 運営側のキャンセル：枠を戻し、必要ならお客様にキャンセル連絡を送る
+            const reason = get('reason').slice(0, 300);
+            const sendIt = get('sendmail') !== '' && !!r.email;
+            const subject = get('subject').slice(0, 120);
+            const body = getText('body', 6000);
+            if (sendIt && (!subject || !body)) error = 'キャンセル連絡メールの件名と本文を入力してください（送らない場合はチェックを外してください）。';
+            else if (!(await cancelReservation(s, r, reason))) {
+              return back({ session: s.id, msg: `予約 ${r.id}（${r.name}様）はすでにキャンセル済みです（二重に処理していません）。` });
+            } else {
+              let mailMsg = 'お客様へのメールは送っていません。';
+              if (sendIt) {
+                const cancelled = (await getReservation(s.id, r.id)) ?? r;
+                mailMsg = (await sendCancelMail(work, s, cancelled, subject, body, settings))
+                  ? 'お客様にキャンセル連絡メールを送信しました。'
+                  : '※キャンセル連絡メールの送信に失敗しました。予約者の連絡先から個別にご連絡ください。';
+              }
+              const bookedNow = await bookedSeats(s.id);
+              const warn = s.go && bookedNow < minPlayersOf(s)
+                ? ` ※開催決定済みですが、確定人数が${bookedNow}名になり開催最少人数（${minPlayersOf(s)}名）を下回りました。`
+                : '';
+              return back({ session: s.id, msg: `予約 ${r.id}（${r.name}様 ${r.count}名）をキャンセルし、${r.count}名分の枠を戻しました（確定 ${bookedNow}名／定員 ${s.capacity}名）。${mailMsg}${warn}` });
+            }
+          } else if (action === 'res-restore') {
+            const res = await restoreReservation(s, r);
+            if (res === 'ok') return back({ session: s.id, msg: `予約 ${r.id}（${r.name}様 ${r.count}名）のキャンセルを取り消し、予約に戻しました。必要に応じてお客様にご連絡ください。` });
+            error = res === 'full'
+              ? `残席が足りないため予約に戻せません（${r.count}名分が必要／定員${s.capacity}名）。定員を増やしてからお試しください。`
+              : 'この予約はキャンセル済みではありません。';
           } else if (action === 'res-count') {
             const newCount = parseInt(get('count'), 10);
             if (!Number.isInteger(newCount) || newCount < 1) error = '人数が不正です。';
@@ -473,7 +504,7 @@ if (authed() && configured && sessionId && Astro.url.searchParams.get('csv') ===
     const list = await getReservations(sessionId);
     const esc = (v: string) => `"${v.replace(/"/g, '""')}"`;
     const rows = [
-      ['予約番号', '状態', 'お名前', 'メールアドレス', '電話番号', 'X', '人数', '備考', '受付経路', '予約日時', '受付メール', '開催案内', 'リマインド'],
+      ['予約番号', '状態', 'お名前', 'メールアドレス', '電話番号', 'X', '人数', '備考', '受付経路', '予約日時', '受付メール', '開催案内', 'リマインド', 'キャンセル日時', 'キャンセル理由'],
       ...list.map((r) => [
         r.id,
         r.status === 'confirmed' ? '確定' : 'キャンセル',
@@ -488,6 +519,8 @@ if (authed() && configured && sessionId && Astro.url.searchParams.get('csv') ===
         r.confirmMailAt ? '送信済み' : r.confirmMailError ? '失敗' : '未送信',
         r.goMailAt ? '送信済み' : r.goMailError ? '失敗' : '未送信',
         r.remindedAt ? '送信済み' : r.reminderSkipped ? '対象外' : '未送信',
+        r.cancelledAt ?? '',
+        r.cancelReason ?? '',
       ]),
     ];
     const csv = '﻿' + rows.map((row) => row.map(esc).join(',')).join('\r\n');
@@ -594,6 +627,15 @@ const bulkToken = randomBytes(16).toString('hex');
 const recipientCandidates = detail ? detail.reservations.filter((r) => r.email) : [];
 const noMailCount = detail ? confirmedOf(detail.reservations).filter((r) => !r.email).length : 0;
 const isChecked = (r: HtReservation) => (postedTo ? postedTo.has(r.id) : r.status === 'confirmed');
+// キャンセル画面の対象と、キャンセル料の目安（規定: 公演日3日前以降50％／1日前以降100％。社内向け表示のみ）
+const cancelTarget = detail && cancelResId ? detail.reservations.find((r) => r.id === cancelResId) ?? null : null;
+let cancelFeeHint = '';
+if (detail && cancelTarget && cancelTarget.status === 'confirmed') {
+  const daysBefore = Math.round((Date.parse(`${detail.s.start.slice(0, 10)}T00:00:00Z`) - Date.parse(`${now.slice(0, 10)}T00:00:00Z`)) / 86400000);
+  if (daysBefore < 0) cancelFeeHint = '公演日を過ぎた予約です。';
+  else if (daysBefore <= 1) cancelFeeHint = `公演日の${daysBefore === 0 ? '当日' : '1日前'}のキャンセルです（規定ではキャンセル料100％）。必要に応じて本文にキャンセル料のご案内を追記してください。`;
+  else if (daysBefore <= 3) cancelFeeHint = `公演日の${daysBefore}日前のキャンセルです（規定ではキャンセル料50％）。必要に応じて本文にキャンセル料のご案内を追記してください。`;
+}
 const noticeTarget = detail
   ? noticeMode === 'go'
     ? confirmedOf(detail.reservations).filter((r) => r.email && !r.goMailAt).length
@@ -678,7 +720,7 @@ const decisionLabel = (s: HtSession, booked: number) =>
                 <summary>予約者 {conf.length}組 {s.booked}名{cancelled > 0 ? `（キャンセル ${cancelled}件）` : ''}</summary>
                 <div class="tblwrap">
                 <table class="tbl">
-                  <thead><tr><th>お名前</th><th>人数</th><th>電話</th><th>メール</th><th>X</th><th>備考</th><th>予約日時</th><th>メール</th></tr></thead>
+                  <thead><tr><th>お名前</th><th>人数</th><th>電話</th><th>メール</th><th>X</th><th>備考</th><th>予約日時</th><th>メール</th><th></th></tr></thead>
                   <tbody>
                   {s.reservations.map((r) => (
                     <tr class:list={[{ cancelled: r.status === 'cancelled' }]}>
@@ -689,7 +731,8 @@ const decisionLabel = (s: HtSession, booked: number) =>
                       <td class="nowrap">{r.xId ? <a href={`https://x.com/${encodeURIComponent(r.xId)}`} target="_blank" rel="noopener noreferrer">@{r.xId}</a> : '―'}</td>
                       <td class="small2">{r.note ?? '―'}</td>
                       <td class="nowrap small2">{new Date(Date.parse(r.createdAt) + 9 * 3600000).toISOString().slice(5, 16).replace('T', ' ').replace('-', '/')}</td>
-                      <td class="nowrap small2">{r.goMailAt ? '開催案内 済' : r.goMailError ? <b class="fail">開催案内 失敗</b> : r.confirmMailAt ? '受付 済' : r.confirmMailError ? <b class="fail">受付 失敗</b> : '―'}</td>
+                      <td class="nowrap small2">{r.status === 'cancelled' ? (r.cancelMailAt ? 'キャンセル連絡 済' : '―') : r.goMailAt ? '開催案内 済' : r.goMailError ? <b class="fail">開催案内 失敗</b> : r.confirmMailAt ? '受付 済' : r.confirmMailError ? <b class="fail">受付 失敗</b> : '―'}</td>
+                      <td class="nowrap">{r.status === 'confirmed' && <a class="btn small danger" href={`${BASE}?session=${s.id}&cancel=${encodeURIComponent(r.id)}#cancel`}>キャンセル</a>}</td>
                     </tr>
                   ))}
                   </tbody>
@@ -824,6 +867,43 @@ const decisionLabel = (s: HtSession, booked: number) =>
       <p class="dim">公開ページ: <a href={`/hacktale/reservation/${detail.s.id}/`} target="_blank" rel="noopener">/hacktale/reservation/{detail.s.id}/</a></p>
     </section>
 
+    {cancelTarget && (
+      <section class="card notice" id="cancel">
+        <h2>予約のキャンセル</h2>
+        {cancelTarget.status === 'cancelled' ? (
+          <p class="dim">この予約はすでにキャンセル済みです（{cancelTarget.cancelledAt?.slice(0, 16).replace('T', ' ')}）。予約に戻す場合は、下の予約一覧の「キャンセルを取り消す」を使ってください。</p>
+        ) : (
+          <>
+          <table class="tbl kv"><tbody>
+            <tr><th>予約番号</th><td>{cancelTarget.id}</td></tr>
+            <tr><th>お名前</th><td>{cancelTarget.name}様（{cancelTarget.count}名）</td></tr>
+            <tr><th>連絡先</th><td class="small2">{cancelTarget.email || '（メールなし）'}／{cancelTarget.phone || '（電話なし）'}{cancelTarget.xId ? `／@${cancelTarget.xId}` : ''}</td></tr>
+            <tr><th>公演</th><td>{workTitle(detail.s.workId)}｜{formatStartJa(detail.s.start)}</td></tr>
+            <tr><th>キャンセル後</th><td>確定 {detail.booked}名 → <b>{detail.booked - cancelTarget.count}名</b>（定員 {detail.s.capacity}名・開催最少 {detail.min}名）。{cancelTarget.count}名分の枠が戻り、再び予約を受け付けます。{detail.s.go && detail.booked - cancelTarget.count < detail.min ? ' ※開催決定済みですが、キャンセル後は最少人数を下回ります。' : ''}</td></tr>
+          </tbody></table>
+          {cancelFeeHint && <p class="warn">{cancelFeeHint}</p>}
+          <form method="POST" class="grid">
+            <input type="hidden" name="action" value="res-cancel">
+            <input type="hidden" name="session" value={detail.s.id}>
+            <input type="hidden" name="res" value={cancelTarget.id}>
+            <label class="wide">キャンセル理由（社内メモ・任意。お客様には送られません）<input type="text" name="reason" maxlength="300" placeholder="例: お客様からLINEで連絡（体調不良）"></label>
+            {cancelTarget.email ? (
+              <>
+              <label class="check"><input type="checkbox" name="sendmail" checked>お客様（{cancelTarget.email}）にキャンセル連絡メールを送る</label>
+              <label class="wide">件名<input type="text" name="subject" value={SUBJECTS.cancel} maxlength="120"></label>
+              <label class="wide">本文（宛名・予約番号・問い合わせ先は自動で付きます。キャンセル料のご案内が必要なら追記してください）<textarea name="body" rows="9">{CANCEL_TEMPLATE}</textarea></label>
+              </>
+            ) : <p class="wide dim">この予約にはメールアドレスがないため、キャンセル連絡は電話・LINE等で個別にお願いします。</p>}
+            <div class="wide btnrow">
+              <button class="btn danger" type="submit" onclick={`return confirm('${cancelTarget.name}様（${cancelTarget.count}名）の予約をキャンセルします。よろしいですか？')`}>この予約をキャンセルする</button>
+              <a class="linkbtn" href={`${BASE}?session=${detail.s.id}`}>やめる</a>
+            </div>
+          </form>
+          </>
+        )}
+      </section>
+    )}
+
     {noticeMode && (
       <section class="card notice" id="notice">
         <h2>{noticeMode === 'go' ? '開催案内メール（一斉送信）' : noticeMode === 'flop' ? '開催見送りメール' : noticeMode === 'cancelled' ? '中止のご案内メール' : noticeMode === 'custom' ? '予約者へメール一斉送信' : '変更のご案内メール'}</h2>
@@ -927,7 +1007,7 @@ const decisionLabel = (s: HtSession, booked: number) =>
           {detail.reservations.map((r) => (
             <tr class:list={[{ cancelled: r.status === 'cancelled' }]}>
               <td class="nowrap">{r.id}<br><span class="dim2">{r.createdAt.slice(0, 16).replace('T', ' ')}（{r.source === 'web' ? 'Web' : '手動'}）</span></td>
-              <td>{r.name}{r.note && <><br><span class="dim2">備考: {r.note}</span></>}</td>
+              <td>{r.name}{r.note && <><br><span class="dim2">備考: {r.note}</span></>}{r.status === 'cancelled' && <><br><span class="dim2">キャンセル {r.cancelledAt ? new Date(Date.parse(r.cancelledAt) + 9 * 3600000).toISOString().slice(5, 16).replace('T', ' ').replace('-', '/') : ''}{r.cancelReason ? `｜理由: ${r.cancelReason}` : ''}{r.cancelMailAt ? '｜連絡済み' : ''}</span></>}</td>
               <td class="small2">{r.email || '（メールなし）'}<br>{r.phone}{r.xId && <><br>@{r.xId}</>}</td>
               <td class="nowrap">{r.count}名</td>
               <td class="nowrap">{r.status === 'confirmed' ? '確定' : 'キャンセル'}</td>
@@ -941,8 +1021,11 @@ const decisionLabel = (s: HtSession, booked: number) =>
                 {r.status === 'confirmed' && (
                   <>
                   <form method="POST" class="inline"><input type="hidden" name="action" value="res-count"><input type="hidden" name="session" value={detail!.s.id}><input type="hidden" name="res" value={r.id}><input class="numin" type="number" name="count" value={r.count} min="1" max="500"><button class="linkbtn" type="submit">人数変更</button></form>
-                  <form method="POST" class="inline" onsubmit={`return confirm('予約 ${r.id}（${r.name}様 ${r.count}名）をキャンセルしますか？枠は戻ります。')`}><input type="hidden" name="action" value="res-cancel"><input type="hidden" name="session" value={detail!.s.id}><input type="hidden" name="res" value={r.id}><button class="linkbtn danger2" type="submit">キャンセル</button></form>
+                  <a class="btn small danger" href={`${BASE}?session=${detail!.s.id}&cancel=${encodeURIComponent(r.id)}#cancel`}>キャンセル</a>
                   </>
+                )}
+                {r.status === 'cancelled' && (
+                  <form method="POST" class="inline" onsubmit={`return confirm('予約 ${r.id}（${r.name}様 ${r.count}名）のキャンセルを取り消して、予約に戻しますか？（${r.count}名分の枠を使います）')`}><input type="hidden" name="action" value="res-restore"><input type="hidden" name="session" value={detail!.s.id}><input type="hidden" name="res" value={r.id}><button class="linkbtn" type="submit">キャンセルを取り消す</button></form>
                 )}
                 {r.email && <form method="POST" class="inline"><input type="hidden" name="action" value="res-resend"><input type="hidden" name="session" value={detail!.s.id}><input type="hidden" name="res" value={r.id}><button class="linkbtn" type="submit">受付メール再送</button></form>}
                 {r.email && r.status === 'confirmed' && detail!.s.go && <form method="POST" class="inline"><input type="hidden" name="action" value="res-resend-go"><input type="hidden" name="session" value={detail!.s.id}><input type="hidden" name="res" value={r.id}><button class="linkbtn" type="submit">開催案内{r.goMailAt ? '再送' : '送信'}</button></form>}
@@ -1069,6 +1152,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#d9e63b}
 .noroster{margin:4px 0 0}
 .tbl a{color:#f1efe9}
 .rcpt{border:1px solid rgba(255,255,255,.15);padding:10px 14px 12px;margin:0;display:flex;flex-direction:column;gap:6px}
+.kv th{width:110px;white-space:nowrap}
+.kv td b{color:#d9e63b}
 .rcpt legend{font-size:12.5px;font-weight:700;padding:0 6px}
 .rcpt .check{font-size:13px}
 .rcpt .check.cancelled{color:#8f8b82}

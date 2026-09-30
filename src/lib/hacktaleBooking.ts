@@ -119,6 +119,12 @@ export interface HtReservation {
   goMailError?: string;
   /** 見送りメールの送信成功時刻 */
   flopMailAt?: string;
+  /** 運営側でキャンセルした理由（社内メモ。お客様には送らない） */
+  cancelReason?: string;
+  /** キャンセル連絡メールの送信成功時刻 */
+  cancelMailAt?: string;
+  /** キャンセルを取り消して予約に戻した時刻 */
+  restoredAt?: string;
 }
 
 export interface HtSettings {
@@ -135,9 +141,9 @@ export interface HtSettings {
 
 export const DEFAULT_SETTINGS: HtSettings = { reminderEnabled: true, reminderHours: 36 };
 
-export type HtMailKind = 'confirm' | 'go' | 'flop' | 'remind' | 'notice' | 'admin';
+export type HtMailKind = 'confirm' | 'go' | 'flop' | 'remind' | 'notice' | 'cancel' | 'admin';
 export const MAIL_KIND_LABEL: Record<HtMailKind, string> = {
-  confirm: '受付', go: '開催案内', flop: '見送り', remind: 'リマインド', notice: '案内', admin: '管理者',
+  confirm: '受付', go: '開催案内', flop: '見送り', remind: 'リマインド', notice: '案内', cancel: 'キャンセル連絡', admin: '管理者',
 };
 
 export interface HtMailLog {
@@ -493,11 +499,66 @@ async function adjustReservation(session: HtSession, r: HtReservation, delta: nu
   return Number(result);
 }
 
-/** キャンセル：人数分の枠を戻し、レコードは履歴として残す。 */
-export async function cancelReservation(session: HtSession, r: HtReservation): Promise<void> {
-  if (r.status === 'cancelled') return;
-  const updated: HtReservation = { ...r, status: 'cancelled', cancelledAt: new Date().toISOString() };
-  await adjustReservation(session, updated, -r.count);
+// キャンセルとその取り消しは、保存されている予約の「今の状態」を Lua の中で
+// 確かめてから人数を動かす。管理画面を2人で開いて同時に押しても、枠が二重に
+// 戻る（増える）ことはない。人数も保存済みレコードから読む。
+const CANCEL_LUA = `
+-- ht:cancel
+local cur = redis.call('HGET', KEYS[2], ARGV[1])
+if not cur or not string.find(cur, '"status":"confirmed"', 1, true) then return -2 end
+local cnt = tonumber(string.match(cur, '"count":(%d+)') or '0')
+local booked = tonumber(redis.call('GET', KEYS[1]) or '0')
+local after = booked - cnt
+if after < 0 then after = 0 end
+redis.call('SET', KEYS[1], after)
+redis.call('HSET', KEYS[2], ARGV[1], ARGV[2])
+return after
+`;
+
+const RESTORE_LUA = `
+-- ht:restore
+local cur = redis.call('HGET', KEYS[2], ARGV[1])
+if not cur or not string.find(cur, '"status":"cancelled"', 1, true) then return -2 end
+local cnt = tonumber(string.match(cur, '"count":(%d+)') or '0')
+local booked = tonumber(redis.call('GET', KEYS[1]) or '0')
+if booked + cnt > tonumber(ARGV[3]) then return -1 end
+redis.call('INCRBY', KEYS[1], cnt)
+redis.call('HSET', KEYS[2], ARGV[1], ARGV[2])
+return booked + cnt
+`;
+
+/**
+ * キャンセル：人数分の枠を戻し、レコードは履歴として残す。
+ * 戻り値: true＝今回キャンセルした／false＝すでにキャンセル済み（何もしていない）
+ */
+export async function cancelReservation(session: HtSession, r: HtReservation, reason?: string): Promise<boolean> {
+  if (r.status === 'cancelled') return false;
+  const updated: HtReservation = {
+    ...r,
+    status: 'cancelled',
+    cancelledAt: new Date().toISOString(),
+    cancelReason: reason?.trim() || undefined,
+  };
+  const result = await redis('EVAL', CANCEL_LUA, 2, seatsKey(session.id), resKey(session.id), r.id, JSON.stringify(updated));
+  return Number(result) >= 0;
+}
+
+/**
+ * キャンセルの取り消し（予約に戻す）。定員を超える場合は戻さない。
+ * 戻り値: 'ok' | 'full'（残席不足）| 'not-cancelled'（キャンセル済みではない）
+ */
+export async function restoreReservation(session: HtSession, r: HtReservation): Promise<'ok' | 'full' | 'not-cancelled'> {
+  if (r.status !== 'cancelled') return 'not-cancelled';
+  const updated: HtReservation = {
+    ...r,
+    status: 'confirmed',
+    cancelledAt: undefined,
+    cancelReason: undefined,
+    cancelMailAt: undefined,
+    restoredAt: new Date().toISOString(),
+  };
+  const result = Number(await redis('EVAL', RESTORE_LUA, 2, seatsKey(session.id), resKey(session.id), r.id, JSON.stringify(updated), session.capacity));
+  return result >= 0 ? 'ok' : result === -1 ? 'full' : 'not-cancelled';
 }
 
 /** 人数変更：増やすときは残席を確認し、足りなければ false。 */
@@ -719,6 +780,20 @@ export async function sendNoticeMail(
   settings: HtSettings,
 ): Promise<boolean> {
   return sendTemplated('notice', work, s, r, subject, body, settings);
+}
+
+/** 運営側でキャンセルした予約者への連絡。成功したら cancelMailAt を記録する。 */
+export async function sendCancelMail(
+  work: HtWorkRec | null,
+  s: HtSession,
+  r: HtReservation,
+  subject: string,
+  body: string,
+  settings: HtSettings,
+): Promise<boolean> {
+  const ok = await sendTemplated('cancel', work, s, r, subject, body, settings);
+  if (ok) await patchReservation(s.id, r.id, { cancelMailAt: new Date().toISOString() });
+  return ok;
 }
 
 /**
