@@ -50,7 +50,7 @@ export const DEFAULT_TITLE = '日程調整のご案内';
 
 // Vercel injects dashboard variables into process.env at runtime;
 // import.meta.env covers .env files and build-time injection.
-function readEnv(name: string): string | undefined {
+export function readEnv(name: string): string | undefined {
   const v = (import.meta.env as Record<string, string | undefined>)[name] ?? process.env[name];
   return v?.trim() || undefined;
 }
@@ -308,6 +308,12 @@ export function adminEmail(): string {
 // 任意: SMTP_HOST（既定 smtp.gmail.com）/ SMTP_PORT（既定 465）
 // 自分のアカウントから自分宛てに送るため、認証・到達性の問題が起きない。
 
+// 直近の送信結果（経路と失敗理由）。お問い合わせの記録に「通知メールが送れたか」を残すために使う。
+let lastDiag = { via: 'none' as 'smtp' | 'resend' | 'none', error: '' };
+export function lastMailDiag(): { via: 'smtp' | 'resend' | 'none'; error: string } {
+  return { ...lastDiag };
+}
+
 export function smtpConfigured(): boolean {
   return !!readEnv('SMTP_USER') && !!readEnv('SMTP_PASS');
 }
@@ -342,9 +348,11 @@ async function sendViaSmtp(
       text,
       replyTo: replyTo ?? adminEmail(),
     });
+    lastDiag = { via: 'smtp', error: '' };
     return true;
   } catch (e) {
     console.error('[mail] smtp send failed:', e);
+    lastDiag = { via: 'smtp', error: `SMTP: ${String(e).slice(0, 300)}` };
     return false;
   }
 }
@@ -361,6 +369,7 @@ export async function sendMail(
   text: string,
   replyTo?: string,
 ): Promise<boolean> {
+  lastDiag = { via: 'none', error: 'SMTP・Resend とも未設定' };
   // 1) 自社SMTP（最優先）
   if (smtpConfigured()) {
     if (await sendViaSmtp(to, subject, text, replyTo)) return true;
@@ -371,6 +380,7 @@ export async function sendMail(
     if (!smtpConfigured()) console.warn('[mail] SMTP/RESEND とも未設定; skipping mail:', subject);
     return false;
   }
+  const smtpError = lastDiag.error;
   const from = readEnv('MAIL_FROM') ?? 'ex Labs 予約窓口 <no-reply@kabuexlabs.com>';
   // RESEND_API_BASE はローカルテストでモックサーバーに向けるための逃げ道
   // （microcms.ts の MICROCMS_API_BASE と同じ流儀）。本番では未設定でよい。
@@ -392,14 +402,17 @@ export async function sendMail(
       console.error('[yoyaku] mail send failed:', res.status, detail);
       if (res.status === 403 && !from.includes('resend.dev')) {
         res = await post('ex Labs <onboarding@resend.dev>');
-        if (res.ok) return true;
+        if (res.ok) { lastDiag = { via: 'resend', error: '' }; return true; }
         console.error('[yoyaku] fallback send failed:', res.status, await res.text());
       }
+      lastDiag = { via: 'resend', error: `${smtpError ? smtpError + ' ／ ' : ''}Resend: ${res.status} ${detail.slice(0, 200)}` };
       return false;
     }
+    lastDiag = { via: 'resend', error: '' };
     return true;
   } catch (e) {
     console.error('[yoyaku] mail send failed:', e);
+    lastDiag = { via: 'resend', error: `${smtpError ? smtpError + ' ／ ' : ''}Resend: ${String(e).slice(0, 200)}` };
     return false;
   }
 }

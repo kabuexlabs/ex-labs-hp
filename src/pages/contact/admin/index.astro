@@ -20,6 +20,8 @@ import {
   INQUIRY_STATUS_LABEL,
   type InquiryStatus,
   readMetrics,
+  readMailResults,
+  type MailResult,
 } from '../../../lib/contact';
 
 Astro.response.headers.set('Cache-Control', 'no-store');
@@ -64,6 +66,16 @@ if (Astro.request.method === 'POST') {
 const authed = checkAdminKey(key);
 const status = contactConfigStatus();
 const inquiries: ContactRecord[] = authed ? await listInquiries(50) : [];
+const mailRes: Record<string, MailResult> = authed ? await readMailResults(inquiries.map((q) => q.id)) : {};
+// 通知メールの結果を1行で（記録を始める前の問い合わせは「記録なし」）
+const mailLine = (q: ContactRecord): [string, string] => {
+  const r = mailRes[q.id];
+  if (!r) return ['記録なし（2026-09-30 より前の受信）', '#8a8378'];
+  if (r.skipped === 'duplicate') return ['未送信：10分以内に同じ内容が届いていたため（二重送信）', '#8a8378'];
+  if (r.skipped === 'limited') return ['未送信：同じ回線から10分に10件を超えたため', '#b3261e'];
+  if (r.admin) return [`送信済み → ${r.to}（${r.via === 'smtp' ? '自社メール' : 'Resend'}）${r.extra && r.extra.length ? ' ＋ ' + r.extra.join('、') : ''}`, '#1a7f4b'];
+  return [`送信失敗：${r.error || '原因不明'}`, '#b3261e'];
+};
 // 問い合わせ導線の計測（直近28日）：フォーム表示・相談CTAクリック・送信成功
 const metrics = authed ? await readMetrics(28) : { rows: [], from: '', to: '' };
 const mSum = (e: string) => metrics.rows.filter((r) => r.event === e).reduce((a, r) => a + r.count, 0);
@@ -260,6 +272,7 @@ const stats = (() => {
       {inquiries.map((q) => (
         <details id={`q-${q.id}`} style="border:2px solid var(--ink);background:#fff;padding:14px 18px">
           <summary style="cursor:pointer;font-size:13.5px;font-weight:700"><span style={`margin-right:8px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;color:#fff;background:${q.status === 'won' ? '#1a7f4b' : q.status === 'meeting' ? 'var(--accent)' : q.status === 'lost' || q.status === 'spam' ? '#8a8378' : q.status === 'replied' ? '#3b6fb6' : '#b3261e'}`}>{INQUIRY_STATUS_LABEL[q.status ?? 'new']}</span>{fmtDate(q.createdAt)}　{q.subject}　<span style="font-weight:500;color:#8a8378">{q.email}</span>{q.spam && <span style="margin-left:8px;font-size:11px;font-weight:700;color:#fff;background:#b3261e;padding:2px 8px;border-radius:999px">営業・スパムの疑い</span>}<span style="margin-left:8px;font-size:11.5px;font-weight:600;color:var(--accent)">{parseSource(q.source).channel}</span></summary>
+          <p style={`margin:10px 0 0;font-size:12.5px;font-weight:700;color:${mailLine(q)[1]}`}>通知メール：{mailLine(q)[0]}{q.emailInvalid && "（メールアドレスの形式が崩れていたため、お客様への控えは未送信）"}</p>
           <pre style="white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:13.5px;margin:12px 0 0;line-height:1.9">{q.fields}</pre>
           {q.source ? (
             <div style="margin:12px 0 0;padding:10px 12px;background:#f6f4ef;border-radius:8px;font-size:12.5px;line-height:1.8">

@@ -8,7 +8,7 @@ export const prerender = false;
 // インターフェースは formsubmit 互換（_subject / _next / _gotcha）なので、
 // 各サイトのフォームは action を差し替えるだけで移行できる。
 import type { APIRoute } from 'astro';
-import { sendMail, adminEmail } from '../../lib/yoyaku';
+import { sendMail, adminEmail, lastMailDiag, readEnv } from '../../lib/yoyaku';
 import { contactRedis as redis, CONTACT_LOG_KEY, recordMetric } from '../../lib/contact';
 
 // フォームの「ご相談の種類」→ 件名に付ける表示名
@@ -58,17 +58,21 @@ export const POST: APIRoute = async ({ request }) => {
   // ハニーポットが埋まっていたら、botに気付かれないよう成功を装って捨てる。
   if (HONEYPOTS.some((h) => get(h) !== '')) return redirect();
 
-  // IPごとのレート制限（10分に5件まで）。KV未設定なら素通し。
+  // IPごとのレート制限（10分に10件まで）。超えた分も捨てずに記録だけ残し、通知メールは送らない
+  // （同じ事務所・同じ回線から続けて送られた正当な問い合わせを失わないため）。KV未設定なら素通し。
   const ip = (request.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
   const count = await redis('INCR', `contact:rl:${ip}`);
+  let limited = false;
   if (typeof count === 'number') {
     if (count === 1) await redis('EXPIRE', `contact:rl:${ip}`, '600');
-    if (count > 5) return redirect(); // 静かに捨てる
+    if (count > 10) limited = true;
   }
 
   // --- バリデーション --------------------------------------------------------
-  const email = get('email');
-  if (!EMAIL_RE.test(email) || email.length > 200) return redirect();
+  // 全角の＠や空白が混じったアドレスは半角に直す。それでも形式が崩れていても問い合わせは捨てず、
+  // 管理者への通知だけ送る（控えメールは送れないため送らない）。
+  const email = get('email').normalize('NFKC').replace(/\s+/g, '').slice(0, 200);
+  const emailOk = EMAIL_RE.test(email);
 
   // メタ以外の入力フィールドを本文に整形（フォームごとの項目差を吸収）
   const lines: string[] = [];
@@ -90,20 +94,23 @@ export const POST: APIRoute = async ({ request }) => {
   // 控えメールも止めない（件名の印でメールソフトの迷惑メールに振り分けられ、重要な問い合わせを見落としたため）。
   const spam = spamCheck(`${baseSubject}\n${lines.join('\n')}`, source, email, totalLen);
   const subject = baseSubject;
-  // 同じ内容の再送（連打・同じ営業文の繰り返し送信）だけは通知メールを送らない。
-  // 判定はメールアドレスに関係なく「入力内容そのもの」が過去30日に届いたものと同じかどうか。
+  // 同じ内容の二重送信（送信ボタンの連打・再読み込み）だけは通知メールを送らない。
+  // 判定は「入力内容そのもの」が直近10分に届いたものと同じかどうか。10分を過ぎた再送は、
+  // 返事が届かず送り直した場合もあるため通常どおり通知する（2026-09-30 に30日から短縮）。
   // 記録（KV）が使えない場合は判定できないので、通常どおりメールを送る。
   const norm = lines.join('\n').replace(/\s+/g, ' ').trim().toLowerCase();
   const digest = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(norm)))).map((b) => b.toString(16).padStart(2, '0')).join('');
   // INCR は初回 1。KV 未設定・障害時は null（→ 重複扱いにしない）
   const seen = await redis('INCR', `contact:dup:${digest}`);
-  if (seen === 1) await redis('EXPIRE', `contact:dup:${digest}`, String(60 * 60 * 24 * 30));
+  if (seen === 1) await redis('EXPIRE', `contact:dup:${digest}`, '600');
   const duplicate = typeof seen === 'number' && seen > 1;
   const record = {
     id: crypto.randomUUID(),
     subject,
     spam,
     duplicate,
+    limited,
+    emailInvalid: !emailOk || undefined,
     email,
     fields: lines.join('\n\n'),
     source,
@@ -121,19 +128,33 @@ export const POST: APIRoute = async ({ request }) => {
     await redis('LTRIM', CONTACT_LOG_KEY, '0', '499');
   }
 
-  // 同じ内容の再送は記録だけ残し、通知・控えメールは送らない（受付済みとして完了画面へ）
-  if (duplicate && stored) return redirect();
+  // 通知メールの結果を問い合わせごとに残す（管理画面で「届いたはずか」を確認できるように）
+  const saveMailResult = async (r: Record<string, unknown>) => {
+    await redis('SET', `contact:mailres:${record.id}`, JSON.stringify({ ...r, at: new Date().toISOString() }), 'EX', String(60 * 60 * 24 * 180));
+  };
+
+  // 同じ内容の二重送信・回数制限を超えた送信は記録だけ残し、通知・控えメールは送らない（受付済みとして完了画面へ）
+  if ((duplicate || limited) && stored) {
+    await saveMailResult({ skipped: duplicate ? 'duplicate' : 'limited' });
+    return redirect();
+  }
 
   const body =
     `サイトのお問い合わせフォームから送信がありました。\n\n${record.fields}\n\n` +
     `——\n送信者メールアドレス: ${email}\n受信日時: ${record.createdAt}\n` +
     (source ? `流入元:\n${source}\n` : '') +
     `このメールに返信すると送信者宛に届きます。`;
-  const mailed = await sendMail(adminEmail(), subject, body, email);
+  const mailed = await sendMail(adminEmail(), subject, body, emailOk ? email : undefined);
+  const diag = lastMailDiag();
+  // 追加の通知先（任意）：CONTACT_NOTIFY_TO にカンマ区切りで設定すると、同じ通知をそちらにも送る
+  const extra = (readEnv('CONTACT_NOTIFY_TO') ?? '').split(',').map((a) => a.trim()).filter((a) => EMAIL_RE.test(a) && a !== adminEmail());
+  const extraOk: string[] = [];
+  for (const to of extra) if (await sendMail(to, subject, body, emailOk ? email : undefined)) extraOk.push(to);
+  await saveMailResult({ admin: mailed, via: diag.via, error: mailed ? '' : diag.error, to: adminEmail(), extra: extraOk });
 
   // 送信者への自動控えメール。受付が成立した場合のみ送る。
   // 返信先は info@ なので、送信者がこのメールに返信すればそのまま届く。
-  if (stored || mailed) {
+  if ((stored || mailed) && emailOk) {
     // 控えメールは入力者以外のアドレスにも送れてしまうため、第三者宛の迷惑メール・フィッシングの踏み台に
     // されないよう、本文中の URL は伏せ、長さも抑える（管理者宛の通知メールには原文を載せる）。
     const receiptFields = record.fields.replace(/(https?:\/\/|www\.)\S+/gi, '［URLは省略］').slice(0, 3000);

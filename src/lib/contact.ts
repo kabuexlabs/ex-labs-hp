@@ -15,6 +15,12 @@ export interface ContactRecord {
   source?: string;
   /** 営業・スパム自動判定でフラグが立った送信 */
   spam?: boolean;
+  /** 直近10分に同じ内容が届いていた（二重送信） */
+  duplicate?: boolean;
+  /** 同じIPから10分に10件を超えた送信 */
+  limited?: boolean;
+  /** メールアドレスの形式が崩れていた（控えメールは送っていない） */
+  emailInvalid?: boolean;
   /** 商談ステータス（管理画面で手動更新）。SEO・AI 経由の相談が有効商談になったかを追う */
   status?: InquiryStatus;
   /** ステータスのメモ（例：初回打合せ 9/12） */
@@ -84,6 +90,17 @@ export async function listInquiries(limit = 50): Promise<ContactRecord[]> {
       // 壊れたレコードは無視
     }
   }
+  return out;
+}
+
+export interface MailResult { admin?: boolean; via?: string; error?: string; to?: string; extra?: string[]; skipped?: 'duplicate' | 'limited'; at?: string }
+/** 問い合わせごとの通知メールの結果（2026-09-30 以降の受信分のみ記録あり） */
+export async function readMailResults(ids: string[]): Promise<Record<string, MailResult>> {
+  if (!ids.length) return {};
+  const raw = await contactRedis('MGET', ...ids.map((id) => `contact:mailres:${id}`));
+  const out: Record<string, MailResult> = {};
+  if (!Array.isArray(raw)) return out;
+  raw.forEach((v, i) => { if (v) { try { out[ids[i]] = JSON.parse(String(v)) as MailResult; } catch { /* 壊れた記録は無視 */ } } });
   return out;
 }
 
