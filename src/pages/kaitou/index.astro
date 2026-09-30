@@ -41,6 +41,7 @@ const cast = [
   { slug: 'mayuri', name: 'まゆり（楯真由子）', x: 'MayuliG_G6', bio: '出てくる度、物騒な事件を起こしがちなお姉さんです。今日はどんな風に君たちを可愛がろうかな。なんてね。' },
   { slug: 'miyasaka-rino', name: '宮坂莉乃', x: 'MiyasakaRino', bio: '長野県出身。2020年、舞台を中心に活動を開始。近年はイマーシブ作品に出演する。趣味はマーダーミステリー、人狼ゲーム、シナリオ制作。' },
   { slug: 'kameda-risa', name: '亀田理紗', x: 'kame_yuto', bio: '俳優・MC。謎解きゲームやイマーシブシアターなど、体験型エンターテインメントを中心に活動。芝居歴18年、キャスト歴12年。演技と進行を通して、物語への没入感を支えることを得意としている。' },
+  { slug: 'manabe-ayaka', name: '真辺彩加', x: '', bio: '広島県出身。俳優・MC・モデル。主に舞台俳優として活躍。2026年よりイマーシブ作品への出演を始める。' },
 ];
 
 // 開催日チップ。曜日は2026年カレンダーで検証済み。
@@ -892,8 +893,15 @@ section[id],header[id]{scroll-margin-top:64px}
       img.alt = c.name + ' 宣材写真';
       name.textContent = c.name;
       bio.textContent = c.bio;
-      x.textContent = '@' + c.x;
-      x.href = 'https://x.com/' + c.x;
+      if (c.x) {
+        x.hidden = false;
+        x.textContent = '@' + c.x;
+        x.href = 'https://x.com/' + c.x;
+      } else {
+        x.hidden = true;
+        x.textContent = '';
+        x.removeAttribute('href');
+      }
       dlg.showModal();
     });
   });
