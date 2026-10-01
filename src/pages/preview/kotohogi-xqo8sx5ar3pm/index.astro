@@ -16,8 +16,9 @@ import SiteGuard from '../../../components/SiteGuard.astro';
 const INTRO_MODE: '毎回' | '初回のみ' | 'なし' = '毎回';
 // チケット販売先URL（https:// から）。未設定の間、購入ボタンはページ内のチケット欄（#tickets）へ移動するだけ
 const RESERVE_URL = '';
-// メインビジュアル（位置情報を削除したもの）。未設定の間は文字組みで代替
-const KV_SRC = '';
+// メインビジュアル（位置情報を削除したもの）。未設定の間は文字組みで代替。
+// 設定中はビジュアル自体にタイトル・キャッチ・クレジットが入っているので、ヒーローの文字の重ね（祝の印・縦書きキャッチ・H1）は出さず、H1 は読み上げ用に残す
+const KV_SRC = '/assets/kotohogi/kv.webp';
 // 支給ロゴ（冒頭演出で使用。H1 はテキストのまま）。未設定の間は仮のテキストロゴ
 const LOGO_SRC = '';
 // 所要時間（入力すると開催概要に表示）
@@ -181,7 +182,7 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
 <div lang="ja" style="max-width:440px;margin:0 auto;background-color:#f1f0ec;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%22.85%22 numOctaves=%222%22 stitchTiles=%22stitch%22/%3E%3CfeColorMatrix values=%220 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 .07 0%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');color:#1b1b1a;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:15px;font-weight:500;line-height:1.9;word-break:auto-phrase;line-break:strict;box-shadow:0 0 40px rgba(27,27,26,.12);overflow:hidden">
 
 
-  <header style="display:flex;justify-content:center;align-items:center;gap:12px;padding:0 20px;height:52px;background:#1b1b1a;color:#f1f0ec">
+  <header style="display:flex;justify-content:center;align-items:center;gap:12px;padding:0 20px;height:52px;background:#1b1b1a;color:#f1f0ec;border-bottom:3px solid #c41b85">
     <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:15px;font-weight:800;letter-spacing:.08em;white-space:nowrap">ウワサバナシ調査委員会</p>
   </header>
   {(review) && (<Fragment>
@@ -189,8 +190,8 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
   </Fragment>)}
 
   <section id="top">
-    <div style="position:relative;aspect-ratio:3 / 4;background:#2b2a28;overflow:hidden">
-      {KV_SRC && <img src={KV_SRC} alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />}
+    <div style={KV_SRC ? 'position:relative;aspect-ratio:1076 / 1522;background:#c41b85;overflow:hidden' : 'position:relative;aspect-ratio:3 / 4;background:#2b2a28;overflow:hidden'}>
+      {KV_SRC && <img src={KV_SRC} alt="" width="1076" height="1522" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />}
       {(!KV_SRC) && (<Fragment>
         <div aria-hidden="true" style="position:absolute;inset:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;color:#a9a7a0">
           <div style="position:absolute;inset:0;background-image:radial-gradient(circle,#f1f0ec 1.1px,transparent 1.5px);background-size:7px 7px;opacity:.2;-webkit-mask-image:linear-gradient(170deg,#000 0%,transparent 55%);mask-image:linear-gradient(170deg,#000 0%,transparent 55%)"></div>
@@ -202,14 +203,17 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
           <span style="position:absolute;top:51%;left:8%;font-size:12px;letter-spacing:.2em">妻の様子もおかしいという。</span>
         </div>
       </Fragment>)}
+      {!KV_SRC && (<Fragment>
       <div aria-hidden="true" style="position:absolute;inset:10px;border:1px solid rgba(241,240,236,.3);pointer-events:none;z-index:1"></div>
       <div aria-hidden="true" style="position:absolute;left:0;right:0;bottom:0;height:52%;background:linear-gradient(180deg,rgba(27,27,26,0),rgba(27,27,26,.9))"></div>
-      <span aria-hidden="true" style="position:absolute;top:18px;left:18px;width:46px;height:46px;border:2px solid #c0553a;border-radius:50%;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:22px;font-weight:700;color:#c0553a;transform:rotate(-8deg)">祝</span>
+      <span aria-hidden="true" style="position:absolute;top:18px;left:18px;width:46px;height:46px;border:2px solid #c41b85;border-radius:50%;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:22px;font-weight:700;color:#c41b85;transform:rotate(-8deg)">祝</span>
       <p style="position:absolute;top:22px;right:20px;margin:0;writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:21px;font-weight:600;letter-spacing:.34em;line-height:1.4;color:#f1f0ec;text-shadow:0 1px 8px rgba(0,0,0,.5);white-space:nowrap">祝いの席に、<span style="display:inline-block;margin-top:.8em">招かれる。</span></p>
-      <h1 style="position:absolute;left:20px;right:20px;bottom:22px;margin:0;color:#f1f0ec;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-weight:500;line-height:1.2;display:grid;justify-items:start;gap:10px">
+      </Fragment>)}
+      <h1 class={KV_SRC ? 'k-sr' : undefined} style="position:absolute;left:20px;right:20px;bottom:22px;margin:0;color:#f1f0ec;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-weight:500;line-height:1.2;display:grid;justify-items:start;gap:10px">
         <span style="font-size:13px;letter-spacing:.3em">ウワサバナシ調査委員会</span>
         <span style="font-size:12px;letter-spacing:.2em;border:1px solid #c9c7c1;padding:0 8px;line-height:1.7">case2</span>
         <span style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:min(46px,12.4vw);font-weight:800;letter-spacing:0;white-space:nowrap;margin-left:-.45em">「言祝ぎの家」</span>
+        {KV_SRC && <span>呪われた花嫁</span>}
       </h1>
       {(review && !KV_SRC) && (<Fragment>
         <p style="position:absolute;left:76px;top:24px;margin:0;border:1px dashed #6b6963;background:#fff;padding:4px 8px;font-family:ui-monospace,Menlo,monospace;font-size:10px;line-height:1.5;color:#3d3c3a">確認用｜メインビジュアル差し替え位置</p>
@@ -394,7 +398,7 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
           <p style="margin:0 0 14px;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">受付開始</span><span style="font-size:14px">各回、開演15分前</span></p>
         </li>
         <li style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start">
-          <span aria-hidden="true" style="display:grid;justify-items:center;align-self:stretch"><span style="width:14px;height:14px;border-radius:50%;background:#c0553a;margin-top:6px"></span><span style="width:1px;background:#1b1b1a;min-height:34px"></span></span>
+          <span aria-hidden="true" style="display:grid;justify-items:center;align-self:stretch"><span style="width:14px;height:14px;border-radius:50%;background:#c41b85;margin-top:6px"></span><span style="width:1px;background:#1b1b1a;min-height:34px"></span></span>
           <p style="margin:0 0 14px;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">集合締切</span><span style="font-size:14px">各回、開演5分前</span></p>
         </li>
         <li style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start">
@@ -459,10 +463,10 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
       <div aria-hidden="true" style="position:relative;height:56px;margin:0 4px">
         <div style="position:absolute;left:0;right:24%;top:14px;height:6px;background:#1b1b1a"></div>
         <div style="position:absolute;left:76%;right:0;top:16px;border-top:2px dotted #6a6862"></div>
-        <span style="position:absolute;left:76%;top:6px;width:2px;height:22px;background:#c0553a"></span>
+        <span style="position:absolute;left:76%;top:6px;width:2px;height:22px;background:#c41b85"></span>
         <span style="position:absolute;right:0;top:8px;width:10px;height:18px;background:#1b1b1a"></span>
         <span style="position:absolute;left:0;top:30px;font-size:12px;font-weight:700">空席がある限り販売</span>
-        <span style="position:absolute;left:76%;top:30px;transform:translateX(-62%);font-size:12px;font-weight:700;white-space:nowrap;color:#a8432c">開演2時間前</span>
+        <span style="position:absolute;left:76%;top:30px;transform:translateX(-62%);font-size:12px;font-weight:700;white-space:nowrap;color:#b3177a">開演2時間前</span>
         <span style="position:absolute;right:0;top:30px;font-size:12px;font-weight:700">開演</span>
       </div>
       <p style="margin:0;text-align:center;font-size:14px;line-height:2">チケットは、空席がある場合に限り、<br>各回の開演2時間前まで販売します。</p>
@@ -535,7 +539,7 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
         <p style="margin:0 0 18px;padding-top:2px;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">当日、バス停に集合</span><span style="font-size:13px;color:#3d3c3a">会場最寄りのバス停</span></p>
       </li>
       <li style="display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px">
-        <span aria-hidden="true" style="display:grid;justify-items:center"><span style="width:32px;height:32px;border-radius:50%;background:#a8432c;color:#fff;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700">4</span></span>
+        <span aria-hidden="true" style="display:grid;justify-items:center"><span style="width:32px;height:32px;border-radius:50%;background:#b3177a;color:#fff;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700">4</span></span>
         <p style="margin:0;padding-top:2px;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">会場へ</span><span style="font-size:13px;color:#3d3c3a">さいたま市内の一軒家</span></p>
       </li>
     </ol>
@@ -656,7 +660,7 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
     <div id="faq" style="margin-top:56px;display:grid;gap:14px">
       <div style="display:grid;justify-items:center;gap:8px;text-align:center">
         <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:23px;font-weight:800;letter-spacing:.06em">よくあるご質問</p>
-        <div aria-hidden="true" style="display:flex;align-items:center;gap:8px"><span style="width:28px;height:1px;background:#1b1b1a"></span><span style="width:5px;height:5px;transform:rotate(45deg);background:#c0553a"></span><span style="width:28px;height:1px;background:#1b1b1a"></span></div>
+        <div aria-hidden="true" style="display:flex;align-items:center;gap:8px"><span style="width:28px;height:1px;background:#1b1b1a"></span><span style="width:5px;height:5px;transform:rotate(45deg);background:#c41b85"></span><span style="width:28px;height:1px;background:#1b1b1a"></span></div>
       </div>
       <div style="display:grid;gap:8px">
         <details style="background:#fbfaf7;border:1px solid #1b1b1a">
@@ -705,17 +709,17 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
     </Fragment>)}
   </section>
 
-  <section id="final-cta" style="position:relative;background:#1b1b1a;color:#f1f0ec;padding:64px 20px 56px;text-align:center;overflow:hidden">
-    <div aria-hidden="true" style="position:absolute;inset:0;background-image:radial-gradient(circle,#f1f0ec 1px,transparent 1.4px);background-size:8px 8px;opacity:.1;-webkit-mask-image:radial-gradient(ellipse at center,transparent 40%,#000 100%);mask-image:radial-gradient(ellipse at center,transparent 40%,#000 100%)"></div>
+  <section id="final-cta" style="position:relative;background:#c41b85;color:#fff;padding:64px 20px 56px;text-align:center;overflow:hidden">
+    <div aria-hidden="true" style="position:absolute;inset:0;background-image:radial-gradient(circle,#1b1b1a 1px,transparent 1.4px);background-size:8px 8px;opacity:.22;-webkit-mask-image:radial-gradient(ellipse at center,transparent 40%,#000 100%);mask-image:radial-gradient(ellipse at center,transparent 40%,#000 100%)"></div>
     <div style="position:relative;display:grid;justify-items:center;gap:22px">
       <p style="margin:0;writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:22px;font-weight:600;letter-spacing:.4em;line-height:1.5;white-space:nowrap;height:13em">祝いの席に、<br>　招かれる。</p>
       <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;line-height:1.6"><span style="display:block;font-size:12px;letter-spacing:.3em">ウワサバナシ調査委員会</span><span style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:26px;font-weight:800;letter-spacing:0">case2「言祝ぎの家」</span></p>
-      <ul style="list-style:none;margin:0;padding:14px 0 0;border-top:1px solid #5d5b56;display:grid;gap:2px;font-size:13px;color:#e7e6e1">
+      <ul style="list-style:none;margin:0;padding:14px 0 0;border-top:1px solid rgba(255,255,255,.55);display:grid;gap:2px;font-size:13px;color:#fff">
         <li>2026年10月23日〜11月3日の指定日開催</li>
         <li>さいたま市内の一軒家</li>
         <li>1名7,500円</li>
       </ul>
-      <a href={ticketHref} {...ticketAttrs} data-place="final" style="display:flex;justify-content:center;align-items:center;gap:14px;background:#f1f0ec;color:#1b1b1a;text-decoration:none;height:58px;width:100%;font-size:15px;font-weight:700;letter-spacing:.1em;outline:1px solid #f1f0ec;outline-offset:3px" class="kh2">開催日程・チケットを見る<span aria-hidden="true" style="font-weight:400">{ticketArrow}</span></a>
+      <a href={ticketHref} {...ticketAttrs} data-place="final" style="display:flex;justify-content:center;align-items:center;gap:14px;background:#1b1b1a;color:#fff;text-decoration:none;height:58px;width:100%;font-size:15px;font-weight:700;letter-spacing:.1em;outline:1px solid #1b1b1a;outline-offset:3px" class="kh2">開催日程・チケットを見る<span aria-hidden="true" style="font-weight:400">{ticketArrow}</span></a>
     </div>
   </section>
 
@@ -728,7 +732,7 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
   </footer>
 </div>
 
-    <a href={ticketHref} {...ticketAttrs} data-place="float" aria-label="チケット購入" style="position:fixed;right:max(14px, calc(50vw - 220px + 14px));bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;width:88px;height:88px;border-radius:50%;background:#a8432c;color:#fff;text-decoration:none;display:grid;place-content:center;justify-items:center;gap:3px;box-shadow:0 6px 16px rgba(27,27,26,.35);outline:1px solid rgba(255,255,255,.75);outline-offset:-6px;opacity:1;pointer-events:auto;transition:opacity .25s ease,transform .2s ease" class="kh4 k-float">
+    <a href={ticketHref} {...ticketAttrs} data-place="float" aria-label="チケット購入" style="position:fixed;right:max(14px, calc(50vw - 220px + 14px));bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;width:88px;height:88px;border-radius:50%;background:#b3177a;color:#fff;text-decoration:none;display:grid;place-content:center;justify-items:center;gap:3px;box-shadow:0 6px 16px rgba(27,27,26,.35);outline:1px solid rgba(255,255,255,.75);outline-offset:-6px;opacity:1;pointer-events:auto;transition:opacity .25s ease,transform .2s ease" class="kh4 k-float">
       <span aria-hidden="true" style="display:flex;align-items:center;gap:3px"><span style="width:12px;height:1px;background:#fff"></span><span style="width:4px;height:4px;transform:rotate(45deg);background:#fff"></span><span style="width:12px;height:1px;background:#fff"></span></span>
       <span style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:15px;font-weight:800;letter-spacing:.06em;line-height:1.25;text-align:center">チケット<br>購入 →</span>
       <span aria-hidden="true" style="display:flex;align-items:center;gap:3px"><span style="width:12px;height:1px;background:#fff"></span><span style="width:4px;height:4px;transform:rotate(45deg);background:#fff"></span><span style="width:12px;height:1px;background:#fff"></span></span>
@@ -742,9 +746,10 @@ a:hover{color:#4a4844}
 summary::-webkit-details-marker{display:none}
 /* 書き出しの style-hover（インラインスタイルより優先させるため !important） */
 .kh1:hover{background:#3a3937!important;color:#f1f0ec!important}
-.kh2:hover{background:#ffffff!important;color:#1b1b1a!important}
+.kh2:hover{background:#3a3937!important;color:#fff!important}
 .kh3:hover{color:#f1f0ec!important}
 .kh4:hover{transform:translateY(-2px)!important;color:#fff!important}
+.k-sr{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 /* 冒頭演出中は右下のチケットボタンを隠す */
 .k-intro-on .k-float{opacity:0!important;pointer-events:none!important}
 /* FAQ の開閉記号 */
