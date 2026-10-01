@@ -65,9 +65,9 @@ const ticketArrow = hasUrl ? '→' : '↑';
 
 const title = 'ウワサバナシ調査委員会 case2「言祝ぎの家」｜さいたま市の一軒家で体験する没入型ホラー・ミステリー';
 const description =
-  '祝いの席に、招かれる。実際の一軒家を探索し、住人との会話やLINEでの調査報告を通じて真相に迫る没入型ホラー・ミステリー。2026年10月23日〜11月3日の指定日、さいたま市内で開催。1名7,500円、各回定員8名。';
+  '祝いの席に、招かれる。実際の一軒家を探索し、住人との会話や調査報告を通じて真相に迫る没入型ホラー・ミステリー。2026年10月23日〜11月3日の指定日、さいたま市内で開催。1名7,500円、各回定員8名。';
 
-// ---- 冒頭演出（約5.5秒） ----
+// ---- 冒頭演出（約7.5秒。2026-10-01 FB「速い」で約3割ゆっくりに） ----
 // 暗い玄関先で古い家のドアが3回叩かれ（コン、と文字が置かれる）、軋みながら開くとマゼンタの室内。
 // 画面がマゼンタに切り替わり、キャッチを1字ずつ打ち、メインビジュアルと同じ組みのタイトルで終わる。
 // 2026-10-01 ユーザー指摘（扉が立派すぎる／AIで作った感じが強い）で作り直し：光のにじみ・波紋・ぼかし・ズームをやめ、
@@ -78,8 +78,8 @@ const M = "'Shippori Mincho','Yu Mincho',serif";
 const W = 'min(54vw,224px,30vh)';
 const H = `calc(${W} * 1.86)`;
 const center = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center';
-const catchChars = '祝いの席に、招かれる。'.split('').map((c, i) => ({ c, d: (3.0 + i * 0.075).toFixed(3) }));
-const knocks: [number, string, number][] = [[0.55, '4%', -4], [0.9, '31%', 3], [1.25, '57%', -1]];
+const catchChars = '祝いの席に、招かれる。'.split('').map((c, i) => ({ c, d: (3.65 + i * 0.11).toFixed(3) }));
+const knocks: [number, string, number][] = [[0.75, '4%', -4], [1.2, '31%', 3], [1.65, '57%', -1]];
 // ざらつき（コピー・印刷物のノイズ）。SVG のノイズを敷き、0.4秒ごとにずらしてちらつかせる
 const noise = (alpha: number, tone: number) =>
   `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 ${tone} 0 0 0 0 ${tone} 0 0 0 0 ${tone} 0 0 0 ${alpha} 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
@@ -106,13 +106,13 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
 </head>
 <body>
 <template id="k-intro-tpl">
-  <div role="presentation" style="position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;background:#1c1a18;will-change:opacity;animation:kIntroOut .45s cubic-bezier(.3,0,.2,1) 5.25s forwards">
-    <div style={`${center};opacity:0;animation:kFadeIn .5s steps(4,end) .05s forwards`}>
+  <div role="presentation" style="position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;background:#1c1a18;will-change:opacity;animation:kIntroOut .5s cubic-bezier(.3,0,.2,1) 7s forwards">
+    <div style={`${center};opacity:0;animation:kFadeIn .6s steps(4,end) .1s forwards`}>
       <div style="position:relative">
-        <div style="position:relative;animation:kKnock 1.1s steps(1,end) .5s 1">
+        <div style="position:relative;animation:kKnock 1.4s steps(1,end) .68s 1">
           <div style={`position:relative;width:${W};height:${H};box-sizing:border-box;border:7px solid #0c0b0a;border-bottom:0;background:#c41b85;perspective:700px`}>
             <div style={`position:absolute;inset:0;background:${grainInk};opacity:.55`}></div>
-            <div style={`position:absolute;inset:0;transform-origin:left center;background:${wood};box-shadow:inset 0 0 0 1px #15120f;animation:kOpen 1.1s cubic-bezier(.45,0,.7,.4) 1.55s forwards`}>
+            <div style={`position:absolute;inset:0;transform-origin:left center;background:${wood};box-shadow:inset 0 0 0 1px #15120f;animation:kOpen 1.3s cubic-bezier(.45,0,.7,.4) 2.05s forwards`}>
               <div style="position:absolute;top:8%;left:16%;right:16%;height:27%;background:#5e4f58;border:3px solid #1d1915"></div>
               <div style="position:absolute;top:8%;left:50%;height:27%;width:2px;margin-left:-1px;background:#1d1915"></div>
               <div style="position:absolute;top:21.5%;left:16%;right:16%;height:2px;background:#1d1915"></div>
@@ -130,11 +130,11 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
         </div>
       </div>
     </div>
-    <div style="position:absolute;inset:0;background:#c41b85;opacity:0;animation:kShow .01s linear 2.8s forwards"></div>
-    <div style={`${center};animation:kHide .01s linear 4.3s forwards`}>
+    <div style="position:absolute;inset:0;background:#c41b85;opacity:0;animation:kShow .01s linear 3.4s forwards"></div>
+    <div style={`${center};animation:kHide .01s linear 5.75s forwards`}>
       <p style={`margin:0;writing-mode:vertical-rl;font-family:${M};font-size:min(34px,8.4vw);letter-spacing:.3em;color:#fff;font-weight:700;line-height:1`}>{catchChars.map(({ c, d }) => <span style={`opacity:0;animation:kShow .01s linear ${d}s forwards`}>{c}</span>)}</p>
     </div>
-    <div style={`${center};opacity:0;animation:kShow .01s linear 4.4s forwards`}>
+    <div style={`${center};opacity:0;animation:kShow .01s linear 5.85s forwards`}>
       {LOGO_SRC ? (
         <img src={LOGO_SRC} alt="" style="max-width:min(72vw,320px);max-height:40vh">
       ) : (
@@ -174,7 +174,7 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
     cur.addEventListener('animationend',function(e){if(e.animationName==='kIntroOut')finish()});
     root.appendChild(cur);
     html.classList.add('k-intro-on');
-    t=setTimeout(finish,6000);
+    t=setTimeout(finish,8100);
   }
   var show=true;
   try{
@@ -262,8 +262,8 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
 
     <div style="position:relative;display:grid;gap:22px;text-align:center">
       <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:18px;font-weight:600;line-height:1.9;letter-spacing:.06em">あなたは、<br>「ウワサバナシ調査委員会」から<br>派遣された<br>調査チームの一員。</p>
-      <p style="margin:0;font-size:14px;line-height:2.1;letter-spacing:.06em;color:#e7e6e1">実際の一軒家を探索し、<br>そこに暮らす住人から話を聞き、<br>LINEを通じて調査報告を行います。</p>
-      <p style="margin:0;font-size:14px;line-height:2.1;letter-spacing:.06em;color:#e7e6e1">集めた情報から<br>ウワサバナシの真相を推理し、<br>この家からの脱出を<br>目指してください。</p>
+      <p style="margin:0;font-size:14px;line-height:2.1;letter-spacing:.06em;color:#e7e6e1">実際の一軒家を探索し、<br>そこに暮らす住人から話を聞き、<br>調査報告を行います。</p>
+      <p style="margin:0;font-size:14px;line-height:2.1;letter-spacing:.06em;color:#e7e6e1">集めた情報から<br>ウワサバナシの真相を推理し、<br><span class="k-redact" role="img" aria-label="（伏せ字）"></span>を<br>目指してください。</p>
     </div>
 
     <div style="position:relative;margin:48px 0 0">
@@ -285,7 +285,7 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
         <span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-style:italic;font-weight:600;line-height:1;padding-bottom:8px;border-bottom:1px solid #8a8882">03</span>
         <span aria-hidden="true" style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:25px;font-weight:800;letter-spacing:.12em;line-height:1">報告</span>
         <span aria-hidden="true" style="width:1px;height:18px;background:#8a8882"></span>
-        <span style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:600;letter-spacing:.06em;line-height:1.7;white-space:nowrap"><span style="text-orientation:upright;letter-spacing:-.1em">LINE</span>を使った<br>調査報告</span>
+        <span style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:600;letter-spacing:.06em;line-height:1.7;white-space:nowrap">委員会への<br>調査報告</span>
       </li>
       <li style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 0 18px;border:1px solid #6a6862;background:transparent;color:#f1f0ec">
         <span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-style:italic;font-weight:600;line-height:1;padding-bottom:8px;border-bottom:1px solid #8a8882">04</span>
@@ -295,9 +295,9 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
       </li>
       <li style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 0 18px;border:1px solid #f1f0ec;background:#f1f0ec;color:#1b1b1a">
         <span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-style:italic;font-weight:600;line-height:1;padding-bottom:8px;border-bottom:1px solid #1b1b1a">05</span>
-        <span aria-hidden="true" style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:25px;font-weight:800;letter-spacing:.12em;line-height:1">脱出</span>
+        <span aria-hidden="true" style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:25px;font-weight:800;letter-spacing:.12em;line-height:1"><span class="k-redact k-redact-v" style="height:2.3em"></span></span>
         <span aria-hidden="true" style="width:1px;height:18px;background:#1b1b1a"></span>
-        <span style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:600;letter-spacing:.06em;line-height:1.7;white-space:nowrap">家からの脱出</span>
+        <span style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:600;letter-spacing:.06em;line-height:1.7;white-space:nowrap" role="img" aria-label="（伏せ字）"><span class="k-redact k-redact-v" style="height:5.2em;width:.9em"></span></span>
       </li>
       </ol>
     </div>
@@ -461,6 +461,7 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
         <span style="position:absolute;right:0;top:30px;font-size:12px;font-weight:700">開演</span>
       </div>
       <p style="margin:0;text-align:center;font-size:14px;line-height:2">チケットは、空席がある場合に限り、<br>各回の開演2時間前まで販売します。</p>
+      <p style="margin:6px 0 0;text-align:center;font-size:13px;line-height:1.8;color:#b3177a;font-weight:700">集合場所は駅から離れています。<br>ご購入前に<a href="#venue" style="color:#b3177a">「会場・集合案内」</a>をご確認ください。</p>
     </div>
 
     {(hasUrl) && (<Fragment>
@@ -509,6 +510,10 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
     <div style="display:grid;gap:14px;text-align:center">
       <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;line-height:1.9">会場は、さいたま市内の<br>住宅街にある一軒家です。</p>
       <p style="margin:0;font-size:14px;line-height:2.05">当日は、会場最寄りの<br>バス停にお集まりください。<br>詳しい集合場所・アクセス・会場住所は、<br>チケットをご購入いただいた方に<br>ご案内します。</p>
+    </div>
+    <div style="margin-top:22px;border:1px solid #b3177a;outline:1px solid #b3177a;outline-offset:3px;margin-left:3px;margin-right:3px;padding:16px 16px 18px;background:#fbfaf7;display:grid;gap:8px">
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:15px;font-weight:800;letter-spacing:.08em;color:#b3177a;text-align:center">ご購入前にご確認ください</p>
+      <p style="margin:0;font-size:14px;line-height:1.95">集合場所（会場最寄りのバス停）は、<br>駅からさらに離れた場所にあります。<br>移動時間を含め、前後のご予定には<br>十分な余裕をもってお申し込みください。</p>
     </div>
     <ol style="list-style:none;margin:36px 0 0;padding:0;display:grid">
       <li style="display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px">
@@ -576,7 +581,7 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
       <div style="display:grid;gap:8px">
         <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:center;background:#f1f0ec;border-radius:12px;padding:14px 16px">
           <span aria-hidden="true" style="justify-self:center;width:26px;height:44px;border:3px solid #1b1b1a;border-radius:6px;box-sizing:border-box;position:relative;display:block"><span style="position:absolute;left:50%;bottom:3px;width:8px;height:2px;background:#1b1b1a;transform:translateX(-50%)"></span></span>
-          <p style="margin:0;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:16px;font-weight:700">スマートフォン</span><span style="font-size:13px;line-height:1.7;color:#3d3c3a">LINEが利用できる、<br>十分に充電されたスマートフォンを<br>お持ちください。</span></p>
+          <p style="margin:0;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:16px;font-weight:700">スマートフォン</span><span style="font-size:13px;line-height:1.7;color:#3d3c3a">十分に充電されたスマートフォンを<br>お持ちください。</span></p>
         </div>
         <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:center;background:#f1f0ec;border-radius:12px;padding:14px 16px">
           <span aria-hidden="true" style="justify-self:center;width:44px;height:44px;border-radius:50%;border:2px solid #1b1b1a;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:20px;font-weight:800">靴</span>
@@ -615,7 +620,7 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
     <div style="margin-top:48px;display:grid;gap:12px">
       <p style="margin:0;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:20px;font-weight:800;letter-spacing:.06em">撮影・録音・SNS</p>
       <div style="display:grid;gap:10px;font-size:14px;line-height:1.95">
-        <p style="margin:0">キャストの撮影・録画、<br>およびキャストの声の録音は<br>原則として禁止です。<br>会場内の写真撮影については、<br>確定したルールをご案内します。</p>
+        <p style="margin:0">キャストの撮影・録画、<br>およびキャストの声の録音は<br>原則として禁止です。</p>
         <p style="margin:0">SNSでの参加報告や、<br>ネタバレを含まない感想の投稿は歓迎します。<br>家の中の様子、登場人物の秘密、<br>物語の結末に関する投稿はお控えください。</p>
       </div>
       <div style="margin-top:6px;display:grid;justify-items:center;gap:6px;text-align:center">
@@ -708,6 +713,8 @@ summary::-webkit-details-marker{display:none}
 .kh3:hover{color:#f1f0ec!important}
 .kh4:hover{transform:translateY(-2px)!important;color:#fff!important}
 .k-sr{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.k-redact{display:inline-block;width:6.2em;height:1.15em;vertical-align:-.2em;background:#0b0a09;transform:rotate(-.6deg);clip-path:polygon(0 8%,3% 0,40% 6%,72% 1%,100% 7%,98% 92%,64% 100%,30% 94%,2% 100%)}
+.k-redact-v{width:1.1em;vertical-align:baseline;transform:rotate(.6deg);clip-path:polygon(6% 0,100% 2%,94% 35%,100% 70%,92% 100%,0 98%,7% 62%,0 30%)}
 /* 冒頭演出中は右下のチケットボタンを隠す */
 .k-intro-on .k-float{opacity:0!important;pointer-events:none!important}
 /* FAQ の開閉記号 */
