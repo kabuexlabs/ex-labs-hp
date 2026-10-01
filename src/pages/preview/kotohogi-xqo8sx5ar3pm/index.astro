@@ -72,6 +72,8 @@ const description =
 // 画面がマゼンタに切り替わり、キャッチを1字ずつ打ち、メインビジュアルと同じ組みのタイトルで終わる。
 // 2026-10-01 ユーザー指摘（扉が立派すぎる／AIで作った感じが強い）で作り直し：光のにじみ・波紋・ぼかし・ズームをやめ、
 // ベタ塗り＋コピー機のようなざらつき＋カット切り替え（steps）にしている。
+// 本文への切り替えは滑らかな0.45秒のフェード（2026-10-01「切り替えが重い」指摘で、段階フェードと
+// 全画面のブレンド合成〈mix-blend-mode〉をやめ、タイトル表示後の待ちも短くした）。
 const M = "'Shippori Mincho','Yu Mincho',serif";
 const W = 'min(54vw,224px,30vh)';
 const H = `calc(${W} * 1.86)`;
@@ -104,7 +106,7 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
 </head>
 <body>
 <template id="k-intro-tpl">
-  <div role="presentation" style="position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;background:#1c1a18;animation:kIntroOut .4s steps(3,end) 5.5s forwards">
+  <div role="presentation" style="position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;background:#1c1a18;will-change:opacity;animation:kIntroOut .45s cubic-bezier(.3,0,.2,1) 5.25s forwards">
     <div style={`${center};opacity:0;animation:kFadeIn .5s steps(4,end) .05s forwards`}>
       <div style="position:relative">
         <div style="position:relative;animation:kKnock 1.1s steps(1,end) .5s 1">
@@ -142,8 +144,8 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
         </div>
       )}
     </div>
-    <div aria-hidden="true" style={`position:absolute;inset:-60px;pointer-events:none;background:${grainDark};opacity:.16;animation:kGrain .4s steps(1,end) infinite`}></div>
-    <div aria-hidden="true" style={`position:absolute;inset:-60px;pointer-events:none;background:${grainInk};opacity:.35;mix-blend-mode:multiply;animation:kGrain .4s steps(1,end) infinite reverse`}></div>
+    <div aria-hidden="true" style={`position:absolute;inset:-60px;pointer-events:none;background:${grainDark};opacity:.16;will-change:transform;animation:kGrain .4s steps(1,end) infinite`}></div>
+    <div aria-hidden="true" style={`position:absolute;inset:-60px;pointer-events:none;background:${grainInk};opacity:.28;will-change:transform;animation:kGrain .4s steps(1,end) infinite reverse`}></div>
     <button type="button" style={`position:absolute;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:5;min-height:44px;padding:0 18px;background:#f1f0ec;color:#1b1b1a;border:1px solid #1b1b1a;font-family:${M};font-size:14px;font-weight:600;letter-spacing:.1em;cursor:pointer`}>スキップ</button>
   </div>
 </template>
@@ -156,8 +158,14 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
   function finish(){
     clearTimeout(t);
     try{localStorage.setItem(KEY,'1')}catch(e){}
-    if(cur){cur.remove();cur=null}
     html.classList.remove('k-intro-on');
+    if(!cur)return;
+    var el=cur;cur=null;
+    // スキップ・タップ時も一瞬で消さず、短いフェードで本文へ
+    if(getComputedStyle(el).visibility==='hidden'){el.remove();return}
+    el.style.pointerEvents='none';
+    el.style.animation='kIntroOut .22s ease-out forwards';
+    setTimeout(function(){el.remove()},240);
   }
   function play(){
     if(cur||!tpl||!root)return;
@@ -166,7 +174,7 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
     cur.addEventListener('animationend',function(e){if(e.animationName==='kIntroOut')finish()});
     root.appendChild(cur);
     html.classList.add('k-intro-on');
-    t=setTimeout(finish,6400);
+    t=setTimeout(finish,6000);
   }
   var show=true;
   try{
