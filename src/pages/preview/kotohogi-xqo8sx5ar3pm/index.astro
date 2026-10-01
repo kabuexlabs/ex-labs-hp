@@ -1,0 +1,768 @@
+---
+// ウワサバナシ調査委員会 case2「言祝ぎの家」LP（2026.10.23–11.3／さいたま市内の一軒家）。限定URLプレビュー。
+// デザイン書き出し（言祝ぎの家 LP export）の再実装。本文の文言・レイアウトは書き出しのまま（インラインスタイルも原本どおり）。
+// コーポレートサイトとはデザイン系統が別なので BaseLayout は使わず、このファイルだけで完結させている。
+//
+// 公開範囲：URLを知っている人だけが見る前提。noindex（meta と X-Robots-Tag）。sitemap・llms.txt・ナビ・他ページからのリンクには載せない。
+//   - 環境変数 KOTOHOGI_PREVIEW_PASSWORD を Vercel に設定すると Basic 認証がかかる（ユーザー名は何でも可、パスワードのみ照合）。
+//     リポジトリが公開なので URL だけでは秘密にならない。関係者以外に見せたくない間は設定する。未設定なら認証なし。
+//   - URL 末尾に ?review=1 を付けると、未確定箇所の「確認用」注釈を表示する（書き出しの reviewMode）。
+// 本番公開するときは、正式URLへ移し、noindex を外し、sitemap・llms.txt・OGP を整える。未確定事項は docs/kotohogi-lp.md。
+export const prerender = false;
+import SiteGuard from '../../../components/SiteGuard.astro';
+
+// ---- 差し替え・確定後に入力する項目（空文字の間は表示しない） ----
+// 冒頭演出：'毎回'（確認用）／'初回のみ'（本番。2回目以降の訪問では流さない）／'なし'
+const INTRO_MODE: '毎回' | '初回のみ' | 'なし' = '毎回';
+// チケット販売先URL（https:// から）。未設定の間、購入ボタンはページ内のチケット欄（#tickets）へ移動するだけ
+const RESERVE_URL = '';
+// メインビジュアル（位置情報を削除したもの）。未設定の間は文字組みで代替
+const KV_SRC = '';
+// 支給ロゴ（冒頭演出で使用。H1 はテキストのまま）。未設定の間は仮のテキストロゴ
+const LOGO_SRC = '';
+// 所要時間（入力すると開催概要に表示）
+const DURATION_TEXT = '';
+// 最寄り駅・駅からの所要時間・バス利用の概要（入力すると会場欄に表示）
+const ACCESS_TEXT = '';
+// 出演者名（役名・配役は入れない）
+const CAST_TEXT = '';
+
+function readEnv(name: string): string | undefined {
+  const v = (import.meta.env as Record<string, string | undefined>)[name] ?? process.env[name];
+  return v?.trim() || undefined;
+}
+
+const noindex = 'noindex, nofollow, noarchive';
+const password = readEnv('KOTOHOGI_PREVIEW_PASSWORD');
+if (password) {
+  const auth = Astro.request.headers.get('authorization') ?? '';
+  let ok = false;
+  if (auth.startsWith('Basic ')) {
+    try {
+      const decoded = new TextDecoder().decode(Uint8Array.from(atob(auth.slice(6).trim()), (c) => c.charCodeAt(0)));
+      ok = decoded.slice(decoded.indexOf(':') + 1) === password;
+    } catch {}
+  }
+  if (!ok) {
+    return new Response('このページは関係者確認用です。パスワードを入力してください。', {
+      status: 401,
+      headers: {
+        'WWW-Authenticate': 'Basic realm="kotohogi-preview", charset="UTF-8"',
+        'Content-Type': 'text/plain; charset=utf-8',
+        'X-Robots-Tag': noindex,
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
+}
+Astro.response.headers.set('X-Robots-Tag', noindex);
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+
+const review = Astro.url.searchParams.get('review') === '1';
+const hasUrl = /^https?:\/\//.test(RESERVE_URL);
+const ticketHref = hasUrl ? RESERVE_URL : '#tickets';
+const ticketAttrs = hasUrl ? { target: '_blank', rel: 'noopener', 'data-track': 'ticket', 'data-show': 'uwasabanashi-case2' } : {};
+const ticketArrow = hasUrl ? '→' : '↑';
+
+const title = 'ウワサバナシ調査委員会 case2「言祝ぎの家」｜さいたま市の一軒家で体験する没入型ホラー・ミステリー';
+const description =
+  '祝いの席に、招かれる。実際の一軒家を探索し、住人との会話やLINEでの調査報告を通じて真相に迫る没入型ホラー・ミステリー。2026年10月23日〜11月3日の指定日、さいたま市内で開催。1名7,500円、各回定員8名。';
+
+// ---- 冒頭演出（扉が3回叩かれ、開いて室内の光へ入り、キャッチ→ロゴ→本文。約5.5秒） ----
+const M = "'Bodoni Moda','Shippori Mincho','Yu Mincho',serif";
+const W = 'min(54vw,224px,30vh)';
+const H = `calc(${W} * 1.72)`;
+const center = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center';
+const catchChars = '祝いの席に、招かれる。'.split('').map((c, i) => ({ c, d: (3.0 + i * 0.06).toFixed(2) }));
+const ripples = [0.5, 0.85, 1.2];
+const knocks: [number, string, number][] = [[0.5, '28%', -5], [0.85, '39%', 4], [1.2, '50%', -2]];
+const grain = 'repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 6px,rgba(0,0,0,.09) 6px 7px,transparent 7px 13px)';
+const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a;transform:scaleX(0);animation:kRule .6s cubic-bezier(.2,.7,.2,1) 4.35s forwards';
+---
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400..800&family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+{KV_SRC && <link rel="preload" as="image" href={KV_SRC}>}
+<SiteGuard />
+</head>
+<body>
+<template id="k-intro-tpl">
+  <div role="presentation" style="position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;animation:kIntroOut .45s ease 5.35s forwards;background:repeating-linear-gradient(90deg,#1d1c1a 0 46px,#171614 46px 48px)">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 46%,rgba(0,0,0,0) 25%,rgba(0,0,0,.7) 100%)"></div>
+    <div style={`${center};opacity:0;animation:kFadeIn .6s ease 0s forwards`}>
+      <div style="position:relative;transform-origin:50% 50%;animation:kNudge 1.1s linear .45s 1, kPush .8s cubic-bezier(.65,0,.85,.25) 2.35s forwards">
+        <div style="position:absolute;right:-190px;top:-150px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(255,236,190,.2),rgba(255,236,190,0) 65%);pointer-events:none"></div>
+        <div style={`position:absolute;left:50%;top:100%;width:calc(${W} * 2.3);height:96px;transform:translateX(-50%);clip-path:polygon(21% 0,79% 0,100% 100%,0 100%);background:linear-gradient(180deg,#3d3b37,#1c1b19)`}></div>
+        <div style={`position:absolute;left:50%;top:100%;width:calc(${W} * 1.8);height:96px;transform:translateX(-50%);clip-path:polygon(29% 0,71% 0,100% 100%,0 100%);background:linear-gradient(180deg,rgba(255,246,222,.8),rgba(255,246,222,0));opacity:0;animation:kGlow .9s ease 1.75s forwards`}></div>
+        <div style={`position:relative;width:${W};height:${H};padding:14px 14px 0;box-sizing:border-box;background:linear-gradient(90deg,#272623,#3a3834 50%,#272623);box-shadow:0 0 0 1px #0f0e0d, inset 0 1px 0 rgba(255,255,255,.08), 0 34px 44px -22px rgba(0,0,0,.85);z-index:1`}>
+          <div style="position:relative;width:100%;height:100%;background:#0e0d0c;perspective:900px;box-shadow:inset 6px 0 8px -4px rgba(0,0,0,.8), inset -6px 0 8px -4px rgba(0,0,0,.8)">
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,#fffaf0 0%,#f4ead2 40%,#cbbf9f 100%);opacity:0;animation:kGlow .9s ease 1.6s forwards"></div>
+            <div style="position:absolute;inset:0;perspective:900px;animation:kKnock 1.1s linear .45s 1">
+              <div style={`position:absolute;inset:0;transform-origin:left center;animation:kOpen 1.05s cubic-bezier(.55,.05,.3,1) 1.5s forwards;background:${grain},linear-gradient(90deg,#1f1e1c 0%,#2c2a27 40%,#33312d 72%,#262422 100%);box-shadow:inset 0 0 0 1px #121110, inset -3px 0 0 rgba(255,255,255,.04)`}>
+                <div style="position:absolute;top:8%;bottom:8%;left:17%;width:13%;background:linear-gradient(180deg,#eadfc2,#cdbf9b 55%,#a89b7a);box-shadow:inset 0 0 0 3px #1a1917, inset 0 0 14px rgba(0,0,0,.55), 0 0 22px rgba(255,236,190,.18);opacity:.8"></div>
+                <div style="position:absolute;top:8%;bottom:8%;left:17%;width:13%;background:repeating-linear-gradient(180deg,transparent 0 23%,#1a1917 23% calc(23% + 2px))"></div>
+                <div style="position:absolute;top:46%;right:9%;width:10px;height:60px;background:linear-gradient(90deg,#4a4844,#9a988f,#4a4844);border-radius:2px"></div>
+                <div style="position:absolute;top:calc(46% + 12px);right:calc(9% - 2px);width:32px;height:7px;background:linear-gradient(180deg,#e2dfd7,#8f8d87);border-radius:4px;box-shadow:0 3px 4px rgba(0,0,0,.55)"></div>
+                <div style="position:absolute;top:calc(46% + 40px);right:calc(9% + 1px);width:8px;height:8px;border-radius:50%;background:#b9b6ae;box-shadow:inset 0 0 0 2px #6a6862"></div>
+                <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.65));opacity:0;animation:kGlow 1s ease 1.6s forwards"></div>
+              </div>
+            </div>
+            {ripples.map((d) => <span style={`position:absolute;left:70%;top:42%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;border:1px solid rgba(241,240,236,.75);opacity:0;animation:kRipple .75s ease-out ${d}s forwards;pointer-events:none;z-index:4`}></span>)}
+          </div>
+          {knocks.map(([d, top, rot]) => <span style={`position:absolute;right:-60px;top:${top};font-family:${M};font-size:15px;font-weight:600;letter-spacing:.12em;color:#e7e4dc;opacity:0;transform:rotate(${rot}deg);animation:kKnockTxt .9s ease-out ${d}s forwards;white-space:nowrap`}>コン</span>)}
+        </div>
+        <div style="position:absolute;right:-46px;top:4%;width:16px;height:26px;background:linear-gradient(#fff6dc,#efe0b4);border:2px solid #1b1a18;border-radius:2px;box-shadow:0 0 20px 7px rgba(255,236,190,.32);z-index:2"></div>
+        <div style="position:absolute;left:-50px;top:36%;width:30px;height:14px;background:linear-gradient(#cfccc4,#a9a7a0);box-shadow:0 0 0 1px #111, 1px 2px 3px rgba(0,0,0,.6)"></div>
+      </div>
+    </div>
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(255,246,222,.45),rgba(255,246,222,0) 60%);opacity:0;animation:kGlow 1s ease 1.8s forwards;pointer-events:none"></div>
+    <div style="position:absolute;inset:0;background:#f1f0ec;opacity:0;animation:kFadeIn .5s ease 2.6s forwards"></div>
+    <div style={`${center};animation:kFadeOut .35s ease 4.2s forwards`}>
+      <p style={`margin:0;writing-mode:vertical-rl;font-family:${M};font-size:min(34px,8.4vw);letter-spacing:.3em;color:#1b1b1a;font-weight:600;line-height:1`}>{catchChars.map(({ c, d }) => <span style={`opacity:0;animation:kCharIn .55s ease ${d}s forwards`}>{c}</span>)}</p>
+    </div>
+    <div style={center}>
+      {LOGO_SRC ? (
+        <img src={LOGO_SRC} alt="" style="max-width:min(72vw,320px);max-height:40vh;opacity:0;animation:kRise .7s ease 4.4s forwards">
+      ) : (
+        <div style={`text-align:center;font-family:${M};color:#1b1b1a;display:grid;justify-items:center;gap:12px`}>
+          <div style="font-size:13px;font-weight:600;letter-spacing:.26em;opacity:0;animation:kRise .6s ease 4.45s forwards">ウワサバナシ調査委員会</div>
+          <div style="display:flex;align-items:center;gap:12px"><span style={rule}></span><span style="font-size:17px;font-style:italic;letter-spacing:.08em;opacity:0;animation:kRise .6s ease 4.5s forwards">case2</span><span style={rule}></span></div>
+          <div style="font-size:min(50px,12.4vw);font-weight:800;line-height:1.2;white-space:nowrap;margin-left:-.4em;font-feature-settings:'palt';opacity:0;animation:kRise .7s ease 4.55s forwards">「言祝ぎの家」</div>
+        </div>
+      )}
+    </div>
+    <button type="button" style={`position:absolute;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:5;min-height:44px;padding:0 18px;background:rgba(241,240,236,.9);color:#1b1b1a;border:1px solid #1b1b1a;font-family:${M};font-size:14px;font-weight:600;letter-spacing:.1em;cursor:pointer`}>スキップ</button>
+  </div>
+</template>
+<div id="k-intro-root"></div>
+<script is:inline define:vars={{ INTRO_MODE }}>
+// 冒頭演出：タップ／スキップ／Esc で即終了。「動きを減らす」設定がオンなら流さない。
+// 本文は裏で描画済みなので、演出が失敗しても本文・予約導線は閲覧できる。
+(function(){
+  var KEY='kotohogi_intro_seen_v3',root=document.getElementById('k-intro-root'),tpl=document.getElementById('k-intro-tpl'),html=document.documentElement,cur=null,t;
+  function finish(){
+    clearTimeout(t);
+    try{localStorage.setItem(KEY,'1')}catch(e){}
+    if(cur){cur.remove();cur=null}
+    html.classList.remove('k-intro-on');
+  }
+  function play(){
+    if(cur||!tpl||!root)return;
+    cur=tpl.content.firstElementChild.cloneNode(true);
+    cur.addEventListener('click',finish);
+    cur.addEventListener('animationend',function(e){if(e.animationName==='kIntroOut')finish()});
+    root.appendChild(cur);
+    html.classList.add('k-intro-on');
+    t=setTimeout(finish,6400);
+  }
+  var show=true;
+  try{
+    if(INTRO_MODE==='なし')show=false;
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)show=false;
+    if(INTRO_MODE==='初回のみ'&&localStorage.getItem(KEY))show=false;
+  }catch(e){}
+  if(show)play();
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&cur)finish()});
+  document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('[data-replay-intro]'):null;if(b)play()});
+})();
+</script>
+
+<div style="min-height:100vh;background:#d3d2cd">
+<div lang="ja" style="max-width:440px;margin:0 auto;background-color:#f1f0ec;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%22.85%22 numOctaves=%222%22 stitchTiles=%22stitch%22/%3E%3CfeColorMatrix values=%220 0 0 0 0.1 0 0 0 0 0.1 0 0 0 0 0.1 0 0 0 .07 0%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E');color:#1b1b1a;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:15px;font-weight:500;line-height:1.9;word-break:auto-phrase;line-break:strict;box-shadow:0 0 40px rgba(27,27,26,.12);overflow:hidden">
+
+
+  <header style="display:flex;justify-content:center;align-items:center;gap:12px;padding:0 20px;height:52px;background:#1b1b1a;color:#f1f0ec">
+    <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:15px;font-weight:800;letter-spacing:.08em;white-space:nowrap">ウワサバナシ調査委員会</p>
+  </header>
+  {(review) && (<Fragment>
+    <p style="margin:0;border-bottom:1px dashed #6b6963;background:#fff;padding:8px 14px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜既存サイトの共通ヘッダーがある場合は差し替え</p>
+  </Fragment>)}
+
+  <section id="top">
+    <div style="position:relative;aspect-ratio:3 / 4;background:#2b2a28;overflow:hidden">
+      {KV_SRC && <img src={KV_SRC} alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />}
+      {(!KV_SRC) && (<Fragment>
+        <div aria-hidden="true" style="position:absolute;inset:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;color:#a9a7a0">
+          <div style="position:absolute;inset:0;background-image:radial-gradient(circle,#f1f0ec 1.1px,transparent 1.5px);background-size:7px 7px;opacity:.2;-webkit-mask-image:linear-gradient(170deg,#000 0%,transparent 55%);mask-image:linear-gradient(170deg,#000 0%,transparent 55%)"></div>
+          <span style="position:absolute;top:18%;left:8%;font-size:12px;letter-spacing:.24em;color:#d6d4cd">2026年10月。</span>
+          <span style="position:absolute;top:23.5%;left:8%;width:46%;border-top:1px solid #5d5b56"></span>
+          <span style="position:absolute;top:27%;left:8%;font-size:21px;letter-spacing:.1em;line-height:1.55;color:#e7e6e1">不審な出来事が<br>相次いでいる。</span>
+          <span style="position:absolute;top:41%;left:8%;font-size:12px;letter-spacing:.22em">新婚夫婦の新居で</span>
+          <span style="position:absolute;top:46%;left:8%;font-size:14px;letter-spacing:.14em;color:#d6d4cd">足音や獣の臭いが絶えず、</span>
+          <span style="position:absolute;top:51%;left:8%;font-size:12px;letter-spacing:.2em">妻の様子もおかしいという。</span>
+        </div>
+      </Fragment>)}
+      <div aria-hidden="true" style="position:absolute;inset:10px;border:1px solid rgba(241,240,236,.3);pointer-events:none;z-index:1"></div>
+      <div aria-hidden="true" style="position:absolute;left:0;right:0;bottom:0;height:52%;background:linear-gradient(180deg,rgba(27,27,26,0),rgba(27,27,26,.9))"></div>
+      <span aria-hidden="true" style="position:absolute;top:18px;left:18px;width:46px;height:46px;border:2px solid #c0553a;border-radius:50%;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:22px;font-weight:700;color:#c0553a;transform:rotate(-8deg)">祝</span>
+      <p style="position:absolute;top:22px;right:20px;margin:0;writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:21px;font-weight:600;letter-spacing:.34em;line-height:1.4;color:#f1f0ec;text-shadow:0 1px 8px rgba(0,0,0,.5);white-space:nowrap">祝いの席に、<span style="display:inline-block;margin-top:.8em">招かれる。</span></p>
+      <h1 style="position:absolute;left:20px;right:20px;bottom:22px;margin:0;color:#f1f0ec;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-weight:500;line-height:1.2;display:grid;justify-items:start;gap:10px">
+        <span style="font-size:13px;letter-spacing:.3em">ウワサバナシ調査委員会</span>
+        <span style="font-size:12px;letter-spacing:.2em;border:1px solid #c9c7c1;padding:0 8px;line-height:1.7">case2</span>
+        <span style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:min(46px,12.4vw);font-weight:800;letter-spacing:0;white-space:nowrap;margin-left:-.45em">「言祝ぎの家」</span>
+      </h1>
+      {(review && !KV_SRC) && (<Fragment>
+        <p style="position:absolute;left:76px;top:24px;margin:0;border:1px dashed #6b6963;background:#fff;padding:4px 8px;font-family:ui-monospace,Menlo,monospace;font-size:10px;line-height:1.5;color:#3d3c3a">確認用｜メインビジュアル差し替え位置</p>
+      </Fragment>)}
+    </div>
+
+    <div style="padding:28px 20px 40px;display:grid;gap:22px">
+      <div style="border:1px solid #1b1b1a;outline:1px solid #1b1b1a;outline-offset:3px;margin:3px;padding:6px 16px;display:grid;text-align:center">
+        <div style="padding:14px 0;border-bottom:1px solid #b8b6b0;display:grid;gap:4px">
+          <p style="margin:0;display:flex;justify-content:center;gap:12px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;letter-spacing:.24em;color:#4a4844"><span aria-hidden="true">〈</span>開催<span aria-hidden="true">〉</span></p>
+          <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;line-height:1.6">2026年10月23日〜11月3日の<br><span style="display:inline-block;margin-top:4px;background:#1b1b1a;color:#f1f0ec;padding:0 12px;letter-spacing:.14em">指定日開催</span></p>
+        </div>
+        <div style="padding:14px 0;border-bottom:1px solid #b8b6b0;display:grid;gap:4px">
+          <p style="margin:0;display:flex;justify-content:center;gap:12px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;letter-spacing:.24em;color:#4a4844"><span aria-hidden="true">〈</span>会場<span aria-hidden="true">〉</span></p>
+          <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">さいたま市内の一軒家</p>
+        </div>
+        <div style="padding:14px 0;display:grid;gap:4px">
+          <p style="margin:0;display:flex;justify-content:center;gap:12px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;letter-spacing:.24em;color:#4a4844"><span aria-hidden="true">〈</span>料金<span aria-hidden="true">〉</span></p>
+          <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">1名7,500円</p>
+        </div>
+      </div>
+      <a href="#schedule" style="display:flex;justify-content:center;align-items:center;gap:14px;background:#1b1b1a;color:#f1f0ec;text-decoration:none;padding:0 20px;height:58px;font-size:15px;font-weight:700;letter-spacing:.1em;outline:1px solid #1b1b1a;outline-offset:3px" class="kh1">開催日程・チケットを見る<span aria-hidden="true" style="font-weight:400">↓</span></a>
+    </div>
+  </section>
+
+  <section id="story" style="padding:56px 20px 64px;border-top:1px solid #1b1b1a">
+    <div style="position:relative;display:grid;gap:10px;margin-bottom:36px;text-align:center">
+      <div style="display:flex;align-items:center;gap:14px"><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span><h2 style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:29px;font-weight:800;letter-spacing:.04em;line-height:1.35">あらすじ</h2><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span></div>
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.24em;color:#3d3c3a">調査記録　第二項</p>
+    </div>
+    <div style="display:flex;justify-content:center">
+      <p style="margin:0;writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:min(16px,4.2vw);height:24em;line-height:2;letter-spacing:.1em"><span style="text-orientation:upright;letter-spacing:-.12em">2026</span>年<span style="text-combine-upright:all">10</span>月。<br>さいたま市の住宅街にある一軒家で、<br>不審な出来事が相次いでいる。<br>新婚夫婦の新居で<br>足音や獣の臭いが絶えず、<br>妻の様子もおかしいという。<br>囁かれるウワサバナシの真相を調査するため、<br>あなたは「ウワサバナシ調査委員会」の<br>調査員として、<br>その家へ派遣された。</p>
+    </div>
+  </section>
+
+  <section id="experience" style="position:relative;background:#2b2a28;color:#f1f0ec;padding:56px 20px 64px">
+    <div aria-hidden="true" style="position:absolute;inset:0;background-image:radial-gradient(circle,#f1f0ec 1px,transparent 1.4px);background-size:8px 8px;opacity:.08;-webkit-mask-image:linear-gradient(180deg,#000,transparent 30%);mask-image:linear-gradient(180deg,#000,transparent 30%)"></div>
+    <div style="position:relative;display:grid;gap:10px;margin-bottom:36px;text-align:center">
+      <div style="display:flex;align-items:center;gap:14px"><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #a9a7a0;border-bottom:1px solid #a9a7a0"></span><h2 style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:29px;font-weight:800;letter-spacing:.04em;line-height:1.35">体験内容</h2><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #a9a7a0;border-bottom:1px solid #a9a7a0"></span></div>
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.24em;color:#c9c7c1">調査記録　第三項</p>
+    </div>
+
+    <div style="position:relative;display:grid;gap:22px;text-align:center">
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:18px;font-weight:600;line-height:1.9;letter-spacing:.06em">あなたは、<br>「ウワサバナシ調査委員会」から<br>派遣された<br>調査チームの一員。</p>
+      <p style="margin:0;font-size:14px;line-height:2.1;letter-spacing:.06em;color:#e7e6e1">実際の一軒家を探索し、<br>そこに暮らす住人から話を聞き、<br>LINEを通じて調査報告を行います。</p>
+      <p style="margin:0;font-size:14px;line-height:2.1;letter-spacing:.06em;color:#e7e6e1">集めた情報から<br>ウワサバナシの真相を推理し、<br>この家からの脱出を<br>目指してください。</p>
+    </div>
+
+    <div style="position:relative;margin:48px 0 0">
+      <div aria-hidden="true" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;color:#a9a7a0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:11px;letter-spacing:.2em"><span style="width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-right:8px solid #a9a7a0"></span><span style="flex:1;height:1px;background:#6a6862"></span><span>調査の手順</span></div>
+      <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:row-reverse;gap:6px;align-items:stretch">
+      <li style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 0 18px;border:1px solid #6a6862;background:transparent;color:#f1f0ec">
+        <span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-style:italic;font-weight:600;line-height:1;padding-bottom:8px;border-bottom:1px solid #8a8882">01</span>
+        <span aria-hidden="true" style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:25px;font-weight:800;letter-spacing:.12em;line-height:1">探索</span>
+        <span aria-hidden="true" style="width:1px;height:18px;background:#8a8882"></span>
+        <span style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:600;letter-spacing:.06em;line-height:1.7;white-space:nowrap">実際の一軒家を<br>探索</span>
+      </li>
+      <li style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 0 18px;border:1px solid #6a6862;background:transparent;color:#f1f0ec">
+        <span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-style:italic;font-weight:600;line-height:1;padding-bottom:8px;border-bottom:1px solid #8a8882">02</span>
+        <span aria-hidden="true" style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:25px;font-weight:800;letter-spacing:.12em;line-height:1">聴取</span>
+        <span aria-hidden="true" style="width:1px;height:18px;background:#8a8882"></span>
+        <span style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:600;letter-spacing:.06em;line-height:1.7;white-space:nowrap">住人役のキャストとの<br>会話・聞き取り</span>
+      </li>
+      <li style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 0 18px;border:1px solid #6a6862;background:transparent;color:#f1f0ec">
+        <span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-style:italic;font-weight:600;line-height:1;padding-bottom:8px;border-bottom:1px solid #8a8882">03</span>
+        <span aria-hidden="true" style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:25px;font-weight:800;letter-spacing:.12em;line-height:1">報告</span>
+        <span aria-hidden="true" style="width:1px;height:18px;background:#8a8882"></span>
+        <span style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:600;letter-spacing:.06em;line-height:1.7;white-space:nowrap"><span style="text-orientation:upright;letter-spacing:-.1em">LINE</span>を使った<br>調査報告</span>
+      </li>
+      <li style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 0 18px;border:1px solid #6a6862;background:transparent;color:#f1f0ec">
+        <span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-style:italic;font-weight:600;line-height:1;padding-bottom:8px;border-bottom:1px solid #8a8882">04</span>
+        <span aria-hidden="true" style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:25px;font-weight:800;letter-spacing:.12em;line-height:1">推理</span>
+        <span aria-hidden="true" style="width:1px;height:18px;background:#8a8882"></span>
+        <span style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:600;letter-spacing:.06em;line-height:1.7;white-space:nowrap">情報をつなぎ<br>合わせる推理</span>
+      </li>
+      <li style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 0 18px;border:1px solid #f1f0ec;background:#f1f0ec;color:#1b1b1a">
+        <span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-style:italic;font-weight:600;line-height:1;padding-bottom:8px;border-bottom:1px solid #1b1b1a">05</span>
+        <span aria-hidden="true" style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:25px;font-weight:800;letter-spacing:.12em;line-height:1">脱出</span>
+        <span aria-hidden="true" style="width:1px;height:18px;background:#1b1b1a"></span>
+        <span style="writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:600;letter-spacing:.06em;line-height:1.7;white-space:nowrap">家からの脱出</span>
+      </li>
+      </ol>
+    </div>
+
+    <div style="position:relative;margin-top:52px;text-align:center;display:grid;justify-items:center;gap:18px">
+      <div aria-hidden="true" style="display:flex;align-items:center;gap:8px"><span style="width:28px;height:1px;background:#a9a7a0"></span><span style="width:5px;height:5px;transform:rotate(45deg);border:1px solid #a9a7a0"></span><span style="width:28px;height:1px;background:#a9a7a0"></span></div>
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:23px;font-weight:700;line-height:1.8;letter-spacing:.04em">何を調べ、<br>誰に何を尋ねるのか。<br>あなたの行動が、<br>物語の結末を左右します。</p>
+      <div aria-hidden="true" style="display:flex;align-items:center;gap:8px"><span style="width:28px;height:1px;background:#a9a7a0"></span><span style="width:5px;height:5px;transform:rotate(45deg);border:1px solid #a9a7a0"></span><span style="width:28px;height:1px;background:#a9a7a0"></span></div>
+    </div>
+  </section>
+
+  <section id="schedule" style="padding:56px 20px 64px">
+    <div style="position:relative;display:grid;gap:10px;margin-bottom:36px;text-align:center">
+      <div style="display:flex;align-items:center;gap:14px"><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span><h2 style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:29px;font-weight:800;letter-spacing:.04em;line-height:1.35">開催概要<br>開催日程</h2><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span></div>
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.24em;color:#3d3c3a">調査記録　第四項</p>
+    </div>
+
+    <dl style="margin:0;display:grid;gap:22px;text-align:center">
+      <div style="display:grid;gap:4px">
+        <dt style="display:flex;justify-content:center;gap:12px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;letter-spacing:.24em"><span aria-hidden="true" style="color:#8a8882;font-weight:400">〈</span>会期<span aria-hidden="true" style="color:#8a8882;font-weight:400">〉</span></dt>
+        <dd style="margin:0;font-size:16px;line-height:1.8">2026年10月23日（金）〜<br>11月3日（火・祝）<br><span style="display:inline-block;margin-top:6px;border:1px solid #1b1b1a;padding:0 12px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-weight:700;letter-spacing:.14em">指定日開催</span></dd>
+      </div>
+      <div style="display:grid;gap:4px">
+        <dt style="display:flex;justify-content:center;gap:12px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;letter-spacing:.24em"><span aria-hidden="true" style="color:#8a8882;font-weight:400">〈</span>会場<span aria-hidden="true" style="color:#8a8882;font-weight:400">〉</span></dt>
+        <dd style="margin:0;font-size:16px">さいたま市内の一軒家</dd>
+      </div>
+      {(DURATION_TEXT) && (<Fragment>
+        <div style="display:grid;gap:4px">
+          <dt style="display:flex;justify-content:center;gap:12px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;letter-spacing:.24em"><span aria-hidden="true" style="color:#8a8882;font-weight:400">〈</span>所要時間<span aria-hidden="true" style="color:#8a8882;font-weight:400">〉</span></dt>
+          <dd style="margin:0;font-size:16px">{DURATION_TEXT}</dd>
+        </div>
+      </Fragment>)}
+    </dl>
+    {(review && !DURATION_TEXT) && (<Fragment>
+      <p style="margin:16px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜所要時間は未掲載（約90分／約95分を確定後 durationText に入力）</p>
+    </Fragment>)}
+
+    <div style="margin-top:40px;display:grid;gap:12px">
+      <p style="margin:0;display:flex;justify-content:space-between;align-items:baseline;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;letter-spacing:.08em;border-bottom:2px solid #1b1b1a;padding-bottom:6px">開催日<span style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;font-weight:500;color:#4a4844;letter-spacing:.04em">2026年　全22公演</span></p>
+      <div aria-hidden="true" style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;text-align:center">
+        <span style="font-size:11px;color:#4a4844">日</span><span style="font-size:11px;color:#4a4844">月</span><span style="font-size:11px;color:#4a4844">火</span><span style="font-size:11px;color:#4a4844">水</span><span style="font-size:11px;color:#4a4844">木</span><span style="font-size:11px;color:#4a4844">金</span><span style="font-size:11px;color:#4a4844">土</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px;line-height:1.1"><span style="font-size:9px">10/</span>18</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">19</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">20</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">21</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">22</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;background:#1b1b1a;color:#f1f0ec;font-size:17px;font-weight:700">23</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;background:#1b1b1a;color:#f1f0ec;font-size:17px;font-weight:700">24</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;background:#1b1b1a;color:#f1f0ec;font-size:17px;font-weight:700">25</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">26</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">27</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">28</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">29</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;background:#1b1b1a;color:#f1f0ec;font-size:17px;font-weight:700">30</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">31</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;background:#1b1b1a;color:#f1f0ec;font-size:17px;font-weight:700;line-height:1.1"><span style="font-size:9px;font-weight:400">11/</span>1</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">2</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;background:#1b1b1a;color:#f1f0ec;font-size:17px;font-weight:700">3</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">4</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">5</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">6</span>
+        <span style="aspect-ratio:1;display:grid;place-content:center;color:#9a988f;font-size:13px">7</span>
+      </div>
+    </div>
+
+    <p style="margin:32px 0 8px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;letter-spacing:.08em">開演時刻</p>
+    <ul style="list-style:none;margin:0;padding:0;border-top:1px solid #1b1b1a">
+      <li style="display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #b8b6b0">
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;line-height:1.2;text-align:center"><span style="display:block;font-size:22px;font-weight:700">10.23</span><span style="font-size:12px">金</span></p>
+        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px;font-variant-numeric:tabular-nums"><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">16:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">18:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">20:00</li></ul>
+      </li>
+      <li style="display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #b8b6b0">
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;line-height:1.2;text-align:center"><span style="display:block;font-size:22px;font-weight:700">10.24</span><span style="font-size:12px">土</span></p>
+        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px;font-variant-numeric:tabular-nums"><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">13:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">15:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">17:30</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">19:30</li></ul>
+      </li>
+      <li style="display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #b8b6b0">
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;line-height:1.2;text-align:center"><span style="display:block;font-size:22px;font-weight:700">10.25</span><span style="font-size:12px">日</span></p>
+        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px;font-variant-numeric:tabular-nums"><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">13:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">15:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">17:30</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">19:30</li></ul>
+      </li>
+      <li style="display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #b8b6b0">
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;line-height:1.2;text-align:center"><span style="display:block;font-size:22px;font-weight:700">10.30</span><span style="font-size:12px">金</span></p>
+        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px;font-variant-numeric:tabular-nums"><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">16:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">18:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">20:00</li></ul>
+      </li>
+      <li style="display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #b8b6b0">
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;line-height:1.2;text-align:center"><span style="display:block;font-size:22px;font-weight:700">11.1</span><span style="font-size:12px">日</span></p>
+        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px;font-variant-numeric:tabular-nums"><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">13:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">15:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">17:30</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">19:30</li></ul>
+      </li>
+      <li style="display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #1b1b1a">
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;line-height:1.2;text-align:center"><span style="display:block;font-size:22px;font-weight:700">11.3</span><span style="font-size:12px">火・祝</span></p>
+        <ul style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px;font-variant-numeric:tabular-nums"><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">13:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">15:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">17:30</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">19:30</li></ul>
+      </li>
+    </ul>
+    {(review) && (<Fragment>
+      <p style="margin:12px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜10月31日（土）は追加開催候補のため非掲載・予約不可。告知の有無は主催者確認</p>
+    </Fragment>)}
+
+    <div style="margin-top:40px;border:1px solid #1b1b1a;background:#f7f6f2;padding:22px 20px 24px">
+      <p style="margin:0 0 18px;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;letter-spacing:.14em">当日の流れ</p>
+      <ol style="list-style:none;margin:0;padding:0;display:grid">
+        <li style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start">
+          <span aria-hidden="true" style="display:grid;justify-items:center;align-self:stretch"><span style="width:14px;height:14px;border-radius:50%;border:2px solid #1b1b1a;box-sizing:border-box;margin-top:6px;background:#f7f6f2"></span><span style="width:1px;flex:1;background:#1b1b1a;min-height:34px"></span></span>
+          <p style="margin:0 0 14px;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">受付開始</span><span style="font-size:14px">各回、開演15分前</span></p>
+        </li>
+        <li style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start">
+          <span aria-hidden="true" style="display:grid;justify-items:center;align-self:stretch"><span style="width:14px;height:14px;border-radius:50%;background:#c0553a;margin-top:6px"></span><span style="width:1px;background:#1b1b1a;min-height:34px"></span></span>
+          <p style="margin:0 0 14px;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">集合締切</span><span style="font-size:14px">各回、開演5分前</span></p>
+        </li>
+        <li style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start">
+          <span aria-hidden="true" style="display:grid;justify-items:center"><span style="width:14px;height:14px;background:#1b1b1a;margin-top:6px"></span></span>
+          <p style="margin:0;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">開演</span></p>
+        </li>
+      </ol>
+      {(review) && (<Fragment>
+        <p style="margin:14px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜遅刻時の扱い（参加可否・猶予・返金）は確定まで非掲載</p>
+      </Fragment>)}
+    </div>
+  </section>
+
+  <section id="tickets" style="background:#e2e1dc;padding:56px 20px 64px;border-top:1px solid #1b1b1a">
+    <div style="position:relative;display:grid;gap:10px;margin-bottom:36px;text-align:center">
+      <div style="display:flex;align-items:center;gap:14px"><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span><h2 style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:29px;font-weight:800;letter-spacing:.04em;line-height:1.35">チケット<br>参加形式</h2><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span></div>
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.24em;color:#3d3c3a">調査記録　第五項</p>
+    </div>
+
+    <div style="position:relative;display:grid;grid-template-columns:minmax(0,1fr) 34px;background:#fbfaf7;border:1px solid #1b1b1a;box-shadow:5px 5px 0 #1b1b1a;margin-right:5px">
+      <div style="padding:20px 18px 18px;display:grid;gap:2px;text-align:center">
+        <p style="margin:0;font-size:12px;letter-spacing:.24em;color:#4a4844">チケット料金</p>
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-weight:800;line-height:1.2;white-space:nowrap"><span style="font-size:18px;margin-right:4px">1名</span><span style="font-size:min(48px,12vw)">7,500</span><span style="font-size:20px;margin-left:2px">円</span></p>
+      </div>
+      <div style="position:relative;border-left:1px dashed #1b1b1a;display:flex;align-items:center;justify-content:center">
+        <span aria-hidden="true" style="position:absolute;top:-9px;left:-9px;width:16px;height:16px;border-radius:50%;background:#e2e1dc;border:1px solid #1b1b1a;clip-path:inset(50% 0 0 0)"></span>
+        <span aria-hidden="true" style="position:absolute;bottom:-9px;left:-9px;width:16px;height:16px;border-radius:50%;background:#e2e1dc;border:1px solid #1b1b1a;clip-path:inset(0 0 50% 0)"></span>
+        
+      </div>
+    </div>
+    {(review) && (<Fragment>
+      <p style="margin:14px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜税込・税別は未確認のため表記なし</p>
+    </Fragment>)}
+
+    <div style="margin-top:36px;display:grid;gap:14px">
+      <p style="margin:0;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;letter-spacing:.1em">各回の人数</p>
+      <div aria-hidden="true" style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px">
+        <span style="aspect-ratio:1;border-radius:50%;background:#1b1b1a;color:#f1f0ec;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px">1</span>
+        <span style="aspect-ratio:1;border-radius:50%;background:#1b1b1a;color:#f1f0ec;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px">2</span>
+        <span style="aspect-ratio:1;border-radius:50%;background:#1b1b1a;color:#f1f0ec;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px">3</span>
+        <span style="aspect-ratio:1;border-radius:50%;border:1px solid #1b1b1a;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px">4</span>
+        <span style="aspect-ratio:1;border-radius:50%;border:1px solid #1b1b1a;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px">5</span>
+        <span style="aspect-ratio:1;border-radius:50%;border:1px solid #1b1b1a;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px">6</span>
+        <span style="aspect-ratio:1;border-radius:50%;border:1px solid #1b1b1a;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px">7</span>
+        <span style="aspect-ratio:1;border-radius:50%;border:1px solid #1b1b1a;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px">8</span>
+      </div>
+      <div aria-hidden="true" style="display:grid;grid-template-columns:3fr 5fr;column-gap:5px;font-size:12px;line-height:1.4">
+        <div style="border:1px solid #1b1b1a;border-top:none;height:8px"></div><div style="border:1px solid #1b1b1a;border-top:none;height:8px"></div>
+      </div>
+      <dl style="margin:-6px 0 0;display:grid;grid-template-columns:3fr 5fr;column-gap:5px;text-align:center;line-height:1.4">
+        <div><dt style="font-size:11px;color:#4a4844">最低催行人数</dt><dd style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:16px;font-weight:700">各回3名</dd></div>
+        <div><dt style="font-size:11px;color:#4a4844">定員</dt><dd style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:16px;font-weight:700">各回8名</dd></div>
+      </dl>
+      <div style="margin-top:8px;display:grid;gap:4px;text-align:center;font-size:14px;line-height:2">
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:16px;font-weight:700">お一人様から<br>お申し込みいただけます。</p>
+        <p style="margin:0">同じ回にお申し込みのお客様と一緒に、<br>調査チームとしてご参加いただきます。</p>
+      </div>
+    </div>
+
+    <div style="margin-top:36px;display:grid;gap:12px">
+      <p style="margin:0;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;letter-spacing:.1em">販売期間</p>
+      <div aria-hidden="true" style="position:relative;height:56px;margin:0 4px">
+        <div style="position:absolute;left:0;right:24%;top:14px;height:6px;background:#1b1b1a"></div>
+        <div style="position:absolute;left:76%;right:0;top:16px;border-top:2px dotted #6a6862"></div>
+        <span style="position:absolute;left:76%;top:6px;width:2px;height:22px;background:#c0553a"></span>
+        <span style="position:absolute;right:0;top:8px;width:10px;height:18px;background:#1b1b1a"></span>
+        <span style="position:absolute;left:0;top:30px;font-size:12px;font-weight:700">空席がある限り販売</span>
+        <span style="position:absolute;left:76%;top:30px;transform:translateX(-62%);font-size:12px;font-weight:700;white-space:nowrap;color:#a8432c">開演2時間前</span>
+        <span style="position:absolute;right:0;top:30px;font-size:12px;font-weight:700">開演</span>
+      </div>
+      <p style="margin:0;text-align:center;font-size:14px;line-height:2">チケットは、空席がある場合に限り、<br>各回の開演2時間前まで販売します。</p>
+    </div>
+
+    {(hasUrl) && (<Fragment>
+      <a href={RESERVE_URL} data-track="ticket" data-show="uwasabanashi-case2" data-place="tickets" target="_blank" rel="noopener" style="margin-top:32px;display:flex;justify-content:center;align-items:center;gap:14px;background:#1b1b1a;color:#f1f0ec;text-decoration:none;height:58px;font-size:15px;font-weight:700;letter-spacing:.1em" class="kh1">チケットを購入する<span aria-hidden="true" style="font-weight:400">→</span></a>
+    </Fragment>)}
+    {(review && !hasUrl) && (<Fragment>
+      <p style="margin:24px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜販売先URL未設定。reserveUrl を入れると購入ボタンが出て、右下の「チケット購入」も販売ページへ（未設定時はこの欄へ移動）</p>
+    </Fragment>)}
+
+    <div style="margin-top:48px;padding-top:32px;border-top:1px solid #1b1b1a">
+      <p style="margin:0 0 20px;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:19px;font-weight:700;letter-spacing:.1em">公演が中止となる場合</p>
+      <div role="img" aria-label="最低催行人数に満たない場合は開催前日18:00時点、悪天候などの場合は原則として開演4時間前までに判断し、中止の場合は購入者へメールで連絡。全額返金または後日の空席のある回への振替を選択。振替可能な回がない場合は全額返金。" style="display:grid">
+        <div aria-hidden="true" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+          <div style="border:1px solid #1b1b1a;background:#fbfaf7;padding:10px 8px 12px;display:grid;gap:4px;text-align:center"><span style="font-size:11px;color:#4a4844;line-height:1.5">最低催行人数に<br>満たない場合</span><span style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;line-height:1.5">開催前日<br>18:00時点で判断</span></div>
+          <div style="border:1px solid #1b1b1a;background:#fbfaf7;padding:10px 8px 12px;display:grid;gap:4px;text-align:center"><span style="font-size:11px;color:#4a4844;line-height:1.5">悪天候などの<br>場合</span><span style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;line-height:1.5">原則として開演<br>4時間前までに判断</span></div>
+        </div>
+        <div aria-hidden="true" style="height:16px;margin:0 25%;border:1px solid #1b1b1a;border-top:none"></div>
+        <div aria-hidden="true" style="width:1px;height:12px;background:#1b1b1a;margin:0 auto;justify-self:center"></div>
+        <span aria-hidden="true" style="display:block;margin:0 auto;justify-self:center;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #1b1b1a"></span>
+        <div aria-hidden="true" style="margin:6px 0 0;background:#1b1b1a;color:#f1f0ec;padding:10px 12px;text-align:center;line-height:1.5"><span style="display:block;font-size:11px;color:#c9c7c1">中止の場合</span><span style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:15px;font-weight:700">購入者の方へメールでご連絡</span></div>
+        <div aria-hidden="true" style="width:1px;height:12px;background:#1b1b1a;margin:0 auto;justify-self:center"></div>
+        <div aria-hidden="true" style="height:14px;margin:0 25%;border:1px solid #1b1b1a;border-bottom:none"></div>
+        <div aria-hidden="true" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+          <div style="display:grid;align-content:start"><span style="display:block;margin:0 auto 6px;justify-self:center;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #1b1b1a"></span><div style="border:1.5px solid #1b1b1a;background:#fbfaf7;padding:10px 6px;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;line-height:1.5">チケット代金の<br>全額返金</div></div>
+          <div style="display:grid;align-content:start"><span style="display:block;margin:0 auto 6px;justify-self:center;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #1b1b1a"></span><div style="border:1.5px solid #1b1b1a;background:#fbfaf7;padding:10px 6px;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;line-height:1.5">後日の空席のある<br>回への振替</div><div style="width:1px;height:10px;background:#6a6862;margin:0 auto;justify-self:center"></div><div style="border:1px dashed #6a6862;padding:6px;text-align:center;font-size:11px;line-height:1.5">振替可能な回が<br>ない場合は全額返金</div></div>
+        </div>
+        <p aria-hidden="true" style="margin:10px 0 0;text-align:center;font-size:12px;color:#4a4844">返金・振替のいずれかをお選びいただけます</p>
+      </div>
+      <div style="margin-top:24px;display:grid;gap:16px;font-size:14px;line-height:1.95">
+        <div>
+          <p style="margin:0 0 4px;font-weight:700;font-size:15px;border-left:3px solid #1b1b1a;padding-left:10px">最低催行人数に満たない場合</p>
+          <p style="margin:0">最低催行人数は3名です。<br>開催前日の18:00時点で開催可否を判断し、<br>中止となる場合は購入者の方へ<br>メールでご連絡します。</p>
+          <p style="margin:6px 0 0">中止の場合は、チケット代金の全額返金、<br>または後日の空席のある回への振替を<br>お選びいただけます。<br>振替可能な回がない場合は、<br>全額返金いたします。</p>
+        </div>
+        <div>
+          <p style="margin:0 0 4px;font-weight:700;font-size:15px;border-left:3px solid #1b1b1a;padding-left:10px">悪天候等による中止</p>
+          <p style="margin:0">悪天候などにより公演を中止する場合は、<br>原則として開演4時間前までに判断し、<br>購入者の方へメールでご連絡します。</p>
+          <p style="margin:6px 0 0">中止の場合は、チケット代金の全額返金、<br>または後日の空席のある回への振替を<br>お選びいただけます。<br>振替可能な回がない場合は、<br>全額返金いたします。</p>
+        </div>
+      </div>
+      {(review) && (<Fragment>
+        <p style="margin:14px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜4時間前を過ぎた急な中止の連絡方針、自己都合キャンセル・日程変更は未確定のため非掲載</p>
+      </Fragment>)}
+    </div>
+  </section>
+
+  <section id="venue" style="padding:56px 20px 64px;border-top:1px solid #1b1b1a">
+    <div style="position:relative;display:grid;gap:10px;margin-bottom:36px;text-align:center">
+      <div style="display:flex;align-items:center;gap:14px"><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span><h2 style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:29px;font-weight:800;letter-spacing:.04em;line-height:1.35">会場<br>集合案内</h2><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span></div>
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.24em;color:#3d3c3a">調査記録　第六項</p>
+    </div>
+    <div style="display:grid;gap:14px;text-align:center">
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;line-height:1.9">会場は、さいたま市内の<br>住宅街にある一軒家です。</p>
+      <p style="margin:0;font-size:14px;line-height:2.05">当日は、会場最寄りの<br>バス停にお集まりください。<br>詳しい集合場所・アクセス・会場住所は、<br>チケットをご購入いただいた方に<br>ご案内します。</p>
+    </div>
+    <ol style="list-style:none;margin:36px 0 0;padding:0;display:grid">
+      <li style="display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px">
+        <span aria-hidden="true" style="display:grid;grid-template-rows:auto 1fr;justify-items:center"><span style="width:32px;height:32px;border-radius:50%;background:#1b1b1a;color:#f1f0ec;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700">1</span><span style="width:1px;background:#1b1b1a;min-height:22px"></span></span>
+        <p style="margin:0 0 18px;padding-top:2px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">チケットを購入</p>
+      </li>
+      <li style="display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px">
+        <span aria-hidden="true" style="display:grid;grid-template-rows:auto 1fr;justify-items:center"><span style="width:32px;height:32px;border-radius:50%;background:#1b1b1a;color:#f1f0ec;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700">2</span><span style="width:1px;background:#1b1b1a;min-height:22px"></span></span>
+        <p style="margin:0 0 18px;padding-top:2px;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">購入者の方にご案内</span><span style="font-size:13px;color:#3d3c3a">詳しい集合場所・アクセス・会場住所</span></p>
+      </li>
+      <li style="display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px">
+        <span aria-hidden="true" style="display:grid;grid-template-rows:auto 1fr;justify-items:center"><span style="width:32px;height:32px;border-radius:50%;background:#1b1b1a;color:#f1f0ec;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700">3</span><span style="width:1px;background:#1b1b1a;min-height:22px"></span></span>
+        <p style="margin:0 0 18px;padding-top:2px;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">当日、バス停に集合</span><span style="font-size:13px;color:#3d3c3a">会場最寄りのバス停</span></p>
+      </li>
+      <li style="display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px">
+        <span aria-hidden="true" style="display:grid;justify-items:center"><span style="width:32px;height:32px;border-radius:50%;background:#a8432c;color:#fff;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700">4</span></span>
+        <p style="margin:0;padding-top:2px;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">会場へ</span><span style="font-size:13px;color:#3d3c3a">さいたま市内の一軒家</span></p>
+      </li>
+    </ol>
+    {(ACCESS_TEXT) && (<Fragment>
+      <div style="margin-top:28px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a;padding:14px 0;display:grid;gap:4px;text-align:center">
+        <p style="margin:0;display:flex;justify-content:center;gap:12px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;letter-spacing:.24em"><span aria-hidden="true" style="color:#8a8882;font-weight:400">〈</span>アクセス<span aria-hidden="true" style="color:#8a8882;font-weight:400">〉</span></p>
+        <p style="margin:0;white-space:pre-line;font-size:14px">{ACCESS_TEXT}</p>
+      </div>
+    </Fragment>)}
+    {(review) && (<Fragment>
+      <div style="margin-top:20px;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a;display:grid;gap:4px">
+        <p style="margin:0">確認用｜アクセス欄：最寄り駅・駅からの所要時間・バス利用の概要を確認後 accessText に入力</p>
+        <p style="margin:0">確認用｜会場写真：公開範囲・撮影ルール・所在地特定のおそれを確認後に掲載（位置情報は削除）</p>
+      </div>
+    </Fragment>)}
+  </section>
+
+  <section id="notes" style="background:#e2e1dc;padding:56px 20px 64px;border-top:1px solid #1b1b1a">
+    <div style="position:relative;display:grid;gap:10px;margin-bottom:36px;text-align:center">
+      <div style="display:flex;align-items:center;gap:14px"><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span><h2 style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:29px;font-weight:800;letter-spacing:.04em;line-height:1.35">参加条件<br>注意事項</h2><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span></div>
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.24em;color:#3d3c3a">調査記録　第七項</p>
+    </div>
+
+    <div style="display:grid;gap:14px;text-align:center">
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:19px;font-weight:700;line-height:1.85">本公演は、<br>怖さを抑えた<br>ホラー・ミステリー体験です。</p>
+      <p style="margin:0;font-size:14px;line-height:2.05">暗い場所、物音、<br>不意を突く演出が含まれますが、<br>追いかける演出や、<br>キャストがお客様の身体に触れる<br>演出はありません。</p>
+    </div>
+    <div aria-hidden="true" style="margin-top:20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid #1b1b1a;background:#fbfaf7">
+      <div style="padding:12px 12px 14px;display:grid;gap:8px;align-content:start">
+        <p style="margin:0;text-align:center;font-size:12px;letter-spacing:.14em;font-weight:700;background:#1b1b1a;color:#f1f0ec">含まれる演出</p>
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;line-height:1.5">● 暗い場所</p>
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;line-height:1.5">● 物音</p>
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;line-height:1.5">● 不意を突く演出</p>
+      </div>
+      <div style="padding:12px 12px 14px;display:grid;gap:8px;align-content:start;border-left:1px solid #1b1b1a;background-image:repeating-linear-gradient(135deg,transparent 0 7px,rgba(27,27,26,.06) 7px 8px)">
+        <p style="margin:0;text-align:center;font-size:12px;letter-spacing:.14em;font-weight:700;border:1px solid #1b1b1a">ない演出</p>
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;line-height:1.5"><span style="font-family:'Shippori Mincho',serif;font-size:1.1em">×</span> 追いかける演出</p>
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;line-height:1.5"><span style="font-family:'Shippori Mincho',serif;font-size:1.1em">×</span> キャストが身体に<br>　触れる演出</p>
+      </div>
+    </div>
+
+    <div style="margin-top:48px;display:grid;gap:12px">
+      <p style="margin:0;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:20px;font-weight:800;letter-spacing:.06em">参加条件</p>
+      <ul style="list-style:none;margin:0;padding:0;display:grid;gap:8px">
+        <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;background:#fbfaf7;border:1px solid #1b1b1a;padding:12px"><span aria-hidden="true" style="background:#1b1b1a;color:#f1f0ec;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:700;line-height:2">対象</span><span style="font-size:14px;line-height:1.7">中学生以上の方が対象です。</span></li>
+        <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;background:#fbfaf7;border:1px solid #1b1b1a;padding:12px"><span aria-hidden="true" style="background:#1b1b1a;color:#f1f0ec;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:700;line-height:2">同伴</span><span style="font-size:14px;line-height:1.7">18歳未満の方は、<br>保護者同伴でご参加ください。</span></li>
+        <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;background:#fbfaf7;border:1px solid #1b1b1a;padding:12px"><span aria-hidden="true" style="background:#1b1b1a;color:#f1f0ec;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:700;line-height:2">体調</span><span style="font-size:14px;line-height:1.7">心臓疾患のある方、妊娠中の方、<br>体調のすぐれない方は、<br>ご参加をお控えください。</span></li>
+        <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;background:#fbfaf7;border:1px solid #1b1b1a;padding:12px"><span aria-hidden="true" style="background:#1b1b1a;color:#f1f0ec;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:700;line-height:2">設備</span><span style="font-size:14px;line-height:1.7">2階建ての家屋内で<br>階段を使用するため、<br>車椅子でのご参加には<br>対応しておりません。</span></li>
+        <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;background:#fbfaf7;border:1px solid #1b1b1a;padding:12px"><span aria-hidden="true" style="background:#1b1b1a;color:#f1f0ec;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:700;line-height:2">言語</span><span style="font-size:14px;line-height:1.7">本公演は日本語のみで実施します。</span></li>
+      </ul>
+      {(review) && (<Fragment>
+        <p style="margin:0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜同伴する保護者のチケット要否は未確定</p>
+      </Fragment>)}
+    </div>
+
+    <div style="margin-top:48px;display:grid;gap:12px">
+      <p style="margin:0;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:20px;font-weight:800;letter-spacing:.06em">持ち物・服装・お荷物</p>
+      <div style="display:grid;gap:8px">
+        <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:center;background:#f1f0ec;border-radius:12px;padding:14px 16px">
+          <span aria-hidden="true" style="justify-self:center;width:26px;height:44px;border:3px solid #1b1b1a;border-radius:6px;box-sizing:border-box;position:relative;display:block"><span style="position:absolute;left:50%;bottom:3px;width:8px;height:2px;background:#1b1b1a;transform:translateX(-50%)"></span></span>
+          <p style="margin:0;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:16px;font-weight:700">スマートフォン</span><span style="font-size:13px;line-height:1.7;color:#3d3c3a">LINEが利用できる、<br>十分に充電されたスマートフォンを<br>お持ちください。</span></p>
+        </div>
+        <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:center;background:#f1f0ec;border-radius:12px;padding:14px 16px">
+          <span aria-hidden="true" style="justify-self:center;width:44px;height:44px;border-radius:50%;border:2px solid #1b1b1a;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:20px;font-weight:800">靴</span>
+          <p style="margin:0;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:16px;font-weight:700">脱ぎ履きしやすい靴</span><span style="font-size:13px;line-height:1.7;color:#3d3c3a">会場では靴を脱いでいただくため、<br>脱ぎ履きしやすい靴でお越しください。</span></p>
+        </div>
+        <div style="display:grid;grid-template-columns:56px minmax(0,1fr);gap:14px;align-items:center;background:#f1f0ec;border-radius:12px;padding:14px 16px">
+          <span aria-hidden="true" style="justify-self:center;width:44px;height:44px;border-radius:50%;border:2px solid #1b1b1a;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:20px;font-weight:800">荷</span>
+          <p style="margin:0;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:16px;font-weight:700">お荷物</span><span style="font-size:13px;line-height:1.7;color:#3d3c3a">お荷物は、会場内の指定場所に<br>置いていただきます。</span></p>
+        </div>
+      </div>
+      
+      {(review) && (<Fragment>
+        <p style="margin:0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜スマホ1人1台の要否／LINE事前準備／Wi-Fi・充電／大型荷物／貴重品は未確定</p>
+      </Fragment>)}
+    </div>
+
+    <div style="margin-top:48px;display:grid;gap:12px">
+      <p style="margin:0;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:20px;font-weight:800;letter-spacing:.06em">途中退場・お手洗い</p>
+      <div aria-hidden="true" style="display:grid;border:1px solid #1b1b1a;background:#fbfaf7">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 84px;border-bottom:1px solid #b8b6b0"><span style="padding:10px 12px;font-size:13px;line-height:1.6">体験の途中での退場</span><span style="display:flex;align-items:center;justify-content:center;gap:4px;border-left:1px solid #b8b6b0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-weight:700">○ 可能</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 84px;border-bottom:1px solid #b8b6b0"><span style="padding:10px 12px;font-size:13px;line-height:1.6">ご都合による<br>一時退出後の再入場</span><span style="display:flex;align-items:center;justify-content:center;gap:4px;border-left:1px solid #b8b6b0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-weight:700"><span style="font-family:'Shippori Mincho',serif;font-size:1.1em">×</span> 不可</span></div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 84px"><span style="padding:10px 12px;font-size:13px;line-height:1.6">体験中のお手洗い・<br>体調不良</span><span style="display:grid;place-items:center;border-left:1px solid #b8b6b0;font-size:11px;font-weight:700;text-align:center;line-height:1.5;padding:4px">専用のサインで<br>スタッフへ</span></div>
+      </div>
+      <div style="display:grid;gap:8px;font-size:14px;line-height:1.95">
+        <p style="margin:0">体験の途中で退場することは可能です。<br>退場をご希望の場合は、<br>スタッフにお知らせください。<br>お客様のご都合による<br>一時退出後の再入場はできません。</p>
+        <p style="margin:0">お手洗いは、<br>できるだけ受付前にお済ませください。<br>体験中にお手洗いが必要になった場合や、<br>体調がすぐれない場合は、<br>事前にご案内する専用のサインで<br>スタッフにお知らせください。</p>
+      </div>
+      {(review) && (<Fragment>
+        <p style="margin:0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜お手洗い・体調不良で退出した後の体験復帰可否は運営確認</p>
+      </Fragment>)}
+    </div>
+
+    <div style="margin-top:48px;display:grid;gap:12px">
+      <p style="margin:0;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:20px;font-weight:800;letter-spacing:.06em">参加時のお願い</p>
+      <ul style="list-style:none;margin:0;padding:0;display:grid;gap:8px">
+        <li style="display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;align-items:start;background:#fbfaf7;border:1px solid #1b1b1a;padding:12px"><span aria-hidden="true" style="width:30px;height:30px;border:1.5px solid #1b1b1a;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-weight:800"><span style="font-family:'Shippori Mincho',serif;font-size:1.1em">×</span></span><span style="font-size:14px;line-height:1.7;padding-top:3px">飲酒された状態でのご参加は<br>お断りします。</span></li>
+        <li style="display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;align-items:start;background:#fbfaf7;border:1px solid #1b1b1a;padding:12px"><span aria-hidden="true" style="width:30px;height:30px;border:1.5px solid #1b1b1a;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-weight:800"><span style="font-family:'Shippori Mincho',serif;font-size:1.1em">×</span></span><span style="font-size:14px;line-height:1.7;padding-top:3px">飲食物の持ち込みはお断りします。</span></li>
+        <li style="display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;align-items:start;background:#fbfaf7;border:1px solid #1b1b1a;padding:12px"><span aria-hidden="true" style="width:30px;height:30px;border-radius:50%;border:1.5px solid #1b1b1a;display:grid;place-items:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-weight:800">○</span><span style="font-size:14px;line-height:1.7;padding-top:3px">リピート参加も歓迎します。<br>初めて参加される方の体験を<br>損なわないよう、ネタバレにつながる<br>発言や先回りした行動は<br>お控えください。</span></li>
+      </ul>
+    </div>
+
+    <div style="margin-top:48px;display:grid;gap:12px">
+      <p style="margin:0;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:20px;font-weight:800;letter-spacing:.06em">撮影・録音・SNS</p>
+      <div style="display:grid;gap:10px;font-size:14px;line-height:1.95">
+        <p style="margin:0">キャストの撮影・録画、<br>およびキャストの声の録音は<br>原則として禁止です。<br>会場内の写真撮影については、<br>確定したルールをご案内します。</p>
+        <p style="margin:0">SNSでの参加報告や、<br>ネタバレを含まない感想の投稿は歓迎します。<br>家の中の様子、登場人物の秘密、<br>物語の結末に関する投稿はお控えください。</p>
+      </div>
+      <div style="margin-top:6px;display:grid;justify-items:center;gap:6px;text-align:center">
+        <p style="margin:0;font-size:12px;letter-spacing:.14em;color:#4a4844">シリーズ共通ハッシュタグ</p>
+        <p style="margin:0;background:#1b1b1a;color:#f1f0ec;padding:6px 16px;font-size:16px;font-weight:700;letter-spacing:.04em">#ウワサバナシ調査委員会</p>
+      </div>
+      {(review) && (<Fragment>
+        <p style="margin:0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜作品別タグ候補「#言祝ぎの家」は確定まで非掲載。会場内撮影ルール未確定のまま公開する場合は主催者確認</p>
+      </Fragment>)}
+    </div>
+
+    <div id="faq" style="margin-top:56px;display:grid;gap:14px">
+      <div style="display:grid;justify-items:center;gap:8px;text-align:center">
+        <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:23px;font-weight:800;letter-spacing:.06em">よくあるご質問</p>
+        <div aria-hidden="true" style="display:flex;align-items:center;gap:8px"><span style="width:28px;height:1px;background:#1b1b1a"></span><span style="width:5px;height:5px;transform:rotate(45deg);background:#c0553a"></span><span style="width:28px;height:1px;background:#1b1b1a"></span></div>
+      </div>
+      <div style="display:grid;gap:8px">
+        <details style="background:#fbfaf7;border:1px solid #1b1b1a">
+          <summary style="list-style:none;cursor:pointer;display:grid;grid-template-columns:28px minmax(0,1fr) 20px;gap:8px;align-items:center;padding:12px 14px;min-height:52px;box-sizing:border-box;font-weight:700;font-size:14px;line-height:1.6"><span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:18px">Q.</span>一人でも参加できますか？<span aria-hidden="true" style="font-family:'Shippori Mincho',serif;font-size:20px;font-weight:400;text-align:right"><span class="k-sign"></span></span></summary>
+          <p style="margin:0;padding:12px 14px 16px 50px;font-size:14px;line-height:1.9;border-top:1px dashed #b8b6b0">お一人様からお申し込みいただけます。<br>同じ回にお申し込みのお客様と一緒に、<br>調査チームとしてご参加いただきます。</p>
+        </details>
+        <details style="background:#fbfaf7;border:1px solid #1b1b1a">
+          <summary style="list-style:none;cursor:pointer;display:grid;grid-template-columns:28px minmax(0,1fr) 20px;gap:8px;align-items:center;padding:12px 14px;min-height:52px;box-sizing:border-box;font-weight:700;font-size:14px;line-height:1.6"><span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:18px">Q.</span>どのくらい怖いですか？<span aria-hidden="true" style="font-family:'Shippori Mincho',serif;font-size:20px;font-weight:400;text-align:right"><span class="k-sign"></span></span></summary>
+          <p style="margin:0;padding:12px 14px 16px 50px;font-size:14px;line-height:1.9;border-top:1px dashed #b8b6b0">本公演は、怖さを抑えた<br>ホラー・ミステリー体験です。<br>暗い場所、物音、不意を突く演出が<br>含まれますが、追いかける演出や、<br>キャストがお客様の身体に触れる<br>演出はありません。</p>
+        </details>
+        <details style="background:#fbfaf7;border:1px solid #1b1b1a">
+          <summary style="list-style:none;cursor:pointer;display:grid;grid-template-columns:28px minmax(0,1fr) 20px;gap:8px;align-items:center;padding:12px 14px;min-height:52px;box-sizing:border-box;font-weight:700;font-size:14px;line-height:1.6"><span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:18px">Q.</span>会場の住所はどこですか？<span aria-hidden="true" style="font-family:'Shippori Mincho',serif;font-size:20px;font-weight:400;text-align:right"><span class="k-sign"></span></span></summary>
+          <p style="margin:0;padding:12px 14px 16px 50px;font-size:14px;line-height:1.9;border-top:1px dashed #b8b6b0">会場は、さいたま市内の<br>住宅街にある一軒家です。<br>当日は、会場最寄りのバス停に<br>お集まりください。<br>詳しい集合場所・アクセス・会場住所は、<br>チケットをご購入いただいた方に<br>ご案内します。</p>
+        </details>
+        <details style="background:#fbfaf7;border:1px solid #1b1b1a">
+          <summary style="list-style:none;cursor:pointer;display:grid;grid-template-columns:28px minmax(0,1fr) 20px;gap:8px;align-items:center;padding:12px 14px;min-height:52px;box-sizing:border-box;font-weight:700;font-size:14px;line-height:1.6"><span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:18px">Q.</span>チケットはいつまで<br>購入できますか？<span aria-hidden="true" style="font-family:'Shippori Mincho',serif;font-size:20px;font-weight:400;text-align:right"><span class="k-sign"></span></span></summary>
+          <p style="margin:0;padding:12px 14px 16px 50px;font-size:14px;line-height:1.9;border-top:1px dashed #b8b6b0">チケットは、空席がある場合に限り、<br>各回の開演2時間前まで販売します。</p>
+        </details>
+        <details style="background:#fbfaf7;border:1px solid #1b1b1a">
+          <summary style="list-style:none;cursor:pointer;display:grid;grid-template-columns:28px minmax(0,1fr) 20px;gap:8px;align-items:center;padding:12px 14px;min-height:52px;box-sizing:border-box;font-weight:700;font-size:14px;line-height:1.6"><span aria-hidden="true" style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:18px">Q.</span>2回目の参加はできますか？<span aria-hidden="true" style="font-family:'Shippori Mincho',serif;font-size:20px;font-weight:400;text-align:right"><span class="k-sign"></span></span></summary>
+          <p style="margin:0;padding:12px 14px 16px 50px;font-size:14px;line-height:1.9;border-top:1px dashed #b8b6b0">リピート参加も歓迎します。<br>初めて参加される方の体験を<br>損なわないよう、ネタバレにつながる<br>発言や先回りした行動は<br>お控えください。</p>
+        </details>
+      </div>
+      {(review) && (<Fragment>
+        <p style="margin:0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜FAQ回答は掲載原稿のみ。質問文は主催者確認。問い合わせ窓口は未共有</p>
+      </Fragment>)}
+    </div>
+  </section>
+
+  <section id="credits" style="background:#a3a29d;padding:56px 20px 64px;border-top:1px solid #1b1b1a">
+    <div style="position:relative;display:grid;gap:10px;margin-bottom:36px;text-align:center">
+      <div style="display:flex;align-items:center;gap:14px"><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span><h2 style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:29px;font-weight:800;letter-spacing:.04em;line-height:1.35">クレジット</h2><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span></div>
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.24em;color:#3d3c3a">調査記録　第八項</p>
+    </div>
+    <dl style="margin:0;display:grid;gap:12px">
+      <div style="background:#1b1b1a;color:#f1f0ec;padding:22px 16px;text-align:center;display:grid;gap:6px"><dt style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.2em;color:#c9c7c1">主催</dt><dd style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:18px;font-weight:700;line-height:1.6">ウワサバナシ調査委員会<br><span style="font-size:14px">（株式会社ex Labs）</span></dd></div>
+      <div style="background:#1b1b1a;color:#f1f0ec;padding:22px 16px;text-align:center;display:grid;gap:6px"><dt style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.2em;color:#c9c7c1">企画進行・監修</dt><dd style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:20px;font-weight:700;letter-spacing:.08em">三ヶ崎四五六/キョウヘイ</dd></div>
+      <div style="background:#1b1b1a;color:#f1f0ec;padding:22px 16px;text-align:center;display:grid;gap:6px"><dt style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.2em;color:#c9c7c1">ゲームデザイン・<br>アートディレクション</dt><dd style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:22px;font-weight:700;letter-spacing:.2em">タロサカ</dd></div>
+      <div style="background:#1b1b1a;color:#f1f0ec;padding:22px 16px;text-align:center;display:grid;gap:6px"><dt style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.2em;color:#c9c7c1">美術協力</dt><dd style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:20px;font-weight:700;letter-spacing:.08em">東宝舞台株式会社</dd></div>
+      {(CAST_TEXT) && (<Fragment>
+        <div style="background:#1b1b1a;color:#f1f0ec;padding:22px 16px;text-align:center;display:grid;gap:6px"><dt style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.2em;color:#c9c7c1">出演</dt><dd style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:18px;font-weight:700;line-height:1.7">{CAST_TEXT}</dd></div>
+      </Fragment>)}
+    </dl>
+    {(review && !CAST_TEXT) && (<Fragment>
+      <p style="margin:14px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜出演者名は共有後に castText へ入力（役名・配役は掲載しない）</p>
+    </Fragment>)}
+  </section>
+
+  <section id="final-cta" style="position:relative;background:#1b1b1a;color:#f1f0ec;padding:64px 20px 56px;text-align:center;overflow:hidden">
+    <div aria-hidden="true" style="position:absolute;inset:0;background-image:radial-gradient(circle,#f1f0ec 1px,transparent 1.4px);background-size:8px 8px;opacity:.1;-webkit-mask-image:radial-gradient(ellipse at center,transparent 40%,#000 100%);mask-image:radial-gradient(ellipse at center,transparent 40%,#000 100%)"></div>
+    <div style="position:relative;display:grid;justify-items:center;gap:22px">
+      <p style="margin:0;writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:22px;font-weight:600;letter-spacing:.4em;line-height:1.5;white-space:nowrap;height:13em">祝いの席に、<br>　招かれる。</p>
+      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;line-height:1.6"><span style="display:block;font-size:12px;letter-spacing:.3em">ウワサバナシ調査委員会</span><span style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:26px;font-weight:800;letter-spacing:0">case2「言祝ぎの家」</span></p>
+      <ul style="list-style:none;margin:0;padding:14px 0 0;border-top:1px solid #5d5b56;display:grid;gap:2px;font-size:13px;color:#e7e6e1">
+        <li>2026年10月23日〜11月3日の指定日開催</li>
+        <li>さいたま市内の一軒家</li>
+        <li>1名7,500円</li>
+      </ul>
+      <a href={ticketHref} {...ticketAttrs} data-place="final" style="display:flex;justify-content:center;align-items:center;gap:14px;background:#f1f0ec;color:#1b1b1a;text-decoration:none;height:58px;width:100%;font-size:15px;font-weight:700;letter-spacing:.1em;outline:1px solid #f1f0ec;outline-offset:3px" class="kh2">開催日程・チケットを見る<span aria-hidden="true" style="font-weight:400">{ticketArrow}</span></a>
+    </div>
+  </section>
+
+  <footer id="site-footer" style="background:#1b1b1a;color:#c9c7c1;padding:20px 20px 120px;border-top:1px solid #3d3b38;display:grid;justify-items:center;gap:10px;text-align:center">
+    <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;letter-spacing:.16em;color:#f1f0ec">ウワサバナシ調査委員会</p>
+    <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap"><a href="#top" style="font-size:12px;text-decoration:none;letter-spacing:.1em;color:#c9c7c1" class="kh3">ページの先頭へ ↑</a><button type="button" data-replay-intro style="background:none;border:1px solid #5d5b56;color:#c9c7c1;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.1em;padding:6px 12px;min-height:36px;cursor:pointer">オープニングをもう一度見る</button></div>
+    {(review) && (<Fragment>
+      <p style="margin:0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜既存サイトの共通フッター（著作権表記・問い合わせ窓口）に差し替え</p>
+    </Fragment>)}
+  </footer>
+</div>
+
+    <a href={ticketHref} {...ticketAttrs} data-place="float" aria-label="チケット購入" style="position:fixed;right:max(14px, calc(50vw - 220px + 14px));bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;width:88px;height:88px;border-radius:50%;background:#a8432c;color:#fff;text-decoration:none;display:grid;place-content:center;justify-items:center;gap:3px;box-shadow:0 6px 16px rgba(27,27,26,.35);outline:1px solid rgba(255,255,255,.75);outline-offset:-6px;opacity:1;pointer-events:auto;transition:opacity .25s ease,transform .2s ease" class="kh4 k-float">
+      <span aria-hidden="true" style="display:flex;align-items:center;gap:3px"><span style="width:12px;height:1px;background:#fff"></span><span style="width:4px;height:4px;transform:rotate(45deg);background:#fff"></span><span style="width:12px;height:1px;background:#fff"></span></span>
+      <span style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:15px;font-weight:800;letter-spacing:.06em;line-height:1.25;text-align:center">チケット<br>購入 →</span>
+      <span aria-hidden="true" style="display:flex;align-items:center;gap:3px"><span style="width:12px;height:1px;background:#fff"></span><span style="width:4px;height:4px;transform:rotate(45deg);background:#fff"></span><span style="width:12px;height:1px;background:#fff"></span></span>
+    </a>
+</div>
+
+<style is:global>
+html,body{margin:0;color:#1b1b1a;background:#d3d2cd;-webkit-text-size-adjust:100%}
+a{color:#1b1b1a}
+a:hover{color:#4a4844}
+summary::-webkit-details-marker{display:none}
+/* 書き出しの style-hover（インラインスタイルより優先させるため !important） */
+.kh1:hover{background:#3a3937!important;color:#f1f0ec!important}
+.kh2:hover{background:#ffffff!important;color:#1b1b1a!important}
+.kh3:hover{color:#f1f0ec!important}
+.kh4:hover{transform:translateY(-2px)!important;color:#fff!important}
+/* 冒頭演出中は右下のチケットボタンを隠す */
+.k-intro-on .k-float{opacity:0!important;pointer-events:none!important}
+/* FAQ の開閉記号 */
+.k-sign::before{content:'＋'}
+details[open] .k-sign::before{content:'−'}
+@keyframes kKnock{0%,100%{transform:translateX(0)}3%{transform:translateX(3px)}8%{transform:translateX(-1px)}12%{transform:translateX(0)}36%{transform:translateX(3px)}41%{transform:translateX(-1px)}45%{transform:translateX(0)}69%{transform:translateX(3px)}74%{transform:translateX(-1px)}78%{transform:translateX(0)}}
+@keyframes kNudge{0%,100%{transform:scale(1)}4%{transform:scale(1.014)}12%{transform:scale(1)}37%{transform:scale(1.014)}45%{transform:scale(1)}70%{transform:scale(1.014)}78%{transform:scale(1)}}
+@keyframes kKnockTxt{0%{opacity:0}20%{opacity:1}100%{opacity:0;margin-top:-8px}}
+@keyframes kRipple{0%{transform:scale(.2);opacity:.85}100%{transform:scale(2.6);opacity:0}}
+@keyframes kOpen{0%{transform:rotateY(0)}12%{transform:rotateY(-4deg)}100%{transform:rotateY(-112deg)}}
+@keyframes kGlow{to{opacity:1}}
+@keyframes kPush{to{transform:scale(4.8);opacity:0}}
+@keyframes kCharIn{0%{opacity:0;filter:blur(6px)}100%{opacity:1;filter:blur(0)}}
+@keyframes kFadeOut{to{opacity:0}}
+@keyframes kRule{to{transform:scaleX(1)}}
+@keyframes kRise{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:none}}
+@keyframes kFadeIn{to{opacity:1}}
+@keyframes kIntroOut{to{opacity:0;visibility:hidden}}
+</style>
+</body>
+</html>

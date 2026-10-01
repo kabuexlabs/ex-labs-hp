@@ -96,3 +96,7 @@
 - 必ず「京都市京セラ美術館」と続けて書く。正式名称は「京都市美術館」、ネーミングライツによる通称が「京都市京セラ美術館」。
 - 「京都市」を省いた略称、「at 京都市／京セラ…」のように改行・空白で分けた表記は誤り。LP・SNS文案・メール文面すべて同じ。
 - `scripts/seo-audit.mjs`（`npm run check`）が src 内の誤表記をエラーにする。LP は /taikenbizyutu/7th-composition/（限定公開・noindex）。
+
+## 言祝ぎの家 LP（2026-10-01〜、限定URLプレビュー）
+- ウワサバナシ調査委員会 case2「言祝ぎの家」LP は /preview/kotohogi-xqo8sx5ar3pm/（noindex＋X-Robots-Tag、sitemap・llms.txt・他ページから**リンクしない**）。正本メモは docs/kotohogi-lp.md。
+- 販売URL・メインビジュアル・ロゴ・所要時間・アクセス・出演者は index.astro 冒頭の定数で入れる（空なら非表示）。`?review=1` で確認用注釈。Basic 認証は Vercel 環境変数 KOTOHOGI_PREVIEW_PASSWORD（未設定なら認証なし）。
