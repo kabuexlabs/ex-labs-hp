@@ -67,7 +67,8 @@ const title = 'ウワサバナシ調査委員会 case2「言祝ぎの家」｜�
 const description =
   '祝いの席に、招かれる。実際の一軒家を探索し、住人との会話や調査報告を通じて真相に迫る没入型ホラー・ミステリー。2026年10月23日〜11月3日の指定日、さいたま市内で開催。1名7,500円、各回定員8名。';
 
-// ---- 冒頭演出（約7.5秒。2026-10-01 FB「速い」で約3割ゆっくりに） ----
+// ---- 冒頭演出（約8.5秒。2026-10-01 FB「速い」で約3割ゆっくりに。さらに「扉が開いてから文字まで一拍」：
+//      開ききった扉を約0.85秒そのまま見せ、マゼンタに切り替えてから約0.5秒おいてキャッチを打つ） ----
 // 暗い玄関先で古い家のドアが3回叩かれ（コン、と文字が置かれる）、軋みながら開くとマゼンタの室内。
 // 画面がマゼンタに切り替わり、キャッチを1字ずつ打ち、メインビジュアルと同じ組みのタイトルで終わる。
 // 2026-10-01 ユーザー指摘（扉が立派すぎる／AIで作った感じが強い）で作り直し：光のにじみ・波紋・ぼかし・ズームをやめ、
@@ -78,7 +79,7 @@ const M = "'Shippori Mincho','Yu Mincho',serif";
 const W = 'min(54vw,224px,30vh)';
 const H = `calc(${W} * 1.86)`;
 const center = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center';
-const catchChars = '祝いの席に、招かれる。'.split('').map((c, i) => ({ c, d: (3.65 + i * 0.11).toFixed(3) }));
+const catchChars = '祝いの席に、招かれる。'.split('').map((c, i) => ({ c, d: (4.7 + i * 0.11).toFixed(3) }));
 const knocks: [number, string, number][] = [[0.75, '4%', -4], [1.2, '31%', 3], [1.65, '57%', -1]];
 // ざらつき（コピー・印刷物のノイズ）。SVG のノイズを敷き、0.4秒ごとにずらしてちらつかせる
 const noise = (alpha: number, tone: number) =>
@@ -106,7 +107,7 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
 </head>
 <body>
 <template id="k-intro-tpl">
-  <div role="presentation" style="position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;background:#1c1a18;will-change:opacity;animation:kIntroOut .5s cubic-bezier(.3,0,.2,1) 7s forwards">
+  <div role="presentation" style="position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;background:#1c1a18;will-change:opacity;animation:kIntroOut .5s cubic-bezier(.3,0,.2,1) 8.05s forwards">
     <div style={`${center};opacity:0;animation:kFadeIn .6s steps(4,end) .1s forwards`}>
       <div style="position:relative">
         <div style="position:relative;animation:kKnock 1.4s steps(1,end) .68s 1">
@@ -130,11 +131,11 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
         </div>
       </div>
     </div>
-    <div style="position:absolute;inset:0;background:#c41b85;opacity:0;animation:kShow .01s linear 3.4s forwards"></div>
-    <div style={`${center};animation:kHide .01s linear 5.75s forwards`}>
+    <div style="position:absolute;inset:0;background:#c41b85;opacity:0;animation:kShow .01s linear 4.2s forwards"></div>
+    <div style={`${center};animation:kHide .01s linear 6.8s forwards`}>
       <p style={`margin:0;writing-mode:vertical-rl;font-family:${M};font-size:min(34px,8.4vw);letter-spacing:.3em;color:#fff;font-weight:700;line-height:1`}>{catchChars.map(({ c, d }) => <span style={`opacity:0;animation:kShow .01s linear ${d}s forwards`}>{c}</span>)}</p>
     </div>
-    <div style={`${center};opacity:0;animation:kShow .01s linear 5.85s forwards`}>
+    <div style={`${center};opacity:0;animation:kShow .01s linear 6.9s forwards`}>
       {LOGO_SRC ? (
         <img src={LOGO_SRC} alt="" style="max-width:min(72vw,320px);max-height:40vh">
       ) : (
@@ -174,7 +175,7 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
     cur.addEventListener('animationend',function(e){if(e.animationName==='kIntroOut')finish()});
     root.appendChild(cur);
     html.classList.add('k-intro-on');
-    t=setTimeout(finish,8100);
+    t=setTimeout(finish,9200);
   }
   var show=true;
   try{
