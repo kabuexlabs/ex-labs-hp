@@ -1,0 +1,22 @@
+---
+// 夜デート・クリスマス記事の「日時が確認できている回」の一覧。
+// 他社（src/data/seasonalDate.ts）・自社公演（occurrences の日付・開始時刻）・HACKTALE の公演回（予約システム）をまとめて出す。
+import type { HtSlot, Outing } from '../../lib/outingCatalog';
+import type { TimedInfo } from '../../data/seasonalDate';
+interface Props { info: (TimedInfo & { o?: Outing })[]; own: { o: Outing; text: string }[]; slots: HtSlot[]; empty: string; place: string }
+const { info, own, slots, empty, place } = Astro.props;
+---
+{info.length + own.length + slots.length > 0 ? (
+  <ul class="tl">
+    {own.map(({ o, text }) => <li><a href={o.detailHref} data-track="show" data-show={o.id} data-place={place}>{o.name}</a><span>{text}・{o.area}・{o.priceText}</span></li>)}
+    {info.map((x) => <li><a href={x.o?.detailHref ?? '#'} data-track="show" data-show={x.id} data-place={place}>{x.o?.name ?? x.id}</a><span>{x.note}（{x.checkedAt.replace(/-/g, '/')} 確認）</span></li>)}
+    {slots.map((s) => <li><a href={s.href} data-track="show" data-show={`hacktale-${s.id}`} data-place={place}>{s.title}（HACKTALE）</a><span>{s.startText} 開始・{s.venue}・{s.price}・{s.status}</span></li>)}
+  </ul>
+) : <p class="tl-empty">{empty}</p>}
+<style>
+.tl{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px;text-align:left}
+.tl li{display:grid;gap:2px;padding:12px 14px;background:#F3F6FE;border-left:3px solid var(--x-blue,#0B35C8)}
+.tl a{font-weight:800;color:var(--x-blue,#0B35C8)}
+.tl span{font-size:13px;line-height:1.7;color:rgba(11,11,20,.75)}
+.tl-empty{margin:16px 0 0;padding:14px 16px;border:1px dashed #B9C6F2;font-size:13.5px;line-height:1.8;text-align:left}
+</style>

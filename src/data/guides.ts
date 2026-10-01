@@ -4,6 +4,7 @@
 // thumb は scripts で自動生成したサムネイル（public/assets/guide/）。
 import type { PostCategory } from '../lib/microcms';
 import { EXPERIENCE_DATE_PUBLISHED } from './experienceDate';
+import { NIGHT_PUBLISHED, XMAS_PUBLISHED } from './seasonalDate';
 
 export interface GuideArticle {
   /** URLパス（末尾スラッシュあり） */
@@ -29,6 +30,39 @@ export const guideArticles: GuideArticle[] = [
     date: '2026-09-20',
     category: 'immersive' as PostCategory,
     thumb: '/assets/guide/tokyo-experience-date.webp',
+  }] : []),
+  {
+    href: '/guide/tokyo-holiday/',
+    title: '東京で休日に行く場所がないときの過ごし方｜二人・友達・一人で体験を比較',
+    desc: '予約できる体験を「誰と行くか（一人・二人・友達3〜4人）」と「使える時間」で比較。料金、所要時間、他の参加者と一緒になるか、次の土日の開催日つき。',
+    date: '2026-10-01',
+    category: 'immersive',
+    thumb: '/assets/guide/tokyo-holiday.webp',
+  },
+  {
+    href: '/guide/tokyo-before-dating/',
+    title: '東京で付き合う前に行きたいデート｜会話が自然に生まれる体験を料金・時間で比較',
+    desc: '二人で相談する謎解き、キャストと話す物語参加型、作りながら話せるものづくりを、1人あたりの料金、所要時間、二人だけか他の参加者もいるかで比較。',
+    date: '2026-10-01',
+    category: 'immersive',
+    thumb: '/assets/guide/tokyo-before-dating.webp',
+  },
+  // 夜デート・クリスマスデート：開始時刻・開催日を公式で確認できた体験がそろうまで一覧に出さない（src/data/seasonalDate.ts）
+  ...(NIGHT_PUBLISHED ? [{
+    href: '/guide/tokyo-night-date/',
+    title: '東京の夜デート｜仕事終わりに行けるイマーシブ・謎解き・体験を開始時刻で比較',
+    desc: '夜の回の開始時刻を公式で確認できた体験を、所要時間、二人分の料金、二人だけか他の参加者もいるかで比較。間に合うかの考え方つき。',
+    date: '2026-10-01',
+    category: 'immersive' as PostCategory,
+    thumb: '/assets/guide/tokyo-night-date.webp',
+  }] : []),
+  ...(XMAS_PUBLISHED ? [{
+    href: '/guide/tokyo-christmas-date/',
+    title: '東京のクリスマスデート｜予約できる体験型プランを開催日・料金で比較',
+    desc: '12月20日〜25日の開催日を公式で確認できた体験を、二人分の料金、所要時間、二人だけか他の参加者もいるかで比較。',
+    date: '2026-10-01',
+    category: 'immersive' as PostCategory,
+    thumb: '/assets/guide/tokyo-christmas-date.webp',
   }] : []),
   {
     href: '/guide/tokyo-friends-activities/',
@@ -625,7 +659,7 @@ export const guideArticles: GuideArticle[] = [
 ];
 
 // 「東京のデート・お出かけ」カテゴリ（/guide/ 上部・ヘッダー・トップページの入口）。並び順はここが正本。
-// まだ記事がないもの（屋内お出かけ・夜デート・クリスマスデート・休日の過ごし方）は、公開したらここに追加する。
+// まだ記事がないもの（屋内お出かけ・体験型イベント）は、公開したらここに追加する。夜デート・クリスマスは公開扱いになるまで一覧に出ない。
 export const DATE_OUTING = {
   title: '東京のデート・お出かけ',
   desc: '東京で楽しめる体験型デート、雨の日のお出かけ、謎解き、イマーシブ、街歩き、ものづくりなどを、料金・所要時間・アクセス・会話量・貸切可否で比較します。',
@@ -635,6 +669,10 @@ export const DATE_OUTING = {
     '/guide/shibuya-rainy-date/',
     '/guide/tokyo-nazo-date/',
     '/guide/tokyo-friends-activities/',
+    '/guide/tokyo-night-date/',
+    '/guide/tokyo-christmas-date/',
+    '/guide/tokyo-holiday/',
+    '/guide/tokyo-before-dating/',
     '/guide/immersive-tokyo-date/',
     '/guide/immersive-tokyo/',
   ],

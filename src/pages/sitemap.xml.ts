@@ -7,6 +7,7 @@ import { tmNews } from '../data/toudaimurderNews';
 import { htPaths } from '../data/hacktale';
 import { BLOG_REDIRECTS } from '../data/redirects';
 import { EXPERIENCE_DATE_PUBLISHED } from '../data/experienceDate';
+import { NIGHT_PUBLISHED, XMAS_PUBLISHED } from '../data/seasonalDate';
 import { eventsData } from '../data/events/index';
 
 // NOTE: keep every URL here in its canonical trailing-slash form, and
@@ -134,6 +135,9 @@ export const GET: APIRoute = async ({ site }) => {
   }));
   // 体験デート記事は他社項目が公式確認できて公開扱いになった時だけ載せる（下書きは noindex）
   if (EXPERIENCE_DATE_PUBLISHED) urls.push({ loc: new URL('/guide/tokyo-experience-date/', base).toString(), lastmod: '2026-10-01' });
+  for (const [p, ok] of [['/guide/tokyo-holiday/', true], ['/guide/tokyo-before-dating/', true], ['/guide/tokyo-night-date/', NIGHT_PUBLISHED], ['/guide/tokyo-christmas-date/', XMAS_PUBLISHED]] as const) {
+    if (ok) urls.push({ loc: new URL(p, base).toString(), lastmod: '2026-10-01' });
+  }
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {

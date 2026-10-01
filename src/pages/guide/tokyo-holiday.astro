@@ -1,0 +1,179 @@
+---
+// 「東京 休日 過ごし方」「東京 休日 行く場所がない」「東京 休日 何する」の受け皿。
+// 役割：休日の行き先が決まらない人が、誰と行くか（一人・二人・友達3〜4人）と使える時間から、予約できる体験を選ぶ。
+// 体験は src/lib/outingCatalog.ts（自社公演・HACKTALE・UNLIMITED MYSTERY・公式確認済みの他社）から作り、料金・人数を手書きしない。
+// 次の土日の開催は、日付が確認できた公演（src/data/events/）と HACKTALE の予約システムの公演回だけを出す。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import VisualHero from '../../components/VisualHero.astro';
+import DateCompare from '../../components/guide/DateCompare.astro';
+import DateInfo from '../../components/guide/DateInfo.astro';
+import DateChecklist from '../../components/guide/DateChecklist.astro';
+import DateCta from '../../components/guide/DateCta.astro';
+import OutingCards from '../../components/guide/OutingCards.astro';
+import { buildOutings, fitsParty, hacktaleSlots, yen, type Outing } from '../../lib/outingCatalog';
+import { fmtDateShort, jstDateString } from '../../lib/thisWeek';
+import { jsonLd } from '../../lib/microcms';
+
+const now = new Date();
+const MODIFIED = '2026-10-01';
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/tokyo-holiday/', site).toString();
+const all = buildOutings(now);
+
+// 次の土日（今日が土日ならその週末）。開催日が確認できた公演と HACKTALE の公演回だけを出す
+const today = jstDateString(now);
+const dow = new Date(`${today}T00:00:00Z`).getUTCDay();
+const addDays = (d: string, n: number) => new Date(Date.parse(`${d}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
+const sat = dow === 0 ? addDays(today, -1) : addDays(today, (6 - dow + 7) % 7);
+const weekend = [sat, addDays(sat, 1)].filter((d) => d >= today);
+const weekendShows = all.filter((o) => o.dates.some((d) => weekend.includes(d)));
+const weekendSlots = await hacktaleSlots((s) => weekend.includes(s.slice(0, 10)));
+
+// 誰と行くか
+const solo = all.filter((o) => o.solo === true);
+const pair = all.filter((o) => fitsParty(o, 2) === true);
+const group = all.filter((o) => fitsParty(o, 3) === true || fitsParty(o, 4) === true);
+// 使える時間（受付・集合の時間は別。分からないものは別枠）
+const byTime = (lo: number, hi: number) => all.filter((o) => o.minutes !== undefined && o.minutes >= lo && o.minutes <= hi);
+const short = byTime(0, 75), mid = byTime(76, 150), long = byTime(151, 999);
+const timeUnknown = all.filter((o) => o.minutes === undefined);
+
+const perPerson = (o: Outing) => { const ns = [1, 2, 3, 4].filter((n) => o.totalFor(n) !== undefined); return ns.length ? `1人あたり${yen(Math.round(o.totalFor(ns[0])! / ns[0]))}〜` : ''; };
+const fit = (o: Outing) => [
+  o.solo === true ? '一人' : '',
+  fitsParty(o, 2) ? '二人' : '',
+  fitsParty(o, 3) || fitsParty(o, 4) ? '友達3〜4人' : '',
+].filter(Boolean).join('・') + (o.kind === 'madamis' || o.kind === 'zunousen' ? 'のグループで。参加者同士で話すゲームが好きな人向け' : o.talk === 'cast' ? 'で。物語の登場人物として動いてみたい人向け' : o.talk === 'craft' ? 'で。形に残るものを作りたい人向け' : 'で。相談しながら謎を解きたい人向け');
+const names = (xs: Outing[]) => xs.map((o) => o.name).join('、');
+
+const faqs = [
+  { q: '一人でも予約できる体験はありますか？', a: solo.length ? `${names(solo)}は一人でも申し込めます。${solo.some((o) => o.strangers) ? '同じ回・同じ卓に他の参加者がいる体験なので、一人でも会話に加わりやすい形です。' : ''}` : '一人で申し込めると公式で確認できた体験は、現在掲載していません。' },
+  { q: '友達3〜4人で、全員一緒に遊べますか？', a: `${names(group.filter((o) => o.strangers === false))}は申し込んだ人数だけの組（貸切）で遊べます。${group.filter((o) => o.strangers === true).length ? `${names(group.filter((o) => o.strangers === true))}は同じ回・同じ卓に他の参加者もいます。` : ''}人数の条件は作品ごとに違うので、各カードの「人数」でご確認ください。` },
+  { q: '休日の半日くらいで楽しめるものは？', a: `受付・集合の時間を除いた目安で、約1時間以内なら${names(short) || '掲載なし'}、2〜4時間ほど使うなら${names(long) || '掲載なし'}です。前後の移動や食事の時間も含めて予定を組んでください。` },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const title = '東京で休日に行く場所がないときの過ごし方｜二人・友達・一人で体験を比較';
+const desc = '東京で休日に行く場所が決まらないときに、予約できる体験を「誰と行くか（一人・二人・友達3〜4人）」と「使える時間」で比較。謎解き・物語参加型・マダミス・頭脳戦・ものづくりの料金、所要時間、他の参加者と一緒になるかを公式情報で整理しました。';
+const articleLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
+  image: [new URL('/assets/guide/tokyo-holiday.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-01', dateModified: MODIFIED, mainEntityOfPage: pageUrl,
+};
+const rows = all.map((o) => o.row);
+const chips = [`${all.length}件を比較`, '一人・二人・友達で選べる', '料金・時間・相席か'];
+---
+<BaseLayout title={`${title} - 株式会社ex Labs`} description={desc} ogImage="/assets/guide/tokyo-holiday.webp">
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'デート・お出かけ', href: '/guide/#date' },
+  { name: '東京の休日の過ごし方' },
+]} />
+
+<VisualHero image="/assets/uwasabanashi/story-venue.webp" imagePos="center 40%" eyebrow="HOLIDAY IN TOKYO" catchText="予定のない休日を、体験で埋める" chips={chips} alt="渋谷サクラステージの外観">
+  <h1><span class="nobr">東京で休日に行く場所がないときは？</span><span class="nobr">二人・友達・一人で選ぶ体験</span></h1>
+</VisualHero>
+
+<section class="section" style="padding-top:28px"><div class="wrap">
+<p class="lede">休日に「どこへ行くか」が決まらないときは、<strong>誰と行くか</strong>と<strong>何時間使えるか</strong>から絞ると早く決まります。このページでは、東京で予約できる体験を、一人・二人・友達3〜4人のどれで申し込めるか、料金と所要時間、他の参加者と一緒になるかで並べました。</p>
+<div class="key-points"><p class="key-points-h">このページでできること</p><ul>
+<li>一人・二人・友達3〜4人のそれぞれで申し込める体験がわかります。</li>
+<li>次の土日に開催日が確認できている公演を、日付つきで見られます。</li>
+<li>料金・所要時間・会話の量・他の参加者と一緒かを、同じ項目で見比べられます。</li>
+</ul></div>
+<DateInfo modified={MODIFIED} rows={rows.filter((r) => r.checked)} />
+</div></section>
+
+<section class="section tinted" id="who"><div class="wrap">
+<h2 class="cards-h">誰と行くかで選ぶ<span>申し込める人数の条件から</span></h2>
+<div class="pick-grid">
+  <div class="pick-col"><p class="pick-h">一人で</p><p class="pick-p">{solo.length ? solo.map((o, i) => <>{i > 0 && '／'}<a href={`#o-${o.id}`}>{o.name}</a></>) : '一人で申し込めると確認できた体験はありません。'}</p><p class="pick-n">一人で申し込めると公式で確認できた体験です。他の参加者と同じ回・同じ卓になるかは、カードの「他の参加者」で確認できます。</p></div>
+  <div class="pick-col"><p class="pick-h">二人で</p><p class="pick-p">{pair.map((o, i) => <>{i > 0 && '／'}<a href={`#o-${o.id}`}>{o.name}</a></>)}</p><p class="pick-n">二人だけで過ごしたいなら、カードの「他の参加者」が「自分たちだけ」のものを。</p></div>
+  <div class="pick-col"><p class="pick-h">友達3〜4人で</p><p class="pick-p">{group.map((o, i) => <>{i > 0 && '／'}<a href={`#o-${o.id}`}>{o.name}</a></>)}</p><p class="pick-n">マダミスは作品ごとに人数が決まっています。人数ちょうどの作品を選びます。</p></div>
+</div>
+</div></section>
+
+<section class="section" id="weekend"><div class="wrap">
+<h2 class="cards-h">次の土日に予定を入れるなら<span>{weekend.map((d) => fmtDateShort(d)).join('・')}</span></h2>
+{weekendShows.length + weekendSlots.length > 0 ? (
+  <ul class="wk-list">
+    {weekendShows.map((o) => <li><a href={o.detailHref}>{o.name}</a><span>{o.dates.filter((d) => weekend.includes(d)).map((d) => fmtDateShort(d)).join('・')}に開催（{o.area}）。空席は予約サイトで確認</span></li>)}
+    {weekendSlots.map((s) => <li><a href={s.href}>{s.title}（HACKTALE）</a><span>{s.startText} 開始・{s.venue}・{s.price}・{s.status}</span></li>)}
+  </ul>
+) : <p class="lede">次の土日に開催日が確認できている公演は、いまのところありません。</p>}
+<p class="cards-note">日付が決まっている公演だけを載せています。店舗型の脱出ゲームやものづくり体験は常設なので、営業日・空き枠を各公式ページでご確認ください。UNLIMITED MYSTERY（マダミス）は貸切で日程を相談します。</p>
+</div></section>
+
+<section class="section tinted" id="time"><div class="wrap">
+<h2 class="cards-h">使える時間で選ぶ<span>受付・集合の時間は別に見ておく</span></h2>
+<div class="pick-grid">
+  <div class="pick-col"><p class="pick-h">約1時間</p><p class="pick-p">{short.length ? short.map((o, i) => <>{i > 0 && '／'}<a href={`#o-${o.id}`}>{o.name}</a></>) : '掲載なし'}</p></div>
+  <div class="pick-col"><p class="pick-h">1〜2時間半</p><p class="pick-p">{mid.length ? mid.map((o, i) => <>{i > 0 && '／'}<a href={`#o-${o.id}`}>{o.name}</a></>) : '掲載なし'}</p></div>
+  <div class="pick-col"><p class="pick-h">半日（2時間半〜）</p><p class="pick-p">{long.length ? long.map((o, i) => <>{i > 0 && '／'}<a href={`#o-${o.id}`}>{o.name}</a></>) : '掲載なし'}</p></div>
+</div>
+{timeUnknown.length > 0 && <p class="cards-note">所要時間を公式で確認できていない体験：{names(timeUnknown)}（各公式ページで確認）</p>}
+</div></section>
+
+<section class="section" id="items"><div class="wrap">
+<h2 class="cards-h">体験ごとの詳細<span>誰向け・人数・予算・時間・会話・予約</span></h2>
+<OutingCards items={all} party={2} place="holiday-card" fit={fit} />
+<p class="cards-note">予算は二人で申し込んだときの総額です（二人では申し込めない体験は料金の単位を表示）。1人あたりの目安：{all.filter((o) => perPerson(o)).map((o) => `${o.name} ${perPerson(o)}`).join('／')}。</p>
+<DateCta place="holiday-mid" ids={['kaitou', 'uwasabanashi', 'factroom']} />
+</div></section>
+
+<section class="section tinted" id="compare"><div class="wrap">
+<h2 class="cards-h">比較表<span>二人で行く場合の料金・時間・貸切か相席か</span></h2>
+<DateCompare rows={rows} place="holiday-table" />
+<p class="cards-note">「公式で確認」の項目は、各公式ページの案内が最新です。料金は通常料金で、手数料や追加料金は予約画面で確認してください。</p>
+</div></section>
+
+<section class="section" id="check"><div class="wrap narrow">
+<h2 class="cards-h">予約前に確認すべき点</h2>
+<DateChecklist />
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<h2 class="cards-h">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
+</div>
+<DateCta place="holiday-end" ids={['kaitou', 'uwasabanashi', 'factroom']} links={[{ title: 'HACKTALE（頭脳戦・心理戦）', href: '/hacktale/' }]} />
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="cmp-note-p">物語参加型の公演・HACKTALE・UNLIMITED MYSTERY は株式会社ex Labsが企画・制作または運営に関わっています。他の施設は各運営会社の公式ページの案内をもとに掲載しています。</p>
+<p class="vc-line" style="margin-top:20px">あわせて読む：<a href="/guide/tokyo-friends-activities/" style="color:var(--accent)">東京で友達と遊ぶ体験</a>／<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート</a>／<a href="/guide/shibuya-rainy-date/" style="color:var(--accent)">渋谷の雨の日デート</a>／<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)">二人で楽しめる謎解き・脱出ゲーム</a>／<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)">一人で参加できるイマーシブ</a>／<a href="/events/" style="color:var(--accent)">公演を探す</a></p>
+</div></section>
+
+<AuthorBox />
+<LatestPosts category="immersive" />
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cards-h span{font-size:12.5px;font-weight:700;color:#0B35C8}
+.cards-note{margin:14px 0 0;font-size:12px;line-height:1.75;color:rgba(29,29,31,.6);text-align:left}
+.cmp-note-p{max-width:920px;margin:0 auto;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:14px;margin-top:16px}
+.pick-col{background:#fff;border:var(--bd);border-radius:12px;box-shadow:var(--shadow-1);padding:16px 18px;text-align:left}
+.pick-h{margin:0 0 6px;font-size:14px;font-weight:800;color:#0B35C8}
+.pick-p{margin:0;font-size:13.5px;line-height:1.8;color:var(--ink)}
+.pick-p a{color:var(--accent);font-weight:700}
+.pick-n{margin:8px 0 0;font-size:12.5px;line-height:1.7;color:rgba(29,29,31,.62)}
+.wk-list{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px;text-align:left}
+.wk-list li{display:grid;gap:2px;padding:12px 14px;background:#F3F6FE;border-left:3px solid #0B35C8}
+.wk-list a{font-weight:800;color:#0B35C8}
+.wk-list span{font-size:13px;line-height:1.7;color:rgba(11,11,20,.75)}
+#who,#weekend,#time,#items,#compare,#check,#faq{scroll-margin-top:88px}
+.section.tinted,.section{padding:44px 0}
+@media(max-width:640px){.section.tinted,.section{padding:32px 0}.cards-h{font-size:18px}}
+</style>

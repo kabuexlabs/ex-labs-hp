@@ -1,0 +1,129 @@
+---
+// 「東京 クリスマス デート 体験」「クリスマス デート 予約 東京」の受け皿。
+// 役割：クリスマス（12月20日〜25日）に予約できる体験型のデートを、開催日・料金・時間・貸切か相席かで選ぶ。
+// 開催日は src/data/seasonalDate.ts（公式で確認できたもの）・公演データの開催日・HACKTALE の公演回だけを使う。
+// 開催日を確認できた体験が PUBLISH_MIN 件に満たない間は下書き（noindex、記事一覧・サイトマップ・内部リンクに出さない）。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import VisualHero from '../../components/VisualHero.astro';
+import DateCompare from '../../components/guide/DateCompare.astro';
+import DateInfo from '../../components/guide/DateInfo.astro';
+import DateChecklist from '../../components/guide/DateChecklist.astro';
+import DateCta from '../../components/guide/DateCta.astro';
+import TimedList from '../../components/guide/TimedList.astro';
+import { buildOutings, fitsParty, hacktaleSlots, type Outing } from '../../lib/outingCatalog';
+import { XMAS_INFO, XMAS_PUBLISHED, xmasOwnWorkIds, XMAS_FROM, XMAS_TO } from '../../data/seasonalDate';
+import { occurrences } from '../../data/events/occurrences';
+import { fmtDateShort } from '../../lib/thisWeek';
+import { jsonLd } from '../../lib/microcms';
+
+const now = new Date();
+const MODIFIED = '2026-10-01';
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/tokyo-christmas-date/', site).toString();
+const draft = !XMAS_PUBLISHED;
+if (draft) Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+
+const all = buildOutings(now);
+const pair = all.filter((o) => fitsParty(o, 2) === true);
+const byId = (id: string) => all.find((o) => o.id === id);
+const inXmas = (d: string) => d >= XMAS_FROM && d <= XMAS_TO;
+const ownXmas = xmasOwnWorkIds.map((id) => byId(id)).filter((o): o is Outing => !!o).map((o) => ({
+  o, text: occurrences.filter((x) => x.workId === o.id && inXmas(x.date)).map((x) => `${fmtDateShort(x.date)}${x.startTime ? ` ${x.startTime}` : ''}`).join('・') + ' 開催',
+}));
+const info = XMAS_INFO.filter((x) => x.dates?.some(inXmas)).map((x) => ({ ...x, o: byId(x.id) }));
+const slots = await hacktaleSlots((s) => inXmas(s.slice(0, 10)));
+const permanent = pair.filter((o) => o.schedule === 'permanent');
+const privateTwo = pair.filter((o) => o.strangers === false);
+
+const faqs = [
+  { q: 'クリスマスに予約できる体験はありますか？', a: `${ownXmas.length + info.length + slots.length ? 'このページの「12月20日〜25日に開催が確認できている体験」に、開催日つきで載せています。' : '12月20日〜25日の開催を公式で確認できた体験は、いまのところ多くありません。'}${permanent.length ? `${permanent.map((o) => o.name).join('、')}は店舗で常設の体験なので、12月の営業日と空き枠を公式ページでご確認ください。` : ''}` },
+  { q: '二人だけで過ごせる体験は？', a: privateTwo.length ? `${privateTwo.map((o) => o.name).join('、')}は、他の参加者と同じ組にならないことを公式で確認できた体験です。` : '二人だけで体験できると確認できたものは現在掲載していません。' },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const title = '東京のクリスマスデート｜予約できる体験型プランを開催日・料金で比較';
+const desc = '東京のクリスマス（12月20日〜25日）に予約できる体験型デートを、開催日、二人分の料金、所要時間、二人だけか他の参加者もいるかで比較。開催日を公式で確認できた体験だけを載せ、予約の進め方と確認点をまとめました。';
+const articleLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
+  image: [new URL('/assets/guide/tokyo-christmas-date.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-01', dateModified: MODIFIED, mainEntityOfPage: pageUrl,
+};
+const rows = pair.map((o) => o.row);
+---
+<BaseLayout title={`${title} - 株式会社ex Labs`} description={desc} ogImage="/assets/guide/tokyo-christmas-date.webp">
+{!draft && <script type="application/ld+json" set:html={jsonLd(faqLd)} />}
+{!draft && <script type="application/ld+json" set:html={jsonLd(articleLd)} />}
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'デート・お出かけ', href: '/guide/#date' },
+  { name: '東京のクリスマスデート' },
+]} />
+
+<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 45%" eyebrow="CHRISTMAS DATE" catchText="今年のクリスマスは、二人で体験を" chips={['12月20日〜25日の開催日', '二人分の料金・時間', '貸切か相席か']} alt="東京で開催中のイマーシブ公演のキービジュアル">
+  <h1><span class="nobr">東京のクリスマスデート：</span><span class="nobr">予約できる体験型プラン</span></h1>
+</VisualHero>
+
+<section class="section" style="padding-top:28px"><div class="wrap">
+<p class="lede">クリスマスの体験デートは、<strong>その日に開催があるか</strong>を最初に確認します。このページでは、12月20日〜25日の開催日を公式で確認できた体験だけを候補として載せ、二人分の料金・所要時間・二人だけか他の参加者もいるかで比べます。</p>
+<DateInfo modified={MODIFIED} rows={rows.filter((r) => r.checked)} />
+</div></section>
+
+<section class="section tinted" id="dates"><div class="wrap">
+<h2 class="cards-h">12月20日〜25日に開催が確認できている体験</h2>
+<TimedList info={info} own={ownXmas} slots={slots} place="xmas-slot" empty="12月20日〜25日の開催を公式で確認できた体験は、いまのところありません。開催が発表されしだい追加します。" />
+{permanent.length > 0 && <p class="cards-note">店舗で常設の体験（12月の営業日・空き枠は公式で確認）：{permanent.map((o, i) => <>{i > 0 && '／'}<a href={o.detailHref}>{o.name}</a></>)}</p>}
+</div></section>
+
+<section class="section" id="plan"><div class="wrap narrow">
+<h2 class="cards-h">クリスマスの予約の進め方</h2>
+<ol class="bullets">
+<li><strong>開催日を先に押さえる</strong>：日時指定の公演は、開催日と販売開始日を公式ページで確認します。</li>
+<li><strong>二人だけか、他の参加者もいるか</strong>：二人だけで過ごしたいなら、申込単位で貸切の体験や、部屋を一組で貸し切る脱出ゲームを選びます。</li>
+<li><strong>食事との順番</strong>：終了予定時刻と会場の最寄り駅を確認し、食事の予約時刻を決めます。</li>
+<li><strong>キャンセル規定</strong>：購入後の日時変更や払い戻しができない体験があります。予約前に規約を確認します。</li>
+</ol>
+<DateCta place="xmas-mid" ids={['kaitou', 'uwasabanashi', 'factroom']} />
+</div></section>
+
+<section class="section tinted" id="compare"><div class="wrap">
+<h2 class="cards-h">比較表<span>二人分の料金・時間・貸切か相席か</span></h2>
+<DateCompare rows={rows} place="xmas-table" />
+</div></section>
+
+<section class="section" id="check"><div class="wrap narrow">
+<h2 class="cards-h">予約前に確認すべき点</h2>
+<DateChecklist />
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<h2 class="cards-h">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
+</div>
+<DateCta place="xmas-end" ids={['kaitou', 'uwasabanashi', 'factroom']} />
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="vc-line">あわせて読む：<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート</a>／<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)">二人で楽しめる謎解き・脱出ゲーム</a>／<a href="/guide/tokyo-before-dating/" style="color:var(--accent)">付き合う前のデート</a>／<a href="/events/" style="color:var(--accent)">公演を探す</a></p>
+</div></section>
+
+<AuthorBox />
+<LatestPosts category="immersive" />
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cards-note{margin:14px 0 0;font-size:12px;line-height:1.75;color:rgba(29,29,31,.6);text-align:left}
+.cards-note a{color:var(--accent);font-weight:700}
+ol.bullets{padding-left:1.4em;text-align:left}
+#dates,#plan,#compare,#check,#faq{scroll-margin-top:88px}
+.section.tinted,.section{padding:44px 0}
+@media(max-width:640px){.section.tinted,.section{padding:32px 0}.cards-h{font-size:18px}}
+</style>

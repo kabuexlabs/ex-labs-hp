@@ -1,0 +1,59 @@
+---
+// デート・お出かけ記事の体験カード。記事制作ルールの項目（誰向けか・何人で行くか・予算・時間・会話の量・
+// 初対面でも楽しめるか・他の人と一緒になるか・予約が必要か・体験後にどこへ行きやすいか）を全カードで同じ順に出す。
+// 値は src/lib/outingCatalog.ts（各データの正本）から。未確認は「公式で確認」。
+import { TALK_LABEL, KIND_LABEL, yen, type Outing } from '../../lib/outingCatalog';
+interface Props {
+  items: Outing[];
+  /** 予算を出す人数（例：2） */
+  party: number;
+  place: string;
+  /** 記事ごとの「誰向けか」 */
+  fit: (o: Outing) => string;
+}
+const { items, party, place, fit } = Astro.props;
+const budget = (o: Outing) => {
+  const t = o.totalFor(party);
+  return t !== undefined ? `${party}人で${yen(t)}（${o.priceText}）` : o.priceText;
+};
+const others = (o: Outing) => (o.strangers === false ? '自分たちだけ（他の参加者と一緒にならない）' : o.strangers === true ? o.privacyText : '公式で確認');
+---
+<div class="oc-grid">
+{items.map((o) => (
+  <article class="oc-card" id={`o-${o.id}`}>
+    <p class="oc-kind">{KIND_LABEL[o.kind]}{o.own && o.ownLabel ? `｜${o.ownLabel}` : ''}</p>
+    <h3 class="oc-name"><a href={o.detailHref} data-track="show" data-show={o.id} data-place={place}>{o.name}</a></h3>
+    <dl class="oc-dl">
+      <div><dt>誰向け</dt><dd>{fit(o)}</dd></div>
+      <div><dt>人数</dt><dd>{o.partyText}</dd></div>
+      <div><dt>予算</dt><dd>{budget(o)}</dd></div>
+      <div><dt>時間</dt><dd>{o.timeText}</dd></div>
+      <div><dt>会話の量</dt><dd>{TALK_LABEL[o.talk]}。{o.talkText !== TALK_LABEL[o.talk] ? o.talkText : ''}</dd></div>
+      <div><dt>初めてでも</dt><dd>{o.beginner}</dd></div>
+      <div><dt>他の参加者</dt><dd>{others(o)}</dd></div>
+      <div><dt>予約</dt><dd>{o.reserveText}</dd></div>
+      <div><dt>体験後</dt><dd>エリア：{o.area}。終了後の食事や休憩は、このエリアの最寄り駅周辺で探せます</dd></div>
+      {(o.ageRule || o.scary) && <div><dt>注意</dt><dd>{[o.ageRule, o.scary].filter(Boolean).join('。')}</dd></div>}
+    </dl>
+    <div class="oc-act">
+      {o.reserveHref && <a class="oc-btn" href={o.reserveHref} target={/^https?:/.test(o.reserveHref) ? '_blank' : undefined} rel={/^https?:/.test(o.reserveHref) ? (o.own ? 'noopener' : 'noopener nofollow') : undefined} data-track={o.own ? 'ticket' : 'ev-ext'} data-show={o.id} data-place={place}>{o.reserveLabel}{/^https?:/.test(o.reserveHref) ? ' ↗' : ' →'}</a>}
+      {o.detailHref !== o.reserveHref && <a class="oc-sub" href={o.detailHref} data-track="show" data-show={o.id} data-place={`${place}-detail`}>詳しく見る →</a>}
+    </div>
+  </article>
+))}
+</div>
+<style>
+.oc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:16px;margin-top:18px;text-align:left}
+.oc-card{background:#fff;border:1px solid #D6DFFB;padding:18px 18px 16px;display:flex;flex-direction:column;gap:8px;scroll-margin-top:88px}
+.oc-kind{margin:0;font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--x-blue,#0B35C8)}
+.oc-name{margin:0;font-family:var(--x-min,serif);font-weight:700;font-size:18.5px;line-height:1.5}
+.oc-name a{color:var(--ink,#0B0B14);text-decoration:none}
+.oc-dl{margin:4px 0 0;display:grid;gap:0;font-size:13.5px;line-height:1.65}
+.oc-dl div{display:grid;grid-template-columns:5.6em minmax(0,1fr);gap:8px;padding:7px 0;border-top:1px solid #EEF2FE}
+.oc-dl dt{font-weight:700;color:rgba(11,11,20,.55);font-size:12.5px}
+.oc-dl dd{margin:0;color:var(--ink,#0B0B14)}
+.oc-act{margin-top:auto;padding-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.oc-btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:11px 18px;background:var(--x-blue,#0B35C8);color:#fff!important;font-weight:700;font-size:14px;text-decoration:none!important}
+.oc-sub{display:inline-block;padding:8px 0;font-size:13.5px;font-weight:700;color:var(--x-blue,#0B35C8)!important;border-bottom:1px solid currentColor}
+@media(max-width:640px){.oc-btn{width:100%}}
+</style>

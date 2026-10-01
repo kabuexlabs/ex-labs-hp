@@ -1,0 +1,132 @@
+---
+// 「東京 夜 デート」「仕事終わり デート 東京」「東京 夜 体験」の受け皿。
+// 役割：仕事終わりの二人が、開始時刻・所要時間・場所から、平日の夜に間に合う体験を選ぶ。
+// 夜の回の開始時刻は src/data/seasonalDate.ts（公式で確認できたもの）・公演データの開始時刻・HACKTALE の公演回だけを使う。
+// 開始時刻を確認できた体験が PUBLISH_MIN 件に満たない間は下書き（noindex、記事一覧・サイトマップ・内部リンクに出さない）。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import VisualHero from '../../components/VisualHero.astro';
+import DateCompare from '../../components/guide/DateCompare.astro';
+import DateInfo from '../../components/guide/DateInfo.astro';
+import DateChecklist from '../../components/guide/DateChecklist.astro';
+import DateCta from '../../components/guide/DateCta.astro';
+import TimedList from '../../components/guide/TimedList.astro';
+import { buildOutings, fitsParty, hacktaleSlots, type Outing } from '../../lib/outingCatalog';
+import { NIGHT_INFO, NIGHT_PUBLISHED, nightOwnWorkIds } from '../../data/seasonalDate';
+import { occurrences } from '../../data/events/occurrences';
+import { fmtDateShort, jstDateString } from '../../lib/thisWeek';
+import { jsonLd } from '../../lib/microcms';
+
+const now = new Date();
+const MODIFIED = '2026-10-01';
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/tokyo-night-date/', site).toString();
+const draft = !NIGHT_PUBLISHED;
+if (draft) Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+
+const today = jstDateString(now);
+const all = buildOutings(now);
+const pair = all.filter((o) => fitsParty(o, 2) === true);
+const byId = (id: string) => all.find((o) => o.id === id);
+// 夜（17時以降）に始まる回：自社公演（開始時刻が確認できた回）
+const ownNight = nightOwnWorkIds.map((id) => byId(id)).filter((o): o is Outing => !!o).map((o) => ({
+  o, text: occurrences.filter((x) => x.workId === o.id && x.date >= today && x.startTime && x.startTime >= '17:00').map((x) => `${fmtDateShort(x.date)} ${x.startTime}`).join('・') + ' 開始',
+}));
+const info = NIGHT_INFO.map((x) => ({ ...x, o: byId(x.id) }));
+const slots = await hacktaleSlots((s) => s.slice(11, 16) >= '17:00');
+// 仕事終わりに組み込みやすい長さ（受付・集合は別）。夜の回があるかは各公式ページで確認
+const short = pair.filter((o) => o.minutes !== undefined && o.minutes <= 75);
+
+const faqs = [
+  { q: '平日の仕事終わりに間に合う体験はありますか？', a: `${ownNight.length + info.length + slots.length ? `開始時刻が確認できている夜の回は、このページの「開始時刻が確認できている夜の回」に載せています。` : '夜の開始時刻を公式で確認できた体験は、いまのところ多くありません。'}受付は開始より前のことが多いので、開始時刻から逆算して職場を出る時間を決めてください。` },
+  { q: '夜の短い時間で楽しめるものは？', a: short.length ? `受付・集合を除いた目安で約1時間以内なのは、${short.map((o) => `${o.name}（${o.timeText}）`).join('、')}です。夜の回の有無と最終受付は各公式ページでご確認ください。` : '約1時間以内と確認できた体験は現在掲載していません。' },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const title = '東京の夜デート｜仕事終わりに行けるイマーシブ・謎解き・体験を開始時刻で比較';
+const desc = '東京で仕事終わりに行ける夜の体験デートを、開始時刻、所要時間、二人分の料金、二人だけか他の参加者もいるかで比較。開始時刻を公式で確認できた回だけを載せ、間に合うかの考え方と予約前の確認点をまとめました。';
+const articleLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
+  image: [new URL('/assets/guide/tokyo-night-date.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-01', dateModified: MODIFIED, mainEntityOfPage: pageUrl,
+};
+const rows = pair.map((o) => o.row);
+---
+<BaseLayout title={`${title} - 株式会社ex Labs`} description={desc} ogImage="/assets/guide/tokyo-night-date.webp">
+{!draft && <script type="application/ld+json" set:html={jsonLd(faqLd)} />}
+{!draft && <script type="application/ld+json" set:html={jsonLd(articleLd)} />}
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'デート・お出かけ', href: '/guide/#date' },
+  { name: '東京の夜デート' },
+]} />
+
+<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 45%" eyebrow="NIGHT DATE" catchText="仕事終わりに、二人で体験を" chips={['開始時刻で選ぶ', '所要時間・二人分の料金', '貸切か相席か']} alt="東京で開催中のイマーシブ公演のキービジュアル">
+  <h1><span class="nobr">東京の夜デート：</span><span class="nobr">仕事終わりに行ける体験</span></h1>
+</VisualHero>
+
+<section class="section" style="padding-top:28px"><div class="wrap">
+<p class="lede">仕事終わりのデートでは、<strong>何時に始まるか</strong>と<strong>何時に終わるか</strong>が一番の条件です。このページでは、夜の回の開始時刻を公式で確認できた体験だけを「間に合う候補」として載せ、所要時間・二人分の料金・二人だけか他の参加者もいるかで比べます。</p>
+<DateInfo modified={MODIFIED} rows={rows.filter((r) => r.checked)} />
+</div></section>
+
+<section class="section tinted" id="slots"><div class="wrap">
+<h2 class="cards-h">開始時刻が確認できている夜の回<span>17時以降に始まる回</span></h2>
+<TimedList info={info} own={ownNight} slots={slots} place="night-slot" empty="夜の回の開始時刻を公式で確認できた体験は、いまのところありません。開始時刻は各公式ページ・予約ページでご確認ください。" />
+<p class="cards-note">HACKTALE の公演回は予約システムに登録された日時です。各回の空席・受付状況は予約ページが最新です。</p>
+</div></section>
+
+<section class="section" id="plan"><div class="wrap narrow">
+<h2 class="cards-h">仕事終わりに間に合うかの考え方</h2>
+<ol class="bullets">
+<li><strong>開始時刻ではなく受付時刻から逆算する</strong>：受付は開始より前のことが多く、遅れると参加できない体験があります。</li>
+<li><strong>終了時刻を出す</strong>：開始時刻＋所要時間＋説明・感想の時間。終電や翌日の予定から逆算して選びます。</li>
+<li><strong>駅からの移動を足す</strong>：最寄り駅から会場までの道のりは各公式ページのアクセス案内で確認します。</li>
+<li><strong>食事の順番を決める</strong>：体験の前に軽く食べるか、終わってから食事にするか。終了時刻と会場の最寄り駅から決めます。</li>
+</ol>
+{short.length > 0 && <p class="lede">受付・集合を除いた目安で約1時間以内の体験：{short.map((o, i) => <>{i > 0 && '／'}<a href={o.detailHref} style="color:var(--accent)">{o.name}</a></>)}（夜の回の有無は公式で確認）。</p>}
+<DateCta place="night-mid" ids={['kaitou', 'factroom']} links={[{ title: 'UNLIMITED MYSTERY（マダミス）', href: '/toudaimurder/' }]} />
+</div></section>
+
+<section class="section tinted" id="compare"><div class="wrap">
+<h2 class="cards-h">比較表<span>二人分の料金・時間・貸切か相席か</span></h2>
+<DateCompare rows={rows} place="night-table" />
+</div></section>
+
+<section class="section" id="check"><div class="wrap narrow">
+<h2 class="cards-h">予約前に確認すべき点</h2>
+<DateChecklist />
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<h2 class="cards-h">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
+</div>
+<DateCta place="night-end" ids={['kaitou', 'factroom']} links={[{ title: 'UNLIMITED MYSTERY（マダミス）', href: '/toudaimurder/' }]} />
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="vc-line">あわせて読む：<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート</a>／<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)">二人で楽しめる謎解き・脱出ゲーム</a>／<a href="/guide/tokyo-before-dating/" style="color:var(--accent)">付き合う前のデート</a>／<a href="/events/" style="color:var(--accent)">公演を探す</a></p>
+</div></section>
+
+<AuthorBox />
+<LatestPosts category="immersive" />
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cards-h span{font-size:12.5px;font-weight:700;color:#0B35C8}
+.cards-note{margin:14px 0 0;font-size:12px;line-height:1.75;color:rgba(29,29,31,.6);text-align:left}
+ol.bullets{padding-left:1.4em;text-align:left}
+.wrap.narrow .lede{text-align:left}
+#slots,#plan,#compare,#check,#faq{scroll-margin-top:88px}
+.section.tinted,.section{padding:44px 0}
+@media(max-width:640px){.section.tinted,.section{padding:32px 0}.cards-h{font-size:18px}}
+</style>

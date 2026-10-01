@@ -1,0 +1,164 @@
+---
+// 「付き合う前 デート 東京」「2回目のデート 東京 体験」「付き合う前 デート 会話」の受け皿。
+// 役割：まだ付き合う前の二人が、会話が途切れにくく、時間と費用が重すぎない体験を選ぶ。
+// 体験は src/lib/outingCatalog.ts から、二人で申し込めるものだけ（マダミス・頭脳戦のように5人以上が前提のものは除く）。
+// 会話の生まれ方は各データの記載（キャストとの会話・二人で相談・講師とのやり取り）から分類し、相性の断定はしない。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import VisualHero from '../../components/VisualHero.astro';
+import DateCompare from '../../components/guide/DateCompare.astro';
+import DateInfo from '../../components/guide/DateInfo.astro';
+import DateChecklist from '../../components/guide/DateChecklist.astro';
+import DateCta from '../../components/guide/DateCta.astro';
+import OutingCards from '../../components/guide/OutingCards.astro';
+import { buildOutings, fitsParty, yen, TALK_LABEL, type Outing, type TalkStyle } from '../../lib/outingCatalog';
+import { jsonLd } from '../../lib/microcms';
+
+const now = new Date();
+const MODIFIED = '2026-10-01';
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/tokyo-before-dating/', site).toString();
+const items = buildOutings(now).filter((o) => fitsParty(o, 2) === true && o.kind !== 'madamis' && o.kind !== 'zunousen');
+
+const talkOrder: TalkStyle[] = ['pair', 'cast', 'craft'];
+const TALK_WHY: Record<TalkStyle, string> = {
+  pair: '目の前の謎について話すので、話題を探さなくても会話が続きます。相手の考え方や得意なことも自然に見えてきます。',
+  cast: 'キャストが話しかけてくれるので、二人きりの沈黙が生まれにくい形です。物語の中で同じ役割を担うため、終わった後の感想も話しやすくなります。',
+  craft: '手を動かしながら話せるので、ずっと向き合って話す必要がありません。完成したものが会話のきっかけになります。',
+  group: '',
+};
+const byTalk = (t: TalkStyle) => items.filter((o) => o.talk === t);
+const short = items.filter((o) => o.minutes !== undefined && o.minutes <= 75);
+const privateTwo = items.filter((o) => o.strangers === false);
+const withOthers = items.filter((o) => o.strangers === true);
+const pp = (o: Outing) => { const t = o.totalFor(2); return t !== undefined ? Math.round(t / 2) : undefined; };
+const cheap = items.filter((o) => (pp(o) ?? 99999) <= 3000);
+const names = (xs: Outing[]) => xs.map((o) => o.name).join('、');
+const fit = (o: Outing) => o.talk === 'pair' ? '話題に困りたくない二人。相談しながら一緒に解きたい人向け' : o.talk === 'cast' ? '二人きりの会話が続くか不安な二人。物語の中で一緒に動きたい人向け' : '向かい合って話し続けるより、並んで作業したい二人向け';
+
+const faqs = [
+  { q: '付き合う前のデートで、会話が途切れにくい体験は？', a: `${byTalk('pair').length ? `${names(byTalk('pair'))}は、目の前の謎について二人で相談しながら進めます。` : ''}${byTalk('cast').length ? `${names(byTalk('cast'))}はキャストとの会話が進行の一部です。` : ''}${byTalk('craft').length ? `${names(byTalk('craft'))}は手を動かしながら話せる体験です。` : ''}` },
+  { q: '長すぎない体験はありますか？', a: short.length ? `受付・集合を除いた目安で約1時間以内なのは、${short.map((o) => `${o.name}（${o.timeText}）`).join('、')}です。終わった後に食事やお茶へ移りやすい長さです。` : '約1時間以内と確認できた体験は現在掲載していません。' },
+  { q: '割り勘しやすい料金の体験は？', a: `二人で申し込んだときの1人あたりの目安は、${items.filter((o) => pp(o) !== undefined).map((o) => `${o.name}が${yen(pp(o)!)}`).join('、')}です。予約サイトの手数料や、平日・土日の料金差がある場合があります。` },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const title = '東京で付き合う前に行きたいデート｜会話が自然に生まれる体験を料金・時間で比較';
+const desc = '付き合う前の二人に向けて、東京で会話が自然に生まれる体験を比較。二人で相談する謎解き、キャストと話す物語参加型、作りながら話せるものづくりを、二人分の料金と1人あたりの額、所要時間、二人だけか他の参加者もいるかで整理しました。';
+const articleLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
+  image: [new URL('/assets/guide/tokyo-before-dating.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-01', dateModified: MODIFIED, mainEntityOfPage: pageUrl,
+};
+const rows = items.map((o) => o.row);
+const chips = [`${items.length}件を比較`, '会話の生まれ方で選べる', '1人あたりの料金つき'];
+---
+<BaseLayout title={`${title} - 株式会社ex Labs`} description={desc} ogImage="/assets/guide/tokyo-before-dating.webp">
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'デート・お出かけ', href: '/guide/#date' },
+  { name: '付き合う前のデート' },
+]} />
+
+<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 45%" eyebrow="BEFORE DATING" catchText="話題を探さなくても、会話が続く" chips={chips} alt="東京で開催中のイマーシブ公演のキービジュアル">
+  <h1><span class="nobr">付き合う前のデートに、</span><span class="nobr">会話が自然に生まれる</span><span class="nobr">東京の体験</span></h1>
+</VisualHero>
+
+<section class="section" style="padding-top:28px"><div class="wrap">
+<p class="lede">付き合う前のデートでは、<strong>話題が途切れないか</strong>、<strong>時間が長すぎないか</strong>、<strong>費用が重すぎないか</strong>、<strong>二人だけか他の人もいるか</strong>が気になります。食事だけのデートと違い、体験型のデートは「目の前のこと」が話題になるので、まだお互いをよく知らない二人でも会話が生まれやすくなります。このページでは、東京で二人で申し込める体験を、会話の生まれ方で分けて比べました。</p>
+<div class="key-points"><p class="key-points-h">このページでできること</p><ul>
+<li>二人で相談する・キャストと話す・作りながら話す、の会話の形から選べます。</li>
+<li>所要時間、二人分の料金と1人あたりの額、二人だけか他の参加者もいるかを見比べられます。</li>
+<li>気になった体験は、そのまま予約ページへ進めます。</li>
+</ul></div>
+<DateInfo modified={MODIFIED} rows={rows.filter((r) => r.checked)} />
+</div></section>
+
+<section class="section tinted" id="talk"><div class="wrap">
+<h2 class="cards-h">会話の生まれ方で選ぶ<span>二人の雰囲気に合わせて</span></h2>
+<div class="pick-grid">
+{talkOrder.filter((t) => byTalk(t).length > 0).map((t) => (
+  <div class="pick-col"><p class="pick-h">{TALK_LABEL[t]}</p><p class="pick-n">{TALK_WHY[t]}</p><p class="pick-p">{byTalk(t).map((o, i) => <>{i > 0 && '／'}<a href={`#o-${o.id}`}>{o.name}</a></>)}</p></div>
+))}
+</div>
+<p class="cards-note">楽しみ方や相性は人によって違います。相手が人前で話すのが苦手そうなら二人だけの体験、二人きりの沈黙が心配ならキャストや他の参加者がいる体験、のように選ぶのがおすすめです。</p>
+</div></section>
+
+<section class="section" id="conditions"><div class="wrap">
+<h2 class="cards-h">付き合う前に見ておきたい条件</h2>
+<div class="pick-grid">
+  <div class="pick-col"><p class="pick-h">短めに終わる（約1時間以内）</p><p class="pick-p">{short.length ? short.map((o, i) => <>{i > 0 && '／'}<a href={`#o-${o.id}`}>{o.name}</a></>) : '掲載なし'}</p><p class="pick-n">終わった後に食事やお茶に移りやすく、次の予定も決めやすい長さです。</p></div>
+  <div class="pick-col"><p class="pick-h">二人だけで過ごせる</p><p class="pick-p">{privateTwo.length ? privateTwo.map((o, i) => <>{i > 0 && '／'}<a href={`#o-${o.id}`}>{o.name}</a></>) : '掲載なし'}</p><p class="pick-n">他の参加者と同じ組にならないことを公式で確認できたものです。</p></div>
+  <div class="pick-col"><p class="pick-h">他の参加者もいる</p><p class="pick-p">{withOthers.length ? withOthers.map((o, i) => <>{i > 0 && '／'}<a href={`#o-${o.id}`}>{o.name}</a></>) : '掲載なし'}</p><p class="pick-n">二人きりになる時間が少ないので、緊張しやすい二人にも。</p></div>
+  <div class="pick-col"><p class="pick-h">1人3,000円以内</p><p class="pick-p">{cheap.length ? cheap.map((o, i) => <>{i > 0 && '／'}<a href={`#o-${o.id}`}>{o.name}</a><small>1人{yen(pp(o)!)}〜</small></>) : '掲載なし'}</p><p class="pick-n">二人で申し込んだときの通常料金を2で割った額です（手数料は別）。</p></div>
+</div>
+</div></section>
+
+<section class="section tinted" id="items"><div class="wrap">
+<h2 class="cards-h">体験ごとの詳細<span>誰向け・予算・時間・会話・予約</span></h2>
+<OutingCards items={items} party={2} place="before-card" fit={fit} />
+<DateCta place="before-mid" ids={['kaitou', 'uwasabanashi', 'factroom']} />
+</div></section>
+
+<section class="section" id="compare"><div class="wrap">
+<h2 class="cards-h">比較表<span>二人分の料金・時間・貸切か相席か</span></h2>
+<DateCompare rows={rows} place="before-table" />
+</div></section>
+
+<section class="section tinted" id="after"><div class="wrap narrow">
+<h2 class="cards-h">当日の流れを決めておく</h2>
+<ul class="bullets">
+<li><strong>体験の前</strong>：集合・受付の時刻に余裕を持って待ち合わせます。受付時間に遅れると参加できない体験があります。</li>
+<li><strong>体験</strong>：各カードの「時間」は本編の目安です。受付・説明の時間を足して予定を組みます。</li>
+<li><strong>体験の後</strong>：終了予定時刻と会場の最寄り駅を確認し、食事やお茶の予定を入れておくと、体験の感想をそのまま話せます。</li>
+<li><strong>費用</strong>：誘う側がまとめて予約する場合は、1人あたりの額を伝えておくと精算しやすくなります。</li>
+</ul>
+</div></section>
+
+<section class="section" id="check"><div class="wrap narrow">
+<h2 class="cards-h">予約前に確認すべき点</h2>
+<DateChecklist />
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<h2 class="cards-h">よくある質問</h2>
+<div class="faq-list tag-immersive">
+{faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
+</div>
+<DateCta place="before-end" ids={['kaitou', 'uwasabanashi', 'factroom']} />
+</div></section>
+
+<section class="section"><div class="wrap">
+<p class="cmp-note-p">物語参加型の公演は株式会社ex Labsが企画・制作またはプロデュースしています。他の施設は各運営会社の公式ページの案内をもとに掲載しています。</p>
+<p class="vc-line" style="margin-top:20px">あわせて読む：<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート</a>／<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)">二人で楽しめる謎解き・脱出ゲーム</a>／<a href="/guide/tokyo-date-under-5000/" style="color:var(--accent)">1人5,000円以内の体験デート</a>／<a href="/guide/shibuya-rainy-date/" style="color:var(--accent)">渋谷の雨の日デート</a>／<a href="/guide/tokyo-holiday/" style="color:var(--accent)">東京の休日の過ごし方</a></p>
+</div></section>
+
+<AuthorBox />
+<LatestPosts category="immersive" />
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.cards-h{margin:0;font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--ink);text-align:left;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cards-h span{font-size:12.5px;font-weight:700;color:#0B35C8}
+.cards-note{margin:14px 0 0;font-size:12px;line-height:1.75;color:rgba(29,29,31,.6);text-align:left}
+.cmp-note-p{max-width:920px;margin:0 auto;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.62);text-align:left}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px;margin-top:16px}
+.pick-col{background:#fff;border:var(--bd);border-radius:12px;box-shadow:var(--shadow-1);padding:16px 18px;text-align:left}
+.pick-h{margin:0 0 6px;font-size:14px;font-weight:800;color:#0B35C8}
+.pick-p{margin:0;font-size:13.5px;line-height:1.8;color:var(--ink)}
+.pick-p a{color:var(--accent);font-weight:700}
+.pick-p small{font-size:11px;color:rgba(29,29,31,.6);margin-left:3px}
+.pick-n{margin:6px 0 8px;font-size:12.5px;line-height:1.7;color:rgba(29,29,31,.62)}
+ul.bullets{text-align:left}
+#talk,#conditions,#items,#compare,#after,#check,#faq{scroll-margin-top:88px}
+.section.tinted,.section{padding:44px 0}
+@media(max-width:640px){.section.tinted,.section{padding:32px 0}.cards-h{font-size:18px}}
+</style>

@@ -14,8 +14,13 @@ import VisualHero from '../../components/VisualHero.astro';
 import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
 import { publishedNazoItems } from '../../data/nazoDate';
 import { jsonLd } from '../../lib/microcms';
+import DateInfo from '../../components/guide/DateInfo.astro';
+import DateChecklist from '../../components/guide/DateChecklist.astro';
+import OutingCards from '../../components/guide/OutingCards.astro';
+import { buildOutings, type Outing } from '../../lib/outingCatalog';
 
 const now = new Date();
+const MODIFIED = '2026-10-01';
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const pageUrl = new URL('/guide/tokyo-friends-activities/', site).toString();
 const SIZES = [2, 3, 4];
@@ -50,6 +55,10 @@ const ext: Row[] = publishedNazoItems.filter((i) => i.privacy === 'room').map((i
   weather: i.indoor, note: i.tax, href: i.officialUrl, own: false, siteId: i.siteId, privateGroup: true, talkHeavy: false,
 }));
 const rows = [...own, ...ext];
+// 4人以上・グループで遊ぶゲーム（HACKTALE の頭脳戦、UNLIMITED MYSTERY のマダミス）。作品データから
+const groupGames = buildOutings(now).filter((o) => o.kind === 'madamis' || o.kind === 'zunousen');
+const groupFit = (o: Outing) => o.kind === 'madamis' ? `ちょうど${o.partyText}そろうグループ。推理と会話をじっくり楽しみたい人向け` : '2〜4人で申し込み、他の参加者とも同じ卓で交渉・推理を楽しみたい人向け';
+const checkedRows = [...buildOutings(now).filter((o) => o.checked).map((o) => ({ checked: o.checked }))];
 // 同じ値が続く人数（例：3名・4名とも「公式の料金表で確認」）はまとめて1回だけ出す
 const runs = (ts: string[]) => ts.reduce<{ t: string; i: number; n: number }[]>((a, t, i) => { const l = a[a.length - 1]; if (l && l.t === t && !/円|¥/.test(t)) l.n++; else a.push({ t, i, n: 1 }); return a; }, []);
 const names = (xs: Row[]) => xs.map((r) => r.name).join('、');
@@ -70,7 +79,7 @@ const articleLd = {
   image: [new URL('/assets/guide/tokyo-friends-activities.webp', site).toString()],
   author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
-  datePublished: '2026-09-27', dateModified: '2026-09-27', mainEntityOfPage: pageUrl,
+  datePublished: '2026-09-27', dateModified: MODIFIED, mainEntityOfPage: pageUrl,
 };
 const chips = [`${rows.length}件を比較`, '2〜4人の総額', ...(privateRows.length ? [`全員同じ組で遊べる ${privateRows.length}件`] : [])];
 ---
@@ -98,6 +107,7 @@ const chips = [`${rows.length}件を比較`, '2〜4人の総額', ...(privateRow
 <li>全員が同じ組か、貸切か相席か、会話の多さ、雨の日の屋内外から選べます。</li>
 <li>気になった体験は、そのまま予約ページへ進めます。</li>
 </ul></div>
+<DateInfo modified={MODIFIED} rows={checkedRows} />
 </div></section>
 
 <section class="section tinted" id="compare"><div class="wrap">
@@ -143,7 +153,16 @@ const chips = [`${rows.length}件を比較`, '2〜4人の総額', ...(privateRow
   </article>
 ))}
 </div>
+<DateCta place="friends-mid" links={[{ title: 'HACKTALE（頭脳戦・心理戦の公演）', href: '/hacktale/' }, { title: 'UNLIMITED MYSTERY（東大マーダーミステリーサークルのマダミス）', href: '/toudaimurder/' }]} />
 </div></section>
+
+{groupGames.length > 0 && (
+<section class="section" id="group"><div class="wrap">
+<h2 class="cards-h">4人以上で集まるなら<span>マダミス・頭脳戦（株式会社ex Labs制作）</span></h2>
+<p class="lede" style="text-align:left">マーダーミステリー（マダミス）は、作品ごとに遊ぶ人数が決まっていて、ちょうどの人数で貸し切って遊びます。HACKTALE の頭脳戦は1人から予約でき、他の参加者と同じ卓で交渉や推理を楽しみます。予算は4人で申し込んだときの総額です（その人数で遊べない作品は1人あたりの料金）。</p>
+<OutingCards items={groupGames} party={4} place="friends-group" fit={groupFit} />
+</div></section>
+)}
 
 <section class="section" id="check"><div class="wrap narrow">
 <h2 class="cards-h">予約前に確認すること</h2>
@@ -153,6 +172,7 @@ const chips = [`${rows.length}件を比較`, '2〜4人の総額', ...(privateRow
 <li><strong>年齢と内容</strong>：18歳以上の公演や、怖い描写を含む作品があります。全員が参加できるかを確認します。</li>
 <li><strong>集合時刻</strong>：受付に遅れると参加できない体験があります。待ち合わせは早めに。</li>
 </ul>
+<DateChecklist />
 </div></section>
 
 <section class="section tinted" id="faq"><div class="wrap">

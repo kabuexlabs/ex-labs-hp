@@ -1205,3 +1205,10 @@
   - /guide/botsunyukan/：「没入感とは？意味・使い方・例文と言い換え｜没入感を味わえる東京の体験も紹介」。
   - /blog/v1czofdqf/：<title>・description だけをコード側で上書き（H1・本文は CMS のまま）。「イマーシブシアターとは？劇場の外へ広がる「街なか型」イマーシブも紹介」。/guide/immersive-theater/ と検索意図が重ならないよう街なか型に寄せた。
 - 次に実施（未着手）：夜デート・休日・友達（拡充）・付き合う前・クリスマスの新規記事。他社の料金・営業時間は公式ページで確認できたものだけ載せる方針のため、作業環境から公式サイトに到達できない現状では作成していない。
+
+## 2026-10-01 デート・お出かけの新記事（休日・付き合う前・夜・クリスマス）と友達記事の拡充
+- 共通データ：src/lib/outingCatalog.ts に確認済みの体験を1つの型でまとめた（自社公演＝src/data/events/、HACKTALE＝src/data/hacktale.ts、UNLIMITED MYSTERY＝src/data/toudaimurderWorks.ts の料金・人数・時間がそろった作品、他社＝nazoDate・experienceDate の published 分）。料金・人数・時間は手書きしない。カードは記事制作ルールの9項目（誰向け・人数・予算・時間・会話の量・初めてでも・他の参加者・予約・体験後）を同じ順で出す（src/components/guide/OutingCards.astro）。
+- 公開：/guide/tokyo-holiday/（東京で休日に行く場所がないときの過ごし方｜二人・友達・一人で体験を比較）、/guide/tokyo-before-dating/（東京で付き合う前に行きたいデート｜会話が自然に生まれる体験を料金・時間で比較）。一覧のデート・お出かけカテゴリ、サイトマップに追加。
+- 下書き（noindex・一覧/サイトマップに出さない）：/guide/tokyo-night-date/、/guide/tokyo-christmas-date/。記事の核心である「夜の回の開始時刻」「12月20〜25日の開催日」を確認できた体験が3件そろったら自動で公開扱い（src/data/seasonalDate.ts の NIGHT_INFO・XMAS_INFO、または公演データの startTime・開催日）。HACKTALE の公演回（予約システム）は条件に合う回があればページ内に表示する。
+- 友達記事（/guide/tokyo-friends-activities/）：新URLは作らず既存記事を拡充。「4人以上で集まるなら」（HACKTALE・UNLIMITED MYSTERY）、最終更新日・料金更新日・掲載基準、予約前の9項目、中盤のCTAを追加。
+- サムネイル4枚（public/assets/guide/tokyo-holiday.webp ほか）を既存と同じデザインで作成。
