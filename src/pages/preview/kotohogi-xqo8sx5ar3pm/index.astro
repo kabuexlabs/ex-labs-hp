@@ -6,13 +6,12 @@
 // 公開範囲：URLを知っている人だけが見る前提。noindex（meta と X-Robots-Tag）。sitemap・llms.txt・ナビ・他ページからのリンクには載せない。
 //   - 環境変数 KOTOHOGI_PREVIEW_PASSWORD を Vercel に設定すると Basic 認証がかかる（ユーザー名は何でも可、パスワードのみ照合）。
 //     リポジトリが公開なので URL だけでは秘密にならない。関係者以外に見せたくない間は設定する。未設定なら認証なし。
-//   - URL 末尾に ?review=1 を付けると、未確定箇所の「確認用」注釈を表示する（書き出しの reviewMode）。
 // 本番公開するときは、正式URLへ移し、noindex を外し、sitemap・llms.txt・OGP を整える。未確定事項は docs/kotohogi-lp.md。
 export const prerender = false;
 import SiteGuard from '../../../components/SiteGuard.astro';
 
 // ---- 差し替え・確定後に入力する項目（空文字の間は表示しない） ----
-// 冒頭演出：'毎回'（確認用）／'初回のみ'（本番。2回目以降の訪問では流さない）／'なし'
+// 冒頭演出：'毎回'（関係者確認中）／'初回のみ'（本番。2回目以降の訪問では流さない）／'なし'
 const INTRO_MODE: '毎回' | '初回のみ' | 'なし' = '毎回';
 // チケット販売先URL（https:// から）。未設定の間、購入ボタンはページ内のチケット欄（#tickets）へ移動するだけ
 const RESERVE_URL = '';
@@ -45,7 +44,7 @@ if (password) {
     } catch {}
   }
   if (!ok) {
-    return new Response('このページは関係者確認用です。パスワードを入力してください。', {
+    return new Response('このページは関係者向けです。パスワードを入力してください。', {
       status: 401,
       headers: {
         'WWW-Authenticate': 'Basic realm="kotohogi-preview", charset="UTF-8"',
@@ -59,7 +58,6 @@ if (password) {
 Astro.response.headers.set('X-Robots-Tag', noindex);
 Astro.response.headers.set('Cache-Control', 'private, no-store');
 
-const review = Astro.url.searchParams.get('review') === '1';
 const hasUrl = /^https?:\/\//.test(RESERVE_URL);
 const ticketHref = hasUrl ? RESERVE_URL : '#tickets';
 const ticketAttrs = hasUrl ? { target: '_blank', rel: 'noopener', 'data-track': 'ticket', 'data-show': 'uwasabanashi-case2' } : {};
@@ -69,16 +67,24 @@ const title = 'ウワサバナシ調査委員会 case2「言祝ぎの家」｜�
 const description =
   '祝いの席に、招かれる。実際の一軒家を探索し、住人との会話やLINEでの調査報告を通じて真相に迫る没入型ホラー・ミステリー。2026年10月23日〜11月3日の指定日、さいたま市内で開催。1名7,500円、各回定員8名。';
 
-// ---- 冒頭演出（扉が3回叩かれ、開いて室内の光へ入り、キャッチ→ロゴ→本文。約5.5秒） ----
-const M = "'Bodoni Moda','Shippori Mincho','Yu Mincho',serif";
+// ---- 冒頭演出（約5.5秒） ----
+// 暗い玄関先で古い家のドアが3回叩かれ（コン、と文字が置かれる）、軋みながら開くとマゼンタの室内。
+// 画面がマゼンタに切り替わり、キャッチを1字ずつ打ち、メインビジュアルと同じ組みのタイトルで終わる。
+// 2026-10-01 ユーザー指摘（扉が立派すぎる／AIで作った感じが強い）で作り直し：光のにじみ・波紋・ぼかし・ズームをやめ、
+// ベタ塗り＋コピー機のようなざらつき＋カット切り替え（steps）にしている。
+const M = "'Shippori Mincho','Yu Mincho',serif";
 const W = 'min(54vw,224px,30vh)';
-const H = `calc(${W} * 1.72)`;
+const H = `calc(${W} * 1.86)`;
 const center = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center';
-const catchChars = '祝いの席に、招かれる。'.split('').map((c, i) => ({ c, d: (3.0 + i * 0.06).toFixed(2) }));
-const ripples = [0.5, 0.85, 1.2];
-const knocks: [number, string, number][] = [[0.5, '28%', -5], [0.85, '39%', 4], [1.2, '50%', -2]];
-const grain = 'repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 6px,rgba(0,0,0,.09) 6px 7px,transparent 7px 13px)';
-const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a;transform:scaleX(0);animation:kRule .6s cubic-bezier(.2,.7,.2,1) 4.35s forwards';
+const catchChars = '祝いの席に、招かれる。'.split('').map((c, i) => ({ c, d: (3.0 + i * 0.075).toFixed(3) }));
+const knocks: [number, string, number][] = [[0.55, '4%', -4], [0.9, '31%', 3], [1.25, '57%', -1]];
+// ざらつき（コピー・印刷物のノイズ）。SVG のノイズを敷き、0.4秒ごとにずらしてちらつかせる
+const noise = (alpha: number, tone: number) =>
+  `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 ${tone} 0 0 0 0 ${tone} 0 0 0 0 ${tone} 0 0 0 ${alpha} 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
+const grainDark = noise(0.9, 0.85);
+const grainInk = noise(1.1, 0.06);
+// 古い木のドア（ベタ塗り＋不揃いな木目）
+const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 1px 9px,rgba(255,255,255,.03) 9px 10px,transparent 10px 23px,rgba(0,0,0,.12) 23px 24px,transparent 24px 31px),#3a332c';
 ---
 <!doctype html>
 <html lang="ja">
@@ -98,51 +104,47 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
 </head>
 <body>
 <template id="k-intro-tpl">
-  <div role="presentation" style="position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;animation:kIntroOut .45s ease 5.35s forwards;background:repeating-linear-gradient(90deg,#1d1c1a 0 46px,#171614 46px 48px)">
-    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 46%,rgba(0,0,0,0) 25%,rgba(0,0,0,.7) 100%)"></div>
-    <div style={`${center};opacity:0;animation:kFadeIn .6s ease 0s forwards`}>
-      <div style="position:relative;transform-origin:50% 50%;animation:kNudge 1.1s linear .45s 1, kPush .8s cubic-bezier(.65,0,.85,.25) 2.35s forwards">
-        <div style="position:absolute;right:-190px;top:-150px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(255,236,190,.2),rgba(255,236,190,0) 65%);pointer-events:none"></div>
-        <div style={`position:absolute;left:50%;top:100%;width:calc(${W} * 2.3);height:96px;transform:translateX(-50%);clip-path:polygon(21% 0,79% 0,100% 100%,0 100%);background:linear-gradient(180deg,#3d3b37,#1c1b19)`}></div>
-        <div style={`position:absolute;left:50%;top:100%;width:calc(${W} * 1.8);height:96px;transform:translateX(-50%);clip-path:polygon(29% 0,71% 0,100% 100%,0 100%);background:linear-gradient(180deg,rgba(255,246,222,.8),rgba(255,246,222,0));opacity:0;animation:kGlow .9s ease 1.75s forwards`}></div>
-        <div style={`position:relative;width:${W};height:${H};padding:14px 14px 0;box-sizing:border-box;background:linear-gradient(90deg,#272623,#3a3834 50%,#272623);box-shadow:0 0 0 1px #0f0e0d, inset 0 1px 0 rgba(255,255,255,.08), 0 34px 44px -22px rgba(0,0,0,.85);z-index:1`}>
-          <div style="position:relative;width:100%;height:100%;background:#0e0d0c;perspective:900px;box-shadow:inset 6px 0 8px -4px rgba(0,0,0,.8), inset -6px 0 8px -4px rgba(0,0,0,.8)">
-            <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,#fffaf0 0%,#f4ead2 40%,#cbbf9f 100%);opacity:0;animation:kGlow .9s ease 1.6s forwards"></div>
-            <div style="position:absolute;inset:0;perspective:900px;animation:kKnock 1.1s linear .45s 1">
-              <div style={`position:absolute;inset:0;transform-origin:left center;animation:kOpen 1.05s cubic-bezier(.55,.05,.3,1) 1.5s forwards;background:${grain},linear-gradient(90deg,#1f1e1c 0%,#2c2a27 40%,#33312d 72%,#262422 100%);box-shadow:inset 0 0 0 1px #121110, inset -3px 0 0 rgba(255,255,255,.04)`}>
-                <div style="position:absolute;top:8%;bottom:8%;left:17%;width:13%;background:linear-gradient(180deg,#eadfc2,#cdbf9b 55%,#a89b7a);box-shadow:inset 0 0 0 3px #1a1917, inset 0 0 14px rgba(0,0,0,.55), 0 0 22px rgba(255,236,190,.18);opacity:.8"></div>
-                <div style="position:absolute;top:8%;bottom:8%;left:17%;width:13%;background:repeating-linear-gradient(180deg,transparent 0 23%,#1a1917 23% calc(23% + 2px))"></div>
-                <div style="position:absolute;top:46%;right:9%;width:10px;height:60px;background:linear-gradient(90deg,#4a4844,#9a988f,#4a4844);border-radius:2px"></div>
-                <div style="position:absolute;top:calc(46% + 12px);right:calc(9% - 2px);width:32px;height:7px;background:linear-gradient(180deg,#e2dfd7,#8f8d87);border-radius:4px;box-shadow:0 3px 4px rgba(0,0,0,.55)"></div>
-                <div style="position:absolute;top:calc(46% + 40px);right:calc(9% + 1px);width:8px;height:8px;border-radius:50%;background:#b9b6ae;box-shadow:inset 0 0 0 2px #6a6862"></div>
-                <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.65));opacity:0;animation:kGlow 1s ease 1.6s forwards"></div>
-              </div>
+  <div role="presentation" style="position:fixed;inset:0;z-index:100;overflow:hidden;cursor:pointer;background:#1c1a18;animation:kIntroOut .4s steps(3,end) 5.5s forwards">
+    <div style={`${center};opacity:0;animation:kFadeIn .5s steps(4,end) .05s forwards`}>
+      <div style="position:relative">
+        <div style="position:relative;animation:kKnock 1.1s steps(1,end) .5s 1">
+          <div style={`position:relative;width:${W};height:${H};box-sizing:border-box;border:7px solid #0c0b0a;border-bottom:0;background:#c41b85;perspective:700px`}>
+            <div style={`position:absolute;inset:0;background:${grainInk};opacity:.55`}></div>
+            <div style={`position:absolute;inset:0;transform-origin:left center;background:${wood};box-shadow:inset 0 0 0 1px #15120f;animation:kOpen 1.1s cubic-bezier(.45,0,.7,.4) 1.55s forwards`}>
+              <div style="position:absolute;top:8%;left:16%;right:16%;height:27%;background:#5e4f58;border:3px solid #1d1915"></div>
+              <div style="position:absolute;top:8%;left:50%;height:27%;width:2px;margin-left:-1px;background:#1d1915"></div>
+              <div style="position:absolute;top:21.5%;left:16%;right:16%;height:2px;background:#1d1915"></div>
+              <div style="position:absolute;top:42%;bottom:9%;left:16%;right:16%;border:1px solid rgba(0,0,0,.5);box-shadow:1px 1px 0 rgba(255,255,255,.05)"></div>
+              <div style="position:absolute;top:54%;right:9%;width:13px;height:13px;border-radius:50%;background:#8b867b;border:1px solid #14110e"></div>
+              <div style="position:absolute;top:calc(54% + 20px);right:calc(9% + 5px);width:3px;height:6px;background:#14110e"></div>
+              <div style="position:absolute;left:0;right:0;bottom:0;height:7%;background:rgba(0,0,0,.25)"></div>
             </div>
-            {ripples.map((d) => <span style={`position:absolute;left:70%;top:42%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;border:1px solid rgba(241,240,236,.75);opacity:0;animation:kRipple .75s ease-out ${d}s forwards;pointer-events:none;z-index:4`}></span>)}
           </div>
-          {knocks.map(([d, top, rot]) => <span style={`position:absolute;right:-60px;top:${top};font-family:${M};font-size:15px;font-weight:600;letter-spacing:.12em;color:#e7e4dc;opacity:0;transform:rotate(${rot}deg);animation:kKnockTxt .9s ease-out ${d}s forwards;white-space:nowrap`}>コン</span>)}
         </div>
-        <div style="position:absolute;right:-46px;top:4%;width:16px;height:26px;background:linear-gradient(#fff6dc,#efe0b4);border:2px solid #1b1a18;border-radius:2px;box-shadow:0 0 20px 7px rgba(255,236,190,.32);z-index:2"></div>
-        <div style="position:absolute;left:-50px;top:36%;width:30px;height:14px;background:linear-gradient(#cfccc4,#a9a7a0);box-shadow:0 0 0 1px #111, 1px 2px 3px rgba(0,0,0,.6)"></div>
+        <div style="position:absolute;left:50%;top:100%;width:calc(100% + 40px);height:12px;transform:translateX(-50%);background:#2a2826;border-top:1px solid #0c0b0a"></div>
+        <div style="position:absolute;left:calc(100% + 16px);top:10%;width:15px;height:38px;background:#cfc8b8;border:1px solid #0c0b0a;transform:rotate(3deg)"></div>
+        <div style={`position:absolute;left:calc(100% + 14px);top:32%;height:60%;width:3em;font-family:${M};font-size:16px;font-weight:700;color:#e4dfd3`}>
+          {knocks.map(([d, top, rot]) => <span style={`position:absolute;left:0;top:${top};writing-mode:vertical-rl;letter-spacing:.1em;opacity:0;transform:rotate(${rot}deg);animation:kShow .01s linear ${d}s forwards`}>コン</span>)}
+        </div>
       </div>
     </div>
-    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(255,246,222,.45),rgba(255,246,222,0) 60%);opacity:0;animation:kGlow 1s ease 1.8s forwards;pointer-events:none"></div>
-    <div style="position:absolute;inset:0;background:#f1f0ec;opacity:0;animation:kFadeIn .5s ease 2.6s forwards"></div>
-    <div style={`${center};animation:kFadeOut .35s ease 4.2s forwards`}>
-      <p style={`margin:0;writing-mode:vertical-rl;font-family:${M};font-size:min(34px,8.4vw);letter-spacing:.3em;color:#1b1b1a;font-weight:600;line-height:1`}>{catchChars.map(({ c, d }) => <span style={`opacity:0;animation:kCharIn .55s ease ${d}s forwards`}>{c}</span>)}</p>
+    <div style="position:absolute;inset:0;background:#c41b85;opacity:0;animation:kShow .01s linear 2.8s forwards"></div>
+    <div style={`${center};animation:kHide .01s linear 4.3s forwards`}>
+      <p style={`margin:0;writing-mode:vertical-rl;font-family:${M};font-size:min(34px,8.4vw);letter-spacing:.3em;color:#fff;font-weight:700;line-height:1`}>{catchChars.map(({ c, d }) => <span style={`opacity:0;animation:kShow .01s linear ${d}s forwards`}>{c}</span>)}</p>
     </div>
-    <div style={center}>
+    <div style={`${center};opacity:0;animation:kShow .01s linear 4.4s forwards`}>
       {LOGO_SRC ? (
-        <img src={LOGO_SRC} alt="" style="max-width:min(72vw,320px);max-height:40vh;opacity:0;animation:kRise .7s ease 4.4s forwards">
+        <img src={LOGO_SRC} alt="" style="max-width:min(72vw,320px);max-height:40vh">
       ) : (
-        <div style={`text-align:center;font-family:${M};color:#1b1b1a;display:grid;justify-items:center;gap:12px`}>
-          <div style="font-size:13px;font-weight:600;letter-spacing:.26em;opacity:0;animation:kRise .6s ease 4.45s forwards">ウワサバナシ調査委員会</div>
-          <div style="display:flex;align-items:center;gap:12px"><span style={rule}></span><span style="font-size:17px;font-style:italic;letter-spacing:.08em;opacity:0;animation:kRise .6s ease 4.5s forwards">case2</span><span style={rule}></span></div>
-          <div style="font-size:min(50px,12.4vw);font-weight:800;line-height:1.2;white-space:nowrap;margin-left:-.4em;font-feature-settings:'palt';opacity:0;animation:kRise .7s ease 4.55s forwards">「言祝ぎの家」</div>
+        <div style={`display:grid;justify-items:center;gap:18px;font-family:${M};color:#111`}>
+          <div style="font-size:min(46px,11.6vw);font-weight:800;line-height:1.12;letter-spacing:.02em;text-align:center;font-feature-settings:'palt'">ウワサバナシ<br>調査委員会</div>
+          <div style="display:flex;align-items:baseline;gap:12px;background:#111;color:#fff;padding:4px 14px 6px;font-size:min(17px,4.4vw);font-weight:700;white-space:nowrap"><span style="font-family:'Bodoni Moda',serif;font-style:italic;font-size:1.15em">case2</span>言祝ぎの家 -呪われた花嫁-</div>
         </div>
       )}
     </div>
-    <button type="button" style={`position:absolute;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:5;min-height:44px;padding:0 18px;background:rgba(241,240,236,.9);color:#1b1b1a;border:1px solid #1b1b1a;font-family:${M};font-size:14px;font-weight:600;letter-spacing:.1em;cursor:pointer`}>スキップ</button>
+    <div aria-hidden="true" style={`position:absolute;inset:-60px;pointer-events:none;background:${grainDark};opacity:.16;animation:kGrain .4s steps(1,end) infinite`}></div>
+    <div aria-hidden="true" style={`position:absolute;inset:-60px;pointer-events:none;background:${grainInk};opacity:.35;mix-blend-mode:multiply;animation:kGrain .4s steps(1,end) infinite reverse`}></div>
+    <button type="button" style={`position:absolute;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:5;min-height:44px;padding:0 18px;background:#f1f0ec;color:#1b1b1a;border:1px solid #1b1b1a;font-family:${M};font-size:14px;font-weight:600;letter-spacing:.1em;cursor:pointer`}>スキップ</button>
   </div>
 </template>
 <div id="k-intro-root"></div>
@@ -185,9 +187,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
   <header style="display:flex;justify-content:center;align-items:center;gap:12px;padding:0 20px;height:52px;background:#1b1b1a;color:#f1f0ec;border-bottom:3px solid #c41b85">
     <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:15px;font-weight:800;letter-spacing:.08em;white-space:nowrap">ウワサバナシ調査委員会</p>
   </header>
-  {(review) && (<Fragment>
-    <p style="margin:0;border-bottom:1px dashed #6b6963;background:#fff;padding:8px 14px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜既存サイトの共通ヘッダーがある場合は差し替え</p>
-  </Fragment>)}
 
   <section id="top">
     <div style={KV_SRC ? 'position:relative;aspect-ratio:1076 / 1522;background:#c41b85;overflow:hidden' : 'position:relative;aspect-ratio:3 / 4;background:#2b2a28;overflow:hidden'}>
@@ -215,16 +214,13 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
         <span style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:min(46px,12.4vw);font-weight:800;letter-spacing:0;white-space:nowrap;margin-left:-.45em">「言祝ぎの家」</span>
         {KV_SRC && <span>呪われた花嫁</span>}
       </h1>
-      {(review && !KV_SRC) && (<Fragment>
-        <p style="position:absolute;left:76px;top:24px;margin:0;border:1px dashed #6b6963;background:#fff;padding:4px 8px;font-family:ui-monospace,Menlo,monospace;font-size:10px;line-height:1.5;color:#3d3c3a">確認用｜メインビジュアル差し替え位置</p>
-      </Fragment>)}
     </div>
 
     <div style="padding:28px 20px 40px;display:grid;gap:22px">
       <div style="border:1px solid #1b1b1a;outline:1px solid #1b1b1a;outline-offset:3px;margin:3px;padding:6px 16px;display:grid;text-align:center">
         <div style="padding:14px 0;border-bottom:1px solid #b8b6b0;display:grid;gap:4px">
           <p style="margin:0;display:flex;justify-content:center;gap:12px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;letter-spacing:.24em;color:#4a4844"><span aria-hidden="true">〈</span>開催<span aria-hidden="true">〉</span></p>
-          <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;line-height:1.6">2026年10月23日〜11月3日の<br><span style="display:inline-block;margin-top:4px;background:#1b1b1a;color:#f1f0ec;padding:0 12px;letter-spacing:.14em">指定日開催</span></p>
+          <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;line-height:1.6">2026年10月23日〜11月3日</p>
         </div>
         <div style="padding:14px 0;border-bottom:1px solid #b8b6b0;display:grid;gap:4px">
           <p style="margin:0;display:flex;justify-content:center;gap:12px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;letter-spacing:.24em;color:#4a4844"><span aria-hidden="true">〈</span>会場<span aria-hidden="true">〉</span></p>
@@ -245,7 +241,7 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
       <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.24em;color:#3d3c3a">調査記録　第二項</p>
     </div>
     <div style="display:flex;justify-content:center">
-      <p style="margin:0;writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:min(16px,4.2vw);height:24em;line-height:2;letter-spacing:.1em"><span style="text-orientation:upright;letter-spacing:-.12em">2026</span>年<span style="text-combine-upright:all">10</span>月。<br>さいたま市の住宅街にある一軒家で、<br>不審な出来事が相次いでいる。<br>新婚夫婦の新居で<br>足音や獣の臭いが絶えず、<br>妻の様子もおかしいという。<br>囁かれるウワサバナシの真相を調査するため、<br>あなたは「ウワサバナシ調査委員会」の<br>調査員として、<br>その家へ派遣された。</p>
+      <p style="margin:0;writing-mode:vertical-rl;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:min(16px,4.2vw);height:24em;line-height:2;letter-spacing:.1em">２０２６年１０月。<br>さいたま市の住宅街にある一軒家で、<br>不審な出来事が相次いでいる。<br>新婚夫婦の新居で<br>足音や獣の臭いが絶えず、<br>妻の様子もおかしいという。<br>囁かれるウワサバナシの真相を調査するため、<br>あなたは「ウワサバナシ調査委員会」の<br>調査員として、<br>その家へ派遣された。</p>
     </div>
   </section>
 
@@ -308,7 +304,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
   <section id="schedule" style="padding:56px 20px 64px">
     <div style="position:relative;display:grid;gap:10px;margin-bottom:36px;text-align:center">
       <div style="display:flex;align-items:center;gap:14px"><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span><h2 style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:29px;font-weight:800;letter-spacing:.04em;line-height:1.35">開催概要<br>開催日程</h2><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span></div>
-      <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.24em;color:#3d3c3a">調査記録　第四項</p>
     </div>
 
     <dl style="margin:0;display:grid;gap:22px;text-align:center">
@@ -327,9 +322,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
         </div>
       </Fragment>)}
     </dl>
-    {(review && !DURATION_TEXT) && (<Fragment>
-      <p style="margin:16px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜所要時間は未掲載（約90分／約95分を確定後 durationText に入力）</p>
-    </Fragment>)}
 
     <div style="margin-top:40px;display:grid;gap:12px">
       <p style="margin:0;display:flex;justify-content:space-between;align-items:baseline;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;letter-spacing:.08em;border-bottom:2px solid #1b1b1a;padding-bottom:6px">開催日<span style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;font-weight:500;color:#4a4844;letter-spacing:.04em">2026年　全22公演</span></p>
@@ -386,9 +378,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
         <ul style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px;font-variant-numeric:tabular-nums"><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">13:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">15:00</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">17:30</li><li style="border:1px solid #8f8d87;padding:2px 10px;font-size:14px">19:30</li></ul>
       </li>
     </ul>
-    {(review) && (<Fragment>
-      <p style="margin:12px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜10月31日（土）は追加開催候補のため非掲載・予約不可。告知の有無は主催者確認</p>
-    </Fragment>)}
 
     <div style="margin-top:40px;border:1px solid #1b1b1a;background:#f7f6f2;padding:22px 20px 24px">
       <p style="margin:0 0 18px;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;letter-spacing:.14em">当日の流れ</p>
@@ -406,9 +395,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
           <p style="margin:0;line-height:1.6"><span style="display:block;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700">開演</span></p>
         </li>
       </ol>
-      {(review) && (<Fragment>
-        <p style="margin:14px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜遅刻時の扱い（参加可否・猶予・返金）は確定まで非掲載</p>
-      </Fragment>)}
     </div>
   </section>
 
@@ -429,9 +415,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
         
       </div>
     </div>
-    {(review) && (<Fragment>
-      <p style="margin:14px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜税込・税別は未確認のため表記なし</p>
-    </Fragment>)}
 
     <div style="margin-top:36px;display:grid;gap:14px">
       <p style="margin:0;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:17px;font-weight:700;letter-spacing:.1em">各回の人数</p>
@@ -475,9 +458,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
     {(hasUrl) && (<Fragment>
       <a href={RESERVE_URL} data-track="ticket" data-show="uwasabanashi-case2" data-place="tickets" target="_blank" rel="noopener" style="margin-top:32px;display:flex;justify-content:center;align-items:center;gap:14px;background:#1b1b1a;color:#f1f0ec;text-decoration:none;height:58px;font-size:15px;font-weight:700;letter-spacing:.1em" class="kh1">チケットを購入する<span aria-hidden="true" style="font-weight:400">→</span></a>
     </Fragment>)}
-    {(review && !hasUrl) && (<Fragment>
-      <p style="margin:24px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜販売先URL未設定。reserveUrl を入れると購入ボタンが出て、右下の「チケット購入」も販売ページへ（未設定時はこの欄へ移動）</p>
-    </Fragment>)}
 
     <div style="margin-top:48px;padding-top:32px;border-top:1px solid #1b1b1a">
       <p style="margin:0 0 20px;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:19px;font-weight:700;letter-spacing:.1em">公演が中止となる場合</p>
@@ -510,9 +490,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
           <p style="margin:6px 0 0">中止の場合は、チケット代金の全額返金、<br>または後日の空席のある回への振替を<br>お選びいただけます。<br>振替可能な回がない場合は、<br>全額返金いたします。</p>
         </div>
       </div>
-      {(review) && (<Fragment>
-        <p style="margin:14px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜4時間前を過ぎた急な中止の連絡方針、自己都合キャンセル・日程変更は未確定のため非掲載</p>
-      </Fragment>)}
     </div>
   </section>
 
@@ -547,12 +524,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
       <div style="margin-top:28px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a;padding:14px 0;display:grid;gap:4px;text-align:center">
         <p style="margin:0;display:flex;justify-content:center;gap:12px;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;letter-spacing:.24em"><span aria-hidden="true" style="color:#8a8882;font-weight:400">〈</span>アクセス<span aria-hidden="true" style="color:#8a8882;font-weight:400">〉</span></p>
         <p style="margin:0;white-space:pre-line;font-size:14px">{ACCESS_TEXT}</p>
-      </div>
-    </Fragment>)}
-    {(review) && (<Fragment>
-      <div style="margin-top:20px;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a;display:grid;gap:4px">
-        <p style="margin:0">確認用｜アクセス欄：最寄り駅・駅からの所要時間・バス利用の概要を確認後 accessText に入力</p>
-        <p style="margin:0">確認用｜会場写真：公開範囲・撮影ルール・所在地特定のおそれを確認後に掲載（位置情報は削除）</p>
       </div>
     </Fragment>)}
   </section>
@@ -590,9 +561,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
         <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;background:#fbfaf7;border:1px solid #1b1b1a;padding:12px"><span aria-hidden="true" style="background:#1b1b1a;color:#f1f0ec;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:700;line-height:2">設備</span><span style="font-size:14px;line-height:1.7">2階建ての家屋内で<br>階段を使用するため、<br>車椅子でのご参加には<br>対応しておりません。</span></li>
         <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;background:#fbfaf7;border:1px solid #1b1b1a;padding:12px"><span aria-hidden="true" style="background:#1b1b1a;color:#f1f0ec;text-align:center;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:13px;font-weight:700;line-height:2">言語</span><span style="font-size:14px;line-height:1.7">本公演は日本語のみで実施します。</span></li>
       </ul>
-      {(review) && (<Fragment>
-        <p style="margin:0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜同伴する保護者のチケット要否は未確定</p>
-      </Fragment>)}
     </div>
 
     <div style="margin-top:48px;display:grid;gap:12px">
@@ -612,9 +580,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
         </div>
       </div>
       
-      {(review) && (<Fragment>
-        <p style="margin:0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜スマホ1人1台の要否／LINE事前準備／Wi-Fi・充電／大型荷物／貴重品は未確定</p>
-      </Fragment>)}
     </div>
 
     <div style="margin-top:48px;display:grid;gap:12px">
@@ -628,9 +593,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
         <p style="margin:0">体験の途中で退場することは可能です。<br>退場をご希望の場合は、<br>スタッフにお知らせください。<br>お客様のご都合による<br>一時退出後の再入場はできません。</p>
         <p style="margin:0">お手洗いは、<br>できるだけ受付前にお済ませください。<br>体験中にお手洗いが必要になった場合や、<br>体調がすぐれない場合は、<br>事前にご案内する専用のサインで<br>スタッフにお知らせください。</p>
       </div>
-      {(review) && (<Fragment>
-        <p style="margin:0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜お手洗い・体調不良で退出した後の体験復帰可否は運営確認</p>
-      </Fragment>)}
     </div>
 
     <div style="margin-top:48px;display:grid;gap:12px">
@@ -652,9 +614,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
         <p style="margin:0;font-size:12px;letter-spacing:.14em;color:#4a4844">シリーズ共通ハッシュタグ</p>
         <p style="margin:0;background:#1b1b1a;color:#f1f0ec;padding:6px 16px;font-size:16px;font-weight:700;letter-spacing:.04em">#ウワサバナシ調査委員会</p>
       </div>
-      {(review) && (<Fragment>
-        <p style="margin:0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜作品別タグ候補「#言祝ぎの家」は確定まで非掲載。会場内撮影ルール未確定のまま公開する場合は主催者確認</p>
-      </Fragment>)}
     </div>
 
     <div id="faq" style="margin-top:56px;display:grid;gap:14px">
@@ -684,9 +643,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
           <p style="margin:0;padding:12px 14px 16px 50px;font-size:14px;line-height:1.9;border-top:1px dashed #b8b6b0">リピート参加も歓迎します。<br>初めて参加される方の体験を<br>損なわないよう、ネタバレにつながる<br>発言や先回りした行動は<br>お控えください。</p>
         </details>
       </div>
-      {(review) && (<Fragment>
-        <p style="margin:0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜FAQ回答は掲載原稿のみ。質問文は主催者確認。問い合わせ窓口は未共有</p>
-      </Fragment>)}
     </div>
   </section>
 
@@ -704,9 +660,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
         <div style="background:#1b1b1a;color:#f1f0ec;padding:22px 16px;text-align:center;display:grid;gap:6px"><dt style="font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.2em;color:#c9c7c1">出演</dt><dd style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:18px;font-weight:700;line-height:1.7">{CAST_TEXT}</dd></div>
       </Fragment>)}
     </dl>
-    {(review && !CAST_TEXT) && (<Fragment>
-      <p style="margin:14px 0 0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜出演者名は共有後に castText へ入力（役名・配役は掲載しない）</p>
-    </Fragment>)}
   </section>
 
   <section id="final-cta" style="position:relative;background:#c41b85;color:#fff;padding:64px 20px 56px;text-align:center;overflow:hidden">
@@ -726,9 +679,6 @@ const rule = 'display:block;width:64px;height:3px;border-top:1px solid #1b1b1a;b
   <footer id="site-footer" style="background:#1b1b1a;color:#c9c7c1;padding:20px 20px 120px;border-top:1px solid #3d3b38;display:grid;justify-items:center;gap:10px;text-align:center">
     <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;letter-spacing:.16em;color:#f1f0ec">ウワサバナシ調査委員会</p>
     <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap"><a href="#top" style="font-size:12px;text-decoration:none;letter-spacing:.1em;color:#c9c7c1" class="kh3">ページの先頭へ ↑</a><button type="button" data-replay-intro style="background:none;border:1px solid #5d5b56;color:#c9c7c1;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.1em;padding:6px 12px;min-height:36px;cursor:pointer">オープニングをもう一度見る</button></div>
-    {(review) && (<Fragment>
-      <p style="margin:0;border:1px dashed #6b6963;background:#fff;padding:8px 12px;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:#3d3c3a">確認用｜既存サイトの共通フッター（著作権表記・問い合わせ窓口）に差し替え</p>
-    </Fragment>)}
   </footer>
 </div>
 
@@ -755,18 +705,12 @@ summary::-webkit-details-marker{display:none}
 /* FAQ の開閉記号 */
 .k-sign::before{content:'＋'}
 details[open] .k-sign::before{content:'−'}
-@keyframes kKnock{0%,100%{transform:translateX(0)}3%{transform:translateX(3px)}8%{transform:translateX(-1px)}12%{transform:translateX(0)}36%{transform:translateX(3px)}41%{transform:translateX(-1px)}45%{transform:translateX(0)}69%{transform:translateX(3px)}74%{transform:translateX(-1px)}78%{transform:translateX(0)}}
-@keyframes kNudge{0%,100%{transform:scale(1)}4%{transform:scale(1.014)}12%{transform:scale(1)}37%{transform:scale(1.014)}45%{transform:scale(1)}70%{transform:scale(1.014)}78%{transform:scale(1)}}
-@keyframes kKnockTxt{0%{opacity:0}20%{opacity:1}100%{opacity:0;margin-top:-8px}}
-@keyframes kRipple{0%{transform:scale(.2);opacity:.85}100%{transform:scale(2.6);opacity:0}}
-@keyframes kOpen{0%{transform:rotateY(0)}12%{transform:rotateY(-4deg)}100%{transform:rotateY(-112deg)}}
-@keyframes kGlow{to{opacity:1}}
-@keyframes kPush{to{transform:scale(4.8);opacity:0}}
-@keyframes kCharIn{0%{opacity:0;filter:blur(6px)}100%{opacity:1;filter:blur(0)}}
-@keyframes kFadeOut{to{opacity:0}}
-@keyframes kRule{to{transform:scaleX(1)}}
-@keyframes kRise{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:none}}
+@keyframes kKnock{0%,100%{transform:translateX(0)}3%{transform:translateX(2px)}9%{transform:translateX(0)}35%{transform:translateX(2px)}41%{transform:translateX(0)}67%{transform:translateX(2px)}73%{transform:translateX(0)}}
+@keyframes kOpen{0%{transform:rotateY(0)}14%{transform:rotateY(-6deg)}46%{transform:rotateY(-8deg)}100%{transform:rotateY(-100deg)}}
 @keyframes kFadeIn{to{opacity:1}}
+@keyframes kShow{to{opacity:1}}
+@keyframes kHide{to{opacity:0}}
+@keyframes kGrain{0%{transform:translate(0,0)}25%{transform:translate(-23px,14px)}50%{transform:translate(17px,-29px)}75%{transform:translate(-9px,31px)}}
 @keyframes kIntroOut{to{opacity:0;visibility:hidden}}
 </style>
 </body>

@@ -99,4 +99,4 @@
 
 ## 言祝ぎの家 LP（2026-10-01〜、限定URLプレビュー）
 - ウワサバナシ調査委員会 case2「言祝ぎの家」LP は /preview/kotohogi-xqo8sx5ar3pm/（noindex＋X-Robots-Tag、sitemap・llms.txt・他ページから**リンクしない**）。正本メモは docs/kotohogi-lp.md。
-- 販売URL・メインビジュアル・ロゴ・所要時間・アクセス・出演者は index.astro 冒頭の定数で入れる（空なら非表示）。`?review=1` で確認用注釈。Basic 認証は Vercel 環境変数 KOTOHOGI_PREVIEW_PASSWORD（未設定なら認証なし）。
+- 販売URL・メインビジュアル・ロゴ・所要時間・アクセス・出演者は index.astro 冒頭の定数で入れる（空なら非表示）。確認用注釈は削除済み。Basic 認証は Vercel 環境変数 KOTOHOGI_PREVIEW_PASSWORD（未設定なら認証なし）。
