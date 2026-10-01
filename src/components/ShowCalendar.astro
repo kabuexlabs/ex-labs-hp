@@ -86,7 +86,7 @@ const chips = [short(s.duration), short(s.capacity)].filter((c) => c && c.length
         </div>
       ))}
     </div>}
-    <p class="cal-stock">{noDates ? '空席・日程は予約サイトの表示が最新' : todayTimeUnknown ? '◯は開催日です。本日の開演時刻と空席は予約サイトで確認してください' : openCount > 0 ? '◯をタップで予約サイトへ。空席は予約サイトの表示が最新' : nextAfter ? `この2週間に確認できた開催日はありません。次回 ${fmtDateShort(nextAfter)}` : 'この2週間に確認できた開催日はありません'}{stale ? '（最新の日程は予約サイトでご確認ください）' : ''}</p>
+    <p class="cal-stock">{noDates ? '空席・日程は予約サイトの表示が最新' : todayTimeUnknown ? '◯は開催日です。本日の開演時刻と空席は予約サイトで確認してください' : openCount > 0 ? '◯は開催日の印です（空席ありの印ではありません）。タップすると予約サイトで空席を確認できます' : nextAfter ? `この2週間に確認できた開催日はありません。次回 ${fmtDateShort(nextAfter)}` : 'この2週間に確認できた開催日はありません'}{stale ? '（最新の日程は予約サイトでご確認ください）' : ''}</p>
     <div class="cal-actions">
       <a class="btn cal-btn" href={s.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={s.id} data-place={`${place}-btn`}>{openCount > 0 ? '予約サイトで空席を見る' : '次回以降の日程を見る'}<small>{s.ticketSite}</small></a>
       {!noDetailLink && <a class="cal-sub" href={s.url} data-track="show" data-show={s.id} data-place={place}>公演内容 →</a>}

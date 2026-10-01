@@ -102,6 +102,45 @@ function scrubHiddenTopics(html: string): string {
   return out;
 }
 
+// 非公開ワードの除去で本文が消え、見出しだけが残った節を補う（CMS の原稿は直接編集できないため配信時に足す）。
+// 補足は自社で確認できる事実だけで書く。
+const TOKYO_GUIDE_LINK = '<p><a href="/guide/immersive-tokyo/">東京で体験できるイマーシブ公演を、開催日・料金・人数で比較する →</a></p>';
+const BLOG_SUPPLEMENTS: Record<string, { heading: RegExp; html: (body: string) => string }[]> = {
+  // イマーシブシアター解説の旧記事：「街なか型イマーシブという選択肢」の本文が非公開ワードの除去で空になっていた（2026-10-01）
+  v1czofdqf: [{
+    heading: /街なか型イマーシブ/,
+    html: (body) =>
+      '<p>劇場の外に出て、実際の街や商業施設そのものを舞台にするイマーシブもあります。株式会社ex Labsが企画・制作した「ロスト・フレーム」は、下北沢の街に散らばった絵画を探して歩く周遊型の公演でした。「ウワサバナシ調査委員会」は、渋谷サクラステージの施設全体を調査員として巡りながら、キャストへの聞き込みで物語を追う施設一体型の公演です。</p>' +
+      (/\/guide\/immersive-tokyo\//.test(body) ? '' : TOKYO_GUIDE_LINK),
+  }],
+};
+
+function applySupplements(id: string | undefined, html: string): string {
+  const list = id ? BLOG_SUPPLEMENTS[id] : undefined;
+  if (!list) return html;
+  let out = html;
+  for (const sup of list) {
+    const re = /<(h[2-4])\b[^>]*>([\s\S]*?)<\/\1>/gi;
+    let done = false;
+    out = out.replace(re, (m, _tag, inner) => {
+      if (done || !sup.heading.test(String(inner).replace(/<[^>]+>/g, ''))) return m;
+      done = true;
+      return m + sup.html(out);
+    });
+  }
+  return out;
+}
+
+// 中身のない見出し（直後が同じか上の階層の見出し、または本文の終わり）を出さない
+function dropEmptyHeadings(html: string): string {
+  let out = html;
+  for (let pass = 0; pass < 3; pass++) {
+    out = out.replace(/<h([2-4])\b[^>]*>[\s\S]*?<\/h\1>((?:\s|<p>\s*(?:<br\s*\/?>)?\s*<\/p>)*)(?=<h([1-4])\b|$)/gi, (m, lv, _gap, nextLv) =>
+      nextLv === undefined || Number(nextLv) <= Number(lv) ? '' : m);
+  }
+  return out;
+}
+
 // The rich-editor field may be called `body` or `content` depending on
 // how the microCMS API schema was created; accept either and make sure
 // the templates always receive strings.
@@ -109,7 +148,7 @@ function normalizePost(raw: any): BlogPost {
   return {
     ...raw,
     title: raw?.title ?? '(無題)',
-    body: scrubHiddenTopics(sanitizeBody(raw?.body ?? raw?.content ?? '')),
+    body: dropEmptyHeadings(applySupplements(raw?.id, scrubHiddenTopics(sanitizeBody(raw?.body ?? raw?.content ?? '')))),
   };
 }
 

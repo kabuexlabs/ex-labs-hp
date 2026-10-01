@@ -52,6 +52,7 @@ export interface Show {
 
 import { eventsData } from './events/index.ts';
 import { regionName, areaName } from './events/areas.ts';
+import { priceLabels, bookingUrl } from '../lib/priceLabel.ts';
 
 export const shows: Show[] = eventsData.works.filter((w) => !w.guideOnly).map((w) => {
   const occ = eventsData.occurrences.filter((o) => o.workId === w.id && o.published && !o.test).sort((a, b) => (a.date + (a.startTime ?? '')).localeCompare(b.date + (b.startTime ?? '')));
@@ -65,7 +66,7 @@ export const shows: Show[] = eventsData.works.filter((w) => !w.guideOnly).map((w
     area: `${regionName(venue.regionId)}・${areaName(venue.areaId)}／${venue.listName ?? venue.name}`,
     feature: w.summary,
     url: w.officialUrl,
-    ticketUrl: ch?.url ?? w.ticketUrl ?? w.officialUrl,
+    ticketUrl: bookingUrl(w, ch?.url) ?? w.officialUrl,
     ticketSite: channel?.name ?? (w.ticketUrl ? new URL(w.ticketUrl).hostname : '公式ページ'),
     duration: w.duration.text,
     capacity: w.party.text,
@@ -81,11 +82,10 @@ export const shows: Show[] = eventsData.works.filter((w) => !w.guideOnly).map((w
     verifiedFrom: srcs.map((s) => `${s!.label}${s!.url ? ' ' + s!.url : ''}（${s!.terms}）`),
     verifyTtlDays: w.verifyTtlDays,
     published: w.published,
+    // 料金の表示文は lib/priceLabel.ts だけで作る（東京ガイドの比較表・公演カードと同じ言い方にする）
     priceCard: (() => {
-      if (w.price.unit === 'per-person' && w.price.amount !== undefined) return { main: `¥${w.price.amount.toLocaleString('ja-JP')}`, sub: '1人・税込' };
-      if (w.price.unit === 'per-group' && w.price.tiers?.length) { const t = [...w.price.tiers].sort((a, b) => a.party - b.party)[0]; return { main: `¥${t.amount.toLocaleString('ja-JP')}〜`, sub: `1組（${t.party}人）・1人 ¥${Math.round(t.amount / t.party).toLocaleString('ja-JP')}〜` }; }
-      if (w.price.unit === 'charter' && w.price.amount !== undefined) return { main: `¥${w.price.amount.toLocaleString('ja-JP')}`, sub: '貸切・税込' };
-      return { main: '料金は公式で確認', sub: '' };
+      const l = priceLabels(w.price);
+      return { main: l.main, sub: [l.sub, l.group].filter(Boolean).join('／') };
     })(),
     ...(w.image ? { image: { path: w.image.path, alt: `${w.title} キービジュアル` } } : {}),
   };
