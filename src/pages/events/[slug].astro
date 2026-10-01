@@ -5,6 +5,7 @@
 // 未確認の回には offers を付けない（予約可能に見せない）。
 export const prerender = false;
 
+import DateGuideLinks from '../../components/guide/DateGuideLinks.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import EventCard from '../../components/EventCard.astro';
@@ -121,6 +122,7 @@ const eventLd = upcoming.concat(cancelled).map((r) => {
   <><p class="ev-res-h" style="margin-top:26px;font-size:15px">終了した回</p><ul class="ev-past">{past.map((r) => <li>{fmtDateShort(r.occ.date)}{r.occ.startTime ? ` ${r.occ.startTime}` : ''} {EVENT_STATUS_LABEL[r.occ.eventStatus] === '中止' ? '中止' : '終了'}</li>)}</ul></>
 )}
 <p class="ev-src" style="margin-top:22px">情報源：{sources.map((s, i) => <>{i > 0 && '／'}{s.url ? <a href={s.url} target="_blank" rel="noopener">{s.label}</a> : s.label}（{fmtVerified(s.checkedAt)}確認）</>)}。掲載内容の修正・掲載停止のご依頼は <a href={`mailto:${EVENTS_CONTACT}`}>{EVENTS_CONTACT}</a> へ。</p>
+{!isOver && <DateGuideLinks place={`detail-${work.id}`} />}
 </div></section>
 
 {otherWorks.length > 0 && (

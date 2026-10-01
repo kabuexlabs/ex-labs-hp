@@ -623,3 +623,22 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/immersive-vr.webp',
   },
 ];
+
+// 「東京のデート・お出かけ」カテゴリ（/guide/ 上部・ヘッダー・トップページの入口）。並び順はここが正本。
+// まだ記事がないもの（屋内お出かけ・夜デート・クリスマスデート・休日の過ごし方）は、公開したらここに追加する。
+export const DATE_OUTING = {
+  title: '東京のデート・お出かけ',
+  desc: '東京で楽しめる体験型デート、雨の日のお出かけ、謎解き、イマーシブ、街歩き、ものづくりなどを、料金・所要時間・アクセス・会話量・貸切可否で比較します。',
+  hrefs: [
+    '/guide/tokyo-experience-date/',
+    '/guide/tokyo-date-under-5000/',
+    '/guide/shibuya-rainy-date/',
+    '/guide/tokyo-nazo-date/',
+    '/guide/tokyo-friends-activities/',
+    '/guide/immersive-tokyo-date/',
+    '/guide/immersive-tokyo/',
+  ],
+};
+/** 公開中の記事だけを、DATE_OUTING の並び順で返す */
+export const dateOutingArticles = (): GuideArticle[] =>
+  DATE_OUTING.hrefs.map((h) => guideArticles.find((g) => g.href === h)).filter((g): g is GuideArticle => !!g);

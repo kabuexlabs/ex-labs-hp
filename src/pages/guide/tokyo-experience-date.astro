@@ -17,8 +17,14 @@ import { jstDateString } from '../../lib/thisWeek';
 import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
 import { publishedItems, EXPERIENCE_DATE_PUBLISHED, GENRE_LABEL, type Genre } from '../../data/experienceDate';
 import { jsonLd } from '../../lib/microcms';
+import { ownDateRow, UNKNOWN, type DateRow } from '../../lib/dateGuide';
+import DateCompare from '../../components/guide/DateCompare.astro';
+import DateInfo from '../../components/guide/DateInfo.astro';
+import DateChecklist from '../../components/guide/DateChecklist.astro';
+import DateCta from '../../components/guide/DateCta.astro';
 
 const now = new Date();
+const MODIFIED = '2026-10-01';
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const pageUrl = new URL('/guide/tokyo-experience-date/', site).toString();
 const draft = !EXPERIENCE_DATE_PUBLISHED;
@@ -58,7 +64,7 @@ const articleLd = {
   image: [new URL('/assets/guide/tokyo-experience-date.webp', site).toString()],
   author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
-  datePublished: '2026-09-20', dateModified: '2026-09-20', mainEntityOfPage: pageUrl,
+  datePublished: '2026-09-20', dateModified: MODIFIED, mainEntityOfPage: pageUrl,
 };
 // 予算・時間・二人だけか・屋外移動で横断して選ぶための行（他社＝compare、自社＝公演データ。未確認は「公式で確認」のまま）
 type CmpRow = { id: string; name: string; genre: string; pairTotal: string; pairTotalMin?: number; time: string; minutes?: number; place: string; together: string; privateForTwo?: boolean; outdoor: string; href: string; ext: boolean };
@@ -83,6 +89,16 @@ const privateRows = cmpRows.filter((c) => c.privateForTwo === true);
 const sharedRows = cmpRows.filter((c) => c.privateForTwo === false);
 const togetherUnknown = cmpRows.filter((c) => c.privateForTwo === undefined);
 const nameLinks = (xs: CmpRow[]) => xs.map((c) => ({ name: c.name, href: c.href, extra: c.pairTotalMin !== undefined ? yen(c.pairTotalMin) + (c.pairTotal.includes('〜') ? '〜' : '') : '' }));
+// 全デート記事で共通の比較表（列をそろえる）
+const GENRE_TALK: Record<Genre, string> = { craft: '講師とのやり取りが中心。二人で話しながら作れるかは各体験の案内で確認', art: '鑑賞が中心。他の来場者も一緒', puzzle: '二人で相談しながら謎を解く', story: '' };
+const dateRows: DateRow[] = [
+  ...publishedItems.filter((i) => i.compare).map<DateRow>((i) => ({
+    id: i.id, name: i.name, sub: GENRE_LABEL[i.genre], href: `#item-${i.id}`, area: i.compare!.place, pair: i.compare!.pairTotal, time: i.compare!.time,
+    privacy: i.compare!.together, setting: i.compare!.outdoor, talk: GENRE_TALK[i.genre], beginner: UNKNOWN,
+    reserveHref: extHref(i), reserveLabel: i.urlChecked ? '公式ページで予約' : '公式サイトを検索', own: false, siteId: i.siteId, checked: i.checkedAt,
+  })),
+  ...story.map((r) => ownDateRow(r, shows.find((s) => s.id === r.w.id)?.area ?? r.venue?.listName ?? UNKNOWN)),
+];
 const latestStory = story.map((r) => r.w.verified.at).sort().pop();
 const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.verifiedText ?? '';
 ---
@@ -116,6 +132,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 <li>二人分の料金、所要時間、二人だけで体験できるかを、体験ごとに見比べられます。</li>
 <li>気になった体験は、そのまま予約ページへ進めます。</li>
 </ul></div>
+<DateInfo modified={MODIFIED} rows={dateRows} />
 </div></section>
 
 <section class="section tinted" id="pick"><div class="wrap">
@@ -136,15 +153,8 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 </ul></div>
 </div>
 <p class="cards-note">金額は二人分の目安です（税込・手数料や追加料金は各体験の案内をご確認ください）。所要時間には集合・受付や移動の時間は含まれないので、前後の予定には余裕を。</p>
-<div class="cmp-wrap"><table class="cmp-table cmp-x"><thead><tr><th>体験</th><th>ジャンル</th><th>二人分の総額</th><th>所要時間</th><th>場所・最寄り</th><th>二人だけか相席か</th><th>屋外移動</th></tr></thead><tbody>
-{cmpRows.map((c) => (
-  <tr>
-    <th scope="row"><a href={c.href} style="color:var(--ink)">{c.name}</a></th>
-    <td>{c.genre}</td><td>{c.pairTotal}</td><td>{c.time}</td><td>{c.place}</td><td>{c.together}</td><td>{c.outdoor}</td>
-  </tr>
-))}
-</tbody></table></div>
-<p class="cards-note">雨の日は「屋外移動」欄で、受付から会場までの移動の有無をご確認ください。「公式で確認」の項目は、各公式ページの案内が最新です。</p>
+<DateCompare rows={dateRows} place="xdate-table" />
+<p class="cards-note">雨の日は「屋内・屋外」欄で、受付から会場までの移動の有無をご確認ください。「公式で確認」の項目は、各公式ページの案内が最新です。</p>
 </div></section>
 
 <section class="section tinted" id="genres"><div class="wrap">
@@ -227,6 +237,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
   </div>
   <p class="vc-line">開催日カレンダーと公演の比較は<a href="/guide/immersive-tokyo/" style="color:var(--accent)" data-track="show" data-show="guide-tokyo" data-place="xdate-story">東京で体験できるイマーシブイベント →</a>／二人参加の条件（同じ組・貸切・二人分の料金）は<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)" data-track="show" data-show="guide-tokyo-date" data-place="xdate-story">イマーシブ体験を二人で楽しむには →</a></p>
 </div>
+<DateCta place="xdate-mid" ids={['kaitou', 'uwasabanashi']} />
 </div></section>
 
 <section class="section tinted" id="choose"><div class="wrap narrow">
@@ -243,13 +254,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 
 <section class="section" id="check"><div class="wrap narrow">
 <p class="eyebrow">BEFORE BOOKING</p><h2 class="h2 serif">予約前に確認すること</h2>
-<ol class="bullets">
-<li><strong>料金の単位</strong>：1人あたりか1組あたりか。素材費・焼成費・送料・予約サイトの手数料が別かどうか。</li>
-<li><strong>同じ回・同じ組</strong>：1名ずつのチケットは同じ日時の回を選んで代表者がまとめて購入。1組単位は人数を2名にして申し込む。</li>
-<li><strong>貸切と相席、最低催行人数</strong>：二人だけで体験できるか、他の参加者やチームと一緒か。最低人数に満たないと中止になる体験もあります。</li>
-<li><strong>開始・集合・移動・遅刻とキャンセル</strong>：受付時間より前に入れない会場、途中入場不可の公演、受付後の徒歩移動がある公演があります。キャンセル・日時変更の可否は各予約ページの規約に従います。</li>
-<li><strong>現在の予約枠</strong>：開催日があることと空席があることは別です。空き状況は公式予約ページで確認してください。</li>
-</ol>
+<DateChecklist />
 <p class="lede">公演ごとの細かな条件（年齢・持ち物・注意事項）は各公式ページと<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="xdate-check">公演を探す</a>の作品詳細に載せています。服装・持ち物は<a href="/guide/immersive-preparation/" style="color:var(--accent)">イマーシブ体験の服装・持ち物</a>をご覧ください。</p>
 </div></section>
 
@@ -258,6 +263,7 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 <div class="faq-list tag-immersive">
 {faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
 </div>
+<DateCta place="xdate-end" ids={['kaitou', 'uwasabanashi']} />
 </div></section>
 
 <section class="section"><div class="wrap">

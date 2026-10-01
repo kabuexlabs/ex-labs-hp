@@ -133,21 +133,21 @@ export const GET: APIRoute = async ({ site }) => {
     loc: new URL(p, base).toString(),
   }));
   // 体験デート記事は他社項目が公式確認できて公開扱いになった時だけ載せる（下書きは noindex）
-  if (EXPERIENCE_DATE_PUBLISHED) urls.push({ loc: new URL('/guide/tokyo-experience-date/', base).toString(), lastmod: '2026-09-20' });
+  if (EXPERIENCE_DATE_PUBLISHED) urls.push({ loc: new URL('/guide/tokyo-experience-date/', base).toString(), lastmod: '2026-10-01' });
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {
-    '/guide/tokyo-friends-activities/': '2026-09-28',
-    '/guide/shibuya-rainy-date/': '2026-09-27',
+    '/guide/tokyo-friends-activities/': '2026-10-01',
+    '/guide/shibuya-rainy-date/': '2026-10-01',
     '/guide/tokyo-date-under-5000/': '2026-09-27',
-    '/guide/tokyo-nazo-date/': '2026-09-22',
+    '/guide/tokyo-nazo-date/': '2026-10-01',
     '/guide/immersive-tokyo-solo/': '2026-09-18',
     '/guide/immersive-tokyo-date/': '2026-09-18',
     '/guide/saiji-kikaku/': '2026-09-14',
     '/guide/shanai-quiz/': '2026-09-14',
     '/events/': '2026-09-28',
     '/guide/immersive-taiken/': '2026-09-13',
-    '/guide/immersive-theater/': '2026-09-15',
+    '/guide/immersive-theater/': '2026-10-01',
     '/guide/immersive-preparation/': '2026-09-13',
     '/guide/madamis-shoshinsha/': '2026-09-13',
     '/events/about/': '2026-09-13',
@@ -165,8 +165,8 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/ip-event/': '2026-09-08',
     '/guide/event-original-or-existing/': '2026-09-15',
     '/guide/event-revenue-share/': '2026-09-12',
-    '/guide/': '2026-09-28',
-    '/guide/madamis/': '2026-09-28',
+    '/guide/': '2026-10-01',
+    '/guide/madamis/': '2026-10-01',
     '/guide/madamis-cost/': '2026-09-15',
     '/guide/madamis-making/': '2026-09-15',
     '/guide/madamis-company/': '2026-09-15',
@@ -201,7 +201,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/madamis-seisaku/': '2026-09-12',
     '/guide/zunousen-seisaku/': '2026-09-12',
     '/guide/halloween-event/': '2026-09-15',
-    '/guide/botsunyukan/': '2026-09-07',
+    '/guide/botsunyukan/': '2026-10-01',
     '/guide/popup-event/': '2026-09-15',
     '/guide/nazotoki-event/': '2026-08-27',
     '/guide/nazotoki-company/': '2026-09-08',

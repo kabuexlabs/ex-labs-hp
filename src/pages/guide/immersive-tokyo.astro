@@ -9,6 +9,7 @@ export const prerender = false;
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import DateGuideNote from '../../components/guide/DateGuideNote.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import ShowCalendar from '../../components/ShowCalendar.astro';
 import VisualHero from '../../components/VisualHero.astro';
@@ -372,6 +373,8 @@ const articleLd = {
 
 <p class="vc-line" style="margin-top:40px">関連ページ：<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="guide-footer">公演を探す</a>／<a href="/guide/immersive-taiken/" style="color:var(--accent)">イマーシブ体験とは</a>／<a href="/guide/madamis-tokyo/" style="color:var(--accent)">東京でマダミスを遊ぶには</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド</a>／<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例4選</a></p>
 </div></section>
+
+<DateGuideNote place="immersive-tokyo-date" />
 
 <AuthorBox />
 

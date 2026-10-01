@@ -13,8 +13,15 @@ import VisualHero from '../../components/VisualHero.astro';
 import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
 import { publishedNazoItems } from '../../data/nazoDate';
 import { jsonLd } from '../../lib/microcms';
+import { shows } from '../../data/shows';
+import { ownDateRow, UNKNOWN, type DateRow } from '../../lib/dateGuide';
+import DateCompare from '../../components/guide/DateCompare.astro';
+import DateInfo from '../../components/guide/DateInfo.astro';
+import DateChecklist from '../../components/guide/DateChecklist.astro';
+import DateCta from '../../components/guide/DateCta.astro';
 
 const now = new Date();
+const MODIFIED = '2026-10-01';
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const pageUrl = new URL('/guide/shibuya-rainy-date/', site).toString();
 
@@ -47,6 +54,18 @@ const extRows: Row[] = publishedNazoItems.filter((i) => i.area.includes('渋谷'
   href: i.officialUrl, own: false, siteId: i.siteId,
 }));
 const rows = [...extRows, ...ownRows];
+// 全デート記事で共通の比較表（列をそろえる）。駅からの移動は詳細カードに残す
+const shibuyaOwn = buildGuideRows(now).filter((r) => r.status !== 'ended' && r.venue?.areaId === 'shibuya');
+const dateRows: DateRow[] = [
+  ...publishedNazoItems.filter((i) => i.area.includes('渋谷')).map<DateRow>((i) => ({
+    id: i.id, name: i.name, sub: '室内の脱出ゲーム', href: `#item-${i.id}`, area: `${i.area}${i.station ? `（${i.station}）` : ''}`,
+    pair: `${i.pairPrice}。${i.tax}`, time: `${/^\d/.test(i.timeLimit) ? `制限時間${i.timeLimit}` : i.timeLimit}／${i.totalTime}`,
+    privacy: i.privacy === 'room' ? '二人だけ（部屋を一組で貸切）' : i.privacy === 'team' ? '二人で1チーム（知らない人と組まない。部屋の貸切ではない）' : UNKNOWN,
+    setting: i.indoor, talk: '二人で相談しながら謎を解く', beginner: i.beginner.replace('公式ページで確認', UNKNOWN),
+    reserveHref: i.officialUrl || undefined, reserveLabel: '公式ページで予約', own: false, siteId: i.siteId, checked: i.checkedAt,
+  })),
+  ...shibuyaOwn.map((r) => ownDateRow(r, shows.find((x) => x.id === r.w.id)?.area ?? '東京・渋谷')),
+];
 const shortRows = extRows;
 const faqs = [
   { q: '駅から一度も濡れずに行けますか？', a: `${ownRows.length ? `${ownRows.map((r) => r.name).join('、')}は${ownRows[0].station}です。` : ''}${extRows.length ? `${extRows.map((r) => r.name).join('、')}は館内で遊べますが、駅からの屋外移動は公式ページでご確認ください。` : ''}「屋内で遊べる」ことと「駅から濡れずに行ける」ことは別なので、傘の用意をおすすめします。` },
@@ -61,7 +80,7 @@ const articleLd = {
   image: [new URL('/assets/guide/shibuya-rainy-date.webp', site).toString()],
   author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
-  datePublished: '2026-09-26', dateModified: '2026-09-26', mainEntityOfPage: pageUrl,
+  datePublished: '2026-09-26', dateModified: MODIFIED, mainEntityOfPage: pageUrl,
 };
 const chips = [`${rows.length}件を比較`, '屋内で遊べる', ...(shortRows.length ? ['約20分〜の短時間あり'] : [])];
 ---
@@ -89,20 +108,13 @@ const chips = [`${rows.length}件を比較`, '屋内で遊べる', ...(shortRows
 <li>短時間で遊ぶ／物語に参加する、の目的から選べます。</li>
 <li>気になった体験は、そのまま予約ページへ進めます。</li>
 </ul></div>
+<DateInfo modified={MODIFIED} rows={dateRows} />
 </div></section>
 
 <section class="section tinted" id="compare"><div class="wrap">
-<h2 class="cards-h">比較表<span>駅からの移動・屋内外・料金・時間</span></h2>
-<div class="cmp-wrap"><table class="cmp-table cmp-x"><thead><tr><th>施設・作品</th><th>最寄り・出口</th><th>駅からの屋外移動</th><th>体験中</th><th>二人分の料金</th><th>本編の時間</th><th>受付を含む時間</th><th>二人だけか</th><th>予約</th></tr></thead><tbody>
-{rows.map((r) => (
-  <tr>
-    <th scope="row"><a href={`#item-${r.id}`} style="color:var(--ink)">{r.name}</a><span class="cmp-sub">{r.kind}</span></th>
-    <td>{r.station}</td><td>{r.walkOutside}</td><td>{r.during}</td><td>{r.pair}</td><td>{r.game}</td><td>{r.total}</td><td>{r.privacy}</td>
-    <td><a class="cmp-btn" href={r.href} target="_blank" rel={r.own ? 'noopener' : 'noopener nofollow'} data-track={r.own ? 'ticket' : 'ev-ext'} data-show={r.siteId} data-place="shibuya-rain-table">予約ページ →</a></td>
-  </tr>
-))}
-</tbody></table></div>
-<p class="cards-note">料金は通常料金の二人分です。曜日・時間帯の条件と手数料は各予約ページでご確認ください。「公式ページで確認」の項目は、各公式ページの案内が最新です。</p>
+<h2 class="cards-h">比較表<span>料金・時間・貸切か相席か・屋内外</span></h2>
+<DateCompare rows={dateRows} place="shibuya-rain-table" />
+<p class="cards-note">料金は通常料金の二人分です。曜日・時間帯の条件と手数料は各予約ページでご確認ください。駅から会場までの屋外移動は、下の「体験ごとの詳細」に載せています。「公式で確認」の項目は、各公式ページの案内が最新です。</p>
 </div></section>
 
 <section class="section" id="pick"><div class="wrap">
@@ -133,6 +145,7 @@ const chips = [`${rows.length}件を比較`, '屋内で遊べる', ...(shortRows
   </article>
 ))}
 </div>
+<DateCta place="shibuya-rain-mid" ids={['uwasabanashi']} />
 </div></section>
 
 <section class="section" id="plan"><div class="wrap narrow">
@@ -142,6 +155,8 @@ const chips = [`${rows.length}件を比較`, '屋内で遊べる', ...(shortRows
 <li><strong>体験</strong>：表の「受付を含む時間」を目安にします。本編の時間だけで予定を組まないのがコツです。</li>
 <li><strong>体験の後</strong>：周辺で休憩や食事を。雨の日は駅周辺の屋内施設が混みやすいので、時間に余裕を持たせてください。</li>
 </ul>
+<h2 class="cards-h" id="check" style="margin-top:32px">予約前に確認すべき点</h2>
+<DateChecklist />
 </div></section>
 
 <section class="section tinted" id="faq"><div class="wrap">
@@ -149,6 +164,7 @@ const chips = [`${rows.length}件を比較`, '屋内で遊べる', ...(shortRows
 <div class="faq-list tag-immersive">
 {faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
 </div>
+<DateCta place="shibuya-rain-end" ids={['uwasabanashi']} />
 </div></section>
 
 <section class="section"><div class="wrap">

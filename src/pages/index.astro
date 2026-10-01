@@ -109,6 +109,11 @@ const services = [
 ];
 // 最新の解説記事（旧トップの「最新記事」枠の代わり。内部リンクを保つ）
 const latestGuides = [...guideArticles].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
+// 東京で、次の休日に行きたい体験を探す（デート・お出かけの入口）。公開中の記事だけを、この順で出す
+const outingCards = ['/guide/tokyo-experience-date/', '/guide/shibuya-rainy-date/', '/guide/tokyo-nazo-date/', '/guide/tokyo-date-under-5000/', '/guide/tokyo-friends-activities/']
+  .map((h) => guideArticles.find((g) => g.href === h))
+  .filter((g): g is (typeof guideArticles)[number] => !!g)
+  .map((g) => { const i = g.title.indexOf('｜'); return { href: g.href, thumb: g.thumb, main: i < 0 ? g.title : g.title.slice(0, i), sub: i < 0 ? '' : g.title.slice(i + 1) }; });
 const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc:${gtc};--gap:${gap};--col:${col};${mt ? `margin-top:${mt};` : ''}`;
 
 ---
@@ -206,6 +211,24 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
   </div>
 </section>
 
+{outingCards.length > 0 && (
+<section id="outing" class="xt-pad16">
+  <div style="max-width:1040px;margin:0 auto">
+    <SecHead en="Outing" size="top" ja="東京で、次の休日に行きたい体験を探す" />
+    <p class="xt-sub"><Cls text="食事や映画だけではない、東京のデート・お出かけ先を紹介。二人で楽しめる謎解き、イマーシブ体験、街歩き、ものづくり、物語参加型イベントを、料金・時間・アクセスから選べます。" emph={false} /></p>
+    <div class="x-hscroll xt-out" style="margin-top:36px;gap:16px">
+      {outingCards.map((g) => (
+        <a href={g.href} class="xt-out-c" data-track="show" data-show={g.href.split('/')[2]} data-place="home-outing">
+          <img src={g.thumb} alt="" width="1200" height="630" loading="lazy" decoding="async">
+          <span class="xt-out-t"><Cls text={g.main} emph={false} /></span>
+          {g.sub && <span class="xt-out-s"><Cls text={g.sub} emph={false} /></span>}
+        </a>
+      ))}
+    </div>
+    <div class="xt-works-more" style="margin-top:32px"><a href="/guide/#date" class="x-btn is-line xt-more" data-track="show" data-show="guide-date" data-place="home-outing">デート・お出かけの記事をすべて見る&nbsp;→</a></div>
+  </div>
+</section>
+)}
 <section id="strength" class="xt-pad24">
   <div style="max-width:1040px;margin:0 auto">
     <SecHead en="Strength" size="top" />
@@ -430,6 +453,10 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-mq-cell.is-round{flex:0 0 150px;height:96px;padding:10px}
 .xt-mq-cell img{max-width:100%;max-height:100%;object-fit:contain;display:block}
 .xt-sub{margin:14px auto 0;text-align:center;font-size:14px;line-height:1.9;color:var(--x-pale)}
+.xt-out-c{flex:0 0 clamp(240px,68vw,300px);display:grid;gap:10px;align-content:start;background:var(--x-panel);padding:12px 12px 18px;color:#fff!important;text-decoration:none}
+.xt-out-c img{width:100%;height:auto;aspect-ratio:1200/630;display:block;outline:1px solid rgba(255,255,255,.28);outline-offset:-1px}
+.xt-out-t{font-family:var(--x-min);font-weight:700;font-size:17px;line-height:1.55}
+.xt-out-s{font-size:12.5px;line-height:1.7;color:var(--x-pale)}
 .xt-ev{flex:0 0 clamp(240px,68vw,300px);display:grid;gap:16px;align-content:start;background:var(--x-panel);padding:14px 14px 22px}
 .xt-ev img{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;display:block}
 .xt-ev-org{margin:0;font-size:12px;line-height:1.7;color:var(--x-pale2)}

@@ -1,0 +1,24 @@
+---
+// 公演ページの予約導線の近くに置く「デート・友達とのお出かけで検討する方へ」。
+// 各公演LPのデザインを崩さないよう、色は周囲の文字色（currentColor）を引き継ぐ。
+interface Props { place: string; class?: string; /** 公演LPなど別ドメインでも表示されるページでは true（絶対URLにする） */ abs?: boolean }
+const { place, class: cls = '', abs = false } = Astro.props;
+const base = abs ? 'https://kabuexlabs.com' : '';
+const links = [
+  { href: '/guide/tokyo-experience-date/', label: ['東京の非日常デート：', '二人で楽しむ体験を比較'] },
+  { href: '/guide/shibuya-rainy-date/', label: ['渋谷の雨の日デート：', '屋内体験を比較'] },
+  { href: '/guide/tokyo-nazo-date/', label: ['東京で二人で楽しめる', '謎解き・脱出ゲーム'] },
+];
+---
+<nav class={`dgl ${cls}`} aria-label="デート・お出かけの記事">
+  <p class="dgl-h"><span>この公演を</span><span>デートや友達との</span><span>お出かけで</span><span>検討する方へ</span></p>
+  <ul class="dgl-l">{links.map((l) => <li><a href={base + l.href} data-track="show" data-show="date-guide" data-place={place}>{l.label.map((c, i) => <span>{c}{i === l.label.length - 1 ? '\u00a0→' : ''}</span>)}</a></li>)}</ul>
+</nav>
+<style>
+.dgl{max-width:760px;margin:28px auto 0;padding:16px 18px;border:1px solid currentColor;border-color:color-mix(in srgb,currentColor 28%,transparent);text-align:left;color:inherit}
+.dgl-h{margin:0 0 6px;font-size:14px;font-weight:700;line-height:1.6;letter-spacing:normal}
+.dgl-h span{display:inline-block}
+.dgl-l a span{display:inline-block;text-decoration:underline;text-underline-offset:3px}
+.dgl-l{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.dgl-l a{display:inline-block;padding:7px 0;font-size:14px;line-height:1.6;color:inherit!important;text-decoration:underline;text-underline-offset:3px}
+</style>

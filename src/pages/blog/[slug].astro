@@ -23,6 +23,16 @@ function excerpt(html: string, length = 110) {
   return text.length > length ? text.slice(0, length) + '…' : text;
 }
 
+// 検索結果での見え方（<title>・説明文）だけを上書きする記事。H1・本文・URL・canonical は CMS のまま。
+// 同じテーマの /guide/immersive-theater/ と検索意図が重ならないよう、街なか型の紹介と東京の公演探しに寄せる（2026-10-01）。
+const SEO_OVERRIDES: Record<string, { title: string; description: string }> = {
+  v1czofdqf: {
+    title: 'イマーシブシアターとは？劇場の外へ広がる「街なか型」イマーシブも紹介',
+    description: 'イマーシブシアター（観客が歩き回りながら物語を体験する没入型の演劇）の基本と、街や商業施設そのものを舞台にする街なか型イマーシブを紹介。東京でいま参加できる公演の料金・開催日は、東京のイマーシブ公演ガイドで比較できます。',
+  },
+};
+const seo = post ? SEO_OVERRIDES[post.id] : undefined;
+
 const articleLd = post
   ? {
       '@context': 'https://schema.org',
@@ -40,8 +50,8 @@ const articleLd = post
   : null;
 ---
 <BaseLayout
-  title={post ? `${post.title}｜ex Labsブログ` : '記事が見つかりません｜ex Labsブログ'}
-  description={post ? excerpt(post.body) : undefined}
+  title={post ? `${seo?.title ?? post.title}｜ex Labsブログ` : '記事が見つかりません｜ex Labsブログ'}
+  description={post ? (seo?.description ?? excerpt(post.body)) : undefined}
   ogImage={post?.eyecatch?.url}
   ogType="article"
 >

@@ -4,6 +4,7 @@
 // → TICKET → CONTACT → フッターマーキー → フッター
 import HacktaleLayout from '../../layouts/HacktaleLayout.astro';
 import { jsonLd } from '../../lib/microcms';
+import DateGuideLinks from '../../components/guide/DateGuideLinks.astro';
 import HacktaleContactForm from '../../components/HacktaleContactForm.astro';
 import HacktaleCalendar from '../../components/HacktaleCalendar.astro';
 import {
@@ -127,6 +128,7 @@ const orgLd = {
 <div class="step"><div class="en snum">02</div><h3 class="sh3">ご予約・ご連絡</h3><p class="sp">開催日程が決まっている公開公演は<a href={`${htBase}/reservation/`}>公演予約ページ</a>からそのままお申し込みいただけます。貸切のご相談は<a href="#contact">お問い合わせフォーム</a>、<a href={HT_LINE_URL} target="_blank" rel="noopener">公式LINE</a>、もしくは<a href={HT_X_URL} target="_blank" rel="noopener">X（{HT_X_HANDLE}）</a>のDMまで。</p></div>
 <div class="step"><div class="en snum">03</div><h3 class="sh3">ご参加</h3><p class="sp">公開公演は予約確定メールの案内に沿ってご来場ください。貸切は日程を調整のうえ、公演をご案内します。</p></div>
 </div>
+<DateGuideLinks place="lp-hacktale" abs />
 </div></section>
 
 <section class="sec dark2" id="contact"><div class="wrap">

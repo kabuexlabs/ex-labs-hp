@@ -8,6 +8,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import DateGuideNote from '../../components/guide/DateGuideNote.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { seg } from '../../lib/jpbreak';
 import { tmWorks, TM_LINE_URL } from '../../data/toudaimurderWorks';
@@ -127,20 +128,20 @@ const definedTermLd = {
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'マダミスとは？意味・遊び方・種類・費用｜マーダーミステリー完全ガイド',
+  headline: 'マダミスとは？遊び方・人数・料金・初心者におすすめの作品を解説',
   about: 'マダミス（マーダーミステリー）',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/madamis.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
-  dateModified: '2026-09-28',
+  dateModified: '2026-10-01',
   mainEntityOfPage: new URL('/guide/madamis/', Astro.site).toString(),
 };
 ---
 <BaseLayout
-  title="マダミスとは？意味・遊び方・種類・費用｜マーダーミステリー完全ガイド - 株式会社ex Labs"
-  description="マダミス（マーダーミステリー）は、物語の登場人物になって会話と推理を楽しむゲーム。遊び方と当日の流れ、人狼・謎解きとの違い、人数・時間・料金の目安、一人で参加する方法、企業・施設向けの制作費用まで紹介します。"
+  title="マダミスとは？遊び方・人数・料金・初心者におすすめの作品を解説 - 株式会社ex Labs"
+  description="マダミス（マーダーミステリー）とは、物語の登場人物になって会話と推理で真相を探すゲーム。遊び方と当日の流れ、人数・所要時間・料金の目安、初心者におすすめの作品の選び方、人狼・謎解きとの違い、一人で参加する方法まで解説します。"
   ogImage="/assets/guide/madamis.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
@@ -346,6 +347,8 @@ const articleLd = {
 </div></section>
 
 <MadamisPartners />
+
+<DateGuideNote place="madamis-date" friends />
 
 <AuthorBox />
 

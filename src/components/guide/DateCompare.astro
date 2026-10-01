@@ -1,0 +1,30 @@
+---
+// デート・お出かけ記事の共通比較表。列は全記事で同じ（体験｜エリア｜2人分の料金｜所要時間｜貸切・相席｜屋内・屋外｜会話量｜初心者向け｜予約）。
+// 表はHTMLのテキストのまま出し、スマホでは1体験ずつのカード（.cmp-stack）に組み替える。
+import type { DateRow } from '../../lib/dateGuide';
+interface Props { rows: DateRow[]; place: string }
+const { rows, place } = Astro.props;
+---
+<div class="cmp-wrap dc-wrap"><table class="cmp-table cmp-x cmp-stack dc-table"><thead><tr><th>体験</th><th>エリア</th><th>2人分の料金</th><th>所要時間</th><th>貸切・相席</th><th>屋内・屋外</th><th>会話量</th><th>初心者向け</th><th>予約</th></tr></thead><tbody>
+{rows.map((r) => (
+  <tr>
+    <th scope="row"><a href={r.href}>{r.name}</a>{r.sub && <span class="dc-sub">{r.sub}</span>}</th>
+    <td data-label="エリア">{r.area}</td>
+    <td data-label="2人分の料金">{r.pair}</td>
+    <td data-label="所要時間">{r.time}</td>
+    <td data-label="貸切・相席">{r.privacy}</td>
+    <td data-label="屋内・屋外">{r.setting}</td>
+    <td data-label="会話量">{r.talk}</td>
+    <td data-label="初心者向け">{r.beginner}</td>
+    <td data-label="予約" class="cmp-stack-btn">{r.reserveHref ? <a class="cmp-btn dc-btn" href={r.reserveHref} target="_blank" rel={r.own ? 'noopener' : 'noopener nofollow'} data-track={r.own ? 'ticket' : 'ev-ext'} data-show={r.siteId} data-place={place}>{r.reserveLabel ?? '公式ページで予約'} ↗</a> : '公式で確認'}</td>
+  </tr>
+))}
+</tbody></table></div>
+<style>
+.dc-table th[scope=row]{min-width:170px;white-space:normal}
+.dc-table th[scope=row] a{color:var(--ink,#0B0B14)}
+.dc-table td{min-width:120px;vertical-align:top;font-size:13px;line-height:1.65}
+.dc-table td[data-label="2人分の料金"],.dc-table td[data-label="会話量"],.dc-table td[data-label="初心者向け"]{min-width:190px}
+.dc-sub{display:block;font-size:11px;font-weight:700;color:var(--accent,#0B35C8);margin-top:2px}
+.dc-btn{display:inline-flex;align-items:center;min-height:44px;background:var(--accent,#0B35C8);color:#fff!important;font-weight:800;font-size:12.5px;padding:8px 14px;border-radius:999px;text-decoration:none!important;white-space:nowrap}
+</style>

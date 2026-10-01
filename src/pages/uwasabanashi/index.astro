@@ -2,6 +2,7 @@
 // 終了表示を日付で切り替えるためリクエスト時に描画する（日付は日本時間。開催日の正本は src/data/events/）
 export const prerender = false;
 import SiteGuard from '../../components/SiteGuard.astro';
+import DateGuideLinks from '../../components/guide/DateGuideLinks.astro';
 import { eventsData } from '../../data/events/index';
 import { jstDateString } from '../../lib/thisWeek';
 // 公演「ウワサバナシ調査委員会」公式LP。
@@ -254,6 +255,7 @@ const faqs = [
   </>
 )}
 <p class="pricenote">日程が合わない場合：<a href="https://kabuexlabs.com/events/" target="_blank" rel="noopener" style="color:var(--accent)">東京のほかのイマーシブ公演を日付・人数で探す →</a></p>
+{!ended && <DateGuideLinks place="lp-uwasabanashi" abs />}
 </div>
 </div>
 </section>

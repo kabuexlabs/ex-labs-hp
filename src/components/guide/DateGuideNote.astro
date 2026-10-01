@@ -1,0 +1,26 @@
+---
+// 解説記事（イマーシブとは・マダミスとは など）の末尾に置く、デート・お出かけ記事への案内。
+interface Props { place: string; lead?: string; friends?: boolean }
+const { place, lead = '二人で出かける日や友達と遊ぶ日の行き先として探すなら、料金・所要時間・貸切か相席か・会話の量で比べた記事が役立ちます。', friends = false } = Astro.props;
+const links = [
+  { href: '/guide/tokyo-experience-date/', t: '東京の非日常デート', d: '二人で楽しむ体験を料金・時間・過ごし方で比較' },
+  { href: '/guide/shibuya-rainy-date/', t: '渋谷の雨の日デート', d: '雨でも楽しめる屋内体験を比較' },
+  { href: '/guide/tokyo-nazo-date/', t: '二人で楽しめる謎解き・脱出ゲーム', d: '貸切・料金・所要時間で比較' },
+  ...(friends ? [{ href: '/guide/tokyo-friends-activities/', t: '東京で友達と遊ぶ体験', d: '2〜4人で楽しめる体験を比較' }] : []),
+];
+---
+<section class="section dgn"><div class="wrap">
+<p class="eyebrow">DATE &amp; OUTING</p>
+<h2 class="h2 serif">デート・お出かけで探す</h2>
+<p class="lede">{lead}</p>
+<ul class="dgn-l">{links.map((l) => <li><a href={l.href} data-track="show" data-show="date-guide" data-place={place}><strong>{l.t}</strong><span>{l.d}</span></a></li>)}</ul>
+<p class="dgn-all"><a href="/guide/#date" data-track="show" data-show="date-guide" data-place={place}>デート・お出かけの記事をすべて見る →</a></p>
+</div></section>
+<style>
+.dgn-l{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px;text-align:left}
+.dgn-l a{display:grid;gap:2px;height:100%;padding:14px 16px;background:#F3F6FE;border-left:3px solid var(--x-blue,#0B35C8);text-decoration:none;min-height:48px}
+.dgn-l strong{font-family:var(--x-min,serif);font-size:16px;color:var(--x-blue,#0B35C8);background:none!important;padding:0!important}
+.dgn-l span{font-size:13px;line-height:1.7;color:rgba(11,11,20,.72)}
+.dgn-all{margin:16px 0 0;text-align:left}
+.dgn-all a{display:inline-block;padding:8px 0;font-size:14px;font-weight:700;color:var(--x-blue,#0B35C8)!important;border-bottom:1px solid currentColor}
+</style>

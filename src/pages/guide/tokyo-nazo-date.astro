@@ -14,8 +14,14 @@ import { buildGuideRows, fmtYen } from '../../lib/tokyoGuide';
 import { shows } from '../../data/shows';
 import { publishedNazoItems, type NazoItem } from '../../data/nazoDate';
 import { jsonLd } from '../../lib/microcms';
+import { ownDateRow, UNKNOWN, type DateRow } from '../../lib/dateGuide';
+import DateCompare from '../../components/guide/DateCompare.astro';
+import DateInfo from '../../components/guide/DateInfo.astro';
+import DateChecklist from '../../components/guide/DateChecklist.astro';
+import DateCta from '../../components/guide/DateCta.astro';
 
 const now = new Date();
+const MODIFIED = '2026-10-01';
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const pageUrl = new URL('/guide/tokyo-nazo-date/', site).toString();
 
@@ -52,6 +58,17 @@ const indoorRows = rows.filter((r) => /^屋内/.test(r.indoor));
 const names = (xs: Row[]) => xs.map((r) => r.name).join('、');
 const known = rows.filter((r) => r.pairPriceMin !== undefined);
 const heroChips = [`${rows.length}作品を比較`, ...(privateRows.length ? [`二人だけで遊べる ${privateRows.length}件`] : []), ...(known.length ? [`二人で ${fmtYen(Math.min(...known.map((r) => r.pairPriceMin!)))}〜`] : []), '短時間の作品あり'];
+// 全デート記事で共通の比較表（列をそろえる）
+const dateRows: DateRow[] = [
+  ...publishedNazoItems.map<DateRow>((i) => ({
+    id: i.id, name: i.name, sub: i.format, href: `#item-${i.id}`, area: `${i.area}${i.station ? `（${i.station}）` : ''}`,
+    pair: `${i.pairPrice}。${i.tax}`, time: `${/^\d/.test(i.timeLimit) ? `制限時間${i.timeLimit}` : i.timeLimit}／${i.totalTime}`,
+    privacy: i.privacy === 'room' ? '二人だけ（部屋を一組で貸切）' : i.privacy === 'team' ? '二人で1チーム（知らない人と組まない。部屋の貸切ではない）' : i.privacy === 'shared' ? '相席（他の参加者と一緒）' : UNKNOWN,
+    setting: i.indoor, talk: i.format === '店舗型' ? '二人で相談しながら謎を解く' : '二人で相談しながら街を歩いて解く', beginner: i.beginner.replace('公式ページで確認', UNKNOWN),
+    reserveHref: i.officialUrl || undefined, reserveLabel: '公式ページで予約', own: false, siteId: i.siteId, checked: i.checkedAt,
+  })),
+  ...own.map((r) => ownDateRow(r, shows.find((x) => x.id === r.w.id)?.area ?? '東京・渋谷')),
+];
 const extHref = (r: Row) => r.officialUrl || `https://www.google.com/search?q=${encodeURIComponent(`${r.name} 公式`)}`;
 
 const faqs = [
@@ -68,7 +85,7 @@ const articleLd = {
   image: [new URL('/assets/guide/tokyo-nazo-date.webp', site).toString()],
   author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
-  datePublished: '2026-09-22', dateModified: '2026-09-22', mainEntityOfPage: pageUrl,
+  datePublished: '2026-09-22', dateModified: MODIFIED, mainEntityOfPage: pageUrl,
 };
 ---
 <BaseLayout
@@ -95,21 +112,13 @@ const articleLd = {
 <li>二人分の料金、制限時間と合計体験時間、屋内か屋外かを同じ表で見比べられます。</li>
 <li>気になった施設は、そのまま公式ページ・予約ページへ進めます。</li>
 </ul></div>
+<DateInfo modified={MODIFIED} rows={dateRows} />
 <p class="lede" style="margin-top:18px"><strong>まず目的で絞るなら</strong>：短時間で遊ぶなら{shortRows.filter((r) => !r.own).length ? shortRows.filter((r) => !r.own).map((r, i) => <>{i > 0 && '・'}<a href={r.href} style="color:var(--accent)">{r.name.replace(/（[^）]*）/g, '')}</a></>) : '合計約1時間以内の作品'}、部屋を貸し切って二人だけで遊ぶなら{roomRows.filter((r) => !r.own).map((r, i) => <>{i > 0 && '・'}<a href={r.href} style="color:var(--accent)">{r.name.replace(/（[^）]*）/g, '')}</a></>)}、キャストと会話しながら物語を進めるなら{own.map((r) => <a href={`#item-${r.w.id}`} style="color:var(--accent)">{r.w.title}</a>)}や<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">イマーシブ公演</a>が候補です。</p>
 </div></section>
 
 <section class="section tinted" id="compare"><div class="wrap">
 <h2 class="cards-h">比較表<span>二人だけか・料金・時間・屋内外</span></h2>
-<div class="cmp-wrap"><table class="cmp-table cmp-x"><thead><tr><th>施設・作品</th><th>場所／形式</th><th>人数</th><th>二人だけで遊べるか</th><th>二人分の料金</th><th>税込・手数料</th><th>制限時間</th><th>合計時間の目安</th><th>屋内・屋外</th><th>初心者向け</th></tr></thead><tbody>
-{rows.map((r) => (
-  <tr>
-    <th scope="row"><a href={r.href} style="color:var(--ink)">{r.name}</a>{r.own && <span class="cmp-sub">当社制作</span>}</th>
-    <td>{r.area}／{r.format}</td><td>{r.players}</td>
-    <td>{privacyText(r)}</td>
-    <td>{r.pairPrice}</td><td>{r.tax}</td><td>{r.timeLimit}</td><td>{r.totalTime}</td><td>{r.indoor}</td><td>{r.beginner}</td>
-  </tr>
-))}
-</tbody></table></div>
+<DateCompare rows={dateRows} place="nazo-table" />
 <p class="cards-note">料金は通常料金の二人分です（割引料金は含めていません。土日祝・ハイシーズンの対象日は各公式ページで確認）。「部屋を一組で貸切」は部屋を二人だけで使えること、「同じチームで遊べる」は知らない人と組まないことで、どちらも施設全体の貸切ではありません。合計時間には受付までの移動は含まれません。</p>
 </div></section>
 
@@ -151,17 +160,13 @@ const articleLd = {
 ))}
 </div>
 <p class="cards-note">料金・作品・空き状況は変わることがあるため、最新の情報は公式ページでご確認ください。</p>
+<DateCta place="nazo-mid" ids={['uwasabanashi', 'factroom']} />
 </div></section>
 
 <section class="section" id="check"><div class="wrap narrow">
 <h2 class="cards-h">予約前に確認すること</h2>
-<ol class="bullets">
-<li><strong>料金の単位</strong>：1人あたりか、1組（部屋）あたりか。平日・夜・土日祝で変わる施設があります。</li>
-<li><strong>受付時刻と遅刻</strong>：開始の何分前に受付するか。遅れると参加できない施設・公演があります。</li>
-<li><strong>人数</strong>：2人で申し込めるか、二人だけで1チームになれるか、他の参加者と合流するか。</li>
-<li><strong>キャンセル・日時変更</strong>：予約後の変更・返金の可否は各予約ページの規約に従います。</li>
-<li><strong>開催の継続</strong>：作品の入れ替えや期間限定の公演があるため、遊びたい作品が予約日に開催されているかを確認します。</li>
-</ol>
+<DateChecklist />
+<p class="cards-note">キャンセル・日時変更の可否は各予約ページの規約に従います。作品の入れ替えや期間限定の公演があるため、遊びたい作品が予約日に開催されているかも確認してください。</p>
 </div></section>
 
 <section class="section tinted" id="faq"><div class="wrap">
@@ -169,6 +174,7 @@ const articleLd = {
 <div class="faq-list tag-immersive">
 {faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}
 </div>
+<DateCta place="nazo-end" ids={['uwasabanashi', 'factroom']} />
 </div></section>
 
 <section class="section"><div class="wrap">

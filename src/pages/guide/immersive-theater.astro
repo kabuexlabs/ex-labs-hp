@@ -8,6 +8,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import NowShowing from '../../components/guide/NowShowing.astro';
+import DateGuideNote from '../../components/guide/DateGuideNote.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -86,7 +88,7 @@ const definedTermLd = {
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'イマーシブシアター（イマーシブ公演）とは？演劇との違い・楽しみ方・東京の体験スポット',
+  headline: 'イマーシブシアターとは？東京の公演・料金・楽しみ方を初心者向けに解説',
   about: 'イマーシブシアター（没入型演劇）',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/immersive-theater.webp', Astro.site).toString()],
@@ -94,13 +96,13 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-01',
-  dateModified: '2026-09-15',
+  dateModified: '2026-10-01',
   mainEntityOfPage: new URL('/guide/immersive-theater/', Astro.site).toString(),
 };
 ---
 <BaseLayout
-  title="イマーシブシアター（イマーシブ公演）とは？演劇との違い・楽しみ方・東京の体験スポット - 株式会社ex Labs"
-  description="イマーシブシアター（イマーシブ演劇）とは、観客が空間の中を歩き回りながら物語を体験する没入型の演劇のこと。普通の演劇との違い・初めての楽しみ方・服装・東京で体験できる公演まで、イマーシブ制作会社がわかりやすく解説します。"
+  title="イマーシブシアターとは？東京の公演・料金・楽しみ方を初心者向けに解説 - 株式会社ex Labs"
+  description="イマーシブシアターとは、観客が空間の中を歩き回りながら物語を体験する没入型の演劇のこと。普通の演劇との違い、初めての楽しみ方と服装、東京でいま参加できる公演の料金・所要時間・予約先まで、初心者向けにわかりやすく解説します。"
   ogImage="/assets/guide/immersive-theater.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
@@ -171,6 +173,8 @@ const articleLd = {
 <p class="lede">イマーシブシアターの常設・大型公演は現在も<strong>東京が中心</strong>ですが、大阪・名古屋・京都などでも期間限定の没入型公演やホテル・商業施設とタイアップしたイベントが増えつつあります。地方で体験機会を探す場合は、<strong>期間限定公演の告知（SNS・チケットサイト）をこまめに追う</strong>のが確実です（東京の公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京イマーシブ最新ガイド</a>にまとめています）。また、当社のような制作会社は<strong>全国の施設・企業向けにイマーシブ公演の企画・制作・出張開催に対応</strong>しています。「自分の街・自分の施設で開催したい」という場合は、開催地を問わずご相談いただけます。</p>
 </div></section>
 
+<NowShowing place="theater-now" title="東京でいま参加できるイマーシブシアター" lead="開催中・開催予定の公演の料金・所要時間・人数です。気になった公演は予約サイトで空席を確認できます。" />
+
 <section class="section tinted" id="make"><div class="wrap narrow">
 <p class="eyebrow">PRODUCTION</p><h2 class="h2 serif">企業・施設がイマーシブシアターを制作するには</h2>
 <p class="lede">イマーシブシアターは劇場だけのものではありません。<strong>商業施設・文化施設・書店・街並み</strong>など、実在する空間そのものを「物語の舞台」に変えられるため、施設の集客・話題化の施策として導入が広がっています。</p>
@@ -211,6 +215,8 @@ const articleLd = {
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/events/" style="color:var(--accent)">今日できるイマーシブ・マダミスを探す</a>／<a href="/guide/immersive-taiken/" style="color:var(--accent)">イマーシブ体験とは</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？完全ガイド</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a></p>
 </div></section>
+
+<DateGuideNote place="immersive-theater-date" />
 
 <AuthorBox />
 

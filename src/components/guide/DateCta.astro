@@ -1,0 +1,27 @@
+---
+// デート・お出かけ記事の中盤と末尾に置く、公演一覧（/events/）への案内。
+// ids の公演（src/data/events/）は開催が終わると自動で外れる。links はブランドページなど常設の案内。
+import { buildGuideRows } from '../../lib/tokyoGuide';
+interface Props { place: string; ids?: string[]; links?: { title: string; href: string }[] }
+const { place, ids = [], links = [] } = Astro.props;
+const rows = buildGuideRows(new Date());
+const shows = [
+  ...ids.map((id) => rows.find((r) => r.w.id === id && r.status !== 'ended')).filter((r) => r !== undefined).map((r) => ({ title: r!.w.title, href: `/events/${r!.w.slug}/`, id: r!.w.id })),
+  ...links.map((l) => ({ ...l, id: l.href.split('/')[1] })),
+];
+---
+<aside class="dcta" aria-label="公演一覧へ">
+  <p class="dcta-t"><span>二人で会話しながら</span><span>楽しめる体験を探すなら、</span><span>ex&nbsp;Labsの公演一覧を</span><span>ご覧ください。</span></p>
+  <a class="dcta-btn" href="/events/" data-track="show" data-show="events" data-place={place}>現在開催中の公演を見る →</a>
+  {shows.length > 0 && <p class="dcta-shows"><span>この記事に合う公演：</span>{shows.map((s, i) => <>{i > 0 && '／'}<a href={s.href} data-track="show" data-show={s.id} data-place={place}>{s.title}</a></>)}</p>}
+</aside>
+<style>
+.dcta{max-width:920px;margin:28px auto 0;padding:20px 22px;background:#F3F6FE;border:1px solid #D6DFFB;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 22px;text-align:left}
+.dcta-t{margin:0;flex:1 1 320px;font-size:15px;font-weight:700;line-height:1.75;color:var(--ink,#0B0B14)}
+.dcta-t span{display:inline-block}
+.dcta-btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 26px;background:var(--x-blue,#0B35C8);color:#fff!important;font-weight:700;font-size:15px;text-decoration:none!important}
+.dcta-shows{flex-basis:100%;margin:0;font-size:13.5px;line-height:1.9}
+.dcta-shows span{font-weight:700;color:rgba(11,11,20,.6)}
+.dcta-shows a{display:inline-block;padding:4px 0;font-weight:700;color:var(--x-blue,#0B35C8)!important;border-bottom:1px solid currentColor}
+@media(max-width:640px){.dcta{padding:18px 16px}.dcta-btn{width:100%}}
+</style>

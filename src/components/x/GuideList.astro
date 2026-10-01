@@ -2,10 +2,12 @@
 // 解説記事の一覧（カテゴリフィルター＋12件ずつ「もっと見る」）。/blog/ と /guide/ で共通（デザイン元 ListPage.dc.html の blog）。
 // 全件を HTML に出力し、絞り込みと「もっと見る」はブラウザ側で表示を切り替えるだけ（検索エンジンは全リンクを辿れる）。
 import Cls from './Cls.astro';
-import { guideArticles } from '../../data/guides';
+import { guideArticles, DATE_OUTING } from '../../data/guides';
 
 const CATS: [string, string, RegExp][] = [
   ['all', 'すべて', /./],
+  // 東京のデート・お出かけ：本文の語ではなく DATE_OUTING の一覧で決め、その並び順で表示する
+  ['date', DATE_OUTING.title, /$^/],
   ['madamis', 'マダミス', /マダミス|マーダーミステリー/],
   ['immersive', 'イマーシブ', /イマーシブ|没入/],
   ['zunousen', '頭脳戦・心理戦', /頭脳戦|心理戦/],
@@ -23,8 +25,9 @@ const all = [...guideArticles].sort((a, b) => b.date.localeCompare(a.date)).map(
     ...g,
     main: i < 0 ? g.title : g.title.slice(0, i),
     sub: i < 0 ? '' : g.title.slice(i + 1),
-    tags: CATS.slice(1).filter((c) => c[2].test(g.title)).map((c) => c[1]).slice(0, 2),
-    keys: CATS.slice(1).filter((c) => c[2].test(txt)).map((c) => c[0]),
+    tags: CATS.slice(2).filter((c) => c[2].test(g.title)).map((c) => c[1]).slice(0, 2),
+    keys: [...(DATE_OUTING.hrefs.includes(g.href) ? ['date'] : []), ...CATS.slice(2).filter((c) => c[2].test(txt)).map((c) => c[0])],
+    dorder: DATE_OUTING.hrefs.indexOf(g.href),
   };
 });
 const cats = CATS.map(([k, label]) => ({ k, label, n: k === 'all' ? all.length : all.filter((g) => g.keys.includes(k)).length }));
@@ -36,7 +39,7 @@ const PAGE = 12;
   </div>
   <div class="xgl-cards">
     {all.map((g, i) => (
-      <a href={g.href} class="xgl-card" data-keys={g.keys.join(' ')} hidden={i >= PAGE ? true : undefined}>
+      <a href={g.href} class="xgl-card" data-keys={g.keys.join(' ')} data-i={i} data-dorder={g.dorder} hidden={i >= PAGE ? true : undefined}>
         <img src={g.thumb} alt="" width="1200" height="630" loading="lazy" decoding="async">
         <div class="xgl-meta"><span class="xgl-date">{fmt(g.date)}</span>{g.tags.map((t) => <span class="xgl-tag">{t}</span>)}</div>
         <h2 class="xgl-h"><Cls text={g.main} emph={false} /></h2>
@@ -53,9 +56,14 @@ const PAGE = 12;
   var cards = [].slice.call(root.querySelectorAll('.xgl-card'));
   var btns = [].slice.call(root.querySelectorAll('[data-cat]'));
   var more = root.querySelector('[data-more]'), remain = root.querySelector('[data-remain]');
-  var cat = 'all', shown = PAGE;
+  var grid = root.querySelector('.xgl-cards');
+  // /guide/#date（ヘッダーの「デート・お出かけ」）から来たら、そのカテゴリを選んだ状態で開く
+  var cat = location.hash === '#date' ? 'date' : 'all', shown = PAGE;
   function render() {
-    var list = cards.filter(function (c) { return cat === 'all' || (' ' + c.dataset.keys + ' ').indexOf(' ' + cat + ' ') >= 0; });
+    // デート・お出かけは指定の並び順、それ以外は新しい順（元の順）に並べ直す
+    var key = cat === 'date' ? function (c) { return +c.dataset.dorder; } : function (c) { return +c.dataset.i; };
+    cards.slice().sort(function (a, b) { return key(a) - key(b); }).forEach(function (c) { grid.appendChild(c); });
+    var list = cards.filter(function (c) { return cat === 'all' || (' ' + c.dataset.keys + ' ').indexOf(' ' + cat + ' ') >= 0; }).sort(function (a, b) { return key(a) - key(b); });
     cards.forEach(function (c) { c.hidden = true; });
     list.forEach(function (c, i) { c.hidden = i >= shown; });
     var r = Math.max(0, list.length - shown);
@@ -64,6 +72,8 @@ const PAGE = 12;
   }
   btns.forEach(function (b) { b.addEventListener('click', function () { cat = b.dataset.cat; shown = PAGE; render(); }); });
   more.addEventListener('click', function () { shown += PAGE; render(); });
+  if (cat !== 'all') render();
+  window.addEventListener('hashchange', function () { if (location.hash === '#date') { cat = 'date'; shown = PAGE; render(); } });
 })();
 </script>
 <style>

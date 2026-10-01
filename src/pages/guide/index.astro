@@ -7,7 +7,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ListHero from '../../components/x/ListHero.astro';
 import GuideList from '../../components/x/GuideList.astro';
 import { jsonLd } from '../../lib/microcms';
-import { guideArticles } from '../../data/guides';
+import { guideArticles, DATE_OUTING, dateOutingArticles } from '../../data/guides';
+import Cls from '../../components/x/Cls.astro';
+
+const outing = dateOutingArticles().map((g) => { const i = g.title.indexOf('｜'); return { ...g, main: i < 0 ? g.title : g.title.slice(0, i), sub: i < 0 ? '' : g.title.slice(i + 1) }; });
 
 const listLd = {
   '@context': 'https://schema.org',
@@ -28,5 +31,30 @@ const listLd = {
 >
 <script type="application/ld+json" set:html={jsonLd(listLd)} />
 <ListHero crumb="解説記事一覧" en="Guide" ja="解説記事・完全ガイド一覧" lead="マダミス・イマーシブ・頭脳戦・施設活用の基礎知識から、制作依頼の実務まで、制作会社の視点で解説しています。" />
+<section class="xgd" id="date" aria-labelledby="xgd-h">
+  <div class="xgd-in">
+    <p class="xgd-en">Date &amp; Outing</p>
+    <h2 class="xgd-h" id="xgd-h">{DATE_OUTING.title}</h2>
+    <p class="xgd-d"><Cls text={DATE_OUTING.desc} emph={false} /></p>
+    <ol class="xgd-list">
+      {outing.map((g) => (
+        <li><a href={g.href} data-track="show" data-show={g.href.split('/')[2]} data-place="guide-date"><span class="xgd-no" aria-hidden="true">→</span><span class="xgd-t"><Cls text={g.main} emph={false} />{g.sub && <small><Cls text={g.sub} emph={false} /></small>}</span></a></li>
+      ))}
+    </ol>
+  </div>
+</section>
 <section style="padding:0 16px 120px"><GuideList /></section>
 </BaseLayout>
+<style>
+.xgd{padding:0 16px 64px;scroll-margin-top:110px}
+.xgd-in{max-width:1100px;margin:0 auto;background:var(--x-card);color:var(--x-ink);padding:clamp(28px,5vw,48px) clamp(18px,4vw,44px)}
+.xgd-en{margin:0;font-family:var(--x-en);font-size:18px;letter-spacing:.12em;color:#7d8f00}
+.xgd-h{margin:6px 0 0;font-family:var(--x-min);font-weight:700;font-size:clamp(22px,3vw,30px);color:var(--x-blue)}
+.xgd-d{margin:12px 0 0;font-size:14.5px;line-height:1.95;color:rgba(11,11,20,.78)}
+.xgd-list{list-style:none;margin:22px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:10px}
+.xgd-list a{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start;min-height:56px;padding:14px 16px;background:#EEF2FE;color:var(--x-ink)!important;text-decoration:none}
+.xgd-list a:hover{background:#E1E8FD}
+.xgd-no{font-family:var(--x-en);font-size:20px;line-height:1.2;color:var(--x-blue)}
+.xgd-t{display:grid;gap:2px;font-family:var(--x-min);font-weight:700;font-size:16px;line-height:1.5;color:var(--x-blue)}
+.xgd-t small{font-family:var(--x-sans);font-weight:500;font-size:12.5px;line-height:1.6;color:rgba(11,11,20,.65)}
+</style>

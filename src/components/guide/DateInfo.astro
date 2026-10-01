@@ -1,0 +1,19 @@
+---
+// デート・お出かけ記事の冒頭に置く「この記事について」（最終更新日・料金を確認した日・掲載基準）。
+import { checkedRange, ymd, type DateRow } from '../../lib/dateGuide';
+interface Props { modified: string; rows: Pick<DateRow, 'checked'>[] }
+const { modified, rows } = Astro.props;
+const checked = checkedRange(rows);
+---
+<dl class="dinfo">
+  <div><dt>最終更新日</dt><dd><time datetime={modified}>{ymd(modified)}</time></dd></div>
+  {checked && <div><dt>料金更新日</dt><dd>{checked}</dd></div>}
+  <div><dt>掲載基準</dt><dd>主催者の公式ページ・公式予約ページで、料金・所要時間・二人での参加条件を確認できた体験を掲載しています。確認できなかった項目は「公式で確認」と表示しています。株式会社ex Labsが企画・制作する公演も含み、その旨を明記しています。</dd></div>
+</dl>
+<style>
+.dinfo{max-width:920px;margin:18px auto 0;padding:14px 18px;border:1px solid #D6DFFB;background:#fff;display:grid;gap:8px;text-align:left;font-size:13px;line-height:1.75}
+.dinfo div{display:grid;grid-template-columns:6.5em minmax(0,1fr);gap:10px}
+.dinfo dt{font-weight:700;color:var(--x-blue,#0B35C8)}
+.dinfo dd{margin:0;color:rgba(11,11,20,.78)}
+@media(max-width:480px){.dinfo div{grid-template-columns:1fr;gap:0}}
+</style>
