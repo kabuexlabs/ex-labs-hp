@@ -1,6 +1,7 @@
 # ウワサバナシ調査委員会 case2「言祝ぎの家」LP（限定URLプレビュー）
 
-- URL：https://kabuexlabs.com/preview/kotohogi-xqo8sx5ar3pm/
+- URL（限定プレビュー）：https://kabuexlabs.com/preview/kotohogi-xqo8sx5ar3pm/
+- **本番公開URL（2026-10-02 決定）：https://kabuexlabs.com/uwasabanashi/kotohogi/**（case1 の公式LP /uwasabanashi/ の下。作品名「言祝ぎ（ことほぎ）」のローマ字。チラシ・SNS・販売ページにはこのURLを使う）
 - 実装：`src/pages/preview/kotohogi-xqo8sx5ar3pm/index.astro`（2026-10-01、デザイン書き出し「言祝ぎの家 LP」export の再実装。文言・レイアウト・冒頭演出は書き出しのまま）
 - 検索対策：meta robots noindex,nofollow,noarchive＋レスポンスヘッダー `X-Robots-Tag`（ページ側と vercel.json の `/preview/(.*)`）。sitemap・llms.txt・ナビ・他ページからのリンクには載せない。
 - アクセス制限：Vercel の環境変数 `KOTOHOGI_PREVIEW_PASSWORD` を設定すると Basic 認証がかかる（ユーザー名は任意、パスワードのみ照合）。**リポジトリが公開なので URL だけでは秘密にならない**。未設定の間は URL を知っていれば誰でも見られる。共有は URL とパスワードを別経路で。
@@ -28,7 +29,7 @@
 | `CAST_TEXT` | 空 | 出演者名（役名・配役は入れない） |
 
 ## 本番公開するとき
-- 正式URL（例：/uwasabanashi/ 配下）へ移し、noindex と `X-Robots-Tag` を外す。sitemap・llms.txt に登録し、OGP（正式メインビジュアル納品後）を設定する。
+- 本番URL /uwasabanashi/kotohogi/ へ移し（ページを src/pages/uwasabanashi/kotohogi/index.astro に移動し、旧プレビューURLは本番URLへ301）、noindex と `X-Robots-Tag` を外す。sitemap・llms.txt に登録し、OGP（正式メインビジュアル納品後）を設定する。
 - 共通ヘッダー・フッター（著作権表記・問い合わせ窓口）を既存サイトのものに差し替える。
 - 10月31日（土）の追加開催は現在非掲載。確定したらカレンダーと開演時刻リストに追加する。
 - 公演データ（src/data/events/）への登録は、販売先・開催日を公式で確認してから。
