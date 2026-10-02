@@ -17,7 +17,7 @@ const INTRO_MODE: '毎回' | '初回のみ' | 'なし' = '毎回';
 const RESERVE_URL = '';
 // メインビジュアル（位置情報を削除したもの）。未設定の間は文字組みで代替。
 // 設定中はビジュアル自体にタイトル・キャッチ・クレジットが入っているので、ヒーローの文字の重ね（祝の印・縦書きキャッチ・H1）は出さず、H1 は読み上げ用に残す
-const KV_SRC = '/assets/kotohogi/kv.webp';
+const KV_SRC = '/assets/kotohogi/kv-v2.webp';
 // 支給ロゴ（冒頭演出で使用。H1 はテキストのまま）。未設定の間は仮のテキストロゴ
 const LOGO_SRC = '';
 // 所要時間（入力すると開催概要に表示）
@@ -198,8 +198,8 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
   </header>
 
   <section id="top">
-    <div style={KV_SRC ? 'position:relative;aspect-ratio:1076 / 1522;background:#c41b85;overflow:hidden' : 'position:relative;aspect-ratio:3 / 4;background:#2b2a28;overflow:hidden'}>
-      {KV_SRC && <img src={KV_SRC} alt="" width="1076" height="1522" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />}
+    <div style={KV_SRC ? 'position:relative;aspect-ratio:1414 / 2000;background:#c41b85;overflow:hidden' : 'position:relative;aspect-ratio:3 / 4;background:#2b2a28;overflow:hidden'}>
+      {KV_SRC && <img src={KV_SRC} alt="" width="1414" height="2000" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />}
       {(!KV_SRC) && (<Fragment>
         <div aria-hidden="true" style="position:absolute;inset:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;color:#a9a7a0">
           <div style="position:absolute;inset:0;background-image:radial-gradient(circle,#f1f0ec 1.1px,transparent 1.5px);background-size:7px 7px;opacity:.2;-webkit-mask-image:linear-gradient(170deg,#000 0%,transparent 55%);mask-image:linear-gradient(170deg,#000 0%,transparent 55%)"></div>
