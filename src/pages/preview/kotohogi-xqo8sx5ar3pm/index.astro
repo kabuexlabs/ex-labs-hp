@@ -24,8 +24,14 @@ const LOGO_SRC = '';
 const DURATION_TEXT = '';
 // 最寄り駅・駅からの所要時間・バス利用の概要（入力すると会場欄に表示）
 const ACCESS_TEXT = '';
-// 出演者名（役名・配役は入れない）
-const CAST_TEXT = '';
+// キャスト（2026-10-02 主催側提供。役名・配役は載せない）。写真は public/assets/kotohogi/cast-<id>.webp に置き photo に指定
+// （位置情報を消してから。縦長でも正方形に切り抜き、顔が枠の窓に入るよう上寄せで表示）。photo が空の間は「写真準備中」。
+const CAST: { id: string; name: string; photo?: string; bio: string }[] = [
+  { id: 'matsui', name: '松井瑞季', bio: '大学院卒業後プログラマーとして就職。2024年から声優事務所に所属しそこから活動を開始。陸上競技歴が11年以上あり、全国大会にも出場しているので体力だけは特に自信がある。乾いた体はビールで潤す派。' },
+  { id: 'shiina', name: '椎名しおり', bio: '日本大学演劇学科卒。小学生の頃にミュージカルから芝居の道に入り、大学では小劇場を中心に活動。2023年の『黄昏のまほろば遊園地』への出演からイマーシブシアター作品に関わり始め、現在もイマーシブシアター、体験型コンテンツの作品に多く出演中。' },
+];
+// クレジット欄の「出演」（キャスト欄から自動で並べる）
+const CAST_TEXT = CAST.map((c) => c.name).join('／');
 
 function readEnv(name: string): string | undefined {
   const v = (import.meta.env as Record<string, string | undefined>)[name] ?? process.env[name];
@@ -660,6 +666,25 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
     </div>
   </section>
 
+  <section id="cast" style="padding:56px 20px 64px;border-top:1px solid #1b1b1a">
+    <div style="position:relative;display:grid;gap:10px;margin-bottom:36px;text-align:center">
+      <div style="display:flex;align-items:center;gap:14px"><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span><h2 style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:29px;font-weight:800;letter-spacing:.04em;line-height:1.35">キャスト</h2><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span></div>
+      <p style="margin:0;font-family:'Bodoni Moda',serif;font-size:13px;font-style:italic;letter-spacing:.24em;color:#3d3c3a">CAST</p>
+    </div>
+    <ul class="k-cast">
+      {CAST.map((c) => (
+        <li>
+          <div class="k-cast-card">
+            {c.photo ? <img src={c.photo} alt={c.name} loading="lazy" decoding="async"> : <span class="k-cast-tbd" aria-hidden="true">写真準備中</span>}
+            <span class="k-cast-frame" aria-hidden="true"><span class="k-cast-bar l"></span><span class="k-cast-bar r"></span></span>
+            <p class="k-cast-name">{c.name}</p>
+          </div>
+          <p class="k-cast-bio">{c.bio}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
   <section id="credits" style="background:#a3a29d;padding:56px 20px 64px;border-top:1px solid #1b1b1a">
     <div style="position:relative;display:grid;gap:10px;margin-bottom:36px;text-align:center">
       <div style="display:flex;align-items:center;gap:14px"><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span><h2 style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:29px;font-weight:800;letter-spacing:.04em;line-height:1.35">クレジット</h2><span aria-hidden="true" style="flex:1;min-width:24px;height:3px;border-top:1px solid #1b1b1a;border-bottom:1px solid #1b1b1a"></span></div>
@@ -716,6 +741,17 @@ summary::-webkit-details-marker{display:none}
 .k-sr{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .k-redact{display:inline-block;width:6.2em;height:1.15em;vertical-align:-.2em;background:#0b0a09;transform:rotate(-.6deg);clip-path:polygon(0 8%,3% 0,40% 6%,72% 1%,100% 7%,98% 92%,64% 100%,30% 94%,2% 100%)}
 .k-redact-v{width:1.1em;vertical-align:baseline;transform:rotate(.6deg);clip-path:polygon(6% 0,100% 2%,94% 35%,100% 70%,92% 100%,0 98%,7% 62%,0 30%)}
+/* キャスト欄：紙色の正方形に、マゼンタの U 字の枠（窓に顔、下の帯に名前）。枠はビジュアルと同じざらつき */
+.k-cast{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}
+.k-cast-card{position:relative;aspect-ratio:1;overflow:hidden;background:#e2e1dc;border:1px solid #1b1b1a}
+.k-cast-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 18%}
+.k-cast-tbd{position:absolute;left:0;right:0;top:34%;text-align:center;font-size:11px;letter-spacing:.2em;color:#8a8882}
+.k-cast-frame{position:absolute;left:12%;right:12%;top:26%;bottom:6%;pointer-events:none}
+.k-cast-bar,.k-cast-name{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 -.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),#c41b85}
+.k-cast-bar{position:absolute;top:0;bottom:0;width:12%}
+.k-cast-bar.l{left:0}.k-cast-bar.r{right:0}
+.k-cast-name{position:absolute;left:12%;right:12%;bottom:6%;height:20%;margin:0;display:flex;align-items:center;justify-content:center;font-family:'Shippori Mincho',serif;font-weight:800;font-size:min(18px,4.6vw);letter-spacing:.08em;color:#fff;white-space:nowrap}
+.k-cast-bio{margin:12px 0 0;font-size:12.5px;line-height:1.85;letter-spacing:.02em;color:#3d3c3a;text-align:left;word-break:normal;line-break:strict;overflow-wrap:anywhere}
 /* 冒頭演出中は右下のチケットボタンを隠す */
 .k-intro-on .k-float{opacity:0!important;pointer-events:none!important}
 /* FAQ の開閉記号 */
