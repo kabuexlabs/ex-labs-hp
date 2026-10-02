@@ -3,6 +3,7 @@
 // 役割：仕事終わりの二人が、開始時刻・所要時間・場所から、平日の夜に間に合う体験を選ぶ。
 // 夜の回の開始時刻は src/data/seasonalDate.ts（公式で確認できたもの）・公演データの開始時刻・HACKTALE の公演回だけを使う。
 // 開始時刻を確認できた体験が PUBLISH_MIN 件に満たない間は下書き（noindex、記事一覧・サイトマップ・内部リンクに出さない）。
+// 下書き（公開前）の間は seo-audit の登録チェック（llms.txt 等）の対象外。公開に切り替わったらこの行を消し、public/llms.txt に1行足す。
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -57,7 +58,11 @@ const articleLd = {
 };
 const rows = pair.map((o) => o.row);
 ---
-<BaseLayout title={`${title} - 株式会社ex Labs`} description={desc} ogImage="/assets/guide/tokyo-night-date.webp">
+<BaseLayout
+  title="東京の夜デート｜仕事終わりに行けるイマーシブ・謎解き・体験を開始時刻で比較 - 株式会社ex Labs"
+  description="東京で仕事終わりに行ける夜の体験デートを、開始時刻、所要時間、二人分の料金、二人だけか他の参加者もいるかで比較。開始時刻を公式で確認できた回だけを載せ、間に合うかの考え方と予約前の確認点をまとめました。"
+  ogImage="/assets/guide/tokyo-night-date.webp"
+>
 {!draft && <script type="application/ld+json" set:html={jsonLd(faqLd)} />}
 {!draft && <script type="application/ld+json" set:html={jsonLd(articleLd)} />}
 <Breadcrumb items={[

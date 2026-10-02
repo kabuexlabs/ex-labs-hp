@@ -3,6 +3,7 @@
 // 役割：クリスマス（12月20日〜25日）に予約できる体験型のデートを、開催日・料金・時間・貸切か相席かで選ぶ。
 // 開催日は src/data/seasonalDate.ts（公式で確認できたもの）・公演データの開催日・HACKTALE の公演回だけを使う。
 // 開催日を確認できた体験が PUBLISH_MIN 件に満たない間は下書き（noindex、記事一覧・サイトマップ・内部リンクに出さない）。
+// 下書き（公開前）の間は seo-audit の登録チェック（llms.txt 等）の対象外。公開に切り替わったらこの行を消し、public/llms.txt に1行足す。
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -56,7 +57,11 @@ const articleLd = {
 };
 const rows = pair.map((o) => o.row);
 ---
-<BaseLayout title={`${title} - 株式会社ex Labs`} description={desc} ogImage="/assets/guide/tokyo-christmas-date.webp">
+<BaseLayout
+  title="東京のクリスマスデート｜予約できる体験型プランを開催日・料金で比較 - 株式会社ex Labs"
+  description="東京のクリスマス（12月20日〜25日）に予約できる体験型デートを、開催日、二人分の料金、所要時間、二人だけか他の参加者もいるかで比較。開催日を公式で確認できた体験だけを載せ、予約の進め方と確認点をまとめました。"
+  ogImage="/assets/guide/tokyo-christmas-date.webp"
+>
 {!draft && <script type="application/ld+json" set:html={jsonLd(faqLd)} />}
 {!draft && <script type="application/ld+json" set:html={jsonLd(articleLd)} />}
 <Breadcrumb items={[

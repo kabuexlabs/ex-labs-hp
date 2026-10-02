@@ -22,6 +22,8 @@ for (const slug of [...order, ...extra]) {
   const f = path.join(dir, `${slug}.astro`);
   if (!fs.existsSync(f)) continue;
   const s = fs.readFileSync(f, 'utf8');
+  // 下書き（公開前）の記事は noindex で一覧にも出さないので、AI 向け全文にも載せない（seo-audit と同じ判定）
+  if (s.includes('下書き（公開前）')) continue;
   const [, fm = '', body = ''] = s.split(/^---$/m);
   const title = (s.match(/^\s*title="([^"]*)"/m) || [])[1] ?? slug;
   const desc = (s.match(/^\s*description="([^"]*)"/m) || [])[1] ?? '';

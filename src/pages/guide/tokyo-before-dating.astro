@@ -58,7 +58,11 @@ const articleLd = {
 const rows = items.map((o) => o.row);
 const chips = [`${items.length}件を比較`, '会話の生まれ方で選べる', '1人あたりの料金つき'];
 ---
-<BaseLayout title={`${title} - 株式会社ex Labs`} description={desc} ogImage="/assets/guide/tokyo-before-dating.webp">
+<BaseLayout
+  title="東京で付き合う前に行きたいデート｜会話が自然に生まれる体験を料金・時間で比較 - 株式会社ex Labs"
+  description="付き合う前の二人に向けて、東京で会話が自然に生まれる体験を比較。二人で相談する謎解き、キャストと話す物語参加型、作りながら話せるものづくりを、二人分の料金と1人あたりの額、所要時間、二人だけか他の参加者もいるかで整理しました。"
+  ogImage="/assets/guide/tokyo-before-dating.webp"
+>
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
 <Breadcrumb items={[

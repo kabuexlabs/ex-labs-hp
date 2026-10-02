@@ -69,7 +69,11 @@ const articleLd = {
 const rows = all.map((o) => o.row);
 const chips = [`${all.length}件を比較`, '一人・二人・友達で選べる', '料金・時間・相席か'];
 ---
-<BaseLayout title={`${title} - 株式会社ex Labs`} description={desc} ogImage="/assets/guide/tokyo-holiday.webp">
+<BaseLayout
+  title="東京で休日に行く場所がないときの過ごし方｜二人・友達・一人で体験を比較 - 株式会社ex Labs"
+  description="東京で休日に行く場所が決まらないときに、予約できる体験を「誰と行くか（一人・二人・友達3〜4人）」と「使える時間」で比較。謎解き・物語参加型・マダミス・頭脳戦・ものづくりの料金、所要時間、他の参加者と一緒になるかを公式情報で整理しました。"
+  ogImage="/assets/guide/tokyo-holiday.webp"
+>
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
 <Breadcrumb items={[
