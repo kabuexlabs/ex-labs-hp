@@ -7,9 +7,15 @@ const { href = '/#contact', place, showGuide = true } = Astro.props;
 <aside class="rsc" aria-label="レベニューシェアでの実施">
   <p class="rsc-eb">REVENUE SHARE</p>
   <p class="rsc-t"><span>原価＋実績に対する</span><span>レベニューシェアで</span><span>実施できます</span></p>
-  <p class="rsc-b">ex Labsの強みとして、制作費を一括でお支払いいただく方法のほかに、<strong>原価＋実績に対するレベニューシェア</strong>で実施することが可能です。掲載している費用の目安とあわせて、ご予算に合う進め方をご相談ください。</p>
-  <div class="rsc-act">
-    <a class="rsc-btn" href={href} data-track="cta" data-show="revshare" data-place={place}>レベニューシェアでの実施を相談する（無料）</a>
+  <p class="rsc-b">
+    <span class="rsc-l">ex Labsの強みとして、</span>
+    <span class="rsc-l">制作費を一括でお支払いいただく方法のほかに、</span>
+    <span class="rsc-l"><strong>原価＋実績に対するレベニューシェア</strong>で</span>
+    <span class="rsc-l">実施することが可能です。</span>
+    <span class="rsc-l">掲載している費用の目安とあわせて、</span>
+    <span class="rsc-l">ご予算に合う進め方をご相談ください。</span>
+  </p>  <div class="rsc-act">
+    <a class="rsc-btn" href={href} data-track="cta" data-show="revshare" data-place={place}><span>レベニューシェアでの実施を相談する（無料）</span></a>
     {showGuide && <a class="rsc-sub" href="/guide/event-revenue-share/" data-track="show" data-show="guide-revshare" data-place={place}>レベニューシェアの仕組み →</a>}
   </div>
 </aside>
@@ -18,10 +24,15 @@ const { href = '/#contact', place, showGuide = true } = Astro.props;
 .rsc-eb{margin:0 0 6px;font-size:11.5px;font-weight:800;letter-spacing:.2em;color:#0B35C8}
 .rsc-t{margin:0;font-family:var(--x-min,serif);font-weight:800;font-size:clamp(19px,3.2vw,25px);line-height:1.5;color:#0B0B14}
 .rsc-t span{display:inline-block}
-.rsc-b{margin:10px 0 0;font-size:14.5px;line-height:1.9;color:#0B0B14}
+/* 本文は1文ずつ改行し、各行が折り返さないよう枠の幅に合わせて文字サイズを決める（最長行＝全角22字＋字間） */
+.rsc-b{margin:12px 0 0;container-type:inline-size;color:#0B0B14}
+.rsc-l{display:block;white-space:nowrap;font-size:min(15px,calc(100cqi / 22.6));line-height:1.95;letter-spacing:0;font-feature-settings:normal}
 .rsc-b strong{background:none!important;padding:0!important;color:#0B0B14;border-bottom:2px solid #0B0B14}
 .rsc-act{margin-top:16px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
-.rsc-btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 22px;background:#0B0B14;color:#fff!important;font-weight:700;font-size:14.5px;text-decoration:none!important}
+.rsc-act{container-type:inline-size}
+.rsc-btn{display:inline-flex;align-items:center;justify-content:center;max-width:100%;min-height:50px;padding:12px 22px;background:#0B0B14;color:#fff!important;font-weight:700;text-decoration:none!important}
+/* ボタンの文言（全角21字）は1行に収める */
+.rsc-btn span{white-space:nowrap;font-size:min(15px,calc((100cqi - 20px) / 21.6));letter-spacing:0}
 .rsc-sub{display:inline-block;padding:8px 0;font-weight:700;font-size:14px;color:#0B0B14!important;border-bottom:1px solid currentColor;text-decoration:none!important}
-@media(max-width:640px){.rsc-btn{width:100%}}
+@media(max-width:640px){.rsc{padding:20px 14px}.rsc-btn{width:100%;padding:12px 10px}:global(.wrap)>.rsc{margin-left:-12px;margin-right:-12px}}
 </style>
