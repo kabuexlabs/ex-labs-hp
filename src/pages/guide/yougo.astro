@@ -4,6 +4,7 @@
 // 全ての軸ページへ内部リンクを配るハブでもある。
 export const prerender = false;
 
+import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
@@ -138,6 +139,7 @@ const setLd = {
 {groups.map((g) => <a href={`#g-${g.key}`}>{g.label}</a>)}
 </nav>
 </div></section>
+<section class="section" style="padding-top:0;padding-bottom:0"><div class="wrap"><RevShareCallout place="yougo-top" /></div></section>
 
 {groups.map((g, gi) => (
   <section class:list={['section', { tinted: gi % 2 === 0 }]} id={`g-${g.key}`}><div class="wrap narrow">

@@ -8,6 +8,7 @@ import Cls from './Cls.astro';
 import Rich from './Rich.astro';
 import SecHead from './SecHead.astro';
 import { SERVICES, SERVICE_LINKS, type ServiceSlug } from '../../data/services';
+import RevShareCallout from '../RevShareCallout.astro';
 import { flat } from '../../lib/jpbreak';
 import { jsonLd } from '../../lib/microcms';
 import type { ContactType } from './ContactBlock.astro';
@@ -26,6 +27,9 @@ const defTitle = dm ? dm[1] + 'とは' : '';
 const CONTACT: Record<ServiceSlug, ContactType> = { nazotoki: 'kenshu', murder: 'madamis', shisetsu: 'shisetsu', immersive: 'immersive', zunousen: 'zunousen', ip: 'immersive' };
 const related = SERVICE_LINKS.filter((l) => l.slug !== slug);
 const faqSec = sections.find((s) => s.type === 'faq');
+// 費用（金額）を載せている節（「ご依頼の条件」優先、なければ最初の節、FAQ だけなら FAQ）に「原価＋実績に対するレベニューシェア」の訴求を置く（FAQ は除く）
+const hasCost = (s: any) => /万円/.test(JSON.stringify(s));
+const costSecId = (sections.find((s) => s.id === 'terms' && hasCost(s)) ?? sections.find((s) => s.type !== 'faq' && hasCost(s)) ?? sections.find(hasCost))?.id;
 const faqLd = faqSec ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqSec.items.map((f: any) => ({ '@type': 'Question', name: flat(f.q), acceptedAnswer: { '@type': 'Answer', text: flat(f.a) } })) } : null;
 const crumbLd = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
   { '@type': 'ListItem', position: 1, name: 'ホーム', item: new URL('/', site).toString() },
@@ -123,6 +127,7 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
       <SecHead en={s.en} size="l" />
       <p class="x-sh-ja is-b"><Ph list={s.ja} /></p>
       {s.lead && <p class="xs-lead"><Cls text={s.lead} emph={false} /></p>}
+      {s.id === costSecId && <RevShareCallout href="#contact" place={`svc-${slug}-cost`} />}
 
       {s.type === 'list' && (
         <div {...railAttrs('list')}>

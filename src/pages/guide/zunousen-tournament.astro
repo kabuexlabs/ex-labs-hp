@@ -4,6 +4,7 @@
 // 説明していない判断材料を置き、/services/zunousen/ へ送客する。本文中の数値例は説明用の仮定。
 export const prerender = false;
 
+import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
@@ -82,6 +83,7 @@ const articleLd = {
 </ol>
 </nav>
 </div></section>
+<section class="section" style="padding-top:0;padding-bottom:0"><div class="wrap"><RevShareCallout place="zunousen-tournament-top" /></div></section>
 
 <section class="section tinted" id="format"><div class="wrap narrow">
 <p class="eyebrow">FORMAT</p><h2 class="h2 serif">目的に合わせて対戦形式を選ぶ</h2>
