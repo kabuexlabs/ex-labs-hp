@@ -23,7 +23,7 @@ const facts = (raw.intro.facts ?? []) as any[];
 const def: string = raw.intro.definition ?? '';
 const dm = def.match(/^\**([^、。*]+?)\**とは/);
 const defTitle = dm ? dm[1] + 'とは' : '';
-const CONTACT: Record<ServiceSlug, ContactType> = { nazotoki: 'kenshu', murder: 'madamis', shisetsu: 'shisetsu', immersive: 'immersive', zunousen: 'zunousen' };
+const CONTACT: Record<ServiceSlug, ContactType> = { nazotoki: 'kenshu', murder: 'madamis', shisetsu: 'shisetsu', immersive: 'immersive', zunousen: 'zunousen', ip: 'immersive' };
 const related = SERVICE_LINKS.filter((l) => l.slug !== slug);
 const faqSec = sections.find((s) => s.type === 'faq');
 const faqLd = faqSec ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqSec.items.map((f: any) => ({ '@type': 'Question', name: flat(f.q), acceptedAnswer: { '@type': 'Answer', text: flat(f.a) } })) } : null;

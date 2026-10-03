@@ -43,6 +43,10 @@ export interface Outing {
   own: boolean;
   ownLabel?: string;
   area: string;
+  /** 何をする体験か（一文。各データの記載から） */
+  what: string;
+  /** 持ち物・服装などの条件（公式の記載がある場合だけ） */
+  bring?: string;
   /** 申し込める人数 */
   partyText: string;
   min?: number;
@@ -89,6 +93,7 @@ function fromEvent(r: GuideRow, today: string): Outing {
   const fmt = r.w.party.format;
   return {
     id: r.w.id, name: r.w.title, kind: 'story', own: r.own, ownLabel: r.organizer.relationLabel,
+    what: r.w.summary, bring: (r.w.info.requirements ?? []).filter((x) => /持参|服装|荷物|ロッカー|靴/.test(x)).join('。') || undefined,
     area: row.area, partyText: r.w.party.text, min: r.w.party.min, max: r.w.party.max, solo: r.w.party.soloAllowed,
     strangers: fmt === 'private' ? false : fmt === 'shared' ? true : undefined, privacyText: row.privacy,
     totalFor: (n) => r.totalFor(n), priceText: r.w.price.unit === 'per-group' ? '1組料金・税込、手数料別' : r.w.price.unit === 'per-person' && r.w.price.amount !== undefined ? `1人${yen(r.w.price.amount)}・税込、手数料別` : r.w.price.text,
@@ -114,7 +119,7 @@ function fromHacktale(w: (typeof htWorks)[number]): Outing | undefined {
     talk: TALK_LABEL.group, beginner, reserveHref: '/hacktale/reservation/', reserveLabel: '公演予約ページ', own: true, siteId: `hacktale-${w.slug}`, checked: '',
   };
   return {
-    id: row.id, name: row.name, kind: 'zunousen', own: true, ownLabel: '株式会社ex Labs制作', area: row.area,
+    id: row.id, name: row.name, kind: 'zunousen', own: true, ownLabel: '株式会社ex Labs制作', area: row.area, what: w.desc,
     partyText: `${w.players}人で1卓（1人から予約。開催に必要な人数が集まると開催決定）`, min: 1, max: w.players, solo: true, strangers: true, privacyText: row.privacy,
     totalFor: (n) => (n <= w.players ? total(n) : undefined), priceText: `1人${yen(price)}`, minutes: w.minutes, timeText: row.time, setting: row.setting,
     talk: 'group', talkText: w.desc, beginner, reserveText: '公演予約ページで日程を選んで予約。開催に必要な人数が集まった時点で開催決定。貸切は公式LINE・フォームで相談',
@@ -140,6 +145,7 @@ function fromTm(w: (typeof tmWorks)[number]): Outing | undefined {
   };
   return {
     id: row.id, name: row.name, kind: 'madamis', own: true, ownLabel: 'UNLIMITED MYSTERY（東大マーダーミステリーサークル）', area: row.area,
+    what: /^[？?]+$/.test(w.desc) ? '登場人物になりきり、会話と推理で事件の真相を探すマーダーミステリー' : w.desc,
     partyText: `${peopleS}`, min: Math.min(...people), max: Math.max(...people), solo: false, strangers: false, privacyText: row.privacy,
     totalFor: total, priceText: `1人${priceS}`, minutes, timeText: timeS ?? UNKNOWN, setting: row.setting,
     talk: 'group', talkText: '登場人物になりきり、会話と推理で真相を探す', beginner: row.beginner,
@@ -159,7 +165,8 @@ function fromNazo(i: NazoItem): Outing {
     reserveHref: i.officialUrl || undefined, reserveLabel: '公式ページで予約', own: false, siteId: i.siteId, checked: i.checkedAt,
   };
   return {
-    id: i.id, name: i.name, kind: 'escape', own: false, area: i.area, partyText: i.players, min: players[0], max: players[1],
+    id: i.id, name: i.name, kind: 'escape', own: false, area: i.area, partyText: i.players,
+    what: i.format === '店舗型' ? `制限時間内に謎を解き、脱出を目指す${i.format}の脱出ゲーム` : '街を歩きながら謎を解く', min: players[0], max: players[1],
     solo: players[0] === 1 ? true : players[0] >= 2 ? false : undefined,
     strangers: i.privacy === 'room' || i.privacy === 'team' ? false : i.privacy === 'shared' ? true : undefined, privacyText: row.privacy,
     totalFor: (n) => (n === 2 ? n2 : undefined), priceText: i.pairPrice, minutes: i.totalMinutes ?? i.gameMinutes, timeText: row.time, setting: i.indoor,
@@ -181,7 +188,7 @@ function fromExperience(i: ExperienceItem): Outing | undefined {
     reserveLabel: i.urlChecked ? '公式ページで予約' : '公式サイトを検索', own: false, siteId: i.siteId, checked: i.checkedAt,
   };
   return {
-    id: i.id, name: i.name, kind, own: false, area: c.place, partyText: i.forTwo, solo: undefined,
+    id: i.id, name: i.name, kind, own: false, area: c.place, partyText: i.forTwo, solo: undefined, what: `${i.what}${i.time ? `（${i.time}）` : ''}`,
     strangers: c.privateForTwo === true ? false : c.privateForTwo === false ? true : undefined, privacyText: c.together,
     totalFor: (n) => (n === 2 ? c.pairTotalMin : undefined), priceText: c.pairTotal, minutes: c.minutes, timeText: c.time, setting: c.outdoor,
     talk, talkText: TALK_LABEL[talk], beginner: UNKNOWN, reserveText: '予約制（空き状況は公式予約ページで確認）', reserveHref: href, reserveLabel: row.reserveLabel!,

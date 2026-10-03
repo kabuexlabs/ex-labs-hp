@@ -1,0 +1,368 @@
+---
+// 東京で今週末に遊べる体験（/outing/）。2026-10 追加。
+// 役割：「イマーシブ」という言葉を知らない人が、いつ・誰と・何をしたいかから、指定した日に行ける体験を選び、公式予約先へ進む。
+// /events/（公演回の検索）・解説記事は変えない。体験は src/lib/outingCatalog.ts（自社公演・HACKTALE・UNLIMITED MYSTERY・
+// 公式確認済みの他社）から作り、料金・人数・時間を手書きしない。空席と連携できない体験に「予約できる」とは書かない。
+// 条件はクエリ（GET フォーム）で受け、canonical はクエリなしの /outing/（BaseLayout）。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { buildOutings, fitsParty, hacktaleSlots, yen, TALK_LABEL, KIND_LABEL, type Outing, type HtSlot } from '../../lib/outingCatalog';
+import { NIGHT_INFO, nightOwnWorkIds } from '../../data/seasonalDate';
+import { EVENTS_CONTACT } from '../../data/events/index';
+import { fmtDateShort, jstDateString } from '../../lib/thisWeek';
+import { UNKNOWN } from '../../lib/dateGuide';
+import { jsonLd } from '../../lib/microcms';
+
+const now = new Date();
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const q = Astro.url.searchParams;
+const today = jstDateString(now);
+const addDays = (d: string, n: number) => new Date(Date.parse(`${d}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
+const dow = new Date(`${today}T00:00:00Z`).getUTCDay();
+const thisSat = dow === 0 ? addDays(today, -1) : addDays(today, 6 - dow);
+
+// ---- 条件（いつ・誰と・何を・絞り込み） ----
+type When = 'this' | 'next' | 'date' | 'any';
+const when = (['this', 'next', 'date', 'any'].includes(q.get('when') ?? '') ? q.get('when') : 'this') as When;
+const dateQ = /^\d{4}-\d{2}-\d{2}$/.test(q.get('date') ?? '') && (q.get('date') as string) >= today ? (q.get('date') as string) : '';
+const win: { from: string; to: string; label: string } =
+  when === 'next' ? { from: addDays(thisSat, 7), to: addDays(thisSat, 8), label: '来週末' }
+  : when === 'date' && dateQ ? { from: dateQ, to: dateQ, label: fmtDateShort(dateQ) }
+  : when === 'any' ? { from: today, to: addDays(today, 13), label: '今日から2週間' }
+  : { from: thisSat < today ? today : thisSat, to: addDays(thisSat, 1), label: '今週末' };
+const days: string[] = []; for (let d = win.from; d <= win.to; d = addDays(d, 1)) days.push(d);
+const inWin = (d: string) => d >= win.from && d <= win.to;
+
+const PARTIES = [{ k: '2', label: '2人', n: 2 }, { k: 'group', label: '友達と（3〜4人）', n: 4 }, { k: '1', label: '1人', n: 1 }] as const;
+const partyK = PARTIES.find((p) => p.k === q.get('party'))?.k ?? '2';
+const n = PARTIES.find((p) => p.k === partyK)!.n;
+const WANTS = [
+  { k: 'story', label: '物語に入りたい' },
+  { k: 'pair', label: '協力して解きたい' },
+  { k: 'craft', label: '作って残したい' },
+  { k: 'brain', label: '頭を使って遊びたい' },
+  { k: 'walk', label: '歩いて巡りたい' },
+] as const;
+const want = WANTS.find((w) => w.k === q.get('want'))?.k ?? '';
+const AREAS = ['渋谷', '新宿', '池袋', '六本木', '神田', '代官山', '原宿', '銀座'];
+const area = AREAS.includes(q.get('area') ?? '') ? (q.get('area') as string) : '';
+const budget = Number(q.get('budget')) || 0;
+const timeMax = Number(q.get('time')) || 0;
+const indoor = q.get('indoor') === '1';
+const priv = q.get('private') === '1';
+const night = q.get('night') === '1';
+
+// ---- 体験と、選んだ期間の開催状況 ----
+const all = buildOutings(now);
+const slots = await hacktaleSlots((s) => inWin(s.slice(0, 10)));
+const slotsFor = (o: Outing): HtSlot[] => (o.kind === 'zunousen' ? slots.filter((s) => o.name.startsWith(s.title)) : []);
+type Avail = { state: 'yes' | 'check' | 'request' | 'other'; text: string };
+const availOf = (o: Outing): Avail => {
+  if (o.kind === 'zunousen') {
+    const ss = slotsFor(o);
+    return ss.length ? { state: 'yes', text: `公演回あり：${ss.slice(0, 3).map((s) => `${s.startText.replace(/^\d+年/, '')}（${s.status}）`).join('／')}${ss.length > 3 ? ` ほか${ss.length - 3}回` : ''}` } : { state: 'check', text: '公演回は予約ページのカレンダーで確認' };
+  }
+  if (o.schedule === 'dated') {
+    const ds = o.dates.filter(inWin);
+    if (ds.length) return { state: 'yes', text: `開催予定：${ds.map(fmtDateShort).join('・')}（空席は予約サイトで確認）` };
+    return { state: 'other', text: o.dates.length ? `次の開催予定：${fmtDateShort(o.dates[0])}` : o.scheduleText };
+  }
+  if (o.schedule === 'on-request') return { state: 'request', text: '貸切で日程を相談（公式LINE・フォーム）' };
+  return { state: 'check', text: '常設の施設。営業日・空き枠は公式ページで確認' };
+};
+// 夜（17時以降）に始まる回を公式で確認できた体験
+const nightIds = new Set<string>([...nightOwnWorkIds, ...NIGHT_INFO.filter((x) => x.startTimes?.length || x.lastStart).map((x) => x.id)]);
+const isNight = (o: Outing) => nightIds.has(o.id) || slotsFor(o).some((s) => s.start.slice(11, 16) >= '17:00');
+const wantOk = (o: Outing) =>
+  !want ? true
+  : want === 'story' ? o.kind === 'story'
+  : want === 'pair' ? o.talk === 'pair' || (o.kind === 'story' && o.strangers === false)
+  : want === 'craft' ? o.kind === 'craft' || o.kind === 'art'
+  : want === 'brain' ? o.kind === 'zunousen' || o.kind === 'madamis' || o.kind === 'escape'
+  : /歩|周遊/.test(o.setting);
+// 人数条件のデータがない体験（他社のものづくり等）は、二人分の料金を公式で確認できたものだけ「2人」で出す
+const partyOk = (o: Outing) => (partyK === 'group' ? fitsParty(o, 3) === true || fitsParty(o, 4) === true : (fitsParty(o, n) ?? (n === 2 && o.totalFor(2) !== undefined)) === true || (n === 1 && o.solo === true));
+const filtersOk = (o: Outing) =>
+  partyOk(o) && wantOk(o)
+  && (!area || o.area.includes(area))
+  && (!budget || (o.totalFor(n) ?? Infinity) <= budget)
+  && (!timeMax || (o.minutes ?? Infinity) <= timeMax)
+  && (!indoor || /^屋内/.test(o.setting))
+  && (!priv || o.strangers === false)
+  && (!night || isNight(o));
+const candidates = all.filter(filtersOk).map((o) => ({ o, a: availOf(o) }));
+const order = { yes: 0, request: 1, check: 2, other: 3 } as const;
+const matched = candidates.filter((x) => x.a.state !== 'other').sort((a, b) => order[a.a.state] - order[b.a.state]);
+const otherDays = candidates.filter((x) => x.a.state === 'other');
+
+// ---- カードの表示 ----
+const total = (o: Outing) => o.totalFor(n);
+const perPerson = (o: Outing) => { const t = total(o); return t !== undefined ? Math.round(t / n) : undefined; };
+const priceLine = (o: Outing) => { const t = total(o); return t !== undefined ? `${n}人で${yen(t)}（1人あたり${yen(perPerson(o)!)}）` : o.priceText; };
+const joinLine = (o: Outing) => (partyK === 'group' ? `${fitsParty(o, 3) ? '3人' : ''}${fitsParty(o, 3) && fitsParty(o, 4) ? '・' : ''}${fitsParty(o, 4) ? '4人' : ''}で申し込める` : fitsParty(o, n) === undefined ? o.partyText : `${n}人で申し込める`);
+const withWhom = (o: Outing) => (o.strangers === false ? '申し込んだ人だけで遊べる（他の参加者と一緒にならない）' : o.strangers === true ? `他の参加者と一緒（${o.privacyText.replace(/^相席（|）$/g, '')}）` : '他の参加者と一緒になるかは公式で確認');
+const checkedText = (o: Outing) => (o.checked ? `${o.checked.replace(/-/g, '/')} 確認` : o.kind === 'zunousen' ? '公演回は予約システムの登録内容' : '');
+const cmpData = (o: Outing, a: Avail) => JSON.stringify({ name: o.name, price: priceLine(o), time: o.timeText, whom: withWhom(o), talk: TALK_LABEL[o.talk], setting: o.setting, avail: a.text });
+
+// ---- 迷った人への案内（データから） ----
+const firstTime = matched.filter(({ o }) => o.beginner !== UNKNOWN).map(({ o }) => o);
+const onlyUs = matched.filter(({ o }) => o.strangers === false).map(({ o }) => o);
+const quiet = matched.filter(({ o }) => o.talk === 'pair' || o.talk === 'craft').map(({ o }) => o);
+const names = (xs: Outing[]) => xs.slice(0, 4).map((o) => o.name).join('、');
+
+const PRESETS = [
+  { t: '二人で、いつもと違う週末', d: '二人で申し込めて、会話や協力がある体験', href: '/outing/?party=2&want=pair#results' },
+  { t: '日常を離れて、物語の中へ', d: '登場人物として物語に入る体験', href: '/outing/?want=story#results' },
+  { t: '食事の前後に、ひとつ体験', d: '約1時間以内で終わる体験', href: '/outing/?time=60#results' },
+  { t: '二人で作る、持ち帰れる思い出', d: '何かを作って残す体験', href: '/outing/?party=2&want=craft#results' },
+  { t: '友達と、本気で遊ぶ', d: '協力・対戦・推理を楽しむ体験', href: '/outing/?party=group&want=brain#results' },
+];
+const filtered = !!(q.get('when') || q.get('party') || want || area || budget || timeMax || indoor || priv || night);
+const title = '東京で今週末に遊べる体験｜デート・お出かけ・非日常';
+const desc = '東京で今週末・来週末・指定した日に遊べる体験を、人数（2人・友達・1人）と「やりたいこと」から探せます。物語に入る体験、協力して解く謎解き、作って残す体験、頭を使うゲームを、料金・所要時間・他の参加者と一緒になるかで比べて、公式の予約先へ進めます。';
+const pageLd = { '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, description: desc, url: new URL('/outing/', site).toString(), inLanguage: 'ja', publisher: { '@id': new URL('/#organization', site).toString() } };
+const crumbLd = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'ホーム', item: new URL('/', site).toString() }, { '@type': 'ListItem', position: 2, name: '今週末に遊べる体験', item: new URL('/outing/', site).toString() }] };
+const BUDGETS = n === 1 ? [3000, 5000, 8000] : n === 2 ? [5000, 10000, 20000] : [10000, 20000, 30000];
+---
+<BaseLayout renewal title={`${title} - 株式会社ex Labs`} description={desc} contact={{ title: ['掲載情報の修正や、', '体験づくりのご相談はこちら'], type: 'other' }} footer="short">
+<script type="application/ld+json" set:html={jsonLd(pageLd)} />
+<script type="application/ld+json" set:html={jsonLd(crumbLd)} />
+
+<nav class="og-crumb" aria-label="パンくずリスト"><a href="/">ホーム</a><span>/</span><span aria-current="page">今週末に遊べる体験</span></nav>
+
+<section class="og-hero">
+  <p class="og-catch">今週末、いつもと違うことを。</p>
+  <h1 class="og-h1"><span>東京で今週末に</span><span>遊べる体験</span></h1>
+  <p class="og-sub"><span>いつ・誰と・何をしたいかを選ぶと、</span><span>行ける体験だけが並びます。</span></p>
+</section>
+
+<section class="og-sec" id="search">
+  <form class="og-form" method="get" action="/outing/#results" aria-label="探す条件">
+    <fieldset class="og-fs">
+      <legend class="og-lbl">いつ</legend>
+      <div class="og-pills">
+        {[['this', '今週末', `${fmtDateShort(thisSat < today ? today : thisSat)}〜`], ['next', '来週末', fmtDateShort(addDays(thisSat, 7))], ['date', '日付を指定', ''], ['any', '2週間以内', '']].map(([k, l, s]) => <label class="og-pill"><input type="radio" name="when" value={k} checked={when === k}><span>{l}{s && <small>{s}</small>}</span></label>)}
+      </div>
+      <label class="og-date">日付<input type="date" name="date" value={dateQ} min={today} max={addDays(today, 90)}></label>
+    </fieldset>
+    <fieldset class="og-fs">
+      <legend class="og-lbl">誰と</legend>
+      <div class="og-pills">{PARTIES.map((p) => <label class="og-pill"><input type="radio" name="party" value={p.k} checked={partyK === p.k}><span>{p.label}</span></label>)}</div>
+    </fieldset>
+    <fieldset class="og-fs">
+      <legend class="og-lbl">何をしたい</legend>
+      <div class="og-pills">
+        <label class="og-pill"><input type="radio" name="want" value="" checked={!want}><span>なんでも</span></label>
+        {WANTS.map((w) => <label class="og-pill"><input type="radio" name="want" value={w.k} checked={want === w.k}><span>{w.label}</span></label>)}
+      </div>
+    </fieldset>
+    <details class="og-adv" open={!!(area || budget || timeMax || indoor || priv || night)}>
+      <summary>条件で絞り込む（エリア・予算・時間・屋内・二人だけ・夜）</summary>
+      <div class="og-sels">
+        <label class="og-sel"><span>エリア</span><select name="area"><option value="">指定なし</option>{AREAS.map((a) => <option value={a} selected={area === a}>{a}</option>)}</select></label>
+        <label class="og-sel"><span>{n === 1 ? '予算（1人）' : `予算（${n}人分の合計）`}</span><select name="budget"><option value="">指定なし</option>{BUDGETS.map((b) => <option value={b} selected={budget === b}>{yen(b)}以内</option>)}</select></label>
+        <label class="og-sel"><span>使える時間</span><select name="time"><option value="">指定なし</option><option value="60" selected={timeMax === 60}>約1時間以内</option><option value="120" selected={timeMax === 120}>約2時間以内</option></select></label>
+      </div>
+      <div class="og-checks">
+        <label><input type="checkbox" name="indoor" value="1" checked={indoor}>屋内中心</label>
+        <label><input type="checkbox" name="private" value="1" checked={priv}>申し込んだ人だけで遊ぶ</label>
+        <label><input type="checkbox" name="night" value="1" checked={night}>夜（17時以降）に始まる回がある</label>
+      </div>
+      <p class="og-note">予算は通常料金の合計です（手数料は別）。所要時間は本編の目安で、受付・集合の時間は別に見てください。「夜」は開始時刻を公式で確認できた体験だけが対象です。</p>
+    </details>
+    <div class="og-go"><button type="submit">この条件で探す</button>{filtered && <a href="/outing/">条件をリセット</a>}</div>
+  </form>
+
+  <div class="og-presets" aria-label="おすすめの探し方">
+    {PRESETS.map((p) => <a href={p.href}><strong>{p.t}</strong><span>{p.d}</span></a>)}
+  </div>
+</section>
+
+<section class="og-sec og-res" id="results" aria-live="polite">
+  <h2 class="og-h2">{win.label}{when !== 'date' && days.length <= 2 ? `（${days.map(fmtDateShort).join('・')}）` : ''}に{partyK === 'group' ? '友達と' : `${n}人で`}行ける体験<span>{matched.length}件</span></h2>
+  <p class="og-res-note">開催日が決まっている体験は、選んだ日に開催予定があるものだけを並べています。開催予定は空席があることを意味しません。空席は各予約先でご確認ください。</p>
+
+  {matched.length > 0 ? (
+    <div class="og-cards">
+      {matched.map(({ o, a }) => (
+        <article class="og-card" data-cmp={cmpData(o, a)}>
+          <p class="og-kind">{KIND_LABEL[o.kind]}{o.own && o.ownLabel ? `｜${o.ownLabel}` : ''}</p>
+          <h3 class="og-name">{o.name}</h3>
+          <p class="og-what">{o.what}</p>
+          <p class={`og-avail is-${a.state}`}>{a.text}</p>
+          <dl class="og-dl">
+            <div><dt>場所</dt><dd>{o.area}</dd></div>
+            <div><dt>料金</dt><dd>{priceLine(o)}</dd></div>
+            <div><dt>時間</dt><dd>{o.timeText}</dd></div>
+            <div><dt>参加の形</dt><dd>{joinLine(o)}。{withWhom(o)}</dd></div>
+            <div><dt>会話・協力</dt><dd>{TALK_LABEL[o.talk]}。{o.talkText !== TALK_LABEL[o.talk] ? o.talkText : ''}</dd></div>
+            <div><dt>屋内・屋外</dt><dd>{o.setting}</dd></div>
+            {(o.ageRule || o.scary || o.bring) && <div><dt>条件・持ち物</dt><dd>{[o.ageRule, o.scary, o.bring].filter(Boolean).join('。')}</dd></div>}
+          </dl>
+          {checkedText(o) && <p class="og-checked">{checkedText(o)}</p>}
+          <div class="og-act">
+            {o.reserveHref && <a class="og-btn" href={o.reserveHref} target={/^https?:/.test(o.reserveHref) ? '_blank' : undefined} rel={/^https?:/.test(o.reserveHref) ? (o.own ? 'noopener' : 'noopener nofollow') : undefined} data-track={o.own ? 'ticket' : 'ev-ext'} data-show={o.id} data-place="outing-card">{o.kind === 'madamis' ? '公式LINEで日程を相談' : '公式サイトで空席を確認'}{/^https?:/.test(o.reserveHref) ? ' ↗' : ' →'}</a>}
+            <a class="og-more" href={o.detailHref} data-track="show" data-show={o.id} data-place="outing-detail">内容を見る →</a>
+            <label class="og-cmp"><input type="checkbox" data-cmp-toggle>比較に追加</label>
+          </div>
+        </article>
+      ))}
+    </div>
+  ) : (
+    <p class="og-empty">この条件に合う体験は見つかりませんでした。日付や「何をしたい」を変えるか、下の「別の日なら」をご覧ください。</p>
+  )}
+
+  <div class="og-cmpbar" id="og-cmpbar" hidden>
+    <p><span id="og-cmpn">0</span>件を選択中（最大3件）</p>
+    <button type="button" id="og-cmpgo">選んだ体験を比べる</button>
+  </div>
+  <div class="og-cmpbox" id="og-cmpbox" hidden>
+    <h2 class="og-h2">選んだ体験の比較</h2>
+    <div class="og-cmpwrap"><table class="og-cmptable"><tbody id="og-cmpbody"></tbody></table></div>
+  </div>
+</section>
+
+{otherDays.length > 0 && (
+  <section class="og-sec" id="other-days">
+    <h2 class="og-h2">別の日なら</h2>
+    <ul class="og-list">{otherDays.map(({ o, a }) => <li><a href={o.detailHref}>{o.name}</a><span>{a.text}</span></li>)}</ul>
+    <p class="og-res-note">「いつ」を「2週間以内」や「日付を指定」に変えると、別の日の開催も探せます。</p>
+  </section>
+)}
+
+<section class="og-sec" id="plan">
+  <h2 class="og-h2">半日の過ごし方</h2>
+  <ol class="og-steps">
+    <li><strong>集合・受付</strong>予約サイトに書かれた受付時刻に間に合うように待ち合わせます。受付に遅れると参加できない体験があります。</li>
+    <li><strong>体験</strong>カードの「時間」は本編の目安です。受付・説明の時間を足して見積もります。</li>
+    <li><strong>前後の食事・散歩</strong>会場の最寄り駅と終了予定時刻を確認し、体験の前に軽く食べるか、終わってから食事にするかを決めておくと、当日の移動に迷いません。</li>
+  </ol>
+</section>
+
+<section class="og-sec" id="help">
+  <h2 class="og-h2">迷ったら</h2>
+  <div class="og-help">
+    <div><p class="og-help-q">初めてなら</p><p>{firstTime.length ? `${names(firstTime)}は、初めての人への案内が公式に書かれています（カードの各条件をご確認ください）。` : '初めての人向けの案内が公式で確認できた体験は、この条件ではありません。'}</p></div>
+    <div><p class="og-help-q">二人きり・仲間だけで遊びたいなら</p><p>{onlyUs.length ? `${names(onlyUs)}は、申し込んだ人だけで遊べます。` : '「申し込んだ人だけで遊ぶ」にチェックして探してください。'}</p></div>
+    <div><p class="og-help-q">知らない人と話すのが苦手なら</p><p>{quiet.length ? `${names(quiet)}は、仲間内の相談や作業が中心の体験です。` : '「協力して解きたい」「作って残したい」から探すと、仲間内で進める体験が見つかります。'}</p></div>
+  </div>
+  <p class="og-res-note">選び方を詳しく読むなら：<a href="/guide/tokyo-experience-date/">東京の非日常デート</a>／<a href="/guide/tokyo-friends-activities/">東京で友達と遊ぶ体験</a>／<a href="/guide/tokyo-holiday/">東京の休日の過ごし方</a>／公演の日時から探すなら<a href="/events/">今日できるイマーシブ（公演を探す）</a></p>
+</section>
+
+<section class="og-sec" id="about">
+  <h2 class="og-h2">掲載情報について</h2>
+  <ul class="og-about">
+    <li>料金・人数・所要時間は、主催者の公式ページ・公式予約ページで確認できた内容です。確認日を各カードに記載しています。確認できなかった項目は「公式で確認」と表示しています。</li>
+    <li>「開催予定」は、その日に公演があることを示すもので、空席があることは意味しません。空席・販売状況は各予約先の表示が最新です。</li>
+    <li>このページは株式会社ex Labsが運営しています。物語参加型の公演・HACKTALE・UNLIMITED MYSTERY は当社が企画・制作または運営に関わっており、カードにその旨を記載しています。並び順は開催状況によるもので、主催者による優先表示はしていません。</li>
+    <li>掲載内容の修正・掲載停止のご依頼は <a href={`mailto:${EVENTS_CONTACT}`}>{EVENTS_CONTACT}</a> へご連絡ください。</li>
+  </ul>
+</section>
+
+<script is:inline>
+(function(){
+  var max=3,bar=document.getElementById('og-cmpbar'),nEl=document.getElementById('og-cmpn'),go=document.getElementById('og-cmpgo'),box=document.getElementById('og-cmpbox'),body=document.getElementById('og-cmpbody');
+  if(!bar)return;
+  var boxes=[].slice.call(document.querySelectorAll('[data-cmp-toggle]'));
+  function picked(){return boxes.filter(function(b){return b.checked})}
+  function sync(){var p=picked();nEl.textContent=p.length;bar.hidden=p.length===0;boxes.forEach(function(b){b.disabled=!b.checked&&p.length>=max});if(!p.length)box.hidden=true}
+  boxes.forEach(function(b){b.addEventListener('change',sync)});
+  var ROWS=[['name','体験'],['price','料金'],['time','時間'],['whom','一緒に遊ぶ人'],['talk','会話・協力'],['setting','屋内・屋外'],['avail','開催']];
+  go.addEventListener('click',function(){
+    var items=picked().map(function(b){try{return JSON.parse(b.closest('[data-cmp]').getAttribute('data-cmp'))}catch(e){return null}}).filter(Boolean);
+    body.textContent='';
+    ROWS.forEach(function(r){var tr=document.createElement('tr');var th=document.createElement('th');th.scope='row';th.textContent=r[1];tr.appendChild(th);items.forEach(function(it){var td=document.createElement('td');td.textContent=it[r[0]]||'';tr.appendChild(td)});body.appendChild(tr)});
+    box.hidden=false;box.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+  // 「日付を指定」以外では日付欄を使わない
+  var date=document.querySelector('.og-date input');
+  if(date)date.addEventListener('change',function(){var r=document.querySelector('input[name=when][value=date]');if(r)r.checked=true});
+})();
+</script>
+</BaseLayout>
+
+<style>
+.og-crumb{max-width:1040px;margin:0 auto;padding:20px 24px 0;display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--x-pale2)}
+.og-crumb a{color:var(--x-pale2);padding:6px 0}
+.og-hero{max-width:1040px;margin:0 auto;padding:clamp(40px,7vw,88px) 24px 0}
+.og-catch{margin:0;font-family:var(--x-min);font-weight:600;font-size:clamp(16px,2.6vw,22px);color:var(--x-lime);letter-spacing:.06em}
+.og-h1{margin:14px 0 0;font-family:var(--x-min);font-weight:600;font-size:clamp(30px,6vw,60px);line-height:1.35;text-shadow:var(--x-glow)}
+.og-h1 span,.og-sub span,.og-h2 span.nb{display:inline-block}
+.og-sub{margin:16px 0 0;font-size:clamp(14px,2vw,16px);line-height:1.9;color:var(--x-pale)}
+.og-sec{max-width:1040px;margin:0 auto;padding:clamp(36px,6vw,64px) 24px 0}
+.og-form{border:1px solid rgba(255,255,255,.35);padding:clamp(20px,4vw,36px) clamp(16px,4vw,36px);display:grid;gap:24px}
+.og-fs{margin:0;padding:0;border:0;min-width:0;display:grid;gap:10px}
+.og-lbl{font-family:var(--x-min);font-weight:700;font-size:17px;padding:0;margin-bottom:10px}
+.og-pills{display:flex;flex-wrap:wrap;gap:8px}
+.og-pill{position:relative;cursor:pointer}
+.og-pill input{position:absolute;opacity:0;pointer-events:none}
+.og-pill span{display:inline-flex;align-items:baseline;gap:6px;min-height:44px;align-items:center;padding:10px 16px;border:1px solid rgba(255,255,255,.5);font-weight:700;font-size:14.5px}
+.og-pill small{font-size:11px;font-weight:500;color:var(--x-pale2)}
+.og-pill input:checked+span{background:var(--x-lime);color:var(--x-ink);border-color:var(--x-lime)}
+.og-pill input:checked+span small{color:var(--x-ink)}
+.og-pill input:focus-visible+span{outline:2px solid var(--x-lime);outline-offset:3px}
+.og-date{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--x-pale)}
+.og-date input{background:var(--x-panel);color:#fff;border:1px solid rgba(255,255,255,.45);padding:10px 12px;font-size:15px;font-family:inherit;color-scheme:dark}
+.og-adv summary{cursor:pointer;font-weight:700;font-size:14.5px;padding:10px 0;color:var(--x-pale)}
+.og-sels{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:14px;margin-top:12px}
+.og-sel{display:grid;gap:6px;font-size:13px;color:var(--x-pale)}
+.og-sel select{width:100%;background:var(--x-panel);color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:0;padding:12px;font-size:15px;font-family:inherit}
+.og-checks{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:14px}
+.og-checks label{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:14px}
+.og-checks input{width:18px;height:18px;accent-color:var(--x-lime)}
+.og-note,.og-res-note{margin:10px 0 0;font-size:12.5px;line-height:1.8;color:var(--x-pale2)}
+.og-res-note a{color:#fff;border-bottom:1px solid currentColor}
+.og-go{display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px}
+.og-go button{min-height:52px;padding:14px 34px;background:var(--x-lime);color:var(--x-ink);border:0;font-family:var(--x-min);font-weight:700;font-size:16px;cursor:pointer}
+.og-go a{color:var(--x-pale);font-size:14px;padding:8px 0;border-bottom:1px solid currentColor}
+.og-presets{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:10px;margin-top:22px}
+.og-presets a{display:grid;gap:4px;padding:14px 16px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.04)}
+.og-presets strong{font-family:var(--x-min);font-size:15.5px;line-height:1.5}
+.og-presets span{font-size:12px;color:var(--x-pale2);line-height:1.6}
+.og-h2{margin:0;font-family:var(--x-min);font-weight:700;font-size:clamp(20px,3vw,28px);line-height:1.5;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.og-h2>span{font-family:var(--x-en);font-size:clamp(22px,3vw,30px);color:var(--x-lime)}
+.og-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;margin-top:22px}
+.og-card{background:var(--x-card);color:var(--x-ink);padding:20px 18px 16px;display:flex;flex-direction:column;gap:8px}
+.og-kind{margin:0;font-size:11.5px;font-weight:700;color:var(--x-blue);letter-spacing:.03em}
+.og-name{margin:0;font-family:var(--x-min);font-weight:700;font-size:19px;line-height:1.5}
+.og-what{margin:0;font-size:13.5px;line-height:1.75;color:rgba(11,11,20,.8)}
+.og-avail{margin:2px 0 0;padding:8px 10px;font-size:13px;font-weight:700;line-height:1.6;background:#EEF2FE;color:var(--x-blue)}
+.og-avail.is-yes{background:var(--x-lime);color:var(--x-ink)}
+.og-dl{margin:4px 0 0;display:grid;font-size:13.5px;line-height:1.65}
+.og-dl div{display:grid;grid-template-columns:5.8em minmax(0,1fr);gap:8px;padding:7px 0;border-top:1px solid #E3E9FC}
+.og-dl dt{font-weight:700;font-size:12.5px;color:rgba(11,11,20,.55)}
+.og-dl dd{margin:0}
+.og-checked{margin:0;font-size:11.5px;color:rgba(11,11,20,.5)}
+.og-act{margin-top:auto;padding-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.og-btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:11px 16px;background:var(--x-blue);color:#fff!important;font-weight:700;font-size:14px}
+.og-more{padding:8px 0;font-size:13.5px;font-weight:700;color:var(--x-blue)!important;border-bottom:1px solid currentColor}
+.og-cmp{display:inline-flex;align-items:center;gap:6px;min-height:44px;font-size:13px;color:rgba(11,11,20,.7);cursor:pointer}
+.og-cmp input{width:18px;height:18px}
+.og-empty{margin:22px 0 0;padding:18px;border:1px dashed rgba(255,255,255,.5);line-height:1.8}
+.og-cmpbar{position:sticky;bottom:12px;z-index:5;margin:20px auto 0;max-width:560px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--x-ink);border:1px solid var(--x-lime);padding:10px 12px 10px 16px}
+.og-cmpbar[hidden],.og-cmpbox[hidden]{display:none}
+.og-cmpbar p{margin:0;font-size:13.5px}
+.og-cmpbar button{min-height:44px;padding:10px 16px;background:var(--x-lime);color:var(--x-ink);border:0;font-weight:700;font-size:14px;cursor:pointer}
+.og-cmpbox{margin-top:36px;scroll-margin-top:90px}
+.og-cmpwrap{margin-top:16px;overflow-x:auto}
+.og-cmptable{width:100%;min-width:560px;border-collapse:collapse;background:var(--x-card);color:var(--x-ink);font-size:13.5px;line-height:1.65}
+.og-cmptable th,.og-cmptable td{border:1px solid #D6DFFB;padding:10px 12px;text-align:left;vertical-align:top}
+.og-cmptable th{width:7.5em;min-width:7.5em;background:#EEF2FE;font-size:12.5px;white-space:nowrap}
+.og-cmptable tr:first-child td{font-family:var(--x-min);font-weight:700;font-size:15px}
+.og-list{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:8px}
+.og-list li{display:grid;gap:2px;padding:12px 14px;border-left:3px solid var(--x-lime);background:rgba(255,255,255,.05)}
+.og-list a{font-weight:700;color:#fff}
+.og-list span{font-size:13px;color:var(--x-pale)}
+.og-steps{margin:18px 0 0;padding-left:1.3em;display:grid;gap:12px;line-height:1.85;font-size:14.5px}
+.og-steps strong{display:block;font-family:var(--x-min);color:var(--x-lime)}
+.og-help{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px;margin-top:18px}
+.og-help>div{border:1px solid rgba(255,255,255,.3);padding:16px}
+.og-help p{margin:0;font-size:14px;line-height:1.8}
+.og-help .og-help-q{font-family:var(--x-min);font-weight:700;color:var(--x-lime);margin-bottom:6px}
+.og-about{margin:18px 0 0;padding-left:1.2em;display:grid;gap:10px;font-size:13.5px;line-height:1.85;color:var(--x-pale)}
+.og-about a{color:#fff;border-bottom:1px solid currentColor}
+#about{padding-bottom:clamp(64px,9vw,110px)}
+#results,#other-days,#plan,#help,#about{scroll-margin-top:80px}
+@media(max-width:640px){.og-btn{flex:1 1 100%}.og-go button{width:100%}}
+</style>

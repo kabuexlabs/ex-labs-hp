@@ -1,7 +1,9 @@
 // 2026-09 リニューアルのサービスページ本文データ（デザイン元 service-data.js を移植。immersive は既存ページの内容を同じ形式に整理）。
 // 本文の「**」は強調、「／」は箇条書き、「A：B／C：D」は項目表として自動整形される（src/lib/jpbreak.ts の rich）。
 // FAQ はページ内の表示と FAQPage 構造化データの両方に使う。
-export type ServiceSlug = 'nazotoki' | 'murder' | 'shisetsu' | 'immersive' | 'zunousen';
+import { IP_SERVICE } from './serviceIp';
+// ip（IPイベント企画・制作）は 2026-10 追加。既存サービスの「関連サービス」欄（SERVICE_LINKS）には加えない（既存ページを変えないため）
+export type ServiceSlug = 'nazotoki' | 'murder' | 'shisetsu' | 'immersive' | 'zunousen' | 'ip';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const SERVICES: Record<ServiceSlug, any> = {
  "nazotoki": {
@@ -1810,7 +1812,8 @@ export const SERVICES: Record<ServiceSlug, any> = {
     "label": "渋谷サクラステージの制作事例"
    }
   ]
- }
+ },
+ "ip": IP_SERVICE
 };
 export const SERVICE_LINKS: { slug: ServiceSlug; label: string; href: string }[] = [
  {

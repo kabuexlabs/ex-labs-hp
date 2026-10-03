@@ -1,0 +1,20 @@
+---
+// IP・キャラクターを活用したイベント企画・制作（2026-10 追加）。本文は src/data/serviceIp.ts、描画は components/x/ServicePage.astro。
+// 進め方の解説は /guide/ip-event/。ここは「ex Labsに何を依頼できるか」を判断するページ。
+export const prerender = false;
+import ServicePage from '../../components/x/ServicePage.astro';
+
+const serviceLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  serviceType: 'IPイベント企画・制作',
+  name: 'IP・キャラクターを活用したイベント企画・制作',
+  alternateName: ['IPイベント制作', 'キャラクターイベント企画', 'IPコラボイベント制作', 'IP活用 体験型イベント'],
+  description: '漫画・アニメ・ゲーム・小説などの作品やキャラクターを、来場者が役割を持って参加する体験型イベントに企画・制作。物語参加型・施設や街の周遊型・展示連動型・ゲーム／心理戦型に対応し、企画提案から体験設計、シナリオ、制作物、キャスト演出、運営、監修工程の整理まで担当',
+  provider: { '@type': 'Organization', '@id': new URL('/#organization', Astro.site).toString(), name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
+  audience: { '@type': 'BusinessAudience', name: '出版社・ゲーム会社などの権利元・広告代理店・商業施設・店舗・キャラクターやブランドを持つ企業' },
+  areaServed: 'JP',
+  url: new URL('/services/ip-event/', Astro.site).toString(),
+};
+---
+<ServicePage slug="ip" title="IP・キャラクターを活用したイベント企画・制作｜株式会社ex Labs" description="漫画・アニメ・ゲームなどの作品やキャラクターを、来場者が役割を持って参加する体験型イベントに。物語参加型・周遊型・展示連動型・心理戦型の形式、依頼できる範囲、監修の進め方、費用が変わる条件を、イマーシブ制作の株式会社ex Labsがご案内します。相談無料。" serviceLd={serviceLd} />
