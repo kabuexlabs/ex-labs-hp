@@ -13,7 +13,7 @@ import SiteGuard from '../../../components/SiteGuard.astro';
 // 「京都市」を省いた略称や、「京都市」と「京セラ…」を改行・空白で分けた表記は使わない（2026-09-29 美術館総務より指摘）。
 // scripts/seo-audit.mjs が誤表記をエラーにする。
 // 購入先URL。null の間はチケットボタンをすべて #ticket へのアンカーにする
-const TICKET_URL: string | null = null;
+const TICKET_URL: string | null = 'https://escape.id/kyoukaiart-org/e-7th/'; // 2026-10-03 支給（escape.id）
 // 地図の埋め込みURL（Google マップ。APIキー不要の検索埋め込み）。null にすると枠だけ表示
 const MAP_EMBED_URL: string | null = 'https://maps.google.com/maps?q=' + encodeURIComponent('京都市京セラ美術館') + '&hl=ja&z=16&output=embed';
 const MAP_LINK_URL = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('京都市京セラ美術館');
@@ -340,7 +340,9 @@ const eventLd = {
     </div>
     <div class="info info-sub">
       {ticketRows.map((r) => (
-        <div class="info-row"><span class="k">+・{r.k}</span><span class:list={['v', { tbd: isTbd(r.v) }]}>{r.v}</span></div>
+        <div class="info-row"><span class="k">+・{r.k}</span>{r.k === '購入先URL' && TICKET_URL
+          ? <a class="v ticket-link" href={TICKET_URL} {...ticketAttrs} data-place="info">{TICKET_URL}<span class="bodoni">↗</span></a>
+          : <span class:list={['v', { tbd: isTbd(r.v) }]}>{r.v}</span>}</div>
       ))}
     </div>
     <div class="sched">
@@ -665,6 +667,8 @@ h1,h2,p{margin:0}
 .info-row .v{font-size:17px;line-height:1.8;letter-spacing:.08em;overflow-wrap:anywhere}
 .info-row.main .v{font-size:clamp(20px,2vw,24px);font-weight:600}
 .info-sub .info-row{padding:14px 0;gap:4px}
+.ticket-link{text-decoration:underline;text-underline-offset:4px}
+.ticket-link .bodoni{margin-left:6px}
 .info-sub .info-row .v{font-size:15px;color:rgba(255,247,242,.85)}
 .sched{margin-top:72px}
 .sched-t{margin-bottom:8px;font-size:32px;text-align:center}
