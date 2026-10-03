@@ -38,7 +38,9 @@ const strip = (s) => s
 // components/x/ServicePage.astro で描画する。監査ではページ本体＋テンプレート＋該当サービスの本文データを合わせて読む。
 const SVC_SLUG = { 'nazotoki-kenshu': 'nazotoki', 'murder-mystery': 'murder', 'shisetsu-event': 'shisetsu', immersive: 'immersive', zunousen: 'zunousen' };
 const svcSrc = fs.readFileSync('src/data/services.ts', 'utf8');
-const SVC = JSON.parse(svcSrc.slice(svcSrc.indexOf('= {') + 2, svcSrc.indexOf(';\nexport const SERVICE_LINKS')));
+// 別ファイルから import した定数（例："ip": IP_SERVICE）は JSON として読めないので null に置き換える（監査対象の5サービスには影響しない）
+const svcJson = svcSrc.slice(svcSrc.indexOf('= {') + 2, svcSrc.indexOf(';\nexport const SERVICE_LINKS')).replace(/("[\w-]+":\s*)([A-Za-z_$][\w$]*)(\s*[,}\n])/g, (m, k, v, e) => (['true', 'false', 'null'].includes(v) ? m : `${k}null${e}`));
+const SVC = JSON.parse(svcJson);
 const SVC_LINKS = JSON.parse(svcSrc.slice(svcSrc.indexOf('= [', svcSrc.indexOf('SERVICE_LINKS')) + 2, svcSrc.lastIndexOf(';')));
 const svcTemplate = fs.readFileSync('src/components/x/ServicePage.astro', 'utf8');
 const flatText = (o) => (typeof o === 'string' ? [o] : Array.isArray(o) ? o.flatMap(flatText) : o && typeof o === 'object' ? Object.values(o).flatMap(flatText) : []);
