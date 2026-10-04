@@ -203,7 +203,7 @@ img{max-width:100%}
 .lamp,.beam{position:absolute;top:0;left:50%;width:100svh;height:100svh;max-width:none;transform:translateX(-50%);overflow:visible}
 .beam{opacity:calc(.4 + var(--o) * .6);will-change:opacity;pointer-events:none}
 .persp{position:relative;perspective:1300px;perspective-origin:50% 0%;margin-top:6svh}
-.book{position:relative;width:min(40vw,300px,32svh);aspect-ratio:1/1.42;container-type:inline-size;transform-style:preserve-3d;transform:translateX(calc(var(--o) * 50%)) rotateX(calc((1 - var(--z)) * 30deg)) scale(calc(1 + var(--z) * 7))}
+.book{position:relative;width:min(40vw,300px,32svh);aspect-ratio:1295/1754;container-type:inline-size;transform-style:preserve-3d;transform:translateX(calc(var(--o) * 50%)) rotateX(calc((1 - var(--z)) * 30deg)) scale(calc(1 + var(--z) * 7))}
 .b-glow{position:absolute;inset:-70% -110%;transform:translateZ(-2px);background:radial-gradient(closest-side,rgba(232,227,214,.2),rgba(232,227,214,.05) 55%,transparent);opacity:calc(.5 + var(--o) * .5);pointer-events:none}
 /* 落ち影：元は radial-gradient + filter:blur(10px)。拡大中にぼかしを毎フレーム再計算して重いので、
    ぼかし後と同等になるよう広げた多段グラデーションに置き換え（見た目は同等） */
@@ -218,11 +218,9 @@ img{max-width:100%}
 .b-cover{position:absolute;inset:0;transform-origin:left center;transform-style:preserve-3d;transform:translateZ(6.2cqw) rotateY(calc(var(--o) * -179.5deg))}
 .b-cover-edge{position:absolute;left:0;right:0;top:100%;height:1.2cqw;transform-origin:top center;transform:rotateX(-90deg);background:#0f1311}
 .b-front{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;opacity:calc((0.5 - var(--o)) * 1000);background:radial-gradient(120% 70% at 50% 0%,rgba(255,248,230,.1),rgba(255,248,230,0) 60%),linear-gradient(90deg,rgba(0,0,0,.5) 0,rgba(255,255,255,.05) 3cqw,rgba(0,0,0,.35) 4.6cqw,rgba(0,0,0,0) 7cqw),#1c2420;border-radius:0 1.5cqw 1.5cqw 0;display:flex;align-items:center;justify-content:center}
-.b-frame1{position:absolute;top:7cqw;bottom:7cqw;left:11cqw;right:7cqw;border:1px solid rgba(232,227,214,.42)}
-.b-frame2{position:absolute;top:8.6cqw;bottom:8.6cqw;left:12.6cqw;right:8.6cqw;border:1px solid rgba(232,227,214,.2)}
-.b-title{display:flex;flex-direction:column;align-items:center;gap:9cqw;margin-left:4cqw}
-.b-title img{display:block;width:62cqw;height:auto;opacity:.92}
-.b-title div{font-size:4cqw;letter-spacing:.34em;color:#bdb8ab}
+.b-front img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+/* 背の溝とハイライト（表紙画像の上に重ねて立体感を残す） */
+.b-front::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120% 70% at 50% 0%,rgba(255,248,230,.08),rgba(255,248,230,0) 60%),linear-gradient(90deg,rgba(0,0,0,.5) 0,rgba(255,255,255,.05) 3cqw,rgba(0,0,0,.35) 4.6cqw,rgba(0,0,0,0) 7cqw)}
 .b-inner{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;opacity:calc((var(--o) - 0.5) * 1000);transform:rotateY(180deg);background:linear-gradient(270deg,rgba(60,45,20,.3),rgba(60,45,20,0) 16%),#e4dfd1;border-radius:1.5cqw 0 0 1.5cqw;padding:10cqw 11cqw 10cqw 9cqw}
 .b-mv{width:100%;height:100%;background:repeating-linear-gradient(135deg,rgba(26,28,27,.07) 0 6px,transparent 6px 12px);border:1px solid rgba(26,28,27,.2)}
 .cue{position:absolute;left:0;right:0;bottom:3svh;display:flex;flex-direction:column;align-items:center;gap:10px;opacity:calc(1 - var(--o) * 3)}
@@ -404,12 +402,13 @@ img{max-width:100%}
   <section class="hero" id="hero" aria-label="メインビジュアル">
     <div class="stage">
       {/* 点描の光：元は SVG フィルター（feTurbulence ほか）を毎フレーム再計算していて重かったため、
-          同じフィルターを 2400px で書き出した画像に置き換えた（scratchpad の beam.mjs 相当・seed 4）。
-          見た目は同一。不透明度だけを変えるので GPU 合成で済む。 */}
+          同じフィルターを 2400px で書き出した画像に置き換えた（seed 4）。不透明度だけを変えるので GPU 合成で済む。
+          2026-10-04 ランプ画像の差し替えに合わせ、光の出口を傘の幅（台形の上辺 426〜574・楕円 rx72）に広げて再書き出し。 */}
       <img class="beam" src="/assets/douwa/beam.webp" alt="" aria-hidden="true" width="2400" height="2400" decoding="async" fetchpriority="high">
       <svg class="lamp" viewBox="0 0 1000 1000" aria-hidden="true">
-        <line x1="500" y1="-10" x2="500" y2="112" stroke="rgba(232,227,214,.55)" stroke-width="1"></line>
-        <polygon points="490,112 510,112 528,150 472,150" fill="#0e100f" stroke="rgba(232,227,214,.45)" stroke-width="1"></polygon>
+        {/* ランプ（支給画像）。傘のふち（画像の下端）が光の出口 y=153 に来る位置。
+            暗い背景で消えないよう、元デザインの線（rgba(232,227,214,.45)）相当の縁取りを画像に焼き込み済み */}
+        <image href="/assets/douwa/lamp.webp" x="423.2" y="0" width="153.6" height="154.3" preserveAspectRatio="none"></image>
       </svg>
 
       <div class="persp">
@@ -428,12 +427,7 @@ img{max-width:100%}
           <div class="b-cover">
             <div class="b-cover-edge"></div>
             <div class="b-front">
-              <div class="b-frame1"></div>
-              <div class="b-frame2"></div>
-              <div class="b-title">
-                <img src="/assets/douwa/logo-light.webp" alt="午前零時の童話集 Midnight Tales" width="720" height="748">
-                <div>夢の島熱帯植物館</div>
-              </div>
+              <img src="/assets/douwa/cover.webp" alt="" width="720" height="975" fetchpriority="high">
             </div>
             {/* 表紙裏：メインビジュアルが支給されたらここに画像を入れる */}
             <div class="b-inner"><div class="b-mv"></div></div>
