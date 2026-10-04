@@ -38,6 +38,11 @@
       "permanent": false
     },
     {
+      "source": "/douwa/:path*",
+      "destination": "/gensou/:path*",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {
@@ -45,7 +50,18 @@
           "value": "douwa.kabuexlabs.com"
         }
       ],
-      "destination": "https://kabuexlabs.com/douwa/:path*",
+      "destination": "https://kabuexlabs.com/gensou/:path*",
+      "permanent": false
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "gensou.kabuexlabs.com"
+        }
+      ],
+      "destination": "https://kabuexlabs.com/gensou/:path*",
       "permanent": false
     }
   ],

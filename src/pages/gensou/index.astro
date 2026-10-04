@@ -1,12 +1,13 @@
 ---
-// 公演「午前零時の童話集 × 夢の島熱帯植物館」公式LP（douwa.kabuexlabs.com → /douwa/ へ転送）。
+// 公演「午前零時の幻想集 × 夢の島熱帯植物館」公式LP（/gensou/）。旧URL /douwa/ と douwa・gensou サブドメインは vercel.json で /gensou/ へ転送。
+// 2026-10-04 作品名を「童話集」→「幻想集」に変更（ロゴ差し替え・URL を /douwa/ → /gensou/）。
 // デザインはハンドオフ（design_handoff_yumenoshima_lp）の再実装。コーポレートサイトとは
 // デザイン系統が別物なので BaseLayout は使わず、このファイルだけで完結させている。
 // 公開前のため noindex（sitemap・llms.txt にも未掲載）。検索に出すときは INDEXABLE を true にし、sitemap・llms.txt に戻す。
 const INDEXABLE = false;
 import SiteGuard from '../../components/SiteGuard.astro';
-import SecHead from '../../components/douwa/SecHead.astro';
-import J from '../../components/douwa/J.astro';
+import SecHead from '../../components/gensou/SecHead.astro';
+import J from '../../components/gensou/J.astro';
 
 // ---- 未定の項目（決まったらここを埋める。null の間は非表示／仮表示） ----
 // escape.id の販売ページURL。null の間は予約ボタンを「近日販売開始」表示にし、#ticket へ飛ばす
@@ -29,14 +30,14 @@ const news: { date: string; text: string }[] = [];
 
 const reserveHref = RESERVE_URL ?? '#ticket';
 const reserveAttrs = RESERVE_URL
-  ? { target: '_blank', rel: 'noopener', 'data-track': 'ticket', 'data-show': 'douwa' }
+  ? { target: '_blank', rel: 'noopener', 'data-track': 'ticket', 'data-show': 'gensou' }
   : {};
 
-const title = '【公式】午前零時の童話集 × 夢の島熱帯植物館 | 夜のイマーシブ体験';
-const canonical = 'https://kabuexlabs.com/douwa/';
-const ogImage = 'https://kabuexlabs.com/assets/douwa/og.png';
+const title = '【公式】午前零時の幻想集 × 夢の島熱帯植物館 | 夜のイマーシブ体験';
+const canonical = 'https://kabuexlabs.com/gensou/';
+const ogImage = 'https://kabuexlabs.com/assets/gensou/og.png';
 const description =
-  '夜の夢の島熱帯植物館を巡るイマーシブ体験「午前零時の童話集」公式サイト。2026年11月5日〜22日の全12日間、各日17:00〜20:00開始。最大4人1組・約50分、怖さ控えめの物語体験。個別チケット3,500円／グループ14,000円（税込・入館料込み）。';
+  '夜の夢の島熱帯植物館を巡るイマーシブ体験「午前零時の幻想集」公式サイト。2026年11月5日〜22日の全12日間、各日17:00〜20:00開始。最大4人1組・約50分、怖さ控えめの物語体験。個別チケット3,500円／グループ14,000円（税込・入館料込み）。';
 
 const times: string[] = [];
 for (let m = 0; m <= 180; m += 12) {
@@ -96,7 +97,7 @@ const faqs = [
 const eventLd = {
   '@context': 'https://schema.org',
   '@type': 'EventSeries',
-  name: '午前零時の童話集 × 夢の島熱帯植物館',
+  name: '午前零時の幻想集 × 夢の島熱帯植物館',
   description,
   url: canonical,
   image: ogImage,
@@ -112,7 +113,7 @@ const eventLd = {
   },
   subEvent: dates.map((d) => ({
     '@type': 'Event',
-    name: '午前零時の童話集 × 夢の島熱帯植物館',
+    name: '午前零時の幻想集 × 夢の島熱帯植物館',
     startDate: `${d}T17:00:00+09:00`,
     endDate: `${d}T20:50:00+09:00`,
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
@@ -148,7 +149,7 @@ const faqLd = {
 <meta property="og:image" content={ogImage}>
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:site_name" content="午前零時の童話集">
+<meta property="og:site_name" content="午前零時の幻想集">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#1a1c1b">
@@ -376,9 +377,9 @@ img{max-width:100%}
 </svg>
 
 <header class="hd">
-  <a href="#top" class="hd-logo"><img src="/assets/douwa/logo-light.webp" alt="午前零時の童話集 Midnight Tales" width="720" height="748"></a>
+  <a href="#top" class="hd-logo"><img src="/assets/gensou/logo-light.webp" alt="午前零時の幻想集 Midnight Tales" width="720" height="711"></a>
   <div class="hd-r">
-    <a href={reserveHref} class="btn-rsv" data-place="douwa-header" {...reserveAttrs}>予約する</a>
+    <a href={reserveHref} class="btn-rsv" data-place="gensou-header" {...reserveAttrs}>予約する</a>
     <button type="button" class="burger" id="menu-open" aria-label="メニュー" aria-controls="menu" aria-expanded="false"><span></span><span></span></button>
   </div>
 </header>
@@ -389,13 +390,13 @@ img{max-width:100%}
     {nav.map((n) => (
       <a class="mi" href={n.href}><span class="no">{n.no}</span><span class="en">{n.en}</span><span class="ja">{n.ja}</span></a>
     ))}
-    <a href={reserveHref} class="m-rsv mi-rsv" data-place="douwa-menu" {...reserveAttrs}>{RESERVE_URL ? 'escape.id で予約する' : 'チケット情報を見る'}</a>
+    <a href={reserveHref} class="m-rsv mi-rsv" data-place="gensou-menu" {...reserveAttrs}>{RESERVE_URL ? 'escape.id で予約する' : 'チケット情報を見る'}</a>
   </nav>
 </div>
 
 <aside class="side">
-  <div class="vt">午前零時の童話集<br>夢の島熱帯植物館</div>
-  <a href={reserveHref} data-place="douwa-side" {...reserveAttrs}>チケットを予約する</a>
+  <div class="vt">午前零時の幻想集<br>夢の島熱帯植物館</div>
+  <a href={reserveHref} data-place="gensou-side" {...reserveAttrs}>チケットを予約する</a>
 </aside>
 
 <main id="top">
@@ -404,11 +405,11 @@ img{max-width:100%}
       {/* 点描の光：元は SVG フィルター（feTurbulence ほか）を毎フレーム再計算していて重かったため、
           同じフィルターを 2400px で書き出した画像に置き換えた（seed 4）。不透明度だけを変えるので GPU 合成で済む。
           2026-10-04 ランプ画像の差し替えに合わせ、光の出口を傘の幅（台形の上辺 426〜574・楕円 rx72）に広げて再書き出し。 */}
-      <img class="beam" src="/assets/douwa/beam.webp" alt="" aria-hidden="true" width="2400" height="2400" decoding="async" fetchpriority="high">
+      <img class="beam" src="/assets/gensou/beam.webp" alt="" aria-hidden="true" width="2400" height="2400" decoding="async" fetchpriority="high">
       <svg class="lamp" viewBox="0 0 1000 1000" aria-hidden="true">
         {/* ランプ（支給画像）。傘のふち（画像の下端）が光の出口 y=153 に来る位置。
             暗い背景で消えないよう、元デザインの線（rgba(232,227,214,.45)）相当の縁取りを画像に焼き込み済み */}
-        <image href="/assets/douwa/lamp.webp" x="423.2" y="0" width="153.6" height="154.3" preserveAspectRatio="none"></image>
+        <image href="/assets/gensou/lamp.webp" x="423.2" y="0" width="153.6" height="154.3" preserveAspectRatio="none"></image>
       </svg>
 
       <div class="persp">
@@ -427,7 +428,7 @@ img{max-width:100%}
           <div class="b-cover">
             <div class="b-cover-edge"></div>
             <div class="b-front">
-              <img src="/assets/douwa/cover.webp" alt="" width="720" height="975" fetchpriority="high">
+              <img src="/assets/gensou/cover.webp" alt="" width="720" height="975" fetchpriority="high">
             </div>
             {/* 表紙裏：メインビジュアルが支給されたらここに画像を入れる */}
             <div class="b-inner"><div class="b-mv"></div></div>
@@ -445,7 +446,7 @@ img{max-width:100%}
 
   <section id="about" class="ov">
     <div class="wrap">
-      <h1><img src="/assets/douwa/logo-dark.webp" alt="午前零時の童話集 Midnight Tales" width="720" height="748"><span class="sr">× 夢の島熱帯植物館</span></h1>
+      <h1><img src="/assets/gensou/logo-dark.webp" alt="午前零時の幻想集 Midnight Tales" width="720" height="711"><span class="sr">× 夢の島熱帯植物館</span></h1>
       <p class="ov-lead"><J t="普段は入れない夜の夢の島熱帯植物館を巡る物語体験。" /></p>
       <div class="ov-date">
         <span class="ov-y hv">2026</span>
@@ -563,7 +564,7 @@ img{max-width:100%}
         <div class="row"><span>販売</span><span>escape.id{!RESERVE_URL && <><br><span style="font-size:13px;color:#bdb8ab"><J t="販売開始日は決まり次第お知らせします。" /></span></>}</span></div>
       </div>
       {RESERVE_URL ? (
-        <a href={RESERVE_URL} class="cta" target="_blank" rel="noopener" data-track="ticket" data-show="douwa" data-place="douwa-ticket"><span>escape.id で予約する</span><span class="arc">→</span></a>
+        <a href={RESERVE_URL} class="cta" target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="gensou-ticket"><span>escape.id で予約する</span><span class="arc">→</span></a>
       ) : (
         <div class="cta off"><span>チケット近日販売開始</span><span class="arc">→</span></div>
       )}
@@ -620,7 +621,7 @@ img{max-width:100%}
 
   <footer class="ft">
     <div class="ft-in">
-      <img src="/assets/douwa/logo-light.webp" alt="午前零時の童話集 Midnight Tales" width="720" height="748" loading="lazy">
+      <img src="/assets/gensou/logo-light.webp" alt="午前零時の幻想集 Midnight Tales" width="720" height="711" loading="lazy">
       <div class="ft-info"><span>運営会社</span><span><a href="https://kabuexlabs.com/">株式会社ex Labs</a></span></div>
       <div class="ft-links">
         {TERMS_URL && <a href={TERMS_URL}>利用規約</a>}
