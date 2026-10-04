@@ -26,10 +26,11 @@ const DURATION_TEXT = '';
 const ACCESS_TEXT = '';
 // キャスト（2026-10-02 主催側提供。役名・配役は載せない）。写真は public/assets/kotohogi/cast-<id>.webp に置き photo に指定
 // （位置情報を消してから。縦長でも正方形に切り抜き、顔が枠の窓に入るよう上寄せで表示）。photo が空の間は「写真準備中」。
-const CAST: { id: string; name: string; photo?: string; bio: string }[] = [
-  { id: 'matsui', photo: '/assets/kotohogi/cast-matsui.webp', name: '松井瑞季', bio: '大学院卒業後プログラマーとして就職。2024年から声優事務所に所属しそこから活動を開始。陸上競技歴が11年以上あり、全国大会にも出場しているので体力だけは特に自信がある。乾いた体はビールで潤す派。' },
-  { id: 'shiina', photo: '/assets/kotohogi/cast-shiina.webp', name: '椎名しおり', bio: '日本大学演劇学科卒。小学生の頃にミュージカルから芝居の道に入り、大学では小劇場を中心に活動。2023年の『黄昏のまほろば遊園地』への出演からイマーシブシアター作品に関わり始め、現在もイマーシブシアター、体験型コンテンツの作品に多く出演中。' },
-];
+// 並びは姓の読み（kana）のあいうえお順で自動（2026-10-04 主催側の要望）。
+const CAST: { id: string; name: string; kana: string; photo?: string; bio: string }[] = [
+  { id: 'matsui', photo: '/assets/kotohogi/cast-matsui.webp', name: '松井瑞季', kana: 'まつい', bio: '大学院卒業後プログラマーとして就職。2024年から声優事務所に所属しそこから活動を開始。陸上競技歴が11年以上あり、全国大会にも出場しているので体力だけは特に自信がある。乾いた体はビールで潤す派。' },
+  { id: 'shiina', photo: '/assets/kotohogi/cast-shiina.webp', name: '椎名しおり', kana: 'しいな', bio: '日本大学演劇学科卒。小学生の頃にミュージカルから芝居の道に入り、大学では小劇場を中心に活動。2023年の『黄昏のまほろば遊園地』への出演からイマーシブシアター作品に関わり始め、現在もイマーシブシアター、体験型コンテンツの作品に多く出演中。' },
+].sort((a, b) => a.kana.localeCompare(b.kana, 'ja'));
 // クレジット欄の「出演」（キャスト欄から自動で並べる）
 const CAST_TEXT = CAST.map((c) => c.name).join('／');
 
@@ -742,7 +743,11 @@ summary::-webkit-details-marker{display:none}
 .k-redact{display:inline-block;width:6.2em;height:1.15em;vertical-align:-.2em;background:#0b0a09;transform:rotate(-.6deg);clip-path:polygon(0 8%,3% 0,40% 6%,72% 1%,100% 7%,98% 92%,64% 100%,30% 94%,2% 100%)}
 .k-redact-v{width:1.1em;vertical-align:baseline;transform:rotate(.6deg);clip-path:polygon(6% 0,100% 2%,94% 35%,100% 70%,92% 100%,0 98%,7% 62%,0 30%)}
 /* キャスト欄：正方形の写真をマゼンタの枠で四方から囲む（窓に顔、下の太い帯に名前）。枠はビジュアルと同じざらつき */
-.k-cast{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}
+.k-cast{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.k-cast>li{padding:28px 0;border-top:1px dashed #b8b6b0}
+.k-cast>li:first-child{padding-top:0;border-top:0}
+.k-cast>li:last-child{padding-bottom:0}
+.k-cast-card{width:min(260px,74%);margin:0 auto}
 .k-cast-card{position:relative;aspect-ratio:1;overflow:hidden;background:#e2e1dc;border:1px solid #1b1b1a}
 .k-cast-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 18%}
 .k-cast-tbd{position:absolute;left:0;right:0;top:34%;text-align:center;font-size:11px;letter-spacing:.2em;color:#8a8882}
@@ -751,8 +756,8 @@ summary::-webkit-details-marker{display:none}
 .k-cast-bar{position:absolute;top:0;bottom:0;width:8%}
 .k-cast-bar.t{left:0;right:0;width:auto;bottom:auto;height:8%}
 .k-cast-bar.l{left:0}.k-cast-bar.r{right:0}
-.k-cast-name{position:absolute;left:0;right:0;bottom:0;height:20%;margin:0;display:flex;align-items:center;justify-content:center;font-family:'Shippori Mincho',serif;font-weight:800;font-size:min(18px,4.6vw);letter-spacing:.08em;color:#fff;white-space:nowrap}
-.k-cast-bio{margin:12px 0 0;font-size:12.5px;line-height:1.85;letter-spacing:.02em;color:#3d3c3a;text-align:left;word-break:normal;line-break:strict;overflow-wrap:anywhere}
+.k-cast-name{position:absolute;left:0;right:0;bottom:0;height:20%;margin:0;display:flex;align-items:center;justify-content:center;font-family:'Shippori Mincho',serif;font-weight:800;font-size:min(22px,5.6vw);letter-spacing:.08em;color:#fff;white-space:nowrap}
+.k-cast-bio{margin:16px 0 0;font-size:14px;line-height:1.95;letter-spacing:.02em;color:#3d3c3a;text-align:left;word-break:normal;line-break:strict;overflow-wrap:anywhere}
 /* 冒頭演出中は右下のチケットボタンを隠す */
 .k-intro-on .k-float{opacity:0!important;pointer-events:none!important}
 /* FAQ の開閉記号 */
