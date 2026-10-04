@@ -32,6 +32,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/tokyo-experience-date.webp',
   }] : []),
   {
+    href: '/guide/ip-multi-site/',
+    title: 'IPを活用した体験型イベントの全国・複数施設展開｜企画・施設調整・運営・効果測定',
+    desc: '共通化する部分と施設ごとの調整、IP側・施設側・制作会社の役割分担、受託・レベニューシェア・併用で決める経済条件、効果測定の指標、小規模実証からの広げ方。',
+    date: '2026-10-05',
+    category: 'immersive',
+    thumb: '/assets/guide/ip-multi-site.webp',
+  },
+  {
     href: '/guide/tokyo-holiday/',
     title: '東京で休日に行く場所がないときの過ごし方｜二人・友達・一人で体験を比較',
     desc: '予約できる体験を「誰と行くか（一人・二人・友達3〜4人）」と「使える時間」で比較。料金、所要時間、他の参加者と一緒になるか、次の土日の開催日つき。',

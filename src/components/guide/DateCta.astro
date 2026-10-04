@@ -2,8 +2,11 @@
 // デート・お出かけ記事の中盤と末尾に置く、公演一覧（/events/）への案内。
 // ids の公演（src/data/events/）は開催が終わると自動で外れる。links はブランドページなど常設の案内。
 import { buildGuideRows } from '../../lib/tokyoGuide';
-interface Props { place: string; ids?: string[]; links?: { title: string; href: string }[] }
-const { place, ids = [], links = [] } = Astro.props;
+interface Props { place: string; ids?: string[]; links?: { title: string; href: string }[]; /** 希望日の確認リンクに渡す人数（2＝二人、4＝友達） */ party?: 2 | 4 }
+const { place, ids = [], links = [], party = 2 } = Astro.props;
+// 希望日に遊べるかの確認：/events/ は公演（イマーシブ・マダミス等）だけ、/outing/ は謎解き・ものづくり等も含む。どちらも既存の条件パラメータだけを使う
+const evHref = `/events/?when=weekend&party=${party}#results`;
+const ogHref = `/outing/?party=${party === 4 ? 'group' : '2'}#results`;
 const rows = buildGuideRows(new Date());
 const shows = [
   ...ids.map((id) => rows.find((r) => r.w.id === id && r.status !== 'ended')).filter((r) => r !== undefined).map((r) => ({ title: r!.w.title, href: `/events/${r!.w.slug}/`, id: r!.w.id })),
@@ -13,6 +16,10 @@ const shows = [
 <aside class="dcta" aria-label="公演一覧へ">
   <p class="dcta-t"><span>二人で会話しながら</span><span>楽しめる体験を探すなら、</span><span>ex&nbsp;Labsの公演一覧を</span><span>ご覧ください。</span></p>
   <a class="dcta-btn" href="/events/" data-track="show" data-show="events" data-place={place}>現在開催中の公演を見る →</a>
+  <div class="dcta-days">
+    <a href={evHref} data-track="show" data-show="events-weekend" data-place={place}><strong>今週末の開催日を確認</strong><span>{party === 4 ? '4人' : '2人'}で参加できる公演（イマーシブ・マダミス等）</span></a>
+    <a href={ogHref} data-track="show" data-show="outing" data-place={place}><strong>謎解き・ものづくりも含めて探す</strong><span>今週末に{party === 4 ? '友達と' : '2人で'}行ける体験（公演以外も）</span></a>
+  </div>
   {shows.length > 0 && <p class="dcta-shows"><span>この記事に合う公演：</span>{shows.map((s, i) => <>{i > 0 && '／'}<a href={s.href} data-track="show" data-show={s.id} data-place={place}>{s.title}</a></>)}</p>}
 </aside>
 <style>
@@ -20,6 +27,10 @@ const shows = [
 .dcta-t{margin:0;flex:1 1 320px;font-size:15px;font-weight:700;line-height:1.75;color:var(--ink,#0B0B14)}
 .dcta-t span{display:inline-block}
 .dcta-btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 26px;background:var(--x-blue,#0B35C8);color:#fff!important;font-weight:700;font-size:15px;text-decoration:none!important}
+.dcta-days{flex-basis:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:8px}
+.dcta-days a{display:grid;gap:2px;padding:12px 14px;background:#fff;border:1px solid #D6DFFB;text-decoration:none!important;min-height:48px}
+.dcta-days strong{font-size:14.5px;color:var(--x-blue,#0B35C8);background:none!important;padding:0!important}
+.dcta-days span{font-size:12.5px;line-height:1.6;color:rgba(11,11,20,.65)}
 .dcta-shows{flex-basis:100%;margin:0;font-size:13.5px;line-height:1.9}
 .dcta-shows span{font-weight:700;color:rgba(11,11,20,.6)}
 .dcta-shows a{display:inline-block;padding:4px 0;font-weight:700;color:var(--x-blue,#0B35C8)!important;border-bottom:1px solid currentColor}

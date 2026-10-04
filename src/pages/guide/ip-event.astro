@@ -9,6 +9,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
+import B2BNext from '../../components/guide/B2BNext.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -151,9 +152,11 @@ const articleLd = {
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作とは</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの企業活用事例</a>／<a href="/guide/event-original-or-existing/" style="color:var(--accent)">オリジナル制作か既存導入か</a>／<a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブ制作の費用相場</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/yougo/" style="color:var(--accent)">体験型イベント用語集</a></p>
 </div></section>
 
+<B2BNext place="ip-event-next" steps={[{ k: "関連する制作実績・導入事例", links: [{ label: "渋谷サクラステージの制作事例", href: '/guide/case-uwasabanashi/' }, { label: "制作事例一覧", href: '/works/' }] }, { k: "対応する制作サービス", links: [{ label: "IPイベント企画・制作", href: '/services/ip-event/' }, { label: "イマーシブ制作", href: '/services/immersive/' }] }, { k: "費用・納期・実施条件", links: [{ label: "費用が変わる条件", href: '/services/ip-event/#terms' }, { label: "イマーシブ制作の条件・参考価格", href: '/services/immersive/#terms' }, { label: "制作の工程", href: '/guide/immersive-making/' }] }, { k: "施設活用・レベニューシェアの適用条件", links: [{ label: "施設活用イベント", href: '/services/shisetsu-event/' }, { label: "初期費用0円の適用条件", href: '/services/shisetsu-event/#revenue' }, { label: "複数施設での展開", href: '/guide/ip-multi-site/' }] }, { k: "制作相談", links: [{ label: "IPを活用した企画を相談する（無料）", href: '/services/ip-event/#contact' }] }]} />
+
 <AuthorBox />
 
-<LatestPosts category="immersive" />
+<LatestPosts heading="法人向けの関連記事" hrefs={['/guide/case-uwasabanashi/', '/guide/immersive-cost/', '/guide/event-revenue-share/']} />
 
 </BaseLayout>
 

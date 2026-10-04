@@ -50,6 +50,11 @@ const label = (r: AnyResolved) => isListing(r) ? r.listing.title : r.work.title;
 const place = (r: AnyResolved) => isListing(r) ? `${regionName(r.listing.regionId)}・${areaName(r.listing.areaId)}` : `${regionName(r.venue.regionId)}・${areaName(r.venue.areaId)}`;
 const timeOf = (r: AnyResolved) => r.row.start !== undefined ? `${minToHhmm(r.row.start)}開演` : '開演時刻は公式で確認';
 const ctaOf = (r: AnyResolved) => r.cta === 'book' ? '予約可（確認時点）' : r.cta === 'soldout' ? '満席（確認時点）' : r.cta === 'started' ? '開演済み' : '空席は公式で確認';
+// 開催期間だけ公式で分かり、回ごとの日時・人数条件が未確認の公演（例：FACTROOM）。条件に合う予約候補には混ぜず、別枠で「公式日程を確認」と案内する
+const withOcc = new Set(eventsData.occurrences.filter((o) => o.published && !o.test).map((o) => o.workId));
+const periodOnly = eventsData.works.filter((w) => w.published && !w.guideOnly && !withOcc.has(w.id) && w.period?.from && w.period?.to && w.period.to >= today);
+const overlaps = (w: (typeof periodOnly)[number], win: string[] | null) => (win ? win.some((d) => d >= w.period!.from! && d <= w.period!.to!) : true);
+const periodShown = periodOnly.filter((w) => overlaps(w, result.window));
 const worksUpcoming = [...new Map(own.filter((r) => !['ended', 'cancelled'].includes(r.eventState)).map((r) => [r.work.id, r])).values()];
 
 const pageTitle = '今日できるイマーシブ｜東京で今日・明日・今週末に参加できる公演を探す - 株式会社ex Labs';
@@ -76,6 +81,14 @@ const pageLd = {
   mainEntity: { '@type': 'ItemList', itemListElement: worksUpcoming.map((r, i) => ({ '@type': 'ListItem', position: i + 1, name: r.work.title, url: new URL(`/events/${r.work.slug}/`, site).toString() })) },
 };
 
+// 0件のとき、公演（イマーシブ・マダミス等）以外の体験も含めて探せる /outing/ へ。日付・人数は /outing/ にある条件だけ引き継ぐ
+const outingHref = (cc: Criteria) => {
+  const p = new URLSearchParams();
+  if (cc.when === 'date' && cc.date) { p.set('when', 'date'); p.set('date', cc.date); } else if (cc.when === 'weekend') p.set('when', 'this');
+  if (cc.party) p.set('party', cc.party === 1 ? '1' : cc.party === 2 ? '2' : 'group');
+  const q = p.toString();
+  return `/outing/${q ? `?${q}` : ''}#results`;
+};
 const relax: { label: string; q: string }[] = [];
 if (c.party) relax.push({ label: '人数の指定を外す', q: criteriaToQuery({ ...c, party: undefined }) });
 if (c.area || c.region) relax.push({ label: 'エリアの指定を外す', q: criteriaToQuery({ ...c, area: undefined, region: undefined }) });
@@ -205,6 +218,7 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
       <div class="xe-zero-btns">
         <a class="xe-zero-next" hidden={!nextDate} href={nextDate ? `/events/${criteriaToQuery({ ...c, when: 'date', date: nextDate })}#results` : '/events/'} data-next-date>{nextDate ? `次に候補がある日：${fmtDateJa(nextDate)}` : ''}</a>
         {relax.map((x) => <a class="xe-zero-rel" href={`/events/${x.q}#results`}>{x.label}</a>)}
+        <a class="xe-zero-rel" href={outingHref(c)} data-outing data-track="show" data-show="outing" data-place="events-zero">謎解き・ものづくりなど公演以外も探す</a>
         <a class="xe-zero-rel" href="/events/">条件をリセット</a>
       </div>
     </div>
@@ -220,6 +234,20 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
         {gUnknown.map((g) => <li><ShowGroupCard rows={g} show={g.filter((r) => uIds.has(r.row.id)).map((r) => r.row.id)} place="events-unknown" /></li>)}
       </ul>
     </details>
+
+    <div class="xe-period" id="ev-period" hidden={periodShown.length === 0}>
+      <p class="xe-period-h">開催期間中で、回ごとの日時が未確認の公演</p>
+      <p class="xe-unk-note"><Ph list={['開催期間は公式で確認できていますが、', '各回の開演時刻・人数条件は未確認のため、', '条件に合う公演には含めていません。', '公式の日程でご確認ください。']} /></p>
+      <ul class="xe-plist">
+        {periodOnly.map((w) => (
+          <li data-pfrom={w.period!.from} data-pto={w.period!.to} hidden={!periodShown.includes(w)}>
+            <a href={`/events/${w.slug}/`} class="xe-plist-t" data-track="show" data-show={w.id} data-place="events-period">{w.title}</a>
+            <span>{w.period!.text}</span>
+            {(w.ticketUrl || /^https?:/.test(w.officialUrl)) && <a class="xe-plist-b" href={w.ticketUrl ?? w.officialUrl} target="_blank" rel="noopener" data-track="ticket" data-show={w.id} data-place="events-period">公式日程・空席を確認 ↗</a>}
+          </li>
+        ))}
+      </ul>
+    </div>
     </div>
     <ul class="xe-list" id="ev-rest" hidden>
       {gRest.map((g) => <li><ShowGroupCard rows={g} show={[]} place="events" /></li>)}
@@ -330,12 +358,24 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
       form.querySelectorAll<HTMLElement>('[data-go-when]').forEach((el) => { el.hidden = !noWhen; });
       form.querySelectorAll<HTMLElement>('[data-go-count]').forEach((el) => { el.hidden = noWhen; });
       zero.hidden = nMatch > 0;
+      const oa = zero.querySelector<HTMLAnchorElement>('[data-outing]');
+      if (oa) { const p = new URLSearchParams(); if (c.when === 'date' && c.date) { p.set('when', 'date'); p.set('date', c.date); } else if (c.when === 'weekend') p.set('when', 'this'); if (c.party) p.set('party', c.party === 1 ? '1' : c.party === 2 ? '2' : 'group'); const qs = p.toString(); oa.href = `/outing/${qs ? `?${qs}` : ''}#results`; }
+      const pbox = document.getElementById('ev-period');
+      if (pbox) {
+        let np = 0;
+        pbox.querySelectorAll<HTMLElement>('[data-pfrom]').forEach((li) => {
+          const f = li.dataset.pfrom || '', t = li.dataset.pto || '';
+          const on = t >= today && (win ? win.some((d) => d >= f && d <= t) : true);
+          li.hidden = !on; if (on) np++;
+        });
+        pbox.hidden = np === 0;
+      }
       unknownBox.hidden = nUnknown === 0;
       if (nMatch === 0 && nUnknown > 0) unknownBox.open = true;
       const after = win && win.length ? win[win.length - 1] : today;
       const nd = nextDates.filter((d) => d > after).sort()[0];
       const ndA = zero.querySelector<HTMLAnchorElement>('[data-next-date]');
-      if (ndA) { if (nd) { ndA.textContent = `次に候補がある日：${fmtDateJa(nd)}`; ndA.href = `/events/${criteriaToQuery({ ...c, when: 'date', date: nd })}#results`; ndA.parentElement!.hidden = false; } else ndA.parentElement!.hidden = true; }
+      if (ndA) { if (nd) { ndA.textContent = `次に候補がある日：${fmtDateJa(nd)}`; ndA.href = `/events/${criteriaToQuery({ ...c, when: 'date', date: nd })}#results`; ndA.hidden = false; } else ndA.hidden = true; }
       const wk = weekRange(now).weekend.filter((d) => d >= today);
       const lab: Record<string, string> = { today: fmtDateShort(today), tomorrow: fmtDateShort(addDays(today, 1)), weekend: wk.map(fmtDateShort).join('・') };
       form.querySelectorAll<HTMLElement>('[data-when-label]').forEach((el) => { el.textContent = lab[el.dataset.whenLabel || ''] || ''; });
@@ -440,6 +480,14 @@ const authorText = 'イマーシブ・マダミス（マーダーミステリー
 .xe-list[hidden]{display:none}
 .xe-unknown{margin-top:48px;border-top:1px solid rgba(255,255,255,.3);padding-top:28px}
 .xe-unknown[hidden]{display:none}
+.xe-period{margin-top:40px;border-top:1px solid rgba(255,255,255,.3);padding-top:24px}
+.xe-period[hidden],.xe-plist li[hidden]{display:none}
+.xe-period-h{margin:0;font-family:var(--x-min);font-weight:700;font-size:17px}
+.xe-plist{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:10px}
+.xe-plist li{display:grid;gap:6px;padding:14px 16px;border:1px solid rgba(255,255,255,.35)}
+.xe-plist-t{font-family:var(--x-min);font-weight:700;font-size:16px;color:#fff}
+.xe-plist span{font-size:13px;color:var(--x-pale)}
+.xe-plist-b{justify-self:start;display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;background:var(--x-lime);color:var(--x-ink)!important;font-weight:700;font-size:14px}
 .xe-unknown summary{cursor:pointer;display:flex;justify-content:space-between;gap:12px;font-family:var(--x-min);font-weight:700;font-size:18px}
 .xe-unk-n{margin-left:8px;font-family:var(--x-en);font-size:22px}
 .xe-unk-note{margin:8px 0 0;font-size:13px;color:var(--x-pale2)}

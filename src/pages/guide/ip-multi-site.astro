@@ -1,0 +1,198 @@
+---
+// IPを活用した体験型イベントの全国・複数施設展開（2026-10-05 追加）。
+// 役割：IPホルダー・施設運営会社・広告代理店が「単会場の制作」ではなく「複数施設での事業展開」を相談するための判断材料。
+// 「IPイベントとは」・単会場の企画・監修の進め方は /guide/ip-event/、依頼範囲は /services/ip-event/ が担当（ここでは繰り返さない）。
+// 実績は /works/ に公開済みの複数会場・複数拠点の事例だけ。全国の提携網・他社比較の優位など確認できないことは書かない。
+export const prerender = false;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import RevShareCallout from '../../components/RevShareCallout.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/ip-multi-site/', site).toString();
+const title = 'IPを活用した体験型イベントの全国・複数施設展開｜企画・施設調整・運営・効果測定';
+const desc = 'IPを活用した体験型イベントを、複数の施設・地域で展開するときの進め方。共通化する部分と施設ごとに調整する部分、IP側・施設側・制作会社の役割分担、受託・レベニューシェア・併用で決める経済条件、効果測定の指標、小規模実証からの広げ方を整理します。';
+const toc = [
+  { id: 'issues', label: '複数施設で展開するときの課題' },
+  { id: 'experience', label: '参加者がすること' },
+  { id: 'model', label: '共通化する部分と、施設ごとに調整する部分' },
+  { id: 'roles', label: '役割分担' },
+  { id: 'money', label: '経済条件で決めること' },
+  { id: 'measure', label: '効果測定の指標' },
+  { id: 'steps', label: '小規模実証から広げる手順' },
+  { id: 'diff', label: '周遊型の謎解きイベントとの違い' },
+  { id: 'track', label: '複数会場・複数拠点での当社の実績' },
+  { id: 'contact', label: 'ご相談のときに伝えること' },
+];
+const faqs = [
+  { q: '全部の施設で同じ内容にする必要がありますか？', a: '物語・世界観・監修済みの設定・制作物の原版は共通にし、動線・設置場所・営業時間に合わせた運営条件は施設ごとに調整する形が基本です。どこまで共通にするかは、監修の回数と施設側の負担を見ながら決めます。' },
+  { q: '最初から複数施設で始めないといけませんか？', a: 'いいえ。1施設での小規模な実証から始め、参加者の動きや運営の負担を確認して改善してから、対象施設を追加する進め方をおすすめしています。' },
+  { q: '費用はかかりませんか？', a: '案件によって異なります。受託・レベニューシェア・併用から相談でき、初期費用・原価の負担・権利使用料・収益の分配方法を案件ごとに決めます。すべての案件で費用がかからないわけではありません。' },
+  { q: 'IP名や予算が決まっていなくても相談できますか？', a: 'はい。IPが検討中の段階、予算や施設数が未定の段階でもご相談いただけます。' },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const articleLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
+  image: [new URL('/assets/guide/ip-multi-site.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-05', dateModified: '2026-10-05', mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout title={`${title} - 株式会社ex Labs`} description={desc} ogImage="/assets/guide/ip-multi-site.webp">
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'IP・キャラクターの体験型イベント制作', href: '/guide/ip-event/' },
+  { name: '全国・複数施設での展開' },
+]} />
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">MULTI-SITE</p>
+<h1 class="h2 serif"><span class="nobr">IPを活用した体験型イベントの</span><span class="nobr">全国・複数施設展開</span></h1>
+<p class="lede">1つの会場で開催した体験を、別の施設や地域でも開催する。複数施設での展開では、単会場の制作とは別に、<strong>施設ごとの調整、体験の品質をそろえること、監修を重複させないこと、施設どうしで効果を比べられること</strong>が課題になります。</p>
+<p class="lede">このページでは、共通化する部分と施設ごとに調整する部分の分け方、役割分担、経済条件、効果測定、広げ方の手順を整理します。IPイベントそのものの企画・監修の進め方は<a href="/guide/ip-event/" style="color:var(--accent)">IP・キャラクターの体験型イベント制作</a>をご覧ください。</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul>
+<li>物語・世界観・監修済みの設定・制作物の原版は共通にし、動線・設置場所・運営条件は施設ごとに調整します。</li>
+<li>IP側・施設側・制作会社の役割を先に分けると、監修や確認の重複を減らせます。</li>
+<li>受託・レベニューシェア・併用のどれで進めるかは、初期費用・原価・権利使用料・収益分配を案件ごとに決めます。</li>
+<li>1施設での小規模な実証から始め、改善してから対象施設を追加します。</li>
+</ul></div>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}<li><a href="#faq">よくある質問</a></li></ol></nav>
+</div></section>
+
+<section class="section tinted" id="issues"><div class="wrap narrow">
+<p class="eyebrow">ISSUES</p><h2 class="h2 serif">複数施設で展開するときの課題</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>課題</th><th>起きやすいこと</th><th>考え方</th></tr></thead><tbody>
+<tr><th scope="row">施設ごとの調整負担</th><td>会場ごとに一から企画し直し、設置・営業時間・告知の調整が毎回発生する</td><td>共通部分と施設別の調整部分を最初に分け、調整項目を一覧にする</td></tr>
+<tr><th scope="row">体験の品質のばらつき</th><td>会場によってキャストの対応や進行が変わり、参加者の体験に差が出る</td><td>運営マニュアル・研修・確認項目を共通化する</td></tr>
+<tr><th scope="row">監修の重複</th><td>会場ごとに同じ確認を権利元へ依頼し、期間が延びる</td><td>共通部分はまとめて一度監修を受け、施設別の変更だけを追加で確認する</td></tr>
+<tr><th scope="row">効果の比較</th><td>会場ごとに測り方が違い、どこが良かったか比べられない</td><td>指標と記録方法を全施設でそろえる</td></tr>
+</tbody></table></div>
+</div></section>
+
+<section class="section" id="experience"><div class="wrap narrow">
+<p class="eyebrow">EXPERIENCE</p><h2 class="h2 serif">参加者がすること</h2>
+<p class="lede">体験の中心は、作品の世界で役割を持った参加者が、<strong>登場人物と会話する、場所を探索する、選択して物語を進める</strong>ことです。謎解きは、そのための設計手段の一つとして使います。施設ごとに場所や動線は変わっても、参加者が担う役割と物語の筋は共通にできます。</p>
+</div></section>
+
+<section class="section tinted" id="model"><div class="wrap narrow">
+<p class="eyebrow">MODEL</p><h2 class="h2 serif">共通化する部分と、施設ごとに調整する部分</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>区分</th><th>内容</th></tr></thead><tbody>
+<tr><th scope="row">全施設で共通</th><td>物語と世界観、参加者の役割、監修済みの設定・台詞の範囲、制作物の原版（印刷物・小道具・キット）、運営マニュアル、効果測定の項目と記録方法</td></tr>
+<tr><th scope="row">施設ごとに調整</th><td>動線と手がかりの設置場所、営業時間と開催時間帯、受付・スタッフの配置、告知に使える場所や媒体、会期、安全面の確認事項</td></tr>
+</tbody></table></div>
+<p class="lede">共通部分の監修はまとめて受け、施設ごとの変更点だけを追加で確認すると、権利元の確認回数を抑えられます。</p>
+</div></section>
+
+<section class="section" id="roles"><div class="wrap narrow">
+<p class="eyebrow">ROLES</p><h2 class="h2 serif">役割分担</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>立場</th><th>主に担当すること（例）</th></tr></thead><tbody>
+<tr><th scope="row">IP側（権利元・代理店）</th><td>使用できる素材・設定の提供、世界観とキャラクターの監修、利用範囲（告知・物販・配信など）の決定</td></tr>
+<tr><th scope="row">施設側</th><td>使用できる空間と時間帯、営業上の条件、館内・店舗との調整、告知面の提供、施設側の窓口</td></tr>
+<tr><th scope="row">株式会社ex Labs</th><td>企画・体験設計・シナリオ、制作物、施設ごとの動線設計と調整、運営設計・マニュアル、当日運営、効果測定とレポートの取りまとめ</td></tr>
+</tbody></table></div>
+<p class="lede">上記は一例です。実際の担当範囲は案件ごとに確認して決めます。窓口と報告を一本化すると、IP側・施設側の双方が全施設の状況を把握しやすくなります。</p>
+</div></section>
+
+<section class="section tinted" id="money"><div class="wrap narrow">
+<p class="eyebrow">TERMS</p><h2 class="h2 serif">経済条件で決めること</h2>
+<p class="lede">進め方は<strong>受託・レベニューシェア・併用</strong>のいずれも相談できます。どれを選ぶかは、次の項目を案件ごとに決めてから判断します。すべての案件で費用がかからないわけではありません。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>決める項目</th><th>確認すること</th></tr></thead><tbody>
+<tr><th scope="row">初期費用</th><td>企画・制作・制作物の費用を、誰がいつ負担するか</td></tr>
+<tr><th scope="row">原価の負担</th><td>施設ごとに発生する設置・運営・キャストの費用をどう分けるか</td></tr>
+<tr><th scope="row">権利使用料</th><td>IPの利用料の額と支払い方法（固定・売上連動など）</td></tr>
+<tr><th scope="row">収益の分配</th><td>チケット・物販などの売上を、どの割合・順番で分配するか</td></tr>
+<tr><th scope="row">精算と報告</th><td>精算の時期、売上・参加数の報告方法</td></tr>
+</tbody></table></div>
+<RevShareCallout place="ip-multi-site-money" href="/services/ip-event/#contact" />
+</div></section>
+
+<section class="section" id="measure"><div class="wrap narrow">
+<p class="eyebrow">MEASURE</p><h2 class="h2 serif">効果測定の指標</h2>
+<p class="lede">施設どうしで比べられるよう、指標と記録方法を全施設でそろえます。記録から数えられる<strong>実測の指標</strong>と、アンケートなどの<strong>参考指標</strong>は分けて報告します。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>指標</th><th>記録の方法（例）</th><th>区分</th></tr></thead><tbody>
+<tr><th scope="row">参加数</th><td>チケット販売・受付の記録</td><td>実測</td></tr>
+<tr><th scope="row">予約数</th><td>予約サイトの記録</td><td>実測</td></tr>
+<tr><th scope="row">施設内の回遊</th><td>手がかりの設置スポットごとの到達記録</td><td>実測（記録の仕組みを設けた場合）</td></tr>
+<tr><th scope="row">店舗・テナントへの送客</th><td>体験と連動したクーポン・特典の利用数</td><td>実測（連動施策を設けた場合）</td></tr>
+<tr><th scope="row">満足度</th><td>参加後アンケート</td><td>参考</td></tr>
+<tr><th scope="row">再参加の意向</th><td>参加後アンケート</td><td>参考</td></tr>
+</tbody></table></div>
+</div></section>
+
+<section class="section tinted" id="steps"><div class="wrap narrow">
+<p class="eyebrow">STEPS</p><h2 class="h2 serif">小規模実証から広げる手順</h2>
+<ol class="bullets">
+<li><strong>1施設で小規模に実証する</strong>：共通部分を作り、1施設で開催。参加者の動き、運営の負担、指標の取り方を確認します。</li>
+<li><strong>改善する</strong>：実証の結果をもとに、物語・動線・運営マニュアルを見直します。</li>
+<li><strong>対象施設を追加する</strong>：施設ごとの調整項目に沿って準備し、開催施設を増やします。</li>
+<li><strong>全施設の結果をまとめて報告する</strong>：そろえた指標で施設どうしを比べ、次の展開を判断します。</li>
+</ol>
+</div></section>
+
+<section class="section" id="diff"><div class="wrap narrow">
+<p class="eyebrow">DIFFERENCE</p><h2 class="h2 serif">周遊型の謎解きイベントとの違い</h2>
+<p class="lede">複数の施設や店舗を巡る企画としては、周遊型の謎解きイベントも広く行われています。ここで扱う進め方には、次のような特徴があります。</p>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>観点</th><th>このページで扱う進め方</th></tr></thead><tbody>
+<tr><th scope="row">体験の中心</th><td>謎解きに限らず、登場人物との会話・探索・選択による物語体験として設計できる</td></tr>
+<tr><th scope="row">事業の設計</th><td>収益の分配を含めた経済条件を、IP側・施設側と一緒に決める</td></tr>
+<tr><th scope="row">共通化する業務</th><td>監修・制作物・運営マニュアル・効果測定を、全施設で共通にする</td></tr>
+<tr><th scope="row">窓口と報告</th><td>調整の窓口と結果の報告を一本化する</td></tr>
+</tbody></table></div>
+</div></section>
+
+<section class="section tinted" id="track"><div class="wrap narrow">
+<p class="eyebrow">TRACK RECORD</p><h2 class="h2 serif">複数会場・複数拠点での当社の実績</h2>
+<p class="lede">IPを使った複数施設展開の公開実績は、現在このページに掲載できるものがありません。複数の会場・拠点を同時に扱った当社の公開済みの事例は次のとおりです。</p>
+<ul class="bullets">
+<li><strong>東京都頭脳王決定戦</strong>：都内4会場を同時に活用した大型の頭脳戦イベントを企画・運営（自社主催）。</li>
+<li><strong>恣験（カラオケ館）</strong>：参加者が店舗を巡りながら挑戦する、複数拠点の周遊型頭脳戦コンテンツを制作。</li>
+<li><strong>ウワサバナシ調査委員会（渋谷サクラステージ）</strong>：施設全体を周遊する施設一体型イマーシブを企画・制作。日本経済新聞に掲載。</li>
+</ul>
+<p class="lede"><a href="/works/" style="color:var(--accent)">制作事例一覧 →</a></p>
+</div></section>
+
+<section class="section" id="contact"><div class="wrap narrow">
+<p class="eyebrow">CONTACT</p><h2 class="h2 serif">ご相談のときに伝えること</h2>
+<p class="lede">次の項目をお知らせいただくと、検討が早く進みます。<strong>未定の項目があってもご相談いただけます。</strong></p>
+<ul class="bullets">
+<li>ご相談者の立場（IPホルダー・施設運営会社・広告代理店など）</li>
+<li>IP名、または検討中であること</li>
+<li>希望する地域・施設数</li>
+<li>希望の時期</li>
+<li>予算（未定でも可）</li>
+<li>権利の調整状況</li>
+</ul>
+<div class="cta-mini" style="margin-top:24px">
+<p class="cta-mini-title serif">複数施設での展開を相談する</p>
+<a class="btn" href="/services/ip-event/#contact" data-track="cta" data-show="ip-event" data-place="ip-multi-site">IPを活用した企画を相談する（無料）</a>
+</div>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">{faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}</div>
+<p class="vc-line" style="margin-top:40px">関連ページ：<a href="/guide/ip-event/" style="color:var(--accent)">IP・キャラクターの体験型イベント制作（企画・監修・運営の進め方）</a>／<a href="/services/ip-event/" style="color:var(--accent)">IPイベント企画・制作のサービス</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧</a></p>
+</div></section>
+
+<AuthorBox />
+<LatestPosts heading="法人向けの関連記事" hrefs={['/guide/ip-event/', '/guide/case-uwasabanashi/', '/guide/event-revenue-share/']} />
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.cmp-table th[scope=row]{min-width:140px;white-space:normal}
+.cmp-table td{min-width:180px;vertical-align:top}
+ol.bullets,ul.bullets{text-align:left}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06);text-align:left}
+.toc-h{margin:0 0 10px;font-weight:800}
+.toc ol{margin:0;padding-left:1.3em;line-height:2}
+.toc a{color:var(--ink)}
+#issues,#experience,#model,#roles,#money,#measure,#steps,#diff,#track,#contact,#faq{scroll-margin-top:88px}
+</style>

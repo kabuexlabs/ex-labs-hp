@@ -1,0 +1,29 @@
+---
+// 法人向け解説記事の末尾に置く「検討の順番」。事例 → 制作サービス → 費用・納期・条件 → 施設活用・レベニューシェア → 制作相談 の順に、
+// 既存ページだけへ案内する（新しいURLは推測で作らない）。2026-10-05 追加。
+interface Step { k: string; links: { label: string; href: string }[] }
+interface Props { place: string; steps: Step[] }
+const { place, steps } = Astro.props;
+---
+<section class="section b2n"><div class="wrap">
+<p class="eyebrow">FOR BUSINESS</p>
+<h2 class="h2 serif">制作をご検討中の方へ</h2>
+<p class="lede">事例を見て、依頼できる内容と費用・条件を確かめ、相談へ進む順番でまとめました。</p>
+<ol class="b2n-l">
+  {steps.map((s, i) => (
+    <li>
+      <span class="b2n-no">{String(i + 1).padStart(2, '0')}</span>
+      <div><p class="b2n-k">{s.k}</p><p class="b2n-a">{s.links.map((l, j) => <>{j > 0 && <span class="b2n-sep">／</span>}<a href={l.href} data-track="cta" data-show={l.href.replace(/[^a-z0-9-]/g, '').slice(0, 30)} data-place={place}>{l.label} →</a></>)}</p></div>
+    </li>
+  ))}
+</ol>
+</div></section>
+<style>
+.b2n-l{list-style:none;margin:22px auto 0;padding:0;max-width:820px;display:grid;gap:8px;text-align:left}
+.b2n-l li{display:grid;grid-template-columns:2.6em minmax(0,1fr);gap:10px;align-items:start;padding:14px 16px;background:#F3F6FE;border-left:3px solid var(--x-blue,#0B35C8)}
+.b2n-no{font-family:var(--x-en,serif);font-size:20px;line-height:1.3;color:var(--x-blue,#0B35C8)}
+.b2n-k{margin:0;font-weight:800;font-size:14.5px;color:var(--ink,#0B0B14)}
+.b2n-a{margin:4px 0 0;font-size:14px;line-height:1.9}
+.b2n-a a{display:inline-block;padding:4px 0;font-weight:700;color:var(--x-blue,#0B35C8)!important;border-bottom:1px solid currentColor;text-decoration:none!important}
+.b2n-sep{color:rgba(11,11,20,.4);margin:0 6px}
+</style>

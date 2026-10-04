@@ -9,6 +9,7 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import DateGuideNote from '../../components/guide/DateGuideNote.astro';
+import B2BNext from '../../components/guide/B2BNext.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -221,6 +222,8 @@ const articleLd = {
 </div></section>
 
 <DateGuideNote place="shuyu-event-date" />
+
+<B2BNext place="shuyu-event-next" steps={[{ k: "関連する制作実績・導入事例", links: [{ label: "渋谷サクラステージの制作事例", href: '/guide/case-uwasabanashi/' }, { label: "制作事例一覧", href: '/works/' }] }, { k: "対応する制作サービス", links: [{ label: "施設活用イベント", href: '/services/shisetsu-event/' }, { label: "イマーシブ制作", href: '/services/immersive/' }] }, { k: "費用・納期・実施条件", links: [{ label: "ご依頼の条件・参考価格", href: '/services/shisetsu-event/#terms' }, { label: "周遊イベントの制作", href: '/guide/shuyu-event-seisaku/' }] }, { k: "施設活用・レベニューシェアの適用条件", links: [{ label: "初期費用0円の適用条件", href: '/services/shisetsu-event/#revenue' }, { label: "レベニューシェアの仕組み", href: '/guide/event-revenue-share/' }] }, { k: "制作相談", links: [{ label: "施設活用イベントを相談する（無料）", href: '/services/shisetsu-event/#contact' }] }]} />
 
 <AuthorBox />
 

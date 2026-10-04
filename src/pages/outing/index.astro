@@ -10,7 +10,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { buildOutings, fitsParty, hacktaleSlots, yen, TALK_LABEL, KIND_LABEL, type Outing, type HtSlot } from '../../lib/outingCatalog';
 import { NIGHT_INFO, nightOwnWorkIds } from '../../data/seasonalDate';
 import { EVENTS_CONTACT } from '../../data/events/index';
-import { fmtDateShort, jstDateString } from '../../lib/thisWeek';
+import { fmtDateShort, jstDateString, weekRange } from '../../lib/thisWeek';
 import { UNKNOWN } from '../../lib/dateGuide';
 import { jsonLd } from '../../lib/microcms';
 
@@ -19,8 +19,8 @@ const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const q = Astro.url.searchParams;
 const today = jstDateString(now);
 const addDays = (d: string, n: number) => new Date(Date.parse(`${d}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
-const dow = new Date(`${today}T00:00:00Z`).getUTCDay();
-const thisSat = dow === 0 ? addDays(today, -1) : addDays(today, 6 - dow);
+// 今週末は /events/ と同じ関数（日本時間・月曜始まりの週）で決める
+const thisSat = weekRange(now).weekend[0];
 
 // ---- 条件（いつ・誰と・何を・絞り込み） ----
 type When = 'this' | 'next' | 'date' | 'any';
@@ -179,7 +179,7 @@ const BUDGETS = n === 1 ? [3000, 5000, 8000] : n === 2 ? [5000, 10000, 20000] : 
   </div>
 </section>
 
-<section class="og-sec og-res" id="results" aria-live="polite">
+<section class="og-sec og-res" id="results" aria-live="polite" data-og-cat={filtered ? `og-${when}-${partyK}-${want || 'all'}`.slice(0, 40) : undefined} data-og-n={matched.length}>
   <h2 class="og-h2">{win.label}{when !== 'date' && days.length <= 2 ? `（${days.map(fmtDateShort).join('・')}）` : ''}に{partyK === 'group' ? '友達と' : `${n}人で`}行ける体験<span>{matched.length}件</span></h2>
   <p class="og-res-note">開催日が決まっている体験は、選んだ日に開催予定があるものだけを並べています。開催予定は空席があることを意味しません。空席は各予約先でご確認ください。</p>
 
@@ -261,6 +261,10 @@ const BUDGETS = n === 1 ? [3000, 5000, 8000] : n === 2 ? [5000, 10000, 20000] : 
 </section>
 
 <script is:inline>
+(function(){
+  // 計測：条件を指定して表示したときだけ「検索」と「結果0件」を送る（/events/ と同じ /api/track、カテゴリは og- で区別）
+  try{var rs=document.getElementById('results');var cat=rs&&rs.getAttribute('data-og-cat');if(cat&&!sessionStorage.getItem('og:'+location.search)){sessionStorage.setItem('og:'+location.search,'1');var send=function(e){var b=JSON.stringify({e:e,p:location.pathname,c:cat});if(navigator.sendBeacon)navigator.sendBeacon('/api/track',new Blob([b],{type:'application/json'}));else fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},body:b,keepalive:true})};send('ev-search');if(rs.getAttribute('data-og-n')==='0')send('ev-zero')}}catch(e){}
+})();
 (function(){
   var max=3,bar=document.getElementById('og-cmpbar'),nEl=document.getElementById('og-cmpn'),go=document.getElementById('og-cmpgo'),box=document.getElementById('og-cmpbox'),body=document.getElementById('og-cmpbody');
   if(!bar)return;
