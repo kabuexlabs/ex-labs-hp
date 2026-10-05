@@ -96,3 +96,4 @@
 - 冒頭演出は INTRO_MODE='初回のみ'（2回目以降は流さない。フッターから再生可）。
 - sitemap（lastmod 2026-10-05）・llms.txt に登録。旧プレビューURLは vercel.json で本番へ 301。
 - 内部リンク：case1 LP（/uwasabanashi/）の終了表示から case2 へ（固定ボタン・チケット欄、data-track="show"）。LP フッターから case1・会社概要へ。
+- 2026-10-05：各見出し下の「調査記録　第◯項」をすべて削除（主催側指示）。
