@@ -12,8 +12,15 @@ import J from '../../components/gensou/J.astro';
 // ---- 未定の項目（決まったらここを埋める。null の間は非表示／仮表示） ----
 // escape.id の販売ページURL。null の間は予約ボタンを「近日販売開始」表示にし、#ticket へ飛ばす
 const RESERVE_URL: string | null = null;
-// 住所（null の間は「追記予定」）
-const ADDRESS: string | null = null;
+// 住所（null の間は「追記予定」）。2026-10-05 公開情報（るるぶ・施設紹介）で確認
+const ADDRESS: string | null = '東京都江東区夢の島2-1-2（夢の島公園内）';
+const ACCESS = '新木場駅（JR京葉線・東京メトロ有楽町線・りんかい線）から徒歩約15分';
+// サブタイトル（ポスターの表記）
+const SUB_NO = '第一夜';
+const SUB_TITLE = '草陰の夢';
+// 地図：Google マップの埋め込み（CSP の frame-src で www.google.com は許可済み）
+const MAP_EMBED = 'https://www.google.com/maps?q=' + encodeURIComponent('夢の島熱帯植物館') + '&hl=ja&z=16&output=embed';
+const MAP_LINK = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('夢の島熱帯植物館');
 // 利用規約・公式X（null の間はリンクを出さない）
 const TERMS_URL: string | null = null;
 const X_URL: string | null = null;
@@ -33,11 +40,11 @@ const reserveAttrs = RESERVE_URL
   ? { target: '_blank', rel: 'noopener', 'data-track': 'ticket', 'data-show': 'gensou' }
   : {};
 
-const title = '【公式】午前零時の幻想集 × 夢の島熱帯植物館 | 夜のイマーシブ体験';
+const title = '【公式】午前零時の幻想集 第一夜「草陰の夢」| 夢の島熱帯植物館の夜のイマーシブ体験';
 const canonical = 'https://kabuexlabs.com/gensou/';
 const ogImage = 'https://kabuexlabs.com/assets/gensou/og.png';
 const description =
-  '夜の夢の島熱帯植物館を巡るイマーシブ体験「午前零時の幻想集」公式サイト。2026年11月5日〜22日の全12日間、各日17:00〜20:00開始。最大4人1組・約50分、怖さ控えめの物語体験。個別チケット3,500円／グループ14,000円（税込・入館料込み）。';
+  '夜の夢の島熱帯植物館を巡るイマーシブ体験「午前零時の幻想集 第一夜『草陰の夢』」公式サイト。2026年11月5日〜22日の全12日間、各日17:00〜20:00開始。最大4人1組・約50分、怖さ控えめの物語体験。個別チケット3,500円／グループ14,000円（税込・入館料込み）。';
 
 const times: string[] = [];
 for (let m = 0; m <= 180; m += 12) {
@@ -97,7 +104,7 @@ const faqs = [
 const eventLd = {
   '@context': 'https://schema.org',
   '@type': 'EventSeries',
-  name: '午前零時の幻想集 × 夢の島熱帯植物館',
+  name: '午前零時の幻想集 第一夜「草陰の夢」',
   description,
   url: canonical,
   image: ogImage,
@@ -109,11 +116,11 @@ const eventLd = {
   location: {
     '@type': 'Place',
     name: '夢の島熱帯植物館',
-    address: { '@type': 'PostalAddress', addressLocality: '江東区', addressRegion: '東京都', addressCountry: 'JP' },
+    address: { '@type': 'PostalAddress', streetAddress: '夢の島2-1-2', addressLocality: '江東区', addressRegion: '東京都', postalCode: '136-0081', addressCountry: 'JP' },
   },
   subEvent: dates.map((d) => ({
     '@type': 'Event',
-    name: '午前零時の幻想集 × 夢の島熱帯植物館',
+    name: '午前零時の幻想集 第一夜「草陰の夢」',
     startDate: `${d}T17:00:00+09:00`,
     endDate: `${d}T20:50:00+09:00`,
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
@@ -250,6 +257,11 @@ img{max-width:100%}
 .ov{background:linear-gradient(180deg,#2a1226 0%,#1d1830 100%);color:#f2eef5;padding:40px 0 0}
 .ov h1{margin:0}
 .ov h1 img{display:block;width:min(100%,360px);height:auto}
+/* サブタイトル：ポスターの「第一夜／草陰の夢」 */
+.ov-sub{margin:28px 0 0;display:flex;flex-direction:column;gap:6px}
+.ov-sub .n{font-size:15px;letter-spacing:.4em;color:#6fd9c4}
+.ov-sub .t{display:flex;align-items:center;gap:14px;font-size:clamp(30px,7.4vw,44px);font-weight:600;letter-spacing:.12em;line-height:1.3}
+.ov-sub .t::after{content:"";flex:1;max-width:120px;height:1px;background:linear-gradient(90deg,rgba(201,90,166,.8),transparent)}
 .ov-lead{margin:36px 0 0;font-size:clamp(17px,2.4vw,20px);line-height:2;font-weight:600;text-wrap:pretty}
 .ov-date{margin-top:72px;display:flex;flex-direction:column;gap:6px}
 .ov-y{font-size:18px;letter-spacing:.04em}
@@ -329,7 +341,9 @@ img{max-width:100%}
 .notes li:last-child{border-bottom:1px solid rgba(242,238,245,.2)}
 
 /* access */
-.map{margin-top:24px;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;font-size:11px;color:#8f86a0;text-align:center;line-height:1.8}
+.map{margin-top:24px;aspect-ratio:16/10;border:1px solid rgba(242,238,245,.2);background:#120e19}
+.map iframe{display:block;width:100%;height:100%;border:0}
+.map-link{display:inline-flex;gap:8px;margin-top:14px;font-size:14px;color:#d4ccdc;text-underline-offset:4px}
 
 /* faq */
 .faq{display:flex;flex-direction:column;border-bottom:1px solid rgba(242,238,245,.2)}
@@ -447,7 +461,8 @@ img{max-width:100%}
 
   <section id="about" class="ov">
     <div class="wrap">
-      <h1><img src="/assets/gensou/logo-light.webp" alt="午前零時の幻想集 Midnight Tales" width="720" height="711"><span class="sr">× 夢の島熱帯植物館</span></h1>
+      <h1><img src="/assets/gensou/logo-light.webp" alt="午前零時の幻想集 Midnight Tales" width="720" height="711"><span class="sr">{SUB_NO}「{SUB_TITLE}」× 夢の島熱帯植物館</span></h1>
+      <p class="ov-sub" aria-hidden="true"><span class="n">{SUB_NO}</span><span class="t">{SUB_TITLE}</span></p>
       <p class="ov-lead"><J t="普段は入れない夜の夢の島熱帯植物館を巡る物語体験。" /></p>
       <div class="ov-date">
         <span class="ov-y hv">2026</span>
@@ -595,9 +610,11 @@ img{max-width:100%}
       <div class="rows">
         <div class="row"><span>会場</span><span>夢の島熱帯植物館</span></div>
         <div class="row"><span>集合場所</span><span>正面入口</span></div>
-        <div class="row"><span>住所</span>{ADDRESS ? <span>{ADDRESS}</span> : <span style="color:#bdb8ab">追記予定</span>}</div>
+        <div class="row"><span>住所</span>{ADDRESS ? <span><J t={ADDRESS} /></span> : <span style="color:#bdb8ab">追記予定</span>}</div>
+        <div class="row"><span>最寄り駅</span><span><J t={ACCESS} /></span></div>
       </div>
-      <div class="map ph mono">MAP<br><J t="地図・最寄り駅からのアクセス案内 追記予定" /></div>
+      <div class="map"><iframe src={MAP_EMBED} title="夢の島熱帯植物館の地図" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
+      <a class="map-link" href={MAP_LINK} target="_blank" rel="noopener">Google マップで開く<span class="arc">→</span></a>
     </section>
 
     <section id="faq" class="sec">
