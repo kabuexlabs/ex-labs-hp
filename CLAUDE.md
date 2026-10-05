@@ -97,6 +97,7 @@
 - 「京都市」を省いた略称、「at 京都市／京セラ…」のように改行・空白で分けた表記は誤り。LP・SNS文案・メール文面すべて同じ。
 - `scripts/seo-audit.mjs`（`npm run check`）が src 内の誤表記をエラーにする。LP は /taikenbizyutu/7th-composition/（限定公開・noindex）。
 
-## 言祝ぎの家 LP（2026-10-01〜、限定URLプレビュー）
-- ウワサバナシ調査委員会 case2「言祝ぎの家」LP は /preview/kotohogi-xqo8sx5ar3pm/（noindex＋X-Robots-Tag、sitemap・llms.txt・他ページから**リンクしない**）。正本メモは docs/kotohogi-lp.md。**本番公開URLは /uwasabanashi/kotohogi/ に決定（2026-10-02）**。公開時にページをそこへ移し、プレビューURLは301で寄せる。
-- 販売URL・メインビジュアル・ロゴ・所要時間・アクセス・出演者は index.astro 冒頭の定数で入れる（空なら非表示）。確認用注釈は削除済み。Basic 認証は Vercel 環境変数 KOTOHOGI_PREVIEW_PASSWORD（未設定なら認証なし）。
+## 言祝ぎの家 LP（2026-10-05 本公開）
+- ウワサバナシ調査委員会 case2「言祝ぎの家」公式LPは **/uwasabanashi/kotohogi/**（検索インデックス許可、sitemap・llms.txt 掲載、Event 構造化データ22公演分）。正本メモは docs/kotohogi-lp.md。旧プレビュー /preview/kotohogi-xqo8sx5ar3pm/ は vercel.json で 301。
+- 販売URL・メインビジュアル・キャスト（CAST：読みのあいうえお順で自動）・所要時間・アクセスは index.astro 冒頭の定数で入れる（空なら非表示）。公演回は本文の開演時刻リストと PERFORMANCES（構造化データ）の両方を直す。
+- case1 /uwasabanashi/ は終了表示中に case2 へ誘導（固定ボタン・チケット欄）。正確な住所・地図・緯度経度は載せない。

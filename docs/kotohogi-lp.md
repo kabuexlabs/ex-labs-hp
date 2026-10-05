@@ -1,7 +1,7 @@
 # ウワサバナシ調査委員会 case2「言祝ぎの家」LP（限定URLプレビュー）
 
 - URL（限定プレビュー）：https://kabuexlabs.com/preview/kotohogi-xqo8sx5ar3pm/
-- **本番公開URL（2026-10-02 決定）：https://kabuexlabs.com/uwasabanashi/kotohogi/**（case1 の公式LP /uwasabanashi/ の下。作品名「言祝ぎ（ことほぎ）」のローマ字。チラシ・SNS・販売ページにはこのURLを使う）
+- **本番公開URL：https://kabuexlabs.com/uwasabanashi/kotohogi/**（2026-10-02 決定、2026-10-05 本公開）（case1 の公式LP /uwasabanashi/ の下。作品名「言祝ぎ（ことほぎ）」のローマ字。チラシ・SNS・販売ページにはこのURLを使う）
 - 実装：`src/pages/preview/kotohogi-xqo8sx5ar3pm/index.astro`（2026-10-01、デザイン書き出し「言祝ぎの家 LP」export の再実装。文言・レイアウト・冒頭演出は書き出しのまま）
 - 検索対策：meta robots noindex,nofollow,noarchive＋レスポンスヘッダー `X-Robots-Tag`（ページ側と vercel.json の `/preview/(.*)`）。sitemap・llms.txt・ナビ・他ページからのリンクには載せない。
 - アクセス制限：Vercel の環境変数 `KOTOHOGI_PREVIEW_PASSWORD` を設定すると Basic 認証がかかる（ユーザー名は任意、パスワードのみ照合）。**リポジトリが公開なので URL だけでは秘密にならない**。未設定の間は URL を知っていれば誰でも見られる。共有は URL とパスワードを別経路で。
@@ -88,3 +88,11 @@
 - キャスト枠（2026-10-02「上が詰まって見えるので正方形を囲う形に」）：U 字をやめ、四方を囲む額縁型（上・左右 8%、下の名前帯 20%）。顔が窓の中央に来るよう写真を切り直し。
 - チケット販売先（2026-10-03）：RESERVE_URL = https://escape.id/uwasabanashi-org/e-hanayome/ 。チケット欄の「チケットを購入する」、最下部ボタン、右下の丸ボタンがこのURLへ別タブで遷移（data-track="ticket"、data-show="uwasabanashi-case2"、data-place=tickets/final/float でクリック計測）。
 - キャスト欄（2026-10-04 主催側の要望）：左右2列 → 1人ずつ上下に（姓の読み kana のあいうえお順で自動並べ替え：椎名→松井）。写真は中央 min(260px,74%)、プロフィールは全幅14px。椎名さんの写真を引き（顔まわりに余白、肩が見える）に切り直し、松井さんも同じ引き具合に揃えた。
+
+## 2026-10-05 本公開
+- ページを src/pages/uwasabanashi/kotohogi/index.astro へ移動。noindex・X-Robots-Tag・Basic 認証（KOTOHOGI_PREVIEW_PASSWORD）を撤去し、canonical・OGP（/assets/kotohogi/og.jpg、ビジュアルをマゼンタ地に配置した 1200×630）・theme-color を追加。
+- 構造化データ：TheaterEvent を公演回ごと（22件）。会場は「さいたま市内の一軒家」で市区町村まで、料金 7,500円、販売ページURL、出演（CAST）。販売状態（空席）は未確認なので availability は入れていない。所要時間未確定のため endDate なし。
+- title「【公式】ウワサバナシ調査委員会 case2「言祝ぎの家」｜さいたま市の一軒家で体験するイマーシブホラー」、description に「イマーシブ（没入型）」を入れた。
+- 冒頭演出は INTRO_MODE='初回のみ'（2回目以降は流さない。フッターから再生可）。
+- sitemap（lastmod 2026-10-05）・llms.txt に登録。旧プレビューURLは vercel.json で本番へ 301。
+- 内部リンク：case1 LP（/uwasabanashi/）の終了表示から case2 へ（固定ボタン・チケット欄、data-track="show"）。LP フッターから case1・会社概要へ。

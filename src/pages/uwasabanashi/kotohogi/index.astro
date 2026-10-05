@@ -1,18 +1,14 @@
 ---
-// ウワサバナシ調査委員会 case2「言祝ぎの家」LP（2026.10.23–11.3／さいたま市内の一軒家）。限定URLプレビュー。
-// デザイン書き出し（言祝ぎの家 LP export）の再実装。本文の文言・レイアウトは書き出しのまま（インラインスタイルも原本どおり）。
-// コーポレートサイトとはデザイン系統が別なので BaseLayout は使わず、このファイルだけで完結させている。
-//
-// 公開範囲：URLを知っている人だけが見る前提。noindex（meta と X-Robots-Tag）。sitemap・llms.txt・ナビ・他ページからのリンクには載せない。
-//   - 環境変数 KOTOHOGI_PREVIEW_PASSWORD を Vercel に設定すると Basic 認証がかかる（ユーザー名は何でも可、パスワードのみ照合）。
-//     リポジトリが公開なので URL だけでは秘密にならない。関係者以外に見せたくない間は設定する。未設定なら認証なし。
-// 本番公開するときは、正式URLへ移し、noindex を外し、sitemap・llms.txt・OGP を整える。未確定事項は docs/kotohogi-lp.md。
+// ウワサバナシ調査委員会 case2「言祝ぎの家」公式LP（2026.10.23–11.3／さいたま市内の一軒家）。
+// 2026-10-05 本公開（検索インデックス許可、sitemap・llms.txt 掲載）。限定プレビュー /preview/kotohogi-xqo8sx5ar3pm/ は vercel.json でここへ 301。
+// デザイン書き出し（言祝ぎの家 LP export）の再実装。コーポレートサイトとはデザイン系統が別なので BaseLayout は使わず、このファイルだけで完結させている。
+// 経緯・未確定事項は docs/kotohogi-lp.md。正確な住所・地図・緯度経度は載せない（集合場所は購入者にだけ案内する運用）。
 export const prerender = false;
 import SiteGuard from '../../../components/SiteGuard.astro';
 
 // ---- 差し替え・確定後に入力する項目（空文字の間は表示しない） ----
-// 冒頭演出：'毎回'（関係者確認中）／'初回のみ'（本番。2回目以降の訪問では流さない）／'なし'
-const INTRO_MODE: '毎回' | '初回のみ' | 'なし' = '毎回';
+// 冒頭演出：'毎回'／'初回のみ'（本番。2回目以降の訪問では流さない。フッターの「もう一度見る」で再生）／'なし'
+const INTRO_MODE: '毎回' | '初回のみ' | 'なし' = '初回のみ';
 // チケット販売先URL（https:// から）。未設定の間、購入ボタンはページ内のチケット欄（#tickets）へ移動するだけ
 const RESERVE_URL = 'https://escape.id/uwasabanashi-org/e-hanayome/'; // 2026-10-03 ユーザー提供（ESCAPE.ID の販売ページ）
 // メインビジュアル（位置情報を削除したもの）。未設定の間は文字組みで代替。
@@ -34,45 +30,46 @@ const CAST: { id: string; name: string; kana: string; photo?: string; bio: strin
 // クレジット欄の「出演」（キャスト欄から自動で並べる）
 const CAST_TEXT = CAST.map((c) => c.name).join('／');
 
-function readEnv(name: string): string | undefined {
-  const v = (import.meta.env as Record<string, string | undefined>)[name] ?? process.env[name];
-  return v?.trim() || undefined;
-}
-
-const noindex = 'noindex, nofollow, noarchive';
-const password = readEnv('KOTOHOGI_PREVIEW_PASSWORD');
-if (password) {
-  const auth = Astro.request.headers.get('authorization') ?? '';
-  let ok = false;
-  if (auth.startsWith('Basic ')) {
-    try {
-      const decoded = new TextDecoder().decode(Uint8Array.from(atob(auth.slice(6).trim()), (c) => c.charCodeAt(0)));
-      ok = decoded.slice(decoded.indexOf(':') + 1) === password;
-    } catch {}
-  }
-  if (!ok) {
-    return new Response('このページは関係者向けです。パスワードを入力してください。', {
-      status: 401,
-      headers: {
-        'WWW-Authenticate': 'Basic realm="kotohogi-preview", charset="UTF-8"',
-        'Content-Type': 'text/plain; charset=utf-8',
-        'X-Robots-Tag': noindex,
-        'Cache-Control': 'no-store',
-      },
-    });
-  }
-}
-Astro.response.headers.set('X-Robots-Tag', noindex);
-Astro.response.headers.set('Cache-Control', 'private, no-store');
-
 const hasUrl = /^https?:\/\//.test(RESERVE_URL);
 const ticketHref = hasUrl ? RESERVE_URL : '#tickets';
 const ticketAttrs = hasUrl ? { target: '_blank', rel: 'noopener', 'data-track': 'ticket', 'data-show': 'uwasabanashi-case2' } : {};
 const ticketArrow = hasUrl ? '→' : '↑';
 
-const title = 'ウワサバナシ調査委員会 case2「言祝ぎの家」｜さいたま市の一軒家で体験する没入型ホラー・ミステリー';
+const title = '【公式】ウワサバナシ調査委員会 case2「言祝ぎの家」｜さいたま市の一軒家で体験するイマーシブホラー';
 const description =
-  '祝いの席に、招かれる。実際の一軒家を探索し、住人との会話や調査報告を通じて真相に迫る没入型ホラー・ミステリー。2026年10月23日〜11月3日の指定日、さいたま市内で開催。1名7,500円、各回定員8名。';
+  '祝いの席に、招かれる。実際の一軒家を探索し、住人との会話や調査報告を通じて真相に迫るイマーシブ（没入型）ホラー・ミステリー。2026年10月23日〜11月3日の指定日、さいたま市内で開催。1名7,500円、各回定員8名、お一人様から参加可能。';
+const canonical = 'https://kabuexlabs.com/uwasabanashi/kotohogi/';
+const ogImage = 'https://kabuexlabs.com/assets/kotohogi/og.jpg';
+const eventName = 'ウワサバナシ調査委員会 case2「言祝ぎの家 -呪われた花嫁-」';
+
+// 公演回（本文の「開演時刻」と同じ。変更時は両方を直す）。所要時間が未確定なので終了時刻は入れない
+const PERFORMANCES: [string, string[]][] = [
+  ['2026-10-23', ['16:00', '18:00', '20:00']],
+  ['2026-10-24', ['13:00', '15:00', '17:30', '19:30']],
+  ['2026-10-25', ['13:00', '15:00', '17:30', '19:30']],
+  ['2026-10-30', ['16:00', '18:00', '20:00']],
+  ['2026-11-01', ['13:00', '15:00', '17:30', '19:30']],
+  ['2026-11-03', ['13:00', '15:00', '17:30', '19:30']],
+];
+// 販売状態（空席）は確認していないので availability は入れない。会場は市区町村まで（住所は購入者にだけ案内）
+const eventLd = {
+  '@context': 'https://schema.org',
+  '@graph': PERFORMANCES.flatMap(([d, times]) => times.map((t) => ({
+    '@type': 'TheaterEvent',
+    name: eventName,
+    description,
+    startDate: `${d}T${t}:00+09:00`,
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    inLanguage: 'ja',
+    image: [ogImage, 'https://kabuexlabs.com' + KV_SRC],
+    url: canonical,
+    location: { '@type': 'Place', name: 'さいたま市内の一軒家（詳しい集合場所は購入者に案内）', address: { '@type': 'PostalAddress', addressLocality: 'さいたま市', addressRegion: '埼玉県', addressCountry: 'JP' } },
+    organizer: { '@type': 'Organization', name: 'ウワサバナシ調査委員会（株式会社ex Labs）', url: 'https://kabuexlabs.com/' },
+    performer: CAST.map((c) => ({ '@type': 'Person', name: c.name })),
+    offers: { '@type': 'Offer', price: 7500, priceCurrency: 'JPY', url: hasUrl ? RESERVE_URL : canonical },
+  }))),
+};
 
 // ---- 冒頭演出（約8.5秒。2026-10-01 FB「速い」で約3割ゆっくりに。さらに「扉が開いてから文字まで一拍」：
 //      開ききった扉を約0.85秒そのまま見せ、マゼンタに切り替えてから約0.5秒おいてキャッチを打つ） ----
@@ -101,9 +98,21 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex,nofollow,noarchive">
 <title>{title}</title>
 <meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:url" content={canonical}>
+<meta property="og:image" content={ogImage}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="ウワサバナシ調査委員会">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#c41b85">
+<script type="application/ld+json" set:html={JSON.stringify(eventLd)} />
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" href="/favicon-ex.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -718,6 +727,7 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
 
   <footer id="site-footer" style="background:#1b1b1a;color:#c9c7c1;padding:20px 20px 120px;border-top:1px solid #3d3b38;display:grid;justify-items:center;gap:10px;text-align:center">
     <p style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:14px;font-weight:700;letter-spacing:.16em;color:#f1f0ec">ウワサバナシ調査委員会</p>
+    <p style="margin:0;font-size:12px;line-height:1.9;letter-spacing:.06em">シリーズ前作：<a href="/uwasabanashi/" style="color:#c9c7c1" class="kh3">case1「現実を改変する文房具」</a><br>主催：ウワサバナシ調査委員会（<a href="/company/" style="color:#c9c7c1" class="kh3">株式会社ex Labs</a>）</p>
     <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap"><a href="#top" style="font-size:12px;text-decoration:none;letter-spacing:.1em;color:#c9c7c1" class="kh3">ページの先頭へ ↑</a><button type="button" data-replay-intro style="background:none;border:1px solid #5d5b56;color:#c9c7c1;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-size:12px;letter-spacing:.1em;padding:6px 12px;min-height:36px;cursor:pointer">オープニングをもう一度見る</button></div>
   </footer>
 </div>
