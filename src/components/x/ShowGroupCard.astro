@@ -11,6 +11,7 @@ interface Props { rows: AnyResolved[]; show: string[]; place: string }
 const { rows, show, place } = Astro.props;
 const first = rows[0];
 const showSet = new Set(show);
+let soldout = false;
 let title = '', summary = '', where = '', ticket = '', track = 'ticket', showId = '', btn = 'チケットサイトで空席を見る ↗', rel = 'noopener';
 if (isListing(first)) {
   const l = first.listing;
@@ -20,6 +21,10 @@ if (isListing(first)) {
   const { work, venue } = first;
   const next = rows.find((r) => !isListing(r) && !['ended', 'cancelled'].includes(r.cta)) ?? first;
   title = work.title; summary = work.summary; where = `${regionName(venue.regionId)}・${areaName(venue.areaId)}／${venue.name}`;
+  // これからの回がすべて完売（確認時点）なら「完売」を表示し、ボタンは最新状況の確認にする
+  const live = rows.filter((r) => !isListing(r) && !['ended', 'cancelled'].includes(r.cta));
+  soldout = live.length > 0 && live.every((r) => r.cta === 'soldout');
+  if (soldout) btn = '完売｜チケットサイトで最新状況を見る ↗';
   ticket = !isListing(next) ? (next.occ.sales.channels[0]?.url ?? work.ticketUrl ?? work.officialUrl) : work.officialUrl; showId = work.id;
 }
 ---
@@ -27,7 +32,7 @@ if (isListing(first)) {
   <ul class="xgc-dates" aria-label="開催日">
     {rows.map((r) => <li data-rid={r.row.id} hidden={showSet.has(r.row.id) ? undefined : true}><time datetime={r.row.date}>{fmtDateShort(r.row.date)}</time></li>)}
   </ul>
-  <h3 class="xgc-t">{title}</h3>
+  <h3 class="xgc-t">{title}{soldout && <span class="xgc-so">完売</span>}</h3>
   <p class="xgc-where"><Cls text={where} emph={false} /></p>
   <p class="xgc-sum"><Cls text={summary} emph={false} /></p>
   {ticket && <a class="xgc-btn" href={ticket} target="_blank" rel={rel} data-track={track} data-show={showId} data-place={place}><Cls text={btn} emph={false} /></a>}
@@ -38,6 +43,7 @@ if (isListing(first)) {
 .xgc-dates li{background:var(--x-card);color:var(--x-blue);font-family:var(--x-min);font-weight:700;font-size:14px;padding:6px 12px;white-space:nowrap}
 .xgc-dates li[hidden]{display:none}
 .xgc-t{margin:4px 0 0;font-family:var(--x-min);font-weight:700;font-size:clamp(21px,2.6vw,26px);line-height:1.4}
+.xgc-so{display:inline-block;margin-left:10px;vertical-align:middle;padding:2px 10px;background:var(--x-lime);color:var(--x-ink);font-family:inherit;font-size:13px;font-weight:800;letter-spacing:.12em}
 .xgc-where{margin:-4px 0 0;font-size:12px;line-height:1.7;color:var(--x-pale2)}
 .xgc-sum{margin:0;font-size:14px;line-height:1.9;color:var(--x-pale)}
 .xgc-btn{justify-self:start;margin-top:4px;background:var(--x-lime);color:var(--x-ink)!important;border-radius:999px;padding:12px 22px;font-family:var(--x-min);font-weight:700;font-size:14px}

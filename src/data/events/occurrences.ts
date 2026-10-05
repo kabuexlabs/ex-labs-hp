@@ -6,6 +6,7 @@ import type { Occurrence } from './types';
 const KAITOU_DATES = ['2026-09-06', '2026-09-13', '2026-09-26', '2026-09-27', '2026-10-03', '2026-10-04', '2026-10-11'];
 const UWASA_DATES = ['2026-09-19', '2026-09-20', '2026-09-26', '2026-09-27', '2026-10-03', '2026-10-04'];
 
+const SOLDOUT_AT = '2026-10-05T12:00:00+09:00';
 const CHECKED = '2026-09-17T03:02:00+09:00'; // 自社公式ページの開催日一覧を再確認（escape.id の開演時刻・受付状況は未確認）
 
 export const occurrences: Occurrence[] = [
@@ -19,7 +20,8 @@ export const occurrences: Occurrence[] = [
     eventCheckedAt: CHECKED,
     eventCheckedBy: 'Claude（自社公式ページの開催日一覧を確認）',
     sales: { status: 'unknown', channels: [{ channelId: 'escape-id', url: 'https://escape.id/ImmersiveIllusion-org/e-kaitou/' }] },
-    seats: { status: 'unknown' },
+    // 2026-10-05 主催（株式会社ex Labs）からの連絡で全回完売
+    seats: { status: 'soldout', checkedAt: SOLDOUT_AT, expiresAt: '2026-10-12T00:00:00+09:00' },
     sourceIds: ['kaitou-official', 'escape-id-kaitou'],
     published: true,
   })),
@@ -32,7 +34,8 @@ export const occurrences: Occurrence[] = [
     eventCheckedAt: CHECKED,
     eventCheckedBy: 'Claude（自社公式ページの開催日一覧を確認）',
     sales: { status: 'unknown', channels: [{ channelId: 'escape-id', url: 'https://escape.id/uwasabanashi-org/e-case1/' }] },
-    seats: { status: 'unknown' },
+    // 2026-10-05 主催（株式会社ex Labs）からの連絡で完売
+    seats: { status: 'soldout', checkedAt: SOLDOUT_AT, expiresAt: '2026-10-12T00:00:00+09:00' },
     sourceIds: ['uwasabanashi-official', 'escape-id-uwasabanashi'],
     published: true,
   })),

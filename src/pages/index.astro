@@ -17,9 +17,20 @@ import { jstDateString } from '../lib/thisWeek';
 // 最終日は時刻が分からないので「本日最終日」と表示し、翌日から外す。自社公演の最終日は公演データ（src/data/events/）から取る。
 const todayJst = jstDateString(new Date());
 const lastDateOf = (workId: string, fallback?: string) => eventsData.occurrences.filter((o) => o.workId === workId && o.published && o.eventStatus !== 'cancelled').map((o) => o.date).sort().pop() ?? eventsData.works.find((w) => w.id === workId)?.period?.to ?? fallback;
-const allEvents = [
+// soldout: true で「完売」を表示（主催からの連絡で設定。公演データ src/data/events/occurrences.ts の空席状態も同じにする）
+const allEvents: { title: string; host: string; place: string; desc: string; url: string; img: string; w: number; h: number; until?: string; soldout?: boolean }[] = [
   {
-    title: 'ウワサバナシ調査委員会',
+    title: 'ウワサバナシ調査委員会 case2「言祝ぎの家 -呪われた花嫁-」',
+    host: 'ex Labs主催',
+    place: 'さいたま市内の一軒家',
+    desc: '祝いの席に、\u200b招かれる。\u200b実際の一軒家を探索し、\u200b住人との会話や調査報告を通じて\u200b真相に迫る\u200bイマーシブホラー・ミステリー。',
+    url: 'https://escape.id/uwasabanashi-org/e-hanayome/',
+    img: '/assets/events/uwasabanashi-case2-kv.webp',
+    w: 880, h: 1245,
+    until: '2026-11-03',
+  },
+  {
+    title: 'ウワサバナシ調査委員会 case1',
     host: 'ex Labs主催',
     place: '渋谷サクラステージ',
     desc: '東急不動産株式会社様・\u200b404 Not Found様・\u200bTSUTAYA様のご協力のもと、\u200b渋谷サクラステージを周遊し\u200b都市伝説の謎を解き明かす\u200bイマーシブ体験。',
@@ -27,6 +38,7 @@ const allEvents = [
     img: '/assets/events/uwasabanashi-kv.webp',
     w: 880, h: 1244,
     until: lastDateOf('uwasabanashi', '2026-10-04'),
+    soldout: true,
   },
   {
     title: '怪盗と秘密の試験',
@@ -37,6 +49,7 @@ const allEvents = [
     img: '/assets/events/kaitou-kv.webp',
     w: 880, h: 1248,
     until: lastDateOf('kaitou', '2026-10-11'),
+    soldout: true,
   },
   {
     title: 'ロスト・フレーム',
@@ -200,13 +213,14 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
           <img src={e.img} alt={e.title} width={e.w} height={e.h} loading="lazy" decoding="async">
           <div>
             <p class="xt-ev-org"><span class="x-bl">{e.host}</span><span class="x-bl">開催地：{e.place}{e.until === todayJst && '｜本日最終日'}</span></p>
+            {e.soldout && <p class="xt-ev-so">完売</p>}
             <h3 class="xt-ev-t">{e.title} ↗</h3>
             <p class="xt-ev-d"><Cls text={e.desc} emph={false} /></p>
           </div>
         </a>
       ))}
     </div>
-    {endedEvents.length > 0 && <p class="xt-ended">終了した公演：{endedEvents.map((e, i) => <>{i > 0 && '／'}<a href={e.url} style="border-bottom:1px solid">{e.title}</a>（{e.host}・{e.place}）</>)}。開催日・空席は<a href="/events/" style="border-bottom:1px solid" data-track="show" data-show="events" data-place="home-now">公演を探す</a>で確認できます。</p>}
+    {endedEvents.length > 0 && <p class="xt-ended">終了した公演：{endedEvents.map((e, i) => <>{i > 0 && '／'}<a href={e.url} style="border-bottom:1px solid">{e.title}</a>（{e.host}・{e.place}{e.soldout ? '・完売' : ''}）</>)}。開催日・空席は<a href="/events/" style="border-bottom:1px solid" data-track="show" data-show="events" data-place="home-now">公演を探す</a>で確認できます。</p>}
     {endedEvents.length === 0 && <p class="xt-ended">開催日・空席は<a href="/events/" style="border-bottom:1px solid" data-track="show" data-show="events" data-place="home-now">公演を探す</a>で確認できます。</p>}
   </div>
 </section>
@@ -459,6 +473,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-out-s{font-size:12.5px;line-height:1.7;color:var(--x-pale)}
 .xt-ev{flex:0 0 clamp(240px,68vw,300px);display:grid;gap:16px;align-content:start;background:var(--x-panel);padding:14px 14px 22px}
 .xt-ev img{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;display:block}
+.xt-ev-so{justify-self:start;margin:6px 0 0;display:inline-block;padding:3px 12px;background:var(--x-lime);color:var(--x-ink);font-weight:800;font-size:13px;letter-spacing:.12em}
 .xt-ev-org{margin:0;font-size:12px;line-height:1.7;color:var(--x-pale2)}
 .xt-ev-t{margin:8px 0;font-family:var(--x-min);font-weight:600;font-size:clamp(16px,4.6vw,19px);line-height:1.5}
 .xt-ev-d{margin:0;font-size:13px;line-height:1.85;color:var(--x-pale)}
