@@ -18,7 +18,20 @@ import { jstDateString } from '../lib/thisWeek';
 const todayJst = jstDateString(new Date());
 const lastDateOf = (workId: string, fallback?: string) => eventsData.occurrences.filter((o) => o.workId === workId && o.published && o.eventStatus !== 'cancelled').map((o) => o.date).sort().pop() ?? eventsData.works.find((w) => w.id === workId)?.period?.to ?? fallback;
 // soldout: true で「完売」を表示（主催からの連絡で設定。公演データ src/data/events/occurrences.ts の空席状態も同じにする）
-const allEvents: { title: string; host: string; place: string; desc: string; url: string; img: string; w: number; h: number; until?: string; soldout?: boolean }[] = [
+const allEvents: { title: string; host: string; place: string; desc: string; url: string; img: string; w: number; h: number; until?: string; soldout?: boolean; from?: string; period?: string }[] = [
+  // from（初日）が未来のものは「近日公開」枠に出し、初日になったら自動で「現在実施中」へ移る
+  {
+    title: '午前零時の幻想集 第一夜「草陰の夢」',
+    host: 'ex Labs企画',
+    place: '夢の島熱帯植物館',
+    desc: '夜の夢の島熱帯植物館を巡り、\u200b物語を体験する\u200bイマーシブ体験。',
+    url: 'https://kabuexlabs.com/gensou/',
+    img: '/assets/events/gensou-kv.webp',
+    w: 880, h: 1246,
+    from: '2026-11-05',
+    until: '2026-11-22',
+    period: '2026年11月5日〜22日',
+  },
   {
     title: 'ウワサバナシ調査委員会 case2「言祝ぎの家 -呪われた花嫁-」',
     host: 'ex Labs主催',
@@ -62,7 +75,8 @@ const allEvents: { title: string; host: string; place: string; desc: string; url
     until: '2026-08-31', // 全公演終了（制作事例に記載）
   },
 ];
-const liveEvents = allEvents.filter((e) => !e.until || e.until >= todayJst);
+const upcomingEvents = allEvents.filter((e) => e.from && e.from > todayJst);
+const liveEvents = allEvents.filter((e) => (!e.until || e.until >= todayJst) && !upcomingEvents.includes(e));
 const endedEvents = allEvents.filter((e) => e.until && e.until < todayJst);
 
 // お取引先、ご協力企業様 — client/partner company logos shown above the 展開団体
@@ -220,6 +234,24 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
         </a>
       ))}
     </div>
+    {upcomingEvents.length > 0 && (
+      <div class="xt-soon">
+        <p class="xt-soon-h"><span>Coming Soon</span>近日公開</p>
+        <div class="x-hscroll" style="margin-top:20px;gap:20px">
+          {upcomingEvents.map((e) => (
+            <a href={e.url} class="xt-ev" data-track="show" data-show={e.url.split('/').filter(Boolean).pop()} data-place="home-soon">
+              <img src={e.img} alt={e.title} width={e.w} height={e.h} loading="lazy" decoding="async">
+              <div>
+                <p class="xt-ev-org"><span class="x-bl">{e.host}</span><span class="x-bl">開催地：{e.place}</span></p>
+                <p class="xt-ev-so is-soon">近日公開｜{e.period}</p>
+                <h3 class="xt-ev-t">{e.title} ↗</h3>
+                <p class="xt-ev-d"><Cls text={e.desc.replace(/\u200b/g, '')} emph={false} /></p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
     {endedEvents.length > 0 && <p class="xt-ended">終了した公演：{endedEvents.map((e, i) => <>{i > 0 && '／'}<a href={e.url} style="border-bottom:1px solid">{e.title}</a>（{e.host}・{e.place}{e.soldout ? '・完売' : ''}）</>)}。開催日・空席は<a href="/events/" style="border-bottom:1px solid" data-track="show" data-show="events" data-place="home-now">公演を探す</a>で確認できます。</p>}
     {endedEvents.length === 0 && <p class="xt-ended">開催日・空席は<a href="/events/" style="border-bottom:1px solid" data-track="show" data-show="events" data-place="home-now">公演を探す</a>で確認できます。</p>}
   </div>
@@ -473,6 +505,10 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-out-s{font-size:12.5px;line-height:1.7;color:var(--x-pale)}
 .xt-ev{flex:0 0 clamp(240px,68vw,300px);display:grid;gap:16px;align-content:start;background:var(--x-panel);padding:14px 14px 22px}
 .xt-ev img{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;display:block}
+.xt-soon{margin-top:56px}
+.xt-soon-h{margin:0;display:flex;align-items:baseline;gap:14px;font-family:var(--x-min);font-weight:700;font-size:clamp(19px,2.6vw,24px)}
+.xt-soon-h span{font-family:var(--x-en);font-size:clamp(22px,3vw,30px);color:var(--x-lime);font-weight:400}
+.xt-ev-so.is-soon{background:#fff;letter-spacing:.04em}
 .xt-ev-so{justify-self:start;margin:6px 0 0;display:inline-block;padding:3px 12px;background:var(--x-lime);color:var(--x-ink);font-weight:800;font-size:13px;letter-spacing:.12em}
 .xt-ev-org{margin:0;font-size:12px;line-height:1.7;color:var(--x-pale2)}
 .xt-ev-t{margin:8px 0;font-family:var(--x-min);font-weight:600;font-size:clamp(16px,4.6vw,19px);line-height:1.5}
