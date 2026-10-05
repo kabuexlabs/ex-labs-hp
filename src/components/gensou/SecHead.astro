@@ -1,9 +1,9 @@
 ---
-// 「午前零時の幻想集」LP のセクション見出し（ラフな罫線＋[ English ] 日本語）
+// 「午前零時の幻想集」LP のセクション見出し（ラフな罫線＋英語＋日本語）。英語は数字と同じ Shippori Mincho B1 800
 interface Props { en: string; ja: string }
 const { en, ja } = Astro.props;
 ---
 <div class="sh">
   <div class="sh-bar" aria-hidden="true"></div>
-  <h2 class="sh-t"><span class="sh-en"><span class="l">[ </span><span class="b">{en}</span><span class="l"> ]</span></span><span class="sh-ja">{ja}</span></h2>
+  <h2 class="sh-t"><span class="sh-en">{en}</span><span class="sh-ja">{ja}</span></h2>
 </div>
