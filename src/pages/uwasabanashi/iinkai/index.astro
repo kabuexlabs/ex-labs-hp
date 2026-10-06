@@ -208,6 +208,12 @@ const videoLd = {
     <small>© 2026 ウワサバナシ調査委員会</small>
   </footer>
 
+  <a href="/uwasabanashi/kotohogi/" class="now-btn" data-track="show" data-show="kotohogi" data-place="iinkai-float" aria-label="現在実施中のイベントへ（case2『言祝ぎの家-呪われた花嫁-』）">
+    <span class="now-en">NOW ON</span>
+    <span class="now-ja">現在実施中の<br>イベントへ</span>
+    <span class="now-arrow" aria-hidden="true">→</span>
+  </a>
+
 </div>
 
 <script is:inline>
@@ -319,6 +325,13 @@ a:hover{color:#f4f0f3}
 .ftr-note a:hover{color:#f4f0f3}
 .ftr small{font-size:11px;letter-spacing:0.12em;color:#bdb3bb}
 
+.ftr{padding-bottom:132px}
+/* 右下固定：現在実施中のイベント（case2 LP）へ */
+.now-btn{position:fixed;right:max(14px,calc(50vw - 240px + 14px));bottom:calc(16px + env(safe-area-inset-bottom));z-index:90;width:96px;height:96px;border-radius:50%;background:#d646cd;color:#0d0b0e;display:grid;place-content:center;justify-items:center;gap:2px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.55);outline:1px solid rgba(13,11,14,0.6);outline-offset:-6px;transition:background 0.2s,transform 0.2s}
+.now-btn:hover{background:#f4f0f3;color:#0d0b0e;transform:translateY(-2px)}
+.now-en{font-family:'Bodoni Moda',serif;font-style:italic;font-weight:700;font-size:11px;letter-spacing:0.12em;line-height:1}
+.now-ja{font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:12px;line-height:1.35;letter-spacing:0.02em}
+.now-arrow{font-family:'Bodoni Moda',serif;font-size:14px;line-height:1}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 </body>
