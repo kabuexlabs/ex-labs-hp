@@ -1,5 +1,5 @@
 ---
-// 「ウワサバナシ調査委員会」団体サイト（/uwasabanashi/iinkai/）。ABOUT・活動紹介動画・調査記録（case1／case2）をまとめる。
+// 「ウワサバナシ調査委員会」プロジェクトサイト（/uwasabanashi/iinkai/）。ABOUT・活動紹介動画・調査記録（case1／case2）をまとめる。
 // 2026-10-06 デザイン書き出し（uwasabanashi-site export）の再実装。文言・レイアウトは書き出しのまま。
 // case1 の公式LPは /uwasabanashi/、case2 は /uwasabanashi/kotohogi/（どちらもURLは変えない）。
 // コーポレートサイトとはデザイン系統が別物なので BaseLayout は使わず、このファイルだけで完結させている。
@@ -11,7 +11,7 @@ const cases = [
     id: 'case1',
     no: '01',
     title: '『現実を改変する文房具』',
-    lead: ['Shibuya Sakura Stage内を回遊することで、', 'ミステリーを解き明かすというコンテンツ。'],
+    lead: ['商業施設内で発生した連続死亡事件に関わる', '怪異の真実を施設を周遊しながら', '関係者聞き込みをしながら解き明かす', '周遊型ミステリー。'],
     kv: '/assets/uwasabanashi/hub/case1-kv.webp',
     kvW: 800, kvH: 1130,
     credits: [['クリエイター', 'とんとん'], ['企画進行', 'はるる'], ['原案', 'かるら']],
@@ -24,7 +24,7 @@ const cases = [
     id: 'case2',
     no: '02',
     title: '『言祝ぎの家-呪われた花嫁-』',
-    lead: ['一軒家をフルに活用した、', 'ホラー×ウワサバナシ調査コンテンツ'],
+    lead: ['一軒家をフルに活用した、', 'ホラー×ミステリー体験'],
     kv: '/assets/uwasabanashi/hub/case2-kv.webp',
     kvW: 800, kvH: 1131,
     credits: [['クリエイター', 'タロサカ'], ['企画進行', '三ヶ崎四五六']],
@@ -45,7 +45,7 @@ const title = 'ウワサバナシ調査委員会とは｜活動内容と調査�
 const canonical = 'https://kabuexlabs.com/uwasabanashi/iinkai/';
 const ogImage = 'https://kabuexlabs.com/assets/uwasabanashi/hub/og.jpg';
 const description =
-  'ウワサバナシ調査委員会は、様々なクリエイターと都市伝説をベースにした『ウワサバナシ』を調査するコンテンツを展開する団体です。活動紹介動画と、case1『現実を改変する文房具』・case2『言祝ぎの家-呪われた花嫁-』の調査記録を掲載。';
+  'ウワサバナシ調査委員会は、様々なクリエイターと都市伝説をベースにした『ウワサバナシ』にまつわる調査に挑む、様々なジャンルの体験型エンタメを展開するプロジェクトです。活動紹介動画と、case1『現実を改変する文房具』・case2『言祝ぎの家-呪われた花嫁-』の調査記録を掲載。';
 
 const ld = {
   '@context': 'https://schema.org',
@@ -144,7 +144,7 @@ const videoLd = {
       <div class="sec-en" style="font-size:min(20vw,92px)">ABOUT</div>
       <h2 class="sec-tag" style="letter-spacing:0.1em">ウワサバナシ調査委員会とは？</h2>
     </div>
-    <p class="about-text">様々なクリエイター様と<br>都市伝説をベースにした<br><span>『ウワサバナシ』</span>を調査する<br>コンテンツを展開する団体です。</p>
+    <p class="about-text">様々なクリエイター様と<br>都市伝説をベースにした<br><span>『ウワサバナシ』</span>にまつわる<br>調査に挑む<br>様々なジャンルの<br>体験型エンタメを展開する<br>プロジェクトです。</p>
   </section>
 
   <section id="activity" class="activity" data-screen-label="03 Activity">
@@ -180,7 +180,7 @@ const videoLd = {
               <div class="case-no" aria-hidden="true">{c.no}</div>
               <div class="case-tag"><span>{c.id}</span><span class="case-tag-line"></span></div>
               <h3 class="case-title">{c.title}</h3>
-              <p class="case-lead">{c.lead[0]}<br>{c.lead[1]}</p>
+              <p class="case-lead">{c.lead.map((l, i) => (<>{i > 0 && <br>}{l}</>))}</p>
               <dl class="credits">
                 {c.credits.map(([k, v]) => (<><dt>{k}</dt><dd>{v}</dd></>))}
               </dl>
