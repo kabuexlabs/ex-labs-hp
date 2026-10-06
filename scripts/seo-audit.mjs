@@ -89,6 +89,7 @@ const subBrand = [
   'src/layouts/ToudaimurderLayout.astro', 'src/pages/toudaimurder/index.astro',
   'src/layouts/TaikenbizyutuLayout.astro', 'src/layouts/AnatorLayout.astro', 'src/layouts/GameLayout.astro',
   'src/pages/uwasabanashi/index.astro',
+  'src/pages/uwasabanashi/iinkai/index.astro',
   'src/pages/gensou/index.astro',
   // kaitou は PR #115 で運営会社表記を外し公演ブランドに統一したため対象外（勝手に再追加しない）
 ];

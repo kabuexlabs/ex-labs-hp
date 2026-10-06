@@ -1,0 +1,325 @@
+---
+// 「ウワサバナシ調査委員会」団体サイト（/uwasabanashi/iinkai/）。ABOUT・活動紹介動画・調査記録（case1／case2）をまとめる。
+// 2026-10-06 デザイン書き出し（uwasabanashi-site export）の再実装。文言・レイアウトは書き出しのまま。
+// case1 の公式LPは /uwasabanashi/、case2 は /uwasabanashi/kotohogi/（どちらもURLは変えない）。
+// コーポレートサイトとはデザイン系統が別物なので BaseLayout は使わず、このファイルだけで完結させている。
+import SiteGuard from '../../../components/SiteGuard.astro';
+
+// ---- 各ケースの評価（0〜10。0 は未設定扱いで「？」と斜線のゲージを出す） ----
+const cases = [
+  {
+    id: 'case1',
+    no: '01',
+    title: '『現実を改変する文房具』',
+    lead: ['Shibuya Sakura Stage内を回遊することで、', 'ミステリーを解き明かすというコンテンツ。'],
+    kv: '/assets/uwasabanashi/hub/case1-kv.webp',
+    kvW: 800, kvH: 1130,
+    credits: [['クリエイター', 'とんとん'], ['企画進行', 'はるる'], ['原案', 'かるら']],
+    difficulty: 8,
+    fear: 1,
+    href: '/uwasabanashi/',
+    flip: false,
+  },
+  {
+    id: 'case2',
+    no: '02',
+    title: '『言祝ぎの家-呪われた花嫁-』',
+    lead: ['一軒家をフルに活用した、', 'ホラー×ウワサバナシ調査コンテンツ'],
+    kv: '/assets/uwasabanashi/hub/case2-kv.webp',
+    kvW: 800, kvH: 1131,
+    credits: [['クリエイター', 'タロサカ'], ['企画進行', '三ヶ崎四五六']],
+    difficulty: 0,
+    fear: 0,
+    href: '/uwasabanashi/kotohogi/',
+    flip: true,
+  },
+];
+const YOUTUBE_ID = '0g1Zo6gNma8';
+
+const meter = (v: number) => {
+  const n = Math.max(0, Math.min(10, Math.round(v || 0)));
+  return { cells: Array.from({ length: 10 }, (_, i) => (n === 0 ? 'unknown' : i < n ? 'on' : 'off')), label: n > 0 ? String(n) : '？' };
+};
+
+const title = 'ウワサバナシ調査委員会とは｜活動内容と調査記録 case1・case2';
+const canonical = 'https://kabuexlabs.com/uwasabanashi/iinkai/';
+const ogImage = 'https://kabuexlabs.com/assets/uwasabanashi/hub/og.jpg';
+const description =
+  'ウワサバナシ調査委員会は、様々なクリエイターと都市伝説をベースにした『ウワサバナシ』を調査するコンテンツを展開する団体です。活動紹介動画と、case1『現実を改変する文房具』・case2『言祝ぎの家-呪われた花嫁-』の調査記録を掲載。';
+
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'ウワサバナシ調査委員会',
+  url: canonical,
+  description,
+  image: ogImage,
+  inLanguage: 'ja',
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' },
+  hasPart: [
+    { '@type': 'WebPage', name: 'ウワサバナシ調査委員会 case1『現実を改変する文房具』', url: 'https://kabuexlabs.com/uwasabanashi/' },
+    { '@type': 'WebPage', name: 'ウワサバナシ調査委員会 case2『言祝ぎの家-呪われた花嫁-』', url: 'https://kabuexlabs.com/uwasabanashi/kotohogi/' },
+  ],
+  sameAs: ['https://x.com/uwasatyousa'],
+};
+const videoLd = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: 'ウワサバナシ調査委員会 活動紹介',
+  description: 'ウワサバナシ調査委員会の活動紹介動画',
+  thumbnailUrl: `https://i.ytimg.com/vi/${YOUTUBE_ID}/hqdefault.jpg`,
+  uploadDate: '2026-10-06',
+  embedUrl: `https://www.youtube.com/embed/${YOUTUBE_ID}`,
+  contentUrl: `https://www.youtube.com/watch?v=${YOUTUBE_ID}`,
+};
+---
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:url" content={canonical}>
+<meta property="og:image" content={ogImage}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="ウワサバナシ調査委員会">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0d0b0e">
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />
+<script type="application/ld+json" set:html={JSON.stringify(videoLd)} />
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Shippori+Mincho+B1:wght@400;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<SiteGuard />
+</head>
+<body>
+<svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <filter id="uw-rough" x="-5%" y="-10%" width="110%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="7" result="t"/>
+    <feDisplacementMap in="SourceGraphic" in2="t" scale="4" xChannelSelector="R" yChannelSelector="G" result="d"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="3" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -9 0 0 0 6.8" result="m"/>
+    <feComposite in="d" in2="m" operator="in"/>
+  </filter>
+</svg>
+
+<div id="top" class="page">
+
+  <header class="hdr">
+    <a href="#top" class="hdr-logo">
+      <img src="/assets/uwasabanashi/hub/logo-white.webp" alt="ウワサバナシ調査委員会" width="720" height="460">
+    </a>
+    <button type="button" class="menu-btn" aria-label="メニュー" aria-expanded="false" aria-controls="uw-menu">
+      <span class="menu-label">MENU</span>
+      <span class="menu-lines"><span></span><span></span></span>
+    </button>
+  </header>
+
+  <nav id="uw-menu" class="menu" hidden>
+    <a href="#about"><span class="m-en">ABOUT</span><span class="m-ja">ウワサバナシ調査委員会とは？</span></a>
+    <a href="#activity"><span class="m-en">ACTIVITY</span><span class="m-ja">活動内容</span></a>
+    {cases.map((c) => (
+      <a href={`#${c.id}`}><span class="m-en m-case">{c.id}</span><span class="m-ja m-case-ja">{c.title}</span></a>
+    ))}
+  </nav>
+
+  <section class="hero" data-screen-label="01 Top">
+    <h1 class="hero-logo">
+      <img src="/assets/uwasabanashi/hub/logo-pink.webp" alt="" class="hero-shadow" width="720" height="460">
+      <img src="/assets/uwasabanashi/hub/logo-white.webp" alt="ウワサバナシ調査委員会" class="hero-main" width="720" height="460">
+    </h1>
+  </section>
+
+  <section id="about" class="about" data-screen-label="02 About">
+    <div class="sec-head">
+      <div class="sec-en" style="font-size:min(20vw,92px)">ABOUT</div>
+      <h2 class="sec-tag" style="letter-spacing:0.1em">ウワサバナシ調査委員会とは？</h2>
+    </div>
+    <p class="about-text">様々なクリエイター様と<br>都市伝説をベースにした<br><span>『ウワサバナシ』</span>を調査する<br>コンテンツを展開する団体です。</p>
+  </section>
+
+  <section id="activity" class="activity" data-screen-label="03 Activity">
+    <div class="sec-head">
+      <div class="sec-en" style="font-size:min(16vw,76px)">ACTIVITY</div>
+      <h2 class="sec-tag">活動内容</h2>
+    </div>
+    <div class="rule-label"><span>MOVIE</span><span class="rule"></span></div>
+    <div class="movie">
+      <div class="movie-inner">
+        <iframe src={`https://www.youtube.com/embed/${YOUTUBE_ID}?rel=0&playsinline=1`} title="ウワサバナシ調査委員会 活動紹介" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+
+  <section id="cases" class="cases" data-screen-label="04 Case Files">
+    <div class="sec-head sec-head-cases">
+      <div class="sec-en" style="font-size:min(13vw,62px);white-space:nowrap">CASE FILES</div>
+      <h2 class="sec-tag">調査記録</h2>
+    </div>
+
+    <div class="case-list">
+      {cases.map((c) => {
+        const d = meter(c.difficulty);
+        const f = meter(c.fear);
+        return (
+          <article id={c.id} class:list={['case', { flip: c.flip }]}>
+            <div class="kv">
+              <div class="kv-frame"></div>
+              <img src={c.kv} alt={`${c.id}${c.title}キービジュアル`} width={c.kvW} height={c.kvH} loading="lazy" decoding="async">
+            </div>
+            <div class="case-body">
+              <div class="case-no" aria-hidden="true">{c.no}</div>
+              <div class="case-tag"><span>{c.id}</span><span class="case-tag-line"></span></div>
+              <h3 class="case-title">{c.title}</h3>
+              <p class="case-lead">{c.lead[0]}<br>{c.lead[1]}</p>
+              <dl class="credits">
+                {c.credits.map(([k, v]) => (<><dt>{k}</dt><dd>{v}</dd></>))}
+              </dl>
+              <div class="meters">
+                {[['謎の難易度', d], ['怖さ', f]].map(([label, m]: any) => (
+                  <div class="meter" role="img" aria-label={`${label} ${m.label === '？' ? '未公開' : `${m.label}/10`}`}>
+                    <span class="meter-label">{label}</span>
+                    <div class="meter-cells">{m.cells.map((s: string) => <span class={s}></span>)}</div>
+                    <span class="meter-val"><span>{m.label}</span>/10</span>
+                  </div>
+                ))}
+              </div>
+              <a href={c.href} class="case-cta">ホームページはこちら<span>→</span></a>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </section>
+
+  <footer class="ftr">
+    <img src="/assets/uwasabanashi/hub/logo-white.webp" alt="ウワサバナシ調査委員会" width="720" height="460" loading="lazy">
+    <a href="#top" class="pagetop">PAGE TOP ↑</a>
+    <p class="ftr-note">運営：<a href="https://kabuexlabs.com/">株式会社ex Labs</a>／<a href="https://kabuexlabs.com/guide/case-uwasabanashi/">case1 の制作事例</a></p>
+    <small>© 2026 ウワサバナシ調査委員会</small>
+  </footer>
+
+</div>
+
+<script is:inline>
+(function(){
+  var btn=document.querySelector('.menu-btn'),nav=document.getElementById('uw-menu'),lab=document.querySelector('.menu-label');
+  if(!btn||!nav)return;
+  var set=function(open){nav.hidden=!open;btn.setAttribute('aria-expanded',String(open));lab.textContent=open?'CLOSE':'MENU'};
+  btn.addEventListener('click',function(){set(nav.hidden)});
+  nav.addEventListener('click',function(e){if(e.target.closest('a'))set(false)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!nav.hidden){set(false);btn.focus()}});
+})();
+</script>
+
+<style is:global>
+html{scroll-behavior:smooth}
+body{margin:0;background:#060507;color:#f4f0f3;font-family:'Zen Kaku Gothic New',sans-serif;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:200;opacity:.14;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+a{color:#d646cd;text-decoration:none}
+a:hover{color:#f4f0f3}
+::selection{background:#d646cd;color:#0d0b0e}
+</style>
+
+<style>
+.defs{position:absolute;width:0;height:0;overflow:hidden}
+.page{position:relative;max-width:480px;margin:0 auto;background:#0d0b0e;min-height:100vh;box-shadow:0 0 0 1px rgba(244,240,243,0.06),0 0 120px rgba(214,70,205,0.08)}
+
+.hdr{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 18px;background:rgba(13,11,14,0.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid rgba(244,240,243,0.08)}
+.hdr-logo{display:flex;align-items:center}
+.hdr-logo img{height:32px;width:auto;display:block}
+.menu-btn{display:flex;align-items:center;gap:10px;height:44px;padding:0 4px;background:none;border:0;color:#f4f0f3;cursor:pointer;font-family:'Bodoni Moda',serif;font-weight:700;font-size:12px;letter-spacing:0.24em}
+.menu-lines{display:flex;flex-direction:column;gap:6px;width:24px}
+.menu-lines span{height:1.5px;background:#f4f0f3}
+.menu-lines span+span{background:#d646cd}
+
+.menu{position:fixed;top:60px;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:99;background:rgba(13,11,14,0.97);display:flex;flex-direction:column;padding:40px 28px;box-sizing:border-box;gap:4px;overflow-y:auto}
+.menu[hidden]{display:none}
+.menu a{display:flex;flex-direction:column;gap:6px;padding:18px 0;border-bottom:1px solid rgba(244,240,243,0.14);color:#f4f0f3}
+.m-en{font-family:'Bodoni Moda',serif;font-weight:900;font-size:34px;line-height:1}
+.m-en.m-case{font-style:italic;font-weight:700;font-size:28px}
+.m-ja{font-family:'Shippori Mincho B1',serif;font-weight:700;font-size:14px;letter-spacing:0.1em;color:#d646cd}
+.m-ja.m-case-ja{letter-spacing:0.08em}
+
+.hero{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:88px 20px 96px;box-sizing:border-box;overflow:hidden;background:radial-gradient(ellipse 80% 45% at 50% 44%,rgba(214,70,205,0.18),rgba(214,70,205,0) 72%),radial-gradient(ellipse 120% 90% at 50% 50%,rgba(0,0,0,0) 40%,rgba(0,0,0,0.7) 100%)}
+.hero-logo{position:relative;margin:0;width:84%;aspect-ratio:1139 / 727}
+.hero-shadow{position:absolute;inset:0;width:100%;height:100%;transform:translate(5px,4px);opacity:0.75}
+.hero-main{position:relative;width:100%;height:100%;display:block}
+
+.sec-head{position:relative;display:flex;justify-content:center;margin:0 0 48px}
+.sec-en{font-family:'Bodoni Moda',serif;font-weight:900;line-height:0.9;color:#f4f0f3;filter:url(#uw-rough)}
+.sec-tag{position:absolute;left:50%;top:58%;transform:translate(-50%,-50%) rotate(-2deg);margin:0;background:#d646cd;color:#0d0b0e;font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:16px;letter-spacing:0.16em;padding:3px 12px 4px;white-space:nowrap}
+
+.about{position:relative;padding:96px 20px 104px;scroll-margin-top:60px;overflow:hidden}
+.about-text{margin:0;text-align:center;font-family:'Shippori Mincho B1',serif;font-weight:600;font-size:18px;line-height:2.3;letter-spacing:0.08em;color:#f4f0f3}
+.about-text span{color:#d646cd}
+
+.activity{position:relative;background:#d646cd;color:#0d0b0e;padding:88px 16px 96px;scroll-margin-top:60px}
+.activity .sec-head{margin-bottom:40px}
+.activity .sec-en{color:#0d0b0e}
+.activity .sec-tag{background:#0d0b0e;color:#d646cd}
+.rule-label{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-family:'Bodoni Moda',serif;font-weight:700;font-size:12px;letter-spacing:0.3em}
+.rule{flex:1;height:1px;background:rgba(13,11,14,0.5)}
+.movie{background:#0d0b0e;padding:6px;box-shadow:8px 8px 0 rgba(13,11,14,0.28)}
+.movie-inner{position:relative;width:100%;aspect-ratio:16 / 9;background:#000}
+.movie-inner iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+.cases{position:relative;padding:96px 20px 112px;scroll-margin-top:60px;overflow:hidden}
+.sec-head-cases{margin-bottom:64px}
+.case-list{display:flex;flex-direction:column;gap:96px}
+.case{display:flex;flex-direction:column;gap:40px;scroll-margin-top:84px}
+.kv{position:relative;margin-right:12px}
+.kv-frame{position:absolute;inset:0;transform:translate(12px,12px);border:1px solid #d646cd}
+.kv img{position:relative;display:block;width:100%;height:auto;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+.flip .kv{margin-right:0;margin-left:12px}
+.flip .kv-frame{transform:translate(-12px,12px)}
+
+.case-body{position:relative;display:flex;flex-direction:column;gap:24px}
+.case-no{position:absolute;top:-34px;right:-4px;font-family:'Bodoni Moda',serif;font-style:italic;font-weight:900;font-size:120px;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(214,70,205,0.55);pointer-events:none;user-select:none}
+.case-tag{position:relative;display:flex;align-items:center;gap:12px}
+.case-tag span:first-child{background:#d646cd;color:#0d0b0e;font-family:'Bodoni Moda',serif;font-style:italic;font-weight:700;font-size:20px;line-height:1;padding:6px 12px 7px}
+.case-tag-line{width:64px;height:1px;background:rgba(244,240,243,0.3)}
+.case-title{position:relative;margin:0;font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:26px;line-height:1.4;letter-spacing:0.02em;text-wrap:balance}
+.case-lead{margin:0;font-size:15px;line-height:2;letter-spacing:0.04em;color:#f4f0f3}
+
+.credits{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);border-top:1px solid rgba(244,240,243,0.22);font-size:14px;letter-spacing:0.06em}
+.credits dt{padding:13px 24px 13px 0;color:#bdb3bb;border-bottom:1px solid rgba(244,240,243,0.22)}
+.credits dd{margin:0;padding:13px 0;border-bottom:1px solid rgba(244,240,243,0.22);font-weight:700}
+
+.meters{display:flex;flex-direction:column;gap:12px;padding:18px 16px;background:rgba(244,240,243,0.04);border:1px solid rgba(244,240,243,0.1)}
+.meter{display:grid;grid-template-columns:80px minmax(0,1fr) 56px;align-items:center;gap:12px}
+.meter-label{font-size:13px;font-weight:700;letter-spacing:0.04em}
+.meter-cells{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:3px}
+.meter-cells span{height:12px}
+.meter-cells .on{background:#d646cd}
+.meter-cells .off{background:rgba(244,240,243,0.12)}
+.meter-cells .unknown{background:repeating-linear-gradient(135deg,rgba(244,240,243,0.28) 0 2px,rgba(244,240,243,0.06) 2px 5px)}
+.meter-val{font-family:'Bodoni Moda',serif;font-weight:700;font-size:13px;color:#bdb3bb;text-align:right}
+.meter-val span{font-size:24px;color:#f4f0f3}
+
+.case-cta{display:flex;align-items:center;justify-content:space-between;min-height:56px;background:#d646cd;color:#0d0b0e;padding:0 22px;font-weight:700;font-size:16px;letter-spacing:0.08em;transition:background 0.2s}
+.case-cta:hover{background:#f4f0f3;color:#0d0b0e}
+.case-cta span{font-family:'Bodoni Moda',serif;font-size:20px}
+
+.ftr{position:relative;border-top:1px solid rgba(244,240,243,0.1);padding:64px 20px 40px;display:flex;flex-direction:column;align-items:center;gap:24px}
+.ftr img{width:160px;height:auto;display:block}
+.pagetop{display:flex;align-items:center;min-height:44px;font-family:'Bodoni Moda',serif;font-weight:700;font-size:12px;letter-spacing:0.3em;color:#d646cd}
+.pagetop:hover{color:#f4f0f3}
+.ftr-note{margin:0;font-size:11px;letter-spacing:0.08em;color:#bdb3bb;text-align:center}
+.ftr-note a{color:#bdb3bb;text-decoration:underline;text-underline-offset:3px}
+.ftr-note a:hover{color:#f4f0f3}
+.ftr small{font-size:11px;letter-spacing:0.12em;color:#bdb3bb}
+
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</body>
+</html>
