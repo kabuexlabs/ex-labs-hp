@@ -19,6 +19,8 @@ import { AREAS, GENRES, REGIONS, areaName, regionName } from '../../data/events/
 import { parseCriteria, criteriaToQuery, resolveAll, resolveListings, isListing, search, nextAvailableDate, compareRows, BUDGET_OPTIONS, END_BY_OPTIONS, PARTY_MAX, fmtYen, minToHhmm, type AnyResolved, type Criteria } from '../../lib/events';
 import { jstDateString, addDays, weekRange, fmtDateShort, fmtDateJa, fmtVerified } from '../../lib/thisWeek';
 import { jsonLd } from '../../lib/microcms';
+import { buildGuideRows } from '../../lib/tokyoGuide';
+import { priceLabels } from '../../lib/priceLabel';
 
 const now = new Date();
 const today = jstDateString(now);
@@ -60,12 +62,14 @@ const worksUpcoming = [...new Map(own.filter((r) => !['ended', 'cancelled'].incl
 const pageTitle = '今日できるイマーシブ｜東京で今日・明日・今週末に参加できる公演を探す - 株式会社ex Labs';
 const pageDesc = `今日できるイマーシブ体験・マダミスを東京で探すページ。今日（${fmtDateShort(today)}）・明日・今週末（${weekendLabel}）に参加できる公演を日本時間で毎日更新し、人数・エリア・予算でも絞り込めます。開催・販売・空席の確認状況を分けて表示し、予約は公式販売ページへ。`.slice(0, 160);
 
+// FAQ の公演名・料金・人数は、終了していない公演（公演データ）から作る。終了した公演を「掲載中」と書かない（2026-10-06）
+const faqLive = buildGuideRows(now).filter((r) => !r.w.guideOnly && (r.status === 'ongoing' || r.status === 'upcoming'));
 const faqs = [
   { q: '今日、東京でイマーシブ体験に参加できますか？', a: `このページの「今日」の欄に、今日（${fmtDateJa(today)}）に開催予定として確認できた公演を表示しています。参加できるかどうかは各公演の公式販売ページの空席次第です。開催予定があるだけでは予約可能と表示せず、受付中かつ確認時点で空席ありの回だけ「予約する」ボタンにしています。` },
   { q: '予約なしで当日参加できるイマーシブはありますか？', a: '当サイトで掲載している公演は、公式販売ページでの事前予約が基本です。当日券の有無は公演ごとに異なるため、公式ページの案内を確認してください。ページ上の「販売」「空席」の表示は確認時点のもので、当日の状況を保証するものではありません。' },
-  { q: '一人でも参加できますか？', a: '作品によります。「ウワサバナシ調査委員会」はチケット1枚につき1名で1人から参加できます。「怪盗と秘密の試験」は各回2〜4名の1組での参加で、1人での申込はできません。各カードの「申込可能な人数」で確認できます。' },
-  { q: '料金はいくらくらいですか？', a: '掲載中の公演では、周遊型の「ウワサバナシ調査委員会」が1人¥4,000（税込・手数料別）、少人数型の「怪盗と秘密の試験」が1組¥13,000〜（2人参加・税込・手数料別）です。東京のマダミス店舗公演は1人3,000〜6,000円程度が目安です。1組料金は人数に応じた1人あたりの目安も表示しています。' },
-  { q: '所要時間はどのくらいですか？', a: '周遊型で60〜120分程度、公演型で1〜3時間程度が一般的です。掲載中の「ウワサバナシ調査委員会」は約70分です。終了時刻の上限（例：19時までに終わる）で絞り込むこともできますが、開演時刻が未確認の公演は条件に合うとは扱わず、別枠で表示します。' },
+  { q: '一人でも参加できますか？', a: `作品によります。${faqLive.length ? faqLive.map((r) => `「${r.w.title}」は${r.w.party.soloAllowed ? '1人から申し込めます' : `${r.w.party.text}です`}`).join('。') + '。' : ''}各カードの「申込可能な人数」で確認できます。` },
+  { q: '料金はいくらくらいですか？', a: `${faqLive.length ? `掲載中の公演では、${faqLive.map((r) => `「${r.w.title}」が${priceLabels(r.w.price).main}${r.w.price.unit === 'per-group' ? '（1組料金を人数で割った額）' : ''}`).join('、')}です（税込・手数料別）。` : ''}東京のマダミス店舗公演は1人3,000〜6,000円程度が目安です。1組料金は人数に応じた1人あたりの目安も表示しています。` },
+  { q: '所要時間はどのくらいですか？', a: `周遊型で60〜120分程度、公演型で1〜3時間程度が一般的です。${faqLive.filter((r) => r.w.duration.minutes).length ? `掲載中の${faqLive.filter((r) => r.w.duration.minutes).map((r) => `「${r.w.title}」は約${r.w.duration.minutes}分`).join('、')}です。` : ''}終了時刻の上限（例：19時までに終わる）で絞り込むこともできますが、開演時刻が未確認の公演は条件に合うとは扱わず、別枠で表示します。` },
   { q: '初めてでも楽しめますか？服装や持ち物は？', a: '多くのイマーシブ体験は演技の経験がなくても参加できます。周遊型は歩きやすい靴、スマートフォンとイヤホン、水分を持参するよう案内されることが多く、各公演の「持ち物・参加条件」に確認できた内容を載せています。詳しくはイマーシブ体験の服装・持ち物ガイドをご覧ください。' },
 ];
 const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };

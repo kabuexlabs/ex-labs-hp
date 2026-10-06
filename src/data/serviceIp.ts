@@ -159,6 +159,7 @@ export const IP_SERVICE = {
   cta: { title: ['IPを活用した企画を', '相談する（無料）'], label: 'IPを活用した企画を相談する', note: '予算・企画内容が未定の段階でもご相談いただけます。' },
   guides: [
     { href: '/guide/ip-event/', label: 'IP・キャラクターの体験型イベント制作（企画・監修・運営の進め方）' },
+    { href: '/guide/ip-multi-site/', label: 'IPを活用した体験型イベントの全国・複数施設展開' },
     { href: '/guide/event-kikakusho/', label: '体験型イベントの企画書の作り方' },
     { href: '/guide/immersive-cost/', label: 'イマーシブ制作の費用相場' },
     { href: '/guide/case-uwasabanashi/', label: '渋谷サクラステージの制作事例' },
