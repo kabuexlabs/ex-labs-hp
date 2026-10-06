@@ -209,7 +209,7 @@ const videoLd = {
   </footer>
 
   <a href="/uwasabanashi/kotohogi/" class="now-btn" data-track="show" data-show="kotohogi" data-place="iinkai-float" aria-label="現在実施中のイベントへ（case2『言祝ぎの家-呪われた花嫁-』）">
-    <span class="now-en">NOW ON</span>
+    <span class="now-en"><span class="now-dot"></span>NOW ON</span>
     <span class="now-ja">現在実施中の<br>イベントへ</span>
     <span class="now-arrow" aria-hidden="true">→</span>
   </a>
@@ -325,13 +325,21 @@ a:hover{color:#f4f0f3}
 .ftr-note a:hover{color:#f4f0f3}
 .ftr small{font-size:11px;letter-spacing:0.12em;color:#bdb3bb}
 
-.ftr{padding-bottom:132px}
-/* 右下固定：現在実施中のイベント（case2 LP）へ */
-.now-btn{position:fixed;right:max(14px,calc(50vw - 240px + 14px));bottom:calc(16px + env(safe-area-inset-bottom));z-index:90;width:96px;height:96px;border-radius:50%;background:#d646cd;color:#0d0b0e;display:grid;place-content:center;justify-items:center;gap:2px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.55);outline:1px solid rgba(13,11,14,0.6);outline-offset:-6px;transition:background 0.2s,transform 0.2s}
-.now-btn:hover{background:#f4f0f3;color:#0d0b0e;transform:translateY(-2px)}
-.now-en{font-family:'Bodoni Moda',serif;font-style:italic;font-weight:700;font-size:11px;letter-spacing:0.12em;line-height:1}
-.now-ja{font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:12px;line-height:1.35;letter-spacing:0.02em}
-.now-arrow{font-family:'Bodoni Moda',serif;font-size:14px;line-height:1}
+.ftr{padding-bottom:150px}
+/* 右下固定：現在実施中のイベント（case2 LP）へ。脈打つ光の輪＋白フチで目立たせる */
+.now-btn{position:fixed;right:max(14px,calc(50vw - 240px + 14px));bottom:calc(16px + env(safe-area-inset-bottom));z-index:90;width:118px;height:118px;border-radius:50%;background:#d646cd;color:#0d0b0e;display:grid;place-content:center;justify-items:center;gap:4px;text-align:center;border:2px solid #f4f0f3;box-shadow:0 0 0 4px rgba(13,11,14,0.85),0 0 28px 6px rgba(214,70,205,0.75),0 10px 28px rgba(0,0,0,0.6);transition:background 0.2s,transform 0.2s;animation:now-bob 2.4s ease-in-out infinite}
+.now-btn::before,.now-btn::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid #d646cd;pointer-events:none;animation:now-ring 2s ease-out infinite}
+.now-btn::after{animation-delay:1s}
+.now-btn:hover{background:#f4f0f3;color:#0d0b0e;transform:scale(1.06);animation-play-state:paused}
+.now-en{display:flex;align-items:center;gap:5px;background:#0d0b0e;color:#f4f0f3;font-family:'Bodoni Moda',serif;font-style:italic;font-weight:700;font-size:11px;letter-spacing:0.14em;line-height:1;padding:3px 7px 4px}
+.now-dot{width:6px;height:6px;border-radius:50%;background:#ff3b6b;box-shadow:0 0 6px #ff3b6b;animation:now-blink 1s steps(2,start) infinite}
+.now-ja{font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:14px;line-height:1.3;letter-spacing:0.02em}
+.now-arrow{font-family:'Bodoni Moda',serif;font-weight:700;font-size:18px;line-height:1;animation:now-arrow 1.2s ease-in-out infinite}
+@keyframes now-ring{0%{transform:scale(1);opacity:0.9}100%{transform:scale(1.45);opacity:0}}
+@keyframes now-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes now-blink{to{visibility:hidden}}
+@keyframes now-arrow{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){.now-btn,.now-btn::before,.now-btn::after,.now-dot,.now-arrow{animation:none}.now-btn::before,.now-btn::after{display:none}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 </body>
