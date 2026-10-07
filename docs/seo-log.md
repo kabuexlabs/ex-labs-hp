@@ -1275,3 +1275,11 @@
 - P2：/guide/botsunyukan/ に体験デート・東京イマーシブへの導線を1行追加（他の解説記事は参加先・制作サービスへの導線が実装済み）。
 - 計測：GA4 はコーポレート側に未設定。既存の自社計測（/api/track）が予約リンク（ticket）・検索（ev-search）・0件（ev-zero）・法人CTA（cta）・フォーム表示（view）・送信成功（submit、サーバー側）を記録済みのため追加なし。
 - 確認待ち：頭脳戦の2人対戦・短時間ゲームの対応可否、他社公演の掲載（escape.id 等。作業環境から到達不可）、icci・Artbar の公式予約URL、FACTROOM の1枚あたり人数・相席／貸切、case2 の所要時間・税区分、東京の頭脳戦体験記事（参加先が自社以外で確認できないため保留）。
+
+## 2026-10-07 Event 構造化データ「offers がありません」対応
+
+- Search Console の警告（イベント：項目「offers」がありません）に対応。
+- /events/[slug]/：全公演回に offers を常時出力（グループ料金は AggregateOffer、それ以外は Offer＋価格）。availability は販売状況が分かる場合のみ。所在地の addressRegion を会場の地域から出すよう修正（埼玉公演が東京都になっていた）。
+- /uwasabanashi/：offers を常時出力（終了後は SoldOut）。
+- /gensou/：subEvent 12件に offers（個別3,500円／グループ14,000円、LP記載の価格）と会場住所を追加。予約URL未定の間は LP のチケット欄を url とする。
+- 確認：ローカルビルドで Event を含む全ページの offers 欠落 0 件。公開後 Search Console で「修正を検証」を実行する。

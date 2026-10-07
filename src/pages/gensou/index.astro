@@ -105,6 +105,16 @@ const faqs = [
   { q: '荷物を預けられますか？', a: '荷物のお預かりはできません。大きな荷物を持たずにお越しください。' },
 ];
 
+// 販売開始前は予約URLが無いため、LP（チケット欄）を販売情報の URL とする
+const ticketOffers = [
+  { '@type': 'Offer', name: '個別チケット', price: '3500', priceCurrency: 'JPY', url: RESERVE_URL ?? `${canonical}#ticket` },
+  { '@type': 'Offer', name: 'グループチケット（最大4名貸切）', price: '14000', priceCurrency: 'JPY', url: RESERVE_URL ?? `${canonical}#ticket` },
+];
+const venueLd = {
+  '@type': 'Place',
+  name: '夢の島熱帯植物館',
+  address: { '@type': 'PostalAddress', streetAddress: '夢の島2-1-2', addressLocality: '江東区', addressRegion: '東京都', postalCode: '136-0081', addressCountry: 'JP' },
+};
 const eventLd = {
   '@context': 'https://schema.org',
   '@type': 'EventSeries',
@@ -117,11 +127,7 @@ const eventLd = {
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
   eventStatus: 'https://schema.org/EventScheduled',
   typicalAgeRange: '18-',
-  location: {
-    '@type': 'Place',
-    name: '夢の島熱帯植物館',
-    address: { '@type': 'PostalAddress', streetAddress: '夢の島2-1-2', addressLocality: '江東区', addressRegion: '東京都', postalCode: '136-0081', addressCountry: 'JP' },
-  },
+  location: venueLd,
   subEvent: dates.map((d) => ({
     '@type': 'Event',
     name: '午前零時の幻想集 第一夜「草陰の夢」',
@@ -129,12 +135,10 @@ const eventLd = {
     endDate: `${d}T20:50:00+09:00`,
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     eventStatus: 'https://schema.org/EventScheduled',
-    location: { '@type': 'Place', name: '夢の島熱帯植物館' },
+    location: venueLd,
+    offers: ticketOffers,
   })),
-  offers: [
-    { '@type': 'Offer', name: '個別チケット', price: '3500', priceCurrency: 'JPY', ...(RESERVE_URL ? { url: RESERVE_URL } : {}) },
-    { '@type': 'Offer', name: 'グループチケット（最大4名貸切）', price: '14000', priceCurrency: 'JPY', ...(RESERVE_URL ? { url: RESERVE_URL } : {}) },
-  ],
+  offers: ticketOffers,
   organizer: { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' },
 };
 const faqLd = {

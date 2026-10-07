@@ -42,6 +42,7 @@ const ppList = work.price.unit === 'per-group' && work.price.tiers ? work.price.
 const title = `${work.title}｜開催日程・料金・予約先（${areaText}） - 株式会社ex Labs`;
 const desc = `${work.title}（${work.genres.map(genreName).join('・')}、${areaText}）の開催日程・料金・申込人数・参加条件と公式予約ページ。${isOver ? 'この公演は終了しました。' : '開催・販売・空席の確認状況を分けて掲載しています。'}${own ? '株式会社ex Labs が企画・制作。' : ''}`.slice(0, 158);
 
+const REGION_PREF: Record<string, string> = { tokyo: '東京都', saitama: '埼玉県' };
 const eventLd = upcoming.concat(cancelled).map((r) => {
   const o = r.occ;
   const v = r.venue;
@@ -54,19 +55,25 @@ const eventLd = upcoming.concat(cancelled).map((r) => {
     ...(o.endTime ? { endDate: `${o.date}T${o.endTime}:00+09:00` } : {}),
     eventStatus: o.eventStatus === 'cancelled' ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled',
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-    location: { '@type': 'Place', name: v.name, ...(v.address ? { address: v.address } : { address: { '@type': 'PostalAddress', addressRegion: '東京都', addressCountry: 'JP' } }) },
+    location: { '@type': 'Place', name: v.name, ...(v.address ? { address: v.address } : { address: { '@type': 'PostalAddress', ...(REGION_PREF[v.regionId] ? { addressRegion: REGION_PREF[v.regionId] } : {}), ...(v.areaId === 'saitama-city' ? { addressLocality: 'さいたま市' } : {}), addressCountry: 'JP' } }) },
     organizer: { '@type': 'Organization', name: organizer.name, ...(organizer.url ? { url: organizer.url } : {}) },
     url: new URL(`/events/${work.slug}/`, site).toString(),
     inLanguage: 'ja',
   };
-  // 受付中と確認できた回だけ offers を付ける。空席は確認済みの場合のみ availability を出す
-  if (r.salesState === 'open' && o.sales.channels[0]) {
-    const offer: Record<string, unknown> = { '@type': 'Offer', url: o.sales.channels[0].url, priceCurrency: 'JPY', validFrom: o.sales.checkedAt };
-    if (work.price.unit === 'per-person' && work.price.amount !== undefined) offer.price = work.price.amount;
-    if (r.seatState === 'available') offer.availability = 'https://schema.org/InStock';
-    if (r.seatState === 'soldout') offer.availability = 'https://schema.org/SoldOut';
-    ld.offers = offer;
+  // offers は全回に付ける（料金と公式の販売ページ）。予約可能かどうかは availability で表し、
+  // 確認できた場合だけ入れる（受付中かつ空席あり＝InStock、満席＝SoldOut）。未確認のときは availability を省く（2026-10-08 Search Console「offers がありません」対応）
+  const offerUrl = o.sales.channels[0]?.url ?? work.ticketUrl ?? new URL(work.officialUrl, site).toString();
+  const offer: Record<string, unknown> = { url: offerUrl, priceCurrency: 'JPY', ...(o.sales.checkedAt ? { validFrom: o.sales.checkedAt } : {}) };
+  const tiers = work.price.unit === 'per-group' ? (work.price.tiers ?? []).map((t) => t.amount) : [];
+  if (tiers.length) Object.assign(offer, { '@type': 'AggregateOffer', lowPrice: Math.min(...tiers), highPrice: Math.max(...tiers), offerCount: tiers.length });
+  else {
+    offer['@type'] = 'Offer';
+    const amt = work.price.amount ?? (Number((/([\d,]+)/.exec(work.price.text)?.[1] ?? '').replace(/,/g, '')) || undefined);
+    if (amt !== undefined) offer.price = amt;
   }
+  if (r.seatState === 'soldout') offer.availability = 'https://schema.org/SoldOut';
+  else if (r.salesState === 'open' && r.seatState === 'available') offer.availability = 'https://schema.org/InStock';
+  ld.offers = offer;
   return ld;
 });
 ---

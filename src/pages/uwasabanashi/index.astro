@@ -64,13 +64,14 @@ const eventLd = {
       addressCountry: 'JP',
     },
   },
-  ...(ended ? {} : { offers: {
+  // 終了後も offers は残し、完売（2026-10-05 主催からの連絡）として示す（Search Console「offers がありません」対応）
+  offers: {
     '@type': 'Offer',
     price: '4000',
     priceCurrency: 'JPY',
     url: 'https://escape.id/uwasabanashi-org/e-case1/',
-    availability: 'https://schema.org/InStock',
-  } }),
+    availability: ended ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
+  },
   organizer: {
     '@type': 'Organization',
     name: '株式会社ex Labs',
