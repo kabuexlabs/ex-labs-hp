@@ -4,6 +4,7 @@ import SiteGuard from '../../../components/SiteGuard.astro';
 // 参考：ChatGPT で試作された shinrinkai-members-karma.pasohige613.chatgpt.site（ユーザー提供のスマホ画面）を移植。
 // パンフレット（グッズ）購入者向けの限定ページ：noindex, nofollow。sitemap・llms.txt・他ページからはリンクしない。
 // ヒーローの彼岸花は元ページの写真が手元にないため SVG で描いた仮のもの（写真が届いたら差し替える）。
+// 裏設定資料・特別肖像集の閲覧先（パスワード付き）は未受領。archive の href に入れると赤枠ボタンがそのリンクになる。
 
 const site = 'https://kabuexlabs.com';
 const canonical = `${site}/karma/shinrinkai/`;
@@ -17,10 +18,22 @@ const tenets = [
   { n: '三', h: 'いつでも、離れてよいこと', p: 'ここは、閉じ込める場所ではありません。必要がなくなったなら、いつでも離れてください。' },
 ];
 
-// 会員限定書庫。href が空のものは「ただいま準備中」表示。
+// 会員限定書庫。
+//  ready: false … 「ただいま準備中」の枠だけ表示（押せない）
+//  ready: true  … 赤枠の「〜をひらく」ボタン＋「購入者限定・パスワードが必要です」。
+//                 href（パスワード付きの閲覧先）が空の間は、押すと「準備中」のお知らせを出す。
 const archive = [
-  { en: 'COMMENTARY', h: '解説', p: '作品をより深く読むために。', href: '', label: 'ただいま準備中' },
-  { en: 'BEHIND THE STORY', h: '裏設定資料', p: '物語の奥にある記録。', href: '', label: 'ただいま準備中' },
+  { en: 'COMMENTARY', h: '解説', p: '作品をより深く読むために。', ready: false, href: '', label: 'ただいま準備中' },
+  { en: 'BEHIND THE STORY', h: '裏設定資料', p: '物語の奥にある記録。', ready: true, href: '', label: '裏設定資料をひらく' },
+  { en: 'PORTRAIT COLLECTION', h: '特別肖像集', p: 'デジタルブロマイドのコレクション。', ready: true, href: '', label: '特別肖像集をひらく' },
+];
+
+// 活動のご案内（作品世界の設定）
+const activities = [
+  { h: '定例講話', lines: ['毎週日曜　14:00〜16:00', '本部施設 2階講堂'], note: '参加無料・予約不要' },
+  { h: '浄心講座', lines: ['月2回開催（第2・第4土曜）', 'カルマの読み解き方を、実践的に学びます。'], note: '参加費　8,000円' },
+  { h: '心澄合宿', lines: ['年4回・3泊4日', '日常から離れ、自らの魂と深く向き合う時間です。'], note: '参加費　120,000円' },
+  { h: '個別面談', lines: ['随時受付', '導師が、あなたのお話を伺います。'], note: 'あなたのペースで' },
 ];
 
 // ヒーローの彼岸花（決定的な疑似乱数で花弁と雄しべの曲線を生成）
@@ -150,24 +163,63 @@ const flowers = [lily(380, 300, 230, 7), lily(330, 720, 200, 23)];
         <p class="eyebrow">{c.en}</p>
         <h3 class="card-h">{c.h}</h3>
         <p class="card-p">{c.p}</p>
-        {c.href
-          ? <a class="btn-red btn-card" href={c.href}>{c.label}</a>
-          : <span class="btn-wait" aria-disabled="true">{c.label}</span>}
+        {!c.ready && <span class="btn-wait" aria-disabled="true">{c.label}</span>}
+        {c.ready && (c.href
+          ? <a class="btn-red btn-card" href={c.href} target="_blank" rel="noopener">{c.label}</a>
+          : <button class="btn-red btn-card" type="button" data-pending>{c.label}</button>)}
+        {c.ready && <p class="card-note">購入者限定・パスワードが必要です</p>}
       </article>
     ))}
   </div>
+  <p class="archive-foot">特典コンテンツの転載・再配布はご遠慮ください。</p>
 </section>
 
 <section class="sec sec-line" id="activities">
-  {/* 後半（活動のご案内 以降）はユーザー提供のスクリーンショット待ち */}
+  <div class="sec-head"><span class="sec-num">04</span><span class="sec-name">活動のご案内</span><span class="sec-rule"></span></div>
+  <h2 class="sec-h2">魂と向き合う時間。</h2>
+  <p class="act-lead">まずは一度、お話を聞きにいらしてください。</p>
+  <ul class="acts">
+    {activities.map((a) => (
+      <li class="act">
+        <h3 class="act-h">{a.h}</h3>
+        <p class="act-p">{a.lines.map((l, i) => <>{i > 0 && <br />}{l}</>)}</p>
+        <p class="act-note">{a.note}</p>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<section class="closing">
+  <p class="closing-h">あなたの魂に、<br>耳を澄ませて。</p>
+  <a class="closing-link" href="#archive">会員限定書庫</a>
 </section>
 
 </main>
 
 <footer class="ftr">
-  <p class="ftr-logo">真凜会<span>SHINRINKAI</span></p>
-  <p class="ftr-note">※本ページは体験型取調室 FACT ROOM「<a href="/karma/">臓腑、或いはカルマ</a>」の劇中に登場する架空の団体のページです。実在の人物・団体・事件とは無関係です。</p>
+  <div class="ftr-row">
+    <p class="ftr-logo">真凜会<span>SHINRINKAI</span></p>
+    <p class="ftr-copy">© 取調室カルマ</p>
+  </div>
+  <p class="ftr-note">『取調室カルマ』グッズ購入特典サイト<br>本サイトの教団・活動案内は作品世界の設定です。</p>
 </footer>
+
+<dialog class="pending" id="pending">
+  <p class="pending-p">ただいま公開の準備中です。<br>公開まで、いましばらくお待ちください。</p>
+  <button class="btn-wait pending-close" type="button">閉じる</button>
+</dialog>
+
+<script is:inline>
+(function () {
+  var dlg = document.getElementById('pending');
+  if (!dlg || typeof dlg.showModal !== 'function') return;
+  document.querySelectorAll('[data-pending]').forEach(function (b) {
+    b.addEventListener('click', function () { dlg.showModal(); });
+  });
+  dlg.querySelector('.pending-close').addEventListener('click', function () { dlg.close(); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+})();
+</script>
 
 <style is:global>
 :root{--bg:#121212;--bg2:#1b1b1b;--ink:#ece6dc;--dim:#a8a19a;--mute:#7c7670;--red:#b23a30;--red-soft:#c9705f;--pink:#c98d80;--rule:rgba(236,230,220,.14)}
@@ -186,7 +238,7 @@ h1,h2,h3{font-weight:400}
 .nav{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px 18px;font-size:14px;letter-spacing:.14em}
 .nav a{padding:4px 0 6px;border-bottom:1px solid transparent;transition:color .2s}
 .nav a:hover{color:var(--pink)}
-.nav a.is-current{border-bottom-color:var(--red)}
+.nav a.is-current{border-bottom:2px solid #c3332b;padding-bottom:5px}
 
 /* ヒーロー */
 .hero{position:relative;overflow:hidden;min-height:min(130vw,820px);padding:clamp(120px,30vw,200px) clamp(24px,6vw,64px) 40px;display:flex;flex-direction:column;justify-content:space-between;background:
@@ -211,7 +263,7 @@ h1,h2,h3{font-weight:400}
 .sec-head{display:flex;align-items:center;gap:clamp(22px,6vw,36px);margin-bottom:clamp(44px,9vw,64px)}
 .sec-num{font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:.12em;color:var(--red-soft);font-weight:600}
 .sec-name{font-size:clamp(17px,4.2vw,20px);letter-spacing:.3em;color:#cfc8be}
-.sec-rule{width:clamp(60px,17vw,110px);height:1px;background:var(--red)}
+.sec-rule{width:clamp(60px,17vw,110px);height:2px;background:#b52f28}
 .sec-h2{font-size:clamp(28px,7vw,40px);line-height:1.7;letter-spacing:.16em;color:#f3eee6;margin-bottom:clamp(36px,8vw,52px)}
 .prose{display:flex;flex-direction:column;gap:2.2em;font-size:clamp(15px,3.9vw,17px);line-height:2.3;letter-spacing:.08em;color:#e4ddd3}
 .prose-dim{color:var(--dim)}
@@ -242,14 +294,39 @@ h1,h2,h3{font-weight:400}
 .btn-wait{display:inline-block;border:1px solid rgba(236,230,220,.25);padding:14px clamp(26px,7vw,40px);font-size:clamp(14px,3.6vw,16px);letter-spacing:.2em;color:var(--dim)}
 .btn-card{padding:14px clamp(26px,7vw,40px)}
 
-#activities:empty{display:none}
+button.btn-red{font:inherit;color:inherit;cursor:pointer}
+.btn-card{background:#2c1d1b;font-size:clamp(15px,3.9vw,17px)}
+.card-note{margin-top:22px;font-size:clamp(13px,3.3vw,15px);letter-spacing:.04em;color:var(--dim)}
+.archive-foot{margin-top:clamp(40px,8vw,56px);font-size:clamp(14px,3.6vw,16px);letter-spacing:.04em;color:var(--dim)}
+
+/* 活動のご案内 */
+.act-lead{font-size:clamp(15px,3.9vw,17px);line-height:2.3;color:var(--dim);margin-bottom:clamp(40px,9vw,56px)}
+.acts{list-style:none;padding:0;margin:0;border-top:1px solid var(--rule)}
+.act{padding:clamp(36px,8vw,48px) 0;border-bottom:1px solid var(--rule)}
+.act:last-child{border-bottom:0}
+.act-h{font-size:clamp(24px,6vw,30px);letter-spacing:.04em;margin-bottom:22px;color:#f3eee6}
+.act-p{font-size:clamp(15px,3.9vw,17px);line-height:2.2;letter-spacing:.04em;color:var(--dim)}
+.act-note{margin-top:14px;font-size:clamp(15px,3.9vw,17px);letter-spacing:.04em;color:var(--pink)}
+
+/* 結び */
+.closing{border-top:1px solid var(--rule);padding:clamp(120px,30vw,180px) 24px;text-align:center}
+.closing-h{font-size:clamp(28px,7.2vw,40px);line-height:2;letter-spacing:.3em;margin-right:-.3em;color:#f3eee6}
+.closing-link{display:inline-block;margin-top:clamp(40px,9vw,56px);padding-bottom:8px;border-bottom:2px solid #c3332b;font-size:clamp(15px,3.9vw,17px);letter-spacing:.08em}
+.closing-link:hover{color:var(--pink)}
 
 /* フッター */
-.ftr{border-top:1px solid var(--rule);padding:56px clamp(24px,6vw,64px) 64px;text-align:center}
-.ftr-logo{font-size:22px;letter-spacing:.5em;margin-right:-.5em;display:flex;flex-direction:column;align-items:center;gap:4px}
-.ftr-logo span{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.32em;margin-right:-.32em}
-.ftr-note{margin-top:28px;font-size:11px;line-height:2;letter-spacing:.06em;color:var(--mute)}
-.ftr-note a{text-decoration:underline;text-underline-offset:3px}
+.ftr{border-top:1px solid var(--rule);padding:clamp(40px,9vw,56px) clamp(24px,6vw,64px) 72px}
+.ftr-row{display:flex;justify-content:space-between;align-items:center;gap:20px}
+.ftr-logo{font-size:clamp(26px,6.4vw,32px);font-weight:500;letter-spacing:.62em;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.3}
+.ftr-logo span{font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.32em;font-weight:500}
+.ftr-copy{font-size:clamp(13px,3.3vw,15px);letter-spacing:.06em;color:var(--dim)}
+.ftr-note{margin-top:clamp(40px,9vw,56px);font-size:clamp(13px,3.3vw,15px);line-height:2.1;letter-spacing:.04em;color:var(--dim)}
+
+/* 準備中のお知らせ */
+.pending{background:var(--bg2);color:var(--ink);border:1px solid rgba(236,230,220,.2);padding:36px 28px;max-width:420px;width:calc(100% - 48px);box-sizing:border-box;text-align:center;font-family:inherit}
+.pending::backdrop{background:rgba(0,0,0,.7)}
+.pending-p{font-size:15px;line-height:2.1;margin-bottom:24px}
+.pending-close{font:inherit;color:var(--dim);background:none;cursor:pointer}
 
 @media (min-width:760px){
 .hdr{align-items:center}
