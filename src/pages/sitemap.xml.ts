@@ -140,6 +140,7 @@ export const GET: APIRoute = async ({ site }) => {
   // 2026-10-03 追加：IPイベント企画・制作の相談ページ、今週末に遊べる体験
   urls.push({ loc: new URL('/services/ip-event/', base).toString(), lastmod: '2026-10-03' }, { loc: new URL('/outing/', base).toString(), lastmod: '2026-10-03' });
   urls.push({ loc: new URL('/guide/ip-multi-site/', base).toString(), lastmod: '2026-10-05' });
+  urls.push({ loc: new URL('/guide/shopping-mall-couple-event/', base).toString(), lastmod: '2026-10-07' });
   for (const [p, ok] of [['/guide/tokyo-holiday/', true], ['/guide/tokyo-before-dating/', true], ['/guide/tokyo-night-date/', NIGHT_PUBLISHED], ['/guide/tokyo-christmas-date/', XMAS_PUBLISHED]] as const) {
     if (ok) urls.push({ loc: new URL(p, base).toString(), lastmod: '2026-10-01' });
   }

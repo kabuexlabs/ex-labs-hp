@@ -18,6 +18,7 @@ import { jstDateString } from '../lib/thisWeek';
 const todayJst = jstDateString(new Date());
 const lastDateOf = (workId: string, fallback?: string) => eventsData.occurrences.filter((o) => o.workId === workId && o.published && o.eventStatus !== 'cancelled').map((o) => o.date).sort().pop() ?? eventsData.works.find((w) => w.id === workId)?.period?.to ?? fallback;
 // soldout: true で「完売」を表示（主催からの連絡で設定。公演データ src/data/events/occurrences.ts の空席状態も同じにする）
+const firstDateOf = (workId: string, fallback: string) => eventsData.occurrences.filter((o) => o.workId === workId && o.published && o.eventStatus !== 'cancelled').map((o) => o.date).sort()[0] ?? fallback;
 const allEvents: { title: string; host: string; place: string; desc: string; url: string; img: string; w: number; h: number; until?: string; soldout?: boolean; from?: string; period?: string }[] = [
   // from（初日）が未来のものは「近日公開」枠に出し、初日になったら自動で「現在実施中」へ移る
   {
@@ -35,12 +36,15 @@ const allEvents: { title: string; host: string; place: string; desc: string; url
   {
     title: 'ウワサバナシ調査委員会 case2「言祝ぎの家 -呪われた花嫁-」',
     host: 'ex Labs主催',
-    place: 'さいたま市内の一軒家',
+    place: '埼玉県さいたま市（東京近郊）の一軒家',
     desc: '祝いの席に、\u200b招かれる。\u200b実際の一軒家を探索し、\u200b住人との会話や調査報告を通じて\u200b真相に迫る\u200bイマーシブホラー・ミステリー。',
     url: 'https://escape.id/uwasabanashi-org/e-hanayome/',
     img: '/assets/events/uwasabanashi-case2-kv.webp',
     w: 880, h: 1245,
-    until: '2026-11-03',
+    // 開催日は公演データ（src/data/events/occurrences.ts）から。初日までは「開催予定」枠に出る
+    from: firstDateOf('kotohogi', '2026-10-23'),
+    until: lastDateOf('kotohogi', '2026-11-03'),
+    period: '2026年10月23日〜11月3日の指定日',
   },
   {
     title: 'ウワサバナシ調査委員会 case1',
@@ -75,7 +79,7 @@ const allEvents: { title: string; host: string; place: string; desc: string; url
     until: '2026-08-31', // 全公演終了（制作事例に記載）
   },
 ];
-const upcomingEvents = allEvents.filter((e) => e.from && e.from > todayJst);
+const upcomingEvents = allEvents.filter((e) => e.from && e.from > todayJst).sort((a, b) => (a.from ?? "").localeCompare(b.from ?? ""));
 const liveEvents = allEvents.filter((e) => (!e.until || e.until >= todayJst) && !upcomingEvents.includes(e));
 const endedEvents = allEvents.filter((e) => e.until && e.until < todayJst);
 
@@ -236,14 +240,14 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
     </div>
     {upcomingEvents.length > 0 && (
       <div class="xt-soon">
-        <p class="xt-soon-h"><span>Coming Soon</span>近日公開</p>
+        <p class="xt-soon-h"><span>Coming Soon</span>開催予定・近日公開</p>
         <div class="x-hscroll" style="margin-top:20px;gap:20px">
           {upcomingEvents.map((e) => (
             <a href={e.url} class="xt-ev" data-track="show" data-show={e.url.split('/').filter(Boolean).pop()} data-place="home-soon">
               <img src={e.img} alt={e.title} width={e.w} height={e.h} loading="lazy" decoding="async">
               <div>
                 <p class="xt-ev-org"><span class="x-bl">{e.host}</span><span class="x-bl">開催地：{e.place}</span></p>
-                <p class="xt-ev-so is-soon">近日公開｜{e.period}</p>
+                <p class="xt-ev-so is-soon">開催予定｜{e.period}</p>
                 <h3 class="xt-ev-t">{e.title} ↗</h3>
                 <p class="xt-ev-d"><Cls text={e.desc.replace(/\u200b/g, '')} emph={false} /></p>
               </div>

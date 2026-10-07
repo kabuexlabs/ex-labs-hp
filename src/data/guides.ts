@@ -32,6 +32,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/tokyo-experience-date.webp',
   }] : []),
   {
+    href: '/guide/shopping-mall-couple-event/',
+    title: '商業施設のカップル集客｜体験型イベントの企画と導入条件',
+    desc: '二人で会話・協力する体験形式の比較、必要なスペースと運営、飲食・物販への導線、費用を左右する条件、効果測定、向いている条件と向かない条件。',
+    date: '2026-10-07',
+    category: 'shisetsu',
+    thumb: '/assets/guide/shopping-mall-couple-event.webp',
+  },
+  {
     href: '/guide/ip-multi-site/',
     title: 'IPを活用した体験型イベントの全国・複数施設展開｜企画・施設調整・運営・効果測定',
     desc: '共通化する部分と施設ごとの調整、IP側・施設側・制作会社の役割分担、受託・レベニューシェア・併用で決める経済条件、効果測定の指標、小規模実証からの広げ方。',

@@ -38,6 +38,7 @@ const PARTIES = [{ k: '2', label: '2人', n: 2 }, { k: 'group', label: '友達�
 const partyK = PARTIES.find((p) => p.k === q.get('party'))?.k ?? '2';
 const n = PARTIES.find((p) => p.k === partyK)!.n;
 const WANTS = [
+  { k: 'talk', label: '会話を楽しみたい' },
   { k: 'story', label: '物語に入りたい' },
   { k: 'pair', label: '協力して解きたい' },
   { k: 'craft', label: '作って残したい' },
@@ -76,6 +77,7 @@ const nightIds = new Set<string>([...nightOwnWorkIds, ...NIGHT_INFO.filter((x) =
 const isNight = (o: Outing) => nightIds.has(o.id) || slotsFor(o).some((s) => s.start.slice(11, 16) >= '17:00');
 const wantOk = (o: Outing) =>
   !want ? true
+  : want === 'talk' ? o.talk === 'cast' || o.talk === 'group'
   : want === 'story' ? o.kind === 'story'
   : want === 'pair' ? o.talk === 'pair' || (o.kind === 'story' && o.strangers === false)
   : want === 'craft' ? o.kind === 'craft' || o.kind === 'art'
@@ -187,7 +189,7 @@ const BUDGETS = n === 1 ? [3000, 5000, 8000] : n === 2 ? [5000, 10000, 20000] : 
     <div class="og-cards">
       {matched.map(({ o, a }) => (
         <article class="og-card" data-cmp={cmpData(o, a)}>
-          <p class="og-kind">{KIND_LABEL[o.kind]}{o.own && o.ownLabel ? `｜${o.ownLabel}` : ''}</p>
+          <p class="og-kind">{KIND_LABEL[o.kind]}｜{o.own ? (o.ownLabel ?? '株式会社ex Labs制作') : '他社運営（公式情報をもとに掲載）'}</p>
           <h3 class="og-name">{o.name}</h3>
           <p class="og-what">{o.what}</p>
           <p class={`og-avail is-${a.state}`}>{a.text}</p>
@@ -202,7 +204,7 @@ const BUDGETS = n === 1 ? [3000, 5000, 8000] : n === 2 ? [5000, 10000, 20000] : 
           </dl>
           {checkedText(o) && <p class="og-checked">{checkedText(o)}</p>}
           <div class="og-act">
-            {o.reserveHref && <a class="og-btn" href={o.reserveHref} target={/^https?:/.test(o.reserveHref) ? '_blank' : undefined} rel={/^https?:/.test(o.reserveHref) ? (o.own ? 'noopener' : 'noopener nofollow') : undefined} data-track={o.own ? 'ticket' : 'ev-ext'} data-show={o.id} data-place="outing-card">{o.kind === 'madamis' ? '公式LINEで日程を相談' : '公式サイトで空席を確認'}{/^https?:/.test(o.reserveHref) ? ' ↗' : ' →'}</a>}
+            {o.reserveHref && <a class="og-btn" href={o.reserveHref} target={/^https?:/.test(o.reserveHref) ? '_blank' : undefined} rel={/^https?:/.test(o.reserveHref) ? (o.own ? 'noopener' : 'noopener nofollow') : undefined} data-track={o.own ? 'ticket' : 'ev-ext'} data-show={o.id} data-place="outing-card">{o.kind === 'madamis' ? '公式LINEで日程を相談' : '公式サイトで日程・空席を見る'}{/^https?:/.test(o.reserveHref) ? ' ↗' : ' →'}</a>}
             <a class="og-more" href={o.detailHref} data-track="show" data-show={o.id} data-place="outing-detail">内容を見る →</a>
             <label class="og-cmp"><input type="checkbox" data-cmp-toggle>比較に追加</label>
           </div>
@@ -210,7 +212,7 @@ const BUDGETS = n === 1 ? [3000, 5000, 8000] : n === 2 ? [5000, 10000, 20000] : 
       ))}
     </div>
   ) : (
-    <p class="og-empty">この条件に合う体験は見つかりませんでした。日付や「何をしたい」を変えるか、下の「別の日なら」をご覧ください。</p>
+    <div class="og-empty"><p style="margin:0">この条件で確認できた開催情報はありません。</p><p style="margin:8px 0 0;font-size:14px">日付や条件を変えるか、下の「別の日なら」をご覧ください。</p><p class="og-empty-a"><a href={`/outing/?when=any&party=${partyK}#results`}>2週間以内で探す</a><a href="/outing/#results">条件をリセット</a><a href="/events/">公演の日程から探す（公演を探す）</a></p></div>
   )}
 
   <div class="og-cmpbar" id="og-cmpbar" hidden>
@@ -343,6 +345,8 @@ const BUDGETS = n === 1 ? [3000, 5000, 8000] : n === 2 ? [5000, 10000, 20000] : 
 .og-more{padding:8px 0;font-size:13.5px;font-weight:700;color:var(--x-blue)!important;border-bottom:1px solid currentColor}
 .og-cmp{display:inline-flex;align-items:center;gap:6px;min-height:44px;font-size:13px;color:rgba(11,11,20,.7);cursor:pointer}
 .og-cmp input{width:18px;height:18px}
+.og-empty-a{margin:12px 0 0;display:flex;flex-wrap:wrap;gap:8px 18px}
+.og-empty-a a{display:inline-block;padding:8px 0;font-weight:700;color:#fff;border-bottom:1px solid currentColor}
 .og-empty{margin:22px 0 0;padding:18px;border:1px dashed rgba(255,255,255,.5);line-height:1.8}
 .og-cmpbar{position:sticky;bottom:12px;z-index:5;margin:20px auto 0;max-width:560px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--x-ink);border:1px solid var(--x-lime);padding:10px 12px 10px 16px}
 .og-cmpbar[hidden],.og-cmpbox[hidden]{display:none}

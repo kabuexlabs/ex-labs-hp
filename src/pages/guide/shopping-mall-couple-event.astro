@@ -1,0 +1,176 @@
+---
+// 商業施設のカップル集客｜体験型イベントの企画と導入条件（2026-10-07 追加）。
+// 役割：商業施設の販促・企画担当が、カップル・二人連れの来館を狙った体験型イベントを導入するかを判断する材料。
+// 既存の /guide/shogyoshisetsu-event/（集客イベント全般のアイデア）と重ならないよう、対象を二人連れに絞り、
+// 体験形式の比較・必要スペースと運営・飲食物販への導線・費用条件・効果測定を扱う。
+// 実績は /works/ に公開済みのものだけで、カップル向けに限定した実績ではないことを明記する。企画例は企画例と書く。
+export const prerender = false;
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import RevShareCallout from '../../components/RevShareCallout.astro';
+import B2BNext from '../../components/guide/B2BNext.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/shopping-mall-couple-event/', site).toString();
+const title = '商業施設のカップル集客｜体験型イベントの企画と導入条件';
+const desc = '商業施設でカップル・二人連れの来館を増やす体験型イベントの考え方。二人で会話・協力する体験形式の比較、必要なスペースと運営、飲食・物販への導線、費用を左右する条件、効果測定、向いている条件と向かない条件を、商業施設でのイマーシブ制作実績がある株式会社ex Labsが整理します。';
+const toc = [
+  { id: 'target', label: '対象客と施設の課題' },
+  { id: 'formats', label: '二人で楽しむ体験形式の比較' },
+  { id: 'space', label: '必要なスペースと運営' },
+  { id: 'route', label: '飲食・物販への導線' },
+  { id: 'cost', label: '費用を左右する条件' },
+  { id: 'track', label: '商業施設での公開実績' },
+  { id: 'measure', label: '効果測定' },
+  { id: 'fit', label: '向いている条件・向かない条件' },
+];
+const faqs = [
+  { q: 'カップル向けにすると、一人客や友人グループは参加しにくくなりませんか？', a: '二人で参加しやすい設計にしても、申込を二人組に限定する必要はありません。一人でも参加できる回や、3〜4人で参加できる枠を残すかは、施設の客層と目的に合わせて決めます。' },
+  { q: '施設のスタッフが運営する必要がありますか？', a: '運営の形によります。キャストや進行スタッフが常駐する有人運営と、設置型・キット型の省人運営があり、施設側にお願いする作業の範囲は事前に取り決めます。' },
+  { q: '費用はどのくらいかかりますか？', a: '形式と規模で変わります。当社の目安は、1空間で行う公演型で数十万円台〜、館内の複数スポットを使う施設一体型で100万円前後〜です。有料チケット型ならレベニューシェアも相談できますが、すべての案件で初期費用0円にできるわけではありません。' },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+const articleLd = {
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ja',
+  image: [new URL('/assets/guide/shopping-mall-couple-event.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-07', dateModified: '2026-10-07', mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout title={`${title} - 株式会社ex Labs`} description={desc} ogImage="/assets/guide/shopping-mall-couple-event.webp">
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '解説記事一覧', href: '/guide/' },
+  { name: '商業施設のカップル集客' },
+]} />
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">COUPLE × FACILITY</p>
+<h1 class="h2 serif"><span class="nobr">商業施設でカップル・二人連れを</span><span class="nobr">集客するには</span></h1>
+<p class="lede">買い物や食事の目的がなくても、二人で出かける理由になる体験をつくる。商業施設で体験型イベントを企画するとき、カップル・二人連れは「一緒に何かをする時間」を求めて来館する客層です。このページでは、二人で会話・協力する体験の形式、必要なスペースと運営、飲食・物販への導線、費用、効果測定を整理します。</p>
+<p class="lede">集客イベント全般のアイデアは<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベントアイデア</a>をご覧ください。</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul>
+<li>二人連れに向く体験は、会話が自然に生まれる仕掛け（相談する・キャストと話す・選ぶ）がある形式です。</li>
+<li>体験のゴールや特典を飲食・物販のフロアに置くと、体験の後の過ごし方までつなげられます。</li>
+<li>運営は有人と省人で施設側の負担が変わります。お願いする作業の範囲は事前に取り決めます。</li>
+<li>費用は形式・規模・会期・運営範囲で決まり、有料チケット型ならレベニューシェアも相談できます。</li>
+</ul></div>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}<li><a href="#faq">よくある質問</a></li></ol></nav>
+</div></section>
+<section class="section" style="padding-top:0;padding-bottom:0"><div class="wrap"><RevShareCallout place="shopping-mall-couple-event-top" href="/services/shisetsu-event/#contact" /></div></section>
+
+<section class="section tinted" id="target"><div class="wrap narrow">
+<p class="eyebrow">TARGET</p><h2 class="h2 serif">対象客と施設の課題</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>施設の課題</th><th>起きやすいこと</th><th>体験型イベントで狙うこと</th></tr></thead><tbody>
+<tr><th scope="row">二人で来る理由が弱い</th><td>買い物・食事の予定がない日は来館の候補に入らない</td><td>「その施設でしかできない体験」を来館の目的にする</td></tr>
+<tr><th scope="row">滞在が短い</th><td>目的の店だけに寄って帰る</td><td>館内を巡る体験で、滞在時間と立ち寄るフロアを増やす</td></tr>
+<tr><th scope="row">フロアの偏り</th><td>特定のフロアにしか人が流れない</td><td>手がかりやスポットを分散させ、普段行かないフロアへ案内する</td></tr>
+<tr><th scope="row">時間帯の偏り</th><td>平日夜や閑散期の来館が少ない</td><td>開催の時間帯・曜日を、来館を増やしたい時間に合わせる</td></tr>
+</tbody></table></div>
+</div></section>
+
+<section class="section" id="formats"><div class="wrap narrow">
+<p class="eyebrow">FORMATS</p><h2 class="h2 serif">二人で楽しむ体験形式の比較</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>形式</th><th>二人がすること</th><th>会話の生まれ方</th><th>必要なスペース</th><th>運営</th></tr></thead><tbody>
+<tr><th scope="row">館内周遊型</th><td>館内の手がかりを巡り、二人で相談して物語の謎を解く</td><td>見つけたものについて相談する</td><td>受付区画＋館内の複数スポット</td><td>受付・巡回スタッフ（設置型にもできる）</td></tr>
+<tr><th scope="row">物語参加型（キャストと対話）</th><td>登場人物（キャスト）と話し、選択して物語を進める</td><td>キャストが会話のきっかけをつくる</td><td>1区画・小部屋・営業時間外の店舗など</td><td>キャストと進行スタッフ</td></tr>
+<tr><th scope="row">短時間の協力型</th><td>制限時間の中で、二人で協力して課題を解く</td><td>役割分担と相談</td><td>小区画・催事スペース</td><td>受付と進行（回ごとのリセット）</td></tr>
+</tbody></table></div>
+<p class="lede">どの形式でも、体験の結末で受け取る記念品や、二人の選択で変わる結末を用意すると、体験の後に話す話題が残ります。カップル・二人連れに向けた形式の具体案は企画例として提案します（当社の公開実績は、カップル向けに限定したものではありません）。</p>
+</div></section>
+
+<section class="section tinted" id="space"><div class="wrap narrow">
+<p class="eyebrow">SPACE & OPERATION</p><h2 class="h2 serif">必要なスペースと運営</h2>
+<ul class="bullets">
+<li><strong>受付</strong>：チケット確認と説明を行う場所。回ごとの人数と待機場所を決めます。</li>
+<li><strong>手がかり・スポット</strong>：通路や店舗前に人が滞留しない位置を選び、混雑時の動線も決めます。</li>
+<li><strong>有人か省人か</strong>：キャスト・スタッフが常駐する有人運営と、設置型・キット型の省人運営で、施設スタッフの負担と設置・撤去の段取りが変わります。違いは<a href="/services/shisetsu-event/#operation" style="color:var(--accent)">施設活用イベントの「有人運営と省人運営の選び方」</a>で比較しています。</li>
+<li><strong>既存営業との両立</strong>：営業時間内に完結させるか、営業時間外を使うかを決め、テナントへの案内方法を取り決めます。</li>
+</ul>
+</div></section>
+
+<section class="section" id="route"><div class="wrap narrow">
+<p class="eyebrow">ROUTE</p><h2 class="h2 serif">飲食・物販への導線</h2>
+<ul class="bullets">
+<li><strong>ゴールの位置</strong>：体験のゴールや最後の手がかりを、飲食フロアや物販の近くに置きます。</li>
+<li><strong>体験と連動した特典</strong>：参加者だけが使える特典を用意すると、体験後の立ち寄りを記録として数えられます。協力店舗の負担と精算方法は事前に決めます。</li>
+<li><strong>時間の設計</strong>：体験の所要時間と受付時刻から、食事の前後に組み込みやすい開始時刻を設定します。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="cost"><div class="wrap narrow">
+<p class="eyebrow">COST</p><h2 class="h2 serif">費用を左右する条件</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>条件</th><th>内容</th></tr></thead><tbody>
+<tr><th scope="row">形式・規模</th><td>1区画で行うか、館内の複数スポットを使うか。参考：1空間で行う公演型は数十万円台〜、施設一体型は100万円前後〜（当社の過去案件をもとにした目安）</td></tr>
+<tr><th scope="row">会期・回数</th><td>会期の長さと1日の開催回数</td></tr>
+<tr><th scope="row">キャスト</th><td>登場人物を演じるキャストの人数と稽古</td></tr>
+<tr><th scope="row">制作物</th><td>手がかりの印刷物・装飾・記念品</td></tr>
+<tr><th scope="row">運営範囲</th><td>告知・チケット販売・当日運営・実施後レポートまで含むか</td></tr>
+<tr><th scope="row">契約の形式</th><td>受託・レベニューシェア・併用。レベニューシェアは有料チケットなど売上で費用を回収できる条件のときに検討します</td></tr>
+</tbody></table></div>
+<p class="lede">条件と参考価格は<a href="/services/shisetsu-event/#terms" style="color:var(--accent)">施設活用イベントのご依頼の条件</a>にも掲載しています。</p>
+</div></section>
+
+<section class="section" id="track"><div class="wrap narrow">
+<p class="eyebrow">TRACK RECORD</p><h2 class="h2 serif">商業施設での公開実績</h2>
+<ul class="bullets">
+<li><strong>ウワサバナシ調査委員会（渋谷サクラステージ）</strong>：東急不動産株式会社様・404 Not Found様・TSUTAYA様のご協力のもと、施設全体を周遊する都市伝説×イマーシブ×謎解きを企画・制作。日本経済新聞に掲載。<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">制作事例を読む →</a></li>
+<li><strong>月明かりの書店と呪われた原稿（博報堂 × 紀伊國屋書店）</strong>：閉店後の書店を舞台にした一夜限りの体験型イベント。当社はミステリー原案・制作を担当。<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の活用を読む →</a></li>
+</ul>
+<p class="lede">いずれもカップル向けに限定した企画ではありません。二人連れを対象にした企画は、これらの制作で得た動線・運営の知見をもとに提案します。</p>
+</div></section>
+
+<section class="section tinted" id="measure"><div class="wrap narrow">
+<p class="eyebrow">MEASURE</p><h2 class="h2 serif">効果測定</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>指標</th><th>記録の方法（例）</th><th>区分</th></tr></thead><tbody>
+<tr><th scope="row">参加数・二人組の割合</th><td>チケット販売・受付の記録（申込人数）</td><td>実測</td></tr>
+<tr><th scope="row">立ち寄ったフロア・スポット</th><td>手がかりの到達記録</td><td>実測（記録の仕組みを設けた場合）</td></tr>
+<tr><th scope="row">飲食・物販への立ち寄り</th><td>体験と連動した特典の利用数</td><td>実測（連動施策を設けた場合）</td></tr>
+<tr><th scope="row">満足度・再来館の意向</th><td>参加後アンケート</td><td>参考</td></tr>
+</tbody></table></div>
+</div></section>
+
+<section class="section" id="fit"><div class="wrap narrow">
+<p class="eyebrow">FIT</p><h2 class="h2 serif">向いている条件・向かない条件</h2>
+<div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>向いている</th><th>向かない・工夫が必要</th></tr></thead><tbody>
+<tr><td>共有区画や複数のフロアを使える</td><td>通路が狭く、立ち止まる場所を確保できない</td></tr>
+<tr><td>2週間以上の会期と、告知の期間を取れる</td><td>開催が数日だけで、告知の期間がない</td></tr>
+<tr><td>飲食・物販のテナントと特典などで連携できる</td><td>テナントへの案内や協力の調整ができない</td></tr>
+</tbody></table></div>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">{faqs.map((f) => (<div class="faq-item"><p class="faq-q">{f.q}</p><p class="faq-a">{f.a}</p></div>))}</div>
+</div></section>
+
+<B2BNext place="shopping-mall-couple-event-next" steps={[
+  { k: '関連する制作実績・導入事例', links: [{ label: '渋谷サクラステージの制作事例', href: '/guide/case-uwasabanashi/' }, { label: '制作事例一覧', href: '/works/' }] },
+  { k: '対応する制作サービス', links: [{ label: '施設活用イベント', href: '/services/shisetsu-event/' }, { label: 'イマーシブ制作', href: '/services/immersive/' }] },
+  { k: '費用・納期・実施条件', links: [{ label: 'ご依頼の条件・参考価格', href: '/services/shisetsu-event/#terms' }, { label: '体験型イベントの費用', href: '/guide/event-hiyou/' }] },
+  { k: '施設活用・レベニューシェアの適用条件', links: [{ label: '初期費用0円の適用条件', href: '/services/shisetsu-event/#revenue' }, { label: 'レベニューシェアの仕組み', href: '/guide/event-revenue-share/' }] },
+  { k: '制作相談', links: [{ label: '施設に合う集客企画を相談する（無料）', href: '/services/shisetsu-event/#contact' }] },
+]} />
+
+<AuthorBox />
+<LatestPosts category="shisetsu" />
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.cmp-table th[scope=row]{min-width:140px;white-space:normal}
+.cmp-table td{min-width:160px;vertical-align:top}
+ul.bullets{text-align:left}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06);text-align:left}
+.toc-h{margin:0 0 10px;font-weight:800}
+.toc ol{margin:0;padding-left:1.3em;line-height:2}
+.toc a{color:var(--ink)}
+#target,#formats,#space,#route,#cost,#track,#measure,#fit,#faq{scroll-margin-top:88px}
+</style>

@@ -33,7 +33,8 @@ const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const DAYS = ['日', '月', '火', '水', '木', '金', '土'];
 const days14 = Array.from({ length: 14 }, (_, i) => addDays(week.start, i));
 type CellState = 'open' | 'today' | 'started' | 'soldout' | 'ended' | 'cancelled' | 'none';
-const calShows = shows.filter((s) => s.published).map((s) => {
+// 開催日がすべて過去の公演（終了）はカレンダーに出さない。終了した公演は下の「終了した公演」に記録として残す
+const calShows = shows.filter((s) => s.published && !(s.occurrences.length > 0 && s.occurrences.every((o) => o.date < today))).map((s) => {
   const byDate = new Map(s.occurrences.map((o) => [o.date, o]));
   const cells = days14.map((d) => {
     const o = byDate.get(d);
@@ -318,7 +319,7 @@ const articleLd = {
 </details>
 
 <details class="acc" id="past">
-<summary><span class="acc-t">終了した公演・閉業した施設</span><span class="acc-s">ロスト・フレーム、イマーシブ・フォート東京</span></summary>
+<summary><span class="acc-t">終了した公演・閉業した施設</span><span class="acc-s">{[...endedRows.map((r) => r.w.title), 'ロスト・フレーム', 'イマーシブ・フォート東京'].join('、')}</span></summary>
 <div class="acc-b">
 <ul class="bullets">
 <li><strong>ロスト・フレーム（下北沢）</strong>：街に散らばった絵画を探して歩く周遊型アートイマーシブ。2026年7月7日〜8月31日、所要時間75分、1組1〜4名。参加費は1人あたり4名参加で4,000円〜1名参加で8,000円。全公演完売で終了。<a href="/taikenbizyutu/lostframe/" style="color:var(--accent)">公演ページ →</a></li>
@@ -339,7 +340,7 @@ const articleLd = {
 <li><strong>秘密の試験</strong>：登場人物との会話や仲間との協力、試練を通して怪盗としての資質を示します。物語の中で本格的なイリュージョンが目の前で行われます。</li>
 </ol>
 <p class="tw-meta">公式案内より：各回2〜4名（1名不可）、18歳以上、日本語で進行、服装の指定なし、スマートフォンとイヤホンを持参、会場にクロークなし、お酒の提供なし、受付時間に遅れると参加不可。</p>
-<h3 class="def-sub serif">ウワサバナシ調査委員会（渋谷サクラステージ）</h3>
+<h3 class="def-sub serif">ウワサバナシ調査委員会（渋谷サクラステージ）{endedRows.some((r) => r.w.id === 'uwasabanashi') && '｜2026年10月4日に終了'}</h3>
 <ol class="bullets">
 <li><strong>集合</strong>：渋谷サクラステージ SHIBUYA SIDE 3階の集合場所へ、開演5分前までに。JR渋谷駅新南改札から直結。途中入場はできません。</li>
 <li><strong>調査</strong>：商業施設内の複数のスポットを歩いて巡り、証言と手がかりを集めて整理します。選択で展開が変わります。</li>
