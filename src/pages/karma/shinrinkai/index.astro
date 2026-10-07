@@ -1,0 +1,261 @@
+---
+import SiteGuard from '../../../components/SiteGuard.astro';
+// 「臓腑、或いはカルマ」劇中の架空団体「真凜会（しんりんかい）」の会員向けページ。
+// 参考：ChatGPT で試作された shinrinkai-members-karma.pasohige613.chatgpt.site（ユーザー提供のスマホ画面）を移植。
+// パンフレット（グッズ）購入者向けの限定ページ：noindex, nofollow。sitemap・llms.txt・他ページからはリンクしない。
+// ヒーローの彼岸花は元ページの写真が手元にないため SVG で描いた仮のもの（写真が届いたら差し替える）。
+
+const site = 'https://kabuexlabs.com';
+const canonical = `${site}/karma/shinrinkai/`;
+const title = '真凜会 SHINRINKAI｜会員限定書庫';
+const description = '真凜会 公式案内。あなたの魂は、何を語っていますか。パンフレットをご購入いただいた皆様へ。';
+
+// 「私たちが大切にしていること」
+const tenets = [
+  { n: '一', h: '自分の魂と向き合うこと', p: '他人を変えることはできません。変えられるのは、自分だけです。' },
+  { n: '二', h: '誰も傷つけないこと', p: '真凜会は、いかなる暴力も、強制も認めません。' },
+  { n: '三', h: 'いつでも、離れてよいこと', p: 'ここは、閉じ込める場所ではありません。必要がなくなったなら、いつでも離れてください。' },
+];
+
+// 会員限定書庫。href が空のものは「ただいま準備中」表示。
+const archive = [
+  { en: 'COMMENTARY', h: '解説', p: '作品をより深く読むために。', href: '', label: 'ただいま準備中' },
+  { en: 'BEHIND THE STORY', h: '裏設定資料', p: '物語の奥にある記録。', href: '', label: 'ただいま準備中' },
+];
+
+// ヒーローの彼岸花（決定的な疑似乱数で花弁と雄しべの曲線を生成）
+function lily(cx: number, cy: number, r: number, seed: number) {
+  let s = seed;
+  const rnd = () => ((s = (s * 9301 + 49297) % 233280) / 233280);
+  const out: { d: string; w: number; o: number }[] = [];
+  const dots: { x: number; y: number }[] = [];
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * Math.PI * 2 + rnd() * 0.3;
+    const len = r * (0.75 + rnd() * 0.45);
+    const bend = (rnd() - 0.5) * 0.9 + 0.35;
+    const x2 = cx + Math.cos(a) * len, y2 = cy + Math.sin(a) * len;
+    const mx = cx + Math.cos(a + bend) * len * 0.55, my = cy + Math.sin(a + bend) * len * 0.55;
+    out.push({ d: `M${cx} ${cy} Q${mx.toFixed(1)} ${my.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`, w: 1.4, o: 0.9 });
+    dots.push({ x: +x2.toFixed(1), y: +y2.toFixed(1) });
+  }
+  // 花弁：細く反り返る帯を2層（太さを変えて重ね、写真のような柔らかさを出す）
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2 + rnd() * 0.35;
+    const len = r * (0.26 + rnd() * 0.1);
+    const x2 = cx + Math.cos(a) * len, y2 = cy + Math.sin(a) * len;
+    const cxp = cx + Math.cos(a - 0.35) * len * 0.8, cyp = cy + Math.sin(a - 0.35) * len * 0.8;
+    const x3 = x2 + Math.cos(a + 1.9) * len * 0.22, y3 = y2 + Math.sin(a + 1.9) * len * 0.22;
+    const d = `M${cx} ${cy} Q${cxp.toFixed(1)} ${cyp.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)} T${x3.toFixed(1)} ${y3.toFixed(1)}`;
+    out.push({ d, w: 5.5, o: 0.55 });
+    out.push({ d, w: 2.2, o: 0.9 });
+  }
+  return { paths: out, dots };
+}
+const flowers = [lily(380, 300, 230, 7), lily(330, 720, 200, 23)];
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href={canonical}>
+<meta name="theme-color" content="#121212">
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:url" content={canonical}>
+<meta property="og:locale" content="ja_JP">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<SiteGuard />
+</head>
+<body>
+
+<header class="hdr">
+  <a class="logo" href="#top" aria-label="真凜会 SHINRINKAI">
+    <span class="logo-ja">真凜会</span>
+    <span class="logo-en">SHINRINKAI</span>
+  </a>
+  <nav class="nav" aria-label="メニュー">
+    <a href="#teachings">真凜会の教え</a>
+    <a href="#activities">活動のご案内</a>
+    <a href="#archive" class="is-current">会員限定書庫</a>
+  </nav>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <svg class="hero-lily" viewBox="0 0 520 980" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+    <defs><filter id="soft"><feGaussianBlur stdDeviation="1.4" /></filter></defs>
+    {flowers.map((f) => (
+      <g filter="url(#soft)">
+        {f.paths.map((p) => <path d={p.d} fill="none" stroke="#8a1616" stroke-width={p.w} stroke-linecap="round" opacity={p.o} />)}
+        {f.dots.map((d) => <circle cx={d.x} cy={d.y} r="2.6" fill="#3a1010" />)}
+      </g>
+    ))}
+  </svg>
+  <div class="hero-in">
+    <p class="hero-label">真凜会　公式案内</p>
+    <h1 class="hero-h1">あなたの魂は、<br>何を語っていますか。</h1>
+    <p class="hero-sub">答えは、あなたの内にある。<br>まずは、それを「視る」ことから。</p>
+    <a class="btn-red" href="#archive">会員限定書庫をひらく</a>
+    <p class="hero-note">パンフレットをご購入していただいた皆様へ</p>
+  </div>
+  <p class="hero-foot">魂と向き合う、その先へ。</p>
+</section>
+
+<section class="sec" id="greeting">
+  <div class="sec-head"><span class="sec-num">01</span><span class="sec-name">ごあいさつ</span><span class="sec-rule"></span></div>
+  <h2 class="sec-h2">その答えを探す<br>お手伝いをしています。</h2>
+  <div class="prose">
+    <p>うまくいかないことが続く。<br>誰にも理解されない。<br>頑張っているのに報われない。</p>
+    <p>それは、あなたが弱いからではありません。<br>あなたの魂が、答えを求めているのです。</p>
+  </div>
+  <p class="sign"><span class="sign-role">真凜会代表</span><span class="sign-name">神崎 真</span></p>
+</section>
+
+<section class="sec sec-line" id="teachings">
+  <div class="sec-head"><span class="sec-num">02</span><span class="sec-name">真凜会の教え</span><span class="sec-rule"></span></div>
+  <h2 class="sec-h2">カルマとは何か。</h2>
+  <div class="prose prose-dim">
+    <p>人の行いは、すべて魂に刻まれます。<br>私たちはそれを「カルマ」と呼びます。<br>積み重なったカルマは、いつか必ず、その人自身に返ってきます。</p>
+  </div>
+  <p class="tenets-label">私たちが大切にしていること</p>
+  <ol class="tenets">
+    {tenets.map((t) => (
+      <li class="tenet">
+        <span class="tenet-n">{t.n}</span>
+        <h3 class="tenet-h">{t.h}</h3>
+        <p class="tenet-p">{t.p}</p>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<section class="sec sec-archive" id="archive">
+  <div class="sec-head"><span class="sec-num">03</span><span class="sec-name">会員限定書庫</span><span class="sec-rule"></span></div>
+  <p class="eyebrow">THE PRIVATE ARCHIVE</p>
+  <h2 class="sec-h2">物語の、さらに奥へ。</h2>
+  <p class="archive-lead">グッズ購入特典としてお届けする、<br>もうひとつの物語と特別な肖像。</p>
+  <div class="cards">
+    {archive.map((c) => (
+      <article class="card">
+        <p class="eyebrow">{c.en}</p>
+        <h3 class="card-h">{c.h}</h3>
+        <p class="card-p">{c.p}</p>
+        {c.href
+          ? <a class="btn-red btn-card" href={c.href}>{c.label}</a>
+          : <span class="btn-wait" aria-disabled="true">{c.label}</span>}
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="sec sec-line" id="activities">
+  {/* 後半（活動のご案内 以降）はユーザー提供のスクリーンショット待ち */}
+</section>
+
+</main>
+
+<footer class="ftr">
+  <p class="ftr-logo">真凜会<span>SHINRINKAI</span></p>
+  <p class="ftr-note">※本ページは体験型取調室 FACT ROOM「<a href="/karma/">臓腑、或いはカルマ</a>」の劇中に登場する架空の団体のページです。実在の人物・団体・事件とは無関係です。</p>
+</footer>
+
+<style is:global>
+:root{--bg:#121212;--bg2:#1b1b1b;--ink:#ece6dc;--dim:#a8a19a;--mute:#7c7670;--red:#b23a30;--red-soft:#c9705f;--pink:#c98d80;--rule:rgba(236,230,220,.14)}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',serif;font-weight:400;line-height:2;letter-spacing:.06em;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+p,h1,h2,h3,ol{margin:0}
+h1,h2,h3{font-weight:400}
+:where(a,button):focus-visible{outline:1px solid var(--red-soft);outline-offset:4px}
+
+/* ヘッダー */
+.hdr{position:relative;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px clamp(24px,6vw,64px) 18px;background:rgba(18,18,18,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+.logo{display:flex;flex-direction:column;align-items:center;gap:2px;flex:none}
+.logo-ja{font-size:clamp(26px,6.4vw,34px);font-weight:500;letter-spacing:.62em;margin-right:-.62em;line-height:1.3}
+.logo-en{font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.32em;margin-right:-.32em;font-weight:500}
+.nav{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px 18px;font-size:14px;letter-spacing:.14em}
+.nav a{padding:4px 0 6px;border-bottom:1px solid transparent;transition:color .2s}
+.nav a:hover{color:var(--pink)}
+.nav a.is-current{border-bottom-color:var(--red)}
+
+/* ヒーロー */
+.hero{position:relative;overflow:hidden;min-height:min(130vw,820px);padding:clamp(120px,30vw,200px) clamp(24px,6vw,64px) 40px;display:flex;flex-direction:column;justify-content:space-between;background:
+  radial-gradient(ellipse 80% 55% at 95% 8%,rgba(176,124,104,.75),transparent 70%),
+  radial-gradient(ellipse 70% 60% at 85% 45%,rgba(120,72,60,.55),transparent 75%),
+  linear-gradient(180deg,#5a4038 0%,#3a2a25 45%,#1d1716 80%,var(--bg) 100%)}
+.hero::after{content:"";position:absolute;inset:auto 0 0 0;height:22%;background:linear-gradient(transparent,var(--bg));pointer-events:none}
+.hero-lily{position:absolute;top:0;right:0;width:min(78%,520px);height:100%;opacity:.95;pointer-events:none}
+.hero-in{position:relative;z-index:1;max-width:620px}
+.hero-label{font-size:15px;letter-spacing:.3em;color:var(--pink);margin-bottom:28px}
+.hero-h1{font-size:clamp(28px,7.4vw,46px);line-height:1.65;letter-spacing:.14em;color:#f3eee6;margin-bottom:34px}
+.hero-sub{font-size:clamp(14px,3.6vw,17px);line-height:2.2;letter-spacing:.24em;color:#d8d0c6;margin-bottom:44px}
+.btn-red{display:inline-block;border:1px solid var(--red-soft);padding:16px clamp(28px,8vw,44px);font-size:clamp(15px,3.8vw,17px);letter-spacing:.2em;background:rgba(60,26,20,.25);transition:background .2s,color .2s}
+.btn-red:hover{background:rgba(178,58,48,.35);color:#fff}
+.hero-note{margin-top:20px;font-size:13px;letter-spacing:.2em;color:var(--dim)}
+.hero-foot{position:relative;z-index:1;margin-top:120px;font-size:13px;letter-spacing:.3em;color:var(--mute)}
+
+/* セクション */
+.sec{padding:clamp(90px,16vw,140px) clamp(24px,6vw,64px);max-width:900px;margin:0 auto;box-sizing:border-box}
+.sec-line{border-top:1px solid var(--rule);max-width:none}
+.sec-line>*{max-width:772px;margin-left:auto;margin-right:auto}
+.sec-head{display:flex;align-items:center;gap:clamp(22px,6vw,36px);margin-bottom:clamp(44px,9vw,64px)}
+.sec-num{font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:.12em;color:var(--red-soft);font-weight:600}
+.sec-name{font-size:clamp(17px,4.2vw,20px);letter-spacing:.3em;color:#cfc8be}
+.sec-rule{width:clamp(60px,17vw,110px);height:1px;background:var(--red)}
+.sec-h2{font-size:clamp(28px,7vw,40px);line-height:1.7;letter-spacing:.16em;color:#f3eee6;margin-bottom:clamp(36px,8vw,52px)}
+.prose{display:flex;flex-direction:column;gap:2.2em;font-size:clamp(15px,3.9vw,17px);line-height:2.3;letter-spacing:.08em;color:#e4ddd3}
+.prose-dim{color:var(--dim)}
+.sign{display:flex;align-items:baseline;gap:clamp(28px,8vw,48px);margin-top:clamp(48px,10vw,72px)}
+.sign-role{font-size:clamp(14px,3.6vw,16px);color:var(--dim)}
+.sign-name{font-size:clamp(24px,6vw,30px);letter-spacing:.08em}
+
+/* 教え */
+.tenets-label{margin-top:clamp(56px,11vw,80px);padding-bottom:clamp(28px,6vw,40px);border-bottom:1px solid var(--rule);font-size:clamp(15px,3.9vw,17px);letter-spacing:.24em}
+.tenets{list-style:none;padding:0}
+.tenet{padding:clamp(40px,9vw,56px) 0;border-bottom:1px solid var(--rule)}
+.tenet:last-child{border-bottom:0}
+.tenet-n{display:block;font-size:22px;color:var(--red);line-height:1;margin-bottom:clamp(28px,6vw,40px)}
+.tenet-h{font-size:clamp(22px,5.6vw,30px);letter-spacing:.18em;line-height:1.6;margin-bottom:24px;color:#f3eee6}
+.tenet-p{font-size:clamp(15px,3.9vw,17px);line-height:2.3;color:var(--dim)}
+
+/* 会員限定書庫 */
+.sec-archive{background:var(--bg2);border-top:1px solid rgba(178,58,48,.7);max-width:none}
+.sec-archive>*{max-width:772px;margin-left:auto;margin-right:auto}
+.eyebrow{font-family:'Cormorant Garamond',serif;font-size:clamp(15px,3.8vw,17px);letter-spacing:.3em;color:var(--pink);font-weight:500;margin-bottom:22px}
+.sec-archive>.eyebrow{margin-bottom:26px}
+.archive-lead{font-size:clamp(15px,3.9vw,17px);line-height:2.3;color:var(--dim);margin-bottom:clamp(48px,10vw,64px)}
+.cards{display:flex;flex-direction:column;gap:clamp(24px,5vw,32px)}
+.card{border:1px solid rgba(236,230,220,.18);padding:clamp(36px,8vw,48px) clamp(26px,6vw,40px)}
+.card .eyebrow{color:var(--red-soft)}
+.card-h{font-size:clamp(26px,6.6vw,32px);letter-spacing:.06em;margin:14px 0 26px;color:#f3eee6}
+.card-p{font-size:clamp(15px,3.9vw,17px);color:var(--dim);margin-bottom:22px}
+.btn-wait{display:inline-block;border:1px solid rgba(236,230,220,.25);padding:14px clamp(26px,7vw,40px);font-size:clamp(14px,3.6vw,16px);letter-spacing:.2em;color:var(--dim)}
+.btn-card{padding:14px clamp(26px,7vw,40px)}
+
+#activities:empty{display:none}
+
+/* フッター */
+.ftr{border-top:1px solid var(--rule);padding:56px clamp(24px,6vw,64px) 64px;text-align:center}
+.ftr-logo{font-size:22px;letter-spacing:.5em;margin-right:-.5em;display:flex;flex-direction:column;align-items:center;gap:4px}
+.ftr-logo span{font-family:'Cormorant Garamond',serif;font-size:11px;letter-spacing:.32em;margin-right:-.32em}
+.ftr-note{margin-top:28px;font-size:11px;line-height:2;letter-spacing:.06em;color:var(--mute)}
+.ftr-note a{text-decoration:underline;text-underline-offset:3px}
+
+@media (min-width:760px){
+.hdr{align-items:center}
+.nav{flex-wrap:nowrap;gap:32px}
+}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+</style>
+</body>
+</html>
