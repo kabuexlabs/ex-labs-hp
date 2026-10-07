@@ -34,4 +34,14 @@ export const venues: Venue[] = [
     setting: 'indoor',
     sourceIds: ['escape-id-factroom'],
   },
+  {
+    // 住所は購入者にだけ案内する公演のため載せない（公式ページの記載どおり）
+    id: 'kotohogi-house',
+    name: 'さいたま市内の一軒家（詳しい集合場所は購入者に案内）',
+    listName: 'さいたま市内の一軒家',
+    regionId: 'saitama',
+    areaId: 'saitama-city',
+    access: '当日は会場最寄りのバス停に集合。集合場所は駅から離れているため、移動時間に余裕を（公式ページに記載）',
+    sourceIds: ['kotohogi-official'],
+  },
 ];

@@ -6,6 +6,8 @@ export interface Area { id: string; regionId: string; name: string }
 
 export const REGIONS: Region[] = [
   { id: 'tokyo', name: '東京' },
+  // 2026-10-07 追加：ウワサバナシ調査委員会 case2（さいたま市）。東京向けの解説記事・デート記事・/outing/ には出さない（tokyoGuide・shows で東京に限定）
+  { id: 'saitama', name: '埼玉' },
 ];
 
 export const AREAS: Area[] = [
@@ -13,6 +15,7 @@ export const AREAS: Area[] = [
   { id: 'roppongi', regionId: 'tokyo', name: '六本木' },
   { id: 'shimokitazawa', regionId: 'tokyo', name: '下北沢' },
   { id: 'kanda', regionId: 'tokyo', name: '神田' },
+  { id: 'saitama-city', regionId: 'saitama', name: 'さいたま市' },
 ];
 
 export const GENRES: { id: Genre; name: string; short: string; desc: string }[] = [

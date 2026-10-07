@@ -7,6 +7,17 @@ const KAITOU_DATES = ['2026-09-06', '2026-09-13', '2026-09-26', '2026-09-27', '2
 const UWASA_DATES = ['2026-09-19', '2026-09-20', '2026-09-26', '2026-09-27', '2026-10-03', '2026-10-04'];
 
 const SOLDOUT_AT = '2026-10-05T12:00:00+09:00';
+// case2「言祝ぎの家」（公式ページの PERFORMANCES と同じ。変更時は両方を直す）。販売は各回の開演2時間前まで
+const KOTOHOGI: [string, string[]][] = [
+  ['2026-10-23', ['16:00', '18:00', '20:00']],
+  ['2026-10-24', ['13:00', '15:00', '17:30', '19:30']],
+  ['2026-10-25', ['13:00', '15:00', '17:30', '19:30']],
+  ['2026-10-30', ['16:00', '18:00', '20:00']],
+  ['2026-11-01', ['13:00', '15:00', '17:30', '19:30']],
+  ['2026-11-03', ['13:00', '15:00', '17:30', '19:30']],
+];
+const KOTOHOGI_CHECKED = '2026-10-07T10:00:00+09:00';
+const minus2h = (d: string, t: string) => new Date(Date.parse(`${d}T${t}:00+09:00`) - 2 * 3600000 + 9 * 3600000).toISOString().slice(0, 19) + '+09:00';
 const CHECKED = '2026-09-17T03:02:00+09:00'; // 自社公式ページの開催日一覧を再確認（escape.id の開演時刻・受付状況は未確認）
 
 export const occurrences: Occurrence[] = [
@@ -39,4 +50,18 @@ export const occurrences: Occurrence[] = [
     sourceIds: ['uwasabanashi-official', 'escape-id-uwasabanashi'],
     published: true,
   })),
+  ...KOTOHOGI.flatMap(([date, times]) => times.map<Occurrence>((startTime) => ({
+    id: `kotohogi-${date}-${startTime.replace(':', '')}`,
+    workId: 'kotohogi',
+    venueId: 'kotohogi-house',
+    date,
+    startTime,
+    eventStatus: 'scheduled',
+    eventCheckedAt: KOTOHOGI_CHECKED,
+    eventCheckedBy: 'Claude（自社公式ページの開催日・開演時刻を確認）',
+    sales: { status: 'unknown', closesAt: minus2h(date, startTime), channels: [{ channelId: 'escape-id', url: 'https://escape.id/uwasabanashi-org/e-hanayome/' }] },
+    seats: { status: 'unknown' },
+    sourceIds: ['kotohogi-official', 'escape-id-kotohogi'],
+    published: true,
+  }))),
 ];

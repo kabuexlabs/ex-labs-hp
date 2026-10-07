@@ -209,4 +209,53 @@ export const works: Work[] = [
     published: true,
     updatedAt: '2026-09-28',
   },
+  {
+    id: 'kotohogi',
+    slug: 'kotohogi',
+    title: 'ウワサバナシ調査委員会 case2「言祝ぎの家 -呪われた花嫁-」',
+    organizerId: 'ex-labs',
+    genres: ['story-experience'],
+    summary: 'さいたま市内の実際の一軒家を探索し、住人との会話や調査報告を通じて真相に迫る、怖さを抑えたイマーシブ・ホラーミステリー。',
+    description: [
+      '「祝いの席に、招かれる。」新居で起きる怪奇現象の調査を依頼された調査員として、実際の一軒家を探索します。住人との会話や調査報告を通じて、真相に迫ります。',
+      'お一人様から申し込めます。同じ回に申し込んだ他のお客様と一緒に調査チームとして参加します（各回定員8名）。暗い場所・物音・不意を突く演出がありますが、追いかける演出やキャストが身体に触れる演出はありません。',
+    ],
+    officialUrl: '/uwasabanashi/kotohogi/',
+    ticketUrl: 'https://escape.id/uwasabanashi-org/e-hanayome/',
+    image: { path: '/assets/kotohogi/kv-v2.webp', holder: '株式会社ex Labs', terms: '自社公演ページ /uwasabanashi/kotohogi/ で使用中のメインビジュアル', confirmedAt: '2026-10-07', confirmedBy: 'Claude（自社サイトで使用中の画像）' },
+    venueId: 'kotohogi-house',
+    // 所要時間は公式ページに記載がない（確定後に入れる）
+    duration: { text: '公式ページで確認' },
+    price: {
+      unit: 'per-person',
+      amount: 6500,
+      text: '1名 ¥6,500',
+      // 公式ページに税込・税抜の記載がないため false（「税区分は予約サイトで確認」と表示）
+      taxIncluded: false,
+      feeNote: '税区分・手数料は予約サイトで確認してください',
+    },
+    party: {
+      min: 1,
+      soloAllowed: true,
+      format: 'shared',
+      text: 'お一人様から。同じ回の他のお客様と一緒に調査チームとして参加（各回定員8名）',
+    },
+    info: {
+      participation: '一軒家を探索し、住人（キャスト）との会話や調査報告を通じて真相に迫ります',
+      actorInteraction: true,
+      scary: '怖さを抑えたホラー・ミステリー。暗い場所・物音・不意を突く演出あり（追いかける演出、キャストが身体に触れる演出はなし）',
+      requirements: [
+        '十分に充電されたスマートフォンを持参',
+        '会場で靴を脱ぐため、脱ぎ履きしやすい靴で',
+        '集合は会場最寄りのバス停（詳しい集合場所・住所は購入者に案内）',
+        'チケットは空席がある場合に限り、各回の開演2時間前まで販売',
+      ],
+    },
+    period: { text: '2026年10月23日〜11月3日の指定日', from: '2026-10-23', to: '2026-11-03' },
+    sourceIds: ['kotohogi-official', 'escape-id-kotohogi'],
+    verified: { at: '2026-10-07T10:00:00+09:00', by: 'Claude（自社公式ページ /uwasabanashi/kotohogi/ の公演日程・開演時刻・料金・人数・注意事項を確認。escape.id は未確認）' },
+    verifyTtlDays: 14,
+    published: true,
+    updatedAt: '2026-10-07',
+  },
 ];

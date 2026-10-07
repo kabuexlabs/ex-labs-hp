@@ -16,6 +16,7 @@ import VisualHero from '../../components/VisualHero.astro';
 import StudioCta from '../../components/guide/StudioCta.astro';
 import { shows } from '../../data/shows';
 import { eventsData } from '../../data/events/index';
+import { isTokyoWork } from '../../lib/tokyoGuide';
 import { areaName, regionName, genreName } from '../../data/events/areas';
 import { perPerson, fmtYen, FORMAT_LABEL } from '../../lib/events';
 import { occurrenceState, weekRange, fmtDateJa, fmtDateShort, fmtVerified, jstDateString, jstWeekday, addDays } from '../../lib/thisWeek';
@@ -49,7 +50,7 @@ const calShows = shows.filter((s) => s.published).map((s) => {
 const latestVerified = shows.filter((s) => s.published).map((s) => s.verifiedAt).sort().pop() ?? '';
 const anyStale = calShows.some((c) => c.stale);
 // 1人あたりの最安値（1組料金は人数で割った額のうち最も安いもの）
-const ppKnown = eventsData.works.filter((w) => w.published && !w.guideOnly).flatMap((w) => w.price.unit === 'per-group' ? (w.price.tiers ?? []).map((t) => t.amount / t.party) : [perPerson(w.price, w.party.min)]).filter((v): v is number => v !== undefined).map(Math.round);
+const ppKnown = eventsData.works.filter((w) => w.published && !w.guideOnly && isTokyoWork(w)).flatMap((w) => w.price.unit === 'per-group' ? (w.price.tiers ?? []).map((t) => t.amount / t.party) : [perPerson(w.price, w.party.min)]).filter((v): v is number => v !== undefined).map(Math.round);
 // 「紹介している公演数」と「今週（月〜日）に確認済みの開催日がある公演数」を分ける。期間内でも日程未確認は今週に数えない
 const thisWeekCount = calShows.filter((c) => c.cells.slice(0, 7).some((x) => x.state === 'open' || x.state === 'today')).length;
 const heroChips = [`紹介 ${calShows.length}公演`, `今週に開催日あり ${thisWeekCount}公演`, ...(ppKnown.length ? [`1人${Math.min(...ppKnown).toLocaleString('ja-JP')}円〜`] : []), '◯は開催日（空席は予約サイトで確認）'];
@@ -59,7 +60,7 @@ const MARK: Record<CellState, string> = { open: '◯', today: '◯', started: '�
 type Status = 'ongoing' | 'upcoming' | 'ended' | 'unknown';
 const MOVEMENT_LABEL: Record<string, string> = { 'free-roam': '自分で歩き回る', guided: '案内に沿って進む', seated: '座って観る時間が中心', mixed: '歩く場面と座る場面がある' };
 const SETTING_LABEL: Record<string, string> = { indoor: '屋内', outdoor: '屋外', mixed: '屋内＋屋外の移動あり' };
-const rows = eventsData.works.filter((w) => w.published).map((w) => {
+const rows = eventsData.works.filter((w) => w.published && isTokyoWork(w)).map((w) => {
   const occ = eventsData.occurrences.filter((o) => o.workId === w.id && o.published && !o.test && o.eventStatus !== 'cancelled').sort((a, b) => a.date.localeCompare(b.date));
   const venue = eventsData.venues.find((v) => v.id === (occ[0]?.venueId ?? w.venueId));
   const dates = occ.map((o) => o.date);

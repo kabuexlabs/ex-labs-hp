@@ -16,6 +16,8 @@ export interface ShowOccurrence {
 
 export interface Show {
   id: string;
+  /** 会場の地域（areas.ts の REGIONS） */
+  regionId: string;
   name: string;
   area: string;
   /** 体験の特徴（1〜2文） */
@@ -54,7 +56,8 @@ import { eventsData } from './events/index.ts';
 import { regionName, areaName } from './events/areas.ts';
 import { priceLabels, bookingUrl } from '../lib/priceLabel.ts';
 
-export const shows: Show[] = eventsData.works.filter((w) => !w.guideOnly).map((w) => {
+/** 全地域の公演（/events/ のカレンダー用） */
+export const allShows: Show[] = eventsData.works.filter((w) => !w.guideOnly).map((w) => {
   const occ = eventsData.occurrences.filter((o) => o.workId === w.id && o.published && !o.test).sort((a, b) => (a.date + (a.startTime ?? '')).localeCompare(b.date + (b.startTime ?? '')));
   const venue = eventsData.venues.find((v) => v.id === (occ[0]?.venueId ?? w.venueId)) ?? eventsData.venues[0];
   const ch = occ[0]?.sales.channels[0];
@@ -63,6 +66,7 @@ export const shows: Show[] = eventsData.works.filter((w) => !w.guideOnly).map((w
   return {
     id: w.id,
     name: w.title,
+    regionId: venue.regionId,
     area: `${regionName(venue.regionId)}・${areaName(venue.areaId)}／${venue.listName ?? venue.name}`,
     feature: w.summary,
     url: w.officialUrl,
@@ -90,3 +94,6 @@ export const shows: Show[] = eventsData.works.filter((w) => !w.guideOnly).map((w
     ...(w.image ? { image: { path: w.image.path, alt: `${w.title} キービジュアル` } } : {}),
   };
 });
+
+/** 東京の会場の公演だけ（東京の解説記事・デート記事のカレンダー用。/events/ は allShows） */
+export const shows: Show[] = allShows.filter((s) => s.regionId === 'tokyo');

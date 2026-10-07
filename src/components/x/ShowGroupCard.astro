@@ -2,7 +2,7 @@
 // /events/ 検索結果：同じ公演の公演回を1枚にまとめたカード（2026-09-28 クライアント指示：公演概要とチケットサイトへのボタンのみ）。
 // 開催日は日付チップで並べ、条件に合う日だけ表示する。data-rows はブラウザ側の即時絞り込み用（個人情報なし）。
 import type { AnyResolved } from '../../lib/events';
-import { isListing } from '../../lib/events';
+import { isListing, minToHhmm } from '../../lib/events';
 import { fmtDateShort } from '../../lib/thisWeek';
 import { genreName, areaName, regionName } from '../../data/events/areas';
 import Cls from './Cls.astro';
@@ -30,7 +30,7 @@ if (isListing(first)) {
 ---
 <article class="xgc" data-rows={JSON.stringify(rows.map((r) => r.row))}>
   <ul class="xgc-dates" aria-label="開催日">
-    {rows.map((r) => <li data-rid={r.row.id} hidden={showSet.has(r.row.id) ? undefined : true}><time datetime={r.row.date}>{fmtDateShort(r.row.date)}</time></li>)}
+    {rows.map((r) => <li data-rid={r.row.id} hidden={showSet.has(r.row.id) ? undefined : true}><time datetime={r.row.date}>{fmtDateShort(r.row.date)}{r.row.start !== undefined ? ` ${minToHhmm(r.row.start)}` : ''}</time></li>)}
   </ul>
   <h3 class="xgc-t">{title}{soldout && <span class="xgc-so">完売</span>}</h3>
   <p class="xgc-where"><Cls text={where} emph={false} /></p>

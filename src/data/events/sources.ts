@@ -67,4 +67,22 @@ export const sources: Source[] = [
     checkedBy: 'Claude（実装環境から passmarket.yahoo.co.jp へ到達できず、検索結果の抜粋のみ）',
     terms: '未確認。主催者公式ページと販売ページで会場・日程・料金・参加内容を確認してから公開する',
   },
+  {
+    id: 'kotohogi-official',
+    label: '「ウワサバナシ調査委員会 case2 言祝ぎの家」公式サイト（自社運営）',
+    url: 'https://kabuexlabs.com/uwasabanashi/kotohogi/',
+    kind: 'own-official',
+    checkedAt: '2026-10-07T10:00:00+09:00',
+    checkedBy: 'Claude（リポジトリ内の公式ページ src/pages/uwasabanashi/kotohogi/index.astro の公演日程・開演時刻・料金・人数・注意事項を確認。所要時間・税区分の記載なし）',
+    terms: '自社サイトの記載。日程・開演時刻・料金・人数・注意事項を自社データとして使用可。会場の住所は購入者のみに案内する運用のため載せない。',
+  },
+  {
+    id: 'escape-id-kotohogi',
+    label: 'escape.id「言祝ぎの家」チケットページ',
+    url: 'https://escape.id/uwasabanashi-org/e-hanayome/',
+    kind: 'ticket-site',
+    checkedAt: '2026-10-07T10:00:00+09:00',
+    checkedBy: 'Claude（実装環境から到達できず、内容は未確認。URLは主催から提供）',
+    terms: '販売ページへのリンクのみ。空席・販売状況は転載しない。',
+  },
 ];

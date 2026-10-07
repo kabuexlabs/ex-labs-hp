@@ -29,9 +29,16 @@ export interface GuideRow {
   formatLabel: string;
 }
 
+/** 東京ガイド・デート記事・/outing/ 用：東京の会場の公演か（さいたま市の case2 などは /events/ にだけ出す） */
+export function isTokyoWork(w: Work): boolean {
+  const o = eventsData.occurrences.find((x) => x.workId === w.id && x.published && !x.test);
+  const v = eventsData.venues.find((x) => x.id === (o?.venueId ?? w.venueId));
+  return !v || v.regionId === 'tokyo';
+}
+
 export function buildGuideRows(now: Date): GuideRow[] {
   const today = jstDateString(now);
-  return eventsData.works.filter((w) => w.published).map((w) => {
+  return eventsData.works.filter((w) => w.published && isTokyoWork(w)).map((w) => {
     const organizer = eventsData.organizers.find((o) => o.id === w.organizerId)!;
     const occ = eventsData.occurrences.filter((o) => o.workId === w.id && o.published && !o.test && o.eventStatus !== 'cancelled').sort((a, b) => a.date.localeCompare(b.date));
     const venue = eventsData.venues.find((v) => v.id === (occ[0]?.venueId ?? w.venueId));
