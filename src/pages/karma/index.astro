@@ -24,16 +24,14 @@ const dateLabel = '2026.10.10（土）〜 11.8（日）';
 // キャスト（表示順はハンドオフ cast.json 準拠）。
 // 一覧写真は /public/assets/karma/cast/<id>.webp（450×600）、
 // モーダルの告知カードは /public/assets/karma/cast/card-<n>.webp（900×1272）。
-// photo: false の出演者は写真を出さない（2026-10-08 ユーザー指示で桐谷 紫月・遥の写真を削除。画像ファイルも削除済み）。
+// 2026-10-08 ユーザー指示で沖田ゆうき役の2名を掲載から外した（名前・写真・告知カードとも削除）。
 const cast = [
   { id: 'ogawa', card: 1, name: '小川 直彦', role: '神崎真 役', tag: '容疑者', desc: '新興宗教団体のカリスマ教祖。', comment: '皆さまと同じ空間を共有できることを楽しみにしております。' },
   { id: 'hayashi', card: 2, name: 'はやし ゆうへい', role: '神崎真 役', tag: '容疑者', desc: '新興宗教団体のカリスマ教祖。', comment: 'これまでの経験を生かし、今回の公演でも皆さまに心から楽しんでいただける物語体験をお届けできるよう、精いっぱい努めてまいります！よろしくお願いいたします！' },
   { id: 'ando', card: 3, name: '安藤 紫緒', role: '神崎真 役', tag: '容疑者', desc: '新興宗教団体のカリスマ教祖。', comment: 'プレイヤーの皆さまと果たしてどんな物語が紡げるのか、とても楽しみで仕方がありません！' },
   { id: 'tsukina', card: 4, name: '月那 珠梨', role: '神崎真 役', tag: '容疑者', desc: '新興宗教団体のカリスマ教祖。', comment: '皆さまとどんな舌戦ができるのか楽しみです。お待ちしております！' },
   { id: 'manabe', card: 5, name: '真辺 彩加', role: '神崎真 役', tag: '容疑者', desc: '新興宗教団体のカリスマ教祖。', comment: '今回はこれまでに演じたことのないタイプのお役をいただき楽しみにしております。皆様、ぜひ濃厚な時間をともに過ごしましょう。' },
-  { id: 'kiritani', card: 6, photo: false, name: '桐谷 紫月', role: '沖田ゆうき 役', tag: '特別捜査班', desc: 'あなたを導く、先輩刑事。', comment: 'この世界を一緒に楽しみましょうね。' },
   { id: 'shiraha', card: 7, name: '白羽 リナ', role: '沖田ゆうき 役', tag: '特別捜査班', desc: 'あなたを導く、先輩刑事。', comment: '真実とは何なのか。その目で、言葉で確かめてください。捜査へのご協力お待ちしております。' },
-  { id: 'haruka', card: 8, photo: false, name: '遥', role: '沖田ゆうき 役', tag: '特別捜査班', desc: 'あなたを導く、先輩刑事。', comment: '取調という普段では絶対にできないことを体験出来る…凄い！私自身もとても楽しみです！皆さんにお会い出来ることを楽しみにしております。' },
   { id: 'sankai', card: 9, name: '山海 まなり', role: '沖田ゆうき 役', tag: '特別捜査班', desc: 'あなたを導く、先輩刑事。', comment: '先輩捜査官としてバッチリサポートします。一緒に捜査を頑張りましょう！みなさんがどんな結末へたどり着くのか、心から楽しみにしています。' },
 ];
 
@@ -234,9 +232,7 @@ const faqLd = {
   <div class="castgrid">
     {cast.map((c, i) => (
       <button class="castcard" type="button" data-cast={i} aria-haspopup="dialog">
-        {c.photo === false
-          ? <span class="castimg castnophoto" aria-hidden="true"></span>
-          : <img class="castimg" src={`${assets}/cast/${c.id}.webp`} alt={c.name} loading="lazy" width="450" height="600">}
+        <img class="castimg" src={`${assets}/cast/${c.id}.webp`} alt={c.name} loading="lazy" width="450" height="600">
         <span class="castmeta">
           <span class="castrole">{c.role}</span>
           <span class="castname">{c.name}</span>
@@ -461,7 +457,6 @@ img{max-width:100%}
 .castcard:hover{opacity:.8}
 .castimg{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;display:block;border:1px solid rgba(233,227,216,.15);filter:saturate(.85);box-sizing:border-box}
 .castmeta{display:flex;flex-direction:column;gap:0;line-height:1.5}
-.castnophoto{display:flex;align-items:center;justify-content:center;padding:8px;text-align:center;background:#0a0e0f;font-family:'Shippori Mincho B1','Hiragino Mincho ProN',serif;font-size:13px;letter-spacing:.08em;color:#5a6260;filter:none}
 .castrole{font-size:10px;letter-spacing:.1em;color:#b8201f}
 .castname{font-family:'Shippori Mincho B1','Hiragino Mincho ProN',serif;font-size:13px;letter-spacing:.04em;color:#f3eee5}
 
@@ -474,7 +469,6 @@ img{max-width:100%}
 /* iOS Safari は縦並び flex の直下に置いた img を縦に引き伸ばすことがあるため、
    div で包んで flex の伸縮対象から外し、縦横比（900×1272）を CSS で固定する */
 .dlgbody>*{flex:0 0 auto;min-height:0}
-.dlgfig[hidden]{display:none}
 .dlgfig{width:100%;aspect-ratio:900/1272;border:1px solid rgba(233,227,216,.12);box-sizing:border-box;background:#0a0e0f}
 .dlgimg{width:100%;height:100%;display:block;object-fit:contain}
 .dlginfo{display:flex;flex-direction:column;gap:10px}
@@ -570,7 +564,6 @@ html{scroll-behavior:auto}
   var dlg = document.getElementById('castdlg');
   if (!dlg || typeof dlg.showModal !== 'function') return;
   var img = document.getElementById('dlgimg');
-  var fig = img.parentNode;
   var tag = document.getElementById('dlgtag');
   var role = document.getElementById('dlgrole');
   var name = document.getElementById('dlgname');
@@ -580,15 +573,8 @@ html{scroll-behavior:auto}
     btn.addEventListener('click', function () {
       var c = cast[Number(btn.dataset.cast)];
       if (!c) return;
-      if (c.photo === false) {
-        fig.hidden = true;
-        img.removeAttribute('src');
-        img.alt = '';
-      } else {
-        fig.hidden = false;
-        img.src = assets + '/cast/card-' + c.card + '.webp';
-        img.alt = c.name + ' キャスト告知カード';
-      }
+      img.src = assets + '/cast/card-' + c.card + '.webp';
+      img.alt = c.name + ' キャスト告知カード';
       tag.textContent = c.tag;
       role.textContent = c.role;
       name.textContent = c.name;
