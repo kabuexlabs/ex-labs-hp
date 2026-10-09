@@ -1,0 +1,27 @@
+---
+// 真凜会 会員限定書庫「解説」。本文は src/data/karma/commentary.ts（パスワードなし）。
+import ShinrinkaiLayout from '../../../../layouts/ShinrinkaiLayout.astro';
+import { commentary } from '../../../../data/karma/commentary';
+
+const blocks = commentary.body
+  .replace(/\r\n?/g, '\n')
+  .trim()
+  .split(/\n{2,}/)
+  .filter(Boolean)
+  .map((b) => (b.startsWith('## ') ? { h: b.slice(3).trim() } : { lines: b.split('\n') }));
+---
+<ShinrinkaiLayout title="解説" path="/karma/shinrinkai/commentary/" description="真凜会 会員限定書庫「解説」。作品をより深く読むために。">
+  <p class="eyebrow">COMMENTARY</p>
+  <h1 class="page-h1">{commentary.title || '解説'}</h1>
+  {blocks.length === 0 ? (
+    <p class="pending-box">ただいま公開の準備中です。<br>公開まで、いましばらくお待ちください。</p>
+  ) : (
+    <div class="text">
+      {blocks.map((b) => ('h' in b ? <h2 class="text-h">{b.h}</h2> : <p>{b.lines.map((l, i) => <>{i > 0 && <br />}{l}</>)}</p>))}
+    </div>
+  )}
+</ShinrinkaiLayout>
+<style>
+.text{display:flex;flex-direction:column;gap:1.9em;font-size:clamp(15px,3.9vw,17px);line-height:2.3;letter-spacing:.06em;color:#e4ddd3}
+.text-h{font-size:clamp(19px,4.8vw,23px);letter-spacing:.12em;color:#f3eee6;margin-top:1.2em;padding-left:14px;border-left:2px solid #b52f28;line-height:1.7}
+</style>

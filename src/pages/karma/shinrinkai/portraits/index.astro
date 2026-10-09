@@ -1,0 +1,134 @@
+---
+// 真凜会 会員限定書庫「特別肖像集」（デジタルブロマイド・パスワード付き）。
+// 写真は scripts/karma-seal.mjs で暗号化した public/assets/karma/sealed/portraits/ をブラウザで復号する。
+// 一覧は各写真のファイル名のリンク。押すとポップアップで写真を表示（HIGE さん指示 2026-10-09）。
+import ShinrinkaiLayout from '../../../../layouts/ShinrinkaiLayout.astro';
+---
+<ShinrinkaiLayout title="特別肖像集" path="/karma/shinrinkai/portraits/" description="真凜会 会員限定書庫「特別肖像集」。デジタルブロマイドのコレクション（購入者限定）。">
+  <p class="eyebrow">PORTRAIT COLLECTION</p>
+  <h1 class="page-h1">特別肖像集</h1>
+  <p class="lead" id="pt-lead">デジタルブロマイドのコレクション。<br>パンフレットに記載のパスワードを入力してください。</p>
+
+  <p class="pending-box" id="pt-pending" hidden>ただいま公開の準備中です。<br>公開まで、いましばらくお待ちください。</p>
+  <form class="gate" id="pt-gate" hidden>
+    <label class="gate-label" for="pt-pass">パスワード</label>
+    <input class="gate-input" id="pt-pass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+    <p class="gate-err" id="pt-err" hidden>パスワードが違います。</p>
+    <div><button class="btn-red" type="submit">ひらく</button></div>
+    <p class="gate-note">購入者限定・パスワードが必要です。</p>
+  </form>
+
+  <div id="pt-list-wrap" hidden>
+    <p class="pt-hint">ファイル名を押すと写真が開きます。</p>
+    <ol class="pt-list" id="pt-list"></ol>
+  </div>
+
+  <dialog class="pt-dlg" id="pt-dlg" aria-label="肖像">
+    <div class="pt-dlg-in">
+      <button class="pt-close" type="button" aria-label="閉じる">×</button>
+      <div class="pt-fig"><img id="pt-img" alt=""><p class="pt-loading" id="pt-loading">読み込み中…</p></div>
+      <div class="pt-bar">
+        <button class="pt-nav" type="button" id="pt-prev" aria-label="前の写真">‹</button>
+        <p class="pt-name" id="pt-name"></p>
+        <button class="pt-nav" type="button" id="pt-next" aria-label="次の写真">›</button>
+      </div>
+    </div>
+  </dialog>
+</ShinrinkaiLayout>
+
+<script>
+import { loadSealed, bindGate, openBin } from '../../../../scripts/karmaSeal';
+
+type Item = { name: string; file: string; type: string };
+const BASE = '/assets/karma/sealed/portraits/';
+const $ = (id: string) => document.getElementById(id)!;
+
+(async () => {
+  const sealed = await loadSealed(BASE + 'index.json');
+  if (!sealed) { $('pt-pending').hidden = false; return; }
+  $('pt-gate').hidden = false;
+
+  const dlg = $('pt-dlg') as HTMLDialogElement;
+  const img = $('pt-img') as HTMLImageElement;
+  const cache = new Map<string, string>();
+  let items: Item[] = [];
+  let key: CryptoKey;
+  let cur = 0;
+
+  async function show(i: number) {
+    cur = (i + items.length) % items.length;
+    const it = items[cur];
+    $('pt-name').textContent = it.name;
+    img.alt = it.name;
+    let url = cache.get(it.file);
+    if (!url) {
+      img.removeAttribute('src');
+      $('pt-loading').hidden = false;
+      const buf = await (await fetch(BASE + it.file)).arrayBuffer();
+      url = URL.createObjectURL(new Blob([await openBin(key, buf)], { type: it.type }));
+      cache.set(it.file, url);
+    }
+    if (items[cur] !== it) return; // 読み込み中に別の写真へ移った
+    $('pt-loading').hidden = true;
+    img.src = url;
+    if (!dlg.open) dlg.showModal();
+  }
+
+  bindGate({
+    sealed,
+    form: $('pt-gate') as HTMLFormElement,
+    input: $('pt-pass') as HTMLInputElement,
+    error: $('pt-err'),
+    onOpen: (k, text) => {
+      key = k;
+      items = JSON.parse(text) as Item[];
+      const list = $('pt-list');
+      list.replaceChildren();
+      items.forEach((it, i) => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#';
+        a.textContent = it.name;
+        a.addEventListener('click', (e) => { e.preventDefault(); show(i); });
+        li.append(a);
+        list.append(li);
+      });
+      $('pt-gate').hidden = true;
+      $('pt-lead').hidden = true;
+      $('pt-list-wrap').hidden = false;
+      const nav = items.length > 1;
+      $('pt-prev').hidden = !nav;
+      $('pt-next').hidden = !nav;
+    },
+  });
+
+  dlg.querySelector('.pt-close')!.addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  $('pt-prev').addEventListener('click', () => show(cur - 1));
+  $('pt-next').addEventListener('click', () => show(cur + 1));
+  dlg.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') show(cur - 1);
+    if (e.key === 'ArrowRight') show(cur + 1);
+  });
+})();
+</script>
+
+<style>
+.pt-hint{font-size:14px;color:var(--dim);margin-bottom:20px}
+.pt-list{list-style:none;padding:0;border-top:1px solid var(--rule)}
+.pt-list li{border-bottom:1px solid var(--rule)}
+.pt-list a{display:block;padding:16px 4px;font-family:'Cormorant Garamond','Shippori Mincho',serif;font-size:clamp(16px,4.2vw,19px);letter-spacing:.08em;word-break:break-all}
+.pt-list a::before{content:"";display:inline-block;width:18px;height:1px;background:#b52f28;vertical-align:middle;margin-right:14px}
+.pt-list a:hover{color:var(--pink)}
+.pt-dlg{background:#0d0d0d;color:var(--ink);border:1px solid rgba(236,230,220,.18);padding:0;max-width:min(720px,calc(100vw - 24px));width:100%;max-height:94svh;box-sizing:border-box}
+.pt-dlg::backdrop{background:rgba(0,0,0,.86)}
+.pt-dlg-in{position:relative;display:flex;flex-direction:column}
+.pt-close{position:absolute;top:6px;right:10px;z-index:2;background:none;border:0;color:#ece6dc;font-size:30px;line-height:1;cursor:pointer;text-shadow:0 0 8px #000}
+.pt-fig{display:flex;align-items:center;justify-content:center;min-height:240px;background:#0a0a0a}
+.pt-fig img{display:block;max-width:100%;max-height:calc(94svh - 72px);width:auto;height:auto;object-fit:contain}
+.pt-loading{position:absolute;color:var(--dim);font-size:14px}
+.pt-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-top:1px solid var(--rule)}
+.pt-name{flex:1;text-align:center;font-family:'Cormorant Garamond','Shippori Mincho',serif;font-size:15px;letter-spacing:.06em;color:var(--dim);word-break:break-all}
+.pt-nav{background:none;border:1px solid rgba(236,230,220,.25);color:var(--ink);width:40px;height:36px;font-size:22px;line-height:1;cursor:pointer}
+.pt-nav:hover{border-color:var(--red-soft)}
+</style>

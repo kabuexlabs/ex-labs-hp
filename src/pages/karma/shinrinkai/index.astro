@@ -1,10 +1,12 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
 import SiteGuard from '../../../components/SiteGuard.astro';
+import { commentary } from '../../../data/karma/commentary';
 // 「臓腑、或いはカルマ」劇中の架空団体「真凜会（しんりんかい）」の会員向けページ。
 // 参考：ChatGPT で試作された shinrinkai-members-karma.pasohige613.chatgpt.site（ユーザー提供のスマホ画面）を移植。
 // パンフレット（グッズ）購入者向けの限定ページ：noindex, nofollow。sitemap・llms.txt・他ページからはリンクしない。
 // ヒーローの彼岸花は元ページの写真が手元にないため SVG で描いた仮のもの（写真が届いたら差し替える）。
-// 裏設定資料・特別肖像集の閲覧先（パスワード付き）は未受領。archive の href に入れると赤枠ボタンがそのリンクになる。
 
 const site = 'https://kabuexlabs.com';
 const canonical = `${site}/karma/shinrinkai/`;
@@ -18,14 +20,20 @@ const tenets = [
   { n: '三', h: 'いつでも、離れてよいこと', p: 'ここは、閉じ込める場所ではありません。必要がなくなったなら、いつでも離れてください。' },
 ];
 
-// 会員限定書庫。
-//  ready: false … 「ただいま準備中」の枠だけ表示（押せない）
-//  ready: true  … 赤枠の「〜をひらく」ボタン＋「購入者限定・パスワードが必要です」。
-//                 href（パスワード付きの閲覧先）が空の間は、押すと「準備中」のお知らせを出す。
+// 会員限定書庫（HIGE さん指示 2026-10-09）。
+//  解説 … /karma/shinrinkai/commentary/（パスワードなし。本文は src/data/karma/commentary.ts）
+//  特典ショートストーリー … /karma/shinrinkai/story/（描き下ろし・パスワード付き。旧「裏設定資料」の枠）
+//  特別肖像集 … /karma/shinrinkai/portraits/（ファイル名のリンク→ポップアップ・パスワード付き）
+// 素材が入ったもの（解説は本文あり、他は scripts/karma-seal.mjs で暗号化済み）だけ各ページへつながる。
+// 素材がまだのものは、解説＝「ただいま準備中」の枠、他＝押すと「準備中」のお知らせ。
+const sealedDir = path.join(process.cwd(), 'public/assets/karma/sealed');
 const archive = [
-  { en: 'COMMENTARY', h: '解説', p: '作品をより深く読むために。', ready: false, href: '', label: 'ただいま準備中' },
-  { en: 'BEHIND THE STORY', h: '裏設定資料', p: '物語の奥にある記録。', ready: true, href: '', label: '裏設定資料をひらく' },
-  { en: 'PORTRAIT COLLECTION', h: '特別肖像集', p: 'デジタルブロマイドのコレクション。', ready: true, href: '', label: '特別肖像集をひらく' },
+  { en: 'COMMENTARY', h: '解説', p: '作品をより深く読むために。', locked: false,
+    href: commentary.body.trim() ? '/karma/shinrinkai/commentary/' : '', label: '解説をひらく' },
+  { en: 'SHORT STORY', h: '特典ショートストーリー', p: '描き下ろしショートストーリー。', locked: true,
+    href: fs.existsSync(path.join(sealedDir, 'story.json')) ? '/karma/shinrinkai/story/' : '', label: '特典ショートストーリーをひらく' },
+  { en: 'PORTRAIT COLLECTION', h: '特別肖像集', p: 'デジタルブロマイドのコレクション。', locked: true,
+    href: fs.existsSync(path.join(sealedDir, 'portraits/index.json')) ? '/karma/shinrinkai/portraits/' : '', label: '特別肖像集をひらく' },
 ];
 
 // 活動のご案内（作品世界の設定）
@@ -163,11 +171,11 @@ const flowers = [lily(380, 300, 230, 7), lily(330, 720, 200, 23)];
         <p class="eyebrow">{c.en}</p>
         <h3 class="card-h">{c.h}</h3>
         <p class="card-p">{c.p}</p>
-        {!c.ready && <span class="btn-wait" aria-disabled="true">{c.label}</span>}
-        {c.ready && (c.href
-          ? <a class="btn-red btn-card" href={c.href} target="_blank" rel="noopener">{c.label}</a>
+        {!c.locked && !c.href && <span class="btn-wait" aria-disabled="true">ただいま準備中</span>}
+        {(c.locked || c.href) && (c.href
+          ? <a class="btn-red btn-card" href={c.href}>{c.label}</a>
           : <button class="btn-red btn-card" type="button" data-pending>{c.label}</button>)}
-        {c.ready && <p class="card-note">購入者限定・パスワードが必要です</p>}
+        {c.locked && <p class="card-note">購入者限定・パスワードが必要です</p>}
       </article>
     ))}
   </div>
@@ -289,13 +297,13 @@ h1,h2,h3{font-weight:400}
 .cards{display:flex;flex-direction:column;gap:clamp(24px,5vw,32px)}
 .card{border:1px solid rgba(236,230,220,.18);padding:clamp(36px,8vw,48px) clamp(26px,6vw,40px)}
 .card .eyebrow{color:var(--red-soft)}
-.card-h{font-size:clamp(26px,6.6vw,32px);letter-spacing:.06em;margin:14px 0 26px;color:#f3eee6}
+.card-h{font-size:clamp(22px,5.8vw,32px);letter-spacing:.06em;word-break:keep-all;margin:14px 0 26px;color:#f3eee6}
 .card-p{font-size:clamp(15px,3.9vw,17px);color:var(--dim);margin-bottom:22px}
 .btn-wait{display:inline-block;border:1px solid rgba(236,230,220,.25);padding:14px clamp(26px,7vw,40px);font-size:clamp(14px,3.6vw,16px);letter-spacing:.2em;color:var(--dim)}
 .btn-card{padding:14px clamp(26px,7vw,40px)}
 
 button.btn-red{font:inherit;color:inherit;cursor:pointer}
-.btn-card{background:#2c1d1b;font-size:clamp(15px,3.9vw,17px)}
+.btn-card{background:#2c1d1b;font-size:clamp(14px,3.7vw,17px);letter-spacing:.1em;padding-left:clamp(18px,5vw,40px);padding-right:clamp(18px,5vw,40px)}
 .card-note{margin-top:22px;font-size:clamp(13px,3.3vw,15px);letter-spacing:.04em;color:var(--dim)}
 .archive-foot{margin-top:clamp(40px,8vw,56px);font-size:clamp(14px,3.6vw,16px);letter-spacing:.04em;color:var(--dim)}
 
@@ -332,6 +340,7 @@ button.btn-red{font:inherit;color:inherit;cursor:pointer}
 .hdr{align-items:center}
 .nav{flex-wrap:nowrap;gap:32px}
 }
+@media (max-width:420px){.nav{font-size:13px;letter-spacing:.1em;gap:6px 14px}}
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
 </style>
 </body>

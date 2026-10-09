@@ -1,0 +1,58 @@
+---
+// 真凜会 会員限定書庫「特典ショートストーリー」（描き下ろし・パスワード付き）。
+// 本文は scripts/karma-seal.mjs で暗号化した public/assets/karma/sealed/story.json をブラウザで復号して表示する。
+import ShinrinkaiLayout from '../../../../layouts/ShinrinkaiLayout.astro';
+---
+<ShinrinkaiLayout title="特典ショートストーリー" path="/karma/shinrinkai/story/" description="真凜会 会員限定書庫「特典ショートストーリー」。描き下ろしショートストーリー（購入者限定）。">
+  <p class="eyebrow">SHORT STORY</p>
+  <h1 class="page-h1" id="st-title">特典ショートストーリー</h1>
+  <p class="lead" id="st-lead">描き下ろしショートストーリー。<br>パンフレットに記載のパスワードを入力してください。</p>
+
+  <p class="pending-box" id="st-pending" hidden>ただいま公開の準備中です。<br>公開まで、いましばらくお待ちください。</p>
+  <form class="gate" id="st-gate" hidden>
+    <label class="gate-label" for="st-pass">パスワード</label>
+    <input class="gate-input" id="st-pass" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+    <p class="gate-err" id="st-err" hidden>パスワードが違います。</p>
+    <div><button class="btn-red" type="submit">ひらく</button></div>
+    <p class="gate-note">購入者限定・パスワードが必要です。</p>
+  </form>
+  <article class="story" id="st-body" hidden></article>
+</ShinrinkaiLayout>
+
+<script>
+import { loadSealed, bindGate } from '../../../../scripts/karmaSeal';
+
+const $ = (id: string) => document.getElementById(id)!;
+(async () => {
+  const sealed = await loadSealed('/assets/karma/sealed/story.json');
+  if (!sealed) { $('st-pending').hidden = false; return; }
+  $('st-gate').hidden = false;
+  bindGate({
+    sealed,
+    form: $('st-gate') as HTMLFormElement,
+    input: $('st-pass') as HTMLInputElement,
+    error: $('st-err'),
+    onOpen: (_key, text) => {
+      const { title, body } = JSON.parse(text) as { title: string; body: string };
+      $('st-title').textContent = title;
+      const art = $('st-body');
+      art.replaceChildren();
+      for (const para of body.split(/\n{2,}/)) {
+        const p = document.createElement('p');
+        para.split('\n').forEach((line, i) => {
+          if (i > 0) p.append(document.createElement('br'));
+          p.append(line);
+        });
+        art.append(p);
+      }
+      $('st-gate').hidden = true;
+      $('st-lead').hidden = true;
+      art.hidden = false;
+    },
+  });
+})();
+</script>
+
+<style>
+.story{display:flex;flex-direction:column;gap:1.6em;font-size:clamp(15px,3.9vw,17px);line-height:2.3;letter-spacing:.06em;color:#e4ddd3}
+</style>
