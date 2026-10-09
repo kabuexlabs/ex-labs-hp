@@ -8,17 +8,22 @@
 <input type="hidden" name="_source" value="">
 
 <script>
+// 送信時にも作り直す（同じページ内で「相談する」ボタンを押してからフォームに入力した場合も反映するため）
+const fillSource = () => {
 try {
   const rd = (st: Storage, k: string) => { try { return JSON.parse(st.getItem(k) || '{}'); } catch { return {}; } };
   const s = rd(sessionStorage, 'exl_src');
   const f = rd(localStorage, 'exl_first');
   const n = (() => { try { return localStorage.getItem('exl_n') || ''; } catch { return ''; } })();
+  // 別ページの「相談する」ボタンから来た場合、そのボタンがあったページ（パスのみ）
+  const cta = (() => { try { return sessionStorage.getItem('exl_cta') || ''; } catch { return ''; } })();
   const day = (t?: number) => (t ? new Date(t).toISOString().slice(0, 10) : '');
   const none = '(なし＝直接アクセス・アプリ内ブラウザなど)';
   const v = [
     `参照元: ${s.r || none}`,
     `最初に開いたページ: ${s.l || '(不明)'}`,
     `送信したページ: ${location.href}`,
+    `相談ボタンを押したページ: ${cta || '(なし)'}`,
     `初回訪問日: ${day(f.t) || '(不明)'}`,
     `初回参照元: ${f.r || none}`,
     `初回入口ページ: ${f.l || '(不明)'}`,
@@ -28,4 +33,7 @@ try {
     el.value = v;
   });
 } catch { /* 記録に失敗しても送信は妨げない */ }
+};
+fillSource();
+document.addEventListener('submit', fillSource, true);
 </script>

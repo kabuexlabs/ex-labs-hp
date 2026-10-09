@@ -665,6 +665,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/case-uwasabanashi.webp',
   },
   {
+    href: '/guide/case-lostframe/',
+    title: '街歩き型イマーシブ制作事例：下北沢「ロスト・フレーム」',
+    desc: '下北沢の街全体を会場にした周遊型アートイマーシブ（全公演完売）の構成・担当範囲・実施条件と、商店街・エリアの回遊企画への応用。',
+    date: '2026-10-09',
+    category: 'immersive',
+    thumb: '/assets/guide/case-lostframe.webp',
+  },
+  {
     href: '/guide/immersive-vr/',
     title: 'イマーシブとVR・メタバースの違い｜リアル型没入体験の強み',
     desc: 'イマーシブ＝VRではない。リアル型とデジタル型の違い、目的別の選び方、リアル型の強みを解説。',

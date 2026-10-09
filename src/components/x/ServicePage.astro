@@ -147,6 +147,7 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
                 <div class="xs-cardc-h"><span class="xs-cardc-no">{c.no}</span><h3><Cls text={c.title} emph={false} /></h3></div>
                 <div class="xs-cardc-sub"><Rich text={c.sub} /></div>
                 <ul class="xs-cardc-ul">{(c.bullets as string[]).map((b) => <li><span class="xs-plus">+</span><span><Cls text={b} emph={false} /></span></li>)}</ul>
+                {c.href && <a href={c.href} class="xs-cardc-a" data-track="cta" data-show="case" data-place={`svc-${slug}-works`}>{c.hrefLabel ?? '事例の詳細を読む'} →</a>}
               </div>
             ))}
           </div>
@@ -235,6 +236,7 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
 </BaseLayout>
 
 <style>
+.xs-cardc-a{display:inline-block;margin-top:18px;font-weight:700;font-size:14px;color:var(--x-lime);border-bottom:1px solid currentColor;line-height:1.6}
 .xs-crumb{max-width:1040px;margin:0 auto;padding:20px 24px 0;display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--x-pale2)}
 .xs-hero{padding:clamp(56px,9vw,112px) 0 0}
 .xs-hero-in{max-width:1040px;margin:0 auto;padding:0 24px}

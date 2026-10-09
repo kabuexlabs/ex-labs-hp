@@ -1,0 +1,23 @@
+---
+// 解説記事の具体例・活用例の直後に置く、法人担当者向けの短い案内（1記事に1つ）。
+// 本文の回答より先に置かず、参加者向けの導線も残したまま、対応するサービスページへ案内する。2026-10-09 追加。
+interface Props { place: string; title: string; body: string; href: string; label: string; sub?: { label: string; href: string } }
+const { place, title, body, href, label, sub } = Astro.props;
+const show = href.split('/')[2] ?? '';
+---
+<aside class="b2bn" aria-label={title}>
+  <p class="b2bn-t">{title}</p>
+  <p class="b2bn-b">{body}</p>
+  <p class="b2bn-a">
+    <a href={href} data-track="cta" data-show={`services-${show}`} data-place={place}>{label} →</a>
+    {sub && <a href={sub.href} class="is-sub" data-track="cta" data-show="case" data-place={place}>{sub.label} →</a>}
+  </p>
+</aside>
+<style>
+.b2bn{margin:28px 0 0;padding:20px 22px;background:#fff;border:1px solid rgba(51,48,43,.12);border-radius:14px;text-align:left}
+.b2bn-t{margin:0;font-weight:800;font-size:15.5px;line-height:1.6;color:var(--ink,#33302B)}
+.b2bn-b{margin:6px 0 0;font-size:14.5px;line-height:1.9;color:rgba(51,48,43,.85)}
+.b2bn-a{margin:10px 0 0;display:flex;flex-wrap:wrap;gap:6px 20px}
+.b2bn-a a{display:inline-block;padding:4px 0;font-weight:700;font-size:14.5px;color:var(--accent)!important;border-bottom:1px solid currentColor;text-decoration:none!important}
+.b2bn-a a.is-sub{font-weight:600;color:rgba(51,48,43,.75)!important}
+</style>

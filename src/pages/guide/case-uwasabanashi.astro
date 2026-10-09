@@ -27,6 +27,8 @@ const toc = [
   { id: 'design', label: '体験設計の工夫3つ' },
   { id: 'media', label: '成果：日本経済新聞・電ファミニコゲーマー掲載' },
   { id: 'kpi', label: '企画の目的・これまでの実績・測る項目' },
+  { id: 'conditions', label: '発注者向けの整理（課題・場所・担当範囲・条件）' },
+  { id: 'apply', label: 'この形式を応用できる場面' },
   { id: 'faq', label: 'よくある質問' },
 ];
 
@@ -70,7 +72,7 @@ const articleLd = {
   reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-11',
-  dateModified: '2026-09-07',
+  dateModified: '2026-10-09',
   mainEntityOfPage: new URL('/guide/case-uwasabanashi/', Astro.site).toString(),
 };
 ---
@@ -171,6 +173,18 @@ const articleLd = {
 <p class="vc-line"><a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントの制作サービス →</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス →</a>／<a href="/?c=shisetsu#contact" style="color:var(--accent)">同じ形式を自施設で検討する（相談無料）→</a></p>
 </div></section>
 
+<section class="section" id="apply"><div class="wrap narrow">
+<p class="eyebrow">APPLY</p><h2 class="h2 serif">この形式を応用できる場面</h2>
+<p class="lede">ここからは実績ではなく、同じ形式を応用する場合のご提案です。</p>
+<ul class="bullets">
+<li><strong>上層階・奥まった区画への回遊</strong>：目的がないと立ち寄られにくいフロアに手がかりを置き、物語の順路で人を運びます。</li>
+<li><strong>テナントとの協働企画</strong>：協力店舗の店内でしか手に入らない手がかりを用意し、来店のきっかけを物語に組み込みます。</li>
+<li><strong>複合ビル・駅直結施設の共有空間</strong>：通路や広場など、通過するだけの場所を体験の舞台として使います。</li>
+</ul>
+<p class="lede">検討の際に確認すること：使える区画と時間帯／営業中の動線（エレベーター・混雑する時間）／館内の告知面／協力テナントとの窓口／有料チケット型にするか（レベニューシェアの条件）。</p>
+<p class="vc-line"><a href="/services/shisetsu-event/#cost-split" style="color:var(--accent)">受託とレベニューシェアの費用負担 →</a>／<a href="/guide/case-lostframe/" style="color:var(--accent)">街全体を会場にした制作事例（下北沢「ロスト・フレーム」）→</a></p>
+</div></section>
+
 <ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
@@ -190,7 +204,7 @@ const articleLd = {
 <p class="cta-mini-title serif">貴施設でも施設一体型イマーシブを開催しませんか？（相談無料）</p>
 <a class="btn" href="/?c=shisetsu#contact" data-track="cta" data-show="contact" data-place="case-uwasabanashi">この形式（施設一体型）を自社施設で実施できるか相談する</a>
 </div>
-<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作とは（工程・体制の解説）</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例4選</a>／<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントとは</a></p>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作とは（工程・体制の解説）</a>／<a href="/services/immersive/" style="color:var(--accent)">イマーシブ制作サービス</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>／<a href="/guide/immersive-event/" style="color:var(--accent)">イマーシブイベントの事例4選</a>／<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントとは</a>／<a href="/guide/case-lostframe/" style="color:var(--accent)">下北沢「ロスト・フレーム」の制作事例</a></p>
 </div></section>
 
 <AuthorBox />
@@ -206,6 +220,6 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#summary,#background,#concept,#design,#media,#kpi,#faq{scroll-margin-top:88px}
+#summary,#background,#concept,#design,#media,#kpi,#conditions,#apply,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>

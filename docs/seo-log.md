@@ -1287,3 +1287,15 @@
 ## 2026-10-08 /karma/ 沖田ゆうき役の出演者2名を掲載から削除
 
 - ユーザー指示。出演者一覧・モーダル（名前・役・コメント・写真・告知カード）と構造化データの performer から外し、画像ファイル4点も削除。キャストは7名表示。
+
+## 2026-10-09 法人問い合わせ強化（10/9指示書 第一陣）
+
+変更URL（title・H1・description・canonical・index は変更なし。新規は /guide/case-lostframe/ のみ）
+- /services/immersive/ /services/murder-mystery/ /services/zunousen/ /services/shisetsu-event/ /services/ip-event/：概要に「よくあるご相談」、ヒーローのボタン文言を指示書のCTA文案に、問い合わせ欄に初回相談の案内。イマーシブは形式表に「演者・運営」「既存営業との共存」列、マダミスは「オリジナル制作・既存作品の活用・IP連動の違い」(#types)、頭脳戦は「番組・配信・リアルイベントでの設計の違い」(#media)、施設活用は「受託とレベニューシェアの費用負担」表(#cost-split)、IPは「素材の扱い」。各ご依頼の条件に「お見積りに含むもの・別途になるもの」。実績カードから事例詳細へリンク。
+- /：サービス一覧の下に /services/ への案内1行。
+- /guide/immersive/ /guide/shuyu-event/ /guide/madamis/ /guide/shinrisen/ /guide/zunousen/：活用例の後に法人向けの短い案内（B2BNote）を1つ。botsunyukan・shopping-mall-couple-event・ip-event・ip-multi-site は既存の法人導線で対応済み（IP系はボタン文言のみ統一）。
+- /guide/case-uwasabanashi/：「この形式を応用できる場面」（実績と提案を分けて記載）と目次を追加。
+- /guide/case-lostframe/（新規）：下北沢「ロスト・フレーム」の制作事例。公開済みの事実（会期・所要時間・人数・料金・クレジット・全公演完売）のみ。/works/ のカードの行き先を公演ページから本事例へ。guides.ts・サイトマップに追加。
+- /guide/hotel-event/：既存記事を増補（形式比較表・導入前の確認・宿泊プランとの組み合わせ・制作範囲と費用を左右する条件・相談時に伝えること）。末尾ボタンを「ホテル向け体験企画を相談する」（/?c=shisetsu#contact）に。新規URL /guide/hotel-experience-event/ は意図重複のため作らない。
+- 計測：入力開始（start）を追加（最初の入力時に1回、パスと相談種別のみ）。相談CTAクリック＝既存の cta、送信成功＝既存の submit（/api/contact の受付成功後のみ）、予約先クリック＝既存の ticket。問い合わせの流入元情報に「相談ボタンを押したページ」（パスのみ）を追加。送信中表示と二重送信防止をフォームに追加。
+- GSC の「http://kabuexlabs.com/guide/zunousen/]。」：ソース・llms.txt に該当リンクなし。サイト内由来は未特定（外部の文章由来と推定）。当該URLは404を返す。

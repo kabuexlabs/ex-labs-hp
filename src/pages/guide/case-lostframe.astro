@@ -1,0 +1,172 @@
+---
+// 「街歩き イベント 事例」「周遊型イベント 制作」「商店街 回遊 企画」系の受け皿。
+// 自社主催公演『ロスト・フレーム』（体験する美術館 第2回）を、発注を検討する担当者向けに整理した制作事例。
+// 公演ページ（/taikenbizyutu/lostframe/）とネタバレ記録（/game/lost-frame/）は参加者向けとして別に残す。
+// 数値は公開済みのもの（会期・所要時間・人数・料金・全公演完売）だけを使い、参加者数などは載せない。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+import { LOST_FRAME, LOST_FRAME_ARTS, CREATORS } from '../../data/taikenbizyutu';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const yen = (n: number) => n.toLocaleString('ja-JP');
+const minP = LOST_FRAME.prices.reduce((a, b) => (a.price < b.price ? a : b));
+const maxP = LOST_FRAME.prices.reduce((a, b) => (a.price > b.price ? a : b));
+
+const toc = [
+  { id: 'summary', label: '概要' },
+  { id: 'background', label: '背景：街そのものを会場にする' },
+  { id: 'concept', label: '企画：街にこぼれた絵画を読み解く' },
+  { id: 'scope', label: '担当範囲と制作体制' },
+  { id: 'conditions', label: '実施条件' },
+  { id: 'result', label: '結果' },
+  { id: 'apply', label: 'この形式を応用できる場面' },
+];
+
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '街歩き型イマーシブ制作事例：下北沢「ロスト・フレーム」',
+  about: '街全体を会場にした周遊型アートイマーシブの制作事例',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/case-lostframe.webp', site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-09',
+  dateModified: '2026-10-09',
+  mainEntityOfPage: new URL('/guide/case-lostframe/', site).toString(),
+};
+---
+<BaseLayout
+  title="街歩き型イマーシブ制作事例：下北沢「ロスト・フレーム」｜街を美術館にした周遊企画 - 株式会社ex Labs"
+  description="下北沢の街全体を会場にした周遊型アートイマーシブ『ロスト・フレーム』（2026年7月7日〜8月31日、全公演完売）の制作事例。協力店舗を含む街の各所を巡る構成、描き下ろし絵画と登場人物との対話による体験設計、制作体制と、商店街・エリアの回遊企画に応用するときの条件を整理します。"
+  ogImage="/assets/guide/case-lostframe.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '周遊型イベントとは', href: '/guide/shuyu-event/' },
+  { name: '制作事例：ロスト・フレーム' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">CASE STUDY</p>
+<h1 class="h2 serif"><span class="nobr">街歩き型イマーシブ制作事例</span><br><span class="nobr">下北沢</span><span class="nobr">「ロスト・フレーム」</span></h1>
+<p class="lede">下北沢の街に散らばった絵画を探し、隠された物語を辿る——株式会社ex Labsのアート×体験レーベル「体験する美術館」の第2回公演<strong>『ロスト・フレーム』</strong>は、<strong>街そのものを会場</strong>にした周遊型アートイマーシブです。2026年7月7日から8月31日まで開催し、<strong>全公演のチケットが完売</strong>しました。このページでは、商店街やエリアの回遊企画を検討する方に向けて、構成・担当範囲・実施条件を整理します。</p>
+
+<div class="key-points"><p class="key-points-h">この事例の要点</p><ul><li>下北沢駅周辺の街の各所を巡り、描き下ろしの絵画と登場人物との対話で物語を進める、約{LOST_FRAME.duration}の周遊型体験です。</li><li>株式会社ex Labsの自社レーベルによる主催公演で、企画から主催まで当社が行いました。会場の一部は下北沢の店舗にご協力いただいています。</li><li>2026年7月7日〜8月31日の全公演が完売しました。</li></ul></div>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="summary"><div class="wrap narrow">
+<p class="eyebrow">SUMMARY</p><h2 class="h2 serif">概要</h2>
+<table class="case-table"><tbody>
+<tr><th scope="row">作品</th><td>体験する美術館 第2回公演『ロスト・フレーム』</td></tr>
+<tr><th scope="row">場所</th><td>{LOST_FRAME.area}。協力店舗を含む街の各所を巡ります</td></tr>
+<tr><th scope="row">実施時期</th><td>2026年7月7日〜8月31日</td></tr>
+<tr><th scope="row">実施形式</th><td>{LOST_FRAME.format}。所要時間{LOST_FRAME.duration}、1組{LOST_FRAME.capacity}の予約制</td></tr>
+<tr><th scope="row">参加費</th><td>1人{yen(minP.price)}円（{minP.people}名参加）〜{yen(maxP.price)}円（{maxP.people}名参加）。参加人数が少ないほど1人あたりの料金が上がる設定</td></tr>
+<tr><th scope="row">当社の役割</th><td>自社レーベル「体験する美術館」の公演として、企画・主催（チケット販売は escape.id）</td></tr>
+<tr><th scope="row">結果</th><td>全公演完売</td></tr>
+</tbody></table>
+<figure class="lf-kv"><img src={LOST_FRAME.image} alt="ロスト・フレーム キービジュアル" width="900" height="1281" loading="lazy" decoding="async"><figcaption>『ロスト・フレーム』キービジュアル</figcaption></figure>
+</div></section>
+
+<section class="section" id="background"><div class="wrap narrow">
+<p class="eyebrow">BACKGROUND</p><h2 class="h2 serif">背景：街そのものを会場にする</h2>
+<p class="lede">本件は取引先からの受託ではなく、当社レーベルの主催公演です。「体験する美術館」は、絵画を眺めるだけでなく、参加者が絵に描かれたものを読み解き、物語に関わる鑑賞体験をつくるレーベルです。第2回となる本公演では、<strong>初めて街そのものを会場</strong>にしました。古着・音楽・演劇・アートの文化が重なる下北沢を舞台に、街を歩くこと自体を鑑賞の一部にする試みです。</p>
+</div></section>
+
+<section class="section tinted" id="concept"><div class="wrap narrow">
+<p class="eyebrow">CONCEPT</p><h2 class="h2 serif">企画：街にこぼれた絵画を読み解く</h2>
+<p class="lede">設定は「絵画のモチーフが、街にこぼれるように現れはじめた」というものです。参加者は街の各所を巡り、この公演のために描き下ろされた<strong>手描きの絵画</strong>と出会い、絵に埋め込まれた図像や作中の言語を読み解きます。</p>
+<ul class="bullets">
+<li><strong>絵画が手がかりになる</strong>：謎の答えを掲示物に書くのではなく、絵画の図像そのものを読み解く対象にしました。公演記録では、使用した絵画のうち{LOST_FRAME_ARTS.length}点を公開しています。</li>
+<li><strong>登場人物との対話</strong>：参加者は街で登場人物と実際に言葉を交わしながら、絵画の側から立ち上がる物語に立ち会います。</li>
+<li><strong>選択で結末が分かれる</strong>：参加者の選択によって、物語は異なる結末へ分岐します。</li>
+</ul>
+<p class="vc-line"><a href={LOST_FRAME.path} style="color:var(--accent)">公演ページ（ネタバレなし）→</a>／<a href={LOST_FRAME.spoilerPath} style="color:var(--accent)">公演記録（ネタバレを含みます）→</a></p>
+</div></section>
+
+<section class="section" id="scope"><div class="wrap narrow">
+<p class="eyebrow">SCOPE</p><h2 class="h2 serif">担当範囲と制作体制</h2>
+<p class="lede">公演記録に掲載しているクレジットのとおりです。</p>
+<table class="case-table"><tbody>
+<tr><th scope="row">企画</th><td>株式会社ex Labs</td></tr>
+<tr><th scope="row">ディレクター・デザイン・ストーリー制作</th><td>荒巻まりの</td></tr>
+<tr><th scope="row">プロデューサー・図像設計</th><td>かるら</td></tr>
+<tr><th scope="row">監修</th><td>御湯波ライト</td></tr>
+<tr><th scope="row">絵画</th><td>{CREATORS.map((c) => c.name).join('／')}（敬称略・順不同）</td></tr>
+<tr><th scope="row">会場協力</th><td>下北沢の店舗の皆様</td></tr>
+</tbody></table>
+</div></section>
+
+<section class="section tinted" id="conditions"><div class="wrap narrow">
+<p class="eyebrow">CONDITIONS</p><h2 class="h2 serif">実施条件</h2>
+<ul class="bullets">
+<li><strong>会期</strong>：2026年7月7日〜8月31日。約2か月の会期で実施しました。</li>
+<li><strong>巡る範囲</strong>：小田急線・京王井の頭線「下北沢駅」周辺。協力店舗を含む街の各所を、約{LOST_FRAME.duration}で巡る構成です。</li>
+<li><strong>参加の単位</strong>：1組{LOST_FRAME.capacity}の予約制。1名から参加でき、1人あたりの料金は参加人数によって変わります。</li>
+<li><strong>販売</strong>：チケット販売は外部の予約サイト（escape.id）で行いました。</li>
+</ul>
+</div></section>
+
+<section class="section" id="result"><div class="wrap narrow">
+<p class="eyebrow">RESULT</p><h2 class="h2 serif">結果</h2>
+<ul class="bullets">
+<li><strong>全公演完売</strong>：2026年7月7日〜8月31日の全公演のチケットが完売しました（<a href={LOST_FRAME.soldoutNewsPath} style="color:var(--accent)">完売のお知らせ</a>）。</li>
+<li><strong>告知</strong>：公演の開始にあわせ、PR TIMES でプレスリリースを配信しました（<a href={LOST_FRAME.pressUrl} target="_blank" rel="noopener" style="color:var(--accent)">2026年7月7日のリリース</a>）。</li>
+<li><strong>記録の公開</strong>：終了後は、使用した絵画とクレジットを公演記録として公開しています。</li>
+</ul>
+<p class="lede">完売は販売した枠がすべて埋まったことを示すもので、協力店舗の売上や街の回遊量への効果を示すものではありません。</p>
+</div></section>
+
+<section class="section tinted" id="apply"><div class="wrap narrow">
+<p class="eyebrow">APPLY</p><h2 class="h2 serif">この形式を応用できる場面</h2>
+<p class="lede">ここからは実績ではなく、同じ形式を応用する場合のご提案です。</p>
+<ul class="bullets">
+<li><strong>商店街・エリアの回遊企画</strong>：駅周辺や商店街に点在する店舗・スポットを、物語の順路でつなぎます。</li>
+<li><strong>協力店舗への来店のきっかけづくり</strong>：店内でしか出会えない手がかりを置き、物語の流れで店舗に立ち寄る理由をつくります。</li>
+<li><strong>美術館・ギャラリー・文化施設と街の連携</strong>：作品の鑑賞を、館内だけでなく周辺の街歩きにつなげる企画に応用できます。</li>
+</ul>
+<p class="lede">検討の際に確認すること：協力店舗との窓口と、店舗にお願いする対応の範囲／巡る場所の数と移動距離／雨天時の扱い／店舗の営業時間と体験時間の調整／会期の長さと販売方法。</p>
+<p class="vc-line"><a href="/services/immersive/#formats" style="color:var(--accent)">街歩き周遊型を含むイマーシブ制作の形式と条件 →</a>／<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントの制作サービス →</a>／<a href="/guide/shuyu-event-seisaku/" style="color:var(--accent)">周遊イベント制作の進め方 →</a></p>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">街やエリアを舞台にした体験企画のご相談（無料）</p>
+<a class="btn" href="/?c=immersive#contact" data-track="cta" data-show="contact" data-place="case-lostframe">イマーシブ体験の制作を相談する</a>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">渋谷サクラステージの制作事例（施設一体型）</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧</a>／<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントとは</a>／<a href="/guide/shotengai-event/" style="color:var(--accent)">商店街イベントの企画</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+.lf-kv{margin:32px auto 0;max-width:360px;text-align:center}
+.lf-kv img{width:100%;height:auto;border-radius:8px}
+.lf-kv figcaption{margin-top:8px;font-size:13px;color:rgba(51,48,43,.6)}
+#summary,#background,#concept,#scope,#conditions,#result,#apply{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
