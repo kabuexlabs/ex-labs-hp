@@ -56,7 +56,13 @@ if (kind === 'story') {
 } else if (kind === 'portraits') {
   const pass = needPass('KARMA_PORTRAIT_PASS');
   const types = { '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png' };
-  const files = fs.readdirSync(src).filter((f) => types[path.extname(f).toLowerCase()]).sort((a, b) => a.localeCompare(b, 'ja', { numeric: true }));
+  // 掲載しない出演者（2026-10-08〜09 ユーザー指示：桐谷 紫月・遥。/karma/ からも削除済み）。
+  // ファイル名にこの文字列を含む写真は暗号化せず、公開フォルダにも出さない。
+  const EXCLUDE = ['桐谷', '紫月', '遥', 'kiritani', 'haruka'];
+  const all = fs.readdirSync(src).filter((f) => types[path.extname(f).toLowerCase()]);
+  const skipped = all.filter((f) => EXCLUDE.some((w) => f.normalize('NFKC').toLowerCase().includes(w)));
+  if (skipped.length) console.log(`掲載しない出演者の写真を除外しました：\n  ${skipped.join('\n  ')}`);
+  const files = all.filter((f) => !skipped.includes(f)).sort((a, b) => a.localeCompare(b, 'ja', { numeric: true }));
   if (!files.length) { console.error('画像が見つかりません'); process.exit(1); }
   const dir = path.join(OUT, 'portraits');
   fs.rmSync(dir, { recursive: true, force: true });
