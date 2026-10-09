@@ -1,0 +1,36 @@
+---
+// 真凜会 会員限定書庫「捜査資料」：今回の捜査に使われた資料（PDF）のリンク集。パスワードなし。
+// PDF は public/assets/karma/files/ に置くだけで一覧に並ぶ（リンク名＝ファイル名、名前順）。
+import fs from 'node:fs';
+import path from 'node:path';
+import ShinrinkaiLayout from '../../../../layouts/ShinrinkaiLayout.astro';
+
+const dir = path.join(process.cwd(), 'public/assets/karma/files');
+const files = fs.existsSync(dir)
+  ? fs.readdirSync(dir)
+      .filter((f) => f.toLowerCase().endsWith('.pdf'))
+      .sort((a, b) => a.localeCompare(b, 'ja', { numeric: true }))
+      .map((f) => ({ name: f, href: `/assets/karma/files/${encodeURIComponent(f)}` }))
+  : [];
+---
+<ShinrinkaiLayout title="捜査資料" path="/karma/shinrinkai/files/" description="真凜会 会員限定書庫「捜査資料」。今回の捜査に使われた資料。">
+  <p class="eyebrow">CASE FILES</p>
+  <h1 class="page-h1">捜査資料</h1>
+  <p class="lead">今回の捜査に使われた資料。<br>ファイル名を押すと PDF が開きます。</p>
+  {files.length === 0 ? (
+    <p class="pending-box">ただいま公開の準備中です。<br>公開まで、いましばらくお待ちください。</p>
+  ) : (
+    <ol class="files">
+      {files.map((f) => (
+        <li><a href={f.href} target="_blank" rel="noopener">{f.name}</a></li>
+      ))}
+    </ol>
+  )}
+</ShinrinkaiLayout>
+<style>
+.files{list-style:none;padding:0;border-top:1px solid var(--rule)}
+.files li{border-bottom:1px solid var(--rule)}
+.files a{display:flex;align-items:center;gap:14px;padding:18px 4px;font-size:clamp(15px,3.9vw,17px);letter-spacing:.06em;word-break:break-all;line-height:1.7}
+.files a::before{content:"PDF";flex:none;font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:.12em;color:var(--red-soft);border:1px solid rgba(201,112,95,.6);padding:1px 6px;line-height:1.6}
+.files a:hover{color:var(--pink)}
+</style>

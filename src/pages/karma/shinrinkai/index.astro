@@ -23,7 +23,8 @@ const tenets = [
 // 会員限定書庫（HIGE さん指示 2026-10-09）。
 //  解説 … /karma/shinrinkai/commentary/（パスワードなし。本文は src/data/karma/commentary.ts）
 //  特典ショートストーリー … /karma/shinrinkai/story/（描き下ろし・パスワード付き。旧「裏設定資料」の枠）
-//  特別肖像集 … /karma/shinrinkai/portraits/（ファイル名のリンク→ポップアップ・パスワード付き）
+//  特別肖像集 … /karma/shinrinkai/portraits/（サムネイル→ポップアップ・パスワード付き）
+//  捜査資料 … /karma/shinrinkai/files/（PDF のリンク集・パスワードなし。PDF は public/assets/karma/files/ に置くだけ）
 // 素材が入ったもの（解説は本文あり、他は scripts/karma-seal.mjs で暗号化済み）だけ各ページへつながる。
 // 素材がまだのものは、解説＝「ただいま準備中」の枠、他＝押すと「準備中」のお知らせ。
 const sealedDir = path.join(process.cwd(), 'public/assets/karma/sealed');
@@ -34,7 +35,13 @@ const archive = [
     href: fs.existsSync(path.join(sealedDir, 'story.json')) ? '/karma/shinrinkai/story/' : '', label: '特典ショートストーリーをひらく' },
   { en: 'PORTRAIT COLLECTION', h: '特別肖像集', p: 'デジタルブロマイドのコレクション。', locked: true,
     href: fs.existsSync(path.join(sealedDir, 'portraits/index.json')) ? '/karma/shinrinkai/portraits/' : '', label: '特別肖像集をひらく' },
+  { en: 'CASE FILES', h: '捜査資料', p: '今回の捜査に使われた資料。', locked: false,
+    href: hasCaseFiles() ? '/karma/shinrinkai/files/' : '', label: '捜査資料をひらく' },
 ];
+function hasCaseFiles() {
+  const dir = path.join(process.cwd(), 'public/assets/karma/files');
+  return fs.existsSync(dir) && fs.readdirSync(dir).some((f) => f.toLowerCase().endsWith('.pdf'));
+}
 
 // 活動のご案内（作品世界の設定）
 const activities = [

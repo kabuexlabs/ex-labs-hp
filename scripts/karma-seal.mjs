@@ -9,8 +9,9 @@
 //   KARMA_STORY_PASS='合言葉' node scripts/karma-seal.mjs story private/karma/story.txt
 //     … 1行目＝タイトル、2行目以降＝本文（空行で段落区切り）
 //   KARMA_PORTRAIT_PASS='合言葉' node scripts/karma-seal.mjs portraits private/karma/portraits
-//     … フォルダ内の画像（.webp .jpg .jpeg .png）を名前順に。表示名はファイル名のまま
+//     … フォルダ内の画像（.webp .jpg .jpeg .png）を名前順に。表示名はファイル名（拡張子なし）
 //       （大きい写真は先に長辺1600px程度へ縮小しておく）
+//       同じ名前のサムネイルを <フォルダ>/_thumbs/ に置くと一覧にはそれを使う（無ければ本体を縮小表示）
 //   書き直すと前回分は消える（毎回すべて作り直す）。
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,9 +34,10 @@ async function seal(key, data) {
 }
 function needPass(name) {
   const p = process.env[name];
-  if (!p || p.length < 8) { console.error(`環境変数 ${name} に8文字以上のパスワードを入れてください`); process.exit(1); }
-  // ブラウザ側（karmaSeal.ts）と同じく全角/半角の揺れを吸収してから使う
-  return p.normalize('NFKC').trim();
+  if (!p) { console.error(`環境変数 ${name} にパスワードを入れてください`); process.exit(1); }
+  if (p.length < 10) console.warn(`※ パスワードが ${p.length} 文字です。暗号文は公開されるため、短いと総当たりで開けられます（目隠し程度の強さ）。`);
+  // ブラウザ側（karmaSeal.ts）と同じく全角/半角・大文字/小文字の揺れを吸収してから使う
+  return p.normalize('NFKC').trim().toLowerCase();
 }
 
 const [kind, src] = process.argv.slice(2);
@@ -66,7 +68,16 @@ if (kind === 'story') {
     const id = randomBytes(8).toString('hex');
     const { iv, ct } = await seal(key, fs.readFileSync(path.join(src, f)));
     fs.writeFileSync(path.join(dir, `${id}.bin`), Buffer.concat([iv, ct]));
-    list.push({ name: f, file: `${id}.bin`, type: types[path.extname(f).toLowerCase()] });
+    const item = { name: f, file: `${id}.bin`, type: types[path.extname(f).toLowerCase()] };
+    const thumbSrc = fs.existsSync(path.join(src, '_thumbs')) && fs.readdirSync(path.join(src, '_thumbs')).find((t) => path.parse(t).name === path.parse(f).name);
+    if (thumbSrc) {
+      const tid = randomBytes(8).toString('hex');
+      const t = await seal(key, fs.readFileSync(path.join(src, '_thumbs', thumbSrc)));
+      fs.writeFileSync(path.join(dir, `${tid}.bin`), Buffer.concat([t.iv, t.ct]));
+      item.thumb = `${tid}.bin`;
+      item.thumbType = types[path.extname(thumbSrc).toLowerCase()];
+    }
+    list.push(item);
   }
   const { iv, ct } = await seal(key, enc.encode(JSON.stringify(list)));
   fs.writeFileSync(path.join(dir, 'index.json'), JSON.stringify({ v: 1, iter: ITER, salt: b64(salt), iv: b64(iv), ct: b64(ct) }));

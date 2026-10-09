@@ -1,7 +1,7 @@
 ---
 // 真凜会 会員限定書庫「特別肖像集」（デジタルブロマイド・パスワード付き）。
 // 写真は scripts/karma-seal.mjs で暗号化した public/assets/karma/sealed/portraits/ をブラウザで復号する。
-// 一覧は各写真のファイル名のリンク。押すとポップアップで写真を表示（HIGE さん指示 2026-10-09）。
+// 一覧は各写真のサムネイル（下にファイル名＝役と名前）。押すとポップアップで大きく表示（HIGE さん指示 2026-10-09）。
 import ShinrinkaiLayout from '../../../../layouts/ShinrinkaiLayout.astro';
 ---
 <ShinrinkaiLayout title="特別肖像集" path="/karma/shinrinkai/portraits/" description="真凜会 会員限定書庫「特別肖像集」。デジタルブロマイドのコレクション（購入者限定）。">
@@ -19,8 +19,8 @@ import ShinrinkaiLayout from '../../../../layouts/ShinrinkaiLayout.astro';
   </form>
 
   <div id="pt-list-wrap" hidden>
-    <p class="pt-hint">ファイル名を押すと写真が開きます。</p>
-    <ol class="pt-list" id="pt-list"></ol>
+    <p class="pt-hint">写真を押すと大きく表示します。</p>
+    <ol class="pt-grid" id="pt-list"></ol>
   </div>
 
   <dialog class="pt-dlg" id="pt-dlg" aria-label="肖像">
@@ -39,7 +39,8 @@ import ShinrinkaiLayout from '../../../../layouts/ShinrinkaiLayout.astro';
 <script>
 import { loadSealed, bindGate, openBin } from '../../../../scripts/karmaSeal';
 
-type Item = { name: string; file: string; type: string };
+type Item = { name: string; file: string; type: string; thumb?: string; thumbType?: string };
+const label = (name: string) => name.replace(/\.[^.]+$/, '').replace(/[_＿]+/g, ' ').trim();
 const BASE = '/assets/karma/sealed/portraits/';
 const $ = (id: string) => document.getElementById(id)!;
 
@@ -55,19 +56,27 @@ const $ = (id: string) => document.getElementById(id)!;
   let key: CryptoKey;
   let cur = 0;
 
+  async function blobUrl(file: string, type: string) {
+    let url = cache.get(file);
+    if (!url) {
+      const buf = await (await fetch(BASE + file)).arrayBuffer();
+      url = URL.createObjectURL(new Blob([await openBin(key, buf)], { type }));
+      cache.set(file, url);
+    }
+    return url;
+  }
+
   async function show(i: number) {
     cur = (i + items.length) % items.length;
     const it = items[cur];
-    $('pt-name').textContent = it.name;
-    img.alt = it.name;
-    let url = cache.get(it.file);
-    if (!url) {
+    $('pt-name').textContent = label(it.name);
+    img.alt = label(it.name);
+    if (!cache.has(it.file)) {
       img.removeAttribute('src');
       $('pt-loading').hidden = false;
-      const buf = await (await fetch(BASE + it.file)).arrayBuffer();
-      url = URL.createObjectURL(new Blob([await openBin(key, buf)], { type: it.type }));
-      cache.set(it.file, url);
+      if (!dlg.open) dlg.showModal();
     }
+    const url = await blobUrl(it.file, it.type);
     if (items[cur] !== it) return; // 読み込み中に別の写真へ移った
     $('pt-loading').hidden = true;
     img.src = url;
@@ -86,12 +95,23 @@ const $ = (id: string) => document.getElementById(id)!;
       list.replaceChildren();
       items.forEach((it, i) => {
         const li = document.createElement('li');
-        const a = document.createElement('a');
-        a.href = '#';
-        a.textContent = it.name;
-        a.addEventListener('click', (e) => { e.preventDefault(); show(i); });
-        li.append(a);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'pt-item';
+        const box = document.createElement('span');
+        box.className = 'pt-thumb';
+        const im = document.createElement('img');
+        im.alt = label(it.name);
+        box.append(im);
+        const cap = document.createElement('span');
+        cap.className = 'pt-cap';
+        cap.textContent = label(it.name);
+        btn.append(box, cap);
+        btn.addEventListener('click', () => show(i));
+        li.append(btn);
         list.append(li);
+        // サムネイル（無ければ本体）を順に復号して表示
+        blobUrl(it.thumb || it.file, it.thumbType || it.type).then((u) => { im.src = u; }).catch(() => {});
       });
       $('pt-gate').hidden = true;
       $('pt-lead').hidden = true;
@@ -113,13 +133,17 @@ const $ = (id: string) => document.getElementById(id)!;
 })();
 </script>
 
-<style>
-.pt-hint{font-size:14px;color:var(--dim);margin-bottom:20px}
-.pt-list{list-style:none;padding:0;border-top:1px solid var(--rule)}
-.pt-list li{border-bottom:1px solid var(--rule)}
-.pt-list a{display:block;padding:16px 4px;font-family:'Cormorant Garamond','Shippori Mincho',serif;font-size:clamp(16px,4.2vw,19px);letter-spacing:.08em;word-break:break-all}
-.pt-list a::before{content:"";display:inline-block;width:18px;height:1px;background:#b52f28;vertical-align:middle;margin-right:14px}
-.pt-list a:hover{color:var(--pink)}
+<style is:global>
+/* 一覧の要素は JS で作るのでスコープなしのスタイルにする */
+.pt-hint{font-size:14px;color:var(--dim);margin-bottom:22px}
+.pt-grid{list-style:none;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 14px}
+@media (min-width:640px){.pt-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 18px}}
+.pt-item{display:flex;flex-direction:column;gap:10px;width:100%;padding:0;margin:0;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.pt-thumb{display:block;aspect-ratio:3/4;background:#0a0a0a;border:1px solid rgba(236,230,220,.16);overflow:hidden}
+.pt-thumb img{display:block;width:100%;height:100%;object-fit:cover;transition:opacity .2s}
+.pt-thumb img:not([src]){opacity:0}
+.pt-item:hover .pt-thumb{border-color:var(--red-soft)}
+.pt-cap{font-size:clamp(12px,3.2vw,14px);line-height:1.6;letter-spacing:.04em;color:#e4ddd3;word-break:break-all}
 .pt-dlg{background:#0d0d0d;color:var(--ink);border:1px solid rgba(236,230,220,.18);padding:0;max-width:min(720px,calc(100vw - 24px));width:100%;max-height:94svh;box-sizing:border-box}
 .pt-dlg::backdrop{background:rgba(0,0,0,.86)}
 .pt-dlg-in{position:relative;display:flex;flex-direction:column}

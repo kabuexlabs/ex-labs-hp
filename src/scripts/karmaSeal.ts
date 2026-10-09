@@ -1,5 +1,6 @@
 // 真凜会 会員限定書庫：scripts/karma-seal.mjs で暗号化した特典をブラウザで復号する。
 // 正しいパスワードのときだけ AES-GCM の検証が通る（違えば例外）。
+// 入力は全角/半角・大文字/小文字を区別しない（スマホの自動大文字対策）。
 // 同じタブで開き直したときに再入力しなくて済むよう、導出した鍵だけを sessionStorage に置く（パスワードは保存しない）。
 export type Sealed = { v: number; iter: number; salt: string; iv: string; ct: string };
 
@@ -76,7 +77,7 @@ export function bindGate(opts: {
     const btn = form.querySelector('button');
     if (btn) btn.disabled = true;
     try {
-      await tryKey(await deriveKey(input.value.normalize('NFKC').trim(), sealed));
+      await tryKey(await deriveKey(input.value.normalize('NFKC').trim().toLowerCase(), sealed));
     } catch {
       error.hidden = false;
       input.select();
