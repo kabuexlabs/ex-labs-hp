@@ -40,7 +40,13 @@ import ShinrinkaiLayout from '../../../../layouts/ShinrinkaiLayout.astro';
 import { loadSealed, bindGate, openBin } from '../../../../scripts/karmaSeal';
 
 type Item = { name: string; file: string; type: string; thumb?: string; thumbType?: string };
-const label = (name: string) => name.replace(/\.[^.]+$/, '').replace(/[_＿]+/g, ' ').trim();
+// ファイル名「役_名前」→ 役と名前に分ける（区切りが無ければ全体を名前として扱う）
+const parts = (name: string) => {
+  const base = name.replace(/\.[^.]+$/, '').trim();
+  const m = base.split(/[_＿]+/);
+  return m.length >= 2 ? { role: m[0], person: m.slice(1).join(' ') } : { role: '', person: base };
+};
+const label = (name: string) => { const p = parts(name); return p.role ? `${p.role} 役　${p.person}` : p.person; };
 const BASE = '/assets/karma/sealed/portraits/';
 const $ = (id: string) => document.getElementById(id)!;
 
@@ -105,7 +111,17 @@ const $ = (id: string) => document.getElementById(id)!;
         box.append(im);
         const cap = document.createElement('span');
         cap.className = 'pt-cap';
-        cap.textContent = label(it.name);
+        const pp = parts(it.name);
+        if (pp.role) {
+          const r = document.createElement('span');
+          r.className = 'pt-role';
+          r.textContent = `${pp.role} 役`;
+          cap.append(r);
+        }
+        const nm = document.createElement('span');
+        nm.className = 'pt-person';
+        nm.textContent = pp.person;
+        cap.append(nm);
         btn.append(box, cap);
         btn.addEventListener('click', () => show(i));
         li.append(btn);
@@ -143,7 +159,9 @@ const $ = (id: string) => document.getElementById(id)!;
 .pt-thumb img{display:block;width:100%;height:100%;object-fit:cover;transition:opacity .2s}
 .pt-thumb img:not([src]){opacity:0}
 .pt-item:hover .pt-thumb{border-color:var(--red-soft)}
-.pt-cap{font-size:clamp(12px,3.2vw,14px);line-height:1.6;letter-spacing:.04em;color:#e4ddd3;word-break:break-all}
+.pt-cap{display:flex;flex-direction:column;gap:2px;line-height:1.5}
+.pt-role{font-size:clamp(11px,2.9vw,12px);letter-spacing:.1em;color:#c9705f}
+.pt-person{font-size:clamp(14px,3.6vw,16px);letter-spacing:.06em;color:#f3eee6}
 .pt-dlg{background:#0d0d0d;color:var(--ink);border:1px solid rgba(236,230,220,.18);padding:0;max-width:min(720px,calc(100vw - 24px));width:100%;max-height:94svh;box-sizing:border-box}
 .pt-dlg::backdrop{background:rgba(0,0,0,.86)}
 .pt-dlg-in{position:relative;display:flex;flex-direction:column}

@@ -1,27 +1,36 @@
 ---
-// 真凜会 会員限定書庫「解説」。本文は src/data/karma/commentary.ts（パスワードなし）。
+// 真凜会 会員限定書庫「解説」（Q＆A）。本文は src/data/karma/commentary.ts（パスワードなし）。
+// トップのカードから遷移し、下の「会員限定書庫へもどる」で戻れる（レイアウト共通）。
 import ShinrinkaiLayout from '../../../../layouts/ShinrinkaiLayout.astro';
 import { commentary } from '../../../../data/karma/commentary';
-
-const blocks = commentary.body
-  .replace(/\r\n?/g, '\n')
-  .trim()
-  .split(/\n{2,}/)
-  .filter(Boolean)
-  .map((b) => (b.startsWith('## ') ? { h: b.slice(3).trim() } : { lines: b.split('\n') }));
+const { title, items } = commentary;
 ---
 <ShinrinkaiLayout title="解説" path="/karma/shinrinkai/commentary/" description="真凜会 会員限定書庫「解説」。作品をより深く読むために。">
   <p class="eyebrow">COMMENTARY</p>
-  <h1 class="page-h1">{commentary.title || '解説'}</h1>
-  {blocks.length === 0 ? (
+  <h1 class="page-h1 cm-h1">{title || '解説'}</h1>
+  {items.length === 0 ? (
     <p class="pending-box">ただいま公開の準備中です。<br>公開まで、いましばらくお待ちください。</p>
   ) : (
-    <div class="text">
-      {blocks.map((b) => ('h' in b ? <h2 class="text-h">{b.h}</h2> : <p>{b.lines.map((l, i) => <>{i > 0 && <br />}{l}</>)}</p>))}
-    </div>
+    <ol class="qa">
+      {items.map((it, i) => (
+        <li class="qa-item">
+          <p class="qa-q"><span class="qa-mark">Q{i + 1}</span><span>{it.q}</span></p>
+          <p class="qa-a"><span class="qa-mark qa-mark-a">A</span><span>{it.a}</span></p>
+          {it.body && <p class="qa-body">{it.body}</p>}
+        </li>
+      ))}
+    </ol>
   )}
 </ShinrinkaiLayout>
 <style>
-.text{display:flex;flex-direction:column;gap:1.9em;font-size:clamp(15px,3.9vw,17px);line-height:2.3;letter-spacing:.06em;color:#e4ddd3}
-.text-h{font-size:clamp(19px,4.8vw,23px);letter-spacing:.12em;color:#f3eee6;margin-top:1.2em;padding-left:14px;border-left:2px solid #b52f28;line-height:1.7}
+.cm-h1{font-size:clamp(22px,5.6vw,34px);letter-spacing:.08em;word-break:keep-all}
+.qa{list-style:none;padding:0;border-top:1px solid var(--rule)}
+.qa-item{padding:clamp(32px,7vw,44px) 0;border-bottom:1px solid var(--rule);display:flex;flex-direction:column;gap:18px}
+.qa-q,.qa-a{display:grid;grid-template-columns:3.2em 1fr;align-items:baseline;gap:0 4px}
+.qa-q{font-size:clamp(17px,4.4vw,20px);line-height:1.8;letter-spacing:.06em;color:#f3eee6}
+.qa-a{font-size:clamp(15px,3.9vw,17px);line-height:2;letter-spacing:.06em;color:#f3eee6}
+.qa-mark{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:1.15em;letter-spacing:.06em;color:#c9705f}
+.qa-mark-a{color:var(--dim)}
+.qa-body{padding-left:calc(3.2em + 4px);font-size:clamp(15px,3.9vw,17px);line-height:2.2;letter-spacing:.05em;color:var(--dim)}
+@media (max-width:420px){.qa-body{padding-left:0}}
 </style>

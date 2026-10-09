@@ -1,17 +1,12 @@
 ---
 // 真凜会 会員限定書庫「捜査資料」：今回の捜査に使われた資料（PDF）のリンク集。パスワードなし。
-// PDF は public/assets/karma/files/ に置くだけで一覧に並ぶ（リンク名＝ファイル名、名前順）。
-import fs from 'node:fs';
-import path from 'node:path';
+// 一覧は src/data/karma/caseFiles.ts（リンク名＝元のファイル名、名前順）。PDF 本体は public/assets/karma/files/。
 import ShinrinkaiLayout from '../../../../layouts/ShinrinkaiLayout.astro';
+import { caseFiles } from '../../../../data/karma/caseFiles';
 
-const dir = path.join(process.cwd(), 'public/assets/karma/files');
-const files = fs.existsSync(dir)
-  ? fs.readdirSync(dir)
-      .filter((f) => f.toLowerCase().endsWith('.pdf'))
-      .sort((a, b) => a.localeCompare(b, 'ja', { numeric: true }))
-      .map((f) => ({ name: f, href: `/assets/karma/files/${encodeURIComponent(f)}` }))
-  : [];
+const files = [...caseFiles]
+  .sort((a, b) => a.name.localeCompare(b.name, 'ja', { numeric: true }))
+  .map((f) => ({ name: f.name, href: `/assets/karma/files/${f.file}` }));
 ---
 <ShinrinkaiLayout title="捜査資料" path="/karma/shinrinkai/files/" description="真凜会 会員限定書庫「捜査資料」。今回の捜査に使われた資料。">
   <p class="eyebrow">CASE FILES</p>

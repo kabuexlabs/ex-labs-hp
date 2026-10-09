@@ -39,6 +39,7 @@ const $ = (id: string) => document.getElementById(id)!;
       art.replaceChildren();
       for (const para of body.split(/\n{2,}/)) {
         const p = document.createElement('p');
+        if (para.trim() === '＊＊＊') p.className = 'story-scene';
         para.split('\n').forEach((line, i) => {
           if (i > 0) p.append(document.createElement('br'));
           p.append(line);
@@ -53,6 +54,8 @@ const $ = (id: string) => document.getElementById(id)!;
 })();
 </script>
 
-<style>
-.story{display:flex;flex-direction:column;gap:1.6em;font-size:clamp(15px,3.9vw,17px);line-height:2.3;letter-spacing:.06em;color:#e4ddd3}
+<style is:global>
+/* 本文の段落は JS で作るのでスコープなしのスタイルにする */
+.story{display:flex;flex-direction:column;gap:1.9em;font-size:clamp(15px,3.9vw,17px);line-height:2.3;letter-spacing:.06em;color:#e4ddd3}
+.story .story-scene{text-align:center;letter-spacing:.6em;color:#b52f28;margin:1.2em 0}
 </style>

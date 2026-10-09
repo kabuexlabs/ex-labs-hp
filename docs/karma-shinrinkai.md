@@ -7,10 +7,10 @@
 
 | カード | ページ | パスワード | 素材の置き場所 |
 |---|---|---|---|
-| 解説 | /karma/shinrinkai/commentary/ | なし | `src/data/karma/commentary.ts`（本文を入れるとカードがつながる） |
+| 解説 | /karma/shinrinkai/commentary/ | なし | `src/data/karma/commentary.ts`（Q＆A。項目を入れるとカードがつながる） |
 | 特典ショートストーリー（旧「裏設定資料」の枠） | /karma/shinrinkai/story/ | あり | 暗号化して `public/assets/karma/sealed/story.json` |
 | 特別肖像集 | /karma/shinrinkai/portraits/ | あり | 暗号化して `public/assets/karma/sealed/portraits/`（サムネイル一覧→押すとポップアップ。表示名＝ファイル名の役と名前） |
-| 捜査資料 | /karma/shinrinkai/files/ | なし | PDF を `public/assets/karma/files/` に置くだけ（リンク名＝ファイル名） |
+| 捜査資料 | /karma/shinrinkai/files/ | なし | PDF を `public/assets/karma/files/` に英数字名で置き、`src/data/karma/caseFiles.ts` にリンク名（元のファイル名）と1行登録 |
 
 素材がまだのカードは押すと「準備中」のお知らせ（解説は「ただいま準備中」の枠）。素材を入れてビルドすれば自動でページにつながる。
 

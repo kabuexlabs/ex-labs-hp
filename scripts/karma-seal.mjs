@@ -12,6 +12,7 @@
 //     … フォルダ内の画像（.webp .jpg .jpeg .png）を名前順に。表示名はファイル名（拡張子なし）
 //       （大きい写真は先に長辺1600px程度へ縮小しておく）
 //       同じ名前のサムネイルを <フォルダ>/_thumbs/ に置くと一覧にはそれを使う（無ければ本体を縮小表示）
+//       並び順は <フォルダ>/_order.txt（1行1ファイル名）で指定できる
 //   書き直すと前回分は消える（毎回すべて作り直す）。
 import fs from 'node:fs';
 import path from 'node:path';
@@ -62,7 +63,11 @@ if (kind === 'story') {
   const all = fs.readdirSync(src).filter((f) => types[path.extname(f).toLowerCase()]);
   const skipped = all.filter((f) => EXCLUDE.some((w) => f.normalize('NFKC').toLowerCase().includes(w)));
   if (skipped.length) console.log(`掲載しない出演者の写真を除外しました：\n  ${skipped.join('\n  ')}`);
-  const files = all.filter((f) => !skipped.includes(f)).sort((a, b) => a.localeCompare(b, 'ja', { numeric: true }));
+  // 並び順：<フォルダ>/_order.txt（1行に1ファイル名、拡張子なしでも可）があればその順、無い分は名前順で後ろに。
+  const orderFile = path.join(src, '_order.txt');
+  const order = fs.existsSync(orderFile) ? fs.readFileSync(orderFile, 'utf8').split(/\r?\n/).map((l) => l.trim()).filter(Boolean) : [];
+  const rank = (f) => { const i = order.findIndex((o) => o === f || o === path.parse(f).name); return i < 0 ? Infinity : i; };
+  const files = all.filter((f) => !skipped.includes(f)).sort((a, b) => (rank(a) - rank(b)) || a.localeCompare(b, 'ja', { numeric: true }));
   if (!files.length) { console.error('画像が見つかりません'); process.exit(1); }
   const dir = path.join(OUT, 'portraits');
   fs.rmSync(dir, { recursive: true, force: true });
