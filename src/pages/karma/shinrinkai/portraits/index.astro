@@ -62,11 +62,19 @@ const $ = (id: string) => document.getElementById(id)!;
   let key: CryptoKey;
   let cur = 0;
 
+  // 復号した写真は data: URL で表示する。サイト共通の CSP（vercel.json）の img-src が
+  // 'self' data: … で blob: を許可していないため、blob URL だと本番で表示されない（2026-10-10 修正）。
+  const toDataUrl = (blob: Blob) => new Promise<string>((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result));
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(blob);
+  });
   async function blobUrl(file: string, type: string) {
     let url = cache.get(file);
     if (!url) {
       const buf = await (await fetch(BASE + file)).arrayBuffer();
-      url = URL.createObjectURL(new Blob([await openBin(key, buf)], { type }));
+      url = await toDataUrl(new Blob([await openBin(key, buf)], { type }));
       cache.set(file, url);
     }
     return url;
