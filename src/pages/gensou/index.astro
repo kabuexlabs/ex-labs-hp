@@ -11,7 +11,7 @@ import J from '../../components/gensou/J.astro';
 
 // ---- 未定の項目（決まったらここを埋める。null の間は非表示／仮表示） ----
 // escape.id の販売ページURL。null の間は予約ボタンを「近日販売開始」表示にし、#ticket へ飛ばす
-const RESERVE_URL: string | null = null;
+const RESERVE_URL: string | null = 'https://escape.id/gensou-org/e-ichi/'; // 2026-10-14 ユーザー提供
 // 住所（null の間は「追記予定」）。2026-10-05 公開情報（るるぶ・施設紹介）で確認
 const ADDRESS: string | null = '東京都江東区夢の島2-1-2（夢の島公園内）';
 const ACCESS = '新木場駅（JR京葉線・東京メトロ有楽町線・りんかい線）から徒歩約15分';
@@ -27,7 +27,7 @@ const MAP_EMBED = 'https://www.google.com/maps?q=' + encodeURIComponent('夢の�
 const MAP_LINK = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('夢の島熱帯植物館');
 // 利用規約・公式X（null の間はリンクを出さない）
 const TERMS_URL: string | null = null;
-const X_URL: string | null = null;
+const X_URL: string | null = 'https://x.com/Gennsousyuu'; // 2026-10-14 ユーザー提供
 // キャスト（掲載の有無が未定。空配列の間はセクションとメニュー項目を出さない）
 const cast: { name: string; role?: string; days?: string; photo?: string }[] = [];
 // スタッフ（profile が決まったら追加する。写真欄は掲載しない）
@@ -534,7 +534,7 @@ img{max-width:100%}
           {news.map((n) => <div class="news-row"><span class="d mono">{n.date}</span><span class="t"><J t={n.text} /></span></div>)}
         </div>
       ) : (
-        <p class="news-empty"><J t="チケットの販売開始日は、決まり次第こちらでお知らせします。" /></p>
+        <p class="news-empty">{RESERVE_URL ? <J t="チケットはescape.idで販売中です。" /> : <J t="チケットの販売開始日は、決まり次第こちらでお知らせします。" />}</p>
       )}
     </section>
 
@@ -625,7 +625,7 @@ img{max-width:100%}
         <div class="row"><span>所要時間</span><span>約50分</span></div>
         <div class="row"><span>開催人数</span><span><J t="参加者1名から開催します。" /></span></div>
         <div class="row"><span>対象年齢</span><span><J t="中学生以上（18歳未満の方は保護者同伴）" /></span></div>
-        <div class="row"><span>販売</span><span>escape.id{!RESERVE_URL && <><br><span style="font-size:13px;color:#bdb8ab"><J t="販売開始日は決まり次第お知らせします。" /></span></>}</span></div>
+        <div class="row"><span>販売</span><span>{RESERVE_URL ? <a href={RESERVE_URL} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="gensou-row">escape.id</a> : 'escape.id'}{!RESERVE_URL && <><br><span style="font-size:13px;color:#bdb8ab"><J t="販売開始日は決まり次第お知らせします。" /></span></>}</span></div>
       </div>
       {RESERVE_URL ? (
         <a href={RESERVE_URL} class="cta" target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="gensou-ticket"><span>escape.id で予約する</span><span class="arc">→</span></a>
