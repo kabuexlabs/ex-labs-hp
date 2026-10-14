@@ -377,7 +377,8 @@ img{max-width:100%}
 .fx li::before{content:"●";color:#ff2a92;font-size:9px;line-height:3.2;flex:none}
 /* 締め */
 .fin{text-align:left}
-.fin-c{margin:0;font-size:clamp(22px,6vw,38px);font-weight:800;line-height:1.6;letter-spacing:.02em}
+.fin-c{margin:0;font-size:clamp(26px,7vw,40px);font-weight:800;line-height:1.5;letter-spacing:.06em}
+.fin-s{font-size:.6em;letter-spacing:.12em}
 .fin-l{margin:28px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#d0d5e6}
 .map{margin-top:24px;aspect-ratio:16/10;border:1px solid rgba(255,42,146,.78);background:#101a40}
 .map iframe{display:block;width:100%;height:100%;border:0}
@@ -475,7 +476,7 @@ img{max-width:100%}
             <div class="b-edge-b"></div>
             <div class="b-edge-r"></div>
             <div class="b-page">
-              <p class="b-copy">普段は入れない夜の<br>夢の島熱帯植物館を巡る<br>物語体験。</p>
+              <p class="b-copy">普段は入れない<br>夜の夢の島熱帯植物館を巡る<br>物語体験。</p>
               <div class="b-date hv">2026.11.05 — 11.22</div>
             </div>
           </div>
@@ -503,7 +504,7 @@ img{max-width:100%}
       {/* タイトルロゴは直前の全面KVで見せるので、ここでは表示しない（見出しとしては残す） */}
       <h1 class="sr">午前零時の幻想集 {SUB_NO}「{SUB_TITLE}」× 夢の島熱帯植物館</h1>
       <p class="ov-sub" aria-hidden="true"><span class="n">{SUB_NO}</span><span class="t">{SUB_TITLE}</span></p>
-      <p class="ov-lead"><J t="普段は入れない夜の夢の島熱帯植物館を巡る物語体験。" /></p>
+      <p class="ov-lead"><J t={"普段は入れない\n夜の夢の島熱帯植物館を巡る\n物語体験。"} /></p>
       <div class="ov-date">
         <span class="ov-y hv">2026</span>
         <div class="ov-d hv">11.05 – 11.22</div>
@@ -679,9 +680,9 @@ img{max-width:100%}
       </div>
     </section>
 
-    {/* 締め：ポスターのキャッチ＋要点＋予約ボタン */}
+    {/* 締め：作品名（ベタ打ち）＋要点＋予約ボタン（2026-10-14 キャッチ「あなたたち、どうしてここにいるの？」から変更） */}
     <section class="sec fin">
-      <p class="fin-c"><J t={"あなたたち、\nどうしてここにいるの？"} /></p>
+      <p class="fin-c">午前零時の幻想集<br><span class="fin-s">{SUB_NO} {SUB_TITLE}</span></p>
       <ul class="fin-l">
         <li>2026年11月5日〜22日（全12日間）</li>
         <li>夢の島熱帯植物館</li>
