@@ -6,7 +6,6 @@ export const prerender = false;
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -25,7 +24,7 @@ const toc = [
 const faqs = [
   {
     q: '営業時間外の施設活用とは何ですか？',
-    a: '閉店後・閉館後や開店前など、施設が使われていない時間帯を体験型イベントの会場として活用し、収益とにぎわいを生む取り組みです。ナイトタイムエコノミー（夜間経済）の文脈でも注目されています。',
+    a: '閉店後・閉館後や開店前など、施設が使われていない時間帯を体験型イベントの会場として活用し、収益とにぎわいを生む取り組みです。',
   },
   {
     q: 'なぜ閉店後の施設がイベント会場に向いているのですか？',
@@ -75,7 +74,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/eigyo-jikangai.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
   dateModified: '2026-09-14',
@@ -112,7 +110,7 @@ const articleLd = {
 
 <section class="section tinted" id="about"><div class="wrap narrow">
 <p class="eyebrow">ABOUT</p><h2 class="h2 serif">営業時間外の施設活用とは</h2>
-<p class="lede"><strong>営業時間外の施設活用</strong>とは、閉店後・閉館後・開店前など、施設が使われていない時間帯を<strong>体験型イベントの会場</strong>として活かし、収益とにぎわいを生む取り組みです。設備・空間はそのままに「時間」だけを切り出して活用するため、<strong>新たな投資をほとんど必要とせず</strong>、通常営業への影響も抑えられます。夜の集客を経済価値に変える<strong>ナイトタイムエコノミー</strong>の文脈でも注目されています。</p>
+<p class="lede"><strong>営業時間外の施設活用</strong>とは、閉店後・閉館後・開店前など、施設が使われていない時間帯を<strong>体験型イベントの会場</strong>として活かし、収益とにぎわいを生む取り組みです。設備・空間はそのまま使い、<strong>通常営業と時間帯を分けて</strong>実施できるのが特徴です。会場を新しく用意する必要はありませんが、夜間の人員や警備、空調・照明などの費用は別に検討します。</p>
 </div></section>
 
 <section class="section" id="why"><div class="wrap narrow">
@@ -161,7 +159,6 @@ const articleLd = {
 <p class="vc-line"><a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談（無料）はこちら →</a></p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

@@ -8,7 +8,6 @@ export const prerender = false;
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -69,7 +68,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/halloween-event.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-09-04',
   dateModified: '2026-09-15',
@@ -130,7 +128,7 @@ const articleLd = {
 <section class="section tinted" id="shanai"><div class="wrap narrow">
 <p class="eyebrow">FOR COMPANIES</p><h2 class="h2 serif">社内・団体向けの企画アイデア5選</h2>
 <ul class="bullets">
-<li><strong>⑧仮装＋当日限定ミッション</strong>：仮装だけで終わらせず、「他部署の人と写真を撮る」「◯◯な人を探す」などの小ミッションを配布。参加率が跳ね上がります。</li>
+<li><strong>⑧仮装＋当日限定ミッション</strong>：仮装だけで終わらせず、「他部署の人と写真を撮る」「◯◯な人を探す」などの小ミッションを配布。仮装していない人も参加するきっかけになります。</li>
 <li><strong>⑨チーム対抗ハロウィン謎解き</strong>：会議室で実施できる短時間の謎解き。協力必須の構造で、部署を越えた会話が自然に生まれます。<a href="/guide/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修とは →</a></li>
 <li><strong>⑩心理戦・人狼系ゲーム大会</strong>：「正体を隠す」テーマはハロウィンと好相性。読み合いの熱狂で懇親会の目玉になります。<a href="/guide/zunousen-game/" style="color:var(--accent)">頭脳戦ゲームの種類と選び方 →</a></li>
 <li><strong>⑪オフィスを舞台にしたストーリー体験</strong>：「オフィスに現れた怪異の正体を突き止める」など、自社を舞台にした物語で特別感を演出。</li>
@@ -159,7 +157,6 @@ const articleLd = {
 </ul>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

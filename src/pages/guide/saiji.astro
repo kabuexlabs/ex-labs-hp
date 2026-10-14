@@ -7,7 +7,6 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import StudioCta from '../../components/guide/StudioCta.astro';
@@ -114,7 +113,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/saiji.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-09-01',
   dateModified: '2026-09-14',
@@ -183,7 +181,7 @@ const articleLd = {
 <div class="genre-grid">
 <div class="genre-cell"><span class="genre-t serif">物販催事</span><span class="genre-d">期間限定ショップ・雑貨市・古本市など、モノを売る催事。手堅い定番ですが、EC時代には「そこで買う理由」の設計が課題になっています。</span></div>
 <div class="genre-cell"><span class="genre-t serif">食催事</span><span class="genre-d">物産展・スイーツフェア・グルメイベントなど。集客力は高い一方、企画の同質化で差別化が難しくなりつつあります。</span></div>
-<div class="genre-cell"><span class="genre-t serif">体験型催事</span><span class="genre-d">謎解き・イマーシブ・マダミス公演・参加型展示など、「体験」そのものを提供する催事。来館の目的になり、回遊・滞在時間に直結する成長分野です。</span></div>
+<div class="genre-cell"><span class="genre-t serif">体験型催事</span><span class="genre-d">謎解き・イマーシブ・マダミス公演・参加型展示など、「体験」そのものを提供する催事。来館の目的になり、回遊・滞在時間につなげやすい分野です。</span></div>
 </div>
 </div></section>
 
@@ -232,7 +230,7 @@ const articleLd = {
 <tr><th scope="row">ポップアップストア</th><td>ブランド認知・販売</td><td>1週間〜1ヶ月</td><td>商業施設・路面区画</td><td>出店側が主体。施設は場所貸しになりやすい</td></tr>
 <tr><th scope="row">展示・ギャラリー催事</th><td>話題化・滞在</td><td>2週間〜1ヶ月</td><td>文化施設・商業施設</td><td>見るだけになりやすく、回遊は生みにくい</td></tr>
 <tr><th scope="row">季節催事（ハロウィン等）</th><td>集客・装飾</td><td>2週間〜1ヶ月</td><td>商業施設全般</td><td>毎年の定番資産に育てやすい</td></tr>
-<tr><th scope="row">体験型催事（謎解き・イマーシブ）</th><td>回遊・滞在時間・SNS拡散</td><td>2週間〜1ヶ月</td><td>商業施設・宿泊・文化施設</td><td>館内を巡る設計で回遊率に直結。レベニューシェアで初期費用0円のケースも</td></tr>
+<tr><th scope="row">体験型催事（謎解き・イマーシブ）</th><td>回遊・滞在時間・SNS拡散</td><td>2週間〜1ヶ月</td><td>商業施設・宿泊・文化施設</td><td>館内を巡る設計で回遊につなげやすい。レベニューシェアで初期費用0円のケースも</td></tr>
 </tbody>
 </table>
 </div>
@@ -251,7 +249,6 @@ const articleLd = {
 <p class="vc-line"><a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベントのご相談（無料）→</a></p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

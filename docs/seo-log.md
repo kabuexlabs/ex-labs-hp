@@ -1340,3 +1340,23 @@
 
 - 「ヌル・アーデン展：広告費0円（告知はXのみ）でチケット約1,000枚」を、レーベル「体験する美術館」全体（ヌル・アーデン展・ロスト・フレーム）の「広告費0円（告知はXのみ）のまま累計約2,000人が参加」に変更（ご担当者の指示。広告費0円・告知はXのみはレーベル全体に当てはまると確認済み）。
 - 対象：/works/、/company/、/company/iida-yuki/（description含む）、/services/ip-event/、ガイド記事18本、guides.ts の museum-event 説明文、llms.txt。llms-full.txt を再生成。
+
+## 2026-10-14 法人相談の情報追加と文章点検（10/14指示書）
+
+変更前の状態：サイトマップ全146ページの title / description / canonical / robots / 見出し / 本文 / リンク / 構造化データを保存（作業用スナップショット snap-1014-before）。変更後との差分で、意図した変更以外に title・H1・canonical・robots の変化がないことを確認（description は /guide/shanai-event/ のみ、企画数の矛盾修正）。
+
+新規（index・サイトマップ・guides.ts・llms.txt に追加）
+- /guide/bonenkai-nazotoki/：忘年会で謎解きを実施できるかの判断材料（着席／立食、並行／時間を分ける形式、進行例〈仮の条件と明記〉、卓上スペース、設備、担当範囲の比較表、制作のみ／運営込み、相談時の情報）。料金は正式な提供条件が個別見積りのため金額なし。CTA「参加人数と会場の形式を伝えて相談する」。リンク元：/guide/shanai-event/、/guide/shanai-quiz/、/services/nazotoki-kenshu/。
+- /guide/shuyu-event-uketsuke/：営業中の商業施設での受付・待機場所・動線（流れ、滞留地点の表、説明用の模式図〈実際の図面ではないと明記〉、出発間隔と同時滞在人数〈仮の計算、避難経路・収容人数は施設の防災計画に従うと明記〉、遅刻・遅れ、保管、分担表、渋谷サクラステージの公開記録の範囲）。CTA「候補区画をもとに開催方法を相談する」。リンク元：/guide/shuyu-event/、/guide/shuyu-event-seisaku/、/guide/case-uwasabanashi/、/services/shisetsu-event/。
+- /guide/zunousen-testplay/（頭脳戦のテスト）：公開許可のある制作記録（実際のルール修正・テスト内容）がないため未作成。
+
+既存ページの修正
+- /guide/immersive-cost/：同じ金額を「当社の参考価格」と「業界相場で当社の料金ではない」の両方で説明していた矛盾を、当社の過去案件をもとにした参考価格（税抜）に統一。レベニューシェアの説明を実際の条件（有料チケット型のみ、当社が原価負担・未回収分も当社負担、社内行事は対象外）に修正。
+- /guide/shanai-event/：レベニューシェアの営業枠を削除し、社内イベントの相談導線（/?c=kenshu）に。要点・description の「8つ紹介」を「8企画を中心に20企画」に修正。断定表現（全員に見せ場、参加率が跳ね上がる 等）を条件つきの説明に。
+- /guide/botsunyukan/：「観るだけの人に没入は生まれない」を、参加型イベントで役割を渡す効果の説明に限定。
+- ZeroCostBanner（「貴社負担なしでイベントを行えます」）：64ページから削除（同じページの冒頭にレベニューシェア案内があり重複、または参加者向け・社内行事の記事で用途に合わない）。文面を実際の条件に直し、施設一体型の事例 /guide/case-uwasabanashi/ のみに残す。
+- レベニューシェア案内（RevShareCallout）：参加者から料金を取らない社内行事・研修と参加者向けの記事（shanai-event、shanai-quiz、nazotoki-kenshu、madamis-kenshu、immersive-preparation、madamis-nazotoki-chigai）から削除。
+- 根拠のない断定・誇張の修正：zunousen（唯一の体験型ジャンル）、shinrisen、immersive-taiken、halloween-event、taikengata-company、madamis、madamis-rekishi、madamis-asobikata（必ず楽しめます）、case-uwasabanashi（注目を集めています）、immersive-event、eigyo-jikangai（新たな投資をほとんど必要とせず）、hotel-event、shogyoshisetsu-event、popup-event、saiji、kisetsu-event、taikengata-idea、nazotoki-idea、immersive-vr、sankagata-event、madamis-nazotoki-chigai、taikengata-event、services.ts（回遊型の定義・最適な）、guides.ts（社内イベントの説明文）。
+- 構造化データ：51ページの Article に入っていた reviewedBy（代表の監修）を削除。画面には「執筆：編集部／発行責任者：代表」と表示しており、監修の事実を確認できないため。
+- 計測：AI検索・チャットからの訪問（ai-visit、参照元ドメインまたは utm_source で判定、セッション最初の1回）、記事本文からサービスページへの移動（cta: services-○○-link）を追加。問い合わせの経路判定で utm_source=chatgpt.com 等も AI検索として扱う。
+- dateModified・サイトマップの lastmod は、内容を修正した6ページと新規2ページのみ更新。

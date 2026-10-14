@@ -7,7 +7,6 @@ export const prerender = false;
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -30,7 +29,7 @@ const toc = [
 const faqs = [
   {
     q: 'ホテル・旅館の集客イベントにはどんな方法がありますか？',
-    a: '料理・温泉・季節企画などに加え、近年は宿泊施設全体を物語の舞台にしたマーダーミステリーや謎解きなどの体験型イベントが注目されています。「そのホテルに泊まること自体が体験の一部」になるため、宿泊予約の直接的な動機を作れるのが特徴です。',
+    a: '料理・温泉・季節企画などに加え、宿泊施設全体を物語の舞台にしたマーダーミステリーや謎解きなどの体験型イベントもあります。「そのホテルに泊まること自体が体験の一部」になるため、宿泊予約の直接的な動機を作れるのが特徴です。',
   },
   {
     q: '体験型イベントは宿泊予約の増加につながりますか？',
@@ -72,7 +71,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/hotel-event.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
   dateModified: '2026-10-09',
@@ -212,7 +210,6 @@ const articleLd = {
 <p class="lede">宿泊施設での体験型イベント全般の対応範囲は<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>、マダミス作品の制作は<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作サービス</a>をご覧ください。</p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

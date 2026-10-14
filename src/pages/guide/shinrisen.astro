@@ -9,7 +9,6 @@ import B2BNote from '../../components/guide/B2BNote.astro';
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import DateGuideNote from '../../components/guide/DateGuideNote.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
@@ -33,7 +32,7 @@ const faqs = [
   },
   {
     q: '心理戦と頭脳戦は何が違いますか？',
-    a: '頭脳戦は閃き・論理・交渉・心理の読み合いなど「頭の使い方」で競う戦い全般を指す広い言葉で、心理戦はそのうち「相手の思考を読み、裏をかく」ことに特化した一分野です。つまり心理戦は頭脳戦の一種で、ルールが最もシンプルなのに読み合いが深い、頭脳戦の入り口に最適なタイプです。',
+    a: '頭脳戦は閃き・論理・交渉・心理の読み合いなど「頭の使い方」で競う戦い全般を指す広い言葉で、心理戦はそのうち「相手の思考を読み、裏をかく」ことに特化した一分野です。つまり心理戦は頭脳戦の一種で、ルールが最もシンプルなのに読み合いが深い、頭脳戦の入り口に向いたタイプです。',
   },
   {
     q: '心理戦に強い人にはどんな特徴がありますか？',
@@ -105,7 +104,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/shinrisen.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-29',
   dateModified: '2026-09-05',
@@ -192,7 +190,7 @@ const articleLd = {
 
 <section class="section tinted" id="real"><div class="wrap narrow">
 <p class="eyebrow">REAL EVENT</p><h2 class="h2 serif">リアルで心理戦を体験する</h2>
-<p class="lede">心理戦の面白さが最大化するのは、<strong>生身の相手と向かい合うリアルの場</strong>です。オンラインでは読めない表情の強張り、沈黙の長さ、声色の揺れ——対面だからこそ情報戦の材料が増え、読み勝った瞬間の快感も桁違いになります。当社が主催した参加型リアルイベント<strong>「東京都頭脳王決定戦 2026」は全公演チケット完売</strong>。心理戦を含む複数種目で「東京で最も頭の良い人間」を決める大会として開催しました。</p>
+<p class="lede">心理戦の面白さが最大化するのは、<strong>生身の相手と向かい合うリアルの場</strong>です。オンラインでは読めない表情の強張り、沈黙の長さ、声色の揺れ——対面だからこそ情報戦の材料が増え、読み勝ったときの手応えも大きくなります。当社が主催した参加型リアルイベント<strong>「東京都頭脳王決定戦 2026」は全公演チケット完売</strong>。心理戦を含む複数種目で「東京で最も頭の良い人間」を決める大会として開催しました。</p>
 <p class="lede">社内イベントの対抗戦・懇親会の目玉企画・施設の集客イベントとしての<strong>オリジナル心理戦の制作・開催</strong>も承っています。</p>
 <p class="vc-line"><a href="/hacktale/event/zunouou/" style="color:var(--accent)">東京都頭脳王決定戦 2026 →</a>／<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作サービス →</a></p>
 <B2BNote place="shinrisen-b2b" title="心理戦を番組・イベントに取り入れたい方へ" body="番組・配信では見ている人に駆け引きが伝わること、リアルイベントでは時間内に決着することなど、用途によって設計の重点が変わります。ルール設計からテストプレイ・進行台本までの範囲を、頭脳戦制作のページにまとめています。" href="/services/zunousen/#media" label="頭脳戦・心理戦ゲームの制作について見る" />
@@ -211,7 +209,6 @@ const articleLd = {
 <p class="vc-line">オリジナルの心理戦・頭脳戦ゲームの制作は<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作サービス</a>へ。工程ごとの依頼範囲と参考価格を掲載しています。</p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

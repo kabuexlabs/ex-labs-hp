@@ -1,0 +1,195 @@
+---
+// 忘年会・宴会場で謎解きを実施できるかを判断するためのページ（2026-10-14 新規）。
+// 読者は宴会場での実施を検討している総務担当者・幹事。アイデア集（/guide/shanai-event/）とは役割を分け、
+// 着席／立食、料理の提供と説明の時間調整、卓上スペース、設備、担当範囲を扱う。
+// 進行例は仮の条件で組んだ例で、実施記録ではない。料金は正式な提供条件が個別見積りのため金額を載せない。
+export const prerender = true;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const toc = [
+  { id: 'conditions', label: '最初に確認する2つの条件' },
+  { id: 'formats', label: '食事と並行する形式と、時間を分ける形式' },
+  { id: 'timeline', label: '進行例（2時間・着席の場合）' },
+  { id: 'table', label: '卓上に必要なスペース' },
+  { id: 'equipment', label: '形式ごとに必要な設備' },
+  { id: 'roles', label: '幹事・会場・制作会社の担当範囲' },
+  { id: 'scope', label: '制作のみの依頼と、運営込みの依頼' },
+  { id: 'consult', label: '相談のときに伝えてほしいこと' },
+];
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '忘年会の食事と謎解きを、どう組み合わせるか',
+  about: '忘年会・宴会での謎解きの実施方法（着席・立食、進行、設備、担当範囲）',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/bonenkai-nazotoki.webp', site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-14',
+  dateModified: '2026-10-14',
+  mainEntityOfPage: new URL('/guide/bonenkai-nazotoki/', site).toString(),
+};
+---
+<BaseLayout
+  title="忘年会の食事と謎解きを、どう組み合わせるか｜着席・立食の進め方と担当範囲 - 株式会社ex Labs"
+  description="忘年会に謎解きを入れるときの判断材料。食事と並行する形式と時間を分ける形式、着席と立食の違い、乾杯・配膳・説明の時間調整、卓上スペース、マイクや画面などの設備、幹事・会場・制作会社の担当範囲を整理します。"
+  ogImage="/assets/guide/bonenkai-nazotoki.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '社内イベントの企画アイデア', href: '/guide/shanai-event/' },
+  { name: '忘年会の食事と謎解き' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap narrow">
+<p class="eyebrow">YEAR-END PARTY</p>
+<h1 class="h2 serif"><span class="nobr">忘年会の食事と謎解きを、</span><span class="nobr">どう組み合わせるか</span></h1>
+<p class="lede">忘年会に謎解きを入れる場合は、料理の提供とゲームの説明が重ならないかを先に確認します。卓上に冊子を置く形式なら、食器が並んだ状態で使えるスペースも必要です。</p>
+<p class="lede">着席か立食か、進行に使える時間はどのくらいか。この二点が決まると、食事と並行して進めるか、ゲームの時間を分けるかを選べます。このページでは、宴会場での実施を検討している幹事・総務の方に向けて、判断に必要な条件と、誰が何を用意するかを整理します。</p>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="conditions"><div class="wrap narrow">
+<p class="eyebrow">CONDITIONS</p><h2 class="h2 serif">最初に確認する2つの条件</h2>
+<p class="lede"><strong>1. 着席か立食か</strong>。着席なら卓ごとにチームを作れるため、冊子を卓に置いて相談しながら解く形にできます。立食は人が動くので卓単位のチームが崩れやすく、手に持てる用紙や、会場の壁・スクリーンに出す問題が向いています。</p>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col"></th><th scope="col">着席（円卓・長テーブル）</th><th scope="col">立食</th></tr></thead>
+<tbody>
+<tr><th scope="row">チームの作り方</th><td>卓ごとにチームを固定しやすい</td><td>チーム分けの目印（色札など）と集合場所を決める</td></tr>
+<tr><th scope="row">配る物</th><td>冊子・解答用紙・筆記具を卓に置ける</td><td>手に持てるサイズの用紙。書く場所が限られる</td></tr>
+<tr><th scope="row">説明の聞こえ方</th><td>全員が前を向けない卓もあるため、マイクと画面があると伝わりやすい</td><td>前方に集まってもらえば説明しやすい</td></tr>
+<tr><th scope="row">向いている進め方</th><td>時間を分ける形式、卓対抗</td><td>会場内を歩いて手がかりを集める形式、短い問題を数回に分ける形式</td></tr>
+</tbody></table></div>
+<p class="lede" style="margin-top:24px"><strong>2. 進行に使える時間</strong>。宴会全体が2時間でも、開宴の挨拶・乾杯・料理の提供・締めの挨拶を除くと、ゲームに使えるのは一部です。何分使えるかによって、問題の量と説明の長さを決めます。</p>
+</div></section>
+
+<section class="section" id="formats"><div class="wrap narrow">
+<p class="eyebrow">FORMATS</p><h2 class="h2 serif">食事と並行する形式と、時間を分ける形式</h2>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col"></th><th scope="col">食事と並行して進める</th><th scope="col">ゲームの時間を分ける</th></tr></thead>
+<tbody>
+<tr><th scope="row">進め方</th><td>開宴から一定時間、食べながら卓で少しずつ解く。締め切りの時刻だけ決めておく</td><td>料理の提供が落ち着いてから説明し、決まった時間で一斉に解く</td></tr>
+<tr><th scope="row">向いている場面</th><td>歓談を優先したい、ゲームに参加しない人がいてもよい</td><td>全員で同時に取り組み、最後に結果発表や表彰をしたい</td></tr>
+<tr><th scope="row">気をつけること</th><td>料理や飲み物で冊子が汚れやすい。解く人と食べる人に分かれやすい</td><td>説明の前に配膳を終えておく必要がある。会場と提供の時刻をすり合わせる</td></tr>
+<tr><th scope="row">説明のしかた</th><td>冊子に遊び方を書いておき、開宴時に短く案内する</td><td>マイクで一度に説明する。画面に例題を映すと伝わりやすい</td></tr>
+</tbody></table></div>
+<p class="lede" style="margin-top:24px">どちらの形式でも、乾杯や役員の挨拶とゲームの説明を同じ時間帯に置かないことが大切です。料理を運ぶ音や配膳の動きがある間は、説明が聞き取りにくくなります。</p>
+</div></section>
+
+<section class="section tinted" id="timeline"><div class="wrap narrow">
+<p class="eyebrow">TIMELINE</p><h2 class="h2 serif">進行例（2時間・着席の場合）</h2>
+<p class="lede">次の条件を仮に置いて組んだ例です。実際の案件の記録ではありません。料理の提供時刻は会場によって違うため、事前に宴会担当の方と調整します。</p>
+<p class="lede"><strong>仮の条件</strong>：宴会全体2時間／着席・1卓8名×6卓（48名）／ゲームの時間を分ける形式／マイク1本とスクリーン1面を会場で借りられる</p>
+<div class="cmp-wrap"><table class="cmp tl">
+<thead><tr><th scope="col">時刻</th><th scope="col">内容</th><th scope="col">確認すること</th></tr></thead>
+<tbody>
+<tr><th scope="row">0:00</th><td>開宴、挨拶、乾杯</td><td>この時点では冊子を配らないか、伏せて置いておく</td></tr>
+<tr><th scope="row">0:10</th><td>歓談、料理の提供</td><td>コース料理なら、ゲーム開始前にどの皿まで出し終えるかを会場と決める</td></tr>
+<tr><th scope="row">0:40</th><td>ゲームの説明（5〜10分）</td><td>配膳が落ち着いてから始める。画面に遊び方と例題を出す</td></tr>
+<tr><th scope="row">0:50</th><td>謎解き（30〜40分）</td><td>途中で残り時間を案内する。手が止まった卓に出すヒントの出し方を決めておく</td></tr>
+<tr><th scope="row">1:30</th><td>解答の発表、表彰</td><td>採点・集計にかかる時間を見込む。景品があればここで渡す</td></tr>
+<tr><th scope="row">1:45</th><td>締めの挨拶</td><td>デザートや飲み物のラストオーダーと重ならないようにする</td></tr>
+<tr><th scope="row">2:00</th><td>終了</td><td>冊子や用紙の回収が必要かを決めておく</td></tr>
+</tbody></table></div>
+<p class="lede" style="margin-top:24px">ゲームに使える時間が20分程度しかない場合は、問題の量を減らすか、食事と並行する形式に切り替えます。</p>
+</div></section>
+
+<section class="section" id="table"><div class="wrap narrow">
+<p class="eyebrow">TABLE SPACE</p><h2 class="h2 serif">卓上に必要なスペース</h2>
+<p class="lede">着席の宴会では、取り皿・グラス・大皿料理が卓に並びます。そこに冊子・解答用紙・筆記具を置くため、次の点を会場と制作側で確認します。</p>
+<ul class="bullets">
+<li><strong>冊子を広げる場所</strong>：卓の中央が大皿で埋まる場合は、冊子を各席に配るのか、1卓に数冊を回すのかを決めます。</li>
+<li><strong>筆記具と解答用紙</strong>：1卓に何本必要か。飲み物をこぼしても読めるよう、解答を書く場所は1か所にまとめます。</li>
+<li><strong>ゲーム中の卓上</strong>：時間を分ける形式なら、ゲーム開始前に空いた皿を下げてもらうよう会場に頼めるかを確認します。</li>
+<li><strong>照明</strong>：演出で照明を落とす宴会場では、冊子の文字が読める明るさかを事前に確かめます。</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="equipment"><div class="wrap narrow">
+<p class="eyebrow">EQUIPMENT</p><h2 class="h2 serif">形式ごとに必要な設備</h2>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col">設備</th><th scope="col">必要になる場面</th><th scope="col">確認先</th></tr></thead>
+<tbody>
+<tr><th scope="row">マイク</th><td>遊び方の説明、残り時間の案内、解答の発表。人数が多い宴会場では、肉声だと後方の卓まで届きにくくなります</td><td>会場（本数・ワイヤレスか）</td></tr>
+<tr><th scope="row">画面・プロジェクター</th><td>例題や問題、タイマー、ヒントを全員に見せる場合</td><td>会場（スクリーンの位置、PCの接続方法）</td></tr>
+<tr><th scope="row">音響</th><td>BGMや効果音で場面を切り替える場合。使わない形式もあります</td><td>会場（音源の再生方法）</td></tr>
+<tr><th scope="row">受付・配布用の机</th><td>立食で用紙を配る、景品を並べる場合</td><td>会場</td></tr>
+</tbody></table></div>
+<p class="lede" style="margin-top:24px">設備の貸し出し条件や追加料金は会場ごとに違います。画面を使えない会場では、冊子だけで進められる問題に切り替えます。</p>
+</div></section>
+
+<section class="section" id="roles"><div class="wrap narrow">
+<p class="eyebrow">ROLES</p><h2 class="h2 serif">幹事・会場・制作会社の担当範囲</h2>
+<p class="lede">一般的な分担の例です。実際の分担は、ご依頼の範囲と会場の対応によって決めます。</p>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col">作業</th><th scope="col">幹事</th><th scope="col">会場</th><th scope="col">制作会社（制作のみ）</th><th scope="col">制作会社（運営込み）</th></tr></thead>
+<tbody>
+<tr><th scope="row">会場・料理の手配、宴会全体の時間</th><td>○</td><td>○（提案・調整）</td><td>—</td><td>—</td></tr>
+<tr><th scope="row">料理の提供時刻の調整</th><td>○</td><td>○</td><td>進行表の案を提出</td><td>進行表を作り、会場と直接確認</td></tr>
+<tr><th scope="row">謎・冊子・解答用紙の制作</th><td>—</td><td>—</td><td>○</td><td>○</td></tr>
+<tr><th scope="row">印刷・当日の持ち込み</th><td>データ納品の場合は幹事</td><td>—</td><td>相談して決定</td><td>相談して決定</td></tr>
+<tr><th scope="row">遊び方の説明・司会</th><td>○（台本を使用）</td><td>—</td><td>説明用の台本を納品</td><td>○</td></tr>
+<tr><th scope="row">ヒントの対応、採点・集計</th><td>○（手順書を使用）</td><td>—</td><td>手順書を納品</td><td>○</td></tr>
+<tr><th scope="row">マイク・画面の手配</th><td>○</td><td>○（貸し出し）</td><td>必要な設備を事前に伝える</td><td>当日の操作を担当</td></tr>
+<tr><th scope="row">景品・表彰の用意</th><td>○</td><td>—</td><td>—</td><td>表彰の進行のみ</td></tr>
+</tbody></table></div>
+</div></section>
+
+<section class="section tinted" id="scope"><div class="wrap narrow">
+<p class="eyebrow">SCOPE</p><h2 class="h2 serif">制作のみの依頼と、運営込みの依頼</h2>
+<p class="lede"><strong>制作のみ</strong>は、謎と冊子、説明用の台本、採点の手順書までを用意し、当日は幹事の方に進めていただく形です。司会に慣れた方が社内にいる場合や、参加者が少人数の場合に向いています。当日、問題の解釈について質問が出たときに答える人を決めておく必要があります。</p>
+<p class="lede"><strong>運営込み</strong>は、説明・進行・ヒント対応・採点・発表まで制作側のスタッフが行う形です。幹事の方も参加者として楽しめるほか、進行が遅れたときに、問題の量やヒントの出し方をその場で調整しやすくなります。人数が多い場合や、宴会の時間が短く調整が細かくなる場合に向いています。</p>
+<p class="lede">費用は、制作費（既存の謎を使うか新しく作るか、人数分の冊子の量）、当日の運営費（スタッフの人数と稼働時間）、交通費などで構成されます。金額は条件によって変わるため、人数と会場の形式を伺ってからお見積りします。当社のお見積りは税抜で、含まれる項目を明記してお出しします。</p>
+<p class="vc-line"><a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修・社内イベントの制作サービス（対応範囲）→</a></p>
+</div></section>
+
+<section class="section" id="consult"><div class="wrap narrow">
+<p class="eyebrow">CONSULT</p><h2 class="h2 serif">相談のときに伝えてほしいこと</h2>
+<p class="lede">次の項目のうち、分かるものだけで構いません。未定の項目があっても相談できます。</p>
+<ul class="bullets">
+<li>開催日と、宴会全体の時間</li>
+<li>参加人数と、着席か立食か（着席なら卓の数と1卓の人数）</li>
+<li>会場名（決まっていれば）と、借りられる設備（マイク、スクリーン）</li>
+<li>謎解きに使いたい時間の目安</li>
+<li>部署をまたいだ交流など、忘年会の目的</li>
+<li>制作のみか、当日の運営も任せたいか</li>
+<li>景品・表彰の有無</li>
+</ul>
+<div class="cta-mini" style="margin-top:36px">
+<p class="cta-mini-title serif">忘年会・宴会での謎解きのご相談（無料）</p>
+<a class="btn" href="/?c=kenshu#contact" data-track="cta" data-show="contact" data-place="bonenkai-nazotoki">参加人数と会場の形式を伝えて相談する</a>
+</div>
+<p class="vc-line" style="margin-top:40px">関連ページ：<a href="/guide/shanai-event/" style="color:var(--accent)">社内イベントの企画アイデア</a>／<a href="/guide/shanai-quiz/" style="color:var(--accent)">社内イベントのクイズ・ゲーム</a>／<a href="/guide/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修とは</a>／<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修・社内イベントの制作サービス</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="nazotoki" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:36px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8)}
+.cmp-wrap{margin:24px 0 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cmp{width:100%;min-width:560px;border-collapse:collapse;background:#fff;font-size:13.5px;line-height:1.75}
+.cmp th,.cmp td{border:1px solid rgba(51,48,43,.12);padding:11px 12px;vertical-align:top;text-align:left}
+.cmp thead th{background:#F4F1EC;font-weight:800;font-size:13px}
+.cmp tbody th{font-weight:800;white-space:nowrap}
+.cmp.tl tbody th{font-variant-numeric:tabular-nums}
+#conditions,#formats,#timeline,#table,#equipment,#roles,#scope,#consult{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}.cmp tbody th{white-space:normal;min-width:6em}}
+</style>

@@ -6,7 +6,6 @@ export const prerender = false;
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -66,7 +65,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/madamis-business.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
   dateModified: '2026-09-15',
@@ -144,7 +142,6 @@ const articleLd = {
 <p class="lede">店舗・宿泊施設・配信企画など目的別の制作範囲と参考価格は<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作サービス</a>にまとめています。</p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section tinted" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

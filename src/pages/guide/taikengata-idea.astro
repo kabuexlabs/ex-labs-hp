@@ -8,7 +8,6 @@ export const prerender = false;
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -75,7 +74,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/taikengata-idea.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-09-05',
   dateModified: '2026-09-15',
@@ -122,7 +120,7 @@ const articleLd = {
 <section class="section" id="shisetsu"><div class="wrap narrow">
 <p class="eyebrow">FOR FACILITIES</p><h2 class="h2 serif">商業施設・店舗の集客向けアイデア5選</h2>
 <ul class="bullets">
-<li><strong>①館内周遊型の謎解き・ミステリー</strong>：手がかりを各フロア・各店舗に配置し、参加者が自然に館内を巡る定番形式。回遊・滞在時間・テナント送客に直結します。<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントの仕組み →</a></li>
+<li><strong>①館内周遊型の謎解き・ミステリー</strong>：手がかりを各フロア・各店舗に配置し、参加者が自然に館内を巡る定番形式。回遊・滞在時間・テナント送客につながりやすくなります。<a href="/guide/shuyu-event/" style="color:var(--accent)">周遊型イベントの仕組み →</a></li>
 <li><strong>②施設一体型イマーシブ</strong>：施設全体を物語の舞台にする没入体験。渋谷サクラステージで開催した「ウワサバナシ調査委員会」は日本経済新聞に掲載されました。<a href="/guide/case-uwasabanashi/" style="color:var(--accent)">制作事例 →</a></li>
 <li><strong>③閉店後のナイトイベント</strong>：営業時間外の暗い館内・書店・美術館を舞台にした特別公演。「普段は入れない時間」の非日常性が最大の付加価値です。<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の活用 →</a></li>
 <li><strong>④空き区画・催事枠の体験拠点化</strong>：空きテナント区画や催事スペースを物語の「本部」や展示空間に。遊休スペースが期間限定の目的地に変わります。<a href="/guide/saiji/" style="color:var(--accent)">催事とは →</a>／<a href="/guide/yukyu-kukaku/" style="color:var(--accent)">遊休区画の活用 →</a></li>
@@ -182,7 +180,6 @@ const articleLd = {
 <p class="lede">企画書にまとめる手順は<a href="/guide/event-kikakusho/" style="color:var(--accent)">体験型イベントの企画書の作り方</a>、指標の決め方は<a href="/guide/event-kpi/" style="color:var(--accent)">効果測定・KPI</a>をご覧ください。</p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

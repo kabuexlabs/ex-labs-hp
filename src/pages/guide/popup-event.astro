@@ -7,7 +7,6 @@ export const prerender = false;
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -30,7 +29,7 @@ const faqs = [
   },
   {
     q: 'ポップアップストアと何が違うのですか？',
-    a: 'ポップアップストアは期間限定の「店舗」（物販が主目的）を指すのに対し、ポップアップイベントは物販に限らず、体験・展示・プロモーションを含むより広い概念です。近年は「買う」より「体験する」目的の来場を作る体験型が伸びています。',
+    a: 'ポップアップストアは期間限定の「店舗」（物販が主目的）を指すのに対し、ポップアップイベントは物販に限らず、体験・展示・プロモーションを含むより広い概念です。「買う」ことより「体験する」ことを目的に来てもらう、体験型のポップアップイベントもあります。',
   },
   {
     q: '空き区画でポップアップイベントを開催できますか？',
@@ -94,7 +93,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/popup-event.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-27',
   dateModified: '2026-09-15',
@@ -183,7 +181,6 @@ const articleLd = {
 <p class="lede">体験型ポップアップの制作範囲・参考価格・初期費用0円の条件は<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>をご覧ください。</p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

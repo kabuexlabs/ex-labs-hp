@@ -7,7 +7,6 @@ export const prerender = false;
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -26,7 +25,7 @@ const toc = [
 const faqs = [
   {
     q: 'イマーシブイベント制作の費用相場はどのくらいですか？',
-    a: '一般的な目安として、1つの空間で完結する小規模な体験で数十万円台から、商業施設や街全体を舞台にした周遊型のフルパッケージでは数百万円規模になることがあります。会場の規模・体験時間・開催期間・運営範囲で大きく変わるため、まずは目的を添えて見積りを取るのが確実です。',
+    a: '当社の過去案件をもとにした目安では、1つの空間で完結する小規模な体験で数十万円台から、商業施設や街全体を舞台にした周遊型のフルパッケージでは数百万円規模になることがあります。会場の規模・体験時間・開催期間・運営範囲で大きく変わるため、まずは目的を添えて見積りを取るのが確実です。',
   },
   {
     q: '初期費用を抑えてイマーシブイベントを実施できますか？',
@@ -64,10 +63,9 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/immersive-cost.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
-  dateModified: '2026-09-15',
+  dateModified: '2026-10-14',
   mainEntityOfPage: new URL('/guide/immersive-cost/', Astro.site).toString(),
 };
 ---
@@ -87,7 +85,7 @@ const articleLd = {
 <section class="section" style="padding-top:40px"><div class="wrap">
 <p class="eyebrow">IMMERSIVE COST GUIDE</p>
 <h1 class="h2 serif"><span class="nobr">イマーシブ制作の</span><span class="nobr">費用・料金相場ガイド</span></h1>
-<p class="lede"><strong>イマーシブイベント（没入型体験）制作の費用</strong>は、一般的な目安として<strong>1つの空間で完結する小規模な体験で数十万円台から、商業施設や街全体を舞台にした周遊型のフルパッケージで数百万円規模</strong>になることがあります。この記事では、料金が決まる要素・初期費用を抑える方法・制作依頼の流れを、イマーシブ制作会社の株式会社ex Labsが解説します。</p>
+<p class="lede"><strong>イマーシブイベント（没入型体験）制作の費用</strong>は、当社にご依頼いただく場合の目安（過去案件をもとにした参考価格・税抜）で<strong>1つの空間で完結する小規模な体験で数十万円台から、商業施設や街全体を舞台にした周遊型のフルパッケージで数百万円規模</strong>になることがあります。この記事では、料金が決まる要素・初期費用を抑える方法・制作依頼の流れを、イマーシブ制作会社の株式会社ex Labsが解説します。</p>
 
 <div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>イマーシブ制作の費用とは、企画・脚本・体験設計・制作物・キャスト・運営・告知の各工程にかかる費用の合計を指します。</li><li>1空間完結型（バー・店舗・1フロア）は数十万円台〜、施設一体型は100万円前後〜、街全体の周遊型は数百万円規模（株式会社ex Labsにご依頼いただく場合の目安）。</li><li>費用を決めるのは、会場数・公演回数・出演者数・制作物の量・運営範囲の5つ。</li><li>有料チケット型の企画なら、初期費用0円のレベニューシェア型（原価回収後に分配）を選べる。</li></ul></div>
 <nav class="toc" aria-label="目次">
@@ -105,9 +103,9 @@ const articleLd = {
 <div class="genre-grid">
 <div class="genre-cell"><span class="genre-t serif">1空間・少人数型</span><span class="genre-d">数十万円台〜が目安。バー・店舗・1フロアなど、1つの空間を舞台にした少人数制の没入体験。既存フォーマットの活用で抑えられることも。</span></div>
 <div class="genre-cell"><span class="genre-t serif">施設・街周遊型</span><span class="genre-d">数百万円規模になることも。商業施設全体や街を舞台に、複数スポットを巡る周遊型。シナリオ・制作物・運営体制の規模が大きくなります。</span></div>
-<div class="genre-cell"><span class="genre-t serif">レベニューシェア型</span><span class="genre-d">初期費用0円または格安で開催できるケースも。チケット売上などに応じて費用をお支払いいただく成果報酬型です。</span></div>
+<div class="genre-cell"><span class="genre-t serif">レベニューシェア型</span><span class="genre-d">参加者から料金をいただく有料チケット型の場合に選べる形です。制作費・運営費を当社が負担してチケット売上から回収するため、施設様の初期費用は0円です。</span></div>
 </div>
-<p class="vc-line" style="margin-top:28px">※上記は業界の一般的な相場観であり、当社の料金表ではありません。条件次第で大きく上下するため、正式な金額は<strong>無料見積り</strong>でご確認ください。</p>
+<p class="vc-line" style="margin-top:28px">※上記は当社の過去案件をもとにした参考価格（税抜）で、他社の料金や業界全体の平均を示すものではありません。会場・期間・運営範囲で大きく変わるため、正式な金額は<strong>無料見積り</strong>でご確認ください。</p>
 </div></section>
 
 <section class="section" id="factors"><div class="wrap narrow">
@@ -123,7 +121,7 @@ const articleLd = {
 
 <section class="section tinted" id="revenue"><div class="wrap narrow">
 <p class="eyebrow">REVENUE SHARE</p><h2 class="h2 serif"><span class="nobr">初期費用を抑える方法</span><span class="nobr">（レベニューシェア型）</span></h2>
-<p class="lede">株式会社ex Labsは、<strong>チケット売上などに応じて費用をお支払いいただくレベニューシェア型（成果報酬型）</strong>に対応しています。案件によっては<strong>初期費用0円または格安</strong>でイマーシブイベントを開催でき、特に商業施設・観光施設の共有区画や未活用時間を活かした開催と相性の良い形式です。</p>
+<p class="lede">株式会社ex Labsは、参加者から料金をいただく<strong>有料チケット型のイベント</strong>に限り、<strong>レベニューシェア型</strong>に対応しています。制作費・運営費を当社が負担し、チケット売上から回収したうえで、残りを施設様と分配する形です。施設様の初期費用は0円で、売上で原価を回収しきれなかった場合も不足分は当社が負担します。参加費をいただかない社内行事や無料の販促イベントは対象外で、受託（有償）でのご提案になります。</p>
 <p class="lede">実際に、渋谷サクラステージ全体を周遊する「ウワサバナシ調査委員会」のような施設一体型イマーシブでは、施設側は空間を提供し、企画・制作・集客・運営を当社が担う形で、施設の負担を抑えた開催を実現しています。この取り組みは日本経済新聞にも掲載されました。<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントについて詳しく →</a></p>
 </div></section>
 
@@ -146,7 +144,6 @@ const articleLd = {
 <p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）はこちら →</a></p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

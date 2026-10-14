@@ -7,7 +7,6 @@ export const prerender = false;
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import DateGuideNote from '../../components/guide/DateGuideNote.astro';
 import B2BNext from '../../components/guide/B2BNext.astro';
@@ -33,7 +32,7 @@ const faqs = [
   },
   {
     q: '体験型イベントにはどんな種類がありますか？',
-    a: '大きく、謎解き型（協力してパズルや謎を解く）、マダミス型（登場人物になりきり推理する）、イマーシブ型（物語世界に入り込む）、頭脳戦型（交渉・心理戦で競う）に分かれます。目的と客層によって最適な形式が変わります。',
+    a: '大きく、謎解き型（協力してパズルや謎を解く）、マダミス型（登場人物になりきり推理する）、イマーシブ型（物語世界に入り込む）、頭脳戦型（交渉・心理戦で競う）に分かれます。目的と客層によって向いている形式が変わります。',
   },
   {
     q: '体験型イベントはなぜ集客に効果があるのですか？',
@@ -94,7 +93,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/taikengata-event.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-10',
   dateModified: '2026-09-12',
@@ -174,7 +172,7 @@ const articleLd = {
 <p class="eyebrow">FLOW</p><h2 class="h2 serif">企画・開催の流れと費用</h2>
 <ul class="bullets">
 <li><strong>1. 目的の整理</strong>：集客・回遊・話題化・研修など、何を達成したいかを明確にします。</li>
-<li><strong>2. 形式の選定・企画提案</strong>：目的・客層・空間に合わせて最適なジャンルと体験を設計。ここまでは無料です。</li>
+<li><strong>2. 形式の選定・企画提案</strong>：目的・客層・空間に合わせてジャンルと体験を設計。ここまでは無料です。</li>
 <li><strong>3. 制作・テスト</strong>：シナリオ・制作物・運営設計を作り込み、テストで品質を仕上げます。</li>
 <li><strong>4. 開催・運営・振り返り</strong>：当日運営から効果検証まで一貫対応します。</li>
 </ul>
@@ -192,7 +190,6 @@ const articleLd = {
 </ul>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

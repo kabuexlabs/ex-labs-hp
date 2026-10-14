@@ -8,7 +8,6 @@ import B2BNote from '../../components/guide/B2BNote.astro';
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import DateGuideNote from '../../components/guide/DateGuideNote.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
@@ -135,7 +134,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/madamis.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   dateModified: '2026-10-01',
   mainEntityOfPage: new URL('/guide/madamis/', Astro.site).toString(),
@@ -295,7 +293,7 @@ const articleLd = {
 
 <section class="section" id="history"><div class="wrap narrow">
 <p class="eyebrow">HISTORY</p><h2 class="h2 serif">マダミスの歴史・発祥</h2>
-<p class="lede">マダミスの源流は、欧米で親しまれてきた<strong>マーダーミステリーパーティー</strong>（参加者が容疑者を演じ合うパーティーゲーム）にあります。これがゲームとして体系化され、中国で<strong>「剧本殺（ジューベンシャー）」</strong>として専門店が数万店規模に広がる爆発的なブームとなり、日本には2019年前後に上陸。専門店の公演やオンラインアプリを通じて急速に広がりました。</p>
+<p class="lede">マダミスの源流は、欧米で親しまれてきた<strong>マーダーミステリーパーティー</strong>（参加者が容疑者を演じ合うパーティーゲーム）にあります。これがゲームとして体系化され、中国で<strong>「剧本殺（ジューベンシャー）」</strong>として専門店が数万店規模に広がる大きなブームとなり、日本には2019年前後に上陸。専門店の公演やオンラインアプリを通じて急速に広がりました。</p>
 <p class="lede">現在の日本では、店舗公演・オンライン・パッケージ販売・動画配信企画と遊び方が多様化し、<strong>企業の集客イベントや研修への活用</strong>という新しい広がりも生まれています。</p>
 <h3 class="def-sub serif">2026年のマダミス最新動向</h3>
 <ul class="bullets">
@@ -328,7 +326,6 @@ const articleLd = {
 <p class="vc-line">これらの判断を含めた制作の依頼は<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作サービス</a>へ。新規オリジナルと既存作品導入、シナリオのみと運営込みの選び方を同ページにまとめています。</p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

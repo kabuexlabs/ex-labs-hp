@@ -8,7 +8,6 @@ export const prerender = false;
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -68,7 +67,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/kisetsu-event.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-24',
   dateModified: '2026-09-15',
@@ -106,7 +104,7 @@ const articleLd = {
 <section class="section tinted" id="why"><div class="wrap narrow">
 <p class="eyebrow">WHY</p><h2 class="h2 serif">季節イベントを「体験型」にする効果</h2>
 <ul class="bullets">
-<li><strong>①装飾投資の回収率が上がる</strong>：同じハロウィン装飾でも、物語の舞台として使えば「装飾を巡る周遊体験」に変わり、投資が集客に直結します。</li>
+<li><strong>①装飾投資の回収率が上がる</strong>：同じハロウィン装飾でも、物語の舞台として使えば「装飾を巡る周遊体験」に変わり、装飾にかけた費用を集客にもつなげやすくなります。</li>
 <li><strong>②滞在時間と館内回遊が伸びる</strong>：手がかりを探して施設を巡る構造が、普段行かないフロア・テナントへの送客を生みます。</li>
 <li><strong>③毎年のリピート資産になる</strong>：「あの施設のハロウィン謎解き」が恒例になれば、季節ごとの集客装置として毎年機能します。</li>
 <li><strong>④SNS・メディアの話題になる</strong>：「見る装飾」は他施設と横並びですが、「体験できる物語」はニュースになります。当社の渋谷サクラステージでの施設一体型イベントは日本経済新聞に掲載されました。</li>
@@ -145,7 +143,6 @@ const articleLd = {
 <p class="lede">季節企画を施設で実施する場合の準備と参考価格は<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>をご覧ください。</p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

@@ -7,7 +7,6 @@ export const prerender = false;
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -99,7 +98,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/sankagata-event.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-13',
   dateModified: '2026-09-15',
@@ -165,7 +163,7 @@ const articleLd = {
 <section class="section" id="merit"><div class="wrap narrow">
 <p class="eyebrow">MERIT</p><h2 class="h2 serif">参加型にする3つのメリット</h2>
 <ul class="bullets">
-<li><strong>①記憶に残り、ファンになる</strong>：自分で選び、動き、解いた体験は「自分の物語」として記憶されます。ブランドや施設への愛着形成に直結します。</li>
+<li><strong>①記憶に残り、ファンになる</strong>：自分で選び、動き、解いた体験は「自分の物語」として記憶されます。ブランドや施設への愛着につながりやすくなります。</li>
 <li><strong>②滞在時間と回遊が伸びる</strong>：参加型の仕組みは「次の目的地」を次々と生むため、施設イベントでは滞在時間・館内回遊が自然に伸びます。</li>
 <li><strong>③SNSで語られる</strong>：「私はこうだった」という一人称の感想が生まれるのが参加型の強み。同じ体験でも人によって物語が変わるため、口コミが多様に広がります。</li>
 </ul>
@@ -178,7 +176,6 @@ const articleLd = {
 <p class="lede">参加型イベントの制作依頼は、施設・店舗向けなら<a href="/services/shisetsu-event/" style="color:var(--accent)">施設活用イベント制作サービス</a>、対戦型なら<a href="/services/zunousen/" style="color:var(--accent)">頭脳戦制作サービス</a>が入口です。</p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

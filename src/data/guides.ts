@@ -225,6 +225,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/zunousen-tournament.webp',
   },
   {
+    href: '/guide/shuyu-event-uketsuke/',
+    title: '営業中の商業施設で、周遊イベントの受付と待機場所をどう決めるか',
+    desc: '受付から体験終了までの流れ、列と滞留が起きる場所、出発間隔と同時に館内にいる人数、遅刻への対応、施設側と制作側の分担。',
+    date: '2026-10-14',
+    category: 'shisetsu',
+    thumb: '/assets/guide/shuyu-event-uketsuke.webp',
+  },
+  {
     href: '/guide/shuyu-event-seisaku/',
     title: '周遊イベントの制作依頼｜費用・スケジュール・施設側の準備',
     desc: '目的の決め方、依頼前に用意する情報、制作工程と役割分担、初期制作と運営の費用、受入人数の計算を発注準備に特化して解説。',
@@ -617,9 +625,17 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/immersive-seisaku.webp',
   },
   {
+    href: '/guide/bonenkai-nazotoki/',
+    title: '忘年会の食事と謎解きを、どう組み合わせるか',
+    desc: '着席と立食の違い、乾杯・配膳・説明の時間調整、卓上スペースと設備、幹事・会場・制作会社の担当範囲を整理。',
+    date: '2026-10-14',
+    category: 'nazotoki',
+    thumb: '/assets/guide/bonenkai-nazotoki.webp',
+  },
+  {
     href: '/guide/shanai-event/',
     title: '社内イベントの企画アイデア20選｜体験型で盛り上がる懇親会・全社会',
-    desc: '全員が主役になる体験型の企画8選と、懇親会・総会・研修などシーン別の選び方、失敗しない3つのポイント。',
+    desc: '体験型の8企画を中心にした20企画と、懇親会・総会・研修などシーン別の選び方、失敗しない3つのポイント。',
     date: '2026-08-24',
     category: 'nazotoki',
     thumb: '/assets/guide/shanai-event.webp',

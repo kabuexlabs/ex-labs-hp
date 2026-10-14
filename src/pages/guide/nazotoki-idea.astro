@@ -7,7 +7,6 @@ export const prerender = false;
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -37,7 +36,7 @@ const faqs = [
   },
   {
     q: 'どの形式を選べばいいかわかりません。',
-    a: '「目的」から逆算するのが近道です。集客なら周遊型、研修・懇親ならホール型、話題化ならイマーシブ融合型が定石です。目的をお聞かせいただければ、最適な形式からご提案します。',
+    a: '「目的」から逆算するのが近道です。集客なら周遊型、研修・懇親ならホール型、話題化ならイマーシブ融合型が定石です。目的をお聞かせいただければ、合う形式の検討からご提案します。',
   },
   {
     q: '謎解きイベントの制作費用と期間の目安は？',
@@ -63,7 +62,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/nazotoki-idea.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-12',
   dateModified: '2026-08-12',
@@ -122,7 +120,7 @@ const articleLd = {
 <section class="section tinted" id="ideas"><div class="wrap narrow">
 <p class="eyebrow">10 IDEAS</p><h2 class="h2 serif">謎解きイベントの企画アイデア10選</h2>
 <ul class="bullets">
-<li><strong>①館内周遊謎解き（商業施設）</strong>：フロアやテナントを巡って手がかりを集める形式。回遊・滞在時間の延長に直結します。<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベント →</a></li>
+<li><strong>①館内周遊謎解き（商業施設）</strong>：フロアやテナントを巡って手がかりを集める形式。回遊・滞在時間の延長につながりやすくなります。<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベント →</a></li>
 <li><strong>②閉店後のナイト謎解き</strong>：営業終了後の施設を「夜だけの特別な舞台」に。閉店後の紀伊國屋書店で物語体験を開催した実績があります。<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外の施設活用 →</a></li>
 <li><strong>③店舗連動スタンプラリー型</strong>：各店舗に謎を設置し、買い回りと連動させる形式。テナントの送客に効きます。</li>
 <li><strong>④展示連動型（美術館・博物館）</strong>：展示品を「観る」から「調べる」に変え、鑑賞の解像度を上げる形式。<a href="/guide/museum-event/" style="color:var(--accent)">ミュージアムの集客イベント →</a></li>
@@ -145,7 +143,6 @@ const articleLd = {
 <p class="vc-line"><a href="/guide/nazotoki-event/" style="color:var(--accent)">謎解きイベントの企画・制作ガイド →</a>／<a href="/guide/nazotoki-company/" style="color:var(--accent)">制作会社の選び方と費用相場 →</a></p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

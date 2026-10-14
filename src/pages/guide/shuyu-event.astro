@@ -7,7 +7,6 @@ import B2BNote from '../../components/guide/B2BNote.astro';
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import DateGuideNote from '../../components/guide/DateGuideNote.astro';
 import B2BNext from '../../components/guide/B2BNext.astro';
@@ -91,10 +90,9 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/shuyu-event.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-10',
-  dateModified: '2026-09-12',
+  dateModified: '2026-10-14',
   mainEntityOfPage: new URL('/guide/shuyu-event/', Astro.site).toString(),
 };
 ---
@@ -177,11 +175,11 @@ const articleLd = {
 <p class="eyebrow">MAKING</p><h2 class="h2 serif">作り方のポイントと費用</h2>
 <ul class="bullets">
 <li><strong>回遊させたい場所から逆算する</strong>：施設側の「人を流したいエリア」を先に決め、そこに物語の目的地を配置します。</li>
-<li><strong>混雑を設計で分散する</strong>：スタート時間の分散・ルートの複線化で、行列を作らないオペレーションにします。</li>
+<li><strong>混雑を設計で分散する</strong>：スタート時間の分散・ルートの複線化で、行列を作らないオペレーションにします。受付や待機場所の決め方は<a href="/guide/shuyu-event-uketsuke/" style="color:var(--accent)">営業中の商業施設での受付と待機場所</a>で詳しく説明しています。</li>
 <li><strong>所要時間をコントロールする</strong>：60〜120分程度に収め、飲食・買い物の時間と共存させるのが定石です。</li>
-<li><strong>その場所ならではの物語にする</strong>：場所と物語が結びついた体験は満足度・話題性が段違いです。</li>
+<li><strong>その場所ならではの物語にする</strong>：その場所を訪れる理由が物語の中にあると、参加者がほかの場所では代わりにならない体験として受け取りやすくなります。</li>
 </ul>
-<p class="lede">費用は規模により数十万円台〜数百万円規模まで。<strong>レベニューシェア型（成果報酬型）なら施設側の初期費用0円または格安</strong>で開催できるケースもあります。</p>
+<p class="lede">費用は規模により数十万円台〜数百万円規模まで。参加者から料金をいただく有料チケット型なら、制作費・運営費を当社が負担してチケット売上から回収する<strong>レベニューシェア</strong>（施設側の初期費用0円）も選べます。</p>
 <p class="vc-line"><a href="/services/shisetsu-event/" style="color:var(--accent)">周遊型イベントのご相談（無料）はこちら →</a>／<a href="/services/shisetsu-event/#shuyu" style="color:var(--accent)">周遊イベント制作の進め方（回遊導線・店舗送客・会期の設計）→</a>／<a href="/guide/shuyu-event-seisaku/" style="color:var(--accent)">周遊イベントの制作依頼（費用・スケジュール・施設側の準備）→</a></p>
 </div></section>
 
@@ -201,7 +199,6 @@ const articleLd = {
 <p class="vc-line"><a href="/guide/taikengata-idea/" style="color:var(--accent)">体験型イベントの企画アイデア15選 →</a>／<a href="/guide/shogyoshisetsu-event/" style="color:var(--accent)">商業施設の集客イベントアイデア →</a>／<a href="/works/" style="color:var(--accent)">制作事例一覧 →</a></p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

@@ -4,10 +4,8 @@
 // 研修LPと各ジャンル記事へ送客する。
 export const prerender = false;
 
-import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -76,16 +74,15 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/shanai-event.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-24',
-  dateModified: '2026-09-14',
+  dateModified: '2026-10-14',
   mainEntityOfPage: new URL('/guide/shanai-event/', Astro.site).toString(),
 };
 ---
 <BaseLayout
   title="社内イベントの企画アイデア20選｜体験型で盛り上がる懇親会・全社会・研修 - 株式会社ex Labs"
-  description="社内イベント・懇親会・全社総会の企画アイデアを体験型に絞って8つ紹介。謎解き・マダミス・頭脳戦など「全員が主役になる」形式の選び方、シーン別の使い分け、失敗しない3つのポイントを、体験型イベントの制作会社が解説します。"
+  description="社内イベント・懇親会・全社総会の企画アイデアを、体験型の8企画を中心に20企画紹介。謎解き・マダミス・頭脳戦など参加者それぞれに担当が生まれる形式の選び方、シーン別の使い分け、失敗しない3つのポイントを、体験型イベントの制作会社が解説します。"
   ogImage="/assets/guide/shanai-event.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
@@ -99,9 +96,9 @@ const articleLd = {
 <section class="section" style="padding-top:40px"><div class="wrap">
 <p class="eyebrow">CORPORATE EVENT</p>
 <h1 class="h2 serif"><span class="nobr">社内イベントの</span><span class="nobr">企画アイデア20選</span><br><span class="nobr">体験型で盛り上がる</span><span class="nobr">懇親会・全社会</span></h1>
-<p class="lede">社内イベントの一番の失敗は、<strong>「参加者が受け身のまま終わる」</strong>こと。立食と歓談だけの懇親会、聞くだけの総会は、翌日には忘れられてしまいます。この記事では、<strong>全員が主役になる「体験型」の社内イベント企画</strong>に絞って、アイデア20選とシーン別の選び方を、体験型イベントの制作会社である株式会社ex Labsが解説します。</p>
+<p class="lede">社内イベントの一番の失敗は、<strong>「参加者が受け身のまま終わる」</strong>こと。立食と歓談だけの懇親会、聞くだけの総会は、翌日には忘れられてしまいます。この記事では、<strong>参加者が自分で手を動かす「体験型」の社内イベント企画</strong>を中心に、アイデア20選とシーン別の選び方を、体験型イベントの制作会社である株式会社ex Labsが解説します。</p>
 
-<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>社内イベントとは、社員の交流・チームビルディング・表彰・懇親を目的に企業が開催する催しを指し、体験型の企画にすると参加率と満足度が上がりやすくなります。</li><li>社内イベント・懇親会・全社総会の企画アイデアを体験型に絞って8つ紹介。</li></ul></div>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>社内イベントとは、社員の交流・チームビルディング・表彰・懇親を目的に企業が開催する催しを指し、体験型の企画にすると参加率と満足度が上がりやすくなります。</li><li>体験型の8企画に、定番・オンライン・季節ものを加えた20企画を、目的別に紹介しています。</li></ul></div>
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
 <ol>
@@ -109,7 +106,6 @@ const articleLd = {
 </ol>
 </nav>
 </div></section>
-<section class="section" style="padding-top:0;padding-bottom:0"><div class="wrap"><RevShareCallout place="shanai-event-top" /></div></section>
 
 <section class="section tinted" id="why"><div class="wrap narrow">
 <p class="eyebrow">WHY</p><h2 class="h2 serif">社内イベントが「体験型」に向かう理由</h2>
@@ -146,7 +142,7 @@ const articleLd = {
 </ul>
 <p class="lede" style="margin-top:28px"><strong>季節・規模で選ぶ企画（18〜20）</strong>：時期や会場を活かすアイデアです。</p>
 <ul class="bullets">
-<li><strong>⑱季節イベント（ハロウィン・忘年会）を物語仕立てに</strong>：仮装や乾杯だけで終わらせず、当日限定のミッションやストーリーを乗せると参加率が跳ね上がります。<a href="/guide/halloween-event/" style="color:var(--accent)">ハロウィンイベントの企画アイデア12選 →</a></li>
+<li><strong>⑱季節イベント（ハロウィン・忘年会）を物語仕立てに</strong>：仮装や乾杯だけで終わらせず、当日限定のミッションやストーリーを乗せると、仮装や出し物が苦手な人も参加するきっかけを作れます。<a href="/guide/halloween-event/" style="color:var(--accent)">ハロウィンイベントの企画アイデア12選 →</a></li>
 <li><strong>⑲会場ごと借り切る貸切イベント</strong>：バー・劇場・イベントスペースを貸し切り、会社が舞台の一夜限りの物語に。周年記念や上場記念など「特別な回」に向きます。</li>
 <li><strong>⑳スポーツ大会・運動会</strong>：体を動かす定番。運営負荷が高いので、外部の運営会社に任せると担当者も楽しめます。</li>
 </ul>
@@ -165,8 +161,8 @@ const articleLd = {
 <section class="section" id="scene"><div class="wrap">
 <p class="eyebrow">SCENE</p><h2 class="h2 serif">シーン別の選び方（懇親会・総会・研修）</h2>
 <div class="genre-grid">
-<div class="genre-cell"><span class="genre-t serif">懇親会・歓送迎会</span><span class="genre-d">食事と並行できる軽めの謎解き・テーブル対抗形式（⑥）。空気を壊さず一体感だけ足せます。</span></div>
-<div class="genre-cell"><span class="genre-t serif">全社総会・キックオフ</span><span class="genre-d">大人数の熱狂を作る対抗戦（①③）や、理念を織り込んだストーリー体験（⑤）。</span></div>
+<div class="genre-cell"><span class="genre-t serif">懇親会・歓送迎会</span><span class="genre-d">食事と並行できる軽めの謎解き・テーブル対抗形式（⑥）。歓談の時間を残したまま、テーブルごとに話すきっかけを作れます。<a href="/guide/bonenkai-nazotoki/" style="color:var(--accent)">忘年会の食事と謎解きの組み合わせ方 →</a></span></div>
+<div class="genre-cell"><span class="genre-t serif">全社総会・キックオフ</span><span class="genre-d">大人数で順位を競う対抗戦（①③）や、理念を織り込んだストーリー体験（⑤）。</span></div>
 <div class="genre-cell"><span class="genre-t serif">研修・チームビルディング</span><span class="genre-d">振り返りまで設計する本格プログラム（①②）。<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修サービス →</a></span></div>
 <div class="genre-cell"><span class="genre-t serif">内定者・新人フォロー</span><span class="genre-d">初対面の壁を壊すアイスブレイク企画（⑦）。オンライン対応も可（⑧）。</span></div>
 </div>
@@ -175,14 +171,13 @@ const articleLd = {
 <section class="section tinted" id="point"><div class="wrap narrow">
 <p class="eyebrow">POINT</p><h2 class="h2 serif">失敗しない3つのポイント</h2>
 <ul class="bullets">
-<li><strong>①「全員に役割」を最優先する</strong>：盛り上がるのは一部だけ、が最大の失敗。謎解きやマダミスは全員に見せ場が生まれる構造を最初から持っています。</li>
+<li><strong>①「全員に役割」を最優先する</strong>：盛り上がるのが一部の人だけになるのは、よくある失敗です。謎解きやマダミスは、チームの人数や配役を調整すれば、一人ひとりに担当を持たせやすい形式です。</li>
 <li><strong>②難易度は「素人がギリギリ解ける」に調整する</strong>：難しすぎると白け、簡単すぎると盛り上がらない。テストプレイを重ねた市販品質のコンテンツを使うのが安全です。</li>
 <li><strong>③運営を現場担当者に背負わせない</strong>：進行・説明・トラブル対応を担当者が抱えると、当人だけ楽しめません。進行込みで外部に任せるのがおすすめです。</li>
 </ul>
 <p class="vc-line"><a href="/guide/taikengata-company/" style="color:var(--accent)">体験型イベント制作会社の選び方 →</a></p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
@@ -199,7 +194,7 @@ const articleLd = {
 <section class="section tinted"><div class="wrap">
 <div class="cta-mini">
 <p class="cta-mini-title serif">社内イベントの企画・制作のご相談はこちら（無料）</p>
-<a class="btn" href="/#contact">社内イベントについて相談する</a>
+<a class="btn" href="/?c=kenshu#contact" data-track="cta" data-show="contact" data-place="shanai-event">社内イベントについて相談する</a>
 </div>
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/taikengata-idea/" style="color:var(--accent)">体験型イベントの企画アイデア15選</a>／<a href="/guide/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修とは</a>／<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修とは</a>／<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修サービス</a>／<a href="/guide/taikengata-event/" style="color:var(--accent)">体験型イベントとは</a>／<a href="/guide/shanai-quiz/" style="color:var(--accent)">社内イベントで盛り上がるクイズ・ゲーム企画</a></p>
 </div></section>

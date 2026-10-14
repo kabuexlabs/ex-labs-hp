@@ -3,10 +3,8 @@
 // 競合が薄い研修×マダミス領域を押さえ、謎解き研修LP・マダミスLPへ送客。
 export const prerender = false;
 
-import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -66,7 +64,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/madamis-kenshu.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-10',
   dateModified: '2026-09-15',
@@ -99,7 +96,6 @@ const articleLd = {
 </ol>
 </nav>
 </div></section>
-<section class="section" style="padding-top:0;padding-bottom:0"><div class="wrap"><RevShareCallout place="madamis-kenshu-top" /></div></section>
 
 <section class="section tinted" id="about"><div class="wrap narrow">
 <p class="eyebrow">ABOUT</p><h2 class="h2 serif">マダミス研修とは</h2>
@@ -138,7 +134,6 @@ const articleLd = {
 <p class="lede">研修向けの作品制作と実施の条件は<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作サービス</a>、謎解き研修との組み合わせは<a href="/services/nazotoki-kenshu/" style="color:var(--accent)">謎解き研修サービス</a>をご覧ください。</p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

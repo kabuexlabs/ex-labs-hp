@@ -117,6 +117,9 @@ function parseSource(src?: string) {
   const visits = get('訪問回数');
   const path = (u: string) => { try { return new URL(u).pathname + (new URL(u).search || ''); } catch { return u || '(不明)'; } };
   let channel = src ? channelOf(ref) : '記録なし';
+  // ChatGPT などはリンクに utm_source を付けて送客するため、参照元が空でも入口URLから判定する
+  const utm = /[?&]utm_source=([^&#\s]+)/.exec(landing)?.[1] ?? '';
+  if (channel === '直接アクセス' && /chatgpt|openai|perplexity|gemini|copilot|claude/.test(utm)) channel = 'AI検索：' + decodeURIComponent(utm);
   const firstChannel = firstRef ? channelOf(firstRef) : '';
   if (firstChannel && firstChannel !== channel) channel += `（初回: ${firstChannel}）`;
   return {
@@ -231,6 +234,16 @@ const stats = (() => {
       <div>
         <p style="margin:0 0 6px;font-weight:700">送信したページ</p>
         <ul style="margin:0;padding-left:1.2em;line-height:1.9">{mByPage('submit').map(([k, n]) => <li><code style="font-size:12px">{k}</code>：<strong>{n}</strong></li>)}</ul>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;font-size:13px;margin-top:14px;padding-top:12px;border-top:1px dotted rgba(51,48,43,.25)">
+      <div>
+        <p style="margin:0 0 6px;font-weight:700">AI検索・チャットからの訪問 <strong>{mSum('ai-visit')}</strong>（参照元）</p>
+        <ul style="margin:0;padding-left:1.2em;line-height:1.9">{mByCat('ai-visit').map(([k, n]) => <li>{k}：<strong>{n}</strong></li>)}</ul>
+      </div>
+      <div>
+        <p style="margin:0 0 6px;font-weight:700">AI検索・チャットからの入口ページ</p>
+        <ul style="margin:0;padding-left:1.2em;line-height:1.9">{mByPage('ai-visit').map(([k, n]) => <li><code style="font-size:12px">{k}</code>：<strong>{n}</strong></li>)}</ul>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;font-size:13px;margin-top:14px;padding-top:12px;border-top:1px dotted rgba(51,48,43,.25)">

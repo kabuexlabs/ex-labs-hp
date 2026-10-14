@@ -6,7 +6,6 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import NowShowing from '../../components/guide/NowShowing.astro';
@@ -99,10 +98,9 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/botsunyukan.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-27',
-  dateModified: '2026-10-01',
+  dateModified: '2026-10-14',
   mainEntityOfPage: new URL('/guide/botsunyukan/', Astro.site).toString(),
 };
 ---
@@ -191,7 +189,7 @@ const articleLd = {
 <ul class="bullets">
 <li><strong>①五感の一貫性</strong>：見た目・音・小道具・照明の世界観を揃える。1つでも「現実」が混ざると没入は途切れます。作り込みの量より<strong>矛盾のなさ</strong>が重要です。</li>
 <li><strong>②現実を思い出させる要素の排除</strong>：進行アナウンス・案内表示・待機列など「運営の都合」をどう物語の中に溶かすか。ここがプロと素人の最大の差です。</li>
-<li><strong>③参加者に役割を与える</strong>：観るだけの人に没入は生まれません。「あなたは調査員です」と役割を渡された瞬間、人は世界の当事者になります。</li>
+<li><strong>③参加者に役割を与える</strong>：参加型のイベントでは、参加者に役割を渡すと、その場で何をすればよいかが伝わり、物語に参加しやすくなります。たとえば「あなたは調査員です」と伝えれば、聞き込みや手がかり探しが自然な行動になります。</li>
 </ul>
 <p class="lede">当社はこの設計思想で、渋谷サクラステージの施設一体型イマーシブ（<strong>日本経済新聞掲載</strong>）など、空間全体の没入体験を制作しています。</p>
 <p class="vc-line"><a href="/guide/immersive-seisaku/" style="color:var(--accent)">イマーシブ制作とは？工程・体制の完全ガイド →</a>／<a href="/guide/immersive-making/" style="color:var(--accent)">イマーシブイベントの作り方 →</a></p>
@@ -213,7 +211,6 @@ const articleLd = {
 </ul>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

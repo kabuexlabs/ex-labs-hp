@@ -22,8 +22,12 @@ try{var k='exl_src',F='exl_first',N='exl_n',now=Date.now();if(!sessionStorage.ge
     var h=a.getAttribute('href')||'';
     if(/#contact(\b|$)/.test(h)){try{sessionStorage.setItem('exl_cta',location.pathname)}catch(_){}}
     if(a.hasAttribute('data-track')){send(a.getAttribute('data-track'),(a.getAttribute('data-show')||'')+'-'+(a.getAttribute('data-place')||''));return}
-    if(/#contact(\b|$)/.test(h)||a.hasAttribute('data-cta'))send('cta',cat(h)||a.getAttribute('data-cta')||'');
+    if(/#contact(\b|$)/.test(h)||a.hasAttribute('data-cta')){send('cta',cat(h)||a.getAttribute('data-cta')||'');return}
+    // 記事などからサービスページへの移動（data-track の付いていない本文中のリンク）
+    var sm=/^(?:https:\/\/kabuexlabs\.com)?\/services\/([a-z-]*)\/?(?:[#?]|$)/.exec(h);if(sm&&location.pathname.indexOf('/services/')!==0)send('cta','services-'+(sm[1]||'index')+'-link');
   },true);
+  // AI検索・チャットからの訪問（セッションの最初のページだけ。参照元のドメインかutm_sourceで判定し、ドメイン名だけを送る）
+  try{if(!sessionStorage.getItem('exl_ai')){sessionStorage.setItem('exl_ai','1');var AI=/(chatgpt\.com|chat\.openai\.com|perplexity\.ai|gemini\.google\.com|copilot\.microsoft\.com|claude\.ai|you\.com|felo\.ai|genspark\.ai)/;var rm=AI.exec(document.referrer||'')||AI.exec((/[?&]utm_source=([^&#]+)/.exec(location.search)||[])[1]||'');if(rm)send('ai-visit',rm[1].replace(/\./g,'-'))}}catch(_){}
   var seen=false,f=document.getElementById('contact');
   if(f&&'IntersectionObserver' in window){var io=new IntersectionObserver(function(en){if(seen)return;for(var i=0;i<en.length;i++){if(en[i].isIntersecting){seen=true;send('view',cat(location.search));io.disconnect();break}}},{threshold:.2});io.observe(f)}
 })();

@@ -7,7 +7,6 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import MadamisPartners from '../../components/MadamisPartners.astro';
@@ -68,7 +67,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/madamis-tokyo.webp', site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-09-07',
   dateModified: '2026-09-13',
@@ -154,7 +152,6 @@ const articleLd = {
 <p class="vc-line"><a href="/guide/madamis-seisaku/" style="color:var(--accent)">マダミス制作とは？依頼の流れ・費用 →</a>／<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修とは →</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作のご相談（無料）→</a></p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>

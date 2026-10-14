@@ -6,7 +6,6 @@ export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import ZeroCostBanner from '../../components/ZeroCostBanner.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -64,7 +63,6 @@ const articleLd = {
   inLanguage: 'ja',
   image: [new URL('/assets/guide/madamis-rekishi.webp', site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
-  reviewedBy: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-09-06',
   dateModified: '2026-09-06',
@@ -115,7 +113,7 @@ const articleLd = {
 
 <section class="section tinted" id="china"><div class="wrap narrow">
 <p class="eyebrow">CHINA</p><h2 class="h2 serif">中国での大流行と「一度きりのシナリオ体験」への進化</h2>
-<p class="lede">2010年代の中国で、この形式が<strong>「剧本杀（ジュベンシャ）」</strong>と呼ばれる娯楽として爆発的に広がりました。テレビの推理バラエティ番組が人気を集めたことをきっかけに、専門店が都市部に急増し、作家が書き下ろす固有のシナリオ、進行役（GM）による演出、衣装や個室を使った没入感の演出が発達しました。</p>
+<p class="lede">2010年代の中国で、この形式が<strong>「剧本杀（ジュベンシャ）」</strong>と呼ばれる娯楽として急速に広がりました。テレビの推理バラエティ番組が人気を集めたことをきっかけに、専門店が都市部に急増し、作家が書き下ろす固有のシナリオ、進行役（GM）による演出、衣装や個室を使った没入感の演出が発達しました。</p>
 <ul class="bullets">
 <li><strong>固有のシナリオとキャラクター</strong>：作品ごとに事件・登場人物・秘密が用意され、体験は一度きりに。</li>
 <li><strong>GM（進行役）の定着</strong>：ルール説明、時間管理、結末の読み上げを担い、体験の質を担保。</li>
@@ -155,7 +153,6 @@ const articleLd = {
 <p class="lede">歴史を踏まえると、マダミスは「遊び」から「場所や組織の課題を解く道具」へ役割を広げている段階にあります。オリジナル制作の流れや費用は<a href="/guide/madamis-seisaku/" style="color:var(--accent)">マダミス制作とは →</a>、<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミスの制作費用 →</a>をご覧ください。</p>
 </div></section>
 
-<ZeroCostBanner />
 
 <section class="section" id="faq"><div class="wrap">
 <p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
