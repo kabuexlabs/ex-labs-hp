@@ -391,6 +391,12 @@ img{max-width:100%}
 .fa[hidden]{display:none}
 
 /* contact / footer */
+.xbtn{display:inline-flex;align-items:center;gap:12px;min-height:52px;padding:0 20px;border:1px solid #e2c43c;color:#f3f2f8;text-decoration:none;font-weight:600;font-size:15px;letter-spacing:.06em}
+.xbtn:hover{background:rgba(217,174,44,.12);color:#fff}
+.xbtn .xid{font-size:13px;color:#d0d5e6;margin-left:4px}
+.menu .xbtn{margin-top:14px;justify-content:center}
+.ov-x{margin-top:72px;display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.ov-x p{margin:0;font-size:15px;color:#d0d5e6}
 .mail{font-weight:800;font-size:clamp(20px,4.4vw,32px);text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px;word-break:break-all}
 .ft{border-top:1px solid rgba(217,174,44,.78);padding:48px 72px 56px 24px}
 .ft-in{max-width:672px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
@@ -437,6 +443,7 @@ img{max-width:100%}
       <a class="mi" href={n.href}><span class="no">{n.no}</span><span class="en">{n.ja}</span><span class="ja">{n.en}</span></a>
     ))}
     <a href={reserveHref} class="m-rsv mi-rsv" data-place="gensou-menu" {...reserveAttrs}>{RESERVE_URL ? 'escape.id で予約する' : 'チケット情報を見る'}</a>
+    {X_URL && <a href={X_URL} class="xbtn" target="_blank" rel="noopener" data-place="gensou-menu-x"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L1 2h6.4l4.4 5.8L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z"/></svg><span>公式X <span class="xid">@Gennsousyuu</span></span><span class="arc" aria-hidden="true">→</span></a>}
   </nav>
 </div>
 
@@ -517,6 +524,12 @@ img{max-width:100%}
         <SecHead ja="会場" side="l" />
         <p class="venue-t">夢の島熱帯植物館</p>
       </div>
+      {X_URL && (
+        <div class="ov-x">
+          <p>最新情報は公式Xでお知らせします。</p>
+          <a href={X_URL} class="xbtn" target="_blank" rel="noopener" data-place="gensou-about"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L1 2h6.4l4.4 5.8L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z"/></svg><span>公式X <span class="xid">@Gennsousyuu</span></span><span class="arc" aria-hidden="true">→</span></a>
+        </div>
+      )}
     </div>
   </section>
 
@@ -680,6 +693,7 @@ img{max-width:100%}
     <section id="contact" class="sec" style="padding-bottom:120px">
       <SecHead ja="お問い合わせ" side="r" />
       <a href="mailto:info@kabuexlabs.com" class="mail">info@kabuexlabs.com</a>
+      {X_URL && <div style="margin-top:32px"><a href={X_URL} class="xbtn" target="_blank" rel="noopener" data-place="gensou-contact"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L1 2h6.4l4.4 5.8L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z"/></svg><span>公式X <span class="xid">@Gennsousyuu</span></span><span class="arc" aria-hidden="true">→</span></a></div>}
     </section>
   </div>
 
