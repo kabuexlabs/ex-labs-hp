@@ -551,12 +551,12 @@ h1,h2,p{margin:0}
 
 /* Section heading */
 .sec{position:relative;padding:clamp(80px,10vw,140px) clamp(20px,4vw,48px)}
-/* 見出し：英字の下半分に絵画（伊藤ゆきの）の横帯を敷く。帯は見出しごとに絵の別の高さ（--y）を切り出し、右へ消える */
+/* 見出し（2026-10-15 画面の左半分ほどに収まる大きさへ縮小）：英字の下半分に絵画（伊藤ゆきの）の横帯を敷く。帯は見出しごとに絵の別の高さ（--y）を切り出し、右へ消える */
 .sh{margin-bottom:64px;text-align:left}
 .sh-56{margin-bottom:56px}.sh-48{margin-bottom:48px}.sh-40{margin-bottom:40px}
-.sh h2{position:relative;isolation:isolate;padding-left:.28em;font-family:'Italiana',serif;font-weight:400;font-size:clamp(64px,11vw,128px);line-height:1.1;letter-spacing:.01em;color:#FFF7F2;text-shadow:0 2px 14px rgba(60,8,24,.35)}
+.sh h2{position:relative;isolation:isolate;padding-left:.28em;font-family:'Italiana',serif;font-weight:400;width:min(100%,440px);font-size:clamp(40px,5vw,72px);line-height:1.1;letter-spacing:.01em;color:#FFF7F2;text-shadow:0 2px 14px rgba(60,8,24,.35)}
 .sh h2::before{content:'';position:absolute;z-index:-1;left:0;right:0;top:.58em;height:.5em;background:linear-gradient(rgba(106,20,48,.22),rgba(106,20,48,.22)),url(/assets/7th-composition/painting.webp) 38% var(--y,30%)/max(170%,900px) auto no-repeat;-webkit-mask-image:linear-gradient(90deg,#000 55%,transparent 98%);mask-image:linear-gradient(90deg,#000 55%,transparent 98%)}
-.sh p{margin-top:14px;padding-left:calc(.28 * clamp(64px,11vw,128px));font-size:14px;letter-spacing:.4em;color:#F2C9D4}
+.sh p{margin-top:14px;padding-left:calc(.28 * clamp(40px,5vw,72px));font-size:14px;letter-spacing:.4em;color:#F2C9D4}
 .body{font-size:17px;line-height:2.3;letter-spacing:.14em;text-wrap:pretty}
 
 /* News */
