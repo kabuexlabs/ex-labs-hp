@@ -1,9 +1,16 @@
 ---
-// 「午前零時の幻想集」LP のセクション見出し（ラフな罫線＋英語＋日本語）。英語は数字と同じ Shippori Mincho B1 800
-interface Props { en: string; ja: string }
-const { en, ja } = Astro.props;
+// 「午前零時の幻想集」LP のセクション見出し（2026-10-15 モックアップに合わせ日本語のみ）。
+// 金の見出し＋光る金の線。背後にオレンジのスポットライトを左右交互に置き、大きさ・位置は見出しの文字から決める（毎回同じ＝ランダム風）
+interface Props { ja: string; side?: 'l' | 'r' }
+const { ja, side = 'r' } = Astro.props;
+let h = 7;
+for (const c of ja) h = (h * 31 + c.charCodeAt(0)) % 9973;
+const size = 150 + (h % 90);               // 150〜239px
+const x = -80 + ((h >> 3) % 70);           // -80〜-11px（画面端からはみ出す量）
+const y = -70 + ((h >> 5) % 60);           // 見出しの上下にずらす
 ---
-<div class="sh">
-  <div class="sh-bar" aria-hidden="true"></div>
-  <h2 class="sh-t"><span class="sh-en">{en}</span><span class="sh-ja">{ja}</span></h2>
+<div class={`sh sh-${side}`}>
+  <span class="spot" aria-hidden="true" style={`--ss:${size}px;--sx:${x}px;--sy:${y}px`}></span>
+  <h2 class="sh-t">{ja}</h2>
+  <div class="sh-line" aria-hidden="true"></div>
 </div>

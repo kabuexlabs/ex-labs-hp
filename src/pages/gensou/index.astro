@@ -17,7 +17,7 @@ const ADDRESS: string | null = '東京都江東区夢の島2-1-2（夢の島公�
 const ACCESS = '新木場駅（JR京葉線・東京メトロ有楽町線・りんかい線）から徒歩約15分';
 // メインビジュアル（KV）と、拡大中に本の左ページへ出す「背景のみ」の画像。
 // BG_IMAGE が null の間は KV をそのまま使う。背景のみの画像が届いたら public/assets/gensou/ に置いてパスを入れる
-const KV_IMAGE = '/assets/gensou/visual.webp';
+const KV_IMAGE = '/assets/gensou/kv-clean.webp'; // 2026-10-15 キャッチ・下部情報なし版（本の左ページと全面KVの両方に使う）
 const BG_IMAGE: string | null = null;
 // サブタイトル（ポスターの表記）
 const SUB_NO = '第一夜';
@@ -36,8 +36,6 @@ const staff: { role: string; name: string; profile?: string }[] = [
   { role: 'ディレクター・デザイン', name: '荒巻まりの' },
   { role: 'プロデューサー', name: 'かるら' },
 ];
-// お知らせ（日付が確定したものだけ載せる。例 { date: '2026.10.01', text: '公演情報を公開しました。' }）
-const news: { date: string; text: string }[] = [];
 
 const reserveHref = RESERVE_URL ?? '#ticket';
 const reserveAttrs = RESERVE_URL
@@ -56,11 +54,11 @@ for (let m = 0; m <= 180; m += 12) {
 }
 const wd = ['木', '金', '土', '日'];
 const wk = (a: number, label: string) => ({ label, days: [0, 1, 2, 3].map((i) => ({ n: a + i, w: wd[i] })) });
-const weeks = [wk(5, '11.05 — 11.08'), wk(12, '11.12 — 11.15'), wk(19, '11.19 — 11.22')];
+const weeks = [wk(5, '11.05-11.08'), wk(12, '11.12-11.15'), wk(19, '11.19-11.22')];
 const dates = weeks.flatMap((w) => w.days.map((d) => `2026-11-${String(d.n).padStart(2, '0')}`));
 
 const nav = [
-  ['About', '公演概要', '#about'], ['News', 'お知らせ', '#news'], ['Story', 'あらすじ', '#story'],
+  ['About', '公演概要', '#about'], ['Story', 'あらすじ', '#story'],
   ['Feature', '体験の特徴', '#feature'], ['Staff', '制作・監修', '#staff'], ['Cast', '出演者', '#cast'],
   ['Ticket', 'チケット', '#ticket'], ['Flow', '当日の流れ', '#flow'], ['Notice', '注意事項', '#notice'],
   ['Access', 'アクセス', '#access'], ['FAQ', 'よくあるご質問', '#faq'], ['Contact', 'お問い合わせ', '#contact'],
@@ -189,9 +187,10 @@ const faqLd = {
 <SiteGuard />
 <style is:global>
 html{scroll-behavior:smooth}
-body{margin:0;background:radial-gradient(1000px 800px at -15% 22%,rgba(70,100,220,.16),transparent 70%) no-repeat,radial-gradient(900px 800px at 115% 52%,rgba(255,42,146,.06),transparent 70%) no-repeat,radial-gradient(900px 700px at -10% 80%,rgba(70,100,220,.12),transparent 70%) no-repeat,#0c1433;color:#f3f2f8;font-family:"Shippori Mincho B1",serif;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere;line-break:strict}
+body{margin:0;background:radial-gradient(1000px 800px at -15% 22%,rgba(60,50,170,.18),transparent 70%) no-repeat,radial-gradient(900px 800px at 115% 52%,rgba(217,174,44,.06),transparent 70%) no-repeat,radial-gradient(900px 700px at -10% 80%,rgba(60,50,170,.14),transparent 70%) no-repeat,#060733;color:#f3f2f8;font-family:"Shippori Mincho B1",serif;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere;line-break:strict}
 body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:90;opacity:.16;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 body.menu-open{overflow:hidden}
+main{overflow-x:clip}
 a{color:#f3f2f8}
 a:hover{color:#fff}
 *{box-sizing:border-box}
@@ -207,21 +206,21 @@ img{max-width:100%}
 .hd-logo{display:flex;align-items:center;text-decoration:none}
 .hd-logo img{display:block;height:52px;width:auto}
 .hd-r{display:flex;align-items:center;gap:12px}
-.btn-rsv{display:flex;align-items:center;height:40px;padding:0 18px;background:#f3f2f8;color:#0c1433 !important;text-decoration:none;font-size:14px;font-weight:600;letter-spacing:.12em}
+.btn-rsv{display:flex;align-items:center;height:40px;padding:0 18px;background:#f3f2f8;color:#060733 !important;text-decoration:none;font-size:14px;font-weight:600;letter-spacing:.12em}
 .burger{width:44px;height:44px;background:none;border:0;padding:0;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px}
 .burger span{display:block;width:26px;height:1px;background:#f3f2f8}
-.side{position:fixed;top:0;right:0;bottom:0;width:52px;z-index:40;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:96px 0 32px;color:#f3f2f8;pointer-events:none;text-shadow:0 0 8px rgba(12,20,51,.7)}
+.side{position:fixed;top:0;right:0;bottom:0;width:52px;z-index:40;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:96px 0 32px;color:#f3f2f8;pointer-events:none;text-shadow:0 0 8px rgba(6,7,51,.7)}
 .side .vt{writing-mode:vertical-rl;font-size:13px;letter-spacing:.3em;line-height:1.8}
 .side a{pointer-events:auto;writing-mode:vertical-rl;font-size:13px;letter-spacing:.3em;color:#f3f2f8;text-decoration:none;border-left:1px solid #f3f2f8;padding-left:6px}
-.menu{position:fixed;inset:0;z-index:80;background:#0c1433;overflow-y:auto;padding:88px 24px 48px}
+.menu{position:fixed;inset:0;z-index:80;background:#060733;overflow-y:auto;padding:88px 24px 48px}
 .menu[hidden]{display:none}
 .menu-x{position:absolute;top:18px;right:20px;width:44px;height:44px;background:none;border:0;color:#f3f2f8;font-size:28px;cursor:pointer;font-family:Archivo,sans-serif;font-weight:300}
 .menu nav{max-width:560px;margin:0 auto;display:flex;flex-direction:column}
-.menu nav a.mi{display:grid;grid-template-columns:40px 1fr auto;align-items:baseline;gap:12px;padding:16px 0;border-bottom:1px solid rgba(255,42,146,.78);text-decoration:none;color:#f3f2f8}
-.mi .no{font-weight:800;font-size:13px;color:#ff2a92}
+.menu nav a.mi{display:grid;grid-template-columns:40px 1fr auto;align-items:baseline;gap:12px;padding:16px 0;border-bottom:1px solid rgba(217,174,44,.78);text-decoration:none;color:#f3f2f8}
+.mi .no{font-weight:800;font-size:13px;color:#e2c43c}
 .mi .en{font-weight:800;font-size:22px;letter-spacing:.02em}
 .mi .ja{font-size:13px;color:#aeb5cf}
-.menu .m-rsv{margin-top:40px;display:flex;align-items:center;justify-content:center;height:56px;background:#ff2a92;color:#fff;text-decoration:none;font-weight:600;letter-spacing:.15em}
+.menu .m-rsv{margin-top:40px;display:flex;align-items:center;justify-content:center;height:56px;background:#e2c43c;color:#060733;text-decoration:none;font-weight:600;letter-spacing:.15em}
 
 /* hero */
 .hero{position:relative;height:400svh;--o:0;--z:0;--f:0}
@@ -260,68 +259,61 @@ img{max-width:100%}
 /* 本を開くと周りが植物園の世界に（KV をぼかして暗くした背景を事前書き出し） */
 .garden{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;opacity:calc(var(--o) * .9);will-change:opacity;pointer-events:none}
 /* 拡大しきったら全面 KV。下はグラデーションで紺に溶かし、そのまま公演概要へつなぐ */
-.kvfull{position:absolute;inset:0;opacity:var(--f);will-change:opacity;pointer-events:none;background:#0c1433}
+.kvfull{position:absolute;inset:0;opacity:var(--f);will-change:opacity;pointer-events:none;background:#060733}
 .kvfull img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover}
-.kvfull::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,20,51,0) 55%,rgba(12,20,51,.75) 82%,#0c1433 100%)}
+.kvfull::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,7,51,0) 55%,rgba(6,7,51,.75) 82%,#060733 100%)}
 /* 横長の画面では切れないよう全体表示（左右は植物園の背景） */
 @media (min-aspect-ratio: 3/4){
-  .kvfull{background:#0c1433 url(/assets/gensou/garden.webp) center/cover}
+  .kvfull{background:#060733 url(/assets/gensou/garden.webp) center/cover}
   .kvfull img{object-fit:contain}
 }
 
 /* layout */
 .wrap{max-width:720px;margin:0 auto;padding:0 72px 0 24px}
 .sec{padding:96px 0}
-.sh{display:flex;flex-direction:column;gap:14px;margin-bottom:48px}
-.sh-bar{height:12px;background:#ff2a92;filter:url(#rough)}
-.sh-t{margin:0;font-weight:400;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-.sh-en{font-weight:800;font-size:32px;letter-spacing:.02em;line-height:1.1}
-.sh-ja{font-size:13px;color:#aeb5cf}
+/* 見出し：金の文字＋光る金の線。背後にオレンジのスポットライト（左右交互） */
+.sh{position:relative;margin-bottom:44px}
+/* スポットは z-index:-1 で本文の後ろ・地色の上に置く（親に背景色を持たせない） */
+.sh-t{margin:0;font-size:24px;font-weight:800;color:#e6d23f;letter-spacing:.16em;line-height:1.4;text-shadow:0 0 14px rgba(230,210,63,.45)}
+.sh-line{margin-top:12px;height:3px;border-radius:2px;background:linear-gradient(90deg,#d9ae2c,#f4d860 45%,rgba(217,174,44,.25));box-shadow:0 0 10px rgba(244,216,96,.75),0 0 24px rgba(244,216,96,.35)}
+.spot{position:absolute;z-index:-1;top:var(--sy);width:var(--ss);height:var(--ss);border-radius:50%;background:radial-gradient(closest-side,rgba(206,108,78,.78),rgba(206,108,78,.42) 55%,rgba(206,108,78,0));pointer-events:none}
+.sh-r .spot{right:var(--sx)}
+.sh-l .spot{left:calc(var(--sx) - 24px)}
 .lead{margin:0;font-size:clamp(18px,2.6vw,22px);line-height:2;font-weight:600;text-wrap:pretty}
 .rows{display:flex;flex-direction:column}
-.row{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:22px 0;border-top:1px solid rgba(255,42,146,.78);font-size:15px;line-height:1.9}
-.row:last-child{border-bottom:1px solid rgba(255,42,146,.78)}
-.ph{background:repeating-linear-gradient(135deg,rgba(242,238,245,.06) 0 8px,transparent 8px 16px);border:1px solid rgba(255,42,146,.78)}
+.row{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:22px 0;border-top:1px solid rgba(217,174,44,.78);font-size:15px;line-height:1.9}
+.row:last-child{border-bottom:1px solid rgba(217,174,44,.78)}
+.ph{background:repeating-linear-gradient(135deg,rgba(242,238,245,.06) 0 8px,transparent 8px 16px);border:1px solid rgba(217,174,44,.78)}
 
 /* overview */
-.ov{background:linear-gradient(180deg,#0c1433 0%,#13215a 55%,#0c1433 100%);color:#f3f2f8;padding:40px 0 0}
-/* サブタイトル：ポスターの「第一夜／草陰の夢」 */
-.ov-sub{margin:24px 0 0;display:flex;flex-direction:column;gap:6px}
-.ov-sub .n{font-size:15px;letter-spacing:.4em;color:#ff2a92}
-.ov-sub .t{display:flex;align-items:center;gap:14px;font-size:clamp(30px,7.4vw,44px);font-weight:600;letter-spacing:.12em;line-height:1.3}
-.ov-sub .t::after{content:"";flex:1;max-width:120px;height:1px;background:linear-gradient(90deg,#ff2a92,transparent)}
-.ov-lead{margin:36px 0 0;font-size:clamp(17px,2.4vw,20px);line-height:2;font-weight:600;text-wrap:pretty}
-.ov-date{margin-top:72px;display:flex;flex-direction:column;gap:6px}
-.ov-y{font-size:20px;letter-spacing:.04em}
-.ov-d{font-size:clamp(40px,10vw,76px);line-height:1.05;letter-spacing:0}
-.ov-n{font-size:15px;margin-top:6px}
-.weeks{margin-top:36px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.week{border-top:2px solid #ff2a92;padding-top:12px;display:flex;flex-direction:column;gap:10px}
-.week-l{font-size:13px;letter-spacing:.02em;color:#aeb5cf}
-.days{display:flex;gap:6px}
-.day{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;border:1px solid rgba(255,42,146,.78)}
-.day .n{font-size:22px}
-.day .w{font-size:11px}
-.venue{margin-top:40px;display:grid;grid-template-columns:72px 1fr;gap:12px;padding:20px 0;border-top:1px solid rgba(255,42,146,.78);border-bottom:1px solid rgba(255,42,146,.78);font-size:16px}
-.ov-grad{height:20svh;margin-top:72px}
+/* 公演概要（モックアップ 2026-10-15） */
+.ov{color:#f3f2f8;padding:24px 0 0}
+.ov-lead{margin:24px 0 104px;text-align:center;font-size:clamp(17px,4.6vw,21px);font-weight:800;line-height:1.95;letter-spacing:.16em;text-shadow:0 0 10px rgba(255,255,255,.6),0 0 24px rgba(255,255,255,.25)}
+.ov-date{display:flex;flex-direction:column;gap:2px}
+.ov-y{font-size:28px;letter-spacing:.06em}
+.ov-d{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;font-size:clamp(38px,10.4vw,64px);line-height:1.15;letter-spacing:.04em}
+.ov-n{font-size:14px;letter-spacing:.08em}
+.weeks{margin-top:36px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px 24px}
+.week{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.week-l{font-size:13px;letter-spacing:.04em;color:#d6d2e6;border:1px solid rgba(217,174,44,.7);padding:2px 10px}
+.days{align-self:stretch;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.day{display:flex;flex-direction:column;align-items:center;gap:0;padding:0 0 8px;border-bottom:1px solid rgba(217,174,44,.6)}
+.day .n{font-size:36px;line-height:1.15;color:#dcd6f0}
+.day .w{font-size:12px;color:#dcd6f0}
+.ov-venue{margin-top:88px}
+.venue-t{margin:0;font-size:clamp(26px,7.4vw,38px);font-weight:800;letter-spacing:.14em;line-height:1.4}
 
-/* news */
-.news-row{display:grid;grid-template-columns:110px 1fr;gap:16px;padding:20px 0;border-top:1px solid rgba(255,42,146,.78)}
-.news-row:last-child{border-bottom:1px solid rgba(255,42,146,.78)}
-.news-row .d{font-size:14px;color:#aeb5cf}
-.news-row .t{font-size:15px;line-height:1.8}
-.news-empty{margin:0;font-size:15px;line-height:1.8;padding:20px 0;border-top:1px solid rgba(255,42,146,.78);border-bottom:1px solid rgba(255,42,146,.78)}
 
 /* story */
 .story{display:flex;flex-direction:column;gap:40px;max-width:560px}
 .story p{margin:0;font-size:16px;line-height:2.2}
 .story .lead{font-size:clamp(18px,2.6vw,22px);line-height:2}
 .story .qwrap{display:flex;flex-direction:column;gap:20px}
-.story .quote{padding:8px 0 8px 24px;font-size:clamp(18px,2.4vw,21px);line-height:2;font-weight:600;border-left:2px solid #ff2a92}
+.story .quote{padding:8px 0 8px 24px;font-size:clamp(18px,2.4vw,21px);line-height:2;font-weight:600;border-left:2px solid #e2c43c}
 
 /* feature */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:rgba(255,42,146,.78);border:1px solid rgba(255,42,146,.78)}
-.stat{background:#101a40;padding:24px 18px;display:flex;flex-direction:column;gap:8px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:rgba(217,174,44,.78);border:1px solid rgba(217,174,44,.78)}
+.stat{background:#0b0c42;padding:24px 18px;display:flex;flex-direction:column;gap:8px}
 .stat .k{font-size:12px;color:#aeb5cf}
 .stat .v{font-weight:800;font-size:44px;line-height:1}
 .stat .v small{font-size:16px;font-weight:600;margin-left:4px}
@@ -330,7 +322,7 @@ img{max-width:100%}
 .stat:last-child:nth-child(odd){grid-column:1/-1}
 
 /* staff / cast */
-.staff{display:flex;flex-direction:column;gap:10px;padding:32px 0;border-bottom:1px solid rgba(255,42,146,.78)}
+.staff{display:flex;flex-direction:column;gap:10px;padding:32px 0;border-bottom:1px solid rgba(217,174,44,.78)}
 .staff .role{font-size:14px;color:#aeb5cf}
 .staff .name{font-size:24px;font-weight:600}
 .staff p{margin:0;font-size:15px;line-height:1.9;color:#aeb5cf}
@@ -339,57 +331,57 @@ img{max-width:100%}
 .cast .photo{aspect-ratio:3/4;width:100%;object-fit:cover;display:block}
 .cast .role{font-size:12px;color:#aeb5cf;margin-top:4px}
 .cast .name{font-size:17px;font-weight:600}
-.cast .days{font-size:11px;color:#8a92b0}
+.cast .days{align-self:stretch;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 
 /* ticket */
 .tickets{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.tk{border:1px solid #ff2a92;padding:28px 22px;display:flex;flex-direction:column;gap:14px}
-.tk.g{background:rgba(255,42,146,.08);border-color:#ff2a92}
+.tk{border:1px solid #e2c43c;padding:28px 22px;display:flex;flex-direction:column;gap:14px}
+.tk.g{background:rgba(217,174,44,.08);border-color:#e2c43c}
 .tk .nm{font-size:15px;font-weight:600}
 .tk .pr{font-weight:800;font-size:40px;line-height:1}
 .tk .pr small{font-size:15px;font-weight:600;margin-left:6px}
 .tk p{margin:0;font-size:14px;line-height:1.9;color:#aeb5cf}
 .tk-note{margin:16px 0 0;font-size:13px;color:#aeb5cf}
 .times{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-.times span{font-size:14px;text-align:center;padding:6px 0;border:1px solid rgba(255,42,146,.78);white-space:nowrap;overflow-wrap:normal}
-.cta{margin-top:40px;display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 24px;background:#ff2a92;color:#fff !important;text-decoration:none;font-weight:600;font-size:16px;letter-spacing:.12em}
-.cta.off{background:transparent;color:#f3f2f8 !important;border:1px solid #ff2a92}
+.times span{font-size:14px;text-align:center;padding:6px 0;border:1px solid rgba(217,174,44,.78);white-space:nowrap;overflow-wrap:normal}
+.cta{margin-top:40px;display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 24px;background:#e2c43c;color:#060733 !important;text-decoration:none;font-weight:600;font-size:16px;letter-spacing:.12em}
+.cta.off{background:transparent;color:#f3f2f8 !important;border:1px solid #e2c43c}
 
 /* flow / notice */
 .flow{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-.flow li{display:grid;grid-template-columns:48px 1fr;gap:16px;padding:22px 0;border-top:1px solid rgba(255,42,146,.78)}
-.flow .no{font-weight:800;font-size:24px;color:#ff2a92}
+.flow li{display:grid;grid-template-columns:48px 1fr;gap:16px;padding:22px 0;border-top:1px solid rgba(217,174,44,.78)}
+.flow .no{font-weight:800;font-size:24px;color:#e2c43c}
 .flow .tx{display:flex;flex-direction:column;gap:4px;font-size:15px;line-height:1.9;color:#d0d5e6}
 /* 見出し語：本文より明るく太く。何の話かを先に拾えるようにする */
 .lb{display:block;font-size:16px;font-weight:600;color:#f3f2f8;letter-spacing:.04em}
 .ng + .ng{margin-top:48px}
-.ng-h{margin:0 0 4px;font-size:13px;font-weight:400;color:#ff2a92;letter-spacing:.12em}
+.ng-h{margin:0 0 4px;font-size:13px;font-weight:400;color:#e2c43c;letter-spacing:.12em}
 .notes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-.notes li{display:flex;flex-direction:column;gap:4px;padding:16px 0;border-top:1px solid rgba(255,42,146,.78);font-size:15px;line-height:1.9;color:#d0d5e6}
-.notes li:last-child{border-bottom:1px solid rgba(255,42,146,.78)}
+.notes li{display:flex;flex-direction:column;gap:4px;padding:16px 0;border-top:1px solid rgba(217,174,44,.78);font-size:15px;line-height:1.9;color:#d0d5e6}
+.notes li:last-child{border-bottom:1px solid rgba(217,174,44,.78)}
 
 /* access */
 /* 含まれる演出 */
-.fx{margin-top:24px;padding:18px 20px;border:1px solid rgba(255,42,146,.78)}
-.fx-h{margin:0 0 8px;font-size:13px;color:#ff2a92;letter-spacing:.12em}
+.fx{margin-top:24px;padding:18px 20px;border:1px solid rgba(217,174,44,.78)}
+.fx-h{margin:0 0 8px;font-size:13px;color:#e2c43c;letter-spacing:.12em}
 .fx ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:15px;line-height:1.9}
 .fx li{display:flex;gap:10px}
-.fx li::before{content:"●";color:#ff2a92;font-size:9px;line-height:3.2;flex:none}
+.fx li::before{content:"●";color:#e2c43c;font-size:9px;line-height:3.2;flex:none}
 /* 締め */
 .fin{text-align:left}
 .fin-c{margin:0;font-size:clamp(26px,7vw,40px);font-weight:800;line-height:1.5;letter-spacing:.06em}
 .fin-s{font-size:.6em;letter-spacing:.12em}
 .fin-l{margin:28px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#d0d5e6}
-.map{margin-top:24px;aspect-ratio:16/10;border:1px solid rgba(255,42,146,.78);background:#101a40}
+.map{margin-top:24px;aspect-ratio:16/10;border:1px solid rgba(217,174,44,.78);background:#0b0c42}
 .map iframe{display:block;width:100%;height:100%;border:0}
 .map-link{display:inline-flex;gap:8px;margin-top:14px;font-size:14px;color:#d0d5e6;text-underline-offset:4px}
 
 /* faq */
-.faq{display:flex;flex-direction:column;border-bottom:1px solid rgba(255,42,146,.78)}
-.fq{border-top:1px solid rgba(255,42,146,.78)}
+.faq{display:flex;flex-direction:column;border-bottom:1px solid rgba(217,174,44,.78)}
+.fq{border-top:1px solid rgba(217,174,44,.78)}
 .fq h3{margin:0;font:inherit}
 .fq button{width:100%;display:grid;grid-template-columns:28px 1fr 24px;gap:10px;align-items:baseline;padding:22px 0;background:none;border:0;color:#f3f2f8;text-align:left;cursor:pointer;font-family:inherit;font-size:16px;line-height:1.7}
-.fq .qa{font-weight:800;color:#ff2a92}
+.fq .qa{font-weight:800;color:#e2c43c}
 .fa .qa{color:#f3f2f8}
 .fq .qt{font-weight:600}
 .fq .sg{font-family:Archivo,sans-serif;font-weight:300;font-size:20px;text-align:right}
@@ -400,7 +392,7 @@ img{max-width:100%}
 
 /* contact / footer */
 .mail{font-weight:800;font-size:clamp(20px,4.4vw,32px);text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px;word-break:break-all}
-.ft{border-top:1px solid rgba(255,42,146,.78);padding:48px 72px 56px 24px}
+.ft{border-top:1px solid rgba(217,174,44,.78);padding:48px 72px 56px 24px}
 .ft-in{max-width:672px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
 .ft-in > img{display:block;width:120px;height:auto}
 .ft-info{display:grid;grid-template-columns:72px 1fr;gap:6px 12px;font-size:13px;line-height:1.8;color:#d0d5e6}
@@ -442,7 +434,7 @@ img{max-width:100%}
   <button type="button" class="menu-x" id="menu-close" aria-label="閉じる">×</button>
   <nav aria-label="ページ内メニュー">
     {nav.map((n) => (
-      <a class="mi" href={n.href}><span class="no">{n.no}</span><span class="en">{n.en}</span><span class="ja">{n.ja}</span></a>
+      <a class="mi" href={n.href}><span class="no">{n.no}</span><span class="en">{n.ja}</span><span class="ja">{n.en}</span></a>
     ))}
     <a href={reserveHref} class="m-rsv mi-rsv" data-place="gensou-menu" {...reserveAttrs}>{RESERVE_URL ? 'escape.id で予約する' : 'チケット情報を見る'}</a>
   </nav>
@@ -486,7 +478,7 @@ img{max-width:100%}
               <img src="/assets/gensou/cover.webp" alt="" width="720" height="975" fetchpriority="high">
             </div>
             {/* 表紙裏：メインビジュアル（2026-10-05 支給。800px） */}
-            <div class="b-inner"><img class="b-mv" src={BG_IMAGE ?? KV_IMAGE} alt="" width="1413" height="2000" decoding="async"></div>
+            <div class="b-inner"><img class="b-mv" src={BG_IMAGE ?? KV_IMAGE} alt="" width="1413" height="1994" decoding="async"></div>
           </div>
         </div>
       </div>
@@ -495,20 +487,19 @@ img{max-width:100%}
         <span class="cue-t">スクロール</span>
         <span class="cue-track"><span></span></span>
       </div>
-      <div class="kvfull"><img src={KV_IMAGE} alt="午前零時の幻想集 第一夜「草陰の夢」メインビジュアル" width="1413" height="2000" decoding="async"></div>
+      <div class="kvfull"><img src={KV_IMAGE} alt="午前零時の幻想集 第一夜「草陰の夢」メインビジュアル" width="1413" height="1994" decoding="async"></div>
     </div>
   </section>
 
   <section id="about" class="ov">
     <div class="wrap">
-      {/* タイトルロゴは直前の全面KVで見せるので、ここでは表示しない（見出しとしては残す） */}
+      {/* タイトルロゴ・サブタイトルは直前の全面KVで見せるので、ここでは表示しない（見出しとしては残す） */}
       <h1 class="sr">午前零時の幻想集 {SUB_NO}「{SUB_TITLE}」× 夢の島熱帯植物館</h1>
-      <p class="ov-sub" aria-hidden="true"><span class="n">{SUB_NO}</span><span class="t">{SUB_TITLE}</span></p>
       <p class="ov-lead"><J t={"普段は入れない\n夜の夢の島熱帯植物館を巡る\n物語体験。"} /></p>
+      <SecHead ja="会期" side="r" />
       <div class="ov-date">
         <span class="ov-y hv">2026</span>
-        <div class="ov-d hv">11.05 – 11.22</div>
-        <span class="ov-n">全12日間</span>
+        <div class="ov-d"><span class="hv">11.05-11.22</span><span class="ov-n">［全12日間］</span></div>
       </div>
       <div class="weeks">
         {weeks.map((w) => (
@@ -522,25 +513,16 @@ img{max-width:100%}
           </div>
         ))}
       </div>
-      <div class="venue"><span>会場</span><span style="font-weight:600">夢の島熱帯植物館</span></div>
+      <div class="ov-venue">
+        <SecHead ja="会場" side="l" />
+        <p class="venue-t">夢の島熱帯植物館</p>
+      </div>
     </div>
-    <div class="ov-grad"></div>
   </section>
 
   <div class="wrap">
-    <section id="news" class="sec">
-      <SecHead en="News" ja="お知らせ" />
-      {news.length > 0 ? (
-        <div class="rows">
-          {news.map((n) => <div class="news-row"><span class="d mono">{n.date}</span><span class="t"><J t={n.text} /></span></div>)}
-        </div>
-      ) : (
-        <p class="news-empty">{RESERVE_URL ? <J t="チケットはescape.idで販売中です。" /> : <J t="チケットの販売開始日は、決まり次第こちらでお知らせします。" />}</p>
-      )}
-    </section>
-
     <section id="story" class="sec">
-      <SecHead en="Story" ja="あらすじ" />
+      <SecHead ja="あらすじ" side="r" />
       <div class="story">
         <p class="lead"><J t={"『夜の植物館』を巡り、\n失われた記憶を取り戻す\nイマーシブ体験。"} /></p>
         <p><J t={"迷い込んだのは、夢の中の植物館。\nなぜここにいるのか。\n隣にいる人は、誰なのか。\nあなたは、何ひとつ思い出せない。"} /></p>
@@ -553,7 +535,7 @@ img{max-width:100%}
     </section>
 
     <section id="feature" class="sec">
-      <SecHead en="Feature" ja="体験の特徴・楽しみ方" />
+      <SecHead ja="体験の特徴" side="l" />
       <p class="lead" style="margin:0 0 48px"><J t="最大4人1組で、夜の植物館を巡る約50分の物語体験。" /></p>
       <div class="stats">
         <div class="stat"><span class="k">最大</span><span class="v">4<small>人1組</small></span></div>
@@ -572,7 +554,7 @@ img{max-width:100%}
     </section>
 
     <section id="staff" class="sec">
-      <SecHead en="Staff" ja="制作・監修" />
+      <SecHead ja="制作・監修" side="r" />
       <div class="rows">
         {staff.map((s) => (
           <div class="staff">
@@ -586,7 +568,7 @@ img{max-width:100%}
 
     {cast.length > 0 && (
       <section id="cast" class="sec">
-        <SecHead en="Cast" ja="出演者" />
+        <SecHead ja="出演者" side="l" />
         <div class="casts">
           {cast.map((c) => (
             <div class="cast">
@@ -601,7 +583,7 @@ img{max-width:100%}
     )}
 
     <section id="ticket" class="sec">
-      <SecHead en="Ticket" ja="チケット・開催情報" />
+      <SecHead ja="チケット" side="l" />
       <div class="tickets">
         <div class="tk">
           <span class="nm">個別チケット</span>
@@ -636,14 +618,14 @@ img{max-width:100%}
     </section>
 
     <section id="flow" class="sec">
-      <SecHead en="Flow" ja="当日の流れ" />
+      <SecHead ja="当日の流れ" side="r" />
       <ol class="flow">
         {flow.map((f) => <li><span class="no">{f.no}</span><span class="tx"><strong class="lb">{f.label}</strong><J t={f.text} /></span></li>)}
       </ol>
     </section>
 
     <section id="notice" class="sec">
-      <SecHead en="Notice" ja="注意事項" />
+      <SecHead ja="注意事項" side="l" />
       {notes.map((g) => (
         <div class="ng">
           <h3 class="ng-h">{g.group}</h3>
@@ -655,7 +637,7 @@ img{max-width:100%}
     </section>
 
     <section id="access" class="sec">
-      <SecHead en="Access" ja="会場・アクセス" />
+      <SecHead ja="会場・アクセス" side="r" />
       <div class="rows">
         <div class="row"><span>会場</span><span>夢の島熱帯植物館</span></div>
         <div class="row"><span>集合場所</span><span>正面入口</span></div>
@@ -667,7 +649,7 @@ img{max-width:100%}
     </section>
 
     <section id="faq" class="sec">
-      <SecHead en="FAQ" ja="よくあるご質問" />
+      <SecHead ja="よくあるご質問" side="l" />
       <div class="faq">
         {faqs.map((f, i) => (
           <div class="fq">
@@ -696,7 +678,7 @@ img{max-width:100%}
     </section>
 
     <section id="contact" class="sec" style="padding-bottom:120px">
-      <SecHead en="Contact" ja="お問い合わせ" />
+      <SecHead ja="お問い合わせ" side="r" />
       <a href="mailto:info@kabuexlabs.com" class="mail">info@kabuexlabs.com</a>
     </section>
   </div>
