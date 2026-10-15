@@ -41,7 +41,8 @@ const nav = [
   .map(([id, ja, en]) => ({ href: '#' + id, ja, en }));
 
 // お知らせ（日付が確定したものを載せる）
-const news: { date: string; text: string }[] = [{ date: '2026.—.—', text: '［お知らせ内容 未定］' }];
+// 2026-10-15 ユーザー指示で NEWS 欄を削除。載せる時はここに追加すると欄が表示される
+const news: { date: string; text: string }[] = [];
 
 // キャスト（写真・プロフィールは荒巻まりの より提供予定）
 const cast: { name: string; roman: string; profile: string; photo?: string }[] = [1, 2, 3].map(() => ({
@@ -228,14 +229,14 @@ const eventLd = {
   </div>
 </section>
 
-<section id="news" class="news">
+{news.length > 0 && (<section id="news" class="news">
   <div class="w880">
     <div class="sh sh-40" style="--y:18%"><h2>News</h2><p>お知らせ</p></div>
     {news.map((n) => (
       <div class="news-row"><span class="bodoni d">{n.date}</span><span class:list={[{ tbd: isTbd(n.text) }]}>{n.text}</span></div>
     ))}
   </div>
-</section>
+</section>)}
 
 <section id="story" class="sec story">
   <div class="w880 rel">
