@@ -3,8 +3,8 @@
 // 2026-10-04 作品名を「童話集」→「幻想集」に変更（ロゴ差し替え・URL を /douwa/ → /gensou/）。
 // デザインはハンドオフ（design_handoff_yumenoshima_lp）の再実装。コーポレートサイトとは
 // デザイン系統が別物なので BaseLayout は使わず、このファイルだけで完結させている。
-// 公開前のため noindex（sitemap・llms.txt にも未掲載）。検索に出すときは INDEXABLE を true にし、sitemap・llms.txt に戻す。
-const INDEXABLE = false;
+// 2026-10-15 検索公開（noindex 解除、sitemap・llms.txt に掲載）。非公開に戻すときは INDEXABLE を false にし、sitemap・llms.txt からも外す。
+const INDEXABLE = true;
 import SiteGuard from '../../components/SiteGuard.astro';
 import SecHead from '../../components/gensou/SecHead.astro';
 import J from '../../components/gensou/J.astro';
