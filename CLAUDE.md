@@ -95,7 +95,7 @@
 ## 会場名の表記（2026-09-29 京都市京セラ美術館 総務より指摘）
 - 必ず「京都市京セラ美術館」と続けて書く。正式名称は「京都市美術館」、ネーミングライツによる通称が「京都市京セラ美術館」。
 - 「京都市」を省いた略称、「at 京都市／京セラ…」のように改行・空白で分けた表記は誤り。LP・SNS文案・メール文面すべて同じ。
-- `scripts/seo-audit.mjs`（`npm run check`）が src 内の誤表記をエラーにする。LP は /taikenbizyutu/7th-composition/（限定公開・noindex）。
+- `scripts/seo-audit.mjs`（`npm run check`）が src 内の誤表記をエラーにする。LP は /taikenbizyutu/7th-composition/（2026-10-15 検索公開。sitemap・llms.txt 登録、/taikenbizyutu/ のお知らせからリンク）。
 
 ## 言祝ぎの家 LP（2026-10-05 本公開）
 - ウワサバナシ調査委員会 case2「言祝ぎの家」公式LPは **/uwasabanashi/kotohogi/**（検索インデックス許可、sitemap・llms.txt 掲載、Event 構造化データ22公演分）。正本メモは docs/kotohogi-lp.md。旧プレビュー /preview/kotohogi-xqo8sx5ar3pm/ は vercel.json で 301。

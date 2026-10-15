@@ -2,10 +2,10 @@
 // 体験する美術館「7枚目のコンポジション」公式LP（2026.11.21–23／京都市京セラ美術館）。
 // デザインはハンドオフ（design_handoff_7th_composition）の再実装。コーポレートサイトとも
 // 既存の体験する美術館LP（TaikenbizyutuLayout）ともデザイン系統が別なので、このファイルだけで完結させている。
-// 限定公開（URLを知っている人だけが見る前提）：noindex, nofollow。sitemap・llms.txt・ナビには載せない。
-// 検索に出すときは INDEXABLE を true にし、sitemap・llms.txt・seo-audit のサブブランド一覧に追加する。
+// 2026-10-15 検索公開（INDEXABLE=true）：sitemap・llms.txt・seo-audit のサブブランド一覧に登録済み。
+// /taikenbizyutu/ のお知らせ（src/data/taikenbizyutu.ts の TB_NEWS）からリンクしている。
 // ［ ］で囲んだ文言は未確定のプレースホルダー（ハンドオフのまま）。決まったら下のデータを書き換える。
-const INDEXABLE = false;
+const INDEXABLE = true;
 import SiteGuard from '../../../components/SiteGuard.astro';
 
 // ---- 未定の項目（決まったらここを埋める） ----
@@ -434,6 +434,7 @@ const eventLd = {
       ))}
     </div>
     <a href="#contact" class="ft-ct">公演に関するお問い合わせ<span class="bodoni">↗</span></a>
+    <a href="/guide/immersive/" class="ft-guide">イマーシブ（没入型）体験とは？</a>
     <p class="ft-copy bodoni tbd">© ［権利者名・表記未確認］</p>
   </div>
 </footer>
@@ -735,6 +736,8 @@ h1,h2,p{margin:0}
 .ft-ct{display:inline-flex;align-items:center;gap:14px;color:#1E0A10;font-family:'Zen Kaku Gothic New',sans-serif;font-weight:500;font-size:16px;letter-spacing:.16em}
 .ft-ct:hover{color:#861E3E}
 .ft-ct .bodoni{width:32px;height:32px;border:1px solid #1E0A10;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+.ft-guide{font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;letter-spacing:.12em;color:#1E0A10;text-decoration:underline;text-underline-offset:4px}
+.ft-guide:hover{color:#861E3E}
 .ft-copy{font-size:13px;letter-spacing:.14em}
 
 /* Floating CTA */

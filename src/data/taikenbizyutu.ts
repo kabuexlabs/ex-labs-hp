@@ -97,6 +97,12 @@ export interface TbNews {
 /** トップページ NEWS 欄。新しいものを上に追加する。 */
 export const TB_NEWS: TbNews[] = [
   {
+    date: '2026.10.15',
+    iso: '2026-10-15',
+    text: '新作『7枚目のコンポジション』（2026年11月21日〜23日・京都市京セラ美術館）の公式サイトを公開しました',
+    link: { href: `${TB_BASE}/7th-composition/`, label: '公式サイトを見る' },
+  },
+  {
     date: '2026.09.03',
     iso: '2026-09-03',
     text: '『ロスト・フレーム』全公演が完売しました',

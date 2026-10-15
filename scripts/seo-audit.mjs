@@ -91,6 +91,7 @@ const subBrand = [
   'src/pages/uwasabanashi/index.astro',
   'src/pages/uwasabanashi/iinkai/index.astro',
   'src/pages/gensou/index.astro',
+  'src/pages/taikenbizyutu/7th-composition/index.astro',
   // kaitou は PR #115 で運営会社表記を外し公演ブランドに統一したため対象外（勝手に再追加しない）
 ];
 for (const p of subBrand) {
