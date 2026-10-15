@@ -230,10 +230,7 @@ const eventLd = {
 
 <section id="news" class="news">
   <div class="w880">
-    <div class="news-hd">
-      <h2 class="italiana">News</h2>
-      <span>お知らせ</span>
-    </div>
+    <div class="sh sh-40" style="--y:18%"><h2>News</h2><p>お知らせ</p></div>
     {news.map((n) => (
       <div class="news-row"><span class="bodoni d">{n.date}</span><span class:list={[{ tbd: isTbd(n.text) }]}>{n.text}</span></div>
     ))}
@@ -241,10 +238,8 @@ const eventLd = {
 </section>
 
 <section id="story" class="sec story">
-  <div class="story-circle" aria-hidden="true"></div>
-  <div class="story-line" aria-hidden="true"></div>
   <div class="w880 rel">
-    <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Story</h2><span class="orn">+·◎·</span></div><p>ストーリー</p></div>
+    <div class="sh" style="--y:16%"><h2>Story</h2><p>ストーリー</p></div>
     <!-- あらすじ（2026-09-27 支給、改行は支給どおり）。情景は本文、最後の2行を見出しの大きさで強調する -->
     <div class="story-txt">
       <p class="body story-b lines">京都市京セラ美術館の一角。<br>三雲彼方展と記された<br>展示のパンフレットを開いた瞬間、<br>あなたの中に<br>知らない記憶が流れ込んできた。</p>
@@ -253,15 +248,9 @@ const eventLd = {
   </div>
 </section>
 
-<!-- 絵画（伊藤ゆきの）の部分切り抜き：軒先の看板と旗飾りを帯として見せる -->
-<figure class="art-band">
-  <img src="/assets/7th-composition/art-awning.webp" alt="伊藤ゆきのによる絵画（部分）。赤い看板と旗飾りのある店先" width="1800" height="455" loading="lazy">
-  <figcaption>絵画：伊藤ゆきの（部分）</figcaption>
-</figure>
-
 <section id="experience" class="sec">
   <div class="w1080">
-    <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Experience</h2><span class="orn">+·◎·</span></div><p>体験について</p></div>
+    <div class="sh" style="--y:52%"><h2>Experience</h2><p>体験について</p></div>
     <div class="exp-lead">
       <p class="exp-h glow-t">『鑑賞するアート』から<br>『体験するアート』へ</p>
       <p class="body lines">体験する美術館は、<br>「『鑑賞するアート』から<wbr>『体験するアート』へ」<br>をテーマにした、<br>絵画を鑑賞することで<br>物語の中に観客が巻き込まれていく<br>イマーシブ体験です。</p>
@@ -273,7 +262,6 @@ const eventLd = {
       <div><span class="lb">+・おひとりさま</span><span class="num"><span class="bodoni n">1</span><span>名から参加可能</span></span></div>
     </div>
     <div class="hl">
-      <img class="hl-img" src="/assets/7th-composition/art-shop.webp" alt="伊藤ゆきのによる絵画（部分）。旗飾りの下の入口と吊るされた服" width="1200" height="900" loading="lazy">
       <div class="hl-txt">
         <p class="hl-t italiana">Highlights<span></span></p>
         <p class="hl-h">具体的な体験方法・見どころ</p>
@@ -283,10 +271,9 @@ const eventLd = {
   </div>
 </section>
 
-<section id="team" class="sec team-sec">
-  <img class="team-art" src="/assets/7th-composition/art-mannequin.webp" alt="" width="600" height="970" loading="lazy" aria-hidden="true">
+<section id="team" class="sec">
   <div class="w880">
-    <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Creators</h2><span class="orn">+·◎·</span></div><p>制作チーム</p></div>
+    <div class="sh" style="--y:58%"><h2>Creators</h2><p>制作チーム</p></div>
     <div class="team">
       <div class="team-lead">
         <span class="role">+・{leadCredit.k}・+</span>
@@ -303,7 +290,7 @@ const eventLd = {
 
 {SHOW_CAST && (<section id="cast" class="sec">
   <div class="w1160">
-    <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Cast</h2><span class="orn">+·◎·</span></div><p>キャスト</p></div>
+    <div class="sh" style="--y:50%"><h2>Cast</h2><p>キャスト</p></div>
     <div class="cast">
       {cast.map((c) => (
         <div class="card">
@@ -327,7 +314,7 @@ const eventLd = {
 
 <section id="ticket" class="sec panel-sec">
   <div class="panel">
-    <div class="sh sh-56"><div class="sh-r"><span class="orn">+·◎·</span><h2>Ticket</h2><span class="orn">+·◎·</span></div><p>チケット・開催情報</p></div>
+    <div class="sh sh-56" style="--y:22%"><h2>Ticket</h2><p>チケット・開催情報</p></div>
     <div class="price">
       <span class="lb">+・料金・+</span>
       <span class="price-v"><span class="p1">1名</span><span class="bodoni pn">4,500</span><span class="p2">円</span></span>
@@ -364,7 +351,7 @@ const eventLd = {
 
 <section id="flow" class="sec">
   <div class="w1160">
-    <div class="sh"><div class="sh-r"><span class="orn">+·◎·</span><h2>Flow</h2><span class="orn">+·◎·</span></div><p>当日の流れ</p></div>
+    <div class="sh" style="--y:62%"><h2>Flow</h2><p>当日の流れ</p></div>
     <div class="flow">
       <div><span class="bodoni fn">01</span><span class="fh">受付</span><span class="fd lines">各回開始の10分前から、<br>本館地下1階「講演室」扉前にて受付</span></div>
       <div><span class="bodoni fn">02</span><span class="fh">参加準備・事前説明</span></div>
@@ -376,7 +363,7 @@ const eventLd = {
 
 <section id="attention" class="sec">
   <div class="w820">
-    <div class="sh sh-40"><div class="sh-r"><span class="orn">+·◎·</span><h2>Attention</h2><span class="orn">+·◎·</span></div><p>注意事項</p></div>
+    <div class="sh sh-40" style="--y:48%"><h2>Attention</h2><p>注意事項</p></div>
     <div class="deco" aria-hidden="true"><span class="l"></span><span class="bodoni">+·◇·+</span><span class="r"></span></div>
     <ul class="att att-main">{notes.map(([em, rest], i) => <li class:list={[{ top: i < 3 }]}><strong>{em}</strong>{rest && <span>{rest}</span>}</li>)}</ul>
     <p class="att-h">以下の扱いは不可能です。</p>
@@ -387,7 +374,7 @@ const eventLd = {
 
 <section id="access" class="sec panel-sec">
   <div class="panel">
-    <div class="sh sh-56"><div class="sh-r"><span class="orn">+·◎·</span><h2>Access</h2><span class="orn">+·◎·</span></div><p>会場・アクセス</p></div>
+    <div class="sh sh-56" style="--y:20%"><h2>Access</h2><p>会場・アクセス</p></div>
     <div class="acc">
       <div class="acc-info">
         {accessRows.map((r) => (
@@ -411,7 +398,7 @@ const eventLd = {
 
 <section id="faq" class="sec">
   <div class="w880">
-    <div class="sh sh-56"><div class="sh-r"><span class="orn">+·◎·</span><h2>Q&amp;A</h2><span class="orn">+·◎·</span></div><p>よくある質問</p></div>
+    <div class="sh sh-56" style="--y:60%"><h2>Q&amp;A</h2><p>よくある質問</p></div>
     <div class="faq">
       {faqs.map(([q, a], i) => (
         <details open={i === 0}>
@@ -425,7 +412,7 @@ const eventLd = {
 
 <section id="contact" class="sec contact">
   <div class="w880 center">
-    <div class="sh sh-48"><div class="sh-r"><span class="orn">+·◎·</span><h2>Contact</h2><span class="orn">+·◎·</span></div><p>お問い合わせ</p></div>
+    <div class="sh sh-48" style="--y:24%"><h2>Contact</h2><p>お問い合わせ</p></div>
     <p class="contact-t lines">公演に関するお問い合わせは、<br>下記メールアドレスまで<br>ご連絡ください。</p>
     <a href="mailto:info@kabuexlabs.com" class="mail bodoni">info@kabuexlabs.com<span class="ic">↗</span></a>
   </div>
@@ -562,28 +549,22 @@ h1,h2,p{margin:0}
 
 /* Section heading */
 .sec{position:relative;padding:clamp(80px,10vw,140px) clamp(20px,4vw,48px)}
-.sh{display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:64px}
+/* 見出し：英字の下半分に絵画（伊藤ゆきの）の横帯を敷く。帯は見出しごとに絵の別の高さ（--y）を切り出し、右へ消える */
+.sh{margin-bottom:64px;text-align:left}
 .sh-56{margin-bottom:56px}.sh-48{margin-bottom:48px}.sh-40{margin-bottom:40px}
-.sh-r{display:flex;align-items:center;gap:clamp(12px,3vw,28px)}
-.sh h2{font-family:'Italiana',serif;font-weight:400;font-size:clamp(52px,9vw,100px);line-height:1}
-.sh p{font-size:14px;letter-spacing:.4em}
-.orn{font-family:'Bodoni Moda',serif;font-size:14px;letter-spacing:.3em;color:#F2C9D4}
+.sh h2{position:relative;isolation:isolate;padding-left:.28em;font-family:'Italiana',serif;font-weight:400;font-size:clamp(64px,11vw,128px);line-height:1.1;letter-spacing:.01em;color:#FFF7F2;text-shadow:0 2px 14px rgba(60,8,24,.35)}
+.sh h2::before{content:'';position:absolute;z-index:-1;left:0;right:0;top:.58em;height:.5em;background:linear-gradient(rgba(106,20,48,.22),rgba(106,20,48,.22)),url(/assets/7th-composition/painting.webp) 38% var(--y,30%)/max(170%,900px) auto no-repeat;-webkit-mask-image:linear-gradient(90deg,#000 55%,transparent 98%);mask-image:linear-gradient(90deg,#000 55%,transparent 98%)}
+.sh p{margin-top:14px;padding-left:calc(.28 * clamp(64px,11vw,128px));font-size:14px;letter-spacing:.4em;color:#F2C9D4}
 .body{font-size:17px;line-height:2.3;letter-spacing:.14em;text-wrap:pretty}
 
 /* News */
 .news{padding:clamp(56px,8vw,96px) clamp(20px,4vw,48px)}
-.news-hd{display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid rgba(255,247,242,.4);padding-bottom:16px;flex-wrap:wrap}
-.news-hd h2{font-size:clamp(40px,6vw,64px);line-height:1}
-.news-hd span{font-size:14px;letter-spacing:.4em}
 .news-row{display:flex;gap:24px;flex-wrap:wrap;padding:22px 0;border-bottom:1px solid rgba(255,247,242,.2);font-size:16px;letter-spacing:.08em}
 .news-row .d{font-size:16px;letter-spacing:.1em;color:#F2C9D4}
 
 /* Story */
 .story{overflow:hidden}
-.story-circle{position:absolute;left:-60px;bottom:40px;width:400px;height:400px;background:url(/assets/7th-composition/art-person.webp) 50% 40%/cover no-repeat;-webkit-mask-image:radial-gradient(closest-side,#000 55%,transparent);mask-image:radial-gradient(closest-side,#000 55%,transparent);opacity:.9}
-.story-line{position:absolute;left:-10%;right:-10%;bottom:120px;height:1px;background:rgba(255,247,242,.35);transform:rotate(-8deg)}
-.story-txt{word-break:auto-phrase;padding-bottom:clamp(120px,16vw,200px)}
-@media (max-width:599.98px){.story-circle{width:240px;height:240px;left:-40px;bottom:0;opacity:.6}.story-line{bottom:80px}}
+.story-txt{word-break:auto-phrase}
 /* 文章は指定した位置（読点・句点・文節）でだけ改行する。入りきらない時だけ <wbr> か最終手段で折り返す */
 .lines{word-break:keep-all;overflow-wrap:anywhere}
 .story-b{margin-bottom:clamp(40px,6vw,64px);color:rgba(255,247,242,.9)}
@@ -598,21 +579,14 @@ h1,h2,p{margin:0}
 .genre-v{word-break:keep-all;font-size:26px;font-weight:600;letter-spacing:.08em;line-height:1.4}
 .num{display:flex;align-items:baseline;gap:6px;font-size:18px}
 .num .n{font-size:64px;line-height:.9}
-.hl{margin-top:72px;display:flex;flex-wrap:wrap;gap:clamp(24px,5vw,64px);align-items:center}
-.hl-img{flex:1 1 360px;min-width:0;display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,#000 70%,transparent);mask-image:linear-gradient(90deg,#000 70%,transparent)}
-.hl-txt{flex:1 1 360px;min-width:0}
+.hl{margin:72px auto 0;max-width:880px}
+.hl-txt{min-width:0}
 .hl-t{margin-bottom:20px;font-size:22px;letter-spacing:.1em;color:#EACF6C;display:flex;align-items:center;gap:16px}
 .hl-t span{flex:1;height:1px;background:#EACF6C}
 .hl-h{margin-bottom:20px;font-size:22px;font-weight:600;letter-spacing:.14em}
 .hl-b{font-size:17px;line-height:2.2;letter-spacing:.12em;text-wrap:pretty}
 
 /* Creators */
-.art-band{position:relative;margin:0;padding:0 0 clamp(8px,2vw,24px)}
-.art-band img{display:block;width:100%;height:clamp(140px,20vw,300px);object-fit:cover;object-position:50% 55%;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
-.art-band figcaption{margin:10px clamp(20px,4vw,48px) 0 auto;width:max-content;font-size:11px;letter-spacing:.2em;color:#F2C9D4;opacity:.8}
-.team-sec{overflow:hidden}
-.team-art{position:absolute;right:clamp(8px,3vw,56px);top:50%;transform:translateY(-50%);width:clamp(160px,15vw,240px);height:auto;opacity:.85;-webkit-mask-image:radial-gradient(closest-side,#000 58%,transparent);mask-image:radial-gradient(closest-side,#000 58%,transparent);pointer-events:none}
-@media (max-width:1099.98px){.team-art{display:none}}
 .team{position:relative;display:flex;flex-direction:column;align-items:center;gap:36px;text-align:center}
 .team-lead{display:flex;flex-direction:column;gap:10px}
 .team-lead .role{font-size:12px;letter-spacing:.24em;color:#F2C9D4}
