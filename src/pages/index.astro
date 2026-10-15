@@ -45,6 +45,20 @@ const allEvents: { title: string; host: string; place: string; desc: string; url
     from: firstDateOf('kotohogi', '2026-10-23'),
     until: lastDateOf('kotohogi', '2026-11-03'),
     period: '2026年10月23日〜11月3日の指定日',
+    // 2026-10-15 主催（株式会社ex Labs）からの連絡で全公演完売
+    soldout: true,
+  },
+  {
+    title: '7枚目のコンポジション',
+    host: '体験する美術館',
+    place: '京都市京セラ美術館',
+    desc: '絵画を鑑賞することで、\u200b物語の中に巻き込まれていく\u200b60分の\u200b絵画×イマーシブ体験。',
+    url: 'https://kabuexlabs.com/taikenbizyutu/7th-composition/',
+    img: '/assets/events/7th-composition-kv.webp',
+    w: 880, h: 1247,
+    from: '2026-11-21',
+    until: '2026-11-23',
+    period: '2026年11月21日〜23日',
   },
   {
     title: 'ウワサバナシ調査委員会 case1',
@@ -229,9 +243,10 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
       {liveCards.map((e) => (
         <a href={e.url} class="xt-ev" data-track="show" data-show={e.id} data-place="home-now">
           <img src={e.img} alt={e.title} width={e.w} height={e.h} loading="lazy" decoding="async">
+          {e.soldout && <span class="xt-ev-stamp" aria-hidden="true">完売</span>}
           <div>
             <p class="xt-ev-org"><span class="x-bl">{e.host}</span><span class="x-bl">開催地：{e.place}{e.until === todayJst && '｜本日最終日'}</span></p>
-            {e.soldout && <p class="xt-ev-so">完売</p>}
+            {e.soldout && <p class="xt-ev-so is-big">完売</p>}
             <h3 class="xt-ev-t">{e.title} ↗</h3>
             <p class="xt-ev-d"><Cls text={e.desc} emph={false} /></p>
           </div>
@@ -245,8 +260,10 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
           {upcomingEvents.map((e) => (
             <a href={e.url} class="xt-ev" data-track="show" data-show={e.url.split('/').filter(Boolean).pop()} data-place="home-soon">
               <img src={e.img} alt={e.title} width={e.w} height={e.h} loading="lazy" decoding="async">
+              {e.soldout && <span class="xt-ev-stamp" aria-hidden="true">完売</span>}
               <div>
                 <p class="xt-ev-org"><span class="x-bl">{e.host}</span><span class="x-bl">開催地：{e.place}</span></p>
+                {e.soldout && <p class="xt-ev-so is-big">完売</p>}
                 <p class="xt-ev-so is-soon">開催予定｜{e.period}</p>
                 <h3 class="xt-ev-t">{e.title} ↗</h3>
                 <p class="xt-ev-d"><Cls text={e.desc.replace(/\u200b/g, '')} emph={false} /></p>
@@ -513,6 +530,9 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-soon{margin-top:56px}
 .xt-soon-h{margin:0;display:flex;align-items:baseline;gap:14px;font-family:var(--x-min);font-weight:700;font-size:clamp(19px,2.6vw,24px)}
 .xt-soon-h span{font-family:var(--x-en);font-size:clamp(22px,3vw,30px);color:var(--x-lime);font-weight:400}
+.xt-ev{position:relative}
+.xt-ev-stamp{position:absolute;top:14px;left:14px;padding:8px 22px;background:var(--x-lime);color:var(--x-ink);font-weight:900;font-size:clamp(28px,7vw,36px);letter-spacing:.2em;line-height:1.2;box-shadow:0 4px 14px rgba(0,0,0,.35);transform:rotate(-6deg)}
+.xt-ev-so.is-big{padding:6px 18px;font-size:22px;letter-spacing:.24em;line-height:1.3}
 .xt-ev-so.is-soon{background:#fff;letter-spacing:.04em}
 .xt-ev-so{justify-self:start;margin:6px 0 0;display:inline-block;padding:3px 12px;background:var(--x-lime);color:var(--x-ink);font-weight:800;font-size:13px;letter-spacing:.12em}
 .xt-ev-org{margin:0;font-size:12px;line-height:1.7;color:var(--x-pale2)}

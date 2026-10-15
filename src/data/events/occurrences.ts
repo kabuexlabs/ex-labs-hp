@@ -60,7 +60,8 @@ export const occurrences: Occurrence[] = [
     eventCheckedAt: KOTOHOGI_CHECKED,
     eventCheckedBy: 'Claude（自社公式ページの開催日・開演時刻を確認）',
     sales: { status: 'unknown', closesAt: minus2h(date, startTime), channels: [{ channelId: 'escape-id', url: 'https://escape.id/uwasabanashi-org/e-hanayome/' }] },
-    seats: { status: 'unknown' },
+    // 2026-10-15 主催（株式会社ex Labs）からの連絡で全公演完売
+    seats: { status: 'soldout', checkedAt: '2026-10-15T12:00:00+09:00', expiresAt: '2026-11-04T00:00:00+09:00' },
     sourceIds: ['kotohogi-official', 'escape-id-kotohogi'],
     published: true,
   }))),
