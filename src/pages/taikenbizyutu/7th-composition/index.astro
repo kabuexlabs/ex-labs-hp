@@ -60,7 +60,7 @@ const ticketKey = kv([
   ['公演時間', '60分（各日7公演）'],
   ['定員', '各回30名（1名から参加可能）'],
   ['対象年齢', '18歳以上'],
-  ['販売開始日時', '［未定］'],
+  ['販売開始日時', '2026年10月17日（土）19:00〜'],
   ['販売締切', '開演1時間前'],
 ]);
 const ticketRows = kv([
@@ -135,7 +135,7 @@ const eventLd = {
   eventStatus: 'https://schema.org/EventScheduled',
   location: { '@type': 'Place', name: '京都市京セラ美術館', address: { '@type': 'PostalAddress', postalCode: '606-8344', streetAddress: '岡崎円勝寺町124', addressLocality: '京都市左京区', addressRegion: '京都府', addressCountry: 'JP' } },
   organizer: { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' },
-  offers: { '@type': 'Offer', price: 4500, priceCurrency: 'JPY', url: TICKET_URL ?? canonical },
+  offers: { '@type': 'Offer', price: 4500, priceCurrency: 'JPY', url: TICKET_URL ?? canonical, validFrom: '2026-10-17T19:00:00+09:00' },
 };
 ---
 <!doctype html>
