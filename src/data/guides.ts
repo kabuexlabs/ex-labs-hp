@@ -121,6 +121,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/immersive-tokyo-solo.webp',
   },
   {
+    href: '/guide/yumenoshima-night/',
+    title: '夜の夢の島熱帯植物館で行われる物語体験｜日程・チケットの選び方・行き方（2026年11月）',
+    desc: '11月5日〜22日の木〜日曜、夜の夢の島熱帯植物館で開催する「午前零時の幻想集」。開始時刻、人数別の総額、当日の流れ、新木場駅からの行き方。',
+    date: '2026-10-16',
+    category: 'immersive',
+    thumb: '/assets/events/gensou-kv.webp',
+  },
+  {
     href: '/guide/immersive-tokyo-date/',
     title: '東京のイマーシブ体験を二人で楽しむには？貸切・料金・会話量で選ぶ',
     desc: '二人分の総額と1人あたり料金、相席か貸切か、同じ組で行動できるか、交流・屋外移動・所要時間を公式情報で比較。予定の組み方と予約前チェック。',
@@ -715,6 +723,7 @@ export const DATE_OUTING = {
     '/guide/tokyo-before-dating/',
     '/guide/immersive-tokyo-date/',
     '/guide/immersive-tokyo/',
+    '/guide/yumenoshima-night/',
   ],
 };
 /** 公開中の記事だけを、DATE_OUTING の並び順で返す */

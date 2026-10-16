@@ -267,6 +267,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
       <div class="xt-soon">
         <p class="xt-soon-h"><span>Coming Soon</span>開催予定・近日公開</p>
         {upcomingEvents.some((e) => e.venueTag) && <p class="xt-soon-pub"><Cls text={`この秋は、${upcomingEvents.filter((e) => e.venueTag).map((e) => `${(e.venueTag ?? '').split('の')[0]}の${e.place}`).join('、')}と、公共の文化施設を舞台にした公演を開催します。`} emph={false} /></p>}
+        {upcomingEvents.some((e) => e.url.endsWith('/gensou/')) && <p class="xt-soon-more"><a href="/guide/yumenoshima-night/" data-track="show" data-show="guide-yumenoshima" data-place="home-soon">夜の夢の島熱帯植物館で行われる物語体験：日程・チケットの選び方・行き方 →</a></p>}
         <div class="x-hscroll" style="margin-top:20px;gap:20px">
           {upcomingEvents.map((e) => (
             <a href={e.url} class="xt-ev" data-track="show" data-show={e.url.split('/').filter(Boolean).pop()} data-place="home-soon">
@@ -548,6 +549,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-ev-pub{justify-self:start;margin:6px 0 0;display:inline-flex;flex-wrap:wrap;align-items:center;border:1.5px solid var(--x-lime);color:#fff;font-size:13.5px;font-weight:700;line-height:1.5}
 .xt-ev-pub span{white-space:nowrap;padding:4px 10px}
 .xt-ev-pub .k{background:var(--x-lime);color:var(--x-ink);font-weight:900;letter-spacing:.08em}
+.xt-soon-more{margin:10px 0 0;font-size:14px;font-weight:700}.xt-soon-more a{color:var(--x-lime);border-bottom:1px solid currentColor}
 .xt-soon-pub{margin:14px 0 0;max-width:720px;font-size:15px;font-weight:700;line-height:1.9;color:#fff;border-left:3px solid var(--x-lime);padding-left:14px}
 .xt-ev-stamp{position:absolute;top:14px;left:14px;padding:8px 22px;background:var(--x-lime);color:var(--x-ink);font-weight:900;font-size:clamp(28px,7vw,36px);letter-spacing:.2em;line-height:1.2;box-shadow:0 4px 14px rgba(0,0,0,.35);transform:rotate(-6deg)}
 .xt-ev-so.is-big{padding:6px 18px;font-size:22px;letter-spacing:.24em;line-height:1.3}

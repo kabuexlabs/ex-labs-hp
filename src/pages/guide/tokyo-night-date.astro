@@ -35,7 +35,8 @@ const pair = all.filter((o) => fitsParty(o, 2) === true);
 const byId = (id: string) => all.find((o) => o.id === id);
 // 夜（17時以降）に始まる回：自社公演（開始時刻が確認できた回）
 const ownNight = nightOwnWorkIds.map((id) => byId(id)).filter((o): o is Outing => !!o).map((o) => ({
-  o, text: occurrences.filter((x) => x.workId === o.id && x.date >= today && x.startTime && x.startTime >= '17:00').map((x) => `${fmtDateShort(x.date)} ${x.startTime}`).join('・') + ' 開始',
+  // 幻想集は1日分を17:00〜20:50の枠で登録しているため、開始時刻の並びではなく会期と開始の間隔で示す
+  o, text: o.id === 'gensou' ? '11月5日〜22日の木〜日曜、各日17:00〜20:00に12分おきに開始（最終回は20:50終了予定）' : occurrences.filter((x) => x.workId === o.id && x.date >= today && x.startTime && x.startTime >= '17:00').map((x) => `${fmtDateShort(x.date)} ${x.startTime}`).join('・') + ' 開始',
 }));
 const info = NIGHT_INFO.map((x) => ({ ...x, o: byId(x.id) }));
 const slots = await hacktaleSlots((s) => s.slice(11, 16) >= '17:00');

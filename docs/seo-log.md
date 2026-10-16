@@ -1399,3 +1399,10 @@
 - 「チケット売上に応じてお支払いいただく」「成果報酬型」「初期費用0円または格安」「案件によっては初期費用を抑えた」などの表現を、実際の条件（参加者から料金をいただく有料チケット型が対象／制作費・運営費は当社が負担しチケット売上から回収／施設側の初期費用0円／未回収分も当社負担）に合わせて修正。
 - 対象：会社概要、制作事例一覧、マーダーミステリー制作サービス（FAQ）、解説記事約25本（saiji, madamis-seisaku, madamis, madamis-cost, madamis-tokyo, yukyu-kukaku, popup-event, case-uwasabanashi, shuyu-event, shogyoshisetsu-event, immersive-event, immersive-seisaku, shisetsu-katsuyo, nazotoki-company, taikengata-idea, taikengata-event, event-hiyou, eigyo-jikangai, immersive-company, taikengata-company, immersive, museum-event, immersive-cost, halloween-event, nazotoki-event, zunousen-seisaku）。
 - トップの「成果報酬型のビジネスモデルの魅力」（売れなければ当社が赤字になる、という当社側の説明）は実際の条件と矛盾しないため変更なし。title・H1・description は変更なし。
+
+## 2026-10-16 「夢の島熱帯植物館」検索向けの案内ページを新設
+
+- 新規 /guide/yumenoshima-night/（title：夢の島熱帯植物館の夜イベント｜物語体験「午前零時の幻想集」の日程・チケット・行き方（2026年11月）／H1：夜の夢の島熱帯植物館で行われる物語体験）。狙い：「夢の島熱帯植物館 夜／イベント／11月／デート」など、施設名で探す人に夜の物語体験を案内し、予約（escape.id）と公式LP（/gensou/）へ送る。
+- 内容は /gensou/ と公演データの記載のみ：開催日12日の週別一覧、開始時刻（12分おき・最終20:00開始20:50終了）、チケットの選び方（人数別の総額表）、当日の流れ、住所・新木場駅からの行き方と帰りの時間の目安、参加条件・持ち物・撮影・雨天。施設の通常の開館時間・入館料は確認できないため「施設の公式サイトで確認」とした。会期前・会期中・終了後で冒頭の表示と予約ボタンを切り替え。
+- 内部リンク（アンカーに施設名）：トップの「開催予定・近日公開」、GensouFeature（東京イマーシブ・デート・お出かけ系9本）、美術館の集客記事。guides.ts（DATE_OUTING にも追加）、サイトマップ、llms.txt、llms-full.txt に追加。
+- /guide/tokyo-night-date/（下書き）：幻想集の開始時刻の表示を「各日17:00〜20:00に12分おき」に修正。
