@@ -23,6 +23,8 @@ try{var k='exl_src',F='exl_first',N='exl_n',now=Date.now();if(!sessionStorage.ge
     if(/#contact(\b|$)/.test(h)){try{sessionStorage.setItem('exl_cta',location.pathname)}catch(_){}}
     if(a.hasAttribute('data-track')){send(a.getAttribute('data-track'),(a.getAttribute('data-show')||'')+'-'+(a.getAttribute('data-place')||''));return}
     if(/#contact(\b|$)/.test(h)||a.hasAttribute('data-cta')){send('cta',cat(h)||a.getAttribute('data-cta')||'');return}
+    // チケット販売サイトへのクリック（data-track の付いていないリンク）。購入完了ではない
+    var tm=/^https:\/\/(?:www\.)?(escape\.id|peatix\.com|eplus\.jp|t\.pia\.jp|l-tike\.com|ticket\.rakuten\.co\.jp|tiget\.net)\//.exec(h);if(tm){send('ticket','link-'+tm[1].replace(/\./g,'-'));return}
     // 記事などからサービスページへの移動（data-track の付いていない本文中のリンク）
     var sm=/^(?:https:\/\/kabuexlabs\.com)?\/services\/([a-z-]*)\/?(?:[#?]|$)/.exec(h);if(sm&&location.pathname.indexOf('/services/')!==0)send('cta','services-'+(sm[1]||'index')+'-link');
   },true);

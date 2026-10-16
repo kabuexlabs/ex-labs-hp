@@ -4,7 +4,6 @@
 // 内部リンクを集約してトピカルオーソリティを形成する。
 export const prerender = false;
 
-import B2BNote from '../../components/guide/B2BNote.astro';
 import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
@@ -51,7 +50,7 @@ const faqs = [
   },
   {
     q: 'マダミスは一人でも遊べますか？',
-    a: '基本は3〜6人程度で遊ぶ会話型ゲームのため、複数人での参加が前提です。人数が集まらない場合は、店舗のオープン公演（相席）に一人で申し込む方法があります。',
+    a: '人数は作品ごとに決まっていて（4〜10人程度の作品が多い）、複数人での参加が前提です。一人の場合は、店舗のオープン公演（相席）に一人で申し込む方法があります。',
   },
   {
     q: 'マダミスは一度遊んだ作品をもう一度遊べますか？',
@@ -75,7 +74,7 @@ const faqs = [
   },
   {
     q: 'マダミスは何人で遊びますか？',
-    a: '作品ごとに人数が決まっており、4〜10人程度が主流です。人数がぴったり揃う必要があるため、店舗公演では相席で参加者を募る形も一般的です。企業や施設向けには、複数卓を同時に進行して大人数に対応します。',
+    a: '作品ごとに人数が決まっており、4〜10人程度の作品が多くあります。人数がぴったり揃う必要があるため、店舗公演では相席で参加者を募る形も一般的です。企業や施設向けには、複数卓を同時に進行して大人数に対応します。',
   },
   {
     q: 'マダミスの所要時間はどのくらいですか？',
@@ -135,7 +134,7 @@ const articleLd = {
   image: [new URL('/assets/guide/madamis.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
-  dateModified: '2026-10-01',
+  dateModified: '2026-10-16',
   mainEntityOfPage: new URL('/guide/madamis/', Astro.site).toString(),
 };
 ---
@@ -161,7 +160,7 @@ const articleLd = {
 <p class="mm-facts-h">マダミスの基本</p>
 <dl>
 <div><dt>意味</dt><dd>マーダーミステリーの略。登場人物になりきり、会話と推理で犯人を突き止める推理ゲーム</dd></div>
-<div><dt>人数</dt><dd>1作品4〜10人程度。一人でも、他の参加者と同じ回に入る相席公演に参加できます</dd></div>
+<div><dt>人数</dt><dd>作品ごとに決まっていて、4〜10人程度の作品が多い。一人でも、他の参加者と同じ回に入る相席公演に参加できます</dd></div>
 <div><dt>所要時間</dt><dd>2〜4時間が中心（初心者向けの短編は60〜90分）</dd></div>
 <div><dt>料金</dt><dd>店舗公演で1名3,500〜5,000円前後</dd></div>
 <div><dt>初心者</dt><dd>参加できます。最初に進行役（GM）がルールを説明するので、予習は不要です</dd></div>
@@ -184,7 +183,6 @@ const articleLd = {
 </ol>
 </nav>
 </div></section>
-<section class="section" style="padding-top:0;padding-bottom:0"><div class="wrap"><RevShareCallout place="madamis-top" /></div></section>
 
 <section class="section tinted" id="about"><div class="wrap narrow">
 <p class="eyebrow">ABOUT</p><h2 class="h2 serif">マダミスとは</h2>
@@ -193,7 +191,7 @@ const articleLd = {
 <ul class="bullets">
 <li><strong>何をするか</strong>：配られた資料で自分の役を知り、他の参加者と話して手がかりを集め、最後に犯人を推理して投票します。</li>
 <li><strong>どう参加するか</strong>：専門店やイベントの公演に申し込む（一人で相席参加／友人と貸切）か、作品を買ってオンライン・自宅で遊びます。</li>
-<li><strong>人数・時間・料金</strong>：1作品4〜10人程度、所要2〜4時間が中心。店舗公演は1名3,500〜5,000円前後が目安です（作品ごとに異なります）。</li>
+<li><strong>人数・時間・料金</strong>：人数は作品ごとに決まっていて4〜10人程度の作品が多く、所要2〜4時間が中心。店舗公演は1名3,500〜5,000円前後が目安です（作品ごとに異なります）。</li>
 </ul>
 </div></section>
 
@@ -307,10 +305,12 @@ const articleLd = {
 <p class="eyebrow">PRODUCTION</p><h2 class="h2 serif">マダミスを制作・依頼するには</h2>
 <p class="lede">動画・配信企画、店舗や施設の集客、イベント、社内研修など、目的に合わせた<strong>オリジナルのマダミス制作</strong>も依頼できます。株式会社ex Labsは、マダミスアンケート1位の実績を持つチームで、企画からシナリオ制作・デバッグ・当日運営まで一貫して対応します。</p>
 <p class="lede"><strong>制作を依頼する場合の費用</strong>は、作品の形式・規模・利用範囲によって変わります。株式会社ex Labsにご依頼いただく場合、既存作品の貸切・出張実施は数十万円台〜、店舗・施設向けのオリジナル制作は100万円前後〜が目安です。参加者から料金をいただく有料チケット型の公演なら、制作費・運営費を当社が負担してチケット売上から回収するレベニューシェア型（初期費用0円）も選べます。</p>
-<p class="vc-line"><a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場を詳しく見る →</a></p>
-<p class="vc-line"><a href="/services/murder-mystery/" style="color:var(--accent)">マダミスの制作依頼・お見積り（無料）はこちら →</a></p>
-<p class="vc-line"><a href="/guide/madamis-seisaku/" style="color:var(--accent)">マダミス制作とは？依頼の流れ・費用・制作事例 →</a></p>
-<B2BNote place="madamis-b2b" title="オリジナル作品の制作・施設への導入を検討している方へ" body="オリジナル制作・既存作品の貸切実施・IP連動の違い、参加人数やプレイ時間など設計の前に決める条件、納品物（シナリオ・キャラクター資料・証拠物・GM資料）を、マダミス制作のページにまとめています。" href="/services/murder-mystery/#types" label="マダミスの制作・導入について見る" />
+<div class="mk-grid">
+<div class="mk-item"><p class="mk-k">制作内容</p><p class="mk-v">オリジナル制作・既存作品の貸切実施・IP連動の違い、参加人数やプレイ時間など設計の前に決める条件、納品物（シナリオ・キャラクター資料・証拠物・GM資料）。</p><p class="mk-a"><a href="/services/murder-mystery/#types" data-track="cta" data-show="services-murder-mystery" data-place="madamis-make">マダミス制作サービスで依頼できる内容を見る →</a><br><a href="/guide/madamis-seisaku/" data-track="show" data-show="guide-madamis-seisaku" data-place="madamis-make">依頼の流れと制作事例（マダミス制作とは）→</a></p></div>
+<div class="mk-item"><p class="mk-k">費用</p><p class="mk-v">既存作品の活用かオリジナル制作か、公演回数、当日の運営を含むかで変わります（目安は上記。当社の過去案件をもとにした金額・税抜）。</p><p class="mk-a"><a href="/services/murder-mystery/#terms" data-track="cta" data-show="services-murder-mystery" data-place="madamis-make">ご依頼の条件・参考価格を見る →</a><br><a href="/guide/madamis-cost/" data-track="show" data-show="guide-madamis-cost" data-place="madamis-make">マダミス制作の費用相場と内訳 →</a></p></div>
+<div class="mk-item"><p class="mk-k">相談先</p><p class="mk-v">目的・時期・会場・想定人数など、分かる範囲でお知らせください。ヒアリング・お見積りは無料です。</p><p class="mk-a"><a class="mk-btn" href="/services/murder-mystery/#contact" data-track="cta" data-show="services-murder-mystery" data-place="madamis-make-contact">マダミスの制作・導入を相談する</a></p></div>
+</div>
+<div style="margin-top:28px"><RevShareCallout place="madamis-make" href="/services/murder-mystery/#contact" /></div>
 </div></section>
 
 <section class="section" id="field"><div class="wrap narrow">
@@ -395,4 +395,11 @@ const articleLd = {
 #field{scroll-margin-top:88px}
 .pick-line{max-width:680px;margin:18px auto 0;font-size:14px;line-height:2;color:var(--ink);text-align:left}
 .pick-line a{color:var(--accent);font-weight:700}
+.mk-grid{margin-top:24px;display:grid;gap:12px}
+.mk-item{background:#fff;border:1px solid rgba(51,48,43,.12);border-radius:14px;padding:18px 20px;text-align:left}
+.mk-k{margin:0;font-weight:800;font-size:13px;letter-spacing:.1em;color:var(--accent)}
+.mk-v{margin:6px 0 0;font-size:14.5px;line-height:1.85}
+.mk-a{margin:8px 0 0;font-size:14px;font-weight:700;line-height:2}
+.mk-a a{color:var(--accent);border-bottom:1px solid currentColor}
+.mk-a a.mk-btn{display:inline-block;margin-top:4px;padding:10px 20px;border:0;border-radius:999px;background:var(--accent);color:#fff!important}
 </style>

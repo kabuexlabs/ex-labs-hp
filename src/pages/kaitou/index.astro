@@ -1,5 +1,8 @@
 ---
+// 終了表示を日付で切り替えるため、リクエスト時に描画する（日付は日本時間）
+export const prerender = false;
 import KaitouGuard from '../../components/KaitouGuard.astro';
+import { jstDateString } from '../../lib/thisWeek';
 import DateGuideLinks from '../../components/guide/DateGuideLinks.astro';
 // 公演「怪盗と秘密の試験」（IMMERSIVE ILLUSION）公式サイト。
 // design_handoff_kaitou の HTML リファレンス（ノワール×ゴールド）を
@@ -16,6 +19,9 @@ const ogImage = 'https://kabuexlabs.com/assets/kaitou/kv.webp';
 
 // チケット販売ページのURL。
 const ticketUrl = 'https://escape.id/ImmersiveIllusion-org/e-kaitou/';
+// 最終公演日（公演データ src/data/events/occurrences.ts と同じ）。過ぎたら購入ボタンを外し「全日程終了」と表示する
+const LAST_DATE = '2026-10-11';
+const ended = jstDateString(new Date()) > LAST_DATE;
 
 const navItems = ['story', 'about', 'team', 'cast', 'ticket', 'flow', 'access', 'faq', 'contact']
   .map((s) => ({ label: s.toUpperCase(), href: '#' + s }));
@@ -103,7 +109,8 @@ const eventLd = {
     highPrice: '19600',
     priceCurrency: 'JPY',
     url: ticketUrl,
-    availability: 'https://schema.org/InStock',
+    // 2026-10-05 主催からの連絡で完売。終了後も offers は残す
+    availability: ended ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
   },
   performer: [
     { '@type': 'Person', name: '才藤大芽' },
@@ -181,7 +188,7 @@ const faqs = [
   </div>
 </nav>
 
-<a class="fab serif" href={ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show="kaitou" data-place="lp-fab"><span class="fab-sheen" aria-hidden="true"></span>チケットを購入する</a>
+{!ended && <a class="fab serif" href={ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show="kaitou" data-place="lp-fab"><span class="fab-sheen" aria-hidden="true"></span>チケットを購入する</a>}
 
 <main>
 
@@ -197,11 +204,13 @@ const faqs = [
       <h1 class="sr-only">怪盗と秘密の試験</h1>
       <div class="hero-genre"><span class="serif">会員制バー × イマーシブ × マジック</span></div>
       <div class="hero-meta serif">
-        <div><div class="hm-label">DATE</div><div class="hm-value">2026年9月〜10月 開催</div></div>
+        <div><div class="hm-label">DATE</div><div class="hm-value">{ended ? '2026年9月〜10月（全日程終了）' : '2026年9月〜10月 開催'}</div></div>
         <div><div class="hm-label">PLACE</div><div class="hm-value">東京・六本木</div></div>
         <div><div class="hm-label">MAGICIAN</div><div class="hm-value">出演マジシャン：才藤大芽</div></div>
       </div>
-      <a class="btn-gold serif" href={ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show="kaitou" data-place="lp-hero">チケットを購入する</a>
+      {ended
+        ? <a class="btn-gold serif" href="/guide/immersive-tokyo/" data-track="show" data-show="guide-immersive-tokyo" data-place="lp-kaitou-ended">全日程終了（全公演完売）｜東京で予約できるイマーシブを探す</a>
+        : <a class="btn-gold serif" href={ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show="kaitou" data-place="lp-hero">チケットを購入する</a>}
     </div>
     <figure class="hero-poster">
       <img src="/assets/kaitou/kv.webp" alt="怪盗と秘密の試験 キービジュアル" width="1100" height="1561" loading="eager" decoding="async">
@@ -343,11 +352,13 @@ const faqs = [
           {dates.map((d) => <span class="serif">{d}</span>)}
         </div>
       </div>
-      {ticketUrl
+      {ended
+        ? <p class="serif" style="margin-top:32px;font-size:16px;line-height:1.9">本公演は全日程を終了しました（全公演完売）。ご来場ありがとうございました。<br><a href="/guide/immersive-tokyo/" style="border-bottom:1px solid currentColor" data-track="show" data-show="guide-immersive-tokyo" data-place="lp-kaitou-ended">東京でいま予約できるイマーシブ公演を見る →</a></p>
+        : ticketUrl
         ? <a class="btn-gold serif" style="margin-top:32px" href={ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show="kaitou" data-place="lp-ticket">チケットを購入する</a>
         : <a class="btn-gold serif" style="margin-top:32px" href="#ticket" data-ticket>チケットを購入する</a>}
       <div class="ticket-notes">
-        <div>※外部チケットサイト（escape.id）が開きます</div>
+        {!ended && <div>※外部チケットサイト（escape.id）が開きます</div>}
         <div>※購入後のお客様都合によるキャンセル・払い戻し・日時変更はお受けできません</div>
         <div>※表示価格のほか、別途手数料がかかる場合があります</div>
       </div>

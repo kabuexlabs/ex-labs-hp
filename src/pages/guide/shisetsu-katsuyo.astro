@@ -95,7 +95,7 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
-  dateModified: '2026-09-03',
+  dateModified: '2026-10-16',
   mainEntityOfPage: new URL('/guide/shisetsu-katsuyo/', Astro.site).toString(),
 };
 ---
@@ -150,7 +150,7 @@ const articleLd = {
 <section class="section tinted" id="examples"><div class="wrap narrow">
 <p class="eyebrow">EXAMPLES</p><h2 class="h2 serif">事例（渋谷サクラステージほか）</h2>
 <ul class="bullets">
-<li><strong>ウワサバナシ調査委員会（渋谷サクラステージ）</strong>：東急不動産様・404 Not Found様・TSUTAYA様のご協力のもと、商業施設全体を周遊する都市伝説×イマーシブ×謎解き。施設の共有区画・館内導線を「体験の目的地」に変える施設一体型の取り組みで、<strong>日本経済新聞に掲載</strong>されました。</li>
+<li><strong>ウワサバナシ調査委員会（渋谷サクラステージ）</strong>：東急不動産様・404 Not Found様・TSUTAYA様のご協力のもと、商業施設全体を周遊する都市伝説×イマーシブ×謎解き。施設の共有区画・館内導線を「体験の目的地」に変える施設一体型の取り組みで、<strong>日本経済新聞に掲載</strong>されました。<a href="/guide/case-uwasabanashi/" style="color:var(--accent)" data-track="show" data-show="case-uwasabanashi" data-place="shisetsu-katsuyo-example">渋谷サクラステージの制作事例（課題・場所・運営の工夫・成果）→</a></li>
 <li><strong>東京都頭脳王決定戦（TUNNEL TOKYO）</strong>：セガサミーグループ様が運営するイベントスペース「TUNNEL TOKYO」（東京・大崎）で本戦を開催した参加型頭脳戦イベント。全公演チケット完売。</li>
 <li><strong>月明かりの書店と呪われた原稿（紀伊國屋書店）</strong>：博報堂様との取り組みで、閉店後の書店を舞台にした一夜限りの物語体験を実施。営業時間外の空間活用の代表例です。</li>
 <li><strong>宿泊施設向けマーダーミステリー</strong>：宿泊とセットの物語体験により、新規宿泊予約20件以上の獲得につながりました。</li>
@@ -172,6 +172,18 @@ const articleLd = {
 <p class="eyebrow">COST</p><h2 class="h2 serif"><span class="nobr">費用と実施形態</span><span class="nobr">（レベニューシェア型）</span></h2>
 <p class="lede">実施形態は大きく、施設が制作費を負担して主催する<strong>発注型</strong>と、制作会社が制作費・運営費を負担し、チケット売上から回収したうえで残りを施設と分配する<strong>レベニューシェア型</strong>に分かれます。株式会社ex Labsは、参加者から料金をいただく有料チケット型のイベントでレベニューシェア型に対応しており、<strong>施設側の初期費用0円</strong>で開催できます。売上で原価を回収しきれなかった場合も、不足分は当社が負担します。</p>
 <p class="lede">レベニューシェア型では、施設は空間を提供し、<strong>企画・制作・集客・運営を当社が一貫して担当</strong>します。「イベントをやりたいが、企画も運営もノウハウがない」という施設様でも導入しやすい形式です。原価回収と分配の計算例、施設側の協力内容は<a href="/guide/event-revenue-share/" style="color:var(--accent)">施設イベントのレベニューシェアとは</a>で解説しています。</p>
+<h3 class="h3-cmp">発注型とレベニューシェア型の比較</h3>
+<div class="cmp-wrap2"><table class="cmp2">
+<thead><tr><th scope="col">項目</th><th scope="col">発注型（受託）</th><th scope="col">レベニューシェア型</th></tr></thead>
+<tbody>
+<tr><th scope="row">制作費・運営費の負担</th><td>施設様（ご依頼者様）が負担</td><td>株式会社ex Labsが負担</td></tr>
+<tr><th scope="row">チケット売上の扱い</th><td>有料にする場合、チケット売上はご依頼者様のもの</td><td>当社が受け取り、原価の回収と分配に充てる</td></tr>
+<tr><th scope="row">原価回収と分配</th><td>制作費・運営費をお支払いいただく形のため、分配はなし</td><td>原価（制作費・運営費など）を回収するまでは当社の取り分。回収後の売上を施設様と分配。分配の目安はex Labs 8：施設様2から5：5の範囲で、契約前に数字で提示。施設様への最低保証はなく、回収しきれなかった場合の不足分は当社が負担</td></tr>
+<tr><th scope="row">施設側に必要な協力</th><td colspan="2">どちらの形でも、次の内容を事前に取り決めます：使える区画と時間帯／電源／制作物や備品の保管場所／警備・防災上の規則と、ふさいではいけない場所／設営・撤去の時間帯と搬入経路／館内の告知（サイネージ・SNS・館内放送）／協力テナントとの窓口。レベニューシェア型では、館内告知への協力が前提です。</td></tr>
+<tr><th scope="row">開催できるかの判断</th><td>日程・予算・場所の条件が合えば実施できる。参加費をいただかない社内行事や無料の販促イベントにも対応</td><td>参加者から料金をいただく有料チケット型であること。目安は、一定の来館者数があること、2週間〜1ヶ月以上の会期を確保できること、館内の告知面を使えること。条件が合わない場合は発注型・併用でご提案</td></tr>
+<tr><th scope="row">準備期間</th><td colspan="2">既存コンテンツの導入で2〜4週間、施設に合わせたオリジナル制作で最短1ヶ月・標準1〜3ヶ月（当社の過去案件をもとにした目安）。季節企画は3ヶ月前までのご相談を推奨</td></tr>
+</tbody></table></div>
+<p class="lede" style="margin-top:16px">「施設側の初期費用0円」は、レベニューシェア型の条件を満たす有料チケット型のイベントに限ります。すべての案件に当てはまるわけではありません。</p>
 <p class="vc-line"><a href="/services/shisetsu-event/#revenue" style="color:var(--accent)">初期費用0円の適用条件（必須条件・分配の考え方）→</a>／<a href="/services/shisetsu-event/#purpose" style="color:var(--accent)">目的別（来館促進・館内回遊・閉館後・空き区画）の対応 →</a>／<a href="/guide/immersive-cost/" style="color:var(--accent)">イマーシブ制作の費用相場も見る →</a></p>
 </div></section>
 
@@ -215,6 +227,13 @@ const articleLd = {
 </BaseLayout>
 
 <style>
+.h3-cmp{margin:28px 0 0;font-size:17px;font-weight:800}
+.cmp-wrap2{margin-top:14px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cmp2{width:100%;min-width:620px;border-collapse:collapse;background:#fff;font-size:13.5px;line-height:1.75}
+.cmp2 th,.cmp2 td{border:1px solid rgba(51,48,43,.12);padding:11px 12px;vertical-align:top;text-align:left}
+.cmp2 thead th{background:#F4F1EC;font-weight:800;font-size:13px}
+.cmp2 tbody th{font-weight:800;white-space:nowrap}
+@media(max-width:640px){.cmp2 tbody th{white-space:normal;min-width:6.5em}}
 .wrap.narrow{max-width:820px}
 /* 辞書風の即答ボックス（強調スニペット・「とは」検索の受け皿） */
 .def-box{max-width:680px;margin:40px auto 26px;background:#fff;border:1px solid rgba(51,48,43,.1);border-left:5px solid var(--accent);border-radius:14px;padding:26px 30px;text-align:left;box-shadow:0 6px 22px rgba(51,48,43,.06)}

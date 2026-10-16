@@ -32,7 +32,8 @@ export function priceLabels(price: Work['price']): PriceLabels {
       unknown: false,
     };
   }
-  if (price.unit === 'per-person' && price.amount !== undefined) return { main: `1人${n(price.amount)}円`, sub: '', group: '', tax, unknown: false };
+  // 1人券のほかに1組券などがある公演（例：個別チケット／グループチケット）は、原文を補足に出す
+  if (price.unit === 'per-person' && price.amount !== undefined) return { main: `1人${n(price.amount)}円`, sub: '', group: /／/.test(price.text) ? price.text : '', tax, unknown: false };
   if (price.unit === 'charter' && price.amount !== undefined) return { main: `貸切${n(price.amount)}円`, sub: '', group: '', tax, unknown: false };
   // 料金単位が未確認でも、公式に「1枚◯円」とあればその金額は出す（1枚で何名参加できるかは補わない）
   const perTicket = /1枚\s*¥\s*([\d,]+)/.exec(price.text);

@@ -81,6 +81,7 @@ const rows = eventsData.works.filter((w) => w.published && isTokyoWork(w)).map((
   return { w, venue, occ, dates, futureDates, from, to, status, ticketUrl, ticketHost, channel, perPersonText, price, stale, datesText };
 });
 const compareRows = rows.filter((r) => r.status !== 'ended');
+const STATUS_LABEL: Record<Status, string> = { ongoing: '開催中', upcoming: '開催予定', ended: '終了', unknown: '開催日は公式で確認' };
 // カード下部（予約ボタンの直前）に出す要約：料金・時間・形式
 const endedRows = rows.filter((r) => r.status === 'ended');
 const names = (xs: typeof rows) => xs.map((r) => r.w.title).join('、');
@@ -178,20 +179,21 @@ const articleLd = {
 
 
 <section class="section" id="compare-now"><div class="wrap">
-<h2 class="cards-h">料金・所要時間・開催場所・参加条件<span>開催中・開催予定の公演</span></h2>
-<div class="cmp-wrap"><table class="cmp-table cmp-now cmp-stack"><thead><tr><th>公演</th><th>料金</th><th>所要時間</th><th>開催場所</th><th>参加条件</th><th>予約</th></tr></thead><tbody>
+<h2 class="cards-h">開催状況・開催日・料金・人数で比較<span>開催中・開催予定の公演</span></h2>
+<div class="cmp-wrap"><table class="cmp-table cmp-now cmp-stack"><thead><tr><th>公演</th><th>開催状況・開催日</th><th>場所</th><th>料金</th><th>所要時間</th><th>人数・参加形式</th><th>予約</th></tr></thead><tbody>
 {compareRows.map((r) => (
   <tr>
-    <th scope="row"><a href={`/events/${r.w.slug}/`} data-track="show" data-show={r.w.id} data-place="guide-compare-now">{r.w.title}</a><span class="cmp-sub">{r.datesText}</span></th>
+    <th scope="row"><a href={`/events/${r.w.slug}/`} data-track="show" data-show={r.w.id} data-place="guide-compare-now">{r.w.title}</a></th>
+    <td data-label="開催状況・開催日"><strong class={`cmp-st is-${r.status}`}>{STATUS_LABEL[r.status]}</strong><br>{r.dates.length ? `${r.datesText}。記載の日付のみ開催` : r.datesText}</td>
+    <td data-label="場所">{r.venue ? (r.venue.listName ?? r.venue.name) : '公式ページで確認'}<br><span class="cmp-note">{r.venue?.station ?? (r.venue ? `${areaName(r.venue.areaId)}（最寄り駅は公式ページで確認）` : '')}</span></td>
     <td data-label="料金">{r.price.main}{r.price.sub && `（${r.price.sub}）`}<br><span class="cmp-note">{r.price.group && <>{r.price.group}<br></>}{r.price.tax}</span></td>
     <td data-label="所要時間">{r.w.duration.text}</td>
-    <td data-label="開催場所">{r.venue ? `${areaName(r.venue.areaId)}｜${r.venue.listName ?? r.venue.name}` : '公式ページで確認'}{r.venue?.station && <><br><span class="cmp-note">{r.venue.station}</span></>}</td>
-    <td data-label="参加条件">{r.w.party.text}{r.w.info.ageRule && <><br><span class="cmp-note">{r.w.info.ageRule}</span></>}</td>
-    <td class="cmp-stack-btn">{r.ticketUrl && <a class="cmp-btn" href={r.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={r.w.id} data-place="guide-compare-now">予約サイト →</a>}</td>
+    <td data-label="人数・参加形式">{r.w.party.text}<br><span class="cmp-note">{FORMAT_LABEL[r.w.party.format]}{r.w.info.ageRule && <><br>{r.w.info.ageRule}</>}</span></td>
+    <td class="cmp-stack-btn">{r.ticketUrl && <a class="cmp-btn" href={r.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={r.w.id} data-place="guide-compare-now">予約サイト →</a>}<span class="cmp-note cmp-seat">{r.occ.length > 0 && r.occ.filter((o) => o.date >= today).every((o) => o.seats.status === 'soldout') ? '確認時点で満席。最新は予約サイトで確認' : '空席は予約サイトで確認'}</span></td>
   </tr>
 ))}
 </tbody></table></div>
-<p class="cmp-note-p">1組料金の公演は、1組（参加者全員）での料金です。1人あたりの金額は参加人数によって変わります。</p>
+<p class="cmp-note-p">開催日と空席は別の情報です。開催日は公式ページに掲載された日付（日本時間）で、空席は予約サイトで確認してください。1組料金の公演は、1組（参加者全員）での料金です。所要時間に受付・集合の時間が含まれるかは、各公演の案内で確認してください。</p>
 </div></section>
 
 <StudioCta place="guide-tokyo-studio" title="東京のイマーシブ公演を、制作しています" lead="このページで紹介している公演の多くは、株式会社ex Labsが企画・制作またはプロデュースしています。商業施設・店舗・ブランドでのイマーシブ体験の制作や、施設での開催のご相談も受け付けています。" />
@@ -445,4 +447,7 @@ const articleLd = {
 ol.bullets{padding-left:1.4em}
 @media(max-width:640px){.section.cards{padding:26px 0 34px}.section.acc-wrap{padding:34px 0 48px}.cards-h{font-size:18px}.tw-name{font-size:19px}.tw-btn{width:100%;text-align:center}.sc-card{padding:18px 14px}.sc-card .tw-dl{grid-template-columns:1fr}.acc summary{padding:16px 18px}.acc-b{padding:0 16px 18px}}
 .tw-sum{margin:12px 0 0;font-size:13px;font-weight:700;color:var(--ink);line-height:1.6}
+.cmp-st{display:inline-block;padding:1px 8px;border-radius:4px;font-size:12.5px;background:#EEF2FE;color:var(--accent)}
+.cmp-st.is-ongoing{background:var(--accent);color:#fff}
+.cmp-seat{display:block;margin-top:6px}
 </style>
