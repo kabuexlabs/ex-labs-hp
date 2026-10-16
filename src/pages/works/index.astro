@@ -29,6 +29,12 @@ const genres: { id: string; en: string; ja: string; lead: string; svc?: [string,
     W('work-2.webp', '企画・制作', '自社主催', 'ヌル・アーデン展', '東京', '東京藝術大学出身アーティストとのコラボレーション企画。アートと謎解きを融合した体験型イベントを実施し、公演終了後には作品オークションも開催しました。', '体験する美術館（本展・ロスト・フレーム）全体で、広告費0円（告知はXのみ）のまま累計約2,000人が参加', 'ネタバレ記録を見る', '/game/null-arden/') ] },
 ];
 const allWorks = genres.flatMap((g) => g.items);
+// 公共の文化施設で開催予定の公演（2026-10-16 追加）。開催前のため実績（genres・構造化データ）には入れない。
+// 夢の島熱帯植物館は東京都の施設、京都市京セラ美術館は京都市の美術館（どちらも国営ではない）。
+const publicVenues = [
+  { id: 'gensou', title: '午前零時の幻想集 第一夜「草陰の夢」', owner: '東京都の熱帯植物館', venue: '夢の島熱帯植物館（東京都江東区）', period: '2026年11月5日〜22日', role: '企画・主催：株式会社ex Labs', desc: '夜の熱帯植物館を巡り、物語を体験するイマーシブ公演。', img: '/assets/events/gensou-kv.webp', href: '/gensou/' },
+  { id: '7th-composition', title: '7枚目のコンポジション', owner: '京都市の美術館', venue: '京都市京セラ美術館（京都市左京区）', period: '2026年11月21日〜23日', role: '主催：株式会社ex Labs（体験する美術館）', desc: '絵画を鑑賞することで物語の中に巻き込まれていく、60分の絵画×イマーシブ体験。', img: '/assets/events/7th-composition-kv.webp', href: '/taikenbizyutu/7th-composition/' },
+];
 const faqs = [
   { q: 'どのような業種・施設の実績がありますか？', a: '商業施設（渋谷サクラステージ）、書店（紀伊國屋書店）、宿泊施設、カラオケ店、会員制バー、街全体（下北沢）など、空間を持つ企業・施設との実績が中心です。広告代理店（博報堂）と組んだ企画制作の実績もあります。' },
   { q: '「新規宿泊予約20件以上」はどのような施策ですか？', a: '宿泊施設向けにオリジナルのマーダーミステリーを制作し、宿泊とセットで体験できるプランにした事例です。告知は X（旧Twitter）のみで、コンテンツそのものが「泊まる理由」になるため、広告や割引に頼らず新規予約を生みました。' },
@@ -59,6 +65,27 @@ const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity
 <nav class="xw-nav" aria-label="ジャンル">
   <div class="xw-cats">{genres.map((g) => <a href={`#${g.id}`}>{g.ja}<span>{g.items.length}</span></a>)}</div>
 </nav>
+
+<section class="xw-up" aria-labelledby="xw-up-h">
+  <div class="xw-in">
+    <p class="xw-up-k">Upcoming</p>
+    <h2 id="xw-up-h" class="xw-up-h">公共の文化施設での公演（開催予定）</h2>
+    <p class="xw-up-lead"><Cls text="2026年11月は、東京都と京都市の施設を舞台にした公演を開催します。どちらも開催前のため、実績ではなく開催予定として掲載しています。" emph={false} /></p>
+    <div class="xw-up-list">
+      {publicVenues.map((v) => (
+        <a href={v.href} class="xw-up-card" data-track="show" data-show={v.id} data-place="works-upcoming">
+          <img src={v.img} alt={v.title} width="880" height="1246" loading="lazy" decoding="async">
+          <div>
+            <p class="xw-up-tag"><span class="k">公共施設で開催</span><span>{v.owner}</span></p>
+            <h3 class="xw-up-t">{v.title}</h3>
+            <p class="xw-up-m">会場：{v.venue}<br>会期：{v.period}<br>{v.role}</p>
+            <p class="xw-up-d"><Cls text={v.desc} emph={false} /></p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
 
 {genres.map((g) => (
   <section id={g.id} class="xw-sec">
@@ -122,6 +149,20 @@ const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity
 </BaseLayout>
 <style>
 .xw-nav{padding:0 16px 72px}
+.xw-up{padding:0 16px clamp(80px,10vw,110px)}
+.xw-up-k{margin:0;font-family:var(--x-en);font-size:clamp(22px,3vw,30px);letter-spacing:.12em;color:var(--x-lime)}
+.xw-up-h{margin:10px 0 0;font-family:var(--x-min);font-weight:700;font-size:clamp(20px,3vw,28px);line-height:1.5}
+.xw-up-lead{margin:14px 0 0;max-width:720px;font-size:15px;line-height:1.9;color:var(--x-pale)}
+.xw-up-list{margin-top:32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:20px}
+.xw-up-card{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr);gap:18px;align-items:start;background:var(--x-panel);padding:16px;color:#fff}
+.xw-up-card img{width:100%;height:auto;display:block}
+.xw-up-tag{margin:0;display:inline-flex;flex-wrap:wrap;border:1.5px solid var(--x-lime);font-size:13px;font-weight:700;line-height:1.5}
+.xw-up-tag span{padding:3px 10px;white-space:nowrap}
+.xw-up-tag .k{background:var(--x-lime);color:var(--x-ink);font-weight:900}
+.xw-up-t{margin:12px 0 0;font-family:var(--x-min);font-size:18px;line-height:1.5}
+.xw-up-m{margin:8px 0 0;font-size:13.5px;line-height:1.8;color:var(--x-pale2)}
+.xw-up-d{margin:8px 0 0;font-size:14px;line-height:1.8}
+@media(max-width:520px){.xw-up-card{grid-template-columns:110px minmax(0,1fr)}}
 .xw-cats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .xw-cats a{border:1px solid rgba(255,255,255,.55);border-radius:999px;padding:9px 18px;font-family:var(--x-min);font-weight:700;font-size:14px;white-space:nowrap}
 .xw-cats a span{white-space:nowrap;margin-left:8px;font-family:var(--x-en);color:var(--x-lime)}

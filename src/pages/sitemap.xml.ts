@@ -193,7 +193,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/shogyoshisetsu-event/': '2026-09-15',
     '/guide/yukyu-kukaku/': '2026-09-15',
     '/guide/eigyo-jikangai/': '2026-09-14',
-    '/guide/museum-event/': '2026-09-15',
+    '/guide/museum-event/': '2026-10-16',
     '/guide/hotel-event/': '2026-10-09',
     '/guide/taikengata-event/': '2026-09-12',
     '/guide/taikengata-idea/': '2026-09-15',
