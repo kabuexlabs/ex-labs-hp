@@ -8,6 +8,9 @@ export interface HeroWork {
 }
 
 export const heroWorks: HeroWork[] = [
+  { src: '/assets/events/gensou-kv.webp', w: 880, h: 1246 },
+  { src: '/assets/events/7th-composition-kv.webp', w: 880, h: 1247 },
+  { src: '/assets/events/uwasabanashi-case2-kv.webp', w: 880, h: 1245 },
   { src: '/assets/work-2.webp', w: 880, h: 1238 },
   { src: '/assets/work-1.webp', w: 849, h: 1200 },
   { src: '/assets/work-8.webp', w: 880, h: 1248 },

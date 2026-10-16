@@ -712,7 +712,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
     {
      "k": "これまでの実績",
      "items": [
-      "開催予定：東京都の夢の島熱帯植物館「午前零時の幻想集」（2026年11月5日〜22日）、京都市京セラ美術館「7枚目のコンポジション」（2026年11月21日〜23日）",
+      "公共施設で開催：東京都の夢の島熱帯植物館「午前零時の幻想集」（2026年11月5日〜22日）、京都市京セラ美術館「7枚目のコンポジション」（2026年11月21日〜23日）",
       "渋谷サクラステージ「ウワサバナシ調査委員会」（東急不動産様ほか協力、日本経済新聞掲載）",
       "閉店後の紀伊國屋書店（博報堂様）",
       "下北沢の街全体「ロスト・フレーム」（全公演完売）",
@@ -933,6 +933,8 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ],
     "type": "gallery",
     "items": [
+     {"img": "/assets/events/gensou-kv.webp", "cap": "午前零時の幻想集（東京都・夢の島熱帯植物館で開催）"},
+     {"img": "/assets/events/7th-composition-kv.webp", "cap": "7枚目のコンポジション（京都市京セラ美術館で開催）"},
      {
       "img": "/assets/events/uwasabanashi-kv.webp",
       "cap": "渋谷サクラステージ「ウワサバナシ調査委員会」"
@@ -1699,7 +1701,8 @@ export const SERVICES: Record<ServiceSlug, any> = {
     {
      "k": "これまでの実績",
      "items": [
-      "開催予定：東京都の夢の島熱帯植物館「午前零時の幻想集」（2026年11月5日〜22日）、京都市京セラ美術館「7枚目のコンポジション」（2026年11月21日〜23日）",
+      "公共施設で開催：東京都の夢の島熱帯植物館「午前零時の幻想集」（2026年11月5日〜22日）、京都市京セラ美術館「7枚目のコンポジション」（2026年11月21日〜23日）",
+      "さいたま市の一軒家「ウワサバナシ調査委員会 case2」（**全公演完売**）",
       "渋谷サクラステージ「ウワサバナシ調査委員会」（日本経済新聞掲載）",
       "下北沢「ロスト・フレーム」（**全公演完売**）",
       "六本木「怪盗と秘密の試験」（電ファミニコゲーマー掲載）"
@@ -1866,6 +1869,9 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ],
     "type": "gallery",
     "items": [
+     {"img": "/assets/events/gensou-kv.webp", "cap": "午前零時の幻想集（東京都・夢の島熱帯植物館で開催）"},
+     {"img": "/assets/events/7th-composition-kv.webp", "cap": "7枚目のコンポジション（京都市京セラ美術館で開催）"},
+     {"img": "/assets/events/uwasabanashi-case2-kv.webp", "cap": "ウワサバナシ調査委員会 case2「言祝ぎの家」（全公演完売）"},
      {
       "img": "/assets/events/uwasabanashi-kv.webp",
       "cap": "渋谷サクラステージ「ウワサバナシ調査委員会」"

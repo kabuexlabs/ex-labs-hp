@@ -15,6 +15,9 @@ type W = { img: string; cat: string; client: string; title: string; place: strin
 const W = (img: string, cat: string, client: string, title: string, place: string, desc: string, result: string, link: string, href: string): W => ({ img: '/assets/' + img, cat, client, title, place, desc, result, link, href });
 const genres: { id: string; en: string; ja: string; lead: string; svc?: [string, string][]; items: W[] }[] = [
   { id: 'immersive', en: 'Immersive / Facility', ja: 'イマーシブ・施設一体型', lead: '商業施設・書店・街全体を物語の舞台にした没入型イベント。回遊・滞在時間・話題化を同時に設計します。', svc: [['イマーシブ制作のご依頼', '/services/immersive/'], ['施設活用イベントのご相談', '/services/shisetsu-event/']], items: [
+    W('events/gensou-kv.webp', '企画・主催', '夢の島熱帯植物館（東京都）', '午前零時の幻想集 第一夜「草陰の夢」', '東京・江東区（公共施設）', '東京都の夢の島熱帯植物館で、夜の館内を巡りながら物語を体験するイマーシブ公演を開催（2026年11月5日〜22日）。', '公共施設で開催／夜の植物館を舞台にした周遊型', '公演サイトを見る', '/gensou/'),
+    W('events/7th-composition-kv.webp', '企画・主催', '京都市京セラ美術館（京都市）', '7枚目のコンポジション', '京都・左京区（公共施設）', '体験する美術館の公演として、京都市京セラ美術館で絵画×イマーシブ体験を開催（2026年11月21日〜23日）。絵画を鑑賞することで物語の中に巻き込まれていく60分の体験です。', '公共施設で開催／美術館での絵画×イマーシブ', '公演サイトを見る', '/taikenbizyutu/7th-composition/'),
+    W('events/uwasabanashi-case2-kv.webp', '企画・主催', '自社主催', 'ウワサバナシ調査委員会 case2「言祝ぎの家」', '埼玉県さいたま市（一軒家）', '実際の一軒家を探索し、住人との会話や調査報告を通じて真相に迫るイマーシブホラー・ミステリー（2026年10月23日〜11月3日）。', '全公演完売／一軒家を丸ごと使ったイマーシブ', '公演サイトを見る', '/uwasabanashi/kotohogi/'),
     W('events/uwasabanashi-kv.webp', 'イマーシブ制作', '渋谷サクラステージ', 'ウワサバナシ調査委員会', '東京・渋谷（商業施設）', '東急不動産株式会社様・404 Not Found様・TSUTAYA様のご協力のもと、渋谷サクラステージを周遊する都市伝説イマーシブ体験を企画・制作。施設一体型イベントとして日本経済新聞に掲載されました。', '日本経済新聞掲載／施設全体を周遊する没入体験', '制作事例の詳細を読む', '/guide/case-uwasabanashi/'),
     W('work-1.webp', 'ミステリー原案', '博報堂 × 紀伊國屋書店', '月明かりの書店と呪われた原稿', '東京（書店・閉店後）', '閉店後の紀伊國屋書店を舞台に開催された、一夜限りの体験型イベントの制作を担当。営業時間外の店舗を「入れない時間の特別な場所」として活用した事例です。', '営業時間外の店舗活用／一夜限りの特別公演', '営業時間外の活用について読む', '/guide/eigyo-jikangai/'),
     W('events/kaitou-kv.webp', 'マジック×イマーシブ', '六本木・会員制バー', '怪盗と秘密の試験', '東京・六本木（バー）', '日本一になった実績のあるマジシャン様とのコラボレーションによる、マジック×イマーシブ公演を六本木の会員制バーで企画・制作。小空間でも成立する高密度な没入体験です。', '1空間完結型イマーシブ／店舗の夜間集客', '公演特設サイト', '/kaitou/'),
@@ -29,11 +32,11 @@ const genres: { id: string; en: string; ja: string; lead: string; svc?: [string,
     W('work-2.webp', '企画・制作', '自社主催', 'ヌル・アーデン展', '東京', '東京藝術大学出身アーティストとのコラボレーション企画。アートと謎解きを融合した体験型イベントを実施し、公演終了後には作品オークションも開催しました。', '体験する美術館（本展・ロスト・フレーム）全体で、広告費0円（告知はXのみ）のまま累計約2,000人が参加', 'ネタバレ記録を見る', '/game/null-arden/') ] },
 ];
 const allWorks = genres.flatMap((g) => g.items);
-// 公共の文化施設で開催予定の公演（2026-10-16 追加）。開催前のため実績（genres・構造化データ）には入れない。
-// 夢の島熱帯植物館は東京都の施設、京都市京セラ美術館は京都市の美術館（どちらも国営ではない）。
-const publicVenues = [
-  { id: 'gensou', title: '午前零時の幻想集 第一夜「草陰の夢」', owner: '東京都の熱帯植物館', venue: '夢の島熱帯植物館（東京都江東区）', period: '2026年11月5日〜22日', role: '企画・主催：株式会社ex Labs', desc: '夜の熱帯植物館を巡り、物語を体験するイマーシブ公演。', img: '/assets/events/gensou-kv.webp', href: '/gensou/' },
-  { id: '7th-composition', title: '7枚目のコンポジション', owner: '京都市の美術館', venue: '京都市京セラ美術館（京都市左京区）', period: '2026年11月21日〜23日', role: '主催：株式会社ex Labs（体験する美術館）', desc: '絵画を鑑賞することで物語の中に巻き込まれていく、60分の絵画×イマーシブ体験。', img: '/assets/events/7th-composition-kv.webp', href: '/taikenbizyutu/7th-composition/' },
+// 2026年秋の公演（2026-10-16 追加、10-16 に実績として扱うよう変更）。夢の島熱帯植物館は東京都、京都市京セラ美術館は京都市の施設（国営ではない）。
+const featured = [
+  { id: 'gensou', title: '午前零時の幻想集 第一夜「草陰の夢」', tag: ['公共施設で開催', '東京都の熱帯植物館'], venue: '夢の島熱帯植物館（東京都江東区）', period: '2026年11月5日〜22日', role: '企画・主催：株式会社ex Labs', desc: '夜の熱帯植物館を巡り、物語を体験するイマーシブ公演。', img: '/assets/events/gensou-kv.webp', href: '/gensou/' },
+  { id: '7th-composition', title: '7枚目のコンポジション', tag: ['公共施設で開催', '京都市の美術館'], venue: '京都市京セラ美術館（京都市左京区）', period: '2026年11月21日〜23日', role: '企画・主催：株式会社ex Labs（体験する美術館）', desc: '絵画を鑑賞することで物語の中に巻き込まれていく、60分の絵画×イマーシブ体験。', img: '/assets/events/7th-composition-kv.webp', href: '/taikenbizyutu/7th-composition/' },
+  { id: 'kotohogi', title: 'ウワサバナシ調査委員会 case2「言祝ぎの家」', tag: ['全公演完売', '一軒家を舞台にしたイマーシブ'], venue: '埼玉県さいたま市の一軒家（東京近郊）', period: '2026年10月23日〜11月3日', role: '企画・主催：株式会社ex Labs', desc: '実際の一軒家を探索し、住人との会話や調査報告を通じて真相に迫るイマーシブホラー・ミステリー。', img: '/assets/events/uwasabanashi-case2-kv.webp', href: '/uwasabanashi/kotohogi/' },
 ];
 const faqs = [
   { q: 'どのような業種・施設の実績がありますか？', a: '商業施設（渋谷サクラステージ）、書店（紀伊國屋書店）、宿泊施設、カラオケ店、会員制バー、街全体（下北沢）など、空間を持つ企業・施設との実績が中心です。広告代理店（博報堂）と組んだ企画制作の実績もあります。' },
@@ -68,17 +71,17 @@ const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity
 
 <section class="xw-up" aria-labelledby="xw-up-h">
   <div class="xw-in">
-    <p class="xw-up-k">Upcoming</p>
-    <h2 id="xw-up-h" class="xw-up-h">公共の文化施設での公演（開催予定）</h2>
-    <p class="xw-up-lead"><Cls text="2026年11月は、東京都と京都市の施設を舞台にした公演を開催します。どちらも開催前のため、実績ではなく開催予定として掲載しています。" emph={false} /></p>
+    <p class="xw-up-k">Featured</p>
+    <h2 id="xw-up-h" class="xw-up-h">2026年秋の公演：公共の文化施設と一軒家を舞台に</h2>
+    <p class="xw-up-lead"><Cls text="東京都の夢の島熱帯植物館、京都市の京都市京セラ美術館という公共の文化施設で公演を開催。さいたま市の一軒家を舞台にしたウワサバナシ調査委員会 case2 は全公演が完売しました。" emph={false} /></p>
     <div class="xw-up-list">
-      {publicVenues.map((v) => (
-        <a href={v.href} class="xw-up-card" data-track="show" data-show={v.id} data-place="works-upcoming">
+      {featured.map((v) => (
+        <a href={v.href} class="xw-up-card" data-track="show" data-show={v.id} data-place="works-featured">
           <img src={v.img} alt={v.title} width="880" height="1246" loading="lazy" decoding="async">
           <div>
-            <p class="xw-up-tag"><span class="k">公共施設で開催</span><span>{v.owner}</span></p>
+            <p class="xw-up-tag"><span class="k">{v.tag[0]}</span><span>{v.tag[1]}</span></p>
             <h3 class="xw-up-t">{v.title}</h3>
-            <p class="xw-up-m">会場：{v.venue}<br>会期：{v.period}<br>{v.role}</p>
+            <p class="xw-up-m">会場：{v.venue}<br>開催：{v.period}<br>{v.role}</p>
             <p class="xw-up-d"><Cls text={v.desc} emph={false} /></p>
           </div>
         </a>
