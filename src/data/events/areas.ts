@@ -15,6 +15,7 @@ export const AREAS: Area[] = [
   { id: 'roppongi', regionId: 'tokyo', name: '六本木' },
   { id: 'shimokitazawa', regionId: 'tokyo', name: '下北沢' },
   { id: 'kanda', regionId: 'tokyo', name: '神田' },
+  { id: 'shinkiba', regionId: 'tokyo', name: '新木場・夢の島' },
   { id: 'saitama-city', regionId: 'saitama', name: 'さいたま市' },
 ];
 

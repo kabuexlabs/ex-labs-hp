@@ -82,6 +82,7 @@ const articleLd = {
   datePublished: '2026-09-27', dateModified: MODIFIED, mainEntityOfPage: pageUrl,
 };
 const chips = [`${rows.length}件を比較`, '2〜4人の総額', ...(privateRows.length ? [`全員同じ組で遊べる ${privateRows.length}件`] : [])];
+import GensouFeature from '../../components/guide/GensouFeature.astro';
 ---
 <BaseLayout
   title="東京で友達と遊ぶ体験｜2〜4人で楽しめる屋内・謎解き・物語体験を比較 - 株式会社ex Labs"
@@ -109,6 +110,8 @@ const chips = [`${rows.length}件を比較`, '2〜4人の総額', ...(privateRow
 </ul></div>
 <DateInfo modified={MODIFIED} rows={checkedRows} />
 </div></section>
+<section class="section" style="padding-top:28px;padding-bottom:12px"><div class="wrap"><GensouFeature place="tokyo-friends-activities-pickup" lead="3〜4人なら、グループチケット（14,000円・最大4名で貸切）で仲間だけの組にできます。4人で行けば1人あたり3,500円です。" /></div></section>
+
 
 <section class="section tinted" id="compare"><div class="wrap">
 <h2 class="cards-h">比較表<span>人数ごとの総額・同じ組か・時間・雨の日</span></h2>

@@ -1387,3 +1387,9 @@
 - /works/：特集枠を「2026年秋の公演：公共の文化施設と一軒家を舞台に」に変更し3作品を掲載、イマーシブのジャンル一覧（構造化データの一覧にも反映）の先頭にも3作品。
 - /services/immersive/：これまでの実績を「公共施設で開催」＋case2全公演完売に、ギャラリー先頭に3作品のKV。/services/shisetsu-event/：これまでの実績を「公共施設で開催」に、ギャラリー先頭に2作品のKV。
 - /company/・/company/iida-yuki/：主な実績に公共の文化施設での公演とcase2（全公演完売）。/guide/museum-event/：表記を「開催」に。StudioCta（解説記事3本の制作実績欄）・heroWorks・llms.txt にも反映。
+
+## 2026-10-16 午前零時の幻想集を東京イマーシブ・デート・お出かけ系で前面に
+
+- 公演データ（src/data/events/）に幻想集を登録：work gensou（料金：個別3,500円・グループ14,000円、税込・入館料込み／1〜4名、相席または貸切／約50分／中学生以上〈18歳未満は保護者同伴〉）、会場 yumenoshima-tropical（東京都江東区夢の島2-1-2、新木場駅徒歩約15分、屋内）、エリア「新木場・夢の島」、情報源（自社公式 /gensou/・escape.id）、公演回12日分（各日17:00〜20:50の枠で登録。12分おき開始は所要時間の欄に明記）。→ /events/、/events/gensou/、東京イマーシブ・デート・友達・一人参加・予算別の各記事の比較表・カードに自動で反映。
+- GensouFeature（夜の植物館を歩くイマーシブ「午前零時の幻想集」）の枠を追加：/guide/immersive-tokyo/（ヒーロー直下。ヒーロー画像も幻想集のKVに変更）、/guide/tokyo-experience-date/・tokyo-holiday・immersive-tokyo-date・tokyo-before-dating・tokyo-night-date・tokyo-friends-activities・immersive-tokyo-solo・tokyo-date-under-5000（最初の節の後）。ページごとに人数・予算・時間帯に合わせた説明文。会期前は「開催｜」、会期中は「開催中」、終了後は自動で非表示。title・H1・description は変更なし。
+- /guide/immersive-tokyo/ の制作相談文にあった「レベニューシェア型（初期費用0円または格安）」を実際の条件の表現に修正。

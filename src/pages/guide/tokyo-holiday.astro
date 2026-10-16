@@ -68,6 +68,7 @@ const articleLd = {
 };
 const rows = all.map((o) => o.row);
 const chips = [`${all.length}件を比較`, '一人・二人・友達で選べる', '料金・時間・相席か'];
+import GensouFeature from '../../components/guide/GensouFeature.astro';
 ---
 <BaseLayout
   title="東京で休日に行く場所がないときの過ごし方｜二人・友達・一人で体験を比較 - 株式会社ex Labs"
@@ -95,6 +96,8 @@ const chips = [`${all.length}件を比較`, '一人・二人・友達で選べ�
 </ul></div>
 <DateInfo modified={MODIFIED} rows={rows.filter((r) => r.checked)} />
 </div></section>
+<section class="section" style="padding-top:28px;padding-bottom:12px"><div class="wrap"><GensouFeature place="tokyo-holiday-pickup" lead="二人で行くなら、グループチケット（14,000円・最大4名で貸切）で二人だけの組にできます。個別チケットなら1人3,500円で、ほかのお客様と同じ組になる場合があります。開始は各日17:00〜20:00なので、夕方からの予定にも組み込めます。" /></div></section>
+
 
 <section class="section tinted" id="who"><div class="wrap">
 <h2 class="cards-h">誰と行くかで選ぶ<span>申し込める人数の条件から</span></h2>

@@ -57,6 +57,7 @@ const articleLd = {
   datePublished: '2026-10-01', dateModified: MODIFIED, mainEntityOfPage: pageUrl,
 };
 const rows = pair.map((o) => o.row);
+import GensouFeature from '../../components/guide/GensouFeature.astro';
 ---
 <BaseLayout
   title="東京の夜デート｜仕事終わりに行けるイマーシブ・謎解き・体験を開始時刻で比較 - 株式会社ex Labs"
@@ -79,6 +80,8 @@ const rows = pair.map((o) => o.row);
 <p class="lede">仕事終わりのデートでは、<strong>何時に始まるか</strong>と<strong>何時に終わるか</strong>が一番の条件です。このページでは、夜の回の開始時刻を公式で確認できた体験だけを「間に合う候補」として載せ、所要時間・二人分の料金・二人だけか他の参加者もいるかで比べます。</p>
 <DateInfo modified={MODIFIED} rows={rows.filter((r) => r.checked)} />
 </div></section>
+<section class="section" style="padding-top:28px;padding-bottom:12px"><div class="wrap"><GensouFeature place="tokyo-night-date-pickup" lead="各日17:00〜20:00に12分おきに始まり、最終回は20:50終了予定。仕事終わりにも間に合う時間帯です。グループチケット（14,000円・最大4名で貸切）なら二人だけの組にできます。" /></div></section>
+
 
 <section class="section tinted" id="slots"><div class="wrap">
 <h2 class="cards-h">開始時刻が確認できている夜の回<span>17時以降に始まる回</span></h2>

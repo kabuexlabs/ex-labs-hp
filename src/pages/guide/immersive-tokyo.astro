@@ -12,6 +12,7 @@ import LatestPosts from '../../components/LatestPosts.astro';
 import DateGuideNote from '../../components/guide/DateGuideNote.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import ShowCalendar from '../../components/ShowCalendar.astro';
+import GensouFeature from '../../components/guide/GensouFeature.astro';
 import VisualHero from '../../components/VisualHero.astro';
 import StudioCta from '../../components/guide/StudioCta.astro';
 import { shows } from '../../data/shows';
@@ -145,9 +146,11 @@ const articleLd = {
   { name: '東京のイマーシブ体験' },
 ]} />
 
-<VisualHero image="/assets/events/kaitou-kv.webp" imagePos="center 60%" eyebrow="IMMERSIVE TOKYO GUIDE" catchText="東京のイマーシブ、開催日から予約へ" chips={heroChips} alt="東京で開催中のイマーシブ公演のキービジュアル">
+<VisualHero image="/assets/events/gensou-kv.webp" imagePos="center 28%" eyebrow="IMMERSIVE TOKYO GUIDE" catchText="東京のイマーシブ、開催日から予約へ" chips={heroChips} alt="東京で開催中のイマーシブ公演のキービジュアル">
   <h1 class="h2 serif"><span class="nobr">東京で体験できる</span><span class="nobr">イマーシブイベント</span><span class="nobr">【2026年最新】</span></h1>
 </VisualHero>
+<section class="section" style="padding-top:28px;padding-bottom:12px"><div class="wrap"><GensouFeature place="immersive-tokyo-pickup" /></div></section>
+
 
 <section class="section cards" id="this-week" data-week-end={week.end} data-today={today}><div class="wrap">
 <div class="gd-jump" style="margin:0 0 26px">
@@ -368,7 +371,7 @@ const articleLd = {
 <details class="acc" id="biz">
 <summary><span class="acc-t">イマーシブイベントを開催したい企業・施設の方へ</span><span class="acc-s">制作・運営のご相談（無料）</span></summary>
 <div class="acc-b">
-<p class="lede">株式会社ex Labsは、商業施設・店舗・街を舞台にしたオリジナルのイマーシブイベントを企画から運営まで制作しています。レベニューシェア型（初期費用0円または格安）を含む柔軟な形で開催できます。</p>
+<p class="lede">株式会社ex Labsは、商業施設・店舗・街を舞台にしたオリジナルのイマーシブイベントを企画から運営まで制作しています。参加者から料金をいただく有料チケット型なら、制作費・運営費を当社が負担してチケット売上から回収するレベニューシェア（施設様の初期費用0円）も選べます。</p>
 <p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）→</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは →</a>／<a href="/?c=immersive#contact" style="color:var(--accent)">相談フォーム →</a></p>
 </div>
 </details>

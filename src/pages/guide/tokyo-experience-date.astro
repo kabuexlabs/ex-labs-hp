@@ -101,6 +101,7 @@ const dateRows: DateRow[] = [
 ];
 const latestStory = story.map((r) => r.w.verified.at).sort().pop();
 const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.verifiedText ?? '';
+import GensouFeature from '../../components/guide/GensouFeature.astro';
 ---
 <BaseLayout
   title="東京の非日常デート｜二人で楽しむ体験を料金・時間・過ごし方で比較 - 株式会社ex Labs"
@@ -134,6 +135,8 @@ const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.veri
 </ul></div>
 <DateInfo modified={MODIFIED} rows={dateRows} />
 </div></section>
+<section class="section" style="padding-top:28px;padding-bottom:12px"><div class="wrap"><GensouFeature place="tokyo-experience-date-pickup" lead="二人で行くなら、グループチケット（14,000円・最大4名で貸切）で二人だけの組にできます。個別チケットなら1人3,500円で、ほかのお客様と同じ組になる場合があります。開始は各日17:00〜20:00なので、夕方からの予定にも組み込めます。" /></div></section>
+
 
 <section class="section tinted" id="pick"><div class="wrap">
 <h2 class="cards-h">条件から選ぶ<span>二人分の予算・使える時間・二人だけで過ごしたいか</span></h2>

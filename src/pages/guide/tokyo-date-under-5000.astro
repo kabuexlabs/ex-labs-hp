@@ -82,6 +82,7 @@ const reasons = [
   { h: '二人で協力して解きたい', xs: main.filter((r) => !r.own) },
   { h: '物語に参加したい', xs: main.filter((r) => r.own) },
 ];
+import GensouFeature from '../../components/guide/GensouFeature.astro';
 ---
 <BaseLayout
   title="東京で1人5,000円以内の体験デート｜二人の料金と時間で比較 - 株式会社ex Labs"
@@ -108,6 +109,8 @@ const reasons = [
 <li>気になった体験は、そのまま予約ページへ進めます。</li>
 </ul></div>
 </div></section>
+<section class="section" style="padding-top:28px;padding-bottom:12px"><div class="wrap"><GensouFeature place="tokyo-date-under-5000-pickup" lead="個別チケットなら1人3,500円（税込・入館料込み）で、二人でも7,000円に収まります。ほかのお客様と同じ組になる場合があります。二人だけの組にしたい場合はグループチケット（14,000円・最大4名で貸切）です。" /></div></section>
+
 
 <section class="section tinted" id="compare"><div class="wrap">
 <h2 class="cards-h">1人5,000円以内の体験<span>安い順</span></h2>

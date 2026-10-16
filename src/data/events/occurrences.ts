@@ -16,6 +16,10 @@ const KOTOHOGI: [string, string[]][] = [
   ['2026-11-01', ['13:00', '15:00', '17:30', '19:30']],
   ['2026-11-03', ['13:00', '15:00', '17:30', '19:30']],
 ];
+// 午前零時の幻想集（公式ページ /gensou/ と同じ）。各日17:00〜20:00に12分おきに開始する回を、日ごとに1件（17:00〜20:50）で登録する。
+// 販売は各回の開始2時間前まで（最終回20:00 → 18:00締切）
+const GENSOU_DATES = ['05', '06', '07', '08', '12', '13', '14', '15', '19', '20', '21', '22'].map((d) => `2026-11-${d}`);
+const GENSOU_CHECKED = '2026-10-16T12:00:00+09:00';
 const KOTOHOGI_CHECKED = '2026-10-07T10:00:00+09:00';
 const minus2h = (d: string, t: string) => new Date(Date.parse(`${d}T${t}:00+09:00`) - 2 * 3600000 + 9 * 3600000).toISOString().slice(0, 19) + '+09:00';
 const CHECKED = '2026-09-17T03:02:00+09:00'; // 自社公式ページの開催日一覧を再確認（escape.id の開演時刻・受付状況は未確認）
@@ -65,4 +69,19 @@ export const occurrences: Occurrence[] = [
     sourceIds: ['kotohogi-official', 'escape-id-kotohogi'],
     published: true,
   }))),
+  ...GENSOU_DATES.map<Occurrence>((date) => ({
+    id: `gensou-${date}`,
+    workId: 'gensou',
+    venueId: 'yumenoshima-tropical',
+    date,
+    startTime: '17:00',
+    endTime: '20:50',
+    eventStatus: 'scheduled',
+    eventCheckedAt: GENSOU_CHECKED,
+    eventCheckedBy: 'Claude（自社公式ページの開催日・開始時刻を確認）',
+    sales: { status: 'unknown', closesAt: `${date}T18:00:00+09:00`, channels: [{ channelId: 'escape-id', url: 'https://escape.id/gensou-org/e-ichi/' }] },
+    seats: { status: 'unknown' },
+    sourceIds: ['gensou-official', 'escape-id-gensou'],
+    published: true,
+  })),
 ];

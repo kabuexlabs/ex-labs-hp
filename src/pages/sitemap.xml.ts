@@ -152,12 +152,12 @@ export const GET: APIRoute = async ({ site }) => {
 
   // 新設・更新したページに lastmod を付けて再クロールを促す。
   const STATIC_LASTMOD: Record<string, string> = {
-    '/guide/tokyo-friends-activities/': '2026-10-01',
+    '/guide/tokyo-friends-activities/': '2026-10-16',
     '/guide/shibuya-rainy-date/': '2026-10-01',
-    '/guide/tokyo-date-under-5000/': '2026-09-27',
+    '/guide/tokyo-date-under-5000/': '2026-10-16',
     '/guide/tokyo-nazo-date/': '2026-10-01',
-    '/guide/immersive-tokyo-solo/': '2026-09-18',
-    '/guide/immersive-tokyo-date/': '2026-09-18',
+    '/guide/immersive-tokyo-solo/': '2026-10-16',
+    '/guide/immersive-tokyo-date/': '2026-10-16',
     '/guide/saiji-kikaku/': '2026-09-14',
     '/guide/shanai-quiz/': '2026-09-14',
     '/events/': '2026-09-28',
@@ -188,7 +188,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/madamis-business/': '2026-09-15',
     '/guide/immersive-cost/': '2026-10-14',
     '/guide/immersive-company/': '2026-09-15',
-    '/guide/immersive-tokyo/': '2026-09-28',
+    '/guide/immersive-tokyo/': '2026-10-16',
     '/guide/shisetsu-katsuyo/': '2026-09-08',
     '/guide/shogyoshisetsu-event/': '2026-09-15',
     '/guide/yukyu-kukaku/': '2026-09-15',

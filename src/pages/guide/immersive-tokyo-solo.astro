@@ -55,6 +55,7 @@ const articleLd = {
   publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-09-18', dateModified: '2026-09-18', mainEntityOfPage: pageUrl,
 };
+import GensouFeature from '../../components/guide/GensouFeature.astro';
 ---
 <BaseLayout
   title="東京のイマーシブ体験に一人で参加するには？申込条件・相席・選び方 - 株式会社ex Labs"
@@ -86,6 +87,8 @@ const articleLd = {
 )}
 <p class="cards-note">◯は開催日です。空席は予約サイトの表示が最新で、◯があっても満席の場合があります。料金は税込・手数料別。{needsTwo.length ? `${names(needsTwo)}は2名以上での申込のため、ここには載せていません。` : ''}</p>
 </div></section>
+<section class="section" style="padding-top:28px;padding-bottom:12px"><div class="wrap"><GensouFeature place="immersive-tokyo-solo-pickup" lead="1名から参加でき、個別チケット（3,500円）ではほかのお客様と同じ組になる場合があります。怖さは控えめで、キャストとの会話で物語が進みます。" /></div></section>
+
 
 <section class="section tinted acc-wrap"><div class="wrap">
 <h2 class="cards-h">くわしく知りたい人は<span>タップで開きます</span></h2>

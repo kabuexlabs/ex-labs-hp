@@ -1,0 +1,50 @@
+---
+// 「午前零時の幻想集」（自社公演、東京都の夢の島熱帯植物館）を東京イマーシブ・デート・お出かけ系の記事で目立たせる枠。
+// 内容は公式ページ /gensou/ と公演データ（src/data/events/）の記載だけ。会期の前は「開催｜」、会期中は「開催中」、終了後は表示しない。
+import { jstDateString } from '../../lib/thisWeek';
+interface Props { place: string; lead?: string }
+const { place, lead } = Astro.props;
+const FROM = '2026-11-05';
+const TO = '2026-11-22';
+const TICKET = 'https://escape.id/gensou-org/e-ichi/';
+const today = jstDateString(new Date());
+const phase = today > TO ? 'ended' : today >= FROM ? 'live' : 'before';
+const facts: [string, string][] = [
+  ['開催', '2026年11月5日〜22日の木〜日曜（全12日間）'],
+  ['開始', '各日17:00〜20:00に12分おき・約50分'],
+  ['料金', '個別チケット3,500円（1名）／グループチケット14,000円（最大4名で貸切）。税込・入館料込み'],
+  ['会場', '夢の島熱帯植物館（東京都の施設）。新木場駅から徒歩約15分'],
+  ['対象', '中学生以上（18歳未満は保護者同伴）。怖さは控えめ'],
+];
+---
+{phase !== 'ended' && (
+<aside class="gf" aria-label="午前零時の幻想集">
+  <a class="gf-img" href="/gensou/" data-track="show" data-show="gensou" data-place={place}><img src="/assets/events/gensou-kv.webp" alt="午前零時の幻想集 第一夜「草陰の夢」" width="880" height="1246" loading="lazy" decoding="async"></a>
+  <div class="gf-b">
+    <p class="gf-k">{phase === 'live' ? '開催中｜11月22日まで' : '開催｜2026年11月5日〜22日'}<span>公共施設で開催</span></p>
+    <p class="gf-t">夜の植物館を歩くイマーシブ<br>「午前零時の幻想集 第一夜『草陰の夢』」</p>
+    <p class="gf-l">{lead ?? '東京都の夢の島熱帯植物館で、夜に開催するイマーシブ体験です。館内を巡り、キャストとの会話を通して物語に入り込みます。怖さは控えめで、1名から参加できます。'}</p>
+    <dl class="gf-f">{facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+    <p class="gf-a">
+      <a class="gf-btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place={place}>チケットを購入する（escape.id）↗</a>
+      <a class="gf-sub" href="/gensou/" data-track="show" data-show="gensou" data-place={place}>公演の詳細・当日の流れ →</a>
+    </p>
+  </div>
+</aside>
+)}
+<style>
+.gf{margin:0 auto;max-width:980px;display:grid;grid-template-columns:minmax(0,240px) minmax(0,1fr);gap:24px;align-items:start;background:#0E1424;color:#EDE8DC;border:1px solid rgba(201,169,97,.55);border-radius:14px;padding:22px;text-align:left}
+.gf-img img{width:100%;height:auto;display:block;border-radius:6px}
+.gf-k{margin:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-weight:800;font-size:13.5px;letter-spacing:.06em;color:#C9A961}
+.gf-k span{padding:2px 10px;border:1px solid #C9A961;border-radius:999px;font-size:12px;letter-spacing:.04em}
+.gf-t{margin:10px 0 0;font-family:var(--font-serif,serif);font-weight:800;font-size:clamp(19px,2.6vw,24px);line-height:1.55;color:#fff}
+.gf-l{margin:10px 0 0;font-size:14.5px;line-height:1.9;color:rgba(237,232,220,.9)}
+.gf-f{margin:14px 0 0;display:grid;gap:6px;font-size:13.5px;line-height:1.7}
+.gf-f div{display:grid;grid-template-columns:3.2em minmax(0,1fr);gap:10px}
+.gf-f dt{margin:0;font-weight:800;color:#C9A961}
+.gf-f dd{margin:0}
+.gf-a{margin:18px 0 0;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.gf-btn{display:inline-block;padding:12px 20px;background:#C9A961;color:#0E1424!important;font-weight:800;font-size:14.5px;border-radius:999px;text-decoration:none!important}
+.gf-sub{color:#EDE8DC!important;font-weight:700;font-size:14px;border-bottom:1px solid currentColor;text-decoration:none!important}
+@media(max-width:640px){.gf{grid-template-columns:110px minmax(0,1fr);gap:14px;padding:16px}.gf-f,.gf-a,.gf-l{grid-column:1 / -1}.gf-b{display:contents}.gf-k,.gf-t{grid-column:2}.gf-img{grid-row:1 / span 2}}
+</style>

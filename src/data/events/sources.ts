@@ -85,4 +85,22 @@ export const sources: Source[] = [
     checkedBy: 'Claude（実装環境から到達できず、内容は未確認。URLは主催から提供）',
     terms: '販売ページへのリンクのみ。空席・販売状況は転載しない。',
   },
+  {
+    id: 'gensou-official',
+    label: '「午前零時の幻想集 第一夜『草陰の夢』」公式サイト（自社運営）',
+    url: 'https://kabuexlabs.com/gensou/',
+    kind: 'own-official',
+    checkedAt: '2026-10-16T12:00:00+09:00',
+    checkedBy: 'Claude（リポジトリ内の公式ページ src/pages/gensou/index.astro の日程・開始時刻・所要時間・料金・人数・参加条件・注意事項を確認）',
+    terms: '自社サイトの記載。日程・開始時刻・料金・人数・注意事項・住所を自社データとして使用可。',
+  },
+  {
+    id: 'escape-id-gensou',
+    label: 'escape.id「午前零時の幻想集」チケットページ',
+    url: 'https://escape.id/gensou-org/e-ichi/',
+    kind: 'ticket-site',
+    checkedAt: '2026-10-16T12:00:00+09:00',
+    checkedBy: 'Claude（実装環境から到達できず、内容は未確認。URLは主催から提供）',
+    terms: '販売ページへのリンクのみ。空席・販売状況は転載しない。',
+  },
 ];

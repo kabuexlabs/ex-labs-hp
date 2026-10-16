@@ -44,4 +44,16 @@ export const venues: Venue[] = [
     access: '当日は会場最寄りのバス停に集合。集合場所は駅から離れているため、移動時間に余裕を（公式ページに記載）',
     sourceIds: ['kotohogi-official'],
   },
+  {
+    // 東京都の施設（夢の島公園内）。住所・最寄り駅は自社公式ページ /gensou/ の記載
+    id: 'yumenoshima-tropical',
+    name: '夢の島熱帯植物館',
+    regionId: 'tokyo',
+    areaId: 'shinkiba',
+    address: '東京都江東区夢の島2-1-2（夢の島公園内）',
+    station: '新木場駅（JR京葉線・東京メトロ有楽町線・りんかい線）から徒歩約15分',
+    setting: 'indoor',
+    access: '集合は植物館の正面入口。受付開始（開始時刻の5分前）までは植物館前（屋外）で待機（公式ページに記載）',
+    sourceIds: ['gensou-official'],
+  },
 ];
