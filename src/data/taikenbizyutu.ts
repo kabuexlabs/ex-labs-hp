@@ -9,6 +9,20 @@ export const TB_X_URL = 'https://x.com/taikenbizyutu';
 /** 『ロスト・フレーム』の参加申し込みページ (escape.id) */
 export const TICKET_URL = 'https://escape.id/kyoukaiart-org/e-lost/';
 
+/** 第三弾『7枚目のコンポジション』。LP（/taikenbizyutu/7th-composition/）の値と揃える。
+ *  会場名は必ず「京都市京セラ美術館」と続けて書く（CLAUDE.md 参照）。 */
+export const SEVENTH_COMPOSITION = {
+  name: '7枚目のコンポジション',
+  nameEn: 'The 7th Composition',
+  path: `${TB_BASE}/7th-composition/`,
+  ticketUrl: 'https://escape.id/kyoukaiart-org/e-7th/',
+  image: '/assets/7th-composition/kv2.webp',
+  dateLabel: '2026年11月21日（土）〜23日（月）',
+  venue: '京都市京セラ美術館',
+  venueDetail: '京都市京セラ美術館 本館地下1階（講演室・多目的室）',
+  saleStart: '2026年10月17日（土）19:00〜',
+} as const;
+
 /** 『ロスト・フレーム』の公演情報。LP 画像 (lp-3) に焼き込まれた内容と揃える。 */
 export const LOST_FRAME = {
   name: 'ロスト・フレーム',

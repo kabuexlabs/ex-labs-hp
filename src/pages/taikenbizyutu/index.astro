@@ -7,7 +7,7 @@
 import TaikenbizyutuLayout from '../../layouts/TaikenbizyutuLayout.astro';
 import TaikenbizyutuContactForm from '../../components/TaikenbizyutuContactForm.astro';
 import { jsonLd } from '../../lib/microcms';
-import { TICKET_URL, LOST_FRAME, CREATORS, TB_NEWS, TB_FAQS, TB_X_URL, LOST_FRAME_ARTS, NULL_ARDEN_ARTS } from '../../data/taikenbizyutu';
+import { TICKET_URL, LOST_FRAME, SEVENTH_COMPOSITION as SC, CREATORS, TB_NEWS, TB_FAQS, TB_X_URL, LOST_FRAME_ARTS, NULL_ARDEN_ARTS } from '../../data/taikenbizyutu';
 
 const assets = '/assets/taikenbizyutu';
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
@@ -76,7 +76,8 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
     <p class="note tc m0 hero-el e3" style="letter-spacing:.14em">絵画が作る物語に没入する団体</p>
   </div>
   <div class="hero-kv hero-el e4">
-    <a href={LOST_FRAME.path} aria-label="最新の公演『ロスト・フレーム』を見る"><img src={`${assets}/lost-frame.webp`} alt="ロスト・フレーム キービジュアル" width="900" height="1281"></a>
+    <a href={SC.path} aria-label={`最新の公演『${SC.name}』を見る`}><img src={SC.image} alt={`${SC.name} キービジュアル`} width="1200" height="1700"></a>
+    <p class="hero-kv-cap"><span>第三弾『{SC.name}』</span><span>{SC.dateLabel}</span><span><strong>{SC.venue}</strong>にて開催</span></p>
   </div>
 </section>
 
@@ -108,6 +109,17 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
     <p class="h2 rv d1" style="margin-top:8px">公演一覧</p>
     <div class="works-grid rv d2">
       <div class="work">
+        <a class="mat" href={SC.path}><img src={SC.image} alt={`${SC.name} キービジュアル`} width="1200" height="1700" loading="lazy"></a>
+        <div class="work-body">
+          <span class="badge">第三弾 ─ 2026.11.21–23</span>
+          <p class="ewtitle">{SC.name}</p>
+          <p class="ewsub en m0">{SC.nameEn}</p>
+          <p class="cdesc" style="margin:14px 0 0">絵画を鑑賞することで、物語の中に巻き込まれていく物語体験。<strong>{SC.venue}</strong>（本館地下1階）にて、{SC.dateLabel}の3日間開催します。</p>
+          <a class="artlink" href={SC.path}><span class="arw">→</span><span>公式サイトを見る</span></a>
+          <a class="artlink" href={SC.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show="7th-composition" data-place="taikenbizyutu-works"><span class="arw">→</span><span>チケットを購入する（{SC.saleStart}販売）</span></a>
+        </div>
+      </div>
+      <div class="work work-up">
         <a class="mat" href={LOST_FRAME.path}><img src={`${assets}/lost-frame.webp`} alt="ロスト・フレーム キービジュアル" width="900" height="1281" loading="lazy"></a>
         <div class="work-body">
           {soldOut ? <span class="sold">第二弾 ─ SOLD OUT</span> : <span class="badge">第二弾 ─ 受付中</span>}
@@ -118,7 +130,7 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
           <a class="artlink" href={LOST_FRAME.spoilerPath}><span class="arw">→</span><span>公演記録（ネタバレ）を読む</span></a>
         </div>
       </div>
-      <div class="work work-up">
+      <div class="work">
         <span class="mat"><img src={`${assets}/null-arden.webp`} alt="ヌル・アーデン展 キービジュアル" width="900" height="1267" loading="lazy"></span>
         <div class="work-body">
           <span class="sold">第一弾 ─ SOLD OUT</span>
@@ -334,6 +346,8 @@ const ringText = 'TAIKEN SURU BIJUTSUKAN — EXPERIENTIAL ART MUSEUM — ';
 .hero-kv{padding:0 24px 56px}
 .hero-kv img{display:block;width:min(440px,78vw);height:auto;margin:0 auto;box-shadow:0 18px 48px rgba(30,34,36,.35)}
 .hero-kv a:hover{opacity:1}
+.hero-kv-cap{color:#24303a;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;margin:20px auto 0;max-width:560px;text-align:center;font-size:13px;letter-spacing:.12em;line-height:1.8}
+.hero-kv-cap strong{font-weight:600}
 /* 絵画3点の帯 */
 .strip{background:var(--ink);padding:26px 22px}
 .strip-in{display:grid;grid-template-columns:repeat(3,1fr);gap:0;max-width:1120px;margin:0 auto}
