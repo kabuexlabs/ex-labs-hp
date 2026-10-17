@@ -1422,3 +1422,8 @@
 5. /guide/shisetsu-katsuyo/：「発注型とレベニューシェア型の比較」表（費用負担／チケット売上の扱い／原価回収と分配／施設側の協力〈区画・電源・保管場所・警備防災・設営撤去・告知・テナント窓口〉／開催可否の判断／準備期間）と、初期費用0円の適用条件の注記を追加。
 6. リンク：/guide/shisetsu-katsuyo/・/guide/shogyoshisetsu-event/・/guide/shuyu-event/ の渋谷サクラステージの説明直後に「渋谷サクラステージの制作事例（課題・場所・運営の工夫・成果）→」。マダミス解説の法人部分→マダミス制作サービス、イマーシブ解説→イマーシブ制作サービス、東京の体験紹介→各公演の詳細・予約は既存リンクで対応済み。
 7. 計測：data-track の付いていないチケット販売サイトへのリンク（escape.id ほか）のクリックを ticket（link-ドメイン）として記録。チケットサイトへのクリックは購入完了とは別の指標。送信完了は既存の submit（受付成功後のみ）、記事→サービスは既存の cta（services-○○-link・data-track）。
+
+## 2026-10-17 体験する美術館：「イマーシブ」→「物語体験」に表現統一（ユーザー指示）
+- 対象：/taikenbizyutu/7th-composition/（本文・description・llms.txt）、/taikenbizyutu/ と /taikenbizyutu/lostframe/ の title・description・sr-only h1・alt・Organization LD（keywords/description）、ブランド共通フッター（制作依頼リンクの文言、解説記事リンクから /guide/immersive/・/guide/immersive-theater/ を外す）、llms.txt のブランド2行。title 変更は docs/title-history.md に記録。
+- 対象外：会社サイトのイマーシブ柱記事・サービスページ・works 等で「体験する美術館」を事例として挙げる箇所（ex Labs のイマーシブ事業の説明として維持）。キービジュアル・ロスト・フレーム LP 画像に焼き込まれた文字。
+- 「イマーシブ」は Tier1 ワードだが、ブランドページの順位は柱記事ほど重要ではないと判断。影響は 14〜28 日で確認（原因は候補として扱う）。

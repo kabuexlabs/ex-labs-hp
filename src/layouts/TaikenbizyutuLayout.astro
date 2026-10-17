@@ -19,14 +19,15 @@ export interface Props {
   hero?: boolean;
 }
 
-// NOTE: 検索エンジン向けの SEO レイヤー（title / description / sr-only 見出し /
-// 構造化データ / alt）には「イマーシブ・周遊型・街歩き謎解き」等の検索ワードを
+// NOTE: 2026-10-17 ユーザー指示で「イマーシブ」の表現は「物語体験」に統一（ブランドサイト内）。
+// 検索エンジン向けの SEO レイヤー（title / description / sr-only 見出し /
+// 構造化データ / alt）には「物語体験・周遊型・街歩き謎解き」等の検索ワードを
 // 載せ、画面に見える本文は参加型アートの文脈で統一する——という二層構成。
 // これで検索流入を確保しつつ、来訪者・審査で目に入る本文は芸術文脈を保つ。
 const {
-  title = '体験する美術館｜参加型アート・周遊型アートイマーシブ｜絵画×物語×街歩き謎解き',
+  title = '体験する美術館｜参加型アート・周遊型の物語体験｜絵画×物語×街歩き謎解き',
   description =
-    '「体験する美術館」は、下北沢など実在の街を舞台に、絵画と物語、街歩き型の謎解きを織り込んだ参加型アート／周遊型アートイマーシブのレーベルです。鑑賞するアートから体験するアートへ——第二弾『ロスト・フレーム』は全公演完売御礼。',
+    '「体験する美術館」は、下北沢など実在の街を舞台に、絵画と物語、街歩き型の謎解きを織り込んだ参加型アート／周遊型の物語体験のレーベルです。鑑賞するアートから体験するアートへ——第二弾『ロスト・フレーム』は全公演完売御礼。',
   ogImage = '/assets/taikenbizyutu/ogp.jpg',
   bare = false,
   hero = false,
@@ -59,9 +60,9 @@ const orgLd = {
   logo: new URL('/assets/taikenbizyutu/logo-white.webp', site).toString(),
   sameAs: [TB_X_URL],
   keywords:
-    '参加型アート, 周遊型アートイマーシブ, イマーシブ, 街歩き 謎解き, 体験型アート, 下北沢 アートイベント, 絵画 展示',
+    '参加型アート, 物語体験, 周遊型 物語体験, 街歩き 謎解き, 体験型アート, 下北沢 アートイベント, 絵画 展示',
   description:
-    '絵画と物語、観客の参加を編み込んだ参加型アート／周遊型アートイマーシブのレーベル。閉館後の美術館や街そのものを会場に、街歩き型の謎解きと絵画鑑賞を融合した体験を届けています。',
+    '絵画と物語、観客の参加を編み込んだ参加型アート／周遊型の物語体験のレーベル。閉館後の美術館や街そのものを会場に、街歩き型の謎解きと絵画鑑賞を融合した体験を届けています。',
   parentOrganization: {
     '@type': 'Organization',
     name: '株式会社ex Labs',
@@ -120,9 +121,9 @@ const orgLd = {
   <div class="wrapc fx col ac gap16">
     <img class="flogo" src="/assets/taikenbizyutu/logo-white.webp" alt="体験する美術館" width="62" height="30" loading="lazy">
     <p class="fsmall m0">企画・運営：<a href="https://kabuexlabs.com/">株式会社 ex Labs</a></p>
-    <p class="fsmall m0">イマーシブイベントの制作依頼：<a href="https://kabuexlabs.com/services/immersive/">イマーシブ制作のex Labs</a></p>
+    <p class="fsmall m0">物語体験・体験型イベントの制作依頼：<a href="https://kabuexlabs.com/services/immersive/">株式会社ex Labs の制作サービス</a></p>
     <p class="fsmall m0">ほかの公演：<a href="https://kabuexlabs.com/events/">東京で開催中の公演を探す</a></p>
-    <p class="fsmall m0">解説記事：<a href="https://kabuexlabs.com/guide/immersive/">イマーシブとは</a>／<a href="https://kabuexlabs.com/guide/botsunyukan/">没入感とは</a>／<a href="https://kabuexlabs.com/guide/immersive-theater/">イマーシブシアターとは</a>／<a href="https://kabuexlabs.com/guide/taikengata-event/">体験型イベントとは</a>／<a href="https://kabuexlabs.com/guide/shuyu-event/">周遊型イベントとは</a></p>
+    <p class="fsmall m0">解説記事：<a href="https://kabuexlabs.com/guide/botsunyukan/">没入感とは</a>／<a href="https://kabuexlabs.com/guide/taikengata-event/">体験型イベントとは</a>／<a href="https://kabuexlabs.com/guide/shuyu-event/">周遊型イベントとは</a></p>
     <p class="fsmall m0">© 2026 ex Labs Inc. All Rights Reserved.</p>
     <p class="fsmall m0">本サイトに掲載の文章・画像等の無断転載・複製を禁じます。</p>
   </div>
