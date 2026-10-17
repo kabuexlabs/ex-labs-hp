@@ -121,6 +121,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/immersive-tokyo-solo.webp',
   },
   {
+    href: '/guide/kyoto-kyocera-museum-7th/',
+    title: '京都市京セラ美術館で行われる、絵画の物語体験｜日程・チケット・行き方（2026年11月）',
+    desc: '11月21日〜23日、京都市京セラ美術館の本館地下1階で開催する体験する美術館「7枚目のコンポジション」。7回の開始時刻、料金、当日の流れ、東山駅からの行き方。',
+    date: '2026-10-17',
+    category: 'immersive',
+    thumb: '/assets/events/7th-composition-kv.webp',
+  },
+  {
     href: '/guide/yumenoshima-night/',
     title: '夜の夢の島熱帯植物館で行われる物語体験｜日程・チケットの選び方・行き方（2026年11月）',
     desc: '11月5日〜22日の木〜日曜、夜の夢の島熱帯植物館で開催する「午前零時の幻想集」。開始時刻、人数別の総額、当日の流れ、新木場駅からの行き方。',

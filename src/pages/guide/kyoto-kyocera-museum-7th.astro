@@ -1,0 +1,186 @@
+---
+// 「京都市京セラ美術館 イベント／11月／体験」で探す人に向けた案内（2026-10-17 新規。/guide/yumenoshima-night/ と同じ構成）。
+// 2026年11月の自社公演 体験する美術館「7枚目のコンポジション」を、日程・チケット・当日の流れ・行き方の順で案内し、
+// 公式サイト（/taikenbizyutu/7th-composition/）と予約サイト（escape.id）へ送る。内容は公式サイトの記載だけ。
+// 会場名は必ず「京都市京セラ美術館」と続けて書く（略称・分割表記は美術館から訂正依頼あり。scripts/seo-audit.mjs が検出）。
+// 美術館の通常の開館時間・展覧会は確認していないため書かない（美術館の公式サイトで確認と案内する）。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+import { jstDateString } from '../../lib/thisWeek';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const TICKET = 'https://escape.id/kyoukaiart-org/e-7th/';
+const LP = '/taikenbizyutu/7th-composition/';
+const FROM = '2026-11-21';
+const TO = '2026-11-23';
+const today = jstDateString(new Date());
+const phase = today > TO ? 'ended' : today >= FROM ? 'live' : 'before';
+const days = [['11/21', '土'], ['11/22', '日'], ['11/23', '月・祝']];
+const sessions = [
+  ['第1回', '12:00', '13:00'], ['第2回', '12:45', '13:45'], ['第3回', '13:30', '14:30'], ['第4回', '14:15', '15:15'],
+  ['第5回', '15:00', '16:00'], ['第6回', '15:45', '16:45'], ['第7回', '16:30', '17:30'],
+];
+const party = [['1人', '4,500円'], ['2人', '9,000円'], ['3人', '13,500円'], ['4人', '18,000円']];
+const toc = [
+  { id: 'what', label: '美術館で何をするのか' },
+  { id: 'dates', label: '開催日と開始時刻' },
+  { id: 'ticket', label: 'チケットと料金' },
+  { id: 'flow', label: '当日の流れ' },
+  { id: 'access', label: '行き方と館内の経路' },
+  { id: 'before', label: '参加前に知っておきたいこと' },
+];
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '京都市京セラ美術館で行われる、絵画の物語体験',
+  about: { '@type': 'Place', name: '京都市京セラ美術館', address: { '@type': 'PostalAddress', postalCode: '606-8344', streetAddress: '岡崎円勝寺町124', addressLocality: '京都市左京区', addressRegion: '京都府', addressCountry: 'JP' } },
+  inLanguage: 'ja',
+  image: [new URL('/assets/events/7th-composition-kv.webp', site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-17',
+  dateModified: '2026-10-17',
+  mainEntityOfPage: new URL('/guide/kyoto-kyocera-museum-7th/', site).toString(),
+};
+---
+<BaseLayout
+  title="京都市京セラ美術館のイベント｜体験する美術館「7枚目のコンポジション」の日程・チケット・行き方（2026年11月） - 株式会社ex Labs"
+  description="2026年11月21日〜23日、京都市京セラ美術館の本館地下1階で、絵画を鑑賞することで物語に巻き込まれていく60分の物語体験「7枚目のコンポジション」を開催。各日7回（12:00〜16:30開始）、1名4,500円（税込・別途入館料なし）、1名から参加可能。当日の流れと東山駅からの行き方をまとめました。"
+  ogImage="/assets/events/7th-composition-kv.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '美術館・博物館の集客イベント', href: '/guide/museum-event/' },
+  { name: '京都市京セラ美術館の物語体験' },
+]} />
+
+<section class="section yn-hero" style="padding-top:36px"><div class="wrap">
+<div class="yn-top">
+  <a class="yn-kv" href={LP} data-track="show" data-show="7th-composition" data-place="kyoto7-hero"><img src="/assets/events/7th-composition-kv.webp" alt="体験する美術館「7枚目のコンポジション」京都市京セラ美術館" width="880" height="1247" fetchpriority="high"></a>
+  <div>
+    <p class="yn-eyebrow">{phase === 'live' ? '開催中｜11月23日まで' : phase === 'ended' ? '2026年11月に開催' : '2026年11月21日〜23日 開催'}</p>
+    <h1 class="yn-h1 serif"><span class="nobr">京都市京セラ美術館で</span><span class="nobr">行われる、</span><span class="nobr">絵画の物語体験</span></h1>
+    <p class="lede">2026年11月21日（土）から23日（月・祝）までの3日間、<span class="nobr">京都市京セラ美術館</span>の本館地下1階で、体験する美術館<strong>「7枚目のコンポジション」</strong>を開催します。絵画を鑑賞することで物語の中に巻き込まれていく、60分の物語体験です。各日7回、12:00から16:30まで45分おきに始まります。</p>
+    <ul class="yn-keys">
+      <li><span>料金</span><span>1名4,500円（税込）。この公演への参加に別途入館料はかかりません</span></li>
+      <li><span>対象</span><span>18歳以上。1名から参加でき、各回最大30名</span></li>
+      <li><span>会場</span><span><span class="nobr">京都市京セラ美術館</span> 本館地下1階。地下鉄東西線「東山駅」から徒歩約8分</span></li>
+    </ul>
+    {phase !== 'ended' && <p class="yn-cta"><a class="yn-btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="7th-composition" data-place="kyoto7-hero">日時を選んでチケットを購入（escape.id）↗</a><a class="yn-sub" href={LP} data-track="show" data-show="7th-composition" data-place="kyoto7-hero">公式サイトでストーリーを見る →</a></p>}
+  </div>
+</div>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}</ol></nav>
+</div></section>
+
+<section class="section tinted" id="what"><div class="wrap narrow">
+<p class="eyebrow">WHAT</p><h2 class="h2 serif">美術館で何をするのか</h2>
+<p class="lede">「体験する美術館」は、「『鑑賞するアート』から『体験するアート』へ」をテーマにしたシリーズです。絵画を鑑賞することが、そのまま物語に参加するきっかけになります。</p>
+<p class="lede">今回の舞台は、<span class="nobr">京都市京セラ美術館</span>の一角。「三雲彼方展」と記された展示のパンフレットを開いた瞬間、知らない記憶が流れ込んでくる――という物語です。体験には本館地下1階の「講演室」と「多目的室」の2部屋を使い、同じ回に申し込んだほかのお客様（各回最大30名）と一緒に参加します。物語の詳しい内容は、参加する方のために伏せています。</p>
+<p class="vc-line"><a href={`${LP}#story`} style="color:var(--accent)" data-track="show" data-show="7th-composition" data-place="kyoto7-what">ストーリーと制作チーム（公式サイト）→</a></p>
+</div></section>
+
+<section class="section" id="dates"><div class="wrap narrow">
+<p class="eyebrow">DATES</p><h2 class="h2 serif">開催日と開始時刻</h2>
+<p class="lede">開催は11月21日（土）・22日（日）・23日（月・祝）の3日間です。各日とも同じ時刻で、7回ずつ行います。</p>
+<div class="kd-days">{days.map(([d, w]) => <span><strong>{d}</strong>（{w}）</span>)}</div>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col">回</th><th scope="col">開始</th><th scope="col">終了</th></tr></thead>
+<tbody>{sessions.map(([n, a, b]) => <tr><th scope="row">{n}</th><td>{a}</td><td>{b}</td></tr>)}</tbody>
+</table></div>
+<p class="lede" style="margin-top:18px">チケットは2026年10月17日（土）19:00から販売し、各回の開演1時間前まで購入できます。空き状況は予約サイトで確認できます。各回の最少催行人数は12名です。</p>
+</div></section>
+
+<section class="section tinted" id="ticket"><div class="wrap narrow">
+<p class="eyebrow">TICKET</p><h2 class="h2 serif">チケットと料金</h2>
+<p class="lede">チケットは<strong>1名4,500円（税込）</strong>の1種類です。割引はありません。この公演に参加するための別途入館料はかかりません。複数人で行く場合も、1人1枚ずつの料金です。</p>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col">人数</th><th scope="col">合計（税込）</th></tr></thead>
+<tbody>{party.map(([n, t]) => <tr><th scope="row">{n}</th><td>{t}</td></tr>)}</tbody>
+</table></div>
+<p class="lede" style="margin-top:18px">購入後のお客様都合によるキャンセル・日時変更はできません。</p>
+</div></section>
+
+<section class="section" id="flow"><div class="wrap narrow">
+<p class="eyebrow">FLOW</p><h2 class="h2 serif">当日の流れ</h2>
+<ol class="yn-flow">
+<li><span>受付</span><span class="t">本館地下1階「講演室」の扉前で、各回開始の10分前から受付を始めます。通路が混み合わないよう、早く着きすぎた場合は少し時間をおいてお越しください。</span></li>
+<li><span>開始</span><span class="t">指定の時刻に1分でも遅れると参加できません。</span></li>
+<li><span>体験</span><span class="t">60分。「講演室」と「多目的室」は同じ地下1階にあり、体験中に階段やエレベーターで上下の階へ移動することはありません。途中退出・再入場はできません。</span></li>
+</ol>
+</div></section>
+
+<section class="section tinted" id="access"><div class="wrap narrow">
+<p class="eyebrow">ACCESS</p><h2 class="h2 serif">行き方と館内の経路</h2>
+<p class="lede"><strong>住所</strong>：〒606-8344 京都府京都市左京区岡崎円勝寺町124</p>
+<ul class="bullets">
+<li>京都市営地下鉄東西線「東山駅」1番出口から徒歩約8分</li>
+<li>京阪本線「三条駅」／地下鉄「三条京阪駅」から徒歩約16分</li>
+<li>各線「京都駅」から市バス5・86系統「岡崎公園 美術館・平安神宮前」下車すぐ</li>
+<li>阪急「京都河原町駅」から市バス46・5系統「岡崎公園 美術館・平安神宮前」下車すぐ</li>
+</ul>
+<p class="lede" style="margin-top:16px"><strong>館内の経路</strong>：神宮道側のメインエントランス（スロープを下りたガラス張りの地下入口）から入り、直進したロビーの周辺に会場の「講演室」があります。</p>
+<p class="lede"><span class="nobr">京都市京セラ美術館</span>は京都市の美術館です。このページで案内しているのは「7枚目のコンポジション」の時間と会場で、美術館の開館時間や開催中の展覧会は、美術館の公式サイトで確認してください。</p>
+<p class="vc-line"><a href={`${LP}#access`} style="color:var(--accent)" data-track="show" data-show="7th-composition" data-place="kyoto7-access">地図（公式サイトのアクセス）→</a></p>
+</div></section>
+
+<section class="section" id="before"><div class="wrap narrow">
+<p class="eyebrow">BEFORE</p><h2 class="h2 serif">参加前に知っておきたいこと</h2>
+<ul class="bullets">
+<li><strong>対象</strong>：18歳以上の方が対象です。</li>
+<li><strong>服装・荷物</strong>：動きやすい服装で。クロークはないため、できるだけ身軽にお越しください。</li>
+<li><strong>撮影・ネタバレ</strong>：体験中の撮影と録音はできません。公演内容のネタバレも禁止です。</li>
+<li><strong>バリアフリー</strong>：この公演にバリアフリー対応はありません。</li>
+</ul>
+<p class="lede" style="margin-top:18px">同じ「体験する美術館」の過去の公演には、東京・下北沢の街を巡る<a href="/guide/case-lostframe/" style="color:var(--accent)">「ロスト・フレーム」</a>があります。</p>
+{phase !== 'ended' && (
+<div class="cta-mini" style="margin-top:36px">
+<p class="cta-mini-title serif"><span class="nobr">京都市京セラ美術館</span>の物語体験「7枚目のコンポジション」</p>
+<a class="btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="7th-composition" data-place="kyoto7-bottom">日時を選んでチケットを購入（escape.id）↗</a>
+</div>
+)}
+<p class="vc-line" style="margin-top:32px">関連ページ：<a href={LP} style="color:var(--accent)">7枚目のコンポジション 公式サイト</a>／<a href="/taikenbizyutu/" style="color:var(--accent)">体験する美術館</a>／<a href="/guide/museum-event/" style="color:var(--accent)">美術館・博物館での体験型イベント</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.yn-top{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:32px;align-items:start;max-width:1000px;margin:0 auto}
+.yn-kv img{width:100%;height:auto;display:block;border-radius:10px;box-shadow:0 10px 30px rgba(60,20,30,.35)}
+.yn-eyebrow{margin:0;display:inline-block;padding:4px 12px;background:#F6EFE6;color:#7A1F35;font-weight:800;font-size:13px;letter-spacing:.08em;border-radius:4px}
+.yn-h1{margin:14px 0 0;font-size:clamp(26px,4vw,38px);line-height:1.45;color:#fff;text-wrap:balance}
+.yn-keys{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px;font-size:14.5px;line-height:1.75;color:#fff}
+.yn-keys li{display:grid;grid-template-columns:3em minmax(0,1fr);gap:10px}
+.yn-keys li > span:first-child{font-weight:800;color:var(--x-lime,#E1F73E)}
+.yn-cta{margin:22px 0 0;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.yn-btn{display:inline-block;padding:14px 22px;background:#7A1F35;color:#fff!important;font-weight:800;font-size:15px;border-radius:999px;text-decoration:none!important;border:1px solid #F6EFE6}
+.yn-sub{font-weight:700;font-size:14.5px;color:#fff!important;border-bottom:1px solid currentColor}
+.toc{max-width:520px;margin:40px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:24px 28px}
+.toc-h{margin:0 0 12px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8)}
+.kd-days{margin-top:18px;display:flex;flex-wrap:wrap;gap:10px}
+.kd-days span{background:#fff;border:1px solid rgba(51,48,43,.12);border-radius:10px;padding:10px 16px;font-size:14px}
+.kd-days strong{font-size:18px;font-variant-numeric:tabular-nums}
+.cmp-wrap{margin:18px 0 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cmp{width:100%;max-width:520px;border-collapse:collapse;background:#fff;font-size:14.5px;line-height:1.75}
+.cmp th,.cmp td{border:1px solid rgba(51,48,43,.12);padding:10px 14px;text-align:left;font-variant-numeric:tabular-nums}
+.cmp thead th{background:#F4F1EC;font-weight:800;font-size:13px}
+.cmp tbody th{white-space:nowrap;font-weight:800}
+.yn-flow{list-style:none;margin:20px 0 0;padding:0;counter-reset:f;display:grid}
+.yn-flow li{counter-increment:f;display:grid;grid-template-columns:2em 3.4em minmax(0,1fr);gap:10px;align-items:baseline;padding:13px 0;border-bottom:1px solid rgba(51,48,43,.12);font-size:14.5px;line-height:1.85}
+.yn-flow li::before{content:counter(f);font-weight:800;color:var(--accent)}
+.yn-flow span{font-weight:800}.yn-flow .t{font-weight:400}
+#what,#dates,#ticket,#flow,#access,#before{scroll-margin-top:88px}
+@media(max-width:700px){.yn-top{grid-template-columns:120px minmax(0,1fr);gap:16px}.yn-top > div{display:contents}.yn-eyebrow,.yn-h1{grid-column:2}.yn-kv{grid-row:1 / span 2}.yn-top .lede,.yn-keys,.yn-cta{grid-column:1 / -1}.yn-h1{font-size:19px;margin-top:0}.toc{padding:20px}}
+</style>

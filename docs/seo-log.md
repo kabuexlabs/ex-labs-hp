@@ -1427,3 +1427,10 @@
 - 対象：/taikenbizyutu/7th-composition/（本文・description・llms.txt）、/taikenbizyutu/ と /taikenbizyutu/lostframe/ の title・description・sr-only h1・alt・Organization LD（keywords/description）、ブランド共通フッター（制作依頼リンクの文言、解説記事リンクから /guide/immersive/・/guide/immersive-theater/ を外す）、llms.txt のブランド2行。title 変更は docs/title-history.md に記録。
 - 対象外：会社サイトのイマーシブ柱記事・サービスページ・works 等で「体験する美術館」を事例として挙げる箇所（ex Labs のイマーシブ事業の説明として維持）。キービジュアル・ロスト・フレーム LP 画像に焼き込まれた文字。
 - 「イマーシブ」は Tier1 ワードだが、ブランドページの順位は柱記事ほど重要ではないと判断。影響は 14〜28 日で確認（原因は候補として扱う）。
+
+## 2026-10-17 「京都市京セラ美術館」検索向けの案内ページを新設
+
+- 新規 /guide/kyoto-kyocera-museum-7th/（title：京都市京セラ美術館のイベント｜体験する美術館「7枚目のコンポジション」の日程・チケット・行き方（2026年11月）／H1：京都市京セラ美術館で行われる、絵画の物語体験）。/guide/yumenoshima-night/ と同じ構成。
+- 内容は公式サイト /taikenbizyutu/7th-composition/ の記載のみ：3日間×7回の開始・終了時刻表、販売開始（10/17 19:00）と締切（開演1時間前）、最少催行人数、1名4,500円（税込・別途入館料なし）と人数別の合計、受付（各回10分前・講演室扉前）、遅刻不可、2部屋とも地下1階で上下移動なし、住所・4通りのアクセス・館内経路、対象年齢・服装・撮影・バリアフリー。美術館の通常の開館時間・展覧会は書かず「美術館の公式サイトで確認」とした。
+- 会場名は「京都市京セラ美術館」と続けて表記し、画面上でも名前の途中で改行されないようにした（seo-audit エラーなし）。
+- 内部リンク：トップ「開催予定・近日公開」、/guide/museum-event/、/guide/yumenoshima-night/、/guide/case-lostframe/。guides.ts・サイトマップ・llms.txt・llms-full.txt に追加。
