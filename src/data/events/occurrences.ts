@@ -20,6 +20,11 @@ const KOTOHOGI: [string, string[]][] = [
 // 販売は各回の開始2時間前まで（最終回20:00 → 18:00締切）
 const GENSOU_DATES = ['05', '06', '07', '08', '12', '13', '14', '15', '19', '20', '21', '22'].map((d) => `2026-11-${d}`);
 const GENSOU_CHECKED = '2026-10-16T12:00:00+09:00';
+// 7枚目のコンポジション（公式ページの schedule と同じ。変更時は両方を直す）。販売は各回の開演1時間前まで
+const SEVENTH_DATES = ['2026-11-21', '2026-11-22', '2026-11-23'];
+const SEVENTH_TIMES: [string, string][] = [['12:00', '13:00'], ['12:45', '13:45'], ['13:30', '14:30'], ['14:15', '15:15'], ['15:00', '16:00'], ['15:45', '16:45'], ['16:30', '17:30']];
+const SEVENTH_CHECKED = '2026-10-17T12:00:00+09:00';
+const minus1h = (d: string, t: string) => new Date(Date.parse(`${d}T${t}:00+09:00`) - 3600000 + 9 * 3600000).toISOString().slice(0, 19) + '+09:00';
 const KOTOHOGI_CHECKED = '2026-10-07T10:00:00+09:00';
 const minus2h = (d: string, t: string) => new Date(Date.parse(`${d}T${t}:00+09:00`) - 2 * 3600000 + 9 * 3600000).toISOString().slice(0, 19) + '+09:00';
 const CHECKED = '2026-09-17T03:02:00+09:00'; // 自社公式ページの開催日一覧を再確認（escape.id の開演時刻・受付状況は未確認）
@@ -84,4 +89,19 @@ export const occurrences: Occurrence[] = [
     sourceIds: ['gensou-official', 'escape-id-gensou'],
     published: true,
   })),
+  ...SEVENTH_DATES.flatMap((date) => SEVENTH_TIMES.map<Occurrence>(([startTime, endTime]) => ({
+    id: `7th-composition-${date}-${startTime.replace(':', '')}`,
+    workId: '7th-composition',
+    venueId: 'kyoto-kyocera-museum',
+    date,
+    startTime,
+    endTime,
+    eventStatus: 'scheduled',
+    eventCheckedAt: SEVENTH_CHECKED,
+    eventCheckedBy: 'Claude（自社公式ページの開催日・開演時刻を確認）',
+    sales: { status: 'unknown', closesAt: minus1h(date, startTime), channels: [{ channelId: 'escape-id', url: 'https://escape.id/kyoukaiart-org/e-7th/' }] },
+    seats: { status: 'unknown' },
+    sourceIds: ['7th-official', 'escape-id-7th'],
+    published: true,
+  }))),
 ];

@@ -103,4 +103,22 @@ export const sources: Source[] = [
     checkedBy: 'Claude（実装環境から到達できず、内容は未確認。URLは主催から提供）',
     terms: '販売ページへのリンクのみ。空席・販売状況は転載しない。',
   },
+  {
+    id: '7th-official',
+    label: '体験する美術館「7枚目のコンポジション」公式サイト（自社運営）',
+    url: 'https://kabuexlabs.com/taikenbizyutu/7th-composition/',
+    kind: 'own-official',
+    checkedAt: '2026-10-17T12:00:00+09:00',
+    checkedBy: 'Claude（リポジトリ内の公式ページ src/pages/taikenbizyutu/7th-composition/index.astro の日程・開演時刻・料金・定員・参加条件・会場・アクセスを確認）',
+    terms: '自社サイトの記載。日程・開演時刻・料金・定員・注意事項・住所を自社データとして使用可。',
+  },
+  {
+    id: 'escape-id-7th',
+    label: 'escape.id「7枚目のコンポジション」チケットページ',
+    url: 'https://escape.id/kyoukaiart-org/e-7th/',
+    kind: 'ticket-site',
+    checkedAt: '2026-10-17T12:00:00+09:00',
+    checkedBy: 'Claude（実装環境から到達できず、内容は未確認。URLは主催から提供）',
+    terms: '販売ページへのリンクのみ。空席・販売状況は転載しない。',
+  },
 ];

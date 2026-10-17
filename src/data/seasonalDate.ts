@@ -5,6 +5,7 @@
 // 自社公演は src/data/events/occurrences.ts の startTime・date からも自動で数える（outingCatalog と同じ正本）。
 import { occurrences } from './events/occurrences';
 import { works } from './events/works';
+import { venues } from './events/venues';
 
 export interface TimedInfo {
   /** src/lib/outingCatalog.ts の Outing.id（例：zettai-kukan-ikebukuro） */
@@ -30,7 +31,9 @@ export const XMAS_FROM = '2026-12-20';
 export const XMAS_TO = '2026-12-25';
 
 const publishedWorkIds = new Set(works.filter((w) => w.published).map((w) => w.id));
-const liveOcc = occurrences.filter((o) => o.published && !o.test && o.eventStatus !== 'cancelled' && publishedWorkIds.has(o.workId));
+// 東京の夜・クリスマスの記事なので、東京の会場の回だけを数える（京都・埼玉の公演は含めない）
+const tokyoVenueIds = new Set(venues.filter((v) => v.regionId === 'tokyo').map((v) => v.id));
+const liveOcc = occurrences.filter((o) => o.published && !o.test && o.eventStatus !== 'cancelled' && publishedWorkIds.has(o.workId) && tokyoVenueIds.has(o.venueId));
 
 /** 自社公演で、開始時刻が17時以降の回がある作品 */
 export const nightOwnWorkIds = [...new Set(liveOcc.filter((o) => o.startTime && o.startTime >= '17:00').map((o) => o.workId))];

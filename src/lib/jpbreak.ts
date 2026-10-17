@@ -19,13 +19,19 @@ const KAN = /[一-鿿々]/;
 const KT = /[ァ-ヺ]/;
 const ZW = '​';
 
+// 途中で改行してはいけない固有名詞（「京都市京セラ美術館」は美術館の依頼で分けない）
+const KEEP = ['京都市京セラ美術館'];
+
 export function seg(str: string): string {
   if (!str) return '';
   const s = [...str];
+  const keep = new Set<number>();
+  for (const w of KEEP) { let k = str.indexOf(w); while (k >= 0) { const st = [...str.slice(0, k)].length; for (let j = st; j < st + [...w].length - 1; j++) keep.add(j); k = str.indexOf(w, k + w.length); } }
   let out = '';
   for (let i = 0; i < s.length; i++) {
     const c = s[i], n = s[i + 1] || '';
     out += c;
+    if (keep.has(i)) continue;
     if (n && (
       (HIRA.test(c) && /[一-鿿ァ-ヺA-Za-z0-9「（]/.test(n)) ||
       (KAN.test(c) && KT.test(n)) ||

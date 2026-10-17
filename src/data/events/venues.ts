@@ -56,4 +56,17 @@ export const venues: Venue[] = [
     access: '集合は植物館の正面入口。受付開始（開始時刻の5分前）までは植物館前（屋外）で待機（公式ページに記載）',
     sourceIds: ['gensou-official'],
   },
+  {
+    // 京都市の美術館。会場名は必ず「京都市京セラ美術館」と続けて書く。住所・アクセスは自社公式ページ /taikenbizyutu/7th-composition/ の記載
+    id: 'kyoto-kyocera-museum',
+    name: '京都市京セラ美術館（本館地下1階 講演室・多目的室）',
+    listName: '京都市京セラ美術館',
+    regionId: 'kyoto',
+    areaId: 'okazaki',
+    address: '京都府京都市左京区岡崎円勝寺町124',
+    station: '京都市営地下鉄東西線「東山駅」1番出口から徒歩約8分',
+    setting: 'indoor',
+    access: '受付・集合は本館地下1階「講演室」扉前（各回開始の10分前から）。神宮道側のメインエントランス（スロープを下りたガラス張りの地下入口）から入館（公式ページに記載）',
+    sourceIds: ['7th-official'],
+  },
 ];

@@ -42,7 +42,7 @@ const ppList = work.price.unit === 'per-group' && work.price.tiers ? work.price.
 const title = `${work.title}｜開催日程・料金・予約先（${areaText}） - 株式会社ex Labs`;
 const desc = `${work.title}（${work.genres.map(genreName).join('・')}、${areaText}）の開催日程・料金・申込人数・参加条件と公式予約ページ。${isOver ? 'この公演は終了しました。' : '開催・販売・空席の確認状況を分けて掲載しています。'}${own ? '株式会社ex Labs が企画・制作。' : ''}`.slice(0, 158);
 
-const REGION_PREF: Record<string, string> = { tokyo: '東京都', saitama: '埼玉県' };
+const REGION_PREF: Record<string, string> = { tokyo: '東京都', saitama: '埼玉県', kyoto: '京都府' };
 const eventLd = upcoming.concat(cancelled).map((r) => {
   const o = r.occ;
   const v = r.venue;

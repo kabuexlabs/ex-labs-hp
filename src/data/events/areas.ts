@@ -8,6 +8,8 @@ export const REGIONS: Region[] = [
   { id: 'tokyo', name: '東京' },
   // 2026-10-07 追加：ウワサバナシ調査委員会 case2（さいたま市）。東京向けの解説記事・デート記事・/outing/ には出さない（tokyoGuide・shows で東京に限定）
   { id: 'saitama', name: '埼玉' },
+  // 2026-10-17 追加：体験する美術館「7枚目のコンポジション」（京都市京セラ美術館）。東京向けの記事・/outing/ には出さない
+  { id: 'kyoto', name: '京都' },
 ];
 
 export const AREAS: Area[] = [
@@ -17,6 +19,7 @@ export const AREAS: Area[] = [
   { id: 'kanda', regionId: 'tokyo', name: '神田' },
   { id: 'shinkiba', regionId: 'tokyo', name: '新木場・夢の島' },
   { id: 'saitama-city', regionId: 'saitama', name: 'さいたま市' },
+  { id: 'okazaki', regionId: 'kyoto', name: '京都市・岡崎' },
 ];
 
 export const GENRES: { id: Genre; name: string; short: string; desc: string }[] = [

@@ -31,7 +31,7 @@ const toc = [
   { id: 'dates', label: '開催日と開始時刻' },
   { id: 'ticket', label: 'チケットと料金' },
   { id: 'flow', label: '当日の流れ' },
-  { id: 'access', label: '行き方と館内の経路' },
+  { id: 'access', label: '行き方（大阪・神戸から）と館内の経路' },
   { id: 'before', label: '参加前に知っておきたいこと' },
 ];
 const articleLd = {
@@ -50,7 +50,7 @@ const articleLd = {
 ---
 <BaseLayout
   title="京都市京セラ美術館のイベント｜体験する美術館「7枚目のコンポジション」の日程・チケット・行き方（2026年11月） - 株式会社ex Labs"
-  description="2026年11月21日〜23日、京都市京セラ美術館の本館地下1階で、絵画を鑑賞することで物語に巻き込まれていく60分の物語体験「7枚目のコンポジション」を開催。各日7回（12:00〜16:30開始）、1名4,500円（税込・別途入館料なし）、1名から参加可能。当日の流れと東山駅からの行き方をまとめました。"
+  description="2026年11月21日〜23日、京都市京セラ美術館の本館地下1階で、絵画を鑑賞することで物語に巻き込まれていく60分の物語体験「7枚目のコンポジション」を開催。各日7回（12:00〜16:30開始）、1名4,500円（税込・別途入館料なし）、1名から参加可能。当日の流れと、東山駅・大阪・神戸からの行き方をまとめました。"
   ogImage="/assets/events/7th-composition-kv.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
@@ -124,6 +124,15 @@ const articleLd = {
 <li>各線「京都駅」から市バス5・86系統「岡崎公園 美術館・平安神宮前」下車すぐ</li>
 <li>阪急「京都河原町駅」から市バス46・5系統「岡崎公園 美術館・平安神宮前」下車すぐ</li>
 </ul>
+<h3 class="kd-h3">大阪・神戸から行く場合</h3>
+<p class="lede">乗り換えの道順です。所要時間や運賃は、乗換案内で出発時刻に合わせて確認してください。</p>
+<ul class="bullets">
+<li><strong>大阪梅田から</strong>：阪急京都線で終点の「京都河原町駅」へ。市バス46・5系統で「岡崎公園 美術館・平安神宮前」下車すぐ。</li>
+<li><strong>淀屋橋・京橋から</strong>：京阪本線で「三条駅」へ。徒歩約16分、または三条京阪駅から地下鉄東西線で「東山駅」へ（1番出口から徒歩約8分）。</li>
+<li><strong>新大阪・神戸方面から（JR）</strong>：JRで「京都駅」へ。市バス5・86系統で「岡崎公園 美術館・平安神宮前」下車すぐ、または地下鉄烏丸線で「烏丸御池駅」へ出て東西線に乗り換え「東山駅」へ。</li>
+<li><strong>神戸三宮から（阪急）</strong>：阪急神戸線で「十三駅」へ出て京都線に乗り換え、「京都河原町駅」へ。そこから市バス46・5系統。</li>
+</ul>
+<p class="lede">各回の開始10分前から受付が始まり、1分でも遅れると参加できません。遠方から来る場合は、乗り換えの待ち時間も含めて余裕を持って出発してください。</p>
 <p class="lede" style="margin-top:16px"><strong>館内の経路</strong>：神宮道側のメインエントランス（スロープを下りたガラス張りの地下入口）から入り、直進したロビーの周辺に会場の「講演室」があります。</p>
 <p class="lede"><span class="nobr">京都市京セラ美術館</span>は京都市の美術館です。このページで案内しているのは「7枚目のコンポジション」の時間と会場で、美術館の開館時間や開催中の展覧会は、美術館の公式サイトで確認してください。</p>
 <p class="vc-line"><a href={`${LP}#access`} style="color:var(--accent)" data-track="show" data-show="7th-composition" data-place="kyoto7-access">地図（公式サイトのアクセス）→</a></p>
@@ -181,6 +190,7 @@ const articleLd = {
 .yn-flow li{counter-increment:f;display:grid;grid-template-columns:2em 3.4em minmax(0,1fr);gap:10px;align-items:baseline;padding:13px 0;border-bottom:1px solid rgba(51,48,43,.12);font-size:14.5px;line-height:1.85}
 .yn-flow li::before{content:counter(f);font-weight:800;color:var(--accent)}
 .yn-flow span{font-weight:800}.yn-flow .t{font-weight:400}
+.kd-h3{margin:28px 0 0;font-size:17px;font-weight:800}
 #what,#dates,#ticket,#flow,#access,#before{scroll-margin-top:88px}
 @media(max-width:700px){.yn-top{grid-template-columns:120px minmax(0,1fr);gap:16px}.yn-top > div{display:contents}.yn-eyebrow,.yn-h1{grid-column:2}.yn-kv{grid-row:1 / span 2}.yn-top .lede,.yn-keys,.yn-cta{grid-column:1 / -1}.yn-h1{font-size:19px;margin-top:0}.toc{padding:20px}}
 </style>
