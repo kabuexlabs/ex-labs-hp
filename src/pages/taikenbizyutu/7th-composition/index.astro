@@ -21,6 +21,7 @@ const MAP_LINK_URL = 'https://www.google.com/maps/search/?api=1&query=' + encode
 // キャスト欄の表示（2026-09-29 ユーザー指示で一旦非表示。出すときは true にする）
 const SHOW_CAST = true;
 
+
 const ticketHref = TICKET_URL ?? '#ticket';
 const ticketAttrs = TICKET_URL
   ? { target: '_blank', rel: 'noopener', 'data-track': 'ticket', 'data-show': '7th-composition' }
@@ -47,16 +48,17 @@ const news: { date: string; text: string }[] = [];
 // キャスト（写真・プロフィールは荒巻まりの より提供予定）
 // キャスト（2026-10-17 出演フォームの回答「7枚目のコンポジション」6名。クレジット名は回答どおり）。
 // 並びは読み（kana）のあいうえお順で自動。写真は public/assets/7th-composition/cast/ に置いて photo を指定する
-// （未指定の間は名前だけのカード）。意気込み欄は運営宛ての文面なので掲載しない。
+// （未指定の人は、誰かに写真がある間は絵画の切り出しを仮の写真枠に表示）。意気込み欄は運営宛ての文面なので掲載しない。
 // 小山栄華の読みは「こやま」と仮定（「おやま」なら先頭に来る）。
 const cast: { name: string; kana: string; note?: string; photo?: string }[] = [
-  { name: 'せとな', kana: 'せとな' },
-  { name: '千葉ひかる', kana: 'ちばひかる' },
+  { name: 'せとな', kana: 'せとな', photo: '/assets/7th-composition/cast/setona.webp' },
+  { name: '千葉ひかる', kana: 'ちばひかる', photo: '/assets/7th-composition/cast/chiba-hikaru.webp' },
   { name: 'ハチヤタカヲ', kana: 'はちやたかを' },
   { name: '神田美那珂', kana: 'かんだみなか' },
   { name: '川添 公二', kana: 'かわぞえこうじ' },
   { name: '小山栄華', kana: 'こやまえいか', note: 'アナグマの脱却座' },
 ].sort((a, b) => a.kana.localeCompare(b.kana, 'ja'));
+const castHasPhoto = cast.some((c) => c.photo);
 
 // 文字の強弱：［ ］で始まる未確定の文言は目立たせない（.tbd）
 const isTbd = (t: string) => t.startsWith('［');
@@ -300,11 +302,13 @@ const eventLd = {
   <div class="w1160">
     <div class="sh" style="--y:50%"><h2>Cast</h2><p>キャスト</p></div>
     <div class="cast">
-      {cast.map((c) => (
+      {cast.map((c, i) => (
         <div class="card">
           <div class="card-tab"></div>
           <div class="card-body">
-            {c.photo && <img class="card-ph" src={c.photo} alt={c.name} width="600" height="800" loading="lazy">}
+            {c.photo
+              ? <img class="card-ph" src={c.photo} alt={c.name} width="600" height="800" loading="lazy">
+              : castHasPhoto && <div class="card-ph ph" style={`--py:${20 + i * 13}%`} aria-hidden="true"></div>}
             <p class="card-name">{c.name}</p>
             {c.note && <p class="card-note">{c.note}</p>}
           </div>
@@ -605,6 +609,7 @@ h1,h2,p{margin:0}
 .card-tab{margin:0 14%;height:20px;background:#F7EFE6;border-radius:20px 20px 0 0}
 .card-body{flex:1;background:#F7EFE6;color:#861E3E;padding:22px 22px 26px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
 .card-ph{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;margin-bottom:10px}
+.card-ph.ph{background:linear-gradient(rgba(247,239,230,.25),rgba(247,239,230,.25)),url(/assets/7th-composition/painting.webp) 40% var(--py,30%)/auto 260% no-repeat}
 .card-name{font-size:clamp(18px,2vw,24px);font-weight:600;letter-spacing:.14em;word-break:keep-all}
 .card-note{font-family:'Zen Kaku Gothic New',sans-serif;font-size:12px;letter-spacing:.08em;color:#B7667D}
 /* キャスト：PC は3列×2段、スマホは2列×3段 */
