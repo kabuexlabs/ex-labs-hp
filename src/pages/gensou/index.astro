@@ -28,8 +28,16 @@ const MAP_LINK = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIC
 // 利用規約・公式X（null の間はリンクを出さない）
 const TERMS_URL: string | null = null;
 const X_URL: string | null = 'https://x.com/Gennsousyuu'; // 2026-10-14 ユーザー提供
-// キャスト（掲載の有無が未定。空配列の間はセクションとメニュー項目を出さない）
-const cast: { name: string; role?: string; days?: string; photo?: string }[] = [];
+// キャスト（2026-10-17 出演フォーム回答の「クレジットのお名前」から。名前のみ掲載。並びは姓の読みの五十音順）
+// 空配列にするとセクションとメニュー項目を出さない
+const cast: { name: string; kana: string }[] = [
+  { name: '川上雅人', kana: 'かわかみ' },
+  { name: '小林実加', kana: 'こばやし' },
+  { name: '滝沢花野', kana: 'たきざわ' },
+  { name: '竹下かおり', kana: 'たけした' },
+  { name: '中山侑子', kana: 'なかやま' },
+  { name: '吉沢たかし', kana: 'よしざわ' },
+].sort((a, b) => a.kana.localeCompare(b.kana, 'ja'));
 // スタッフ（profile が決まったら追加する。写真欄は掲載しない）
 const staff: { role: string; name: string; profile?: string }[] = [
   { role: 'シナリオライター', name: 'タロサカ' },
@@ -59,7 +67,7 @@ const dates = weeks.flatMap((w) => w.days.map((d) => `2026-11-${String(d.n).padS
 
 const nav = [
   ['About', '公演概要', '#about'], ['Story', 'あらすじ', '#story'],
-  ['Feature', '体験の特徴', '#feature'], ['Staff', '制作・監修', '#staff'], ['Cast', '出演者', '#cast'],
+  ['Feature', '体験の特徴', '#feature'], ['Staff', '制作・監修', '#staff'], ['Cast', 'キャスト', '#cast'],
   ['Ticket', 'チケット', '#ticket'], ['Flow', '当日の流れ', '#flow'], ['Notice', '注意事項', '#notice'],
   ['Access', 'アクセス', '#access'], ['FAQ', 'よくあるご質問', '#faq'], ['Contact', 'お問い合わせ', '#contact'],
 ]
@@ -149,6 +157,7 @@ const eventLd = {
   })),
   offers: ticketOffers,
   organizer: { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' },
+  performer: cast.map((c) => ({ '@type': 'Person', name: c.name })),
 };
 const faqLd = {
   '@context': 'https://schema.org',
@@ -326,12 +335,8 @@ img{max-width:100%}
 .staff .role{font-size:14px;color:#aeb5cf}
 .staff .name{font-size:24px;font-weight:500}
 .staff p{margin:0;font-size:15px;line-height:1.9;color:#aeb5cf}
-.casts{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:24px 16px}
-.cast{display:flex;flex-direction:column;gap:8px}
-.cast .photo{aspect-ratio:3/4;width:100%;object-fit:cover;display:block}
-.cast .role{font-size:12px;color:#aeb5cf;margin-top:4px}
-.cast .name{font-size:17px;font-weight:500}
-.cast .days{align-self:stretch;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.casts{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px}
+.casts li{padding:16px 0;border-bottom:1px solid rgba(217,174,44,.78);font-size:19px;font-weight:500;letter-spacing:.12em}
 
 /* ticket */
 .tickets{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
@@ -581,22 +586,15 @@ img{max-width:100%}
 
     {cast.length > 0 && (
       <section id="cast" class="sec">
-        <SecHead ja="出演者" side="l" />
-        <div class="casts">
-          {cast.map((c) => (
-            <div class="cast">
-              {c.photo ? <img class="photo" src={c.photo} alt={c.name} loading="lazy"> : <div class="photo ph" aria-hidden="true"></div>}
-              {c.role && <span class="role">{c.role}</span>}
-              <span class="name">{c.name}</span>
-              {c.days && <span class="days mono">{c.days}</span>}
-            </div>
-          ))}
-        </div>
+        <SecHead ja="キャスト" side="l" />
+        <ul class="casts">
+          {cast.map((c) => <li>{c.name}</li>)}
+        </ul>
       </section>
     )}
 
     <section id="ticket" class="sec">
-      <SecHead ja="チケット" side="l" />
+      <SecHead ja="チケット" side="r" />
       <div class="tickets">
         <div class="tk">
           <span class="nm">個別チケット</span>
@@ -631,14 +629,14 @@ img{max-width:100%}
     </section>
 
     <section id="flow" class="sec">
-      <SecHead ja="当日の流れ" side="r" />
+      <SecHead ja="当日の流れ" side="l" />
       <ol class="flow">
         {flow.map((f) => <li><span class="no">{f.no}</span><span class="tx"><strong class="lb">{f.label}</strong><J t={f.text} /></span></li>)}
       </ol>
     </section>
 
     <section id="notice" class="sec">
-      <SecHead ja="注意事項" side="l" />
+      <SecHead ja="注意事項" side="r" />
       {notes.map((g) => (
         <div class="ng">
           <h3 class="ng-h">{g.group}</h3>
@@ -650,7 +648,7 @@ img{max-width:100%}
     </section>
 
     <section id="access" class="sec">
-      <SecHead ja="会場・アクセス" side="r" />
+      <SecHead ja="会場・アクセス" side="l" />
       <div class="rows">
         <div class="row"><span>会場</span><span>夢の島熱帯植物館</span></div>
         <div class="row"><span>集合場所</span><span>正面入口</span></div>
@@ -662,7 +660,7 @@ img{max-width:100%}
     </section>
 
     <section id="faq" class="sec">
-      <SecHead ja="よくあるご質問" side="l" />
+      <SecHead ja="よくあるご質問" side="r" />
       <div class="faq">
         {faqs.map((f, i) => (
           <div class="fq">
@@ -691,7 +689,7 @@ img{max-width:100%}
     </section>
 
     <section id="contact" class="sec" style="padding-bottom:120px">
-      <SecHead ja="お問い合わせ" side="r" />
+      <SecHead ja="お問い合わせ" side="l" />
       <a href="mailto:info@kabuexlabs.com" class="mail">info@kabuexlabs.com</a>
       {X_URL && <div style="margin-top:32px"><a href={X_URL} class="xbtn" target="_blank" rel="noopener" data-place="gensou-contact"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L1 2h6.4l4.4 5.8L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z"/></svg><span>公式X <span class="xid">@Gennsousyuu</span></span><span class="arc" aria-hidden="true">→</span></a></div>}
     </section>
