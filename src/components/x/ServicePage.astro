@@ -56,7 +56,9 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
 <section class="xs-hero">
   <div class="xs-hero-in">
     <div class="xs-hero-kick"><span class="x-sh-deco" aria-hidden="true">+<span class="x-sh-line"></span></span><p>{raw.hero.en}</p></div>
-    <h1 class="xs-h1">{(raw.hero.lines as string[][]).map((ln) => <span class="x-bl"><Ph list={ln} /></span>)}</h1>
+    {raw.hero.h1
+      ? <><h1 class="xs-h1">{raw.hero.h1}</h1><p class="xs-h1 xs-lead">{(raw.hero.lines as string[][]).map((ln) => <span class="x-bl"><Ph list={ln} /></span>)}</p></>
+      : <h1 class="xs-h1">{(raw.hero.lines as string[][]).map((ln) => <span class="x-bl"><Ph list={ln} /></span>)}</h1>}
     <div class="xs-ctas">
       {(raw.hero.ctas as any[]).map((c) => <a href={c.href} class={`x-btn xs-cta ${c.primary ? 'is-lime' : 'is-line'}`} data-track={c.href === '#contact' ? 'cta' : undefined} data-show={c.href === '#contact' ? 'contact' : undefined} data-place={c.href === '#contact' ? `svc-${slug}-hero` : undefined}>{c.label}</a>)}
     </div>
@@ -190,7 +192,7 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
           {(s.items as any[]).map((g) => (
             <figure class="xs-gal">
               <img src={g.img} alt={g.cap ?? ''} loading="lazy" decoding="async" style={`aspect-ratio:${s.square ? '1 / 1' : '4 / 3'}`}>
-              {g.cap && <figcaption><Cls text={g.cap} emph={false} /></figcaption>}
+              {g.cap && <figcaption><Cls text={g.cap} emph={false} />{g.desc && <><br><Cls text={g.desc} emph={false} /></>}</figcaption>}
             </figure>
           ))}
         </div>

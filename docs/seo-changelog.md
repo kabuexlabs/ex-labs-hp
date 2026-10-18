@@ -92,3 +92,12 @@
 - `/guide/madamis-haishin/` の本文は「動画・配信用マダミスの制作依頼」（視聴者向け企画・配信準備）で、オンラインで遊ぶマダミスの記事ではない → **変更なし**
 - **人がやること**: `/guide/madamis-online/` の新規作成が必要（内容は人が用意。title 案 `オンラインマダミスとは？遊び方・必要なもの・おすすめの作品【{年}年】`）
 
+### P3-1 `/services/nazotoki-kenshu/`（コミット `seo(P3-1)`）
+- 変更: `src/data/services.ts`（nazotoki）、`src/components/x/ServicePage.astro`（`hero.h1` があれば H1 にし、従来のキャッチコピー行を `<p class="xs-h1 xs-lead">` に降格。ギャラリーの `desc` を figcaption に表示）、`src/pages/services/nazotoki-kenshu.astro`（Service JSON-LD の `serviceType` に「チームビルディング研修」を追加）
+- H1: 「自社の社員研修や採用を『面白い』コンテンツにしませんか？」→ `<p>` に降格し、H1 を `謎解き研修｜チームビルディング研修の企画・制作` に。title は現状維持（`謎解き研修｜体験型チームビルディング研修の企画・制作 - 株式会社ex Labs`）
+- H2「プログラム一覧」: 既存プログラムの実施／オリジナル制作の2行（対応人数・所要時間・会場・費用目安・向いている目的）。値は同ページ既存の FAQ・本文（「少人数のチーム単位から数百名規模」「数十万円台〜（税抜）」「個別にお見積り」「会議室・研修施設・宴会場」）のみ。所要時間は「要相談」
+- H2「導入事例・制作実績」（旧「シナリオ制作力の裏付けとなる実績」）: 謎解き研修そのものの公開事例はまだない旨をリード文に明記し、2つの画像事例に文章を追加。出典: 博報堂×紀伊國屋書店「月明かりの書店と呪われた原稿」→ `/works/`（ミステリー原案・閉店後の一夜限りのイベント・営業時間外活用）と `/guide/eigyo-jikangai/`（博報堂様との取り組み、ミステリー原案・体験設計を担当）。「ロスト・フレーム」→ `src/data/taikenbizyutu.ts`（startDate 2026-07-07、endDate 2026-08-31、duration 75分、capacity 1〜4名）、`/taikenbizyutu/lostframe/`、`/guide/case-lostframe/`（全公演完売、自社企画・主催）。新しい数字は作っていない
+- Service JSON-LD: 既存（name 謎解き研修、provider 株式会社ex Labs、areaServed JP、url）に `serviceType: ['謎解き研修', 'チームビルディング研修']`
+- H2「関連ガイド」: P3-3 の逆引き（`nazotoki-kenshu` callout を持つ5本）＋ 既存の手書き6本（nazotoki-kenshu, nazotoki-company, nazotoki-event, madamis-kenshu, shanai-event, bonenkai-nazotoki）
+- 確認: ビルド後 HTML の H1 は1つで「謎解き研修｜チームビルディング研修」を含む。`id="program"` の表と事例文あり。Service JSON-LD `JSON.parse` 通過
+
