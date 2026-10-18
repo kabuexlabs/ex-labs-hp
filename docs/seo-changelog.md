@@ -119,3 +119,34 @@
 - `/toudaimurder/news/*-release/` → 作品ページ: 記事データ `workSlug` により既に「作品ページを見る →」が出ているため変更なし
 - 確認: 13作品すべて title が作品名で始まり、Game の `name` ＝ H1、`arumadamisu` と `arumadamisu2` の title が区別できる
 
+### P4-2 他ブランドの作品・公演ページ（コミット `seo(P4-2)`）
+- title の先頭が作品名でなかった5ページ（`/gensou/` `/kaitou/` `/karma/` `/uwasabanashi/` `/uwasabanashi/kotohogi/`）は「【公式】」が先頭だったため、作品名の直後に移動（サフィックス・区切りは既存のまま）。変更ファイル: `src/pages/{gensou,kaitou,karma,uwasabanashi,uwasabanashi/kotohogi}/index.astro`
+- JSON-LD: `/events/*` はテンプレートで Event 出力済み。`/hacktale/works/*` は個別 `.astro` だが Game 出力済み。`/uwasabanashi/kotohogi/` は構造化データなし、`/taikenbizyutu/*`・`/uwasabanashi/`・`/karma/`・`/kaitou/`・`/gensou/`・`/anator/` は個別 HTML（LP）で各自の Event/TheaterEvent/EventSeries を持つ → **要個別対応**（テンプレート化はしない）
+- `/anator/` と `/uwasabanashi/`・`/uwasabanashi/kotohogi/` は H1 がない／H1 がキャッチコピー（`/karma/`）。本タスクは title のみのため変更せず記録
+
+| URL | title（修正後） | H1 | JSON-LD | 備考 |
+|---|---|---|---|---|
+| `/anator/` | ANATOR｜少人数密室型イマーシブ空間 |  | TheaterGroup+PerformingArtsTheater | 個別 HTML → 要個別対応 |
+| `/events/` | 今日できるイマーシブ｜東京で今日・明日・今週末に参加できる公演を探す - 株式会社ex Labs | 今日できるイマーシブを​探す東京の​今日・明日・今週末の​公演 | Organization+WebSite+FAQPage+CollectionPage+BreadcrumbList | 一覧・案内ページ（対象外） |
+| `/events/7th-composition/` | 体験する美術館「7枚目のコンポジション」｜開催日程・料金・予約先（京都・京都市・岡崎） - 株式会社ex Labs | 体験する美術館「7枚目のコンポジション」 | Organization+WebSite++BreadcrumbList | テンプレート（Event JSON-LD 出力済み） |
+| `/events/about/` | 公演情報サービスについて｜掲載基準・運営者・修正依頼 - 株式会社ex Labs | 公演情報サービスについて | Organization+WebSite+BreadcrumbList | 一覧・案内ページ（対象外） |
+| `/events/factroom/` | 体験型取調室 FACTROOM｜開催日程・料金・予約先（東京・神田） - 株式会社ex Labs | 体験型取調室 FACTROOM | Organization+WebSite+BreadcrumbList | テンプレート（Event JSON-LD 出力済み） |
+| `/events/gensou/` | 午前零時の幻想集 第一夜「草陰の夢」｜開催日程・料金・予約先（東京・新木場・夢の島） - 株式会社ex Labs | 午前零時の幻想集 第一夜「草陰の夢」 | Organization+WebSite++BreadcrumbList | テンプレート（Event JSON-LD 出力済み） |
+| `/events/kaitou/` | 怪盗と秘密の試験｜開催日程・料金・予約先（東京・六本木） - 株式会社ex Labs | 怪盗と秘密の試験 | Organization+WebSite+BreadcrumbList | テンプレート（Event JSON-LD 出力済み） |
+| `/events/kotohogi/` | ウワサバナシ調査委員会 case2「言祝ぎの家 -呪われた花嫁-」｜開催日程・料金・予約先（埼玉・さいたま市） - 株式会社ex Labs | ウワサバナシ調査委員会 case2「言祝ぎの家 -呪われた花嫁-」 | Organization+WebSite++BreadcrumbList | テンプレート（Event JSON-LD 出力済み） |
+| `/events/uwasabanashi/` | ウワサバナシ調査委員会｜開催日程・料金・予約先（東京・渋谷） - 株式会社ex Labs | ウワサバナシ調査委員会 | Organization+WebSite+BreadcrumbList | テンプレート（Event JSON-LD 出力済み） |
+| `/gensou/` | 午前零時の幻想集 第一夜「草陰の夢」【公式】｜ 夢の島熱帯植物館の夜のイマーシブ体験 | 午前零時の幻想集 第一夜「草陰の夢」× 夢の島熱帯植物館 | EventSeries+FAQPage | title 先頭の【公式】を作品名の後ろへ（個別 HTML） |
+| `/hacktale/works/` | 作品一覧 WORKS ｜ ハックテイル | WORKS作品一覧 | BreadcrumbList+ItemList+BreadcrumbList | 一覧・案内ページ（対象外） |
+| `/hacktale/works/dice-box/` | ダイスボックス THE DICE BOX ｜ ハックテイル | ダイスボックス | BreadcrumbList+Game+BreadcrumbList | 個別 HTML（Game JSON-LD 出力済み） |
+| `/hacktale/works/present-poker/` | プレゼント・ポーカー ｜ ハックテイル | プレゼント・ポーカー | BreadcrumbList+Game+BreadcrumbList | 個別 HTML（Game JSON-LD 出力済み） |
+| `/hacktale/works/werewolf-theorem/` | 人狼定理 WEREWOLF THEOREM ｜ ハックテイル | 人狼定理 | BreadcrumbList+Game+BreadcrumbList | 個別 HTML（Game JSON-LD 出力済み） |
+| `/kaitou/` | 怪盗と秘密の試験【公式】｜ イマーシブイリュージョン | 怪盗と秘密の試験 | TheaterEvent+FAQPage | title 先頭の【公式】を作品名の後ろへ（個別 HTML） |
+| `/karma/` | 臓腑、或いはカルマ【公式】｜ 体験型取調室 FACT ROOM | 「その言葉は、予言か。殺意か。」 | TheaterEvent+FAQPage | title 先頭の【公式】を作品名の後ろへ（個別 HTML） |
+| `/taikenbizyutu/` | 体験する美術館｜参加型アート・周遊型の物語体験｜絵画×物語×街歩き謎解き | 体験する美術館｜下北沢の街を巡る参加型アート・周遊型の物語体験｜絵画と物語、街歩き謎解きの体験 | Organization+FAQPage+Event | 個別 HTML → 要個別対応 |
+| `/taikenbizyutu/7th-composition/` | 体験する美術館「7枚目のコンポジション」公式サイト｜京都市京セラ美術館 2026.11.21–23 | 体験する美術館「7枚目のコンポジション」 | Event | 個別 HTML → 要個別対応 |
+| `/taikenbizyutu/lostframe/` | ロスト・フレーム Lost Frame｜下北沢を巡る周遊型の物語体験・街歩き謎解き｜体験する美術館 | ロスト・フレーム Lost Frame｜下北沢の街を巡る周遊型の物語体験・街歩き謎解き｜体験する美術館 | Organization+Event+BreadcrumbList | 個別 HTML → 要個別対応 |
+| `/taikenbizyutu/news/lostframe-soldout/` | 『ロスト・フレーム』全公演 完売のお知らせ｜体験する美術館 | 『ロスト・フレーム』全公演 完売のお知らせ | Organization+NewsArticle+BreadcrumbList | 一覧・案内ページ（対象外） |
+| `/uwasabanashi/` | ウワサバナシ調査委員会【公式】｜ イマーシブ公演 |  | TheaterEvent+FAQPage | title 先頭の【公式】を作品名の後ろへ（個別 HTML） |
+| `/uwasabanashi/iinkai/` | ウワサバナシ調査委員会とは｜活動内容と調査記録 case1・case2 |  | CollectionPage+VideoObject | 一覧・案内ページ（対象外） |
+| `/uwasabanashi/kotohogi/` | ウワサバナシ調査委員会 case2「言祝ぎの家」【公式】｜さいたま市の一軒家で体験するイマーシブホラー | ウワサバナシ調査委員会case2「言祝ぎの家」呪われた花嫁 | — | title 先頭の【公式】を作品名の後ろへ（個別 HTML） |
+
