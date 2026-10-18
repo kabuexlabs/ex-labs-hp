@@ -35,6 +35,7 @@ const articleLd = {
   dateModified: '2026-10-14',
   mainEntityOfPage: new URL('/guide/bonenkai-nazotoki/', site).toString(),
 };
+import GuideCallout from '../../components/guide/GuideCallout.astro';
 ---
 <BaseLayout
   title="忘年会の食事と謎解きを、どう組み合わせるか｜着席・立食の進め方と担当範囲 - 株式会社ex Labs"
@@ -53,6 +54,7 @@ const articleLd = {
 <h1 class="h2 serif"><span class="nobr">忘年会の食事と謎解きを、</span><span class="nobr">どう組み合わせるか</span></h1>
 <p class="lede">忘年会に謎解きを入れる場合は、料理の提供とゲームの説明が重ならないかを先に確認します。卓上に冊子を置く形式なら、食器が並んだ状態で使えるスペースも必要です。</p>
 <p class="lede">着席か立食か、進行に使える時間はどのくらいか。この二点が決まると、食事と並行して進めるか、ゲームの時間を分けるかを選べます。このページでは、宴会場での実施を検討している幹事・総務の方に向けて、判断に必要な条件と、誰が何を用意するかを整理します。</p>
+<GuideCallout />
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
 <ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}</ol>

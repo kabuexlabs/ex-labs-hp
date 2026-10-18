@@ -101,3 +101,8 @@
 - H2「関連ガイド」: P3-3 の逆引き（`nazotoki-kenshu` callout を持つ5本）＋ 既存の手書き6本（nazotoki-kenshu, nazotoki-company, nazotoki-event, madamis-kenshu, shanai-event, bonenkai-nazotoki）
 - 確認: ビルド後 HTML の H1 は1つで「謎解き研修｜チームビルディング研修」を含む。`id="program"` の表と事例文あり。Service JSON-LD `JSON.parse` 通過
 
+### P3-2 B2B ガイドからサービスへの導線（コミット `seo(P3-2)`）
+- 設定（`src/data/seoOverrides.ts`）: `nazotoki-kenshu` 5ページ／`event-seisaku` 12ページ／`shisetsu-event` 17ページ／`murder-mystery` 5ページ／`immersive` 4ページ／`hacktale` 7ページ。ランブックの表に挙がったページは全て存在し、スキップなし
+- 各ページに `<GuideCallout />` をリード文直後に挿入（import 1行＋タグ1行）。既存の本文末尾 CTA はそのまま
+- 確認（ビルド後 HTML の `data-callout` 件数）: shisetsu-event 17、event-seisaku 12、hacktale 7、nazotoki-kenshu 5、murder-mystery 5、immersive 4（いずれも設定ページ数と一致）。参考: madamis 13（P2-2）、immersive-tokyo 6（P1-2）
+

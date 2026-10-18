@@ -35,6 +35,7 @@ const articleLd = {
   dateModified: '2026-10-14',
   mainEntityOfPage: new URL('/guide/shuyu-event-uketsuke/', site).toString(),
 };
+import GuideCallout from '../../components/guide/GuideCallout.astro';
 ---
 <BaseLayout
   title="営業中の商業施設で、周遊イベントの受付と待機場所をどう決めるか - 株式会社ex Labs"
@@ -53,6 +54,7 @@ const articleLd = {
 <h1 class="h2 serif"><span class="nobr">営業中の商業施設で、</span><span class="nobr">周遊イベントの受付と</span><span class="nobr">待機場所をどう決めるか</span></h1>
 <p class="lede">周遊イベントの参加者が立ち止まるのは、受付・説明・出発の地点と、体験中に手がかりを読む場所です。ここが店舗の入口やエスカレーターの前と重なると、買い物に来た方の通行を妨げます。</p>
 <p class="lede">そのため、候補区画が決まったら、受付から体験終了までの流れに沿って「どこで、何人が、何分止まるか」を一つずつ確かめます。このページでは、施設の販促・運営をご担当の方に向けて、通常営業と両立させるために事前に決めることを整理します。</p>
+<GuideCallout />
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
 <ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}</ol>
