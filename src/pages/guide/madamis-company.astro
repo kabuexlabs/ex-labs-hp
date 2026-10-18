@@ -8,6 +8,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
+import MadamisPartners from '../../components/MadamisPartners.astro';
 import { jsonLd } from '../../lib/microcms';
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
@@ -64,7 +65,7 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
-  dateModified: '2026-09-15',
+  dateModified: '2026-10-18',
   mainEntityOfPage: new URL('/guide/madamis-company/', Astro.site).toString(),
 };
 ---
@@ -168,6 +169,8 @@ const articleLd = {
 </div></section>
 
 <AuthorBox />
+
+<MadamisPartners />
 
 <LatestPosts category="murder" />
 

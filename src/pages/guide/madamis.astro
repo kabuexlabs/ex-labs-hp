@@ -4,7 +4,6 @@
 // 内部リンクを集約してトピカルオーソリティを形成する。
 export const prerender = false;
 
-import RevShareCallout from '../../components/RevShareCallout.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
@@ -20,7 +19,8 @@ const playable = tmWorks
   .map((w) => ({ w, people: detail(w, /^人数$/), time: detail(w, /^時間$/), price: detail(w, /料金/) }))
   .filter((x) => x.price && x.people && x.time && !/経験者/.test(`${x.w.play}${x.w.desc}`) && (parseInt(x.people, 10) || 99) <= 8)
   .slice(0, 4);
-import MadamisPartners from '../../components/MadamisPartners.astro';
+import GuideCallout from '../../components/guide/GuideCallout.astro';
+import GuideMeta from '../../components/guide/GuideMeta.astro';
 import { jsonLd } from '../../lib/microcms';
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
@@ -35,7 +35,7 @@ const toc = [
   { id: 'types', label: 'マダミスの種類' },
   { id: 'words', label: 'マダミス用語ミニ辞典' },
   { id: 'history', label: 'マダミスの歴史・発祥' },
-  { id: 'make', label: 'マダミスを制作・依頼するには（法人の費用）' },
+  { id: 'make', label: '企業・施設でマダミスを作りたい方へ' },
   { id: 'faq', label: 'よくある質問' },
 ];
 
@@ -128,18 +128,18 @@ const definedTermLd = {
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'マダミスとは？遊び方・人数・料金・初心者におすすめの作品を解説',
+  headline: 'マダミスとは？意味・遊び方・人数・費用をわかりやすく解説',
   about: 'マダミス（マーダーミステリー）',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/madamis.webp', Astro.site).toString()],
-  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  author: { '@type': 'Person', name: '飯田雄貴', url: new URL('/company/iida-yuki/', site).toString(), worksFor: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() } },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
-  dateModified: '2026-10-16',
+  dateModified: '2026-10-18',
   mainEntityOfPage: new URL('/guide/madamis/', Astro.site).toString(),
 };
 ---
 <BaseLayout
-  title="マダミスとは？遊び方・人数・料金・初心者におすすめの作品を解説 - 株式会社ex Labs"
+  title="マダミスとは？意味・遊び方・人数・費用をわかりやすく解説 - 株式会社ex Labs"
   description="マダミス（マーダーミステリー）とは、物語の登場人物になって会話と推理で真相を探すゲーム。遊び方と当日の流れ、人数・所要時間・料金の目安、初心者におすすめの作品の選び方、人狼・謎解きとの違い、一人で参加する方法まで解説します。"
   ogImage="/assets/guide/madamis.webp"
 >
@@ -153,8 +153,10 @@ const articleLd = {
 
 <section class="section" style="padding-top:40px"><div class="wrap">
 <p class="eyebrow">MURDER MYSTERY GUIDE</p>
-<h1 class="h2 serif"><span class="nobr">マダミスとは？</span><span class="nobr">意味・遊び方・費用まで</span><span class="nobr">完全ガイド</span></h1>
-<p class="lede"><strong>マダミス</strong>とは<strong>マーダーミステリー</strong>の略称・通称。参加者が物語の登場人物になりきり、会話と推理を通じて事件の犯人を突き止める体験型の推理ゲームです。このページでは、マダミスの意味・遊び方・種類・費用から、遊び方・制作依頼の方法までをまとめて解説します。</p>
+<h1 class="h2 serif"><span class="nobr">マダミスとは？</span><span class="nobr">意味・遊び方・人数・費用を</span><span class="nobr">わかりやすく解説</span></h1>
+<GuideMeta />
+<p class="lede"><strong>マダミス</strong>（<strong>マーダーミステリー</strong>）とは、参加者が物語の登場人物になりきり、会話と推理で事件の真相を探す体験型の推理ゲームです。</p>
+<p class="lede">このページでは、マダミスの意味・遊び方・種類・費用から、遊ぶ場所の探し方までをまとめて解説します。</p>
 <p class="pick-line">遊びたい方はこちらから：<a href="/guide/madamis-shoshinsha/" data-track="show" data-show="guide-madamis-shoshinsha" data-place="madamis-pick">一人で参加する（初心者の不安と選び方）</a>／<a href="/guide/madamis-tokyo/" data-track="show" data-show="guide-madamis-tokyo" data-place="madamis-pick">友人と参加する（東京の店舗・公演の探し方）</a>／<a href="/guide/madamis-asobikata/" data-track="show" data-show="guide-madamis-asobikata" data-place="madamis-pick">自宅・オンラインで体験する（遊び方・必要なもの）</a></p>
 <div class="mm-facts">
 <p class="mm-facts-h">マダミスの基本</p>
@@ -258,7 +260,7 @@ const articleLd = {
 <section class="section" id="cost"><div class="wrap narrow">
 <p class="eyebrow">COST</p><h2 class="h2 serif">遊ぶときの費用の目安</h2>
 <p class="lede"><strong>遊ぶ場合</strong>は、店舗公演でおおむね1名あたり3,500〜5,000円前後が目安です。オンラインはやや安価な傾向があります。</p>
-<p class="lede">料金は作品・店舗・人数で変わるため、申し込む公演の案内で確認してください。企業・施設での制作費用は<a href="#make" style="color:var(--accent)">制作・依頼の項目</a>にまとめています。</p>
+<p class="lede">料金は作品・店舗・人数で変わるため、申し込む公演の案内で確認してください。企業・施設での制作費用は<a href="/guide/madamis-seisaku/#make" style="color:var(--accent)">マダミス制作とは（依頼の流れ・費用・事例）</a>にまとめています。</p>
 </div></section>
 
 <section class="section tinted" id="diff"><div class="wrap narrow">
@@ -301,29 +303,8 @@ const articleLd = {
 </ul>
 </div></section>
 
-<section class="section tinted" id="make"><div class="wrap narrow">
-<p class="eyebrow">PRODUCTION</p><h2 class="h2 serif">マダミスを制作・依頼するには</h2>
-<p class="lede">動画・配信企画、店舗や施設の集客、イベント、社内研修など、目的に合わせた<strong>オリジナルのマダミス制作</strong>も依頼できます。株式会社ex Labsは、マダミスアンケート1位の実績を持つチームで、企画からシナリオ制作・デバッグ・当日運営まで一貫して対応します。</p>
-<p class="lede"><strong>制作を依頼する場合の費用</strong>は、作品の形式・規模・利用範囲によって変わります。株式会社ex Labsにご依頼いただく場合、既存作品の貸切・出張実施は数十万円台〜、店舗・施設向けのオリジナル制作は100万円前後〜が目安です。参加者から料金をいただく有料チケット型の公演なら、制作費・運営費を当社が負担してチケット売上から回収するレベニューシェア型（初期費用0円）も選べます。</p>
-<div class="mk-grid">
-<div class="mk-item"><p class="mk-k">制作内容</p><p class="mk-v">オリジナル制作・既存作品の貸切実施・IP連動の違い、参加人数やプレイ時間など設計の前に決める条件、納品物（シナリオ・キャラクター資料・証拠物・GM資料）。</p><p class="mk-a"><a href="/services/murder-mystery/#types" data-track="cta" data-show="services-murder-mystery" data-place="madamis-make">マダミス制作サービスで依頼できる内容を見る →</a><br><a href="/guide/madamis-seisaku/" data-track="show" data-show="guide-madamis-seisaku" data-place="madamis-make">依頼の流れと制作事例（マダミス制作とは）→</a></p></div>
-<div class="mk-item"><p class="mk-k">費用</p><p class="mk-v">既存作品の活用かオリジナル制作か、公演回数、当日の運営を含むかで変わります（目安は上記。当社の過去案件をもとにした金額・税抜）。</p><p class="mk-a"><a href="/services/murder-mystery/#terms" data-track="cta" data-show="services-murder-mystery" data-place="madamis-make">ご依頼の条件・参考価格を見る →</a><br><a href="/guide/madamis-cost/" data-track="show" data-show="guide-madamis-cost" data-place="madamis-make">マダミス制作の費用相場と内訳 →</a></p></div>
-<div class="mk-item"><p class="mk-k">相談先</p><p class="mk-v">目的・時期・会場・想定人数など、分かる範囲でお知らせください。ヒアリング・お見積りは無料です。</p><p class="mk-a"><a class="mk-btn" href="/services/murder-mystery/#contact" data-track="cta" data-show="services-murder-mystery" data-place="madamis-make-contact">マダミスの制作・導入を相談する</a></p></div>
-</div>
-<div style="margin-top:28px"><RevShareCallout place="madamis-make" href="/services/murder-mystery/#contact" /></div>
-</div></section>
-
-<section class="section" id="field"><div class="wrap narrow">
-<p class="eyebrow">FROM THE FIELD</p><h2 class="h2 serif">制作現場の知見：企業・施設向けマダミスを設計するときに判断していること</h2>
-<p class="lede">ここからは、評価サイト「毎月マダミスアンケート」で3か月連続1位となった「あるマーダーミステリーについて」や、宿泊施設向けのオリジナル作品を制作してきた当社が、<strong>企業・施設向けの制作で実際に判断している項目</strong>です。</p>
-<ul class="bullets">
-<li><strong>人数は「6〜8人」に固定しない</strong>：配信・動画企画なら4人（「ブルーダイヤの不在証明」はオンライン4人用）、店舗や宿泊施設なら6〜8人、イベントなら複数卓の同時進行。目的に合わせて人数を決めてからシナリオを書きます。</li>
-<li><strong>所要時間を「場の流れ」に合わせる</strong>：宿泊施設ならチェックインから夕食後までの空き時間、店舗なら営業時間と回転、イベントなら前後のプログラム。2〜3時間の標準を押し付けず、枠に合わせて設計します。</li>
-<li><strong>「その場所で遊ぶ理由」を作る</strong>：宿泊施設向けの作品は、その施設に泊まる人だけが遊べる形で設計しました。「ここでしか遊べない」理由になり、宿泊プランの告知にもそのまま使えます。</li>
-<li><strong>テストプレイで確かめること</strong>：犯人役が最後まで隠しきれる推理の余地があるか（すぐ露見すると議論が止まる）、全員に「自分だけの秘密」があり議論に参加する理由があるか、議論が止まる時間帯がないか、制限時間内に投票まで終わるか。テストプレイは2回以上を前提にしています。</li>
-<li><strong>「自社で回す」前提なら進行台本を厚くする</strong>：店舗スタッフがGM（進行役）を務める場合は、ルール質問への答え方、詰まったときの助け舟、時間管理の目安まで台本に入れます。</li>
-</ul>
-<p class="vc-line">これらの判断を含めた制作の依頼は<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作サービス</a>へ。新規オリジナルと既存作品導入、シナリオのみと運営込みの選び方を同ページにまとめています。</p>
+<section class="section" id="make"><div class="wrap narrow">
+<GuideCallout callout="madamis-b2b" />
 </div></section>
 
 
@@ -347,13 +328,11 @@ const articleLd = {
 <p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/madamis-tokyo/" style="color:var(--accent)">東京でマダミスを遊ぶには</a>／<a href="/guide/madamis-rekishi/" style="color:var(--accent)">マーダーミステリーの歴史</a>／<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミスと謎解きの違い</a>／<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作</a>／<a href="/guide/madamis-cost/" style="color:var(--accent)">マダミス制作の費用相場</a>／<a href="/guide/madamis-making/" style="color:var(--accent)">マダミスの作り方</a>／<a href="/guide/madamis-company/" style="color:var(--accent)">制作会社の選び方</a>／<a href="/guide/madamis-business/" style="color:var(--accent)">企業・店舗の活用</a>／<a href="/toudaimurder/" style="color:var(--accent)">東大マーダーミステリーサークル</a>／<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは</a></p>
 </div></section>
 
-<MadamisPartners />
+<LatestPosts heading="関連ガイド" hrefs={['/guide/madamis-asobikata/', '/guide/madamis-shoshinsha/', '/guide/madamis-nazotoki-chigai/', '/guide/madamis-tokyo/', '/guide/madamis-cost/', '/guide/madamis-rekishi/', '/guide/madamis-haishin/']} limit={7} />
 
 <DateGuideNote place="madamis-date" friends />
 
 <AuthorBox />
-
-<LatestPosts category="murder" />
 
 </BaseLayout>
 
@@ -392,14 +371,6 @@ const articleLd = {
 .def-sub{font-size:19px;color:var(--ink);margin:40px 0 6px;text-align:center}
 #about,#history,#play,#types,#words,#diff,#where,#make,#cost,#faq{scroll-margin-top:88px}
 @media(max-width:640px){.toc{padding:22px 22px}}
-#field{scroll-margin-top:88px}
 .pick-line{max-width:680px;margin:18px auto 0;font-size:14px;line-height:2;color:var(--ink);text-align:left}
 .pick-line a{color:var(--accent);font-weight:700}
-.mk-grid{margin-top:24px;display:grid;gap:12px}
-.mk-item{background:#fff;border:1px solid rgba(51,48,43,.12);border-radius:14px;padding:18px 20px;text-align:left}
-.mk-k{margin:0;font-weight:800;font-size:13px;letter-spacing:.1em;color:var(--accent)}
-.mk-v{margin:6px 0 0;font-size:14.5px;line-height:1.85}
-.mk-a{margin:8px 0 0;font-size:14px;font-weight:700;line-height:2}
-.mk-a a{color:var(--accent);border-bottom:1px solid currentColor}
-.mk-a a.mk-btn{display:inline-block;margin-top:4px;padding:10px 20px;border:0;border-radius:999px;background:var(--accent);color:#fff!important}
 </style>

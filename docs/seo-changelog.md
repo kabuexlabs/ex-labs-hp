@@ -69,3 +69,15 @@
 - title after: `東京のマダミス公演・店舗一覧【2026年最新】初心者OK・オンラインも｜ex Labs`（ランブック案の「2人から」は本文に2人用の案内がないため入れず「初心者OK・オンラインも」とした。35字）
 - 確認: 「最終更新: 2026年10月18日」表示、`data-callout="madamis"` 1つ
 
+### P2-1 `/guide/madamis/` の意図を純化（コミット `seo(P2-1)`）
+- 変更: `src/pages/guide/madamis.astro`、`src/pages/guide/madamis-seisaku.astro`（移動先）、`src/pages/guide/madamis-company.astro`（移動先）、`src/pages/sitemap.xml.ts`（3ページ lastmod 2026-10-18）
+- 移動: 「マダミスを制作・依頼するには」（`#make`）と「制作現場の知見：企業・施設向けマダミスを設計するときに判断していること」（`#field`）→ `/guide/madamis-seisaku/` の「制作会社の選び方」と FAQ の間（目次にも追加。`.mk-*` のスタイルも一緒に移動）。「提携マダミス会社様」（`<MadamisPartners />`）→ `/guide/madamis-company/` の AuthorBox 直前
+- 移動前後の diff（段落単位、22段落）: 完全一致 19、文言調整 2、消失 0。見出し1本は「マダミスを制作・依頼するには（依頼できる内容・相談先）」に改名。調整した2段落は移動先に同等の内容があるため重複を避けたもの: ①費用段落末尾の「…レベニューシェア型（初期費用0円）も選べます。」→「有料チケット型のレベニューシェアを含む料金の考え方は[費用の目安と期間](#cost)にまとめています。」（同ページ `#cost` に同じ RS 条件の箇条書きあり）、②費用カードの「（目安は上記。…）」→「（目安は[費用の目安と期間](#cost)。…）」。`<RevShareCallout>` は移動先ページ冒頭に同じものが既にあるため移動していない
+- 移動元には `<GuideCallout callout="madamis-b2b" />`（見出し「企業・施設でマダミスを作りたい方へ」、リンク `/guide/madamis-seisaku/`・`/services/murder-mystery/`）を1つ残した（`#make` の位置）。費用の節にあった `#make` へのページ内リンクは `/guide/madamis-seisaku/#make` に変更
+- H2（12本）: マダミスとは → マダミスを体験する → マダミスの遊び方・当日の流れ → マダミスを遊ぶには → 遊ぶときの費用の目安 → マダミスと謎解き・人狼の違い → マダミスの種類 → マダミス用語ミニ辞典 → マダミスの歴史・発祥 → よくある質問 → 関連ガイド → デート・お出かけで探す（末尾の CTA 枠「マダミス制作のご相談はこちら」は既存のまま）
+- H1 直後の最初の `<p>`: 「マダミス（マーダーミステリー）とは、参加者が物語の登場人物になりきり、会話と推理で事件の真相を探す体験型の推理ゲームです。」（61字）。更新日は `<div class="guide-updated">` で出すため最初の `<p>` は定義文のまま
+- title before: `マダミスとは？遊び方・人数・料金・初心者におすすめの作品を解説 - 株式会社ex Labs` → after: `マダミスとは？意味・遊び方・人数・費用をわかりやすく解説｜ex Labs`（H1・`articleLd.headline` 同文）
+- `author: iida-yuki`（末尾「この記事の監修・執筆 飯田雄貴」）、Article の `author` を Person（飯田雄貴, `/company/iida-yuki/`, worksFor 株式会社ex Labs）、`dateModified: 2026-10-18`。`toc: true` だが目次はこのページ既存の `<nav class="toc">`（要点ボックスの下）をそのまま使い、GuideMeta からは更新日のみ出す
+- 関連ガイド: `<LatestPosts heading="関連ガイド" hrefs={[asobikata, shoshinsha, nazotoki-chigai, tokyo, cost, rekishi, haishin]} limit={7} />`（既存の自動生成部品）
+- 確認: ビルド後 HTML で H2 12本・順序一致、`data-callout="madamis-b2b"` あり、移動先 `/guide/madamis-seisaku/` に `id="make"`・`id="field"`、`/guide/madamis-company/` に `id="partners"`
+
