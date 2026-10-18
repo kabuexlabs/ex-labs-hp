@@ -95,7 +95,7 @@
 ### P3-1 `/services/nazotoki-kenshu/`（コミット `seo(P3-1)`）
 - 変更: `src/data/services.ts`（nazotoki）、`src/components/x/ServicePage.astro`（`hero.h1` があれば H1 にし、従来のキャッチコピー行を `<p class="xs-h1 xs-lead">` に降格。ギャラリーの `desc` を figcaption に表示）、`src/pages/services/nazotoki-kenshu.astro`（Service JSON-LD の `serviceType` に「チームビルディング研修」を追加）
 - H1: 「自社の社員研修や採用を『面白い』コンテンツにしませんか？」→ `<p>` に降格し、H1 を `謎解き研修｜チームビルディング研修の企画・制作` に。title は現状維持（`謎解き研修｜体験型チームビルディング研修の企画・制作 - 株式会社ex Labs`）
-- H2「プログラム一覧」: 既存プログラムの実施／オリジナル制作の2行（対応人数・所要時間・会場・費用目安・向いている目的）。値は同ページ既存の FAQ・本文（「少人数のチーム単位から数百名規模」「数十万円台〜（税抜）」「個別にお見積り」「会議室・研修施設・宴会場」）のみ。所要時間は「要相談」
+- H2「プログラム一覧」: 既存プログラムの実施／オリジナル制作の2行（対応人数・所要時間・会場・費用目安・向いている目的）。値は同ページ既存の FAQ・本文（「少人数のチーム単位から数百名規模」「数十万円台〜」「個別にお見積り」「会議室・研修施設・宴会場」）のみ。所要時間は「要相談」
 - H2「導入事例・制作実績」（旧「シナリオ制作力の裏付けとなる実績」）: 謎解き研修そのものの公開事例はまだない旨をリード文に明記し、2つの画像事例に文章を追加。出典: 博報堂×紀伊國屋書店「月明かりの書店と呪われた原稿」→ `/works/`（ミステリー原案・閉店後の一夜限りのイベント・営業時間外活用）と `/guide/eigyo-jikangai/`（博報堂様との取り組み、ミステリー原案・体験設計を担当）。「ロスト・フレーム」→ `src/data/taikenbizyutu.ts`（startDate 2026-07-07、endDate 2026-08-31、duration 75分、capacity 1〜4名）、`/taikenbizyutu/lostframe/`、`/guide/case-lostframe/`（全公演完売、自社企画・主催）。新しい数字は作っていない
 - Service JSON-LD: 既存（name 謎解き研修、provider 株式会社ex Labs、areaServed JP、url）に `serviceType: ['謎解き研修', 'チームビルディング研修']`
 - H2「関連ガイド」: P3-3 の逆引き（`nazotoki-kenshu` callout を持つ5本）＋ 既存の手書き6本（nazotoki-kenshu, nazotoki-company, nazotoki-event, madamis-kenshu, shanai-event, bonenkai-nazotoki）
@@ -122,7 +122,7 @@
 ### P4-2 他ブランドの作品・公演ページ（コミット `seo(P4-2)`）
 - title の先頭が作品名でなかった5ページ（`/gensou/` `/kaitou/` `/karma/` `/uwasabanashi/` `/uwasabanashi/kotohogi/`）は「【公式】」が先頭だったため、作品名の直後に移動（サフィックス・区切りは既存のまま）。変更ファイル: `src/pages/{gensou,kaitou,karma,uwasabanashi,uwasabanashi/kotohogi}/index.astro`
 - JSON-LD: `/events/*` はテンプレートで Event 出力済み。`/hacktale/works/*` は個別 `.astro` だが Game 出力済み。`/uwasabanashi/kotohogi/` は構造化データなし、`/taikenbizyutu/*`・`/uwasabanashi/`・`/karma/`・`/kaitou/`・`/gensou/`・`/anator/` は個別 HTML（LP）で各自の Event/TheaterEvent/EventSeries を持つ → **要個別対応**（テンプレート化はしない）
-- `/anator/` と `/uwasabanashi/`・`/uwasabanashi/kotohogi/` は H1 がない／H1 がキャッチコピー（`/karma/`）。本タスクは title のみのため変更せず記録
+- `/anator/` と `/uwasabanashi/` は H1 に文字がない（画像のみ）、`/karma/` は H1 がキャッチコピー。本タスクは title のみのため変更せず記録
 
 | URL | title（修正後） | H1 | JSON-LD | 備考 |
 |---|---|---|---|---|
