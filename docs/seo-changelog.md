@@ -211,7 +211,7 @@
    6. P1-2 の5ページは `dateModified` を 2026-10-18 にしたのに sitemap lastmod が旧日付 → 2026-10-18 に揃えた
    - 対応不要とした指摘: madamis-tokyo の title で「2人から」を外した点（本文に2人用の案内がないため、記録済み）、immersive-tokyo の description に残る【2026年最新】（P1-1 の対象外）
    - 再レビューは行っていない（修正は1〜2行の差分のみで、ビルド・監査・リンクチェックを再実行して確認）
-8. **引き渡し**: `origin`（github.com/kabuexlabs/ex-labs-hp）へ `seo/search-improvements-20261018` を push し、ドラフト PR を作成（URL は PR 欄参照）。マージ・デプロイはしていない
+8. **引き渡し**: `origin`（github.com/kabuexlabs/ex-labs-hp）へ `seo/search-improvements-20261018` を push し、ドラフト PR #128 を作成（https://github.com/kabuexlabs/ex-labs-hp/pull/128）。マージ・デプロイはしていない
 
 ## 人がやること
 
