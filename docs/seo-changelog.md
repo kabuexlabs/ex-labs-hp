@@ -46,3 +46,19 @@
 - Event JSON-LD: 比較表 `compareRows`（開催中・開催予定の東京公演）から ItemList（Event: name/startDate/endDate/eventStatus/eventAttendanceMode/location/image/description/offers/organizer/url）を生成。料金が不明の回は price を省略、全回完売なら availability=SoldOut。終了公演は含めない。京都の公演は Tokyo 向けページのため対象外
 - 確認（ビルド後 HTML）: `JSON.parse` 通過、ItemList の Event 数 2 ＝ 比較表の公演数 2（体験型取調室 FACTROOM 2026-10-10〜11-08、午前零時の幻想集 第一夜「草陰の夢」2026-11-05〜11-22）。H2 14本（既存7＋変換7。うち「関連記事」「デート・お出かけで探す」は共通部品）
 
+### P1-2 「とは」ページに一覧への導線（コミット `seo(P1-2)`）
+- 変更: `src/pages/guide/{immersive,immersive-theater,immersive-taiken,immersive-event,botsunyukan,immersive-vr}.astro`（title・H1・`articleLd.headline`・`dateModified: 2026-10-18`。immersive-vr は callout のみ）。callout は `seoOverrides.ts` の `callout: 'immersive-tokyo'`
+- meta description は現状維持
+
+| ページ | title before | title after | 文字数 |
+|---|---|---|---|
+| `/guide/immersive/` | イマーシブ（immersive）とは？意味を1分で解説｜読み方・例文・体験事例【制作会社が紹介】 - 株式会社ex Labs | イマーシブ（immersive）とは？意味・読み方・例文を1分で解説｜ex Labs | 34 |
+| `/guide/immersive-theater/` | イマーシブシアターとは？東京の公演・料金・楽しみ方を初心者向けに解説 - 株式会社ex Labs | イマーシブシアターとは？意味・特徴・楽しみ方をやさしく解説｜ex Labs | 29 |
+| `/guide/immersive-taiken/` | イマーシブ体験とは？種類・事例・楽しみ方と、企業・施設での活かし方 - 株式会社ex Labs | イマーシブ体験とは？種類・楽しみ方・初めての選び方｜ex Labs | 25 |
+| `/guide/immersive-event/` | イマーシブイベントとは？企業の活用事例4選と費用・開催の流れ - 株式会社ex Labs | イマーシブイベントとは？種類・事例・企画のポイント｜ex Labs | 25 |
+| `/guide/botsunyukan/` | 没入感とは？意味・使い方・例文と言い換え｜没入感を味わえる東京の体験も紹介 - 株式会社ex Labs | 没入感とは？意味・使い方・例文・言い換えを1分で解説｜ex Labs | 26 |
+| `/guide/immersive-vr/` | イマーシブとVR・メタバースの違い｜リアル型没入体験の強み - 株式会社ex Labs | イマーシブとVR・メタバースの違い｜リアル型没入体験の強み｜ex Labs | 29 |
+
+- `/guide/immersive/` はランブック指定の文言そのままで34字（32字超）。他は32字以内
+- 確認: 6ページの HTML に `data-callout="immersive-tokyo"` が各1つ（同じ GuideCallout コンポーネントから出力）。囲みは定義ボックス＋リード文の直後（スクリーンショットで 390px/1280px を確認）
+

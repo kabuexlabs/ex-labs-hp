@@ -73,12 +73,13 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-07-30',
-  dateModified: '2026-09-15',
+  dateModified: '2026-10-18',
   mainEntityOfPage: new URL('/guide/immersive-event/', Astro.site).toString(),
 };
+import GuideCallout from '../../components/guide/GuideCallout.astro';
 ---
 <BaseLayout
-  title="イマーシブイベントとは？企業の活用事例4選と費用・開催の流れ - 株式会社ex Labs"
+  title="イマーシブイベントとは？種類・事例・企画のポイント - 株式会社ex Labs"
   description="イマーシブイベント（没入型体験イベント）の企業活用事例を制作会社が紹介。渋谷サクラステージでの都市伝説イマーシブ、下北沢の街歩きアート体験など実例4選と、メリット・費用の目安・開催までの流れを解説します。"
   ogImage="/assets/guide/immersive-event.webp"
 >
@@ -92,8 +93,9 @@ const articleLd = {
 
 <section class="section" style="padding-top:40px"><div class="wrap">
 <p class="eyebrow">IMMERSIVE EVENT GUIDE</p>
-<h1 class="h2 serif"><span class="nobr">イマーシブイベントとは？</span><span class="nobr">企業の活用事例と</span><span class="nobr">開催の流れ</span></h1>
+<h1 class="h2 serif"><span class="nobr">イマーシブイベントとは？</span><span class="nobr">種類・事例・企画のポイント</span></h1>
 <p class="lede"><strong>イマーシブイベント</strong>とは、参加者が観客としてではなく「物語の登場人物」として世界に入り込む<strong>没入型の体験イベント</strong>のこと。商業施設の回遊促進、ブランドの世界観の体験、施設の話題づくりなど、企業の集客施策として使われています。この記事では、実際の事例4選とメリット・費用・開催までの流れを、イマーシブ制作会社の株式会社ex Labsが解説します。</p>
+<GuideCallout />
 
 <div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>イマーシブイベントとは、参加者が観客ではなく「物語の登場人物」として世界に入り込む没入型の体験イベントです。</li><li>企業活用の目的は、商業施設の回遊促進・ブランドの世界観体験・施設の話題化などの集客施策です。</li><li>実例として、渋谷サクラステージの都市伝説イマーシブ（日経掲載）や下北沢の街歩きアート体験など4事例を紹介します。</li><li>費用は1空間完結型で数十万円台〜、施設一体型で100万円前後〜、街の周遊型で数百万円規模が目安で、準備期間は既存公演の導入で2〜4週間、オリジナル制作で1〜3ヶ月です。</li></ul></div>
 <nav class="toc" aria-label="目次">

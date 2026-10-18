@@ -100,12 +100,13 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-27',
-  dateModified: '2026-10-14',
+  dateModified: '2026-10-18',
   mainEntityOfPage: new URL('/guide/botsunyukan/', Astro.site).toString(),
 };
+import GuideCallout from '../../components/guide/GuideCallout.astro';
 ---
 <BaseLayout
-  title="没入感とは？意味・使い方・例文と言い換え｜没入感を味わえる東京の体験も紹介 - 株式会社ex Labs"
+  title="没入感とは？意味・使い方・例文・言い換えを1分で解説 - 株式会社ex Labs"
   description="没入感とは、対象の世界に深く入り込み、現実を忘れて夢中になる感覚のこと。意味と使い方、例文、言い換え・類語（臨場感・世界観に浸る）との違い、没入感を高める方法に加え、没入感を実際に味わえる東京の公演も紹介します。"
   ogImage="/assets/guide/botsunyukan.webp"
 >
@@ -120,12 +121,13 @@ const articleLd = {
 
 <section class="section" style="padding-top:40px"><div class="wrap">
 <p class="eyebrow">IMMERSION GUIDE</p>
-<h1 class="h2 serif"><span class="nobr">没入感とは？</span><span class="nobr">意味・言い換え・例文・</span><span class="nobr">没入感を高める方法</span></h1>
+<h1 class="h2 serif"><span class="nobr">没入感とは？</span><span class="nobr">意味・使い方・例文・言い換えを1分で解説</span></h1>
 <div class="def-box">
 <p class="def-word"><span class="serif">没入感</span><span class="def-en">immersion</span><span class="def-yomi">読み方：ぼつにゅうかん</span></p>
 <p class="def-body">対象の世界に深く入り込み、<strong>現実を忘れて夢中になっている感覚</strong>のこと。映画・ゲーム・演劇・体験型イベントなどで「その世界の中にいる」と感じられる状態を指す。英語では immersion、形容詞は<strong>immersive（イマーシブ）</strong>。</p>
 </div>
 <p class="gd-lead">没入感は、映画やゲームだけでなく<strong>自分の体で味わう</strong>こともできます。東京では、会員制バーや商業施設、街全体を舞台に、参加者が物語の登場人物として動く<strong>没入型（イマーシブ）イベント</strong>が開かれています。キャストと会話したり、手がかりを追って歩いたりしながら、物語の中に入る感覚を体験できます。</p>
+<GuideCallout />
 <div class="gd-jump">
 <a class="is-main" href="#now-showing" data-track="show" data-show="now-showing" data-place="botsunyukan-top">いま予約できる公演を見る ↓</a>
 <a href="#studio" data-track="cta" data-show="immersive" data-place="botsunyukan-top">法人の方：制作の相談 ↓</a>
