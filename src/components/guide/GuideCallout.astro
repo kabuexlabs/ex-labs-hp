@@ -7,7 +7,8 @@ import { CALLOUTS, GUIDE_SEO, normalizePath } from '../../data/seoOverrides';
 interface Props { callout?: string | string[] }
 const path = normalizePath(Astro.url.pathname);
 const keys = ([] as string[]).concat(Astro.props.callout ?? GUIDE_SEO[path]?.callout ?? []);
-const items = keys.map((k) => ({ k, c: CALLOUTS[k] })).filter((x) => x.c);
+// 自分自身へのリンクは出さない（例: /guide/madamis-tokyo/ の madamis 囲みの「東京の公演を探す」）
+const items = keys.map((k) => ({ k, c: CALLOUTS[k] })).filter((x) => x.c).map(({ k, c }) => ({ k, c: { ...c, links: c.links.filter((l) => normalizePath(l.href) !== path) } }));
 const track = (href: string) => (href.startsWith('/services') ? 'cta' : 'show');
 const show = (href: string) => href.replace(/^\//, '').replace(/\/$/, '').replace(/[^a-z0-9-]/g, '-') || 'home';
 ---
