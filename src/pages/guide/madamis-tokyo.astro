@@ -59,10 +59,11 @@ const faqLd = {
   mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
 };
 
+const seoYear = String(new Date(Date.now() + 9 * 3600000).getUTCFullYear());
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: '東京でマダミスを遊ぶには？店舗・公演・オンラインの探し方と初心者の選び方【2026年版】',
+  headline: `東京のマダミス公演・店舗一覧【${seoYear}年最新】初心者OK・オンラインも`,
   about: '東京でマーダーミステリー（マダミス）を体験できる場所と選び方',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/madamis-tokyo.webp', site).toString()],
@@ -74,7 +75,6 @@ const articleLd = {
 };
 import GuideCallout from '../../components/guide/GuideCallout.astro';
 import GuideMeta from '../../components/guide/GuideMeta.astro';
-const seoYear = String(new Date(Date.now() + 9 * 3600000).getUTCFullYear());
 ---
 <BaseLayout
   title={`東京のマダミス公演・店舗一覧【${seoYear}年最新】初心者OK・オンラインも - 株式会社ex Labs`}
