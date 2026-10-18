@@ -110,3 +110,12 @@
 - 変更: `src/components/x/ServicePage.astro`（`SERVICE_CALLOUT`（nazotoki→nazotoki-kenshu、murder→murder-mystery、shisetsu→shisetsu-event、immersive→immersive、zunousen→hacktale）で `guidesWithCallout()` を逆引きし、既存の手書きリストの後ろに自動で追加。ラベルは `guides.ts` の title の「｜」より前）、`src/pages/services/index.astro`（`event-seisaku` の12本を「関連する解説記事」として末尾に追加）
 - 確認: `/services/shisetsu-event/` の関連ガイドに `shisetsu-event` の17ページ全部、`/services/nazotoki-kenshu/` 5/5、`/services/murder-mystery/` 5/5、`/services/immersive/` 4/4、`/services/zunousen/` 7/7、`/services/` 12/12
 
+### P4-1 作品テンプレート `/toudaimurder/works/*`（コミット `seo(P4-1)`）
+- 変更: `src/pages/toudaimurder/works/[slug].astro`（title・description・Game JSON-LD・BreadcrumbList）。作品データは触っていない
+- title: `{作品名}｜東大マダミス UNLIMITED MYSTERY｜{人数}人・{時間}分のマーダーミステリー`（人数・時間は `meta`（例 `5人／180分`）から。無ければ後半を省略）。例: `あるマーダーミステリーについて｜東大マダミス UNLIMITED MYSTERY｜5人・150分のマーダーミステリー` と `あるマーダーミステリーについて2｜…｜5人・180分のマーダーミステリー`
+- H1: 作品名のまま（変更なし）
+- description: 文頭に作品名、「東大マダミス（UNLIMITED MYSTERY）制作のマーダーミステリー。{人数}人・{時間}分。…」（155字で切る）
+- JSON-LD: 既存の Game に `alternateName`（「{作品名}（東大マダミス）」「{作品名}（マダミス）」）、`author` を 東大マダミス UNLIMITED MYSTERY（`/toudaimurder/`）、`publisher` 株式会社ex Labs。BreadcrumbList を ホーム → 東大マダミス UNLIMITED MYSTERY → マーダーミステリー作品一覧 → 作品名 に
+- `/toudaimurder/news/*-release/` → 作品ページ: 記事データ `workSlug` により既に「作品ページを見る →」が出ているため変更なし
+- 確認: 13作品すべて title が作品名で始まり、Game の `name` ＝ H1、`arumadamisu` と `arumadamisu2` の title が区別できる
+
