@@ -150,3 +150,47 @@
 | `/uwasabanashi/iinkai/` | ウワサバナシ調査委員会とは｜活動内容と調査記録 case1・case2 |  | CollectionPage+VideoObject | 一覧・案内ページ（対象外） |
 | `/uwasabanashi/kotohogi/` | ウワサバナシ調査委員会 case2「言祝ぎの家」【公式】｜さいたま市の一軒家で体験するイマーシブホラー | ウワサバナシ調査委員会case2「言祝ぎの家」呪われた花嫁 | — | title 先頭の【公式】を作品名の後ろへ（個別 HTML） |
 
+### P5 辞書系は守りだけ（コミット `seo(P5)`、changelog のみ）
+1. C-2 の title サフィックス短縮・Article・BreadcrumbList は有効（C-1/C-2 参照）
+2. サフィックスを除いた title が全角32文字を超える `/guide/*`（変更していない。P1・P2 で指定したページは指定の文言）:
+
+| URL | 文字数 | title |
+|---|---|---|
+| `/guide/tokyo-friends-activities/` | 34 | 東京で友達と遊ぶ体験｜2〜4人で楽しめる屋内・謎解き・物語体験を比較｜ex Labs |
+| `/guide/tokyo-nazo-date/` | 34 | 東京で二人で参加できる謎解き・脱出ゲーム｜貸切・料金・所要時間で比較｜ex Labs |
+| `/guide/saiji-kikaku/` | 35 | 催事の企画・やり方｜百貨店・商業施設で集客につながる体験型催事の進め方｜ex Labs |
+| `/guide/shanai-quiz/` | 35 | 社内イベントで盛り上がるクイズ・ゲーム企画｜人数別の選び方と進行のコツ｜ex Labs |
+| `/guide/madamis-tenpo/` | 36 | 飲食店・バー・ホテルへのマダミス導入｜貸切公演・常設・宿泊プランの進め方｜ex Labs |
+| `/guide/event-original-or-existing/` | 34 | 体験型イベントはオリジナル制作か既存導入か｜費用・納期・自由度を比較｜ex Labs |
+| `/guide/event-revenue-share/` | 33 | 施設イベントのレベニューシェアとは｜費用回収・売上分配・負担を解説｜ex Labs |
+| `/guide/` | 44 | 解説記事・完全ガイド一覧｜イマーシブ・マダミス・頭脳戦・心理戦・施設活用・体験型イベント - 株式会社ex Labs |
+| `/guide/immersive-tokyo/` | 42 | 東京のイマーシブ体験・イマーシブシアター公演一覧【2026年最新】開催日・料金・予約｜ex Labs |
+| `/guide/yukyu-kukaku/` | 34 | 遊休区画・空きスペースの活用アイデア｜体験型イベントで目的地に変える｜ex Labs |
+| `/guide/taikengata-idea/` | 38 | 体験型イベントの企画アイデア15選｜盛り上がる・集客できる企画を目的別に解説｜ex Labs |
+| `/guide/event-hiyou/` | 41 | 体験型イベントの費用・料金相場｜謎解き・マダミス・イマーシブ・頭脳戦を規模別に解説｜ex Labs |
+| `/guide/madamis-rekishi/` | 41 | マーダーミステリーの歴史とは？起源・海外との違い・日本での広がりと2026年の動向｜ex Labs |
+| `/guide/madamis-tokyo/` | 35 | 東京のマダミス公演・店舗一覧【2026年最新】初心者OK・オンラインも｜ex Labs |
+| `/guide/zunousen-sakuhin/` | 39 | 頭脳戦・心理戦が面白い漫画・アニメ・映画おすすめ15選｜リアルで体験する方法も｜ex Labs |
+| `/guide/shinrisen-game/` | 34 | 心理戦ゲームとは？おすすめ10選と種類・選び方・イベントでの活かし方｜ex Labs |
+| `/guide/madamis-nazotoki-chigai/` | 35 | マダミスと謎解きの違いとは？イマーシブ・頭脳戦・人狼との比較表と選び方｜ex Labs |
+| `/guide/yougo/` | 39 | 体験型イベント用語集｜イマーシブ・マダミス・頭脳戦・心理戦・施設活用の用語解説｜ex Labs |
+| `/guide/sankagata-event/` | 45 | 参加型イベントとは？体験型との違い・種類・企業の実例・盛り上がる企画の方法を制作会社が解説｜ex Labs |
+| `/guide/shinrisen/` | 44 | 心理戦とは？意味・頭脳戦との違い・強い人の特徴・おすすめゲームを頭脳戦専門レーベルが解説｜ex Labs |
+| `/guide/saiji/` | 45 | 催事とは？意味・読み方・ポップアップとの違い・集客できる体験型催事の企画例【2026年版】｜ex Labs |
+| `/guide/halloween-event/` | 48 | ハロウィンイベントの企画アイデア12選【2026年】｜商業施設・店舗・社内で盛り上がる体験型企画｜ex Labs |
+| `/guide/madamis-shoshinsha/` | 37 | マダミス初心者完全ガイド｜恥ずかしい？何時間かかる？不安解消と作品の選び方｜ex Labs |
+| `/guide/shanai-event/` | 36 | 社内イベントの企画アイデア20選｜体験型で盛り上がる懇親会・全社会・研修｜ex Labs |
+| `/guide/kisetsu-event/` | 33 | 商業施設の季節イベント企画｜ハロウィン・クリスマスを体験型で集客に｜ex Labs |
+| `/guide/case-uwasabanashi/` | 36 | イマーシブイベント制作事例：渋谷サクラステージ「ウワサバナシ調査委員会」｜ex Labs |
+| `/guide/case-lostframe/` | 40 | 街歩き型イマーシブ制作事例：下北沢「ロスト・フレーム」｜街を美術館にした周遊企画｜ex Labs |
+| `/guide/bonenkai-nazotoki/` | 36 | 忘年会の食事と謎解きを、どう組み合わせるか｜着席・立食の進め方と担当範囲｜ex Labs |
+| `/guide/yumenoshima-night/` | 51 | 夢の島熱帯植物館の夜イベント｜物語体験「午前零時の幻想集」の日程・チケット・行き方（2026年11月）｜ex Labs |
+| `/guide/kyoto-kyocera-museum-7th/` | 57 | 京都市京セラ美術館のイベント｜体験する美術館「7枚目のコンポジション」の日程・チケット・行き方（2026年11月）｜ex Labs |
+| `/guide/immersive/` | 34 | イマーシブ（immersive）とは？意味・読み方・例文を1分で解説｜ex Labs |
+| `/guide/ip-multi-site/` | 40 | IPを活用した体験型イベントの全国・複数施設展開｜企画・施設調整・運営・効果測定｜ex Labs |
+| `/guide/tokyo-holiday/` | 35 | 東京で休日に行く場所がないときの過ごし方｜二人・友達・一人で体験を比較｜ex Labs |
+| `/guide/tokyo-before-dating/` | 38 | 東京で付き合う前に行きたいデート｜会話が自然に生まれる体験を料金・時間で比較｜ex Labs |
+
+3. 対応状況の確認: `/guide/botsunyukan/` `/guide/immersive/` は P1-2（callout immersive-tokyo・title 変更）、`/guide/saiji/` `/guide/shuyu-event/` `/guide/popup-event/` `/guide/sankagata-event/` `/guide/taikengata-event/` は P3-2（shisetsu-event／event-seisaku の callout）、`/guide/shinrisen/` `/guide/zunousen/` 系7本は P3-2 の `hacktale` で対応済み
+- 確認: `/guide/madamis/` `/guide/immersive-tokyo/` `/guide/madamis-tokyo/` の Article JSON-LD が `JSON.parse` 通過、`dateModified` 2026-10-18 ＝ 表示中の `<time datetime>` 2026-10-18
+
