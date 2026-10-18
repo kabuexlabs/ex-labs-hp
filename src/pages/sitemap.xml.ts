@@ -201,7 +201,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/taikengata-idea/': '2026-09-15',
     '/guide/event-hiyou/': '2026-09-12',
     '/guide/madamis-rekishi/': '2026-09-06',
-    '/guide/madamis-tokyo/': '2026-09-13',
+    '/guide/madamis-tokyo/': '2026-10-18',
     '/guide/zunousen-sakuhin/': '2026-09-08',
     '/guide/shinrisen-game/': '2026-09-08',
     '/guide/madamis-nazotoki-chigai/': '2026-09-15',

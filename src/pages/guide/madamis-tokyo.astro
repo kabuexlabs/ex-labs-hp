@@ -69,12 +69,15 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-09-07',
-  dateModified: '2026-09-13',
+  dateModified: '2026-10-18',
   mainEntityOfPage: new URL('/guide/madamis-tokyo/', site).toString(),
 };
+import GuideCallout from '../../components/guide/GuideCallout.astro';
+import GuideMeta from '../../components/guide/GuideMeta.astro';
+const seoYear = String(new Date(Date.now() + 9 * 3600000).getUTCFullYear());
 ---
 <BaseLayout
-  title="東京でマダミスを遊ぶには？店舗・公演・オンラインの探し方と初心者の選び方【2026年版】 - 株式会社ex Labs"
+  title={`東京のマダミス公演・店舗一覧【${seoYear}年最新】初心者OK・オンラインも - 株式会社ex Labs`}
   description="東京でマダミス（マーダーミステリー）を遊べる場所を、専門店・ボードゲームカフェ・公演型・オンラインの4種類で整理。料金と所要時間の目安、一人参加の可否、初心者が失敗しない作品の選び方5つ、推理重視の東大マダミス（UNLIMITED MYSTERY）と提携店舗の紹介まで、マダミスを制作する会社が解説します。"
   ogImage="/assets/guide/madamis-tokyo.webp"
 >
@@ -88,8 +91,10 @@ const articleLd = {
 
 <section class="section" style="padding-top:40px"><div class="wrap">
 <p class="eyebrow">MURDER MYSTERY IN TOKYO</p>
-<h1 class="h2 serif"><span class="nobr">東京でマダミスを遊ぶには？</span><br><span class="nobr">店舗・公演・オンラインの探し方と</span><span class="nobr">初心者の選び方【2026年版】</span></h1>
+<h1 class="h2 serif"><span class="nobr">東京のマダミス公演・店舗一覧</span><span class="nobr">【{seoYear}年最新】</span><span class="nobr">初心者OK・オンラインも</span></h1>
+<GuideMeta />
 <p class="lede"><strong>マダミス（マーダーミステリー）</strong>は、東京なら専門店・カフェ・公演型・オンラインと選択肢が多く、初めての人ほど「どこで、何を選べばいいか」で迷います。この記事では、遊べる場所の4種類、料金と所要時間の目安、一人参加の可否、初心者が失敗しない作品の選び方を、推理重視のマダミスを制作・公演する<strong>UNLIMITED MYSTERY（東大マーダーミステリーサークル）</strong>を運営する株式会社ex Labsが解説します。マダミスそのものの意味やルールは<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは？意味・遊び方・種類・費用 →</a>をご覧ください。</p>
+<GuideCallout />
 
 <div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>東京でマダミスを遊ぶ方法とは、専門店・カフェ・公演型・オンラインの4つの形式から、料金・所要時間・一人参加の可否で選ぶことを指します。</li><li>東京でマダミス（マーダーミステリー）を遊べる場所を、専門店・ボードゲームカフェ・公演型・オンラインの4種類で整理。</li></ul></div>
 <nav class="toc" aria-label="目次">

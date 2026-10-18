@@ -62,3 +62,10 @@
 - `/guide/immersive/` はランブック指定の文言そのままで34字（32字超）。他は32字以内
 - 確認: 6ページの HTML に `data-callout="immersive-tokyo"` が各1つ（同じ GuideCallout コンポーネントから出力）。囲みは定義ボックス＋リード文の直後（スクリーンショットで 390px/1280px を確認）
 
+### P1-3 `/guide/madamis-tokyo/`（コミット `seo(P1-3)`）
+- Step 0 のとおり、マダミス公演（UNLIMITED MYSTERY）は貸切予約制で日程・会場・料金のデータファイルがないため、カレンダー・比較表・Event JSON-LD は作らず、title/H1/更新日/callout のみ。**公演データのデータ化が必要**（人がやること）
+- 変更: `src/pages/guide/madamis-tokyo.astro`（title・H1・`dateModified`・`<GuideMeta />`）、`src/pages/sitemap.xml.ts`（lastmod 2026-10-18）
+- title before: `東京でマダミスを遊ぶには？店舗・公演・オンラインの探し方と初心者の選び方【2026年版】 - 株式会社ex Labs`
+- title after: `東京のマダミス公演・店舗一覧【2026年最新】初心者OK・オンラインも｜ex Labs`（ランブック案の「2人から」は本文に2人用の案内がないため入れず「初心者OK・オンラインも」とした。35字）
+- 確認: 「最終更新: 2026年10月18日」表示、`data-callout="madamis"` 1つ
+
