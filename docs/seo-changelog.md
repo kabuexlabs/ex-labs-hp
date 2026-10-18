@@ -88,3 +88,7 @@
 - トップ `src/pages/index.astro`: 解説記事欄（`latestGuides`）の先頭に `/guide/madamis/` を固定（ナビは変えない）
 - 確認: ビルド後 HTML の `/guide/madamis-*`（13ページ）と `/toudaimurder/works/*`（13作品）すべてで、H1 より後ろ・フッターより前に `href="/guide/madamis/"` が1つ以上ある（不足 0）
 
+### P2-3 「マダミス オンライン」の受け皿（コミット `seo(P2-3)`、changelog のみ）
+- `/guide/madamis-haishin/` の本文は「動画・配信用マダミスの制作依頼」（視聴者向け企画・配信準備）で、オンラインで遊ぶマダミスの記事ではない → **変更なし**
+- **人がやること**: `/guide/madamis-online/` の新規作成が必要（内容は人が用意。title 案 `オンラインマダミスとは？遊び方・必要なもの・おすすめの作品【{年}年】`）
+
