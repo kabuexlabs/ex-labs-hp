@@ -91,6 +91,7 @@ const articleLd = {
   dateModified: '2026-10-18',
   mainEntityOfPage: new URL('/guide/madamis-seisaku/', Astro.site).toString(),
 };
+import GuideCallout from '../../components/guide/GuideCallout.astro';
 ---
 <BaseLayout
   title="マダミス制作とは？依頼の流れ・費用・制作事例まで完全ガイド - 株式会社ex Labs"
@@ -114,6 +115,7 @@ const articleLd = {
 <p class="def-body">マーダーミステリー（マダミス）の作品を、<strong>企画・シナリオ執筆・キャラクター設計・証拠や小道具の制作・テストプレイ・進行（GM）マニュアル作成</strong>まで一貫して作ること。店舗公演・企業イベント・動画企画・宿泊施設のプランなど、<strong>目的に応じて形式を設計する</strong>のが特徴。</p>
 </div>
 <p class="lede">このページでは、マダミス制作の種類・依頼の流れ・費用と期間・制作事例・制作会社の選び方を、宿泊施設向け作品で新規宿泊予約20件超を生んだ<strong>マダミス制作会社・株式会社ex Labs</strong>が解説します。すでに依頼先を探している方は<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作依頼・お見積り（無料）のページ →</a>へどうぞ。</p>
+<GuideCallout />
 
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
@@ -187,8 +189,6 @@ const articleLd = {
 </div></section>
 
 
-<section class="section" id="faq"><div class="wrap">
-<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
 <section class="section tinted" id="make"><div class="wrap narrow">
 <p class="eyebrow">PRODUCTION</p><h2 class="h2 serif">マダミスを制作・依頼するには（依頼できる内容・相談先）</h2>
 <p class="lede">動画・配信企画、店舗や施設の集客、イベント、社内研修など、目的に合わせた<strong>オリジナルのマダミス制作</strong>も依頼できます。株式会社ex Labsは、マダミスアンケート1位の実績を持つチームで、企画からシナリオ制作・デバッグ・当日運営まで一貫して対応します。</p>
@@ -213,6 +213,8 @@ const articleLd = {
 <p class="vc-line">これらの判断を含めた制作の依頼は<a href="/services/murder-mystery/" style="color:var(--accent)">マーダーミステリー制作サービス</a>へ。新規オリジナルと既存作品導入、シナリオのみと運営込みの選び方を同ページにまとめています。</p>
 </div></section>
 
+<section class="section" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
 <div class="faq-list tag-murder">
 {faqs.map((f) => (
   <div class="faq-item">

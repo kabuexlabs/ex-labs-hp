@@ -161,7 +161,10 @@ const services = [
   { no: '05', href: '/services/zunousen/', title: '頭脳戦制作', desc: '交渉・心理戦・閃きのゲームに特化したレーベル「HACKTALE」を運営。ルール設計からバランス調整・運営までオリジナル頭脳戦コンテンツを制作。' },
 ];
 // 最新の解説記事（旧トップの「最新記事」枠の代わり。内部リンクを保つ）
-const latestGuides = [...guideArticles].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
+const sortedGuides = [...guideArticles].sort((a, b) => b.date.localeCompare(a.date));
+// seo-improve P2-2: マダミスのピラー記事（/guide/madamis/）を解説記事欄に必ず入れる（ナビは変えない）
+const madamisPillar = sortedGuides.find((g) => g.href === '/guide/madamis/');
+const latestGuides = [...(madamisPillar ? [madamisPillar] : []), ...sortedGuides.filter((g) => g.href !== '/guide/madamis/')].slice(0, 6);
 const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc:${gtc};--gap:${gap};--col:${col};${mt ? `margin-top:${mt};` : ''}`;
 
 ---

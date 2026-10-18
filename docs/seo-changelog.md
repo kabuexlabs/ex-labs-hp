@@ -81,3 +81,10 @@
 - 関連ガイド: `<LatestPosts heading="関連ガイド" hrefs={[asobikata, shoshinsha, nazotoki-chigai, tokyo, cost, rekishi, haishin]} limit={7} />`（既存の自動生成部品）
 - 確認: ビルド後 HTML で H2 12本・順序一致、`data-callout="madamis-b2b"` あり、移動先 `/guide/madamis-seisaku/` に `id="make"`・`id="field"`、`/guide/madamis-company/` に `id="partners"`
 
+### P2-2 ピラーへの内部リンク（コミット `seo(P2-2)`）
+- `callout: madamis` を `/guide/madamis-*/` 全12ページ（asobikata, shoshinsha, nazotoki-chigai, rekishi, tenpo, haishin, seisaku, company, business, making, cost, kenshu。tokyo は P1-3 で設定済み）に設定。B2B 向け5本（seisaku, company, business, making, cost）は P3-2 の `murder-mystery` と併記、kenshu は `nazotoki-kenshu` と併記
+- 作品テンプレート `src/pages/toudaimurder/works/[slug].astro`: INFO ブロック直後に `<p class="syn">マーダーミステリーが初めての方は「<a href="/guide/madamis/">マダミスとは？遊び方・費用の基本</a>」をご覧ください。</p>`（テンプレート共通。個別ページは触っていない）
+- `/guide/madamis/` の「関連ガイド」は P2-1 で LatestPosts（hrefs 指定）により生成
+- トップ `src/pages/index.astro`: 解説記事欄（`latestGuides`）の先頭に `/guide/madamis/` を固定（ナビは変えない）
+- 確認: ビルド後 HTML の `/guide/madamis-*`（13ページ）と `/toudaimurder/works/*`（13作品）すべてで、H1 より後ろ・フッターより前に `href="/guide/madamis/"` が1つ以上ある（不足 0）
+
