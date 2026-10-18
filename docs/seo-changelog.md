@@ -106,3 +106,7 @@
 - 各ページに `<GuideCallout />` をリード文直後に挿入（import 1行＋タグ1行）。既存の本文末尾 CTA はそのまま
 - 確認（ビルド後 HTML の `data-callout` 件数）: shisetsu-event 17、event-seisaku 12、hacktale 7、nazotoki-kenshu 5、murder-mystery 5、immersive 4（いずれも設定ページ数と一致）。参考: madamis 13（P2-2）、immersive-tokyo 6（P1-2）
 
+### P3-3 `/services/*` から関連ガイドへの逆リンク（コミット `seo(P3-3)`）
+- 変更: `src/components/x/ServicePage.astro`（`SERVICE_CALLOUT`（nazotoki→nazotoki-kenshu、murder→murder-mystery、shisetsu→shisetsu-event、immersive→immersive、zunousen→hacktale）で `guidesWithCallout()` を逆引きし、既存の手書きリストの後ろに自動で追加。ラベルは `guides.ts` の title の「｜」より前）、`src/pages/services/index.astro`（`event-seisaku` の12本を「関連する解説記事」として末尾に追加）
+- 確認: `/services/shisetsu-event/` の関連ガイドに `shisetsu-event` の17ページ全部、`/services/nazotoki-kenshu/` 5/5、`/services/murder-mystery/` 5/5、`/services/immersive/` 4/4、`/services/zunousen/` 7/7、`/services/` 12/12
+

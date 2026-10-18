@@ -10,6 +10,8 @@ import SecHead from './SecHead.astro';
 import { SERVICES, SERVICE_LINKS, type ServiceSlug } from '../../data/services';
 import RevShareCallout from '../RevShareCallout.astro';
 import { flat } from '../../lib/jpbreak';
+import { guidesWithCallout, SERVICE_CALLOUT } from '../../data/seoOverrides';
+import { guideArticles } from '../../data/guides';
 import { jsonLd } from '../../lib/microcms';
 import type { ContactType } from './ContactBlock.astro';
 
@@ -26,6 +28,14 @@ const dm = def.match(/^\**([^、。*]+?)\**とは/);
 const defTitle = dm ? dm[1] + 'とは' : '';
 const CONTACT: Record<ServiceSlug, ContactType> = { nazotoki: 'kenshu', murder: 'madamis', shisetsu: 'shisetsu', immersive: 'immersive', zunousen: 'zunousen', ip: 'immersive' };
 const related = SERVICE_LINKS.filter((l) => l.slug !== slug);
+// seo-improve P3-3: 解説記事側の callout（seoOverrides）からサービスを逆引きし、関連ガイドに自動で加える（手書きリストは残す）
+const ownGuides = ((raw.guides ?? []) as { href: string; label: string }[]);
+const autoGuides = guidesWithCallout(SERVICE_CALLOUT[slug] ?? '')
+  .filter((href) => !ownGuides.some((g) => g.href === href))
+  .map((href) => guideArticles.find((g) => g.href === href))
+  .filter((g): g is (typeof guideArticles)[number] => !!g)
+  .map((g) => ({ href: g.href, label: g.title.split('｜')[0] }));
+const allGuides = [...ownGuides, ...autoGuides];
 const faqSec = sections.find((s) => s.type === 'faq');
 // 費用（金額）を載せている節（「ご依頼の条件」優先、なければ最初の節、FAQ だけなら FAQ）に「原価＋実績に対するレベニューシェア」の訴求を置く（FAQ は除く）
 const hasCost = (s: any) => /万円/.test(JSON.stringify(s));
@@ -219,12 +229,12 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
 
 <section class="xs-related">
   <div class="xs-sec-in">
-    {raw.guides?.length > 0 && (
+    {allGuides.length > 0 && (
       <div style="margin-bottom:72px">
         <p class="xs-rel-en">Guide</p>
         <p class="xs-rel-ja">関連する解説記事</p>
         <div class="xs-rel-list">
-          {(raw.guides as { href: string; label: string }[]).map((g) => <a href={g.href}><span><span class="x-c">+ ·</span> <Cls text={g.label} emph={false} /></span><span aria-hidden="true">→</span></a>)}
+          {allGuides.map((g) => <a href={g.href}><span><span class="x-c">+ ·</span> <Cls text={g.label} emph={false} /></span><span aria-hidden="true">→</span></a>)}
         </div>
       </div>
     )}

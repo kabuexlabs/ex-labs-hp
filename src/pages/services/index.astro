@@ -2,6 +2,10 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import { jsonLd } from '../../lib/microcms';
+import { guidesWithCallout, SERVICE_CALLOUT } from '../../data/seoOverrides';
+import { guideArticles } from '../../data/guides';
+// seo-improve P3-3: 体験型イベント全般の解説記事（callout: event-seisaku）を逆引きして並べる
+const relatedGuides = guidesWithCallout(SERVICE_CALLOUT.index).map((h) => guideArticles.find((g) => g.href === h)).filter((g): g is (typeof guideArticles)[number] => !!g);
 
 const services = [
   {
@@ -106,4 +110,13 @@ const itemListLd = {
 <p class="vc-line" style="margin-top:48px">はじめての方へ：<a href="/works/" style="color:var(--accent)">制作事例一覧</a>／<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場</a>／<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミス・謎解き・イマーシブ・頭脳戦の違い</a>／<a href="/guide/taikengata-company/" style="color:var(--accent)">制作会社の選び方</a>／<a href="/guide/yougo/" style="color:var(--accent)">用語集</a></p>
 </div></section>
 
+{relatedGuides.length > 0 && (
+<section class="section tinted" id="related-guides"><div class="wrap">
+<p class="eyebrow">GUIDE</p><h2 class="h2 serif">関連する解説記事</h2>
+<p class="lede">体験型イベントの企画・費用・制作会社の選び方をまとめた記事です。</p>
+<ul class="bullets">
+{relatedGuides.map((g) => <li><a href={g.href} style="color:var(--accent)" data-track="show" data-show={g.href.split('/')[2]} data-place="services-index-guides">{g.title.split('｜')[0]}</a></li>)}
+</ul>
+</div></section>
+)}
 </BaseLayout>
