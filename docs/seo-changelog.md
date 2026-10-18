@@ -194,3 +194,36 @@
 3. 対応状況の確認: `/guide/botsunyukan/` `/guide/immersive/` は P1-2（callout immersive-tokyo・title 変更）、`/guide/saiji/` `/guide/shuyu-event/` `/guide/popup-event/` `/guide/sankagata-event/` `/guide/taikengata-event/` は P3-2（shisetsu-event／event-seisaku の callout）、`/guide/shinrisen/` `/guide/zunousen/` 系7本は P3-2 の `hacktale` で対応済み
 - 確認: `/guide/madamis/` `/guide/immersive-tokyo/` `/guide/madamis-tokyo/` の Article JSON-LD が `JSON.parse` 通過、`dateModified` 2026-10-18 ＝ 表示中の `<time datetime>` 2026-10-18
 
+## 仕上げ（検証結果）
+
+1. **ビルド**: `npm run check`（build ＋ seo-audit ＋ test:spam/week/events ＋ events:validate ＋ fanout-audit）成功（2026-10-18 07:58。レビュー修正後に build・seo-audit・crawl-audit を再実行し成功 08:11）。seo-audit「エラーなし（警告 117 件）」、公演データ検証「エラーなし」。fanout-audit の不足 52 項目は改修前からの既存指摘で、本ブランチでは触っていない
+2. **URL 不変**: 事前描画 HTML 59 → 59（消えたファイル 0、増えたファイル 0）。サイトマップ 154 URL → 154 URL（増減 0）
+3. **リンク切れ**: `node scripts/crawl-audit.mjs --base=http://127.0.0.1:4400` → 「154 URL（sitemap）＋ 5 URL（非公開）をクロール／問題なし」。追加したリンク（callout・関連ガイド・/guide/madamis/・/guide/madamis-seisaku/#make など）に 404 なし
+4. **title/H1 監査**: `docs/seo-title-audit.csv`（154 URL。列: URL, title, H1, title文字数(サフィックス除く), H1数）。H1 が2つ以上のページ 0、title が空のページ 0。title を変えたページ 103（うちサフィックスのみ `｜ex Labs` 化 77、本文を変えたもの 26 = P1-1 1 ＋ P1-2 5 ＋ P1-3 1 ＋ P2-1 1 ＋ P4-1 13 ＋ P4-2 5）
+5. **JSON-LD**: 全 154 ページの `application/ld+json` が `JSON.parse` を通過（エラー 0）。`@type` 別件数: Organization 137、BreadcrumbList 138、WebSite 110、FAQPage 95、Article 84、DefinedTerm 18、Game 17、CollectionPage 8、ItemList 7（うち Event を含む ItemList 1 = immersive-tokyo の Event 2 件、NewsArticle 3 件）、Service 6、NewsArticle 5、Event 4、TheaterEvent 3、DefinedTermSet 1、Person 1、ProfilePage 1、VideoObject 1、TheaterGroup 1、PerformingArtsTheater 1、EventSeries 1
+6. **sitemap lastmod**: `src/pages/sitemap.xml.ts` の手書きマップ（path → 日付）で決まり、`/events/*` は `work.updatedAt`、ニュースは記事日付、ブログは CMS の `revisedAt`。154 URL 中 123 に `<lastmod>` あり。今回 title・本文を変えたガイド5本（madamis, madamis-tokyo, immersive-tokyo, madamis-seisaku, madamis-company）は 2026-10-18 に更新。P1-2 の5ページもレビュー後に 2026-10-18 に揃えた（`dateModified` を変えたため）。`/toudaimurder/works/*`（lastmod なし）、`/services/nazotoki-kenshu/`（2026-09-28）、P4-2 の LP は lastmod を変えていない（title/JSON-LD のみの変更のため。更新したい場合は同マップに日付を足す）
+7. **レビュー**: サブエージェント1つで `git diff 9a1d9ed..HEAD` をランブックの「変更してはいけないもの」と各完了条件に照らして検査。結果「ブロッカーなし」。指摘7件のうち正しさ・要件に関わる6件を修正（タスク別に `seo(…): レビュー修正` コミット）、1件（CSV 未コミット）は仕上げコミットで解消:
+   1. Article `headline` が新しい H1 と不一致（immersive-tokyo, madamis-tokyo, immersive, immersive-theater, immersive-taiken, immersive-event, botsunyukan の7ページ）→ H1 と同文に（一覧2ページは `${seoYear}`）
+   2. immersive-tokyo の「東京でイマーシブシアターを観るなら」の本番側の分岐（シアター形式の開催中公演が0件のとき）で「下の『イマーシブシアターを東京で探す』」と書いていたが、そのアコーディオンは上にある → `#theater` へのリンクに変更
+   3. Event JSON-LD の `addressLocality`（区名）がページ内の直書き表だった → データにない項目は省略するルールに合わせ削除（`streetAddress`・`addressRegion` 東京都・`addressCountry` JP は維持）
+   4. 謎解き研修のプログラム表「数十万円台〜（税抜。…）」の「税抜」が同ページに根拠なし → 削除（changelog P3-1 の記載も修正）
+   5. `/guide/madamis-tokyo/` の `madamis` 囲みに自ページへのリンク「東京の公演を探す」が出ていた → GuideCallout で自ページへのリンクを除外
+   6. P1-2 の5ページは `dateModified` を 2026-10-18 にしたのに sitemap lastmod が旧日付 → 2026-10-18 に揃えた
+   - 対応不要とした指摘: madamis-tokyo の title で「2人から」を外した点（本文に2人用の案内がないため、記録済み）、immersive-tokyo の description に残る【2026年最新】（P1-1 の対象外）
+   - 再レビューは行っていない（修正は1〜2行の差分のみで、ビルド・監査・リンクチェックを再実行して確認）
+8. **引き渡し**: `origin`（github.com/kabuexlabs/ex-labs-hp）へ `seo/search-improvements-20261018` を push し、ドラフト PR を作成（URL は PR 欄参照）。マージ・デプロイはしていない
+
+## 人がやること
+
+1. `/guide/madamis-online/` の新規作成（P2-3。`/guide/madamis-haishin/` は配信用制作の記事のため受け皿にならない。内容は人が用意）
+2. マダミス公演（東大マダミス UNLIMITED MYSTERY）の日程・会場・料金のデータ化（P1-3。`src/data/events/` に載れば `/guide/madamis-tokyo/` に比較表・カレンダー・Event JSON-LD を出せる）
+3. `/taikenbizyutu/*` `/uwasabanashi/*` `/karma/` `/kaitou/` `/gensou/` `/anator/` の JSON-LD は個別 HTML（LP）のため要個別対応（P4-2）。`/uwasabanashi/kotohogi/` は構造化データなし
+4. `/guide/madamis/` の「この記事の監修・執筆 飯田雄貴」は seoOverrides の `author: 'iida-yuki'` で表示している。事実（実際に監修・執筆しているか）の確認
+5. P5 の一覧にある32字超の title（34ページ）は変更していない。短くする場合は個別に判断
+6. 効果測定: 4〜6週間後（2026-11-15〜11-29 ごろ）に Search Console で「体験探し群（イマーシブ体験 東京／イマーシブシアター 東京 など）の6位以下の語の順位」「マダミス一般（マダミスとは／マダミス）の平均順位」「B2B 群（謎解き研修／商業施設 集客イベント など）の平均順位」「作品名クエリの CTR」を改修前（2026-10-18 以前の同期間）と比較
+
+## 成果物
+
+- ブランチ `seo/search-improvements-20261018`（分岐点 `9a1d9ed`、タスクごとのコミット＋レビュー修正コミット）
+- `docs/seo-changelog.md`（本ファイル）、`docs/seo-title-audit.csv`（154 URL の title/H1 監査）
+- 改修前の出力: `/tmp/seo-before/`（セッション内のみ。リポジトリには含めない）
