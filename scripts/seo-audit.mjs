@@ -43,7 +43,10 @@ for (const f of guideFiles) {
   const slug = f.replace('.astro', '');
   const href = `/guide/${slug}/`;
   const s = read(`${guideDir}/${f}`);
-  const title = (s.match(/^\s*title="([^"]*)"/m) || [])[1] ?? '';
+  // title はテンプレートリテラル（`…【${seoYear}年最新】…`）の場合もある（immersive-tokyo・madamis-tokyo）。年は今年に置き換えて評価する
+  const title = (s.match(/^\s*title="([^"]*)"/m) || [])[1]
+    ?? (s.match(/^\s*title=\{`([^`]*)`\}/m) || [])[1]?.replace(/\$\{seoYear\}/g, String(new Date().getFullYear()))
+    ?? '';
   const desc = (s.match(/^\s*description="([^"]*)"/m) || [])[1] ?? '';
   const core = title.split(' - ')[0];
   const og = (s.match(/ogImage="([^"]*)"/) || [])[1] ?? '';

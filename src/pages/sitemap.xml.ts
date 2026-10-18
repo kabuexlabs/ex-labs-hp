@@ -190,7 +190,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/madamis-business/': '2026-09-15',
     '/guide/immersive-cost/': '2026-10-14',
     '/guide/immersive-company/': '2026-09-15',
-    '/guide/immersive-tokyo/': '2026-10-16',
+    '/guide/immersive-tokyo/': '2026-10-18',
     '/guide/shisetsu-katsuyo/': '2026-10-16',
     '/guide/shogyoshisetsu-event/': '2026-09-15',
     '/guide/yukyu-kukaku/': '2026-09-15',

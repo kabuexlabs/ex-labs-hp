@@ -36,3 +36,13 @@
 - JSON-LD: 全 `/guide/*` に既に Article（84本）と BreadcrumbList（Breadcrumb コンポーネント）が出ているため新設せず（二重出力しない）。`/guide/` は CollectionPage、`/guide/yougo/` は DefinedTermSet のまま
 - 確認: ビルド後の全ガイド 85 URL の `<title>` 末尾が `｜ex Labs`（77 ページはサフィックスのみの差分、本文は不変）。`/services/*`・`/toudaimurder/*` などの title は変化なし
 
+### P1-1 `/guide/immersive-tokyo/`（コミット `seo(P1-1)`）
+- 変更: `src/pages/guide/immersive-tokyo.astro`、`src/pages/sitemap.xml.ts`（lastmod 2026-10-18）、`scripts/seo-audit.mjs`（title がテンプレートリテラルのページも監査できるよう `${seoYear}` を今年に置換して読む）
+- title before: `東京で体験できるイマーシブイベント【2026年最新】｜種類・選び方・注目公演 - 株式会社ex Labs`
+- title after: `東京のイマーシブ体験・イマーシブシアター公演一覧【2026年最新】開催日・料金・予約｜ex Labs`（年はビルド時の JST 年 `seoYear`。H1 同文。サフィックス除き42字で付録 B の32字を超えるが、ランブック指定の文言どおり）
+- 更新日「最終更新: 2026年10月18日」と目次（10項目: 今週の開催日／比較／選ぶ／開催中／種類／シアター／動向／終了／FAQ／企業向け）を H1 直下（VisualHero の直後）に表示
+- 擬似見出し→H2: アコーディオンの `<span class="acc-t">` 7本（人数・好み・参加形式で選ぶ／公演ごとの詳しい紹介／東京のイマーシブ体験の種類／{年}年の東京イマーシブ動向／終了した公演・閉業した施設／よくある質問／イマーシブイベントを開催したい企業・施設の方へ）を `<h2 class="acc-t">` に変更（`.acc-t` に `margin:0` を足して見た目は同じ）。「開催中の公演を表で比較する」「イマーシブシアターを東京で探す」「受付から終了までの流れ」は指定外のため span のまま
+- 「東京のイマーシブ体験の種類」の直後に `<h2 id="theater-now">東京でイマーシブシアターを観るなら</h2>` ＋ 開催中公演のうち「俳優と交流する物語体験」形式のものを公演カードへのページ内リンクで案内する段落（公演データの既存の事実のみ）
+- Event JSON-LD: 比較表 `compareRows`（開催中・開催予定の東京公演）から ItemList（Event: name/startDate/endDate/eventStatus/eventAttendanceMode/location/image/description/offers/organizer/url）を生成。料金が不明の回は price を省略、全回完売なら availability=SoldOut。終了公演は含めない。京都の公演は Tokyo 向けページのため対象外
+- 確認（ビルド後 HTML）: `JSON.parse` 通過、ItemList の Event 数 2 ＝ 比較表の公演数 2（体験型取調室 FACTROOM 2026-10-10〜11-08、午前零時の幻想集 第一夜「草陰の夢」2026-11-05〜11-22）。H2 14本（既存7＋変換7。うち「関連記事」「デート・お出かけで探す」は共通部品）
+
