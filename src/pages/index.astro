@@ -99,7 +99,6 @@ const allEvents: { title: string; host: string; place: string; desc: string; url
 ];
 const upcomingEvents = allEvents.filter((e) => e.from && e.from > todayJst).sort((a, b) => (a.from ?? "").localeCompare(b.from ?? ""));
 const liveEvents = allEvents.filter((e) => (!e.until || e.until >= todayJst) && !upcomingEvents.includes(e));
-const endedEvents = allEvents.filter((e) => e.until && e.until < todayJst);
 
 // お取引先、ご協力企業様 — client/partner company logos shown above the 展開団体
 // marquee. 1段構成（7社）。
@@ -163,11 +162,6 @@ const services = [
 ];
 // 最新の解説記事（旧トップの「最新記事」枠の代わり。内部リンクを保つ）
 const latestGuides = [...guideArticles].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
-// 東京で、次の休日に行きたい体験を探す（デート・お出かけの入口）。公開中の記事だけを、この順で出す
-const outingCards = ['/guide/tokyo-experience-date/', '/guide/shibuya-rainy-date/', '/guide/tokyo-nazo-date/', '/guide/tokyo-date-under-5000/', '/guide/tokyo-friends-activities/']
-  .map((h) => guideArticles.find((g) => g.href === h))
-  .filter((g): g is (typeof guideArticles)[number] => !!g)
-  .map((g) => { const i = g.title.indexOf('｜'); return { href: g.href, thumb: g.thumb, main: i < 0 ? g.title : g.title.slice(0, i), sub: i < 0 ? '' : g.title.slice(i + 1) }; });
 const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc:${gtc};--gap:${gap};--col:${col};${mt ? `margin-top:${mt};` : ''}`;
 
 ---
@@ -287,29 +281,10 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
         </div>
       </div>
     )}
-    {endedEvents.length > 0 && <p class="xt-ended">終了した公演：{endedEvents.map((e, i) => <>{i > 0 && '／'}<a href={e.url} style="border-bottom:1px solid">{e.title}</a>（{e.host}・{e.place}{e.soldout ? '・完売' : ''}）</>)}。開催日・空席は<a href="/events/" style="border-bottom:1px solid" data-track="show" data-show="events" data-place="home-now">公演を探す</a>で確認できます。</p>}
-    {endedEvents.length === 0 && <p class="xt-ended">開催日・空席は<a href="/events/" style="border-bottom:1px solid" data-track="show" data-show="events" data-place="home-now">公演を探す</a>で確認できます。</p>}
   </div>
 </section>
 
-{outingCards.length > 0 && (
-<section id="outing" class="xt-pad16">
-  <div style="max-width:1040px;margin:0 auto">
-    <SecHead en="Outing" size="top" ja="東京で、次の休日に行きたい体験を探す" />
-    <p class="xt-sub"><Cls text="食事や映画だけではない、東京のデート・お出かけ先を紹介。二人で楽しめる謎解き、イマーシブ体験、街歩き、ものづくり、物語参加型イベントを、料金・時間・アクセスから選べます。" emph={false} /></p>
-    <div class="x-hscroll xt-out" style="margin-top:36px;gap:16px">
-      {outingCards.map((g) => (
-        <a href={g.href} class="xt-out-c" data-track="show" data-show={g.href.split('/')[2]} data-place="home-outing">
-          <img src={g.thumb} alt="" width="1200" height="630" loading="lazy" decoding="async">
-          <span class="xt-out-t"><Cls text={g.main} emph={false} /></span>
-          {g.sub && <span class="xt-out-s"><Cls text={g.sub} emph={false} /></span>}
-        </a>
-      ))}
-    </div>
-    <div class="xt-works-more" style="margin-top:32px"><a href="/guide/#date" class="x-btn is-line xt-more" data-track="show" data-show="guide-date" data-place="home-outing">デート・お出かけの記事をすべて見る&nbsp;→</a></div>
-  </div>
-</section>
-)}
+
 <section id="strength" class="xt-pad24">
   <div style="max-width:1040px;margin:0 auto">
     <SecHead en="Strength" size="top" />
@@ -388,13 +363,13 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 <section class="xt-pad16">
   <div class="x-wcard xt-card is-perf">
     <div class="x-kicker">Performance</div>
-    <h2 class="xt-perf-h"><Ph list={['自社イベント', '「ヌル・アーデン展」', 'の実績']} /></h2>
+    <h2 class="xt-perf-h"><Ph list={['自社レーベル', '「体験する美術館」', 'の実績']} /></h2>
     <div class="xt-perf-row">
-      <div class="xt-perf-c"><div><div class="xt-perf-l">チケット販売枚数</div><div class="xt-perf-n"><span class="xt-perf-pre">約</span>1,000</div></div><div class="xt-perf-u">枚</div></div>
-      <div class="xt-perf-c"><div><div class="xt-perf-l">チケット価格</div><div class="xt-perf-n">4,000</div></div><div class="xt-perf-u">円</div></div>
+      <div class="xt-perf-c"><div><div class="xt-perf-l">累計参加者数</div><div class="xt-perf-n"><span class="xt-perf-pre">約</span>2,000</div></div><div class="xt-perf-u">人</div></div>
+      <div class="xt-perf-c"><div><div class="xt-perf-l">チケット価格</div><div class="xt-perf-n">4,500</div></div><div class="xt-perf-u">円</div></div>
     </div>
     <p class="xt-perf-cond"><Cls text="しかも、以下の条件下での実績です。" emph={false} /></p>
-    <div class="xt-perf-pills"><span><Ph list={['✓ SNSアカウントを', 'ゼロから立ち上げ']} /></span><span><Ph list={['✓ プレスリリース未実施']} /></span><span><Ph list={['✓ 広告宣伝費0円']} /></span><span><Ph list={['✓ Xのみで集客']} /></span></div>
+    <div class="xt-perf-pills"><span><Ph list={['✓ SNSアカウントを', 'ゼロから立ち上げ']} /></span><span><Ph list={['✓ 広告宣伝費0円']} /></span><span><Ph list={['✓ Xのみで集客']} /></span></div>
   </div>
 </section>
 
