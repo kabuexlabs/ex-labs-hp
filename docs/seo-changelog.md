@@ -29,3 +29,10 @@
 - テストあり → 各タスク後に `node scripts/seo-audit.mjs` と `events:validate`、仕上げで `npm run check`。
 
 ## タスク記録
+### C-1 / C-2 共通部品（コミット `seo(C)`）
+- 追加: `src/data/seoOverrides.ts`（callout 定義8種 + パス→`callout`/`toc`/`author`/`updated` のマップ。P2-1 用に `madamis-b2b` も定義）、`src/components/guide/GuideCallout.astro`（`<aside class="guide-callout key-points" aria-label="関連ページ" data-callout=…>`。既存の `.key-points`・`.vc-line` を流用し CSS は追加していない。リンクは既存の `data-track`（/services→`cta`、他→`show`）で計測）、`src/components/guide/GuideMeta.astro`（H1 直下の「最終更新: YYYY年M月D日」と目次。目次項目は H2 の id をページが持つため、ページから `toc` prop で渡す）
+- 変更: `src/layouts/BaseLayout.astro`（`/guide/*` のみ `<title>`/`og:title` の末尾 ` - 株式会社ex Labs` → `｜ex Labs`。title 本文は変えない。他ディレクトリは現状維持）、`src/components/AuthorBox.astro`（`author: 'iida-yuki'` のページは「この記事の監修・執筆 飯田雄貴（株式会社ex Labs 代表取締役）」＋ `/company/iida-yuki/` リンク）
+- callout の文言: `shisetsu-event` の text はランブック案「周遊型イベントをレベニューシェア（初期費用0円）でも実施できます」をリンク先 `/services/shisetsu-event/` の実際の条件（有料チケット型が対象・施設側の初期費用0円）に合わせ「有料チケット型なら、レベニューシェア（施設側の初期費用0円）でも実施できます。」にした。他7種はランブックどおり（各リンク先の記載と矛盾なし）
+- JSON-LD: 全 `/guide/*` に既に Article（84本）と BreadcrumbList（Breadcrumb コンポーネント）が出ているため新設せず（二重出力しない）。`/guide/` は CollectionPage、`/guide/yougo/` は DefinedTermSet のまま
+- 確認: ビルド後の全ガイド 85 URL の `<title>` 末尾が `｜ex Labs`（77 ページはサフィックスのみの差分、本文は不変）。`/services/*`・`/toudaimurder/*` などの title は変化なし
+

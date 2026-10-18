@@ -1,0 +1,17 @@
+---
+// H1 直下に出す「最終更新」と目次（seo-improve C-2）。
+// 値は src/data/seoOverrides.ts の GUIDE_SEO（updated・toc）。目次の項目はページが toc prop で渡す
+// （H2 の id と見出しの対応はページが持っているため）。updated も toc もないページでは何も出さない。
+import { GUIDE_SEO, normalizePath } from '../../data/seoOverrides';
+interface Props { toc?: { id: string; label: string }[] }
+const { toc = [] } = Astro.props;
+const o = GUIDE_SEO[normalizePath(Astro.url.pathname)] ?? {};
+const fmt = (d: string) => { const [y, m, dd] = d.split('-').map(Number); return `${y}年${m}月${dd}日`; };
+---
+{o.updated && <div class="guide-updated vc-line"><time datetime={o.updated}>最終更新: {fmt(o.updated)}</time></div>}
+{o.toc && toc.length > 0 && (
+  <nav class="toc" aria-label="目次">
+    <p class="toc-h">目次</p>
+    <ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}</ol>
+  </nav>
+)}
