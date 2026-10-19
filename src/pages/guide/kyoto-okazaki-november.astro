@@ -1,0 +1,187 @@
+---
+// 「禅とジブリ」京都展と同じ日に、京都市京セラ美術館の物語体験「7枚目のコンポジション」と永観堂ライトアップを回る組み立て（seo-event-boost E4）。
+// 書いてよい事実はランブックの「事実データ」と公式ページ（/taikenbizyutu/7th-composition/）・ガイド（/guide/kyoto-kyocera-museum-7th/）の記載だけ。
+// 移動の所要時間・飲食・店名・感想は書かない。時刻は各催しの開館時間・公演時刻・受付時間だけで組む。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+import { jstDateString } from '../../lib/thisWeek';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const TICKET = 'https://escape.id/kyoukaiart-org/e-7th/';
+const LP = '/taikenbizyutu/7th-composition/';
+const GUIDE = '/guide/kyoto-kyocera-museum-7th/';
+const ZEN = 'https://www.ghibli.jp/event/zen/';
+const TO = '2026-11-23';
+const ended = jstDateString(new Date()) > TO;
+
+// 3つの催し（事実データのみ）
+const events = [
+  { name: '「禅とジブリ」京都展', venue: '京都市京セラ美術館 新館 東山キューブ', dates: '2026年10月3日〜12月6日', time: '10:00〜18:00（入場は閉館30分前まで）', price: '一般・大学生 1,900円', url: ZEN, urlLabel: '公式サイト ↗', ext: true },
+  { name: '体験する美術館「7枚目のコンポジション」', venue: '京都市京セラ美術館 本館 地下1階 講演室・多目的室', dates: '2026年11月21日（土）・22日（日）・23日（月・祝）', time: '各日7回。第1回12:00〜13:00、第7回16:30〜17:30（所要60分）', price: '1名 4,500円（税込）。別途入館料不要', url: LP, urlLabel: '公式サイト', ext: false },
+  { name: '永観堂（禅林寺）ライトアップ・夜間特別拝観', venue: '永観堂（京都市京セラ美術館と同じ岡崎・東山エリア）', dates: '2026年11月20日〜12月6日', time: '17:30〜20:30（受付は20:30終了）', price: '中学生以上 1,000円', url: '', urlLabel: '', ext: false },
+];
+// 公演の各回（公式ページの記載）
+const sessions = [
+  ['第1回', '12:00', '13:00'], ['第2回', '12:45', '13:45'], ['第3回', '13:30', '14:30'], ['第4回', '14:15', '15:15'],
+  ['第5回', '15:00', '16:00'], ['第6回', '15:45', '16:45'], ['第7回', '16:30', '17:30'],
+];
+const toc = [
+  { id: 'three', label: 'この記事で扱う3つの催し' },
+  { id: 'plan', label: '同じ日に回す組み立て' },
+  { id: 'zen', label: '「禅とジブリ」京都展の基本情報' },
+  { id: 'seventh', label: '「7枚目のコンポジション」の基本情報' },
+  { id: 'eikando', label: '永観堂ライトアップの基本情報' },
+  { id: 'faq', label: 'よくある質問' },
+];
+const faqs = [
+  { q: '同じ日に3つとも回れますか？', a: '開館時間と公演時刻のうえでは回れます。「禅とジブリ」京都展は10:00〜18:00（入場は閉館30分前まで）、「7枚目のコンポジション」は各日12:00〜17:30の間に7回（各60分）、永観堂ライトアップは17:30〜20:30（受付は20:30終了）です。移動時間は含めていないので、各催しの時刻に余裕を持って組んでください。' },
+  { q: '11月23日（月・祝）は美術館が開いていますか？', a: '開館しています。京都市京セラ美術館の休館日は月曜ですが、祝・休日は開館します。「禅とジブリ」京都展も11月23日は開館しています。' },
+  { q: 'それぞれ別のチケットが必要ですか？', a: 'はい。「禅とジブリ」京都展（一般・大学生1,900円、10月31日から予約優先制）、「7枚目のコンポジション」（1名4,500円・税込、別途入館料不要）、永観堂ライトアップ（中学生以上1,000円）は、それぞれ別のチケットです。' },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '「禅とジブリ」京都展と同じ日に回る、岡崎の半日（2026年11月）',
+  about: '京都市京セラ美術館の「禅とジブリ」京都展・「7枚目のコンポジション」・永観堂ライトアップを同じ日に回す組み立て',
+  inLanguage: 'ja',
+  image: [new URL('/assets/events/7th-composition-kv.webp', site).toString()],
+  author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-19',
+  dateModified: '2026-10-19',
+  mainEntityOfPage: new URL('/guide/kyoto-okazaki-november/', site).toString(),
+};
+---
+<BaseLayout
+  title="「禅とジブリ」京都展と同じ日に回る岡崎の半日｜永観堂ライトアップと美術館の物語体験【2026年11月】 - 株式会社ex Labs"
+  description="京都市京セラ美術館の「禅とジブリ」京都展、同じ美術館の本館地下1階で行う60分の物語体験「7枚目のコンポジション」（11月21日〜23日）、徒歩圏の永観堂ライトアップを、開館時間と公演時刻の事実だけで同じ日に回す組み立てを紹介します。"
+  ogImage="/assets/events/7th-composition-kv.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '京都市京セラ美術館の物語体験', href: GUIDE },
+  { name: '「禅とジブリ」京都展と同じ日に回る岡崎の半日' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">KYOTO OKAZAKI, NOVEMBER 2026</p>
+<h1 class="h2 serif"><span class="nobr">「禅とジブリ」京都展と</span><span class="nobr">同じ日に回る、</span><span class="nobr">岡崎の半日（2026年11月）</span></h1>
+<p class="lede">2026年11月、<span class="nobr">京都市京セラ美術館</span>では新館で「禅とジブリ」京都展が開かれ、同じ美術館の本館地下1階では11月21日〜23日の3日間、60分の物語体験<strong>「7枚目のコンポジション」</strong>が行われます。徒歩圏の永観堂では11月20日からライトアップが始まります。この記事では、3つの催しを<strong>開館時間・公演時刻・受付時間の事実だけ</strong>で同じ日に回す組み立てを紹介します。</p>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}</ol></nav>
+</div></section>
+
+<section class="section tinted" id="three"><div class="wrap narrow">
+<p class="eyebrow">EVENTS</p><h2 class="h2 serif">この記事で扱う3つの催し</h2>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col">名称</th><th scope="col">会場</th><th scope="col">日程</th><th scope="col">時間</th><th scope="col">料金</th><th scope="col">公式</th></tr></thead>
+<tbody>{events.map((e) => (
+  <tr><th scope="row">{e.name}</th><td>{e.venue}</td><td>{e.dates}</td><td>{e.time}</td><td>{e.price}</td><td>{e.url ? (e.ext ? <a href={e.url} target="_blank" rel="noopener" style="color:var(--accent)">{e.urlLabel}</a> : <a href={e.url} style="color:var(--accent)" data-track="show" data-show="7th-composition" data-place="okazaki-table">{e.urlLabel}</a>) : '—'}</td></tr>
+))}</tbody>
+</table></div>
+<p class="lede" style="margin-top:18px">「禅とジブリ」京都展と「7枚目のコンポジション」は同じ<span class="nobr">京都市京セラ美術館</span>の中ですが、建物（新館と本館）もチケットも別です。</p>
+</div></section>
+
+<section class="section" id="plan"><div class="wrap narrow">
+<p class="eyebrow">PLAN</p><h2 class="h2 serif">同じ日に回す組み立て</h2>
+<p class="lede">11月21日（土）・22日（日）・23日（月・祝）のいずれかで、午前に展覧会、午後に物語体験、日が暮れてからライトアップという順です。時刻は各催しの開館時間・公演時刻・受付時間だけで組んでいて、<strong>移動時間は含めていません</strong>。</p>
+<ol class="yn-flow">
+<li><span>午前</span><span class="t">「禅とジブリ」京都展（新館 東山キューブ）。開館は10:00。10月31日から予約優先制なので、予約した入場枠の時刻に合わせます。</span></li>
+<li><span>午後</span><span class="t">「7枚目のコンポジション」（本館地下1階）。各日12:00・12:45・13:30・14:15・15:00・15:45・16:30開始の7回から選びます。所要60分で、受付は各回開始の10分前からです。</span></li>
+<li><span>夕方</span><span class="t">公演の第7回は17:30に終わります。永観堂ライトアップの受付は17:30に始まり、20:30に終わります。</span></li>
+</ol>
+<p class="lede" style="margin-top:18px">展覧会を午前に入れない場合は、公演の後に展覧会（入場は閉館30分前の17:30まで）という順もあります。その場合も公演は第1回〜第6回（12:00〜16:45）のいずれかになります。</p>
+</div></section>
+
+<section class="section tinted" id="zen"><div class="wrap narrow">
+<p class="eyebrow">ZEN &amp; GHIBLI</p><h2 class="h2 serif">「禅とジブリ」京都展の基本情報</h2>
+<ul class="bullets">
+<li><strong>会場</strong>：<span class="nobr">京都市京セラ美術館</span> 新館 東山キューブ</li>
+<li><strong>会期</strong>：2026年10月3日〜12月6日。11月23日（月・祝）も開館</li>
+<li><strong>時間</strong>：10:00〜18:00（入場は閉館30分前まで）</li>
+<li><strong>料金</strong>：一般・大学生 1,900円</li>
+<li><strong>予約</strong>：美術館の告知（10月14日付）により、10月31日から予約優先制</li>
+<li><a href={ZEN} target="_blank" rel="noopener" style="color:var(--accent)">「禅とジブリ」京都展 公式サイト ↗</a></li>
+</ul>
+</div></section>
+
+<section class="section" id="seventh"><div class="wrap narrow">
+<p class="eyebrow">THE 7TH COMPOSITION</p><h2 class="h2 serif">「7枚目のコンポジション」の基本情報</h2>
+<ul class="bullets">
+<li><strong>会場</strong>：<span class="nobr">京都市京セラ美術館</span> 本館 地下1階 講演室・多目的室。別途入館料は不要で、「禅とジブリ」京都展とは別のチケットです</li>
+<li><strong>日程</strong>：2026年11月21日（土）・22日（日）・23日（月・祝）。各日7回、所要60分（受付・説明・退場を含む）</li>
+<li><strong>料金・人数</strong>：1名 4,500円（税込）。1名から参加でき、各回最大30名（最少催行12名）</li>
+<li><strong>対象</strong>：18歳以上</li>
+<li><strong>販売</strong>：2026年10月17日（土）19:00〜。各回の開演1時間前まで</li>
+</ul>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col">回</th><th scope="col">開始</th><th scope="col">終了</th></tr></thead>
+<tbody>{sessions.map(([n, a, b]) => <tr><th scope="row">{n}</th><td>{a}</td><td>{b}</td></tr>)}</tbody>
+</table></div>
+{!ended && (
+<div class="cta-mini" style="margin-top:28px">
+<p class="cta-mini-title serif"><span class="nobr">京都市京セラ美術館</span>の物語体験「7枚目のコンポジション」</p>
+<a class="btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="7th-composition" data-place="okazaki-cta">日時を選んでチケットを購入（escape.id）↗</a>
+</div>
+)}
+<p class="vc-line" style="margin-top:24px"><a href={LP} style="color:var(--accent)" data-track="show" data-show="7th-composition" data-place="okazaki-links">7枚目のコンポジション 公式サイト</a>／<a href={GUIDE} style="color:var(--accent)">日程・チケット・行き方の案内（大阪・神戸からの行き方も）</a></p>
+</div></section>
+
+<section class="section tinted" id="eikando"><div class="wrap narrow">
+<p class="eyebrow">EIKANDO</p><h2 class="h2 serif">永観堂ライトアップの基本情報</h2>
+<ul class="bullets">
+<li><strong>名称</strong>：永観堂（禅林寺）ライトアップ・夜間特別拝観</li>
+<li><strong>期間</strong>：2026年11月20日〜12月6日</li>
+<li><strong>時間</strong>：17:30〜20:30（受付は20:30終了）</li>
+<li><strong>料金</strong>：中学生以上 1,000円</li>
+<li><strong>場所</strong>：<span class="nobr">京都市京セラ美術館</span>と同じ岡崎・東山エリアで徒歩圏</li>
+</ul>
+</div></section>
+
+<section class="section" id="faq"><div class="wrap narrow">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+<p class="vc-line" style="margin-top:32px">関連ページ：<a href={GUIDE} style="color:var(--accent)"><span class="nobr">京都市京セラ美術館</span>で行われる、絵画の物語体験</a>／<a href={LP} style="color:var(--accent)">7枚目のコンポジション 公式サイト</a>／<a href="/taikenbizyutu/" style="color:var(--accent)">体験する美術館</a>／<a href="/guide/museum-event/" style="color:var(--accent)">美術館・博物館の集客イベント</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="immersive" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.toc{max-width:520px;margin:40px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:24px 28px}
+.toc-h{margin:0 0 12px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8)}
+.cmp-wrap{margin:18px 0 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cmp{width:100%;min-width:520px;border-collapse:collapse;background:#fff;font-size:14px;line-height:1.75}
+.cmp th,.cmp td{border:1px solid rgba(51,48,43,.12);padding:11px 12px;vertical-align:top;text-align:left}
+.cmp thead th{background:#F4F1EC;font-weight:800;font-size:13px}
+.cmp tbody th{white-space:nowrap;font-weight:800}
+.yn-flow{list-style:none;margin:20px 0 0;padding:0;counter-reset:f;display:grid}
+.yn-flow li{counter-increment:f;display:grid;grid-template-columns:2em 3.4em minmax(0,1fr);gap:10px;align-items:baseline;padding:13px 0;border-bottom:1px solid rgba(51,48,43,.12);font-size:14.5px;line-height:1.8}
+.yn-flow li::before{content:counter(f);font-weight:800;color:var(--accent)}
+.yn-flow span{font-weight:800}.yn-flow .t{font-weight:400}
+#three,#plan,#zen,#seventh,#eikando,#faq{scroll-margin-top:88px}
+</style>
