@@ -117,3 +117,23 @@
 ### E6 検索広告のキーワードと広告文（コミット `event(E6)`）
 - 追加: `docs/ads/gensou.md`、`docs/ads/7th-composition.md`。キーワード候補（ランブック指定の8語ずつ＋除外候補）、レスポンシブ検索広告の見出し10本（10〜17字）・説明文4本（70〜90字）、ランディング先（幻想集 `/gensou/`、7枚目 `/taikenbizyutu/7th-composition/`、禅とジブリ・永観堂・岡崎観光系は E4 の新規ページ）、配信地域のメモ
 - 「〜だけ」「3日間のみ」は事実（夜間に入れるのは公演時間帯だけ／会期3日間）に基づく表現のみ。在庫を示す語は使っていない
+
+## 仕上げ（検証結果）
+
+1. **ビルド**: `npm run build` 成功（2026-10-19 14:52）。`node scripts/seo-audit.mjs` エラーなし（警告 120 件は既存。新規ページの「被内部リンク 3 未満」は E2-B・E6 からの導線が付くまでの既知事項）、`npm run events:validate` エラーなし
+2. **既存ページは追加のみ**: 事前描画 HTML 59 → 59（消えたファイル 0）。ソースの `git diff 9a1d9ed..HEAD` で、既存ページ 14 ファイル（ガイド2本＋告知12本）の削除行は 0。静的 HTML の `/tmp/event-before/static/` との比較では、告知を挿入した3ファイル（anator, karma, taikenbizyutu/lostframe）だけが変わり、挿入した `<p data-event-notice>` と CSS バンドルのハッシュ・`<link rel="stylesheet">` の位置を除けば改修前と同一。SSR ページは改修前後のスナップショット（全 154 URL）を比較し、title の変化 0、本文が短くなったページ 0、見出しの消失は「関連記事」枠（新規ガイドが入って古い記事カードが押し出されたもの）のみ
+3. **リンク切れ**: `node scripts/crawl-audit.mjs --base=http://127.0.0.1:4400` → 155 URL（sitemap）＋ 5 URL をクロール、問題なし
+4. **JSON-LD**: `/gensou/`（2本）・`/taikenbizyutu/7th-composition/`（1本）・新規ガイド（FAQPage/Article/BreadcrumbList ほか）が `JSON.parse` 通過。公式2ページは変更なし
+5. **sitemap**: 新規 `/guide/kyoto-okazaki-november/` を収録（155 URL）。追記した2ガイドと新規ページの lastmod は 2026-10-19（`src/pages/sitemap.xml.ts` の手書きマップを更新。告知を入れたページの lastmod は本文の追加ではないため変えていない）
+6. **告知の出力確認**: ビルド出力で 12 ページに `data-event-notice`（home 1、gensou-next 6、7th-next 2、gensou-nov 3）。対象外ページには出ていない。Playwright で 390px／1280px の表示を確認
+7. **レビュー**: サブエージェント1つで `git diff 9a1d9ed..HEAD` を「既存ページは追加のみ」「事実データ外の記述なし」の2点で検査 → いずれも PASS（ブロッカーなし）。文言の指摘3件を修正（`event(E4)`/`event(E5)` のレビュー修正コミット）: ①新規ページ「予約した入場枠の時刻に合わせます」→「予約優先制です（美術館の告知、10月14日付）」 ②「日が暮れてからライトアップ」→「17:30からライトアップ」 ③X 投稿文「11月の3連休」→「11/21〜23の土日祝」。修正後に再ビルド成功。再レビューは行っていない
+8. **引き渡し**: `origin` へ `event/nov-boost-20261019` を push し、ドラフト PR を作成（URL は下記）。マージ・デプロイはしていない
+
+## 人がやること（順番どおり）
+
+1. デプロイ後に Search Console で `/gensou/` `/taikenbizyutu/7th-composition/` `/guide/yumenoshima-night/` `/guide/kyoto-kyocera-museum-7th/` `/guide/kyoto-okazaki-november/` の URL 検査 → インデックス登録をリクエスト
+2. 夢の島熱帯植物館・京都市京セラ美術館に `docs/event-listings/gensou.md`・`docs/event-listings/7th-composition.md` の原稿で掲載依頼（横長画像 1,920px 推奨を用意）
+3. Tokyo Art Beat／京都観光Navi／Kyoto Art Box／インターネットミュージアム／江東区観光協会に送信（各ファイルのチェックリスト）
+4. `docs/ads/gensou.md`・`docs/ads/7th-composition.md` で検索広告を出稿
+5. 11/23 以降に告知が消えていることを確認。SSR ページ（トップ、公演ページ、ウワサバナシ2本、怪盗、事例記事、デート系3本）はリクエスト時に自動で消える。静的ページ（`/karma/` `/anator/` `/taikenbizyutu/lostframe/`）は再デプロイで消える（11/23 以降に一度デプロイがなければ手で `src/data/eventNotices.ts` の `NOTICE_PAGES` から外す）
+6. 任意（提案）: 公式2ページの `offers` に `availability` を追加、追記した2ガイドの `articleLd.dateModified` を更新し追加 FAQ を `faqLd` に含める、永観堂の公式 URL を E2-B／E4 に追加
