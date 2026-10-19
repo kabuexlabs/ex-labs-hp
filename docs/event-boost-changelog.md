@@ -127,7 +127,7 @@
 5. **sitemap**: 新規 `/guide/kyoto-okazaki-november/` を収録（155 URL）。追記した2ガイドと新規ページの lastmod は 2026-10-19（`src/pages/sitemap.xml.ts` の手書きマップを更新。告知を入れたページの lastmod は本文の追加ではないため変えていない）
 6. **告知の出力確認**: ビルド出力で 12 ページに `data-event-notice`（home 1、gensou-next 6、7th-next 2、gensou-nov 3）。対象外ページには出ていない。Playwright で 390px／1280px の表示を確認
 7. **レビュー**: サブエージェント1つで `git diff 9a1d9ed..HEAD` を「既存ページは追加のみ」「事実データ外の記述なし」の2点で検査 → いずれも PASS（ブロッカーなし）。文言の指摘3件を修正（`event(E4)`/`event(E5)` のレビュー修正コミット）: ①新規ページ「予約した入場枠の時刻に合わせます」→「予約優先制です（美術館の告知、10月14日付）」 ②「日が暮れてからライトアップ」→「17:30からライトアップ」 ③X 投稿文「11月の3連休」→「11/21〜23の土日祝」。修正後に再ビルド成功。再レビューは行っていない
-8. **引き渡し**: `origin` へ `event/nov-boost-20261019` を push し、ドラフト PR を作成（URL は下記）。マージ・デプロイはしていない
+8. **引き渡し**: `origin` へ `event/nov-boost-20261019` を push し、ドラフト PR #129 を作成（https://github.com/kabuexlabs/ex-labs-hp/pull/129）。マージ・デプロイはしていない
 
 ## 人がやること（順番どおり）
 
