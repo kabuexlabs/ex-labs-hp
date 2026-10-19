@@ -10,6 +10,7 @@
 // 2026-10-17 ユーザー指示でテキスト側の「イマーシブ」は「物語体験」に統一（画像内の文字は旧表記のまま）。
 // 公演の数値情報 (料金・所要時間・申込URL) は src/data/taikenbizyutu.ts を参照する。
 import TaikenbizyutuLayout from '../../../layouts/TaikenbizyutuLayout.astro';
+import EventNotice from '../../../components/EventNotice.astro';
 import { jsonLd } from '../../../lib/microcms';
 import { TICKET_URL, LOST_FRAME } from '../../../data/taikenbizyutu';
 
@@ -93,6 +94,7 @@ const breadcrumbLd = {
         <p class="lpnote">お申し込みページ（escape.id）へ移動します</p>
       </>
     )}
+    <EventNotice class="lpnote" linkClass="lpnote-link" />
     <p class="lpnote" style="margin-top:34px">公演の記録（ネタバレを含みます）は <a class="lpnote-link" href={LOST_FRAME.noteUrl} target="_blank" rel="noopener">note の記事</a> で公開しています。</p>
     <a class="lphome" href="/taikenbizyutu/">← 体験する美術館 トップへ戻る</a>
   </div>

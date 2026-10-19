@@ -1,0 +1,24 @@
+---
+// 11月公演への期限付き告知（seo-event-boost E3）。src/data/eventNotices.ts をパスで引き、until を過ぎたら何も出さない。
+// 見た目は挿入先ページの既存クラス／既存のインライン値を class・style で受け取って流用する（このコンポーネント自身はスタイルを持たない）。
+// 静的ページではビルド時、SSR ページではリクエスト時に判定される。
+import { NOTICES, NOTICE_PAGES } from '../data/eventNotices';
+import { jstDateString } from '../lib/thisWeek';
+interface Props { class?: string; linkClass?: string; style?: string; id?: keyof typeof NOTICES }
+const { class: cls, linkClass, style, id } = Astro.props;
+const path = Astro.url.pathname.replace(/([^/])$/, '$1/');
+const key = id ?? NOTICE_PAGES[path];
+const n = key ? NOTICES[key] : undefined;
+const today = jstDateString(new Date());
+const show = !!n && today <= n.until;
+// 会場名は途中で改行しない（サイト共通ルール）
+const NOBR = /(夢の島熱帯植物館|京都市京セラ美術館)/;
+const chunks = (t: string) => t.split(NOBR).filter(Boolean).map((s) => ({ s, nobr: NOBR.test(s) }));
+---
+{show && n && (
+  <p class={cls} style={style} data-event-notice={key} data-until={n.until}>
+    {n.parts.map((p) => p.href
+      ? <a href={p.href} class={linkClass} data-track="show" data-show={p.show} data-place={`notice-${key}`}>{p.label}</a>
+      : chunks(p.text ?? '').map((c) => (c.nobr ? <span class="nobr" style="white-space:nowrap">{c.s}</span> : c.s)))}
+  </p>
+)}

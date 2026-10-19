@@ -6,6 +6,7 @@
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import EventNotice from '../../components/EventNotice.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
@@ -57,6 +58,7 @@ const articleLd = {
 <p class="eyebrow">CASE STUDY</p>
 <h1 class="h2 serif"><span class="nobr">街歩き型イマーシブ制作事例</span><br><span class="nobr">下北沢</span><span class="nobr">「ロスト・フレーム」</span></h1>
 <p class="lede">下北沢の街に散らばった絵画を探し、隠された物語を辿る——株式会社ex Labsのアート×体験レーベル「体験する美術館」の第2回公演<strong>『ロスト・フレーム』</strong>は、<strong>街そのものを会場</strong>にした周遊型アートイマーシブです。2026年7月7日から8月31日まで開催し、<strong>全公演のチケットが完売</strong>しました。このページでは、商店街やエリアの回遊企画を検討する方に向けて、構成・担当範囲・実施条件を整理します。</p>
+<EventNotice class="key-points" />
 
 <div class="key-points"><p class="key-points-h">この事例の要点</p><ul><li>下北沢駅周辺の街の各所を巡り、描き下ろしの絵画と登場人物との対話で物語を進める、約{LOST_FRAME.duration}の周遊型体験です。</li><li>株式会社ex Labsの自社レーベルによる主催公演で、企画から主催まで当社が行いました。会場の一部は下北沢の店舗にご協力いただいています。</li><li>2026年7月7日〜8月31日の全公演が完売しました。</li></ul></div>
 <nav class="toc" aria-label="目次">

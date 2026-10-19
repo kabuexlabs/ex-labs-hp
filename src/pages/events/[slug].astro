@@ -6,6 +6,7 @@
 export const prerender = false;
 
 import DateGuideLinks from '../../components/guide/DateGuideLinks.astro';
+import EventNotice from '../../components/EventNotice.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import EventCard from '../../components/EventCard.astro';
@@ -95,6 +96,7 @@ const eventLd = upcoming.concat(cancelled).map((r) => {
 )}
 <div class="ev-body">
   <p><strong>{work.summary}</strong></p>
+  <EventNotice class="ev-notice" />
   {work.description.map((p) => <p>{p}</p>)}
 </div>
 <dl class="ev-facts">

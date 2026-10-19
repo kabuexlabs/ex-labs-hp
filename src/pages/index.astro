@@ -4,6 +4,7 @@
 export const prerender = false;
 
 import BaseLayout from '../layouts/BaseLayout.astro';
+import EventNotice from '../components/EventNotice.astro';
 import SecHead from '../components/x/SecHead.astro';
 import Ph from '../components/x/Ph.astro';
 import Cls from '../components/x/Cls.astro';
@@ -197,6 +198,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
       <a href="#works" class="x-btn is-line xt-cta">実績を見る</a>
     </div>
     <p class="xt-hero-visitor">参加したい方は <a href="/events/" class="x-link-lime" data-track="show" data-show="events" data-place="home-hero">開催中の公演を探す →</a></p>
+    <EventNotice class="xt-hero-visitor" linkClass="x-link-lime" />
     <a href="/media/" class="xt-media">
       <span class="xt-media-k">MEDIA</span>
       <span class="xt-media-t"><Ph list={['日本経済新聞様に', '掲載されました']} /></span>

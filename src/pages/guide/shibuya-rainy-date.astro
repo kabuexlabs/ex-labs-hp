@@ -6,6 +6,7 @@
 export const prerender = false;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import EventNotice from '../../components/EventNotice.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
@@ -103,6 +104,7 @@ const chips = [`${rows.length}件を比較`, '屋内で遊べる', ...(shortRows
 
 <section class="section" style="padding-top:28px"><div class="wrap">
 <p class="lede">雨の日デートとは、天候に左右されない屋内の過ごし方を中心に組むデートのことです。渋谷で会う日が雨でも、屋内で二人で遊べる体験を並べました。<strong>「館内で遊べること」と「駅から一度も濡れずに行けること」は別</strong>なので、表では駅からの移動と体験中の屋内外を分けています。</p>
+<EventNotice class="key-points" />
 <div class="key-points"><p class="key-points-h">このページでできること</p><ul>
 <li>渋谷で予約できる屋内の体験を、二人分の料金と時間で見比べられます。</li>
 <li>短時間で遊ぶ／物語に参加する、の目的から選べます。</li>

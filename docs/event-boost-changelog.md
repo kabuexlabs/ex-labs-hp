@@ -68,3 +68,29 @@
 | 公演は本館地下1階・別チケット・1名4,500円（税込）・別途入館料不要・各回最大30名（最少催行12名）・各日12:00〜17:30に7回（各60分） | 公演B |
 | 最少催行人数に満たない場合の扱い → 公式ページの案内を確認 | 公式ページの注意事項に「最少催行人数に満たない場合の実施判断・連絡・返金」が列挙されているのみのため |
 - 永観堂の公式サイト URL は事実データに無いためリンクしていない（**人がやること**: 必要なら追加）
+
+### E3 期限付き告知（コミット `event(E3)`）
+- 追加: `src/data/eventNotices.ts`（告知4種とパス→告知のマップ、`until`）、`src/components/EventNotice.astro`（パスで引き、`jstDateString(new Date())` が `until` を過ぎたら何も出さない。見た目は `class`／`style` で挿入先の既存クラス・既存のインライン値を流用。スタイルは持たない）
+- 挿入（各ページ import 1行＋タグ1行の追加のみ。削除行 0）:
+
+| ページ | 告知 | 位置 | 流用したクラス／値 | 判定 |
+|---|---|---|---|---|
+| `/` | 11月開催: …「午前零時の幻想集」（11/5〜22）／…「7枚目のコンポジション」（11/21〜23） | ヒーロー最後の段落「参加したい方は…」の直後 | `xt-hero-visitor`、リンク `x-link-lime` | SSR（期限で自動的に消える） |
+| `/events/factroom/` | 次の公演: …「午前零時の幻想集」11/5〜22 | 概要段落の直後（`src/pages/events/[slug].astro`。データで factroom だけ有効） | `ev-notice`（終了公演の注意書きと同じ） | SSR |
+| `/uwasabanashi/` | 同上 | KV のキャッチ＋日程・会場の直後 | `kvvenue` | SSR |
+| `/uwasabanashi/kotohogi/` | 同上 | 紹介段落の直後 | 同じ段落のインライン値（margin:0;font-size:14px;line-height:2.05;letter-spacing:.04em） | SSR |
+| `/kaitou/` | 同上 | ヒーローの日程・会場（hero-meta）の直後、CTA の前 | `story-p serif` | SSR |
+| `/karma/` | 同上 | リード段落（lead-p）の直後 | `lead-p` | 静的（再デプロイで消える） |
+| `/anator/` | 同上 | ヒーローのタグラインの直後 | `hero-reading` | 静的 |
+| `/taikenbizyutu/lostframe/` | 次回公演: 京都市京セラ美術館「7枚目のコンポジション」11/21〜23 | 完売案内の直後 | `lpnote`、リンク `lpnote-link` | 静的 |
+| `/guide/case-lostframe/` | 同上 | リード文の直後 | `key-points` | SSR |
+| `/guide/tokyo-nazo-date/` `/guide/shibuya-rainy-date/` `/guide/kisetsu-event/` | 11月限定: 夜の植物館に入れる物語体験「午前零時の幻想集」（新木場・11/5〜22） | リード文の直後 | `key-points` | SSR |
+
+- 挿入しなかったページ（改修前ビルドを Playwright で 1280×900／390×844 表示し、公演へのリンクの位置を測定）:
+  - `/taikenbizyutu/`: ヒーローのキービジュアルが `/taikenbizyutu/7th-composition/` へのリンク（desktop y=543、mobile y=422。最初の画面内）
+  - `/events/`: 冒頭のスケジュール欄に幻想集の予約リンク（mobile y=800 で最初の画面内。desktop y=1125 で最初の H2 直下）
+  - `/works/`: 冒頭の Featured 枠に `/gensou/`・7枚目へのリンク（desktop y=903、mobile y=869。本文冒頭の最初のブロック）
+  - `/guide/tokyo-holiday/` `/guide/tokyo-before-dating/` `/guide/tokyo-friends-activities/` `/guide/tokyo-experience-date/` `/guide/tokyo-date-under-5000/`: リード文・要点の直後に幻想集の特集ブロック（`GensouFeature`）があり `/gensou/` へリンク（desktop y=1165〜1406。最初の H2 より前）
+  - `/guide/immersive-tokyo-date/` `/guide/immersive-tokyo-solo/`: 冒頭の公演カードに幻想集の予約リンク（desktop y=692。最初の画面内）
+  - 存在しないページ: なし
+- 静的ページ（karma, anator, lostframe）の告知はビルド時に判定されるため、11/23 以降に再デプロイがなければ残る → **人がやること**に記載

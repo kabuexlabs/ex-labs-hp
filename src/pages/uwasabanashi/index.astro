@@ -2,6 +2,7 @@
 // 終了表示を日付で切り替えるためリクエスト時に描画する（日付は日本時間。開催日の正本は src/data/events/）
 export const prerender = false;
 import SiteGuard from '../../components/SiteGuard.astro';
+import EventNotice from '../../components/EventNotice.astro';
 import DateGuideLinks from '../../components/guide/DateGuideLinks.astro';
 import { eventsData } from '../../data/events/index';
 import { jstDateString } from '../../lib/thisWeek';
@@ -169,6 +170,7 @@ const faqs = [
 </span>
 <span class="kvvenue">渋谷サクラステージ{ended && '（全日程終了）'}</span>
 </div>
+<EventNotice class="kvvenue" />
 </div>
 </section>
 

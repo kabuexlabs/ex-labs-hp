@@ -5,6 +5,7 @@
 // 経緯・未確定事項は docs/kotohogi-lp.md。正確な住所・地図・緯度経度は載せない（集合場所は購入者にだけ案内する運用）。
 export const prerender = false;
 import SiteGuard from '../../../components/SiteGuard.astro';
+import EventNotice from '../../../components/EventNotice.astro';
 
 // ---- 差し替え・確定後に入力する項目（空文字の間は表示しない） ----
 // 冒頭演出：'毎回'／'初回のみ'（本番。2回目以降の訪問では流さない。フッターの「もう一度見る」で再生）／'なし'
@@ -245,6 +246,7 @@ const wood = 'repeating-linear-gradient(90deg,rgba(0,0,0,.18) 0 1px,transparent 
       <div style="display:grid;gap:14px;justify-items:center;text-align:center;padding:4px 0 26px;border-bottom:1px solid #b8b6b0">
         <h2 style="margin:0;font-family:'Bodoni Moda','Shippori Mincho','Yu Mincho',serif;font-feature-settings:'palt';font-size:19px;font-weight:800;letter-spacing:.06em;line-height:1.5">ウワサバナシ調査委員会とは？</h2>
         <p style="margin:0;font-size:14px;line-height:2.05;letter-spacing:.04em">様々なクリエイター様と<br>都市伝説をベースにした<br>『ウワサバナシ』にまつわる<br>調査に挑む<br>様々なジャンルの<br>体験型エンタメを展開する<br>プロジェクトです。</p>
+        <EventNotice style="margin:0;font-size:14px;line-height:2.05;letter-spacing:.04em" />
         <a href="/uwasabanashi/iinkai/" data-track="show" data-show="uwasabanashi-iinkai" data-place="kotohogi-about" style="display:inline-flex;align-items:center;gap:10px;margin-top:4px;padding:10px 14px;border:1px solid #1b1b1a;background:#fbfaf7;color:#1b1b1a;text-decoration:none;font-size:min(13px,3.4vw);font-weight:700;letter-spacing:.02em;white-space:nowrap" class="kh1">ウワサバナシ調査委員会の公式サイトはこちら<span aria-hidden="true" style="font-weight:400">→</span></a>
       </div>
       <div style="border:1px solid #1b1b1a;outline:1px solid #1b1b1a;outline-offset:3px;margin:3px;padding:6px 16px;display:grid;text-align:center">

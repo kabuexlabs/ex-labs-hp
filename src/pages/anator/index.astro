@@ -2,6 +2,7 @@
 // ANATOR トップページ。
 // Claude Design のハンドオフ (ANATOR.dc.html) を Astro に移植したもの。
 import AnatorLayout from '../../layouts/AnatorLayout.astro';
+import EventNotice from '../../components/EventNotice.astro';
 import AnatorContactForm from '../../components/AnatorContactForm.astro';
 
 const assets = '/assets/anator';
@@ -64,6 +65,7 @@ const orgLd = {
   </h1>
   <p class="hero-reading">アナター</p>
   <p class="hero-tag">ここは、あなたと物語が<br>向き合う空間。</p>
+  <EventNotice class="hero-reading" />
   <div class="scrollcue" aria-hidden="true">
     <span>SCROLL</span>
     <span class="line"></span>
