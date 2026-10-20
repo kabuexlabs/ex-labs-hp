@@ -1,6 +1,7 @@
 import { defineMiddleware } from 'astro:middleware';
 import { BLOG_REDIRECTS } from './data/redirects';
 import { enhanceArticleHtml } from './lib/articleHtml';
+import { kampoGuard } from './lib/kampo/auth';
 
 // URL の正規化：末尾スラッシュ無しでアクセスされた SSR ページを
 // スラッシュ付きへ 301 リダイレクトする。canonical だけでは Google が
@@ -26,6 +27,11 @@ export const onRequest = defineMiddleware((context, next) => {
   if (needsSlash) {
     return context.redirect(`${pathname}/${search}`, 301);
   }
+  // 漢方体質チェック（/kampo/）：共通パスワード＋スタッフ PIN のルート保護（lib/kampo/auth.ts）
+  if (pathname.startsWith('/kampo/')) {
+    const blocked = kampoGuard(context);
+    if (blocked) return blocked;
+  }
   // 解説記事・ブログ記事（一覧ページは除く）：文節の改行位置とステップ図を整えてから返す
   if (isGet && /^\/(guide|blog)\/[^/]+\/$/.test(pathname)) {
     return next().then(async (res) => {
@@ -44,7 +50,7 @@ export const onRequest = defineMiddleware((context, next) => {
 // キャッシュ指定がないと毎回関数が動き、アクセスの少ない時間帯はコールドスタートで応答が遅れる
 // （外部クローラーで /events/ などがタイムアウトした一因と考えられる）。デプロイ時に CDN キャッシュは破棄される。
 // 管理・予約・API・会員向けなど、人ごとに内容が変わるページは対象外。
-const PRIVATE = /^\/(api|_|contact|yoyaku|bihin|shimokita|kaitou\/secret|hacktale\/(admin|reservation))(\/|$)/;
+const PRIVATE = /^\/(api|_|contact|yoyaku|bihin|shimokita|kampo|kaitou\/secret|hacktale\/(admin|reservation))(\/|$)/;
 // 日付で表示が変わるページ（開催日・今週の公演）は短めに持つ
 const DATED = /^\/($|events\/|guide\/(immersive-tokyo|tokyo-|shibuya-)|hacktale\/$)/;
 function withEdgeCache(pathname: string, res: Response): Response {

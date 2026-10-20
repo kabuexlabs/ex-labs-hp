@@ -1,0 +1,160 @@
+---
+// 設問（1画面1問）。回答は1問ごとに保存し、途中離脱しても同じ URL で再開できる。
+// 性別が女性以外なら B11・C3 を、舌モードがスタッフなら B13 をスキップ（進捗は表示される問数で数える）。
+export const prerender = false;
+import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
+import { BLOCK_LABEL, QUESTIONS } from '../../../../../../lib/kampo/masters';
+import { getSession, saveSession, getCustomer, saveCustomer } from '../../../../../../lib/kampo/store';
+import { visibleQuestions, firstUnansweredStep, normalizeAnswer, isAnswered, sexFromAnswers, ageBandFromAnswers } from '../../../../../../lib/kampo/flow';
+import { finalize } from '../../../../../../lib/kampo/compute';
+import type { FreeTexts } from '../../../../../../lib/kampo/safety';
+
+const id = Astro.params.id ?? '';
+const stepNum = parseInt(Astro.params.step ?? '', 10);
+const s = await getSession(id);
+if (!s) return Astro.redirect('/kampo/check/new/?msg=notfound', 303);
+if (s.status !== 'in_progress') return Astro.redirect(`/kampo/check/${s.id}/result/`, 303);
+let vis = visibleQuestions(s.answers, s.tongueMode);
+if (!Number.isInteger(stepNum) || stepNum < 1) return Astro.redirect(`/kampo/check/${s.id}/q/1/`, 303);
+const firstOpen = firstUnansweredStep(vis, s.answers, s.texts);
+if (stepNum > vis.length || stepNum > firstOpen) {
+  return Astro.redirect(firstOpen > vis.length ? `/kampo/check/${s.id}/result/` : `/kampo/check/${s.id}/q/${firstOpen}/`, 303);
+}
+const q = vis[stepNum - 1];
+let error = '';
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const rawIds = [...form.getAll('opt').map(String), ...(form.get('sub') ? [String(form.get('sub'))] : [])];
+  const rawTexts: FreeTexts = {};
+  for (const o of q.options) if (o.freeText) rawTexts[o.id] = String(form.get(`t_${o.id}`) ?? '');
+  if (q.type === 'text') rawTexts[q.id] = String(form.get('text') ?? '');
+  const { ids, texts } = normalizeAnswer(q, rawIds, rawTexts);
+  if (!isAnswered(q, ids, texts)) {
+    error = q.type === 'text' ? '入力してください。' : q.sub ? '上下それぞれ1つずつ選んでください。' : '1つ以上選んでください。';
+  } else {
+    s.answers[q.id] = ids;
+    for (const o of q.options) delete s.texts[o.id];
+    delete s.texts[q.id];
+    Object.assign(s.texts, texts);
+    // 性別が変わって表示されなくなった設問の回答は捨てる（採点・安全確認に混ざらないように）
+    vis = visibleQuestions(s.answers, s.tongueMode);
+    const visIds = new Set(vis.map((x) => x.id));
+    for (const qq of QUESTIONS) if (!visIds.has(qq.id)) delete s.answers[qq.id];
+    // 顧客レコードに性別・年代を控える（履歴画面用）
+    if ((q.id === 'A1' || q.id === 'A2') && s.customerId) {
+      const c = await getCustomer(s.customerId);
+      if (c) { c.sex = sexFromAnswers(s.answers) ?? c.sex; c.ageBand = ageBandFromAnswers(s.answers) ?? c.ageBand; await saveCustomer(c); }
+    }
+    const idx = vis.findIndex((x) => x.id === q.id);
+    const nextStep = (idx >= 0 ? idx : stepNum - 1) + 2;
+    if (nextStep > vis.length) {
+      finalize(s);
+      await saveSession(s);
+      return Astro.redirect(`/kampo/check/${s.id}/result/`, 303);
+    }
+    await saveSession(s);
+    return Astro.redirect(`/kampo/check/${s.id}/q/${nextStep}/`, 303);
+  }
+}
+
+const selected = new Set(s.answers[q.id] ?? []);
+const texts = s.texts;
+const isLast = stepNum === vis.length;
+const multi = q.type === 'multi';
+const hint = q.type === 'text' ? (q.optional ? '任意です。なければそのまま「次へ」を押してください。' : '') : multi ? `あてはまるものをすべて選んでください（複数回答可${q.max ? `・最大${q.max}つ` : ''}）` : '1つ選んでください';
+const withImages = q.options.some((o) => o.image);
+const qIndexInBlock = QUESTIONS.filter((x) => x.block === q.block).findIndex((x) => x.id === q.id) + 1;
+---
+<KampoLayout title={`Q${stepNum} ${q.title}`} width="normal" withBar>
+  <div class="kp-progress" aria-label={`${vis.length}問中 ${stepNum}問目`}>
+    {vis.map((_, i) => <i class:list={[{ done: i < stepNum - 1, cur: i === stepNum - 1 }]}></i>)}
+  </div>
+  <div class="kp-card">
+    <div class="kp-qmeta"><span>{BLOCK_LABEL[q.block]}　{q.block}{qIndexInBlock}</span><span>Q{stepNum} / {vis.length}</span></div>
+    {q.block === 'C' && <p class="kp-eyebrow" style="margin-bottom:6px">安心してご提案するための確認です</p>}
+    <h1 class="kp-qtitle">{q.title}</h1>
+    {hint && <p class="kp-qhint">{hint}</p>}
+    {q.help && <p class="kp-note" style="margin:-8px 0 16px">{q.help}</p>}
+    {error && <p class="kp-error" style="margin-bottom:12px">{error}</p>}
+    <form method="post" id="qform" data-type={q.type} data-max={q.max ?? 0} data-sub={q.sub ? '1' : '0'} data-optional={q.optional ? '1' : '0'}>
+      {q.type === 'text' ? (
+        <textarea class="kp-input" name="text" rows="4" placeholder={q.placeholder}>{texts[q.id] ?? ''}</textarea>
+      ) : (
+        <div class:list={['kp-opts', { one: withImages }]}>
+          {q.options.map((o) => {
+            const none = o.flags?.includes('none');
+            const on = selected.has(o.id);
+            return (
+              <>
+                <label class:list={['kp-opt', { radio: !multi, none, 'is-on': on }]}>
+                  <input type={multi ? 'checkbox' : 'radio'} name="opt" value={o.id} checked={on} data-none={none ? '1' : '0'}>
+                  {o.image && <img class="kp-opt-img" src={o.image} alt="" width="72" height="90">}
+                  <span class="kp-opt-text">{o.text}</span>
+                </label>
+                {o.freeText && (
+                  <div class="kp-free" id={`free-${o.id}`} hidden={!on}>
+                    <input type="text" name={`t_${o.id}`} value={texts[o.id] ?? ''} placeholder={o.placeholder ?? '詳しく'} maxlength="300" autocomplete="off">
+                  </div>
+                )}
+              </>
+            );
+          })}
+        </div>
+      )}
+      {q.sub && (
+        <div class="kp-sub">
+          <h3>{q.sub.title}</h3>
+          <div class="kp-opts">
+            {q.sub.options.map((o) => (
+              <label class:list={['kp-opt', 'radio', { 'is-on': selected.has(o.id) }]}>
+                <input type="radio" name="sub" value={o.id} checked={selected.has(o.id)}>
+                <span class="kp-opt-text">{o.text}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+      <div class="kp-bar">
+        <div class="kp-bar-in">
+          {stepNum > 1 ? <a class="kp-btn ghost" href={`/kampo/check/${s.id}/q/${stepNum - 1}/`}>戻る</a> : <span class="kp-btn ghost" aria-disabled="true" style="visibility:hidden">戻る</span>}
+          <button class="kp-btn" type="submit" id="nextBtn" disabled>{isLast ? '結果を見る' : '次へ'}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <script is:inline>
+  (function(){
+    var form=document.getElementById('qform');if(!form)return;
+    var type=form.dataset.type,max=parseInt(form.dataset.max||'0',10),hasSub=form.dataset.sub==='1',optional=form.dataset.optional==='1';
+    var next=document.getElementById('nextBtn');
+    var opts=Array.prototype.slice.call(form.querySelectorAll('input[name=opt]'));
+    var subs=Array.prototype.slice.call(form.querySelectorAll('input[name=sub]'));
+    var text=form.querySelector('textarea[name=text]');
+    var isNone=function(i){return i.dataset.none==='1'};
+    function sync(){
+      var checked=opts.filter(function(i){return i.checked});
+      opts.forEach(function(i){var l=i.closest('.kp-opt');l.classList.toggle('is-on',i.checked);
+        var free=document.getElementById('free-'+i.value);if(free){free.hidden=!i.checked;if(i.checked&&document.activeElement===i){var inp=free.querySelector('input');if(inp)inp.focus();}}
+        var off=type==='multi'&&max>0&&checked.length>=max&&!i.checked&&!isNone(i);
+        i.disabled=off;l.classList.toggle('is-off',off);
+      });
+      subs.forEach(function(i){i.closest('.kp-opt').classList.toggle('is-on',i.checked)});
+      var ok;
+      if(type==='text'){ok=optional||(text&&text.value.trim().length>0)}
+      else{ok=checked.length>0&&(!hasSub||subs.some(function(i){return i.checked}))}
+      next.disabled=!ok;
+    }
+    opts.forEach(function(i){i.addEventListener('change',function(){
+      if(type==='multi'){
+        if(i.checked&&isNone(i)){opts.forEach(function(o){if(o!==i)o.checked=false})}
+        else if(i.checked){opts.forEach(function(o){if(isNone(o))o.checked=false})}
+      }
+      sync();
+    })});
+    subs.forEach(function(i){i.addEventListener('change',sync)});
+    if(text)text.addEventListener('input',sync);
+    sync();
+  })();
+  </script>
+</KampoLayout>

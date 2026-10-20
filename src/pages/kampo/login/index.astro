@@ -1,0 +1,50 @@
+---
+// 共通パスワードのログイン。成功で /kampo 配下だけに効く署名付き Cookie（30日）。
+export const prerender = false;
+import KampoLayout from '../../../layouts/KampoLayout.astro';
+import { checkPassword, isAuthConfigured, isSiteAuthed, setSiteCookie, clearSiteCookie, safeNext, clientIp } from '../../../lib/kampo/auth';
+import { loginAllowed, recordLoginFailure } from '../../../lib/contact';
+import { isKvConfigured } from '../../../lib/kampo/store';
+
+const next = safeNext(Astro.url.searchParams.get('next'), '/kampo/check/new/');
+let error = '';
+let loggedOut = false;
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  if (String(form.get('action') ?? '') === 'logout') {
+    clearSiteCookie(Astro.cookies);
+    return Astro.redirect('/kampo/login/?out=1', 303);
+  }
+  const ip = clientIp(Astro.request);
+  if (!isAuthConfigured()) error = 'パスワードが設定されていません（環境変数 KAMPO_PASSWORD）。';
+  else if (!(await loginAllowed(ip))) error = '失敗が続いたため、10分ほど待ってからやり直してください。';
+  else if (checkPassword(String(form.get('password') ?? ''))) {
+    setSiteCookie(Astro.cookies);
+    return Astro.redirect(next, 303);
+  } else {
+    await recordLoginFailure(ip);
+    error = 'パスワードが違います。';
+  }
+} else {
+  loggedOut = Astro.url.searchParams.get('out') === '1';
+  if (isSiteAuthed(Astro.cookies)) return Astro.redirect(next, 303);
+}
+---
+<KampoLayout title="ログイン" width="narrow">
+  <div class="kp-card" style="max-width:520px;margin:40px auto 0">
+    <p class="kp-eyebrow">ESSENCE薬局</p>
+    <h1 class="kp-title">体質チェック（試験サイト）</h1>
+    <p class="kp-lede">スタッフ用のパスワードを入力してください。</p>
+    {loggedOut && <p class="kp-ok">ログアウトしました。</p>}
+    {!isAuthConfigured() && <p class="kp-error">パスワードが未設定です。Vercel の環境変数に KAMPO_PASSWORD（または YOYAKU_ADMIN_KEY）を設定してください。</p>}
+    {!isKvConfigured() && <p class="kp-notice">データ保存先（KV_REST_API_URL / KV_REST_API_TOKEN）が未設定のため、チェックの保存ができません。</p>}
+    {error && <p class="kp-error">{error}</p>}
+    <form method="post" autocomplete="off">
+      <label class="kp-field">パスワード
+        <input class="kp-input" type="password" name="password" required autofocus autocapitalize="off" autocomplete="current-password">
+      </label>
+      <button class="kp-btn block" type="submit" style="margin-top:20px">ログイン</button>
+    </form>
+  </div>
+  <p class="kp-foot">このページは検索エンジンに掲載されません。株式会社ex Labs</p>
+</KampoLayout>

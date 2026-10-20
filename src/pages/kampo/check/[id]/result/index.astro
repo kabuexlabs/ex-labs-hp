@@ -1,0 +1,98 @@
+---
+// 来店客向け結果：8軸レーダー、タイプ別の点数と段階、主体質・副体質のカード、改善アドバイスへの導線、印刷。
+// 処方名・商品名・安全確認の内容は出さない。右下の隠しボタン（長押し）からスタッフ画面へ。
+export const prerender = false;
+import KampoLayout from '../../../../../layouts/KampoLayout.astro';
+import RadarChart from '../../../../../components/kampo/RadarChart.astro';
+import AdviceBlock from '../../../../../components/kampo/AdviceBlock.astro';
+import { TYPES, TYPE_DEFS } from '../../../../../lib/kampo/masters';
+import { LEVEL_LABEL } from '../../../../../lib/kampo/scoring';
+import { typeIconSvg } from '../../../../../lib/kampo/icons';
+import { getSession, saveSession, fmtJst } from '../../../../../lib/kampo/store';
+import { visibleQuestions, firstUnansweredStep } from '../../../../../lib/kampo/flow';
+import { finalize } from '../../../../../lib/kampo/compute';
+
+const s = await getSession(Astro.params.id ?? '');
+if (!s) return Astro.redirect('/kampo/check/new/?msg=notfound', 303);
+if (s.status === 'in_progress') {
+  const vis = visibleQuestions(s.answers, s.tongueMode);
+  const step = firstUnansweredStep(vis, s.answers, s.texts);
+  if (step <= vis.length) return Astro.redirect(`/kampo/check/${s.id}/q/${step}/`, 303);
+  finalize(s);
+  await saveSession(s);
+}
+if (!s.scores) { finalize(s); await saveSession(s); }
+const r = s.scores!;
+const cards = [...r.mainTypes.map((t) => ({ t, rank: '主体質' })), ...r.subTypes.map((t) => ({ t, rank: '副体質' }))];
+const staffHref = `/kampo/staff/pin/?next=${encodeURIComponent(`/kampo/staff/session/${s.id}/`)}`;
+---
+<KampoLayout title="体質チェックの結果" width="normal">
+  <button slot="actions" class="kp-btn ghost small no-print" type="button" onclick="window.print()">印刷</button>
+  <div class="kp-card">
+    <p class="kp-eyebrow">結果</p>
+    <h1 class="kp-title">あなたの体質バランス</h1>
+    <p class="kp-lede">{fmtJst(s.completedAt ?? s.startedAt)}　{s.customerLabel}</p>
+    <div class="kp-result-top" style="margin-top:12px">
+      <RadarChart pct={r.pct} />
+      <ul class="kp-scores">
+        {TYPES.map((t) => (
+          <li>
+            <span class="sw" style={`background:${TYPE_DEFS[t].color}`}></span>
+            <span>{TYPE_DEFS[t].name}</span>
+            <span class="bar"><i style={`width:${r.pct[t]}%;background:${TYPE_DEFS[t].color}`}></i></span>
+            <span class="pct">{r.pct[t]}%</span>
+            <span class="lv">{LEVEL_LABEL[r.level[t]]}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <p class="kp-note" style="margin-top:14px">点数は「その体質の特徴にどれくらい当てはまったか」の割合です。20%未満＝バランス、20%〜＝傾向あり、40%〜＝注意、60%〜＝強い。</p>
+  </div>
+
+  {r.isBalanced ? (
+    <div class="kp-card" style="margin-top:16px">
+      <h2 class="kp-title" style="font-size:20px">大きな偏りは見られません</h2>
+      <p style="font-size:16px;margin-top:6px">今の生活を維持し、季節の変わり目に再度チェックをおすすめします。気になる症状があれば薬剤師にご相談ください。</p>
+    </div>
+  ) : cards.map(({ t, rank }) => {
+    const d = TYPE_DEFS[t];
+    return (
+      <article class="kp-tcard">
+        <div class="kp-tcard-side" style={`background:${d.color}`}>
+          <Fragment set:html={typeIconSvg(t, 34)} />
+          <span class="nm">{d.name}</span>
+          <span class="rd">{d.reading}</span>
+          <span class="sc">{r.pct[t]}%</span>
+          <span class="lvl">{LEVEL_LABEL[r.level[t]]}</span>
+        </div>
+        <div class="kp-tcard-body">
+          <p class="rank">{rank}</p>
+          <h3>{d.headline}</h3>
+          <p>{d.summary}</p>
+          <ul class="kp-sym">{d.symptoms.map((x) => <li>{x}</li>)}</ul>
+          <a class="kp-btn ghost small no-print" href={`/kampo/check/${s.id}/advice/${t}/`} style="margin-top:14px">改善アドバイスを見る</a>
+        </div>
+      </article>
+    );
+  })}
+
+  <div class="kp-card" style="margin-top:16px;background:var(--accent-soft);border-color:#CFE3DB">
+    <h2 style="font-size:18px">薬剤師が詳しくご提案します</h2>
+    <p style="font-size:15px;margin-top:6px">この結果と安全確認の内容をもとに、薬剤師があなたに合う漢方や養生をご提案します。結果画面はそのままスタッフにお渡しください。</p>
+  </div>
+  <p class="kp-foot">このチェックは体質の傾向を知るためのもので、病気の診断を行うものではありません。</p>
+
+  {/* 印刷時の2ページ目：主体質の改善アドバイス */}
+  {!r.isBalanced && r.mainTypes.map((t) => (
+    <div class="print-only page-break"><AdviceBlock type={t} answers={s.answers} pct={r.pct[t]} /></div>
+  ))}
+
+  <button class="kp-hidden-btn no-print" id="staffBtn" type="button" data-href={staffHref} aria-label="スタッフ用（長押し）" tabindex="-1"></button>
+  <script is:inline>
+  (function(){var b=document.getElementById('staffBtn');if(!b)return;var t=null;var go=function(){location.href=b.dataset.href};
+    b.addEventListener('pointerdown',function(e){e.preventDefault();clearTimeout(t);t=setTimeout(go,1200)});
+    ['pointerup','pointercancel','pointerleave'].forEach(function(ev){b.addEventListener(ev,function(){clearTimeout(t)})});
+    b.addEventListener('contextmenu',function(e){e.preventDefault()});
+  })();
+  </script>
+</KampoLayout>

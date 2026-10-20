@@ -1,0 +1,5 @@
+---
+// /kampo/ → 受付へ（未ログインは middleware が /kampo/login/ へ送る）
+export const prerender = false;
+return Astro.redirect('/kampo/check/new/', 303);
+---

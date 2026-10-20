@@ -1,0 +1,66 @@
+---
+// 顧客履歴：同一識別子の過去セッションを新しい順に。スコアの推移と提案の履歴。
+export const prerender = false;
+import KampoLayout from '../../../../../layouts/KampoLayout.astro';
+import { TYPES, TYPE_DEFS } from '../../../../../lib/kampo/masters';
+import { SEX_LABEL, AGE_BAND_LABEL, type Sex } from '../../../../../lib/kampo/flow';
+import { getCustomer, listCustomerSessions, audit, fmtJst, customerLabel, STATUS_LABEL, typeNamesOf } from '../../../../../lib/kampo/store';
+
+const c = await getCustomer(Astro.params.id ?? '');
+if (!c) return Astro.redirect('/kampo/staff/?msg=notfound', 303);
+const sessions = await listCustomerSessions(c.id);
+await audit('view_customer', c.id);
+const scored = sessions.filter((s) => s.scores);
+---
+<KampoLayout title={`顧客履歴 ${customerLabel(c)}`} mode="staff" width="wide">
+  <a slot="actions" class="kp-btn ghost small" href="/kampo/staff/">一覧へ</a>
+  <a slot="actions" class="kp-btn ghost small" href="/kampo/check/new/">新規チェックを始める</a>
+  <div class="kp-card">
+    <p class="kp-eyebrow">顧客履歴</p>
+    <h1 class="kp-title" style="font-size:20px">{customerLabel(c)}</h1>
+    <dl class="kp-kv" style="margin-top:8px">
+      <dt>会員番号</dt><dd>{c.memberNo ?? '—'}</dd>
+      <dt>電話番号</dt><dd>{c.phone ?? '—'}</dd>
+      <dt>LINE表示名</dt><dd>{c.lineName ?? '—'}</dd>
+      <dt>性別・年代</dt><dd>{c.sex ? SEX_LABEL[c.sex as Sex] ?? c.sex : '—'}／{c.ageBand ? AGE_BAND_LABEL[c.ageBand] ?? c.ageBand : '—'}</dd>
+      <dt>登録</dt><dd>{fmtJst(c.createdAt)}</dd>
+      <dt>チェック回数</dt><dd>{sessions.length} 回</dd>
+    </dl>
+  </div>
+
+  <div class="kp-card">
+    <h2 class="kp-h2" style="margin-top:0">チェックと提案の履歴</h2>
+    {sessions.length === 0 ? <p class="kp-note">まだチェックがありません。</p> : (
+      <table class="kp-table">
+        <thead><tr><th>日時</th><th>状態</th><th>主体質</th><th>副体質</th><th>提案</th><th>担当</th><th>メモ</th><th></th></tr></thead>
+        <tbody>{sessions.map((s) => (
+          <tr>
+            <td>{fmtJst(s.startedAt)}</td>
+            <td><span class:list={['kp-chip', { ok: s.status === 'proposed' }]}>{STATUS_LABEL[s.status]}</span></td>
+            <td>{s.scores ? (s.scores.isBalanced ? 'バランス良好' : typeNamesOf(s.scores.mainTypes, TYPE_DEFS)) : '—'}</td>
+            <td>{s.scores ? typeNamesOf(s.scores.subTypes, TYPE_DEFS) || '—' : '—'}</td>
+            <td>{s.proposal?.selected.map((x) => x.name).join('・') || '—'}</td>
+            <td>{s.proposal?.staffName ?? '—'}</td>
+            <td style="max-width:260px;white-space:pre-wrap">{s.proposal?.note ?? ''}</td>
+            <td><a class="kp-btn ghost small" href={`/kampo/staff/session/${s.id}/`}>開く</a></td>
+          </tr>
+        ))}</tbody>
+      </table>
+    )}
+  </div>
+
+  {scored.length > 0 && (
+    <div class="kp-card">
+      <h2 class="kp-h2" style="margin-top:0">スコアの推移（%）</h2>
+      <table class="kp-table">
+        <thead><tr><th>タイプ</th>{scored.map((s) => <th class="num">{fmtJst(s.startedAt).slice(0, 10)}</th>)}</tr></thead>
+        <tbody>{TYPES.map((k) => (
+          <tr><td><span style={`display:inline-block;width:10px;height:10px;border-radius:3px;background:${TYPE_DEFS[k].color};margin-right:6px`}></span>{TYPE_DEFS[k].name}</td>{scored.map((s) => <td class="num" style={s.scores!.mainTypes.includes(k) ? 'font-weight:700' : ''}>{s.scores!.pct[k]}</td>)}</tr>
+        ))}
+          <tr><td>虚実指数</td>{scored.map((s) => <td class="num">{s.scores!.defExcIndex}</td>)}</tr>
+          <tr><td>寒熱指数</td>{scored.map((s) => <td class="num">{s.scores!.thermalIndex}</td>)}</tr>
+        </tbody>
+      </table>
+    </div>
+  )}
+</KampoLayout>

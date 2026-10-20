@@ -1,0 +1,12 @@
+---
+// 途中再開：同じ URL を開けば続きから答えられる（最初の未回答へ。終わっていれば結果へ）
+export const prerender = false;
+import { getSession } from '../../../../lib/kampo/store';
+import { visibleQuestions, firstUnansweredStep } from '../../../../lib/kampo/flow';
+const s = await getSession(Astro.params.id ?? '');
+if (!s) return Astro.redirect('/kampo/check/new/?msg=notfound', 303);
+if (s.status !== 'in_progress') return Astro.redirect(`/kampo/check/${s.id}/result/`, 303);
+const vis = visibleQuestions(s.answers, s.tongueMode);
+const step = firstUnansweredStep(vis, s.answers, s.texts);
+return Astro.redirect(step > vis.length ? `/kampo/check/${s.id}/result/` : `/kampo/check/${s.id}/q/${step}/`, 303);
+---
