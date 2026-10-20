@@ -8,7 +8,7 @@ import RadarChart from '../../../../../components/kampo/RadarChart.astro';
 import { TYPES, TYPE_DEFS, QUESTIONS, FORMULAS, questionById, optionText, formulaByCode, BLOCK_LABEL } from '../../../../../lib/kampo/masters';
 import { LEVEL_LABEL, DEF_EXC_LABEL, THERMAL_STATE_LABEL } from '../../../../../lib/kampo/scoring';
 import { SAFETY_LEVEL_LABEL, hasRefer } from '../../../../../lib/kampo/safety';
-import { recommend } from '../../../../../lib/kampo/recommend';
+import { recommend, recommendForCustomer } from '../../../../../lib/kampo/recommend';
 import { visibleQuestions, SEX_LABEL, AGE_BAND_LABEL, sexFromAnswers, ageBandFromAnswers } from '../../../../../lib/kampo/flow';
 import { computeSession, finalize, staffNames } from '../../../../../lib/kampo/compute';
 import { clearStaffCookie } from '../../../../../lib/kampo/auth';
@@ -77,6 +77,8 @@ const customer = s.customerId ? await getCustomer(s.customerId) : null;
 const inProgress = s.status === 'in_progress';
 const { scores: r, safetyFlags: flags } = s.scores && s.safetyFlags ? { scores: s.scores, safetyFlags: s.safetyFlags } : computeSession(s);
 const candidates = recommend(r, s.answers, flags, FORMULAS, s.tongueOverride);
+// 来店客向け結果に出している漢方薬（矛盾・警告のないものだけ）
+const customerPicks = new Set(recommendForCustomer(r, s.answers, flags, FORMULAS, s.tongueOverride).map((c) => c.code));
 const refer = hasRefer(flags);
 const vis = visibleQuestions(s.answers, s.tongueMode);
 const a = s.answers;
@@ -183,17 +185,19 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', t
   <div class="kp-card" style="margin-top:16px">
     <h2 class="kp-h2" style="margin-top:0">ご提案の候補（上位3件・おすすめ順）</h2>
     {refer && <p class="kp-notice" style="margin:0 0 8px">受診勧奨の対象です。提案は薬剤師の判断で行ってください。</p>}
-    <p class="kp-note">候補は体質一致・虚実・寒熱・主訴・キー所見から機械的に並べたものです。禁忌に該当する処方も除外せず警告つきで表示します。最終判断は薬剤師が行います。</p>
+    <p class="kp-note">候補は体質一致・虚実・寒熱・主訴・キー所見から機械的に並べたものです。禁忌に該当する処方も除外せず警告つきで表示します。最終判断は薬剤師が行います。<br>来店客向けの結果画面には、このうち「矛盾なし・警告なし」のものだけを最大3件「体質に合う漢方薬（例）」として表示しています（<span class="kp-chip ok">来店客にも表示</span> の印）。{customerPicks.size === 0 && <b>（今回は来店客向けには1件も表示していません{r.isBalanced ? '：バランス良好' : refer ? '：受診勧奨あり' : '：矛盾または警告のない候補がない'}）</b>}</p>
     <form method="post" id="propForm">
       <input type="hidden" name="action" value="proposal">
       {candidates.map((c, i) => (
         <div class="kp-cand" style={c.warnings.length ? 'border-color:#E8B4B4;background:#FFFBFA' : ''}>
           <h3><label class="kp-check small" style="margin:0;border:none;padding:0;background:none"><input type="checkbox" name="sel" value={c.code} checked={selectedSet.has(c.code)}>{i + 1}. {c.name}<small>（{c.reading}）</small></label>
             {c.warnings.map((w) => <span class="contra">禁忌該当: {w}</span>)}
+            {customerPicks.has(c.code) && <span class="kp-chip ok">来店客にも表示</span>}
             <span class="score">スコア {c.score.toFixed(2)}</span></h3>
           <ul>
             {c.reasons.map((x) => <li>{x}</li>)}
             {c.herbCautions.length > 0 && <li class="herb">注意生薬: {c.herbCautions.map((h) => `${h.herb} — ${h.flagLabel}`).join('、')}</li>}
+            {c.conflicts.map((x) => <li style="color:var(--warn);font-weight:700">矛盾: {x}</li>)}
             {c.cautionHerbs.length > 0 && <li style="color:var(--muted)">含む注意生薬: {c.cautionHerbs.join('・')}</li>}
           </ul>
           <input class="kp-input" type="text" name={`reason_${c.code}`} value={s.proposal?.selected.find((x) => x.formulaCode === c.code)?.reason ?? ''} placeholder="選定理由（任意・メモ）" style="min-height:40px;padding:8px 10px;font-size:13.5px;margin-top:8px">

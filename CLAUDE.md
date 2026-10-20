@@ -106,7 +106,7 @@
 - ESSENCE薬局 武蔵小杉店の店頭 iPad 用。仕様の正本は docs/kampo-spec.md（実装指示書 v0.1）、仕様との差分は docs/kampo-decisions.md、運用・環境変数は docs/kampo-setup.md。
 - 仕様書は Next.js+Prisma+PostgreSQL の別リポジトリを想定しているが、仮実装は **この Astro サイトに `/kampo/` として組み込み、Upstash Redis（`kampo:` プレフィックス）に保存**。ロジック（`src/lib/kampo/` の scoring / safety / recommend / flow）は純粋関数、マスタは `src/data/kampo/*.json`（薬剤師が直接編集）。
 - 認証は2段：共通パスワード `KAMPO_PASSWORD`（未設定なら YOYAKU_ADMIN_KEY）＋スタッフ画面の `KAMPO_STAFF_PIN`。ルート保護は `src/middleware.ts` → `kampoGuard`。全ページ noindex・no-store。
-- 画面で「診断」「処方」「治る」を使わない（「体質チェック」「ご提案」）。来店客向け画面に処方名を出さない。
+- 画面で「診断」「処方」「治る」を使わない（「体質チェック」「ご提案」「漢方薬」）。来店客向け結果には「体質に合う漢方薬（例）」を最大3件だけ出す（2026-10-21 ユーザー指示。矛盾・警告のないものだけ＝`recommendForCustomer`。バランス良好・受診勧奨なら出さない）。
 - `npm run test:kampo`（`npm run check` に含む）がマスタ検証と仕様書の検算例を通す。マスタ JSON を変えたら必ず実行。
 - Vercel Cron は追加していない（Hobby の上限）。保持期限 3年は Redis TTL ＋ スタッフ画面表示時の掃除。
 - **本公開はしていない**：ブランチ `claude/jolly-mayer-khrsji` のみ。main に入れるかはユーザー判断。

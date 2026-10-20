@@ -67,6 +67,8 @@ export interface Formula {
   code: string;
   name: string;
   reading: string;
+  /** 来店客向けの説明（一般用漢方製剤の効能に基づく「〜に用いられます」の文。断定しない） */
+  description: string;
   types: Partial<Record<TypeKey, number>>;
   deficiency: Deficiency;
   thermal: Thermal;
@@ -164,6 +166,8 @@ export function validateMasters(q: unknown, t: unknown, f: unknown): string[] {
       if (codes.has(c)) errs.push(`formulas.json: code 重複 ${c}`);
       codes.add(c);
       if (!isStr(raw.name) || !isStr(raw.reading)) errs.push(`${c}: name/reading がない`);
+      if (!isStr(raw.description) || raw.description.length < 10) errs.push(`${c}: description（来店客向けの説明文）がない`);
+      if (isStr(raw.description) && /診断|治る|治り|治す|処方/.test(raw.description)) errs.push(`${c}: description に「診断」「治る」「処方」を使わない`);
       if (!isObj(raw.types) || Object.keys(raw.types).length === 0) errs.push(`${c}: types が空`);
       else for (const [k, v] of Object.entries(raw.types)) {
         if (!isTypeKey(k)) errs.push(`${c}: types のキー ${k} が TypeKey でない`);

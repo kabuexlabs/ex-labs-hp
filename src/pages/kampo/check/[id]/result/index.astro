@@ -1,6 +1,6 @@
 ---
 // 来店客向け結果：8軸レーダー、タイプ別の点数と段階、主体質・副体質のカード、改善アドバイスへの導線、印刷。
-// 処方名・商品名・安全確認の内容は出さない。右下の隠しボタン（長押し）からスタッフ画面へ。
+// 安全確認の内容は出さない。体質に合う漢方薬の例は矛盾・警告のないものだけ最大3件（recommendForCustomer）。右下の隠しボタン（長押し）からスタッフ画面へ。
 export const prerender = false;
 import KampoLayout from '../../../../../layouts/KampoLayout.astro';
 import RadarChart from '../../../../../components/kampo/RadarChart.astro';
@@ -9,6 +9,8 @@ import { TYPES, TYPE_DEFS } from '../../../../../lib/kampo/masters';
 import { LEVEL_LABEL } from '../../../../../lib/kampo/scoring';
 import { typeIconSvg } from '../../../../../lib/kampo/icons';
 import { getSession, saveSession, fmtJst } from '../../../../../lib/kampo/store';
+import { FORMULAS } from '../../../../../lib/kampo/masters';
+import { recommendForCustomer } from '../../../../../lib/kampo/recommend';
 import { visibleQuestions, firstUnansweredStep } from '../../../../../lib/kampo/flow';
 import { finalize } from '../../../../../lib/kampo/compute';
 
@@ -25,6 +27,8 @@ if (!s.scores) { finalize(s); await saveSession(s); }
 const r = s.scores!;
 const cards = [...r.mainTypes.map((t) => ({ t, rank: '主体質' })), ...r.subTypes.map((t) => ({ t, rank: '副体質' }))];
 const staffHref = `/kampo/staff/pin/?next=${encodeURIComponent(`/kampo/staff/session/${s.id}/`)}`;
+// 来店客向けのおすすめ漢方薬（矛盾・安全上の警告のないものだけ。受診勧奨・バランス良好なら空）
+const picks = recommendForCustomer(r, s.answers, s.safetyFlags ?? [], FORMULAS, s.tongueOverride);
 ---
 <KampoLayout title="体質チェックの結果" width="normal">
   <button slot="actions" class="kp-btn ghost small no-print" type="button" onclick="window.print()">印刷</button>
@@ -76,9 +80,28 @@ const staffHref = `/kampo/staff/pin/?next=${encodeURIComponent(`/kampo/staff/ses
     );
   })}
 
+  {picks.length > 0 && (
+    <section class="kp-card" style="margin-top:16px">
+      <p class="kp-eyebrow">おすすめ</p>
+      <h2 class="kp-title" style="font-size:20px">あなたの体質に合う漢方薬（例）</h2>
+      <p class="kp-lede">体質チェックの結果と安全確認の回答から選んだ例です。服用中のお薬や体調を確認したうえで、薬剤師が最終的にご提案します。</p>
+      <div class="kp-fmls">
+        {picks.map((c, i) => (
+          <article class="kp-fml">
+            <p class="kp-fml-no">{i + 1}</p>
+            <div>
+              <h3>{c.name}<small>（{c.reading}）</small></h3>
+              <p class="why">{c.customerReason}</p>
+              <p class="desc">{c.description}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
   <div class="kp-card" style="margin-top:16px;background:var(--accent-soft);border-color:#CFE3DB">
     <h2 style="font-size:18px">薬剤師が詳しくご提案します</h2>
-    <p style="font-size:15px;margin-top:6px">この結果と安全確認の内容をもとに、薬剤師があなたに合う漢方や養生をご提案します。結果画面はそのままスタッフにお渡しください。</p>
+    <p style="font-size:15px;margin-top:6px">{picks.length > 0 ? 'ここに挙げた漢方薬はあくまで例です。' : ''}この結果と安全確認の内容をもとに、薬剤師があなたに合う漢方や養生をご提案します。結果画面はそのままスタッフにお渡しください。</p>
   </div>
   <p class="kp-foot">このチェックは体質の傾向を知るためのもので、病気の診断を行うものではありません。</p>
 
@@ -87,6 +110,16 @@ const staffHref = `/kampo/staff/pin/?next=${encodeURIComponent(`/kampo/staff/ses
     <div class="print-only page-break"><AdviceBlock type={t} answers={s.answers} pct={r.pct[t]} /></div>
   ))}
 
+  <style is:global>
+  .kp-fmls{display:grid;gap:12px;margin-top:14px}
+  .kp-fml{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:#FAF8F4}
+  .kp-fml-no{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+  .kp-fml h3{font-size:19px;margin-bottom:4px}
+  .kp-fml h3 small{font-size:13px;font-weight:500;color:var(--muted);margin-left:4px}
+  .kp-fml .why{font-size:15px;font-weight:500;color:var(--accent-dark)}
+  .kp-fml .desc{font-size:14.5px;color:#444;margin-top:4px}
+  @media print{.kp-fml{padding:8px 12px;break-inside:avoid}.kp-fml .why,.kp-fml .desc{font-size:11.5px}.kp-fml h3{font-size:14px}}
+  </style>
   <button class="kp-hidden-btn no-print" id="staffBtn" type="button" data-href={staffHref} aria-label="スタッフ用（長押し）" tabindex="-1"></button>
   <script is:inline>
   (function(){var b=document.getElementById('staffBtn');if(!b)return;var t=null;var go=function(){location.href=b.dataset.href};
