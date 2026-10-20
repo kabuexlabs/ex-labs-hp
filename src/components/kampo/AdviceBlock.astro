@@ -1,0 +1,59 @@
+---
+// 改善アドバイス：特徴（summary）→ 生活養生（心・食・動・休）→ おすすめのツボ → あなたへの一言 → 監修者。
+// 改善アドバイス画面と、結果画面の印刷用2ページ目で共用する。
+import { TYPE_DEFS, type TypeKey } from '../../lib/kampo/masters';
+import { personalTips } from '../../lib/kampo/flow';
+import { typeIconSvg } from '../../lib/kampo/icons';
+import { supervisorName, supervisorBio } from '../../lib/kampo/compute';
+import type { Answers } from '../../lib/kampo/scoring';
+export interface Props { type: TypeKey; answers: Answers; pct?: number; showSupervisor?: boolean }
+const { type, answers, pct, showSupervisor = true } = Astro.props;
+const d = TYPE_DEFS[type];
+const tips = personalTips(answers, type);
+const sup = supervisorName();
+const bio = supervisorBio();
+const ADVICE_LABEL: Record<'mind' | 'food' | 'move' | 'rest', string> = { mind: '心', food: '食', move: '動', rest: '休' };
+---
+<section class="kp-card kp-advice">
+  <div class="kp-advice-head" style={`--c:${d.color}`}>
+    <span class="kp-advice-icon"><Fragment set:html={typeIconSvg(type, 30)} /></span>
+    <div>
+      <p class="kp-eyebrow">改善アドバイス</p>
+      <h2 class="kp-title">{d.name}<small>（{d.reading}）</small>{pct !== undefined && <small class="pct">{pct}%</small>}</h2>
+      <p class="kp-lede">{d.headline}</p>
+    </div>
+  </div>
+  <h3 class="kp-h2">特徴</h3>
+  <p class="kp-advice-text">{d.summary}</p>
+  <h3 class="kp-h2">生活養生</h3>
+  <div class="kp-advice-grid">
+    {(['mind', 'food', 'move', 'rest'] as const).map((k) => (
+      <div class="kp-card"><h3><span class="kp-advice-badge" style={`background:${d.color}`}>{ADVICE_LABEL[k]}</span></h3><p>{d.advice[k]}</p></div>
+    ))}
+  </div>
+  <h3 class="kp-h2">おすすめのツボ</h3>
+  <div class="kp-tsubo">
+    <p class="kp-tsubo-name">{d.tsubo.name}<small>（{d.tsubo.reading}）</small></p>
+    <p><b>位置</b>　{d.tsubo.position}</p>
+    <p><b>効果</b>　{d.tsubo.effect}</p>
+  </div>
+  {tips.length > 0 && (
+    <div class="kp-tip"><b>あなたへの一言</b>　{tips.join('　')}</div>
+  )}
+  {showSupervisor && (
+    <p class="kp-supervisor">監修：{sup || '（薬剤師名を設定してください）'}{bio && <span>　{bio}</span>}</p>
+  )}
+</section>
+<style is:global>
+.kp-advice-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:8px}
+.kp-advice-icon{flex:none;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--c);color:#fff}
+.kp-advice-head .kp-title small{font-size:14px;font-weight:500;color:var(--muted);margin-left:6px}
+.kp-advice-head .kp-title small.pct{font-weight:700;color:var(--accent-dark)}
+.kp-advice-text{font-size:16px}
+.kp-advice-badge{display:inline-flex;width:32px;height:32px;border-radius:50%;align-items:center;justify-content:center;color:#fff;font-size:16px}
+.kp-tsubo{background:#FAF8F4;border-radius:12px;padding:16px 18px;font-size:15px;display:grid;gap:4px}
+.kp-tsubo-name{font-size:18px;font-weight:700}
+.kp-tsubo-name small{font-size:13px;font-weight:500;color:var(--muted)}
+.kp-supervisor{margin-top:20px;padding-top:14px;border-top:1px dashed var(--line);font-size:13.5px;color:var(--muted)}
+@media print{.kp-advice{padding:14px 18px}.kp-advice-head{margin-bottom:0}.kp-advice .kp-h2{margin:10px 0 6px;font-size:14px}.kp-advice-text,.kp-advice-grid p,.kp-tsubo{font-size:11.5px}.kp-advice-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:6px}.kp-advice-grid .kp-card{padding:8px 12px}.kp-advice-grid h3{margin-bottom:2px}.kp-advice-badge{width:24px;height:24px;font-size:12px}.kp-tsubo{padding:8px 12px}.kp-tsubo-name{font-size:14px}.kp-tip{padding:8px 12px;margin-top:8px;font-size:12px}.kp-supervisor{margin-top:8px;padding-top:6px;font-size:11px}}
+</style>

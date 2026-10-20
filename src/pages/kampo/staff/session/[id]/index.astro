@@ -1,0 +1,239 @@
+---
+// 担当者画面：安全確認フラグ → 主訴・なりたい自分・期間 → スコアと虚実・寒熱指数 → 舌所見（入力・上書き・再計算）
+// → 回答一覧（折りたたみ）→ 処方候補 上位3件（根拠・注意生薬）→ 選定とメモの保存。
+// 「来店客モードへ戻る」でスタッフ Cookie を消して来店客向け結果へ。
+export const prerender = false;
+import KampoLayout from '../../../../../layouts/KampoLayout.astro';
+import RadarChart from '../../../../../components/kampo/RadarChart.astro';
+import { TYPES, TYPE_DEFS, QUESTIONS, FORMULAS, questionById, optionText, formulaByCode, BLOCK_LABEL } from '../../../../../lib/kampo/masters';
+import { LEVEL_LABEL, DEF_EXC_LABEL, THERMAL_STATE_LABEL } from '../../../../../lib/kampo/scoring';
+import { SAFETY_LEVEL_LABEL, hasRefer } from '../../../../../lib/kampo/safety';
+import { recommend } from '../../../../../lib/kampo/recommend';
+import { visibleQuestions, SEX_LABEL, AGE_BAND_LABEL, sexFromAnswers, ageBandFromAnswers } from '../../../../../lib/kampo/flow';
+import { computeSession, finalize, staffNames } from '../../../../../lib/kampo/compute';
+import { clearStaffCookie } from '../../../../../lib/kampo/auth';
+import {
+  getSession, saveSession, getCustomer, audit, fmtJst, STATUS_LABEL, INPUT_BY_LABEL, TONGUE_MODE_LABEL, type KampoProposal,
+} from '../../../../../lib/kampo/store';
+
+const id = Astro.params.id ?? '';
+const s = await getSession(id);
+if (!s) return Astro.redirect('/kampo/staff/?msg=notfound', 303);
+const self = `/kampo/staff/session/${s.id}/`;
+let msg = Astro.url.searchParams.get('msg') ?? '';
+let error = '';
+const tongueQ = questionById('B13')!;
+const tongueIds = new Set(tongueQ.options.map((o) => o.id));
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const get = (k: string) => String(form.get(k) ?? '').trim();
+  const action = get('action');
+  if (action === 'leave') {
+    clearStaffCookie(Astro.cookies);
+    return Astro.redirect(`/kampo/check/${s.id}/result/`, 303);
+  }
+  if (action === 'tongue' || action === 'tongue-clear') {
+    const ids = action === 'tongue' ? form.getAll('tongue').map(String).filter((x) => tongueIds.has(x)) : [];
+    s.tongueOverride = ids.length ? ids : undefined;
+    if (s.status !== 'in_progress') finalize(s);
+    await saveSession(s);
+    await audit(action, s.id, get('staff') || undefined);
+    return Astro.redirect(`${self}?msg=${ids.length ? 'tongue' : 'tongue-clear'}`, 303);
+  }
+  if (action === 'proposal') {
+    const staffName = (get('staffName') === '__other' ? get('staffOther') : get('staffName')).slice(0, 40);
+    const selCodes = form.getAll('sel').map(String).filter((c) => formulaByCode(c));
+    const other = get('selOther').slice(0, 120);
+    if (!staffName) error = '担当者名を選んでください。';
+    else if (selCodes.length === 0 && !other && !get('note')) error = '提案する処方を選ぶか、メモを入力してください。';
+    else {
+      if (s.status === 'in_progress') error = '回答がまだ終わっていません。';
+      else {
+        const { scores, safetyFlags } = computeSession(s);
+        const cands = recommend(scores, s.answers, safetyFlags, FORMULAS, s.tongueOverride);
+        const selected = selCodes.map((c) => ({ formulaCode: c, name: formulaByCode(c)!.name, reason: get(`reason_${c}`).slice(0, 300) || undefined }));
+        if (other) selected.push({ formulaCode: 'other', name: other, reason: get('reason_other').slice(0, 300) || undefined });
+        const now = new Date().toISOString();
+        const dv = get('deliveredVia');
+        const p: KampoProposal = {
+          staffName, candidates: cands, selected, note: get('note').slice(0, 2000) || undefined,
+          deliveredVia: dv === 'print' ? 'print' : dv === 'screen' ? 'screen' : '',
+          createdAt: s.proposal?.createdAt ?? now, updatedAt: now,
+        };
+        s.proposal = p;
+        s.status = 'proposed';
+        await saveSession(s);
+        await audit('proposal', s.id, staffName);
+        return Astro.redirect(`${self}?msg=saved`, 303);
+      }
+    }
+  }
+} else {
+  await audit('view_session', s.id);
+}
+
+const customer = s.customerId ? await getCustomer(s.customerId) : null;
+const inProgress = s.status === 'in_progress';
+const { scores: r, safetyFlags: flags } = s.scores && s.safetyFlags ? { scores: s.scores, safetyFlags: s.safetyFlags } : computeSession(s);
+const candidates = recommend(r, s.answers, flags, FORMULAS, s.tongueOverride);
+const refer = hasRefer(flags);
+const vis = visibleQuestions(s.answers, s.tongueMode);
+const a = s.answers;
+const t = s.texts;
+const joinOpts = (qid: string) => (a[qid] ?? []).map((oid) => optionText(oid) + (t[oid] ? `（${t[oid]}）` : '')).join('、');
+const sex = sexFromAnswers(a);
+const age = ageBandFromAnswers(a);
+const names = staffNames();
+const currentStaff = s.proposal?.staffName ?? '';
+const selectedSet = new Set((s.proposal?.selected ?? []).map((x) => x.formulaCode));
+const tongueCurrent = new Set(s.tongueOverride ?? (s.tongueMode === 'self' ? a['B13'] ?? [] : []));
+const MSG: Record<string, string> = { saved: '提案を保存しました。', tongue: '舌の所見を保存し、スコアを再計算しました。', 'tongue-clear': '舌の所見を消し、スコアを再計算しました。' };
+---
+<KampoLayout title={`担当者画面 ${s.customerLabel}`} mode="staff" width="wide">
+  <a slot="actions" class="kp-btn ghost small" href="/kampo/staff/">一覧へ</a>
+  {customer && <a slot="actions" class="kp-btn ghost small" href={`/kampo/staff/customer/${customer.id}/`}>顧客履歴</a>}
+  <a slot="actions" class="kp-btn ghost small" href={`/kampo/check/${s.id}/result/`} target="_blank" rel="noopener">来店客向け結果（印刷）</a>
+  <form slot="actions" method="post"><button class="kp-btn small" type="submit" name="action" value="leave">来店客モードへ戻る</button></form>
+
+  {msg && MSG[msg] && <p class="kp-ok" style="margin:0 0 12px">{MSG[msg]}</p>}
+  {error && <p class="kp-error" style="margin:0 0 12px">{error}</p>}
+  {inProgress && <p class="kp-notice" style="margin:0 0 12px">このチェックはまだ回答の途中です（スコアは現時点の回答で仮計算）。<a href={`/kampo/check/${s.id}/`}>続きから回答する</a></p>}
+
+  {/* 1. 安全確認 */}
+  {refer && <div class="kp-band">受診勧奨の対象：提案は薬剤師の判断で。必要に応じて医療機関の受診を案内してください。</div>}
+  <div class="kp-card">
+    <h2 class="kp-h2" style="margin-top:0">安全確認 <span class="kp-chip" style="margin-left:6px">{flags.length}件</span></h2>
+    {flags.length === 0 ? <p class="kp-note">該当するフラグはありません。</p> : flags.map((f) => (
+      <div class:list={['kp-flag', f.level]}><b>[{SAFETY_LEVEL_LABEL[f.level]}] {f.label}</b><span>{f.detail}<small style="opacity:.75">　（{f.source}）</small></span></div>
+    ))}
+  </div>
+
+  <div class="kp-grid2" style="margin-top:16px">
+    {/* 2. 基本情報・主訴 */}
+    <div class="kp-card">
+      <h2 class="kp-h2" style="margin-top:0">お客様・主訴</h2>
+      <dl class="kp-kv">
+        <dt>お客様</dt><dd>{s.customerLabel}{customer && <> <a href={`/kampo/staff/customer/${customer.id}/`}>履歴</a></>}</dd>
+        <dt>性別・年代</dt><dd>{sex ? SEX_LABEL[sex] : '—'}／{age ? AGE_BAND_LABEL[age] : '—'}</dd>
+        <dt>入力</dt><dd>{INPUT_BY_LABEL[s.inputBy]}／舌: {TONGUE_MODE_LABEL[s.tongueMode]}</dd>
+        <dt>開始・状態</dt><dd>{fmtJst(s.startedAt)}　<span class:list={['kp-chip', { ok: s.status === 'proposed' }]}>{STATUS_LABEL[s.status]}</span></dd>
+        <dt>気になること</dt><dd><b>{joinOpts('A3') || '—'}</b></dd>
+        <dt>いつから・影響</dt><dd>{joinOpts('A4') || '—'}</dd>
+        <dt>なりたい自分</dt><dd>{joinOpts('A5') || '—'}</dd>
+        <dt>服用中の薬</dt><dd>{a['C1']?.includes('C1-1') ? (t['C1-1'] || 'あり（薬名の記入なし）') : a['C1'] ? 'なし' : '—'}</dd>
+        <dt>飲んだ漢方</dt><dd>{t['C5'] || '—'}</dd>
+        <dt>設問版</dt><dd>{s.questionnaireVersion}</dd>
+      </dl>
+    </div>
+    {/* 3. スコア */}
+    <div class="kp-card">
+      <h2 class="kp-h2" style="margin-top:0">スコア</h2>
+      <div style="display:grid;grid-template-columns:minmax(180px,220px) 1fr;gap:12px;align-items:start">
+        <RadarChart pct={r.pct} size={300} />
+        <table class="kp-table compact">
+          <thead><tr><th>タイプ</th><th class="num">%</th><th>段階</th><th class="num">点/最大</th></tr></thead>
+          <tbody>{TYPES.map((k) => (
+            <tr style={r.mainTypes.includes(k) ? 'font-weight:700' : r.subTypes.includes(k) ? 'font-weight:500' : ''}>
+              <td><span style={`display:inline-block;width:10px;height:10px;border-radius:3px;background:${TYPE_DEFS[k].color};margin-right:6px`}></span>{TYPE_DEFS[k].name}{r.mainTypes.includes(k) && '（主）'}{r.subTypes.includes(k) && '（副）'}</td>
+              <td class="num">{r.pct[k]}</td><td>{LEVEL_LABEL[r.level[k]]}</td><td class="num">{r.raw[k]}/{r.max[k]}</td>
+            </tr>
+          ))}</tbody>
+        </table>
+      </div>
+      <dl class="kp-kv" style="margin-top:10px">
+        <dt>主体質</dt><dd>{r.isBalanced ? 'バランス良好（全タイプ20%未満）' : r.mainTypes.map((k) => TYPE_DEFS[k].name).join('・')}</dd>
+        <dt>副体質</dt><dd>{r.subTypes.map((k) => TYPE_DEFS[k].name).join('・') || '—'}</dd>
+        <dt>虚実指数</dt><dd>{r.defExcIndex > 0 ? '+' : ''}{r.defExcIndex}　{DEF_EXC_LABEL[r.defExcLabel]}<small style="color:var(--muted)">（−1 虚 〜 +1 実）</small></dd>
+        <dt>寒熱指数</dt><dd>{r.thermalIndex > 0 ? '+' : ''}{r.thermalIndex}　{THERMAL_STATE_LABEL[r.thermalLabel]}<small style="color:var(--muted)">（−1 寒 〜 +1 熱）</small></dd>
+      </dl>
+    </div>
+  </div>
+
+  {/* 4. 舌所見 */}
+  <div class="kp-card" style="margin-top:16px">
+    <h2 class="kp-h2" style="margin-top:0">舌の所見 <small style="font-weight:400;color:var(--muted);font-size:13px">{s.tongueMode === 'staff' ? 'スタッフ確認モード：ここで入力すると採点に加わります' : 'セルフ回答を表示中。上書きすると薬剤師の所見が優先されます'}{s.tongueOverride?.length ? '（薬剤師の所見を使用中）' : ''}</small></h2>
+    <form method="post">
+      <input type="hidden" name="action" value="tongue">
+      <div class="kp-opts" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px">
+        {tongueQ.options.filter((o) => !o.flags?.includes('none')).map((o) => (
+          <label class="kp-check small" style="align-items:center"><input type="checkbox" name="tongue" value={o.id} checked={tongueCurrent.has(o.id)}>{o.image && <img src={o.image} alt="" width="44" height="55" style="flex:none;border-radius:6px;background:#FAF7F2">}<span>{o.text}{o.flags?.includes('refer') && <span class="kp-chip refer" style="margin-left:6px">受診</span>}</span></label>
+        ))}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="kp-btn small" type="submit">所見を保存して再計算</button>
+        <button class="kp-btn ghost small" type="submit" name="action" value="tongue-clear">所見をクリア</button>
+      </div>
+    </form>
+  </div>
+
+  {/* 5. 回答一覧 */}
+  <details class="kp-fold">
+    <summary>回答一覧（{vis.length}問）</summary>
+    <div class="kp-card">
+      <table class="kp-table">
+        <tbody>{vis.map((q) => (
+          <tr><th style="width:40%">{q.block === 'A' || q.block === 'C' || q.block === 'D' ? `${BLOCK_LABEL[q.block]} ` : ''}{q.id}　{q.title}</th><td>{q.type === 'text' ? (t[q.id] || '—') : (joinOpts(q.id) || '—')}</td></tr>
+        ))}</tbody>
+      </table>
+    </div>
+  </details>
+
+  {/* 6. 候補と 7. 提案 */}
+  <div class="kp-card" style="margin-top:16px">
+    <h2 class="kp-h2" style="margin-top:0">ご提案の候補（上位3件・おすすめ順）</h2>
+    {refer && <p class="kp-notice" style="margin:0 0 8px">受診勧奨の対象です。提案は薬剤師の判断で行ってください。</p>}
+    <p class="kp-note">候補は体質一致・虚実・寒熱・主訴・キー所見から機械的に並べたものです。禁忌に該当する処方も除外せず警告つきで表示します。最終判断は薬剤師が行います。</p>
+    <form method="post" id="propForm">
+      <input type="hidden" name="action" value="proposal">
+      {candidates.map((c, i) => (
+        <div class="kp-cand" style={c.warnings.length ? 'border-color:#E8B4B4;background:#FFFBFA' : ''}>
+          <h3><label class="kp-check small" style="margin:0;border:none;padding:0;background:none"><input type="checkbox" name="sel" value={c.code} checked={selectedSet.has(c.code)}>{i + 1}. {c.name}<small>（{c.reading}）</small></label>
+            {c.warnings.map((w) => <span class="contra">禁忌該当: {w}</span>)}
+            <span class="score">スコア {c.score.toFixed(2)}</span></h3>
+          <ul>
+            {c.reasons.map((x) => <li>{x}</li>)}
+            {c.herbCautions.length > 0 && <li class="herb">注意生薬: {c.herbCautions.map((h) => `${h.herb} — ${h.flagLabel}`).join('、')}</li>}
+            {c.cautionHerbs.length > 0 && <li style="color:var(--muted)">含む注意生薬: {c.cautionHerbs.join('・')}</li>}
+          </ul>
+          <input class="kp-input" type="text" name={`reason_${c.code}`} value={s.proposal?.selected.find((x) => x.formulaCode === c.code)?.reason ?? ''} placeholder="選定理由（任意・メモ）" style="min-height:40px;padding:8px 10px;font-size:13.5px;margin-top:8px">
+        </div>
+      ))}
+      <div class="kp-cand">
+        <h3><label class="kp-field" style="margin:0;font-size:14px">候補以外の処方<input class="kp-input" type="text" name="selOther" value={s.proposal?.selected.find((x) => x.formulaCode === 'other')?.name ?? ''} placeholder="処方名（候補にないものを提案する場合）" style="min-height:40px;padding:8px 10px;font-size:13.5px"></label></h3>
+        <input class="kp-input" type="text" name="reason_other" value={s.proposal?.selected.find((x) => x.formulaCode === 'other')?.reason ?? ''} placeholder="選定理由（任意）" style="min-height:40px;padding:8px 10px;font-size:13.5px;margin-top:8px">
+      </div>
+
+      <h2 class="kp-h2">選定とメモ</h2>
+      <div class="kp-grid2">
+        <label class="kp-field" style="margin-top:0">担当薬剤師
+          {names.length ? (
+            <select class="kp-input" name="staffName" id="staffName">
+              <option value="">選択してください</option>
+              {names.map((n) => <option value={n} selected={n === currentStaff}>{n}</option>)}
+              <option value="__other" selected={!!currentStaff && !names.includes(currentStaff)}>その他（入力）</option>
+            </select>
+          ) : (
+            <input class="kp-input" type="text" name="staffName" value={currentStaff} placeholder="氏名（KAMPO_STAFF_NAMES に登録すると選択式になります）">
+          )}
+          {names.length > 0 && <input class="kp-input" type="text" name="staffOther" id="staffOther" value={!names.includes(currentStaff) ? currentStaff : ''} placeholder="担当者名" style="margin-top:8px" hidden={!currentStaff || names.includes(currentStaff)}>}
+        </label>
+        <div>
+          <span class="kp-field" style="display:block;margin-top:0">結果の渡し方</span>
+          <div class="kp-radios cols" style="margin-top:8px">
+            <label class="kp-radio" style="min-height:48px"><input type="radio" name="deliveredVia" value="screen" checked={s.proposal?.deliveredVia === 'screen' || !s.proposal}>画面で説明</label>
+            <label class="kp-radio" style="min-height:48px"><input type="radio" name="deliveredVia" value="print" checked={s.proposal?.deliveredVia === 'print'}>A4印刷して渡す</label>
+          </div>
+        </div>
+      </div>
+      <label class="kp-field">メモ<small>店内用。お客様には表示されません</small>
+        <textarea class="kp-input" name="note" rows="3" placeholder="提案内容、次回の確認事項など">{s.proposal?.note ?? ''}</textarea>
+      </label>
+      {s.proposal && <p class="kp-note" style="margin-top:8px">前回保存: {fmtJst(s.proposal.updatedAt)}　担当 {s.proposal.staffName}　選定: {s.proposal.selected.map((x) => x.name).join('・') || '—'}</p>}
+      <button class="kp-btn" type="submit" style="margin-top:16px" disabled={inProgress}>{s.proposal ? '提案を更新する' : '提案を保存する'}</button>
+    </form>
+  </div>
+  <script is:inline>
+  (function(){var sel=document.getElementById('staffName'),oth=document.getElementById('staffOther');if(!sel||!oth)return;var u=function(){oth.hidden=sel.value!=='__other'};sel.addEventListener('change',u);u();})();
+  </script>
+</KampoLayout>

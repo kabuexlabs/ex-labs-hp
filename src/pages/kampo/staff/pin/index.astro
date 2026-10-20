@@ -1,0 +1,42 @@
+---
+// スタッフ画面の PIN 入力。成功でスタッフ Cookie（12時間）。結果画面から来た場合はその担当者画面へ直行。
+export const prerender = false;
+import KampoLayout from '../../../../layouts/KampoLayout.astro';
+import { checkPin, pinConfigured, isStaffAuthed, setStaffCookie, safeNext, clientIp } from '../../../../lib/kampo/auth';
+import { loginAllowed, recordLoginFailure } from '../../../../lib/contact';
+
+let next = safeNext(Astro.url.searchParams.get('next'), '/kampo/staff/');
+if (!next.startsWith('/kampo/staff/')) next = '/kampo/staff/';
+let error = '';
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  const ip = clientIp(Astro.request);
+  if (!(await loginAllowed(ip))) error = '失敗が続いたため、10分ほど待ってからやり直してください。';
+  else if (checkPin(String(form.get('pin') ?? '').trim())) {
+    setStaffCookie(Astro.cookies);
+    return Astro.redirect(next, 303);
+  } else {
+    await recordLoginFailure(ip);
+    error = pinConfigured() ? 'PINが違います。' : '合言葉が違います。';
+  }
+} else if (isStaffAuthed(Astro.cookies)) {
+  return Astro.redirect(next, 303);
+}
+const numeric = pinConfigured();
+---
+<KampoLayout title="スタッフ確認" mode="staff" width="narrow">
+  <a slot="actions" class="kp-btn ghost small" href="/kampo/check/new/">来店客モードへ戻る</a>
+  <div class="kp-card" style="max-width:460px;margin:40px auto 0">
+    <p class="kp-eyebrow">スタッフ確認</p>
+    <h1 class="kp-title">{numeric ? 'PINを入力' : '合言葉を入力'}</h1>
+    <p class="kp-lede">担当者画面を開きます。お客様に iPad をお渡しする前に「来店客モードへ戻る」を押してください。</p>
+    {!numeric && <p class="kp-notice">4桁PIN（KAMPO_STAFF_PIN）が未設定のため、ログインの合言葉で代用しています。</p>}
+    {error && <p class="kp-error">{error}</p>}
+    <form method="post" autocomplete="off">
+      <label class="kp-field">{numeric ? 'PIN（4桁）' : '合言葉'}
+        <input class="kp-input" type="password" name="pin" required autofocus inputmode={numeric ? 'numeric' : 'text'} pattern={numeric ? '[0-9]*' : undefined} maxlength={numeric ? 4 : 100} autocomplete="off" style="letter-spacing:.3em;font-size:26px;text-align:center">
+      </label>
+      <button class="kp-btn block" type="submit" style="margin-top:20px">開く</button>
+    </form>
+  </div>
+</KampoLayout>

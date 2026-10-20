@@ -1,0 +1,119 @@
+---
+// スタッフ画面トップ：本日のチェック一覧・顧客検索・新規チェック・CSV書き出し。
+// 「来店客モードへ戻る」でスタッフ Cookie を消す（iPad を渡す前に押す）。
+export const prerender = false;
+import KampoLayout from '../../../layouts/KampoLayout.astro';
+import { TYPE_DEFS } from '../../../lib/kampo/masters';
+import { SEX_LABEL, AGE_BAND_LABEL, type Sex } from '../../../lib/kampo/flow';
+import { clearStaffCookie, pinConfigured } from '../../../lib/kampo/auth';
+import { supervisorName } from '../../../lib/kampo/compute';
+import {
+  isKvConfigured, listSessionsByDay, searchCustomers, countSessions, purgeExpired, jstDate, fmtJst, customerLabel,
+  STATUS_LABEL, INPUT_BY_LABEL, TONGUE_MODE_LABEL, typeNamesOf,
+} from '../../../lib/kampo/store';
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  if (String(form.get('action') ?? '') === 'leave') {
+    clearStaffCookie(Astro.cookies);
+    return Astro.redirect('/kampo/check/new/', 303);
+  }
+}
+const kv = isKvConfigured();
+const today = jstDate();
+const dateParam = Astro.url.searchParams.get('date') ?? '';
+const date = /^\d{4}-\d{2}-\d{2}$/.test(dateParam) ? dateParam : today;
+const qstr = (Astro.url.searchParams.get('q') ?? '').trim();
+const msg = Astro.url.searchParams.get('msg') ?? '';
+const shift = (d: string, n: number) => { const t = new Date(`${d}T00:00:00+09:00`); t.setUTCDate(t.getUTCDate() + n); return jstDate(new Date(t.getTime() - 9 * 3600 * 1000 + 12 * 3600 * 1000)); };
+let sessions: Awaited<ReturnType<typeof listSessionsByDay>> = [];
+let customers: Awaited<ReturnType<typeof searchCustomers>> = [];
+let total = 0;
+let loadError = '';
+if (kv) {
+  try {
+    if (date === today) await purgeExpired().catch((e) => console.error('[kampo] purge', e));
+    [sessions, total] = await Promise.all([listSessionsByDay(date), countSessions()]);
+    if (qstr) customers = await searchCustomers(qstr);
+  } catch (e) {
+    loadError = String((e as Error).message ?? e);
+  }
+}
+const flagSummary = (s: (typeof sessions)[number]) => {
+  const f = s.safetyFlags ?? [];
+  const refer = f.filter((x) => x.level === 'refer').length;
+  const warn = f.filter((x) => x.level === 'warn').length;
+  return { refer, warn };
+};
+---
+<KampoLayout title="スタッフ画面" mode="staff" width="wide">
+  <a slot="actions" class="kp-btn ghost small" href="/kampo/check/new/">新規チェックを始める</a>
+  <form slot="actions" method="post"><button class="kp-btn small" type="submit" name="action" value="leave">来店客モードへ戻る</button></form>
+
+  {msg === 'notfound' && <p class="kp-notice" style="margin-bottom:12px">指定のチェックが見つかりませんでした（保持期限切れの可能性があります）。</p>}
+  {!kv && <p class="kp-error" style="margin-bottom:12px">データ保存先（KV）が未設定です。</p>}
+  {loadError && <p class="kp-error" style="margin-bottom:12px">読み込みエラー: {loadError}</p>}
+
+  <div class="kp-card">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <h1 class="kp-title" style="font-size:20px;margin:0">{date === today ? '本日' : date.replace(/-/g, '/')}のチェック<span class="kp-chip" style="margin-left:8px">{sessions.length}件</span></h1>
+      <form method="get" style="margin-left:auto;display:flex;gap:6px;align-items:center">
+        <a class="kp-btn ghost small" href={`/kampo/staff/?date=${shift(date, -1)}`}>前日</a>
+        <input class="kp-input" type="date" name="date" value={date} style="min-height:44px;padding:6px 10px;font-size:15px;margin:0;width:170px">
+        <button class="kp-btn ghost small" type="submit">表示</button>
+        <a class="kp-btn ghost small" href={`/kampo/staff/?date=${shift(date, 1)}`}>翌日</a>
+        {date !== today && <a class="kp-btn ghost small" href="/kampo/staff/">今日</a>}
+      </form>
+    </div>
+    {sessions.length === 0 ? (
+      <p class="kp-note" style="margin-top:12px">この日のチェックはありません。</p>
+    ) : (
+      <table class="kp-table" style="margin-top:12px">
+        <thead><tr><th>時刻</th><th>お客様</th><th>入力</th><th>主体質</th><th>副体質</th><th>警告</th><th>状態</th><th></th></tr></thead>
+        <tbody>
+          {sessions.map((s) => { const f = flagSummary(s); return (
+            <tr>
+              <td>{fmtJst(s.startedAt, false)}</td>
+              <td>{s.customerLabel}</td>
+              <td>{INPUT_BY_LABEL[s.inputBy]}／舌: {TONGUE_MODE_LABEL[s.tongueMode]}</td>
+              <td>{s.scores ? (s.scores.isBalanced ? 'バランス良好' : typeNamesOf(s.scores.mainTypes, TYPE_DEFS)) : '—'}</td>
+              <td>{s.scores ? typeNamesOf(s.scores.subTypes, TYPE_DEFS) || '—' : '—'}</td>
+              <td>{f.refer > 0 && <span class="kp-chip refer">受診勧奨 {f.refer}</span>} {f.warn > 0 && <span class="kp-chip warn">注意 {f.warn}</span>} {f.refer + f.warn === 0 && <span class="kp-chip ok">なし</span>}</td>
+              <td><span class:list={['kp-chip', { ok: s.status === 'proposed' }]}>{STATUS_LABEL[s.status]}</span></td>
+              <td><a class="kp-btn ghost small" href={`/kampo/staff/session/${s.id}/`}>開く</a></td>
+            </tr>
+          ); })}
+        </tbody>
+      </table>
+    )}
+  </div>
+
+  <div class="kp-card">
+    <h2 class="kp-title" style="font-size:18px">顧客検索</h2>
+    <form method="get" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+      <label class="kp-field" style="flex:1;min-width:240px;margin-top:0">会員番号・電話番号・LINE表示名
+        <input class="kp-input" type="text" name="q" value={qstr} placeholder="例: 12345 / 09012345678 / 表示名の一部" autocomplete="off">
+      </label>
+      <button class="kp-btn small" type="submit" style="min-height:56px">検索</button>
+    </form>
+    {qstr && (customers.length === 0 ? <p class="kp-note" style="margin-top:12px">「{qstr}」に一致するお客様はいません。</p> : (
+      <table class="kp-table" style="margin-top:12px">
+        <thead><tr><th>お客様</th><th>性別・年代</th><th>登録日</th><th></th></tr></thead>
+        <tbody>{customers.map((c) => (
+          <tr><td>{customerLabel(c)}</td><td>{c.sex ? SEX_LABEL[c.sex as Sex] ?? c.sex : '—'}／{c.ageBand ? AGE_BAND_LABEL[c.ageBand] ?? c.ageBand : '—'}</td><td>{fmtJst(c.createdAt).slice(0, 10)}</td><td><a class="kp-btn ghost small" href={`/kampo/staff/customer/${c.id}/`}>履歴</a></td></tr>
+        ))}</tbody>
+      </table>
+    ))}
+  </div>
+
+  <div class="kp-card">
+    <h2 class="kp-title" style="font-size:18px">設定・データ</h2>
+    <dl class="kp-kv">
+      <dt>保存件数</dt><dd>{total} 件（保持期間 3年。期限切れは自動で削除）</dd>
+      <dt>監修者表示</dt><dd>{supervisorName() || <span style="color:var(--danger)">未設定（KAMPO_SUPERVISOR_NAME）</span>}</dd>
+      <dt>スタッフPIN</dt><dd>{pinConfigured() ? '設定済み' : <span style="color:var(--danger)">未設定（KAMPO_STAFF_PIN）。ログインの合言葉で代用中</span>}</dd>
+      <dt>CSV書き出し</dt><dd><a href="/kampo/staff/export.csv">全チェックの一覧と回答（CSV）</a></dd>
+      <dt>マスタ編集</dt><dd>設問・文面・処方は <code>src/data/kampo/</code> の JSON を直して再デプロイ</dd>
+    </dl>
+  </div>
+</KampoLayout>

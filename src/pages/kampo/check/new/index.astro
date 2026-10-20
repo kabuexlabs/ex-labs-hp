@@ -1,0 +1,144 @@
+---
+// 受付：顧客識別（会員番号／電話番号／LINE表示名／識別なし）、舌チェックのモード、入力者、保存の同意。
+// 同意でセッションを作り、設問1へ。LINE表示名は同名の候補を出してスタッフが選ぶ。
+export const prerender = false;
+import KampoLayout from '../../../../layouts/KampoLayout.astro';
+import consentText from '../../../../data/kampo/consent.md?raw';
+import {
+  isKvConfigured, createSession, saveCustomer, getCustomer, newId, normalizePhone,
+  findCustomerByMember, findCustomerByPhone, findCustomersByLineName, customerLabel, fmtJst,
+  type KampoCustomer, type TongueMode, type InputBy,
+} from '../../../../lib/kampo/store';
+
+const kv = isKvConfigured();
+let error = '';
+const msg = Astro.url.searchParams.get('msg') ?? '';
+let candidates: KampoCustomer[] | null = null;
+let posted = { idtype: 'none', ident: '', tongue: 'self', inputby: 'customer' };
+
+if (Astro.request.method === 'POST' && kv) {
+  const form = await Astro.request.formData();
+  const get = (k: string) => String(form.get(k) ?? '').trim();
+  const action = get('action');
+  const idtype = ['member', 'phone', 'line', 'none'].includes(get('idtype')) ? get('idtype') : 'none';
+  const ident = get('ident').slice(0, 60);
+  const tongue: TongueMode = get('tongue') === 'staff' ? 'staff' : 'self';
+  const inputBy: InputBy = get('inputby') === 'staff' ? 'staff' : 'customer';
+  posted = { idtype, ident, tongue, inputby: inputBy };
+
+  const start = async (customer: KampoCustomer | null) => {
+    const s = await createSession({ customer, tongueMode: tongue, inputBy });
+    return Astro.redirect(`/kampo/check/${s.id}/q/1/`, 303);
+  };
+  const newCustomer = async (fields: Partial<KampoCustomer>) => {
+    const c: KampoCustomer = { id: newId(), createdAt: new Date().toISOString(), ...fields };
+    await saveCustomer(c);
+    return c;
+  };
+
+  if (get('consent') !== 'on') {
+    error = '保存についての同意をご確認のうえ、チェックを入れてください。';
+  } else if (action === 'pick') {
+    // LINE表示名の候補から選択（'new' なら新規登録）
+    const picked = get('customerId');
+    const c = picked === 'new' ? await newCustomer({ lineName: ident }) : await getCustomer(picked);
+    if (!c) error = 'お客様の候補を選び直してください。';
+    else return await start(c);
+  } else if (idtype === 'none') {
+    return await start(null);
+  } else if (!ident) {
+    error = '識別のための番号または名前を入力してください（なければ「識別なし」を選べます）。';
+  } else if (idtype === 'member') {
+    const no = ident.replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0));
+    const c = (await findCustomerByMember(no)) ?? (await newCustomer({ memberNo: no }));
+    return await start(c);
+  } else if (idtype === 'phone') {
+    const digits = normalizePhone(ident);
+    if (digits.length < 10 || digits.length > 11) error = '電話番号は10〜11桁の数字で入力してください。';
+    else {
+      const c = (await findCustomerByPhone(digits)) ?? (await newCustomer({ phone: digits }));
+      return await start(c);
+    }
+  } else if (idtype === 'line') {
+    const found = await findCustomersByLineName(ident);
+    if (found.length === 0) return await start(await newCustomer({ lineName: ident }));
+    candidates = found;
+  }
+}
+---
+<KampoLayout title="受付" width="narrow">
+  <a slot="actions" class="kp-btn ghost small" href="/kampo/staff/">スタッフ画面</a>
+  <div class="kp-card">
+    <p class="kp-eyebrow">受付</p>
+    <h1 class="kp-title">体質チェックを始めます</h1>
+    <p class="kp-lede">所要時間は5〜7分です。スタッフが入力を済ませたら、iPad をお客様にお渡しください。</p>
+    {msg === 'notfound' && <p class="kp-notice">指定のチェックが見つかりませんでした。新しく始めてください。</p>}
+    {!kv && <p class="kp-error">データ保存先（KV）が未設定のため、チェックを始められません。</p>}
+    {error && <p class="kp-error">{error}</p>}
+
+    {candidates ? (
+      <form method="post">
+        <input type="hidden" name="action" value="pick">
+        <input type="hidden" name="idtype" value="line">
+        <input type="hidden" name="ident" value={posted.ident}>
+        <input type="hidden" name="tongue" value={posted.tongue}>
+        <input type="hidden" name="inputby" value={posted.inputby}>
+        <input type="hidden" name="consent" value="on">
+        <h2 class="kp-h2">LINE表示名「{posted.ident}」に近いお客様が見つかりました</h2>
+        <p class="kp-note">該当するお客様を選ぶか、新しいお客様として登録してください。</p>
+        <div class="kp-radios">
+          {candidates.map((c, i) => (
+            <label class="kp-radio"><input type="radio" name="customerId" value={c.id} checked={i === 0}>{customerLabel(c)}<small style="color:var(--muted);margin-left:auto">登録 {fmtJst(c.createdAt).slice(0, 10)}</small></label>
+          ))}
+          <label class="kp-radio"><input type="radio" name="customerId" value="new">新しいお客様として登録する</label>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:22px;flex-wrap:wrap">
+          <a class="kp-btn ghost" href="/kampo/check/new/">戻る</a>
+          <button class="kp-btn" type="submit" style="flex:1">この内容で始める</button>
+        </div>
+      </form>
+    ) : (
+      <form method="post" id="newForm">
+        <input type="hidden" name="action" value="start">
+        <h2 class="kp-h2">お客様の識別</h2>
+        <div class="kp-radios cols">
+          <label class="kp-radio"><input type="radio" name="idtype" value="member" checked={posted.idtype === 'member'}>会員番号</label>
+          <label class="kp-radio"><input type="radio" name="idtype" value="phone" checked={posted.idtype === 'phone'}>電話番号</label>
+          <label class="kp-radio"><input type="radio" name="idtype" value="line" checked={posted.idtype === 'line'}>LINE表示名</label>
+          <label class="kp-radio"><input type="radio" name="idtype" value="none" checked={posted.idtype === 'none'}>識別なし</label>
+        </div>
+        <label class="kp-field" id="identField">番号または名前<small>識別なしの場合は空欄</small>
+          <input class="kp-input" type="text" name="ident" value={posted.ident} autocomplete="off" placeholder="例: 12345 / 09012345678 / LINEの表示名">
+        </label>
+
+        <h2 class="kp-h2">舌のチェック</h2>
+        <div class="kp-radios cols">
+          <label class="kp-radio"><input type="radio" name="tongue" value="self" checked={posted.tongue === 'self'}>ご自分で（イラストを見て選ぶ）</label>
+          <label class="kp-radio"><input type="radio" name="tongue" value="staff" checked={posted.tongue === 'staff'}>スタッフが確認する</label>
+        </div>
+
+        <h2 class="kp-h2">入力する方</h2>
+        <div class="kp-radios cols">
+          <label class="kp-radio"><input type="radio" name="inputby" value="customer" checked={posted.inputby === 'customer'}>お客様ご本人</label>
+          <label class="kp-radio"><input type="radio" name="inputby" value="staff" checked={posted.inputby === 'staff'}>スタッフが聞き取り</label>
+        </div>
+
+        <h2 class="kp-h2">回答の保存について</h2>
+        <p style="font-size:15px;background:#FAF8F4;border-radius:12px;padding:14px 16px">{consentText.trim()}</p>
+        <label class="kp-check" style="margin-top:14px;font-size:16px"><input type="checkbox" name="consent" id="consent">上記に同意して体質チェックを始める</label>
+        <button class="kp-btn block" type="submit" id="startBtn" disabled style="margin-top:20px">同意して始める</button>
+      </form>
+    )}
+  </div>
+  <script is:inline>
+  (function(){
+    var c=document.getElementById('consent'),b=document.getElementById('startBtn');
+    if(c&&b){var s=function(){b.disabled=!c.checked};c.addEventListener('change',s);s();}
+    var f=document.getElementById('newForm');if(!f)return;
+    var ident=f.querySelector('input[name=ident]'),field=document.getElementById('identField');
+    var upd=function(){var v=(f.querySelector('input[name=idtype]:checked')||{}).value;var none=v==='none';field.style.opacity=none?'.5':'1';ident.disabled=none;
+      ident.inputMode=v==='phone'?'tel':v==='member'?'numeric':'text';};
+    Array.prototype.forEach.call(f.querySelectorAll('input[name=idtype]'),function(r){r.addEventListener('change',upd)});upd();
+  })();
+  </script>
+</KampoLayout>
