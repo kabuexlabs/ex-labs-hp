@@ -3,9 +3,9 @@
 // 最終判断は薬剤師。禁忌に該当する処方も除外せず「警告つき」で残す（-1.0）。
 // 候補とスコアは Proposal.candidates に保存し、後で重みを調整する材料にする。
 // ---------------------------------------------------------------------------
-import { TYPE_DEFS, COMPLAINT_LABEL, optionText, optionById, type Formula, type TypeKey, type Deficiency, type Thermal } from './masters.ts';
-import type { Answers, ScoreResult, DefExcLabel, ThermalLabel } from './scoring.ts';
-import { FLAG_HERBS, FLAG_LABEL, type SafetyFlag } from './safety.ts';
+import { TYPE_DEFS, COMPLAINT_LABEL, DEFICIENCY_LABEL, THERMAL_LABEL, optionText, optionById, type Formula, type TypeKey, type Deficiency, type Thermal } from './masters.ts';
+import { DEF_EXC_LABEL, THERMAL_STATE_LABEL, type Answers, type ScoreResult, type DefExcLabel, type ThermalLabel } from './scoring.ts';
+import { FLAG_HERBS, FLAG_LABEL, hasRefer, type SafetyFlag } from './safety.ts';
 
 export interface HerbCaution { herb: string; flag: string; flagLabel: string }
 export interface Candidate {
@@ -18,8 +18,16 @@ export interface Candidate {
   /** 注意生薬 × 該当フラグ（例: 甘草 — 高血圧） */
   herbCautions: HerbCaution[];
   reasons: string[];
+  /** 体質の結果と矛盾する点（主な対象タイプが主体質・副体質にない／虚実が逆／寒熱が逆）。空なら整合 */
+  conflicts: string[];
   cautionHerbs: string[];
+  description: string;
   note?: string;
+}
+/** 来店客向けに出せる候補（矛盾・警告のないものだけ） */
+export interface CustomerPick extends Candidate {
+  /** 来店客向けの平易な根拠文 */
+  customerReason: string;
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -71,6 +79,22 @@ export function herbCautions(f: Formula, safety: SafetyFlag[]): HerbCaution[] {
   return out;
 }
 
+/** 処方の主な対象タイプ（重みが最大のもの） */
+export function primaryType(f: Formula): TypeKey | undefined {
+  return (Object.entries(f.types) as [TypeKey, number][]).sort((a, b) => b[1] - a[1])[0]?.[0];
+}
+
+/** 体質の結果と矛盾する点。来店客向けの表示ではこれが空のものだけを出す */
+export function conflictsOf(f: Formula, result: ScoreResult): string[] {
+  const out: string[] = [];
+  const rel = new Set<TypeKey>([...result.mainTypes, ...result.subTypes]);
+  const top = primaryType(f);
+  if (top && !rel.has(top)) out.push(`主な対象タイプ（${TYPE_DEFS[top].name}）が主体質・副体質にない`);
+  if (defExcMatch(f.deficiency, result.defExcLabel) < 0) out.push(`虚実が逆（${DEFICIENCY_LABEL[f.deficiency]}向け × ${DEF_EXC_LABEL[result.defExcLabel]}）`);
+  if (thermalMatch(f.thermal, result.thermalLabel) < 0) out.push(`寒熱が逆（${THERMAL_LABEL[f.thermal]}処方 × ${THERMAL_STATE_LABEL[result.thermalLabel]}）`);
+  return out;
+}
+
 export function recommend(result: ScoreResult, answers: Answers, safety: SafetyFlag[], formulas: Formula[], tongueOverride?: string[], limit = 3): Candidate[] {
   const tags = complaintTags(answers);
   const chosen = allChosenOptionIds(answers, tongueOverride);
@@ -108,7 +132,8 @@ export function recommend(result: ScoreResult, answers: Answers, safety: SafetyF
     if (warnings.length) s -= 1.0;
     const cand: Candidate = {
       code: f.code, name: f.name, reading: f.reading, score: round2(s), warnings,
-      herbCautions: herbCautions(f, safety), reasons, cautionHerbs: f.cautionHerbs, note: f.note,
+      herbCautions: herbCautions(f, safety), reasons, conflicts: result.isBalanced ? [] : conflictsOf(f, result),
+      cautionHerbs: f.cautionHerbs, description: f.description, note: f.note,
     };
     return { cand, priority: f.priority };
   });
@@ -116,4 +141,37 @@ export function recommend(result: ScoreResult, answers: Answers, safety: SafetyF
     .sort((a, b) => b.cand.score - a.cand.score || a.priority - b.priority)
     .slice(0, limit)
     .map((x) => x.cand);
+}
+
+/** 来店客向けの平易な根拠文（タイプ・主訴・寒熱の方向だけ。所見の詳細は出さない） */
+export function customerReason(f: Formula, result: ScoreResult, answers: Answers): string {
+  const rel = new Set<TypeKey>([...result.mainTypes, ...result.subTypes]);
+  const types = (Object.entries(f.types) as [TypeKey, number][])
+    .filter(([t]) => rel.has(t))
+    .sort((a, b) => result.pct[b[0]] - result.pct[a[0]])
+    .map(([t]) => `${TYPE_DEFS[t].name}（${result.pct[t]}点）`);
+  const tags = complaintTags(answers);
+  const matched = f.complaints.filter((c) => tags.has(c)).map((c) => COMPLAINT_LABEL[c] ?? c);
+  const parts: string[] = [];
+  if (types.length) parts.push(`${types.join('・')}の傾向に合う漢方薬です。`);
+  if (matched.length) parts.push(`気になっている「${matched.join('」「')}」にも使われます。`);
+  if (f.thermal === 'warm' && result.thermalLabel === 'cold') parts.push('冷えを温める方向で働きます。');
+  if (f.thermal === 'cool' && result.thermalLabel === 'hot') parts.push('こもった熱を冷ます方向で働きます。');
+  return parts.join('');
+}
+
+/**
+ * 来店客向けのおすすめ（最大3件）。矛盾や安全上の警告があるものは出さない：
+ *  - バランス良好（全タイプ20%未満）や受診勧奨があるときは出さない
+ *  - 主な対象タイプが主体質・副体質に含まれ、虚実・寒熱が逆でない
+ *  - 禁忌フラグ・注意生薬の警告がない
+ * 最終判断は薬剤師（担当者画面の候補は従来どおり警告つきで全部見える）。
+ */
+export function recommendForCustomer(result: ScoreResult, answers: Answers, safety: SafetyFlag[], formulas: Formula[], tongueOverride?: string[], limit = 3): CustomerPick[] {
+  if (result.isBalanced || hasRefer(safety)) return [];
+  const byCode = new Map(formulas.map((f) => [f.code, f]));
+  return recommend(result, answers, safety, formulas, tongueOverride, formulas.length)
+    .filter((c) => c.conflicts.length === 0 && c.warnings.length === 0 && c.herbCautions.length === 0)
+    .slice(0, limit)
+    .map((c) => ({ ...c, customerReason: customerReason(byCode.get(c.code)!, result, answers) }));
 }

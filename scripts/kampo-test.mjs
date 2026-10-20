@@ -4,7 +4,7 @@
 import { QUESTIONS, TYPES, FORMULAS, validateMasters, TYPE_DEFS } from '../src/lib/kampo/masters.ts';
 import { score, classify, zero } from '../src/lib/kampo/scoring.ts';
 import { safetyFlags } from '../src/lib/kampo/safety.ts';
-import { recommend, defExcMatch, thermalMatch } from '../src/lib/kampo/recommend.ts';
+import { recommend, recommendForCustomer, conflictsOf, primaryType, defExcMatch, thermalMatch } from '../src/lib/kampo/recommend.ts';
 import { visibleQuestions, normalizeAnswer, isAnswered, firstUnansweredStep, personalTips, sexFromAnswers } from '../src/lib/kampo/flow.ts';
 import fs from 'node:fs';
 
@@ -150,6 +150,60 @@ eq('寒熱 neutral 0', [thermalMatch('neutral', 'hot'), thermalMatch('cool', 'ne
   // 全問 none でもエラーにならず候補が出る
   const r = score(noneAll, QUESTIONS, { sex: 'female', tongueMode: 'self' });
   eq('バランス良好でも候補3件（エラーなし）', recommend(r, noneAll, [], FORMULAS).length, 3);
+}
+
+// ---- 来店客向けのおすすめ（矛盾・警告なしのみ） ----
+eq('全処方に来店客向け説明文', FORMULAS.every((f) => typeof f.description === 'string' && f.description.length >= 10), true);
+{
+  const r = score(noneAll, QUESTIONS, { sex: 'female', tongueMode: 'self' });
+  eq('バランス良好 → 来店客向けは出さない', recommendForCustomer(r, noneAll, [], FORMULAS), []);
+}
+{
+  const ids = ['B1-1', 'B1-2', 'B2-1', 'B3-1', 'B4-1', 'B4-2', 'B5-1', 'B6-1', 'B7-1', 'B8-1', 'B9-1', 'B10-1', 'B12-1', 'B13-1', 'D1-1'];
+  const answers = { A3: ['A3-1'] };
+  for (const id of ids) (answers[id.split('-')[0]] ??= []).push(id);
+  const r = score(answers, QUESTIONS, { sex: 'male', tongueMode: 'self' });
+  const picks = recommendForCustomer(r, answers, [], FORMULAS);
+  eq('気虚 → 来店客向け 3件・1位 補中益気湯', [picks.length, picks[0]?.name], [3, '補中益気湯']);
+  eq('来店客向けは主な対象タイプが主体質・副体質', picks.every((c) => [...r.mainTypes, ...r.subTypes].includes(primaryType(FORMULAS.find((f) => f.code === c.code)))), true);
+  eq('来店客向けに矛盾・警告なし', picks.every((c) => c.conflicts.length === 0 && c.warnings.length === 0 && c.herbCautions.length === 0), true);
+  eq('来店客向けの根拠文', picks[0].customerReason.includes('気虚（100点）') && picks[0].customerReason.includes('疲れ・だるさ') && picks[0].customerReason.includes('冷えを温める'), true);
+  // 受診勧奨があれば出さない
+  const flags = safetyFlags({ ...answers, A4: ['A4-5', 'A4s-3'] });
+  eq('受診勧奨 → 来店客向けは出さない', recommendForCustomer(r, answers, flags, FORMULAS), []);
+  // 高血圧（甘草の注意）があると補中益気湯は来店客向けから外れ、担当者画面の候補には残る
+  const hb = safetyFlags({ C2: ['C2-1'] });
+  const picksHb = recommendForCustomer(r, answers, hb, FORMULAS);
+  eq('高血圧 → 甘草入りは来店客向けから外れる', picksHb.some((c) => c.cautionHerbs.includes('甘草')), false);
+  eq('高血圧 → 担当者画面の候補には残る', recommend(r, answers, hb, FORMULAS).some((c) => c.name === '補中益気湯'), true);
+}
+{
+  // 瘀血＋妊娠：桂枝茯苓丸は担当者画面に警告つきで出るが、来店客向けには出ない
+  const answers = { B1: ['B1-5'], B2: ['B2-5'], B3: ['B3-4'], B10: ['B10-4'], B11: ['B11-4'], C3: ['C3-1'], A3: ['A3-10'] };
+  const r = score(answers, QUESTIONS, { sex: 'female', tongueMode: 'staff' });
+  const flags = safetyFlags(answers);
+  eq('妊娠 → 来店客向けに桂枝茯苓丸は出ない', recommendForCustomer(r, answers, flags, FORMULAS).some((c) => c.name === '桂枝茯苓丸'), false);
+  eq('妊娠 → 担当者画面には警告つきで残る', recommend(r, answers, flags, FORMULAS, undefined, 36).find((c) => c.name === '桂枝茯苓丸').warnings, ['pregnancy']);
+}
+{
+  // 陽盛（熱寄り）に温める処方は矛盾
+  const answers = { B1: ['B1-9'], B2: ['B2-10'], B3: ['B3-9'], B4: ['B4-7'], B5: ['B5-9'], B6: ['B6-9'], B8: ['B8-8'], B9: ['B9-9'], B10: ['B10-9'], B12: ['B12-8'], B13: ['B13-8'], D1: ['D1-6'], A3: ['A3-2'] };
+  const r = score(answers, QUESTIONS, { sex: 'male', tongueMode: 'self' });
+  eq('陽盛 → thermalLabel hot', r.thermalLabel, 'hot');
+  const picks = recommendForCustomer(r, answers, [], FORMULAS);
+  eq('熱寄りの来店客向けに温める処方は出ない', picks.every((c) => FORMULAS.find((f) => f.code === c.code).thermal !== 'warm'), true);
+  eq('陽盛 → 1位 黄連解毒湯', picks[0]?.name, '黄連解毒湯');
+  const warmF = FORMULAS.find((f) => f.code === 'F31'); // 八味地黄丸（温・陽虚）
+  eq('矛盾の説明（主体質にない・虚実が逆・寒熱が逆）', conflictsOf(warmF, r).length, 3);
+}
+{
+  // 水滞が主体質で気虚がないとき、六君子湯（主な対象は気虚）は来店客向けに出ない
+  const answers = { B1: ['B1-6'], B2: ['B2-7'], B3: ['B3-5'], B4: ['B4-5'], B5: ['B5-6'], B6: ['B6-5'], B7: ['B7-4', 'B7-5'], B8: ['B8-5'], B9: ['B9-6'], B10: ['B10-6'], B12: ['B12-5'], B13: ['B13-5'], D1: ['D1-3'], A3: ['A3-6', 'A3-4'] };
+  const r = score(answers, QUESTIONS, { sex: 'male', tongueMode: 'self' });
+  eq('水滞 → mainTypes', r.mainTypes, ['fluid']);
+  const picks = recommendForCustomer(r, answers, [], FORMULAS);
+  eq('水滞 → 来店客向けは水滞が主な対象の処方だけ', picks.every((c) => primaryType(FORMULAS.find((f) => f.code === c.code)) === 'fluid'), true);
+  eq('水滞 → 1位 五苓散', picks[0]?.name, '五苓散');
 }
 
 // ---- 設問フロー ----
