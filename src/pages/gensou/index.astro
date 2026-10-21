@@ -125,8 +125,8 @@ const faqs = [
 
 // 販売開始前は予約URLが無いため、LP（チケット欄）を販売情報の URL とする
 const ticketOffers = [
-  { '@type': 'Offer', name: '個別チケット', price: '3500', priceCurrency: 'JPY', url: RESERVE_URL ?? `${canonical}#ticket` },
-  { '@type': 'Offer', name: 'グループチケット（最大4名貸切）', price: '14000', priceCurrency: 'JPY', url: RESERVE_URL ?? `${canonical}#ticket` },
+  { '@type': 'Offer', name: '個別チケット', price: '3500', priceCurrency: 'JPY', url: RESERVE_URL ?? `${canonical}#ticket`, availability: 'https://schema.org/InStock' },
+  { '@type': 'Offer', name: 'グループチケット（最大4名貸切）', price: '14000', priceCurrency: 'JPY', url: RESERVE_URL ?? `${canonical}#ticket`, availability: 'https://schema.org/InStock' },
 ];
 const venueLd = {
   '@type': 'Place',
