@@ -1,0 +1,23 @@
+---
+// 解説記事のリード文直後に出す「関連ページ」の囲み（seo-improve C-1）。
+// どの囲みを出すかは src/data/seoOverrides.ts の GUIDE_SEO（パス → callout）で決める。
+// callout prop で明示もできる（P2-1 の移動元に残す案内など）。設定のないページでは何も出さない。
+// 見た目は既存の .key-points（白い囲み・左の帯）と .vc-line（リンク行）を流用し、新しい色・余白は足さない。
+import { CALLOUTS, GUIDE_SEO, normalizePath } from '../../data/seoOverrides';
+interface Props { callout?: string | string[] }
+const path = normalizePath(Astro.url.pathname);
+const keys = ([] as string[]).concat(Astro.props.callout ?? GUIDE_SEO[path]?.callout ?? []);
+// 自分自身へのリンクは出さない（例: /guide/madamis-tokyo/ の madamis 囲みの「東京の公演を探す」）
+const items = keys.map((k) => ({ k, c: CALLOUTS[k] })).filter((x) => x.c).map(({ k, c }) => ({ k, c: { ...c, links: c.links.filter((l) => normalizePath(l.href) !== path) } }));
+const track = (href: string) => (href.startsWith('/services') ? 'cta' : 'show');
+const show = (href: string) => href.replace(/^\//, '').replace(/\/$/, '').replace(/[^a-z0-9-]/g, '-') || 'home';
+---
+{items.map(({ k, c }) => (
+  <aside class="guide-callout key-points" aria-label="関連ページ" data-callout={k}>
+    <p class="guide-callout__title"><strong>{c.title}</strong></p>
+    <p class="guide-callout__text">{c.text}</p>
+    <p class="guide-callout__links vc-line">
+      {c.links.map((l, i) => <>{i > 0 && '／'}<a class="guide-callout__link" href={l.href} data-track={track(l.href)} data-show={show(l.href)} data-place={`callout-${k}`}>{l.label} →</a></>)}
+    </p>
+  </aside>
+))}

@@ -88,19 +88,20 @@ const definedTermLd = {
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'イマーシブシアターとは？東京の公演・料金・楽しみ方を初心者向けに解説',
+  headline: 'イマーシブシアターとは？意味・特徴・楽しみ方をやさしく解説',
   about: 'イマーシブシアター（没入型演劇）',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/immersive-theater.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-01',
-  dateModified: '2026-10-01',
+  dateModified: '2026-10-18',
   mainEntityOfPage: new URL('/guide/immersive-theater/', Astro.site).toString(),
 };
+import GuideCallout from '../../components/guide/GuideCallout.astro';
 ---
 <BaseLayout
-  title="イマーシブシアターとは？東京の公演・料金・楽しみ方を初心者向けに解説 - 株式会社ex Labs"
+  title="イマーシブシアターとは？意味・特徴・楽しみ方をやさしく解説 - 株式会社ex Labs"
   description="イマーシブシアターとは、観客が空間の中を歩き回りながら物語を体験する没入型の演劇のこと。普通の演劇との違い、初めての楽しみ方と服装、東京でいま参加できる公演の料金・所要時間・予約先まで、初心者向けにわかりやすく解説します。"
   ogImage="/assets/guide/immersive-theater.webp"
 >
@@ -115,12 +116,13 @@ const articleLd = {
 
 <section class="section" style="padding-top:40px"><div class="wrap">
 <p class="eyebrow">IMMERSIVE THEATER GUIDE</p>
-<h1 class="h2 serif"><span class="nobr">イマーシブシアターとは？</span><span class="nobr">演劇との違い・楽しみ方・</span><span class="nobr">東京の体験スポット</span></h1>
+<h1 class="h2 serif"><span class="nobr">イマーシブシアターとは？</span><span class="nobr">意味・特徴・楽しみ方をやさしく解説</span></h1>
 <div class="def-box">
 <p class="def-word"><span class="serif">イマーシブシアター</span><span class="def-en">immersive theater</span></p>
 <p class="def-body">観客が客席から鑑賞するのではなく、<strong>物語が進行する空間の中を自由に歩き回り、登場人物のすぐそばで物語を体験する没入型の演劇</strong>。「イマーシブ演劇」「没入型演劇」とも呼ばれる。どこで何を観るかを観客自身が選ぶため、<strong>同じ公演でも人によって見える物語が変わる</strong>のが最大の特徴。</p>
 </div>
 <p class="lede">このページでは、イマーシブシアターの意味と仕組み、普通の演劇との違い、初めてでも楽しむコツ、東京で体験できる公演までを、体験型エンターテインメント制作会社の株式会社ex Labsが解説します。</p>
+<GuideCallout />
 
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>

@@ -13,6 +13,7 @@ import DateGuideNote from '../../components/guide/DateGuideNote.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
 import ShowCalendar from '../../components/ShowCalendar.astro';
 import GensouFeature from '../../components/guide/GensouFeature.astro';
+import GuideMeta from '../../components/guide/GuideMeta.astro';
 import VisualHero from '../../components/VisualHero.astro';
 import StudioCta from '../../components/guide/StudioCta.astro';
 import { shows } from '../../data/shows';
@@ -27,6 +28,7 @@ import { EXPERIENCE_DATE_PUBLISHED } from '../../data/experienceDate';
 
 const now = new Date();
 const today = jstDateString(now);
+const seoYear = today.slice(0, 4);
 const week = weekRange(now);
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 
@@ -81,6 +83,54 @@ const rows = eventsData.works.filter((w) => w.published && isTokyoWork(w)).map((
   return { w, venue, occ, dates, futureDates, from, to, status, ticketUrl, ticketHost, channel, perPersonText, price, stale, datesText };
 });
 const compareRows = rows.filter((r) => r.status !== 'ended');
+// seo-improve P1-1: シアター形式（俳優と同じ空間を歩く演劇型）の開催中・開催予定公演と、俳優との会話がある公演
+const theaterRows = compareRows.filter((r) => r.w.genres.includes('immersive-theater'));
+const actorRows = compareRows.filter((r) => r.w.info.actorInteraction === true);
+// seo-improve P1-1: 目次（H2 の並び）
+const seoToc = [
+  { id: 'this-week-cal', label: '今週・来週の開催日' },
+  { id: 'compare-now', label: '開催状況・開催日・料金・人数で比較' },
+  { id: 'choose', label: '人数・好み・参加形式で選ぶ' },
+  { id: 'now', label: '公演ごとの詳しい紹介' },
+  { id: 'types', label: '東京のイマーシブ体験の種類' },
+  { id: 'theater-now', label: '東京でイマーシブシアターを観るなら' },
+  { id: 'trend2026', label: `${seoYear}年の東京イマーシブ動向` },
+  { id: 'past', label: '終了した公演・閉業した施設' },
+  { id: 'faq', label: 'よくある質問' },
+  { id: 'biz', label: 'イマーシブイベントを開催したい企業・施設の方へ' },
+];
+// seo-improve P1-1: 開催中・開催予定の公演を ItemList（Event）で出す。値は公演データ（src/data/events/）の事実のみ。終了公演は含めない
+const eventListLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: compareRows.map((r, i) => {
+    const org = eventsData.organizers.find((o) => o.id === r.w.organizerId);
+    const future = r.occ.filter((o) => o.date >= today);
+    const allSoldout = future.length > 0 && future.every((o) => o.seats.status === 'soldout');
+    const tiers = r.w.price.unit === 'per-group' ? (r.w.price.tiers ?? []).map((t) => t.amount) : [];
+    const offer: Record<string, unknown> = { url: r.ticketUrl ?? new URL(`/events/${r.w.slug}/`, site).toString(), priceCurrency: 'JPY', ...(allSoldout ? { availability: 'https://schema.org/SoldOut' } : {}) };
+    if (tiers.length) Object.assign(offer, { '@type': 'AggregateOffer', lowPrice: Math.min(...tiers), highPrice: Math.max(...tiers), offerCount: tiers.length });
+    else Object.assign(offer, { '@type': 'Offer', ...(r.w.price.amount !== undefined && r.w.price.unit !== 'unknown' ? { price: r.w.price.amount } : {}) });
+    return {
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'Event',
+        name: r.w.title,
+        ...(r.from ? { startDate: r.from } : {}),
+        ...(r.to ? { endDate: r.to } : {}),
+        eventStatus: 'https://schema.org/EventScheduled',
+        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+        ...(r.venue ? { location: { '@type': 'Place', name: r.venue.name, address: { '@type': 'PostalAddress', ...(r.venue.address ? { streetAddress: r.venue.address } : {}), addressRegion: '東京都', addressCountry: 'JP' } } } : {}),
+        ...(r.w.image ? { image: new URL(r.w.image.path, site).toString() } : {}),
+        description: r.w.summary,
+        offers: offer,
+        ...(org ? { organizer: { '@type': 'Organization', name: org.name, ...(org.url ? { url: org.url } : {}) } } : {}),
+        url: new URL(`/events/${r.w.slug}/`, site).toString(),
+      },
+    };
+  }),
+};
 const STATUS_LABEL: Record<Status, string> = { ongoing: '開催中', upcoming: '開催予定', ended: '終了', unknown: '開催日は公式で確認' };
 // カード下部（予約ボタンの直前）に出す要約：料金・時間・形式
 const endedRows = rows.filter((r) => r.status === 'ended');
@@ -123,24 +173,25 @@ const faqLd = {
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: '東京で体験できるイマーシブイベント【2026年最新】｜種類・選び方・注目公演',
+  headline: `東京のイマーシブ体験・イマーシブシアター公演一覧【${seoYear}年最新】開催日・料金・予約`,
   about: '東京のイマーシブ体験・イマーシブイベント',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/immersive-tokyo.webp', Astro.site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
-  dateModified: '2026-09-18',
+  dateModified: '2026-10-18',
   mainEntityOfPage: new URL('/guide/immersive-tokyo/', Astro.site).toString(),
 };
 ---
 <BaseLayout
-  title="東京で体験できるイマーシブイベント【2026年最新】｜種類・選び方・注目公演 - 株式会社ex Labs"
+  title={`東京のイマーシブ体験・イマーシブシアター公演一覧【${seoYear}年最新】開催日・料金・予約 - 株式会社ex Labs`}
   description="【2026年最新】東京のイマーシブ体験（没入型イベント）を制作会社が解説。渋谷サクラステージの周遊型「ウワサバナシ調査委員会」、六本木の会員制バーで開催する「怪盗と秘密の試験」、下北沢の「ロスト・フレーム」など注目公演と、初めての選び方を紹介。"
   ogImage="/assets/guide/immersive-tokyo.webp"
 >
 <script type="application/ld+json" set:html={jsonLd(faqLd)} />
 <script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<script type="application/ld+json" set:html={jsonLd(eventListLd)} />
 <Breadcrumb items={[
   { name: 'ホーム', href: '/' },
   { name: 'イマーシブ完全ガイド', href: '/guide/immersive/' },
@@ -148,8 +199,9 @@ const articleLd = {
 ]} />
 
 <VisualHero image="/assets/events/gensou-kv.webp" imagePos="center 28%" eyebrow="IMMERSIVE TOKYO GUIDE" catchText="東京のイマーシブ、開催日から予約へ" chips={heroChips} alt="東京で開催中のイマーシブ公演のキービジュアル">
-  <h1 class="h2 serif"><span class="nobr">東京で体験できる</span><span class="nobr">イマーシブイベント</span><span class="nobr">【2026年最新】</span></h1>
+  <h1 class="h2 serif"><span class="nobr">東京のイマーシブ体験・</span><span class="nobr">イマーシブシアター公演一覧</span><span class="nobr">【{seoYear}年最新】</span><span class="nobr">開催日・料金・予約</span></h1>
 </VisualHero>
+<section class="section" style="padding-top:28px;padding-bottom:0"><div class="wrap"><GuideMeta toc={seoToc} /></div></section>
 <section class="section" style="padding-top:28px;padding-bottom:12px"><div class="wrap"><GensouFeature place="immersive-tokyo-pickup" /></div></section>
 
 
@@ -223,7 +275,7 @@ const articleLd = {
 </details>
 
 <details class="acc" id="choose">
-<summary><span class="acc-t">人数・好み・参加形式で選ぶ</span><span class="acc-s">1人／2人／演者と会話／屋内・屋外／怖くない</span></summary>
+<summary><h2 class="acc-t">人数・好み・参加形式で選ぶ</h2><span class="acc-s">1人／2人／演者と会話／屋内・屋外／怖くない</span></summary>
 <div class="acc-b">
 <p class="lede">人数・好み・参加の仕方ごとに、合う公演を並べています。</p>
 <p class="lede">詳しい判断材料は、<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)" data-track="show" data-show="guide-solo" data-place="guide-choose">一人で参加する場合</a>（1名で申し込めるか・1名だけで成立するか・交流の有無）と<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)" data-track="show" data-show="guide-date" data-place="guide-choose">二人で参加する場合</a>（二人分の総額・貸切か・同じ組で行動できるか）に分けてまとめています。{EXPERIENCE_DATE_PUBLISHED && <>イマーシブに決めていない二人が、ものづくり・謎解きも含めて比べるなら<a href="/guide/tokyo-experience-date/" style="color:var(--accent)" data-track="show" data-show="guide-xdate" data-place="guide-choose">東京の非日常デート</a>、謎解き・脱出ゲームに絞るなら<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)" data-track="show" data-show="guide-nazo" data-place="guide-choose">二人で楽しめる謎解き・脱出ゲーム</a>。渋谷で雨の日なら<a href="/guide/shibuya-rainy-date/" style="color:var(--accent)" data-track="show" data-show="guide-shibuya-rain" data-place="guide-choose">渋谷の雨の日デート</a>、体験の予算を1人5,000円以内に抑えるなら<a href="/guide/tokyo-date-under-5000/" style="color:var(--accent)" data-track="show" data-show="guide-u5000" data-place="guide-choose">1人5,000円以内の体験デート</a>。友達3〜4人で行くなら<a href="/guide/tokyo-friends-activities/" style="color:var(--accent)" data-track="show" data-show="guide-friends" data-place="guide-choose">東京で友達と遊ぶ体験</a>で人数ごとの総額を比べられます。</>}</p>
@@ -247,7 +299,7 @@ const articleLd = {
 </details>
 
 <details class="acc" id="now">
-<summary><span class="acc-t">公演ごとの詳しい紹介</span><span class="acc-s">参加者がすること・条件・料金</span></summary>
+<summary><h2 class="acc-t">公演ごとの詳しい紹介</h2><span class="acc-s">参加者がすること・条件・料金</span></summary>
 <div class="acc-b">
 <div class="sc-grid">
 {compareRows.map((r) => (
@@ -303,7 +355,7 @@ const articleLd = {
 </details>
 
 <details class="acc" id="types">
-<summary><span class="acc-t">東京のイマーシブ体験の種類</span><span class="acc-s">劇場型・周遊型・店舗型・展示型・ミステリー融合型</span></summary>
+<summary><h2 class="acc-t">東京のイマーシブ体験の種類</h2><span class="acc-s">劇場型・周遊型・店舗型・展示型・ミステリー融合型</span></summary>
 <div class="acc-b">
 <div class="genre-grid">
 <div class="genre-cell"><span class="genre-t serif">劇場・施設型</span><span class="genre-d">建物の中を自由に歩き、同時進行する物語を追うイマーシブシアター。<a href="/guide/immersive-theater/" style="color:var(--accent)">イマーシブシアターとは →</a></span></div>
@@ -315,8 +367,14 @@ const articleLd = {
 </div>
 </details>
 
+<h2 class="cards-h" id="theater-now">東京でイマーシブシアターを観るなら</h2>
+<p class="lede">{theaterRows.length > 0
+  ? <>このページで紹介している開催中・開催予定の公演のうち、客席のない空間で俳優と同じ空間を歩く「イマーシブシアター」形式は{theaterRows.map((r, i) => <>{i > 0 && '、'}<a href={`#card-${r.w.id}`} style="color:var(--accent)">{r.w.title}</a></>)}です。詳しい条件と料金は、各公演のカードで確認できます。</>
+  : <>このページで紹介している開催中・開催予定の公演に、客席のない空間で俳優と同じ空間を歩く「イマーシブシアター」に分類している公演は、いまはありません。俳優との会話で物語が進む公演は{actorRows.length > 0 ? actorRows.map((r, i) => <>{i > 0 && '、'}<a href={`#card-${r.w.id}`} style="color:var(--accent)">{r.w.title}</a></>) : 'ありません'}で、形式の違いは<a href="#theater" style="color:var(--accent)">「イマーシブシアターを東京で探す」</a>で比べられます。終了した公演は「終了した公演・閉業した施設」に記録しています。</>}
+</p>
+
 <details class="acc" id="trend2026">
-<summary><span class="acc-t">2026年の東京イマーシブ動向</span><span class="acc-s">大型常設の閉業と、このページで紹介している公演の特徴</span></summary>
+<summary><h2 class="acc-t">{seoYear}年の東京イマーシブ動向</h2><span class="acc-s">大型常設の閉業と、このページで紹介している公演の特徴</span></summary>
 <div class="acc-b">
 <p class="lede">2026年の東京イマーシブシーンは、大きな転換点を迎えています。世界最大級のイマーシブ・テーマパークとして2024年に開業した<strong>「イマーシブ・フォート東京」（お台場）が、2026年2月28日をもって閉業</strong>しました。運営側は理由を「施設規模が過大だったため」と説明しており、実際に人気が集中したのは大人数向けのライトな体験ではなく、<strong>人数限定の濃密な没入体験</strong>だったと報じられています。</p>
 <p class="lede">常設の大型パークが終わった一方で、このページで紹介している東京の公演は、<strong>期間限定公演・店舗型・館内周遊型など、少人数で物語との距離が近い形式</strong>です。市場全体の需要を示すデータではなく、掲載している公演に共通する特徴です。</p>
@@ -324,7 +382,7 @@ const articleLd = {
 </details>
 
 <details class="acc" id="past">
-<summary><span class="acc-t">終了した公演・閉業した施設</span><span class="acc-s">{[...endedRows.map((r) => r.w.title), 'ロスト・フレーム', 'イマーシブ・フォート東京'].join('、')}</span></summary>
+<summary><h2 class="acc-t">終了した公演・閉業した施設</h2><span class="acc-s">{[...endedRows.map((r) => r.w.title), 'ロスト・フレーム', 'イマーシブ・フォート東京'].join('、')}</span></summary>
 <div class="acc-b">
 <ul class="bullets">
 <li><strong>ロスト・フレーム（下北沢）</strong>：街に散らばった絵画を探して歩く周遊型アートイマーシブ。2026年7月7日〜8月31日、所要時間75分、1組1〜4名。参加費は1人あたり4名参加で4,000円〜1名参加で8,000円。全公演完売で終了。<a href="/taikenbizyutu/lostframe/" style="color:var(--accent)">公演ページ →</a></li>
@@ -357,7 +415,7 @@ const articleLd = {
 </details>
 
 <details class="acc" id="faq">
-<summary><span class="acc-t">よくある質問</span><span class="acc-s">1人参加・2人貸切・怖さ・雨・所要時間・空席の確認</span></summary>
+<summary><h2 class="acc-t">よくある質問</h2><span class="acc-s">1人参加・2人貸切・怖さ・雨・所要時間・空席の確認</span></summary>
 <div class="acc-b">
 <div class="faq-list tag-immersive">
 {faqs.map((f) => (
@@ -371,7 +429,7 @@ const articleLd = {
 </details>
 
 <details class="acc" id="biz">
-<summary><span class="acc-t">イマーシブイベントを開催したい企業・施設の方へ</span><span class="acc-s">制作・運営のご相談（無料）</span></summary>
+<summary><h2 class="acc-t">イマーシブイベントを開催したい企業・施設の方へ</h2><span class="acc-s">制作・運営のご相談（無料）</span></summary>
 <div class="acc-b">
 <p class="lede">株式会社ex Labsは、商業施設・店舗・街を舞台にしたオリジナルのイマーシブイベントを企画から運営まで制作しています。参加者から料金をいただく有料チケット型なら、制作費・運営費を当社が負担してチケット売上から回収するレベニューシェア（施設様の初期費用0円）も選べます。</p>
 <p class="vc-line"><a href="/services/immersive/" style="color:var(--accent)">イマーシブの制作依頼・お見積り（無料）→</a>／<a href="/guide/shisetsu-katsuyo/" style="color:var(--accent)">施設活用イベントとは →</a>／<a href="/?c=immersive#contact" style="color:var(--accent)">相談フォーム →</a></p>
@@ -421,7 +479,7 @@ const articleLd = {
 .acc summary::-webkit-details-marker{display:none}
 .acc summary::after{content:'＋';position:absolute;right:20px;top:16px;font-size:20px;font-weight:800;color:var(--accent)}
 .acc[open] summary::after{content:'−'}
-.acc-t{font-size:16.5px;font-weight:800;color:var(--ink);padding-right:32px}
+.acc-t{font-size:16.5px;font-weight:800;color:var(--ink);padding-right:32px;margin:0}
 .acc-s{font-size:12.5px;color:rgba(51,48,43,.62)}
 .acc-b{padding:0 22px 22px;text-align:left}
 .acc-b .lede{text-align:left}

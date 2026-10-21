@@ -44,6 +44,10 @@ const fontCss = `https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@4
 const cutKey = 'exl_cut:' + Astro.url.pathname.replace(/[^A-Za-z0-9/_-]/g, '').slice(0, 120);
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
+// seo-improve（2026-10-18）: 解説記事（/guide/<slug>/）だけ title のサフィックス「 - 株式会社ex Labs」を短い「｜ex Labs」に正規化する。
+// 各ページが渡す title 本文は変えない。一覧 /guide/ とほかのディレクトリは現状維持。
+const isGuidePage = /^\/guide\/[^/]+\/?$/.test(Astro.url.pathname);
+const pageTitle = isGuidePage ? title.replace(/\s*(?:-|｜|\|)\s*株式会社\s?ex Labs\s*$/, '｜ex Labs') : title;
 // Canonical always uses the trailing-slash form: SSR routes answer
 // both /path and /path/, and a request-echoing canonical would split
 // the page into two competing URLs in Google's eyes.
@@ -147,11 +151,11 @@ const orgLd = {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title}</title>
+<title>{pageTitle}</title>
 <meta name="description" content={description}>
 <link rel="canonical" href={canonical}>
 <link rel="alternate" type="application/rss+xml" title="株式会社ex Labs｜解説記事・ブログ" href="/rss.xml">
-<meta property="og:title" content={title}>
+<meta property="og:title" content={pageTitle}>
 <meta property="og:description" content={description}>
 <meta property="og:type" content={ogType}>
 <meta property="og:url" content={canonical}>

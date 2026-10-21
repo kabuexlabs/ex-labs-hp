@@ -70,19 +70,20 @@ const definedTermLd = {
 const articleLd = {
   '@context': 'https://schema.org',
   '@type': 'Article',
-  headline: 'イマーシブ体験とは？種類・事例・楽しみ方と、企業・施設での活かし方',
+  headline: 'イマーシブ体験とは？種類・楽しみ方・初めての選び方',
   about: 'イマーシブ体験（没入型体験）の種類・事例・楽しみ方',
   inLanguage: 'ja',
   image: [new URL('/assets/guide/immersive-taiken.webp', site).toString()],
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-09-07',
-  dateModified: '2026-09-13',
+  dateModified: '2026-10-18',
   mainEntityOfPage: new URL('/guide/immersive-taiken/', site).toString(),
 };
+import GuideCallout from '../../components/guide/GuideCallout.astro';
 ---
 <BaseLayout
-  title="イマーシブ体験とは？種類・事例・楽しみ方と、企業・施設での活かし方 - 株式会社ex Labs"
+  title="イマーシブ体験とは？種類・楽しみ方・初めての選び方 - 株式会社ex Labs"
   description="イマーシブ体験とは、物語や空間の中に入り込み、その一部として参加する没入型の体験のこと。イマーシブシアター・施設一体型イベント・没入型展示・イマーシブダイニング・VRの5種類、日経掲載の渋谷サクラステージなどの事例、料金と所要時間、初めての楽しみ方、企業・施設での作り方を制作会社が解説。"
   ogImage="/assets/guide/immersive-taiken.webp"
 >
@@ -97,12 +98,13 @@ const articleLd = {
 
 <section class="section" style="padding-top:40px"><div class="wrap">
 <p class="eyebrow">IMMERSIVE EXPERIENCE</p>
-<h1 class="h2 serif"><span class="nobr">イマーシブ体験とは？</span><br><span class="nobr">種類・事例・楽しみ方と、</span><span class="nobr">企業・施設での活かし方</span></h1>
+<h1 class="h2 serif"><span class="nobr">イマーシブ体験とは？</span><span class="nobr">種類・楽しみ方・初めての選び方</span></h1>
 <div class="def-box">
 <p class="def-word"><span class="serif">イマーシブ体験</span><span class="def-yomi">読み方：いまーしぶたいけん（immersive experience）</span></p>
 <p class="def-body">観客が客席から「観る」のではなく、<strong>物語や空間の中に入り込み、その一部として見て・歩いて・選ぶ</strong>没入型の体験のこと。イマーシブシアター、施設や街を舞台にしたイマーシブイベント、没入型の展示や飲食、VR などを含む広い言葉。</p>
 </div>
 <p class="lede">このページでは、イマーシブ体験の5つの種類、実際の事例、料金と所要時間、初めての人の楽しみ方、そして企業や施設がイマーシブ体験を作る方法までを、渋谷サクラステージの施設一体型イマーシブ（日本経済新聞掲載）を制作した株式会社ex Labsが解説します。「イマーシブ」という言葉の意味・読み方は<a href="/guide/immersive/" style="color:var(--accent)">イマーシブとは？意味を1分で解説 →</a>、東京で今体験できる公演は<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京のイマーシブ体験まとめ →</a>をどうぞ。</p>
+<GuideCallout />
 
 <nav class="toc" aria-label="目次">
 <p class="toc-h">目次</p>
