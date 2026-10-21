@@ -46,7 +46,20 @@ seo-event-boost E5（2026-10-19）。内容はランブックの事実データ�
 | [ ] | 夢の島熱帯植物館 公式サイト／Instagram／X @yumenetsu | 施設に直接依頼 | 現在公式サイトに公演の告知なし。会場名検索の1位はこのサイト |
 | [ ] | Tokyo Art Beat | https://docs.google.com/forms/d/e/1FAIpQLSfouIsgF1khw9UQ9NmcZoqIF8RVzlDyR4kMtdxQITtTkoZuHw/viewform | 会場登録済み: https://www.tokyoartbeat.com/venues/-/yumenoshima-tropical-greenhouse-dome |
 | [ ] | インターネットミュージアム | 施設IDで登録（office@museum.or.jp）、または https://forms.gle/pkZuVJM85nEjVcsv6 | 施設側に登録を頼むのが早い |
-| [ ] | 江東区観光協会 | https://koto-kanko.jp/contact/ | 掲載窓口は要確認。イベント一覧 https://koto-kanko.jp/event/ |
+| [ ] | 江東区観光協会（江東おでかけ情報局） | 事務局 03-6458-7400（平日）／https://koto-kanko.jp/contact/ | 「夢の島熱帯植物館 ○月開催イベント」として毎月の催しを掲載しているサイト。掲載は会員向けが基本のため、まず植物館側から協会へ情報提供してもらうのが早い。イベント一覧 https://koto-kanko.jp/event/ |
+
+### 追加（2026-10-21）: 「夢の島熱帯植物館」で検索したときに上位に出るサイト
+会場名の検索結果は、植物館の公式サイトと次のおでかけ情報サイトで埋まっている。公演がこれらに載っていないと、会場名で検索した人には届かない。
+
+| 送信 | 媒体 | 窓口 | 備考 |
+|---|---|---|---|
+| [ ] | 夢の島熱帯植物館 公式サイト「イベント」ページ https://www.yumenoshima.jp/en/botanicalhall/event ／月間イベントチラシ | 施設に直接依頼（03-3522-0281） | 会場名検索の1位。ここに載ることが最優先。あわせて植物館の Google ビジネスプロフィール（Google マップ）の「イベント」投稿と、X @yumenetsu・note（yumenoshima-park.note.jp）での告知も依頼する |
+| [ ] | PR TIMES | https://prtimes.jp/ （要アカウント。ロスト・フレームで配信済み） | タイトルに「夢の島熱帯植物館」を入れる。配信先に Walkerplus・レッツエンジョイ東京などが含まれ、転載で複数サイトに載る。原稿は `docs/press/gensou-prtimes.md` |
+| [ ] | Walkerplus（KADOKAWA） | 情報・プレスリリース受付フォーム https://form.enq.kadokawa.co.jp/cre/?enq=6oDBJcF6g8Y%3D | 件名・本文・添付（5MB以内）・メールアドレス。PR TIMES で位置情報（東京都江東区）を設定して配信すると掲載対象になる場合がある |
+| [ ] | レッツエンジョイ東京（東京メトロ共同運営） | 掲載窓口は未確認。アプリサポート support@enjoytokyo.jp に問い合わせ、または PR TIMES 経由 | 「ゆめねつハロウィン・ガーデン」など植物館の催しを掲載しているサイト |
+| [ ] | 駅探（ekitan.com/event） | 一般主催者向けの受付は未確認。自治体・観光協会からの入稿枠がある → 江東区観光協会経由を試す | 「夢の島熱帯植物館 夜間開館」を掲載した実績のあるサイト |
+| [ ] | いこーよ | https://iko-yo.net/provider/faq/event | 掲載基準が「0歳〜小学生が主体で楽しめるイベント」のため、中学生以上の本公演は**対象外**。施設ページに載っているサイトとして把握のみ |
+| [ ] | TOKYOおでかけガイド（park.tachikawaonline.jp）、るるぶ&more.、NAVITIME | 各サイトの問い合わせ窓口 | 施設紹介ページ。イベント掲載枠があるかは未確認 |
 
 ## 5. SNS 投稿文
 
