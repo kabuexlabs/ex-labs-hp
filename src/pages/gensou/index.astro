@@ -6,6 +6,7 @@
 // 2026-10-15 検索公開（noindex 解除、sitemap・llms.txt に掲載）。非公開に戻すときは INDEXABLE を false にし、sitemap・llms.txt からも外す。
 const INDEXABLE = true;
 import SiteGuard from '../../components/SiteGuard.astro';
+import StickyReserve from '../../components/StickyReserve.astro';
 import SecHead from '../../components/gensou/SecHead.astro';
 import J from '../../components/gensou/J.astro';
 
@@ -291,6 +292,13 @@ img{max-width:100%}
 .lead{margin:0;font-size:clamp(18px,2.6vw,22px);line-height:2;font-weight:500;text-wrap:pretty}
 .rows{display:flex;flex-direction:column}
 .row{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:22px 0;border-top:1px solid rgba(217,174,44,.78);font-size:15px;line-height:1.9}
+.qi{margin:36px 0 12px;border:1px solid rgba(217,174,44,.78);padding:20px 22px}
+.qi-l{margin:0;display:grid;gap:8px;font-size:14px;line-height:1.8}
+.qi-l div{display:grid;grid-template-columns:56px 1fr;gap:12px}
+.qi-l dt{color:#e2c43c;font-weight:500}
+.qi-l dd{margin:0}
+.qi-cta{margin-top:18px}
+.qi-n{margin:10px 0 0;font-size:12px;line-height:1.7;color:#bdb8ab}
 .row:last-child{border-bottom:1px solid rgba(217,174,44,.78)}
 .ph{background:repeating-linear-gradient(135deg,rgba(242,238,245,.06) 0 8px,transparent 8px 16px);border:1px solid rgba(217,174,44,.78)}
 
@@ -508,6 +516,18 @@ img{max-width:100%}
       {/* タイトルロゴ・サブタイトルは直前の全面KVで見せるので、ここでは表示しない（見出しとしては残す） */}
       <h1 class="sr">午前零時の幻想集 {SUB_NO}「{SUB_TITLE}」× 夢の島熱帯植物館</h1>
       <p class="ov-lead"><J t={"普段は入れない\n夜の夢の島熱帯植物館を巡る\n物語体験。"} /></p>
+      {/* 2026-10-22 予約促進：最初の画面で開催日・会場・料金・所要時間・対象と予約ボタンを確認できるようにする（値は公式記載のみ） */}
+      <div class="qi" aria-label="公演の基本情報">
+        <dl class="qi-l">
+          <div><dt>開催</dt><dd>2026年11月5日（木）〜22日（日）の木〜日曜・全12日間</dd></div>
+          <div><dt>会場</dt><dd>夢の島熱帯植物館（東京都江東区・新木場駅から徒歩約15分）</dd></div>
+          <div><dt>料金</dt><dd>個別チケット 1名3,500円／グループチケット 1組14,000円（最大4名で貸切）。税込・入館料込み</dd></div>
+          <div><dt>所要</dt><dd>約50分。各日17:00〜20:00の間に12分おきに開始</dd></div>
+          <div><dt>対象</dt><dd>1名から参加可。中学生以上（18歳未満は保護者同伴）。怖さは控えめ（暗い場所やキャストとの会話あり）</dd></div>
+        </dl>
+        <a href={reserveHref} class="cta qi-cta" data-place="gensou-top" {...reserveAttrs}><span>{RESERVE_URL ? '日程・空席を見る（escape.id）' : 'チケット情報を見る'}</span><span class="arc">→</span></a>
+        <p class="qi-n">個別チケットはほかのお客様と同じ組になる場合があります。空席は予約サイトの表示が最新です。</p>
+      </div>
       <SecHead ja="会期" side="r" />
       <div class="ov-date">
         <span class="ov-y hv">2026</span>
@@ -529,6 +549,7 @@ img{max-width:100%}
         <SecHead ja="会場" side="l" />
         <p class="venue-t">夢の島熱帯植物館</p>
       </div>
+      <a href={reserveHref} class="cta" data-place="gensou-body" {...reserveAttrs}><span>{RESERVE_URL ? '日程・空席を見る（escape.id）' : 'チケット情報を見る'}</span><span class="arc">→</span></a>
       {X_URL && (
         <div class="ov-x">
           <p>最新情報は公式Xでお知らせします。</p>
@@ -785,5 +806,6 @@ img{max-width:100%}
   });
 })();
 </script>
+{RESERVE_URL && <StickyReserve href={RESERVE_URL} label="日程・空席を見る" show="gensou" place="gensou-sticky" until={dates[dates.length - 1]} theme="dark" offsetRight={52} />}
 </body>
 </html>

@@ -8,7 +8,8 @@ import type { APIRoute } from 'astro';
 import { contactRedis, recordMetric, METRIC_EVENTS, type MetricEvent } from '../../lib/contact';
 
 const PAGE_RE = /^\/[A-Za-z0-9\-._~\/]{0,118}$/;
-const CAT_RE = /^[a-z][a-z0-9-]{0,39}$/;
+// 2026-10-22: ticket の値は「公演-掲載位置-リンク先ドメイン」まで入るため 60 文字まで
+const CAT_RE = /^[a-z][a-z0-9-]{0,59}$/;
 
 export const POST: APIRoute = async ({ request }) => {
   let body: { e?: unknown; p?: unknown; c?: unknown } = {};

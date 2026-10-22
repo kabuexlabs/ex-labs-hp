@@ -1,0 +1,88 @@
+---
+// 意味解説記事（没入感・イマーシブ）から、実際に参加できる2公演（東京・京都）へ送る小さな紹介枠（2026-10-22 予約促進）。
+// 画像・地域・開催日・料金・リンク先は公演データ（src/data/events/）から取り、手書きしない。最終日を過ぎた公演は出さない。
+// 「公演詳細」（自社の公式ページ）と「日程・空席」（予約サイト）のリンクを分け、空席の有無は書かない。
+import { eventsData } from '../../data/events/index';
+import { regionName, areaName } from '../../data/events/areas';
+import { jstDateString, fmtDateShort } from '../../lib/thisWeek';
+import { priceLabels } from '../../lib/priceLabel';
+
+interface Props {
+  /** 計測用（data-place） */
+  place: string;
+  title?: string;
+  lead?: string;
+  id?: string;
+  /** 出す公演（公演データの id）。既定は東京の幻想集と京都の7枚目 */
+  ids?: string[];
+  eyebrow?: string;
+}
+const { place, title = '実際に物語の中に入ってみたい方へ', lead = '意味を知ったら、次は体験へ。いま参加できる自社公演を2つ紹介します。開催日は公演データの日付で、空席は予約サイトで確認できます。', id = 'now-showing', ids = ['gensou', '7th-composition'], eyebrow = 'NOW BOOKING' } = Astro.props;
+const GUIDES: Record<string, { href: string; label: string }> = {
+  gensou: { href: '/guide/yumenoshima-night/', label: '日程・チケットの選び方・行き方' },
+  '7th-composition': { href: '/guide/kyoto-november-experience/', label: 'どんな体験か・休日の組み込み方' },
+};
+const WHAT: Record<string, string> = {
+  gensou: '夜の夢の島熱帯植物館を巡り、キャストとの会話で物語を進める約50分の物語体験',
+  '7th-composition': '美術館の地下1階で、絵画を鑑賞することが物語に参加するきっかけになる60分の物語体験',
+};
+const today = jstDateString(new Date());
+const picks = ids.flatMap((wid) => {
+  const w = eventsData.works.find((x) => x.id === wid && x.published);
+  if (!w) return [];
+  const dates = eventsData.occurrences.filter((o) => o.workId === w.id && o.published && !o.test && o.eventStatus !== 'cancelled').map((o) => o.date).sort();
+  const from = dates[0] ?? w.period?.from;
+  const to = dates[dates.length - 1] ?? w.period?.to;
+  if (!to || to < today) return [];
+  const venue = eventsData.venues.find((v) => v.id === w.venueId);
+  const status = from && from > today ? `${fmtDateShort(from)}〜${fmtDateShort(to)} 開催` : `開催中｜${fmtDateShort(to)}まで`;
+  const price = priceLabels(w.price);
+  return [{ w, venue, region: venue ? regionName(venue.regionId) : '', area: venue ? areaName(venue.areaId) : '', status, price, guide: GUIDES[w.id], what: WHAT[w.id] ?? w.summary }];
+});
+---
+{picks.length > 0 && (
+<section class="section tinted sp" id={id} aria-label={title}><div class="wrap">
+<p class="eyebrow">{eyebrow}</p>
+<h2 class="h2 serif">{title}</h2>
+{lead && <p class="lede">{lead}</p>}
+<div class="sp-list">
+  {picks.map((p) => (
+    <article class="sp-card">
+      <a class="sp-img" href={p.w.officialUrl} data-track="show" data-show={p.w.id} data-place={`${place}-img`}>{p.w.image && <img src={p.w.image.path} alt={p.w.title} width="880" height="1246" loading="lazy" decoding="async" />}</a>
+      <div class="sp-body">
+        <p class="sp-area"><strong>{p.region}</strong>・{p.area}{p.venue ? `｜${p.venue.listName ?? p.venue.name}` : ''}</p>
+        <p class="sp-status">{p.status}</p>
+        <h3 class="sp-name">{p.w.title}</h3>
+        <p class="sp-what">{p.what}</p>
+        <p class="sp-price">{p.price.main}{p.price.sub && <span>（{p.price.sub}）</span>}{p.price.group && <span>／{p.price.group}</span>}{p.w.info.ageRule && <span>・{p.w.info.ageRule}</span>}</p>
+        <div class="sp-actions">
+          <a class="sp-btn" href={p.w.ticketUrl} target="_blank" rel="noopener" data-track="ticket" data-show={p.w.id} data-place={`${place}-body`}>日程・空席を見る<span>escape.id ↗</span></a>
+          <a class="sp-more" href={p.w.officialUrl} data-track="show" data-show={p.w.id} data-place={place}>公演詳細 →</a>
+          {p.guide && <a class="sp-more" href={p.guide.href} data-track="show" data-show={`guide-${p.w.id}`} data-place={place}>{p.guide.label} →</a>}
+        </div>
+      </div>
+    </article>
+  ))}
+</div>
+<p class="sp-foot">料金は税込。空席は予約サイトの表示が最新です。<a href="/events/" data-track="show" data-show="events" data-place={place}>東京の公演を日付・人数で探す →</a></p>
+</div></section>
+)}
+<style>
+.sp-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;margin-top:22px;text-align:left}
+.sp-card{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;background:#F3F6FE;border:1px solid #D6DFFB;padding:14px}
+.sp-img img{width:100%;height:auto;display:block;background:#0B0B14}
+.sp-body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.sp-area{margin:0;font-size:12px;letter-spacing:.04em;color:rgba(11,11,20,.65)}
+.sp-area strong{color:var(--x-blue,#0B35C8)}
+.sp-status{margin:0;display:inline-block;align-self:flex-start;padding:2px 10px;font-size:12px;font-weight:800;background:#E1F73E;color:#0B0B14}
+.sp-name{margin:0;font-family:var(--x-min,serif);font-weight:700;font-size:17px;line-height:1.5;color:var(--x-blue,#0B35C8)}
+.sp-what{margin:0;font-size:13.5px;line-height:1.7;color:var(--x-ink,#0B0B14)}
+.sp-price{margin:0;font-size:13px;line-height:1.6;color:rgba(11,11,20,.75);font-variant-numeric:tabular-nums}
+.sp-actions{margin-top:auto;padding-top:6px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.sp-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:10px 16px;background:var(--x-blue,#0B35C8);color:#fff!important;font-weight:800;font-size:14px;text-decoration:none!important}
+.sp-btn span{font-size:10.5px;font-weight:600;opacity:.85}
+.sp-more{display:inline-block;padding:4px 0;font-size:13.5px;font-weight:700;color:var(--x-blue,#0B35C8)!important;border-bottom:1px solid currentColor;text-decoration:none!important}
+.sp-foot{margin:16px 0 0;font-size:12.5px;line-height:1.8;color:rgba(11,11,20,.6);text-align:left}
+.sp-foot a{display:inline-block;padding:6px 0;font-weight:700;color:var(--x-blue,#0B35C8)!important;border-bottom:1px solid currentColor}
+@media(max-width:420px){.sp-card{grid-template-columns:96px minmax(0,1fr);gap:10px;padding:12px}}
+</style>

@@ -20,11 +20,14 @@ const todayJst = jstDateString(new Date());
 const lastDateOf = (workId: string, fallback?: string) => eventsData.occurrences.filter((o) => o.workId === workId && o.published && o.eventStatus !== 'cancelled').map((o) => o.date).sort().pop() ?? eventsData.works.find((w) => w.id === workId)?.period?.to ?? fallback;
 // soldout: true で「完売」を表示（主催からの連絡で設定。公演データ src/data/events/occurrences.ts の空席状態も同じにする）
 const firstDateOf = (workId: string, fallback: string) => eventsData.occurrences.filter((o) => o.workId === workId && o.published && o.eventStatus !== 'cancelled').map((o) => o.date).sort()[0] ?? fallback;
-const allEvents: { title: string; host: string; place: string; desc: string; url: string; img: string; w: number; h: number; until?: string; soldout?: boolean; from?: string; period?: string; venueTag?: string }[] = [
+// region：東京・埼玉・京都など（2026-10-22 予約促進：トップで地域を明記し、「公演詳細」と「日程・空席」のリンクを分ける）。ticketUrl は予約サイト（空席はそこで確認）
+const allEvents: { title: string; host: string; place: string; desc: string; url: string; img: string; w: number; h: number; until?: string; soldout?: boolean; from?: string; period?: string; venueTag?: string; region?: string; ticketUrl?: string }[] = [
   // from（初日）が未来のものは「近日公開」枠に出し、初日になったら自動で「現在実施中」へ移る
   {
     title: '午前零時の幻想集 第一夜「草陰の夢」',
     host: 'ex Labs企画',
+    region: '東京',
+    ticketUrl: 'https://escape.id/gensou-org/e-ichi/',
     place: '夢の島熱帯植物館',
     // 公共施設での開催であることを示す（夢の島熱帯植物館は東京都の施設。「国営」ではない）
     venueTag: '東京都の熱帯植物館',
@@ -39,6 +42,7 @@ const allEvents: { title: string; host: string; place: string; desc: string; url
   {
     title: 'ウワサバナシ調査委員会 case2「言祝ぎの家 -呪われた花嫁-」',
     host: 'ex Labs主催',
+    region: '埼玉',
     place: '埼玉県さいたま市（東京近郊）の一軒家',
     desc: '祝いの席に、\u200b招かれる。\u200b実際の一軒家を探索し、\u200b住人との会話や調査報告を通じて\u200b真相に迫る\u200bイマーシブホラー・ミステリー。',
     url: 'https://escape.id/uwasabanashi-org/e-hanayome/',
@@ -54,6 +58,8 @@ const allEvents: { title: string; host: string; place: string; desc: string; url
   {
     title: '7枚目のコンポジション',
     host: '体験する美術館',
+    region: '京都',
+    ticketUrl: 'https://escape.id/kyoukaiart-org/e-7th/',
     place: '京都市京セラ美術館',
     // 京都市京セラ美術館は京都市の美術館（正式名称 京都市美術館）
     venueTag: '京都市の美術館',
@@ -246,40 +252,49 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
     <p class="xt-sub"><Cls text="画像をタップすると、各イベントの特設サイトへ移動します。" emph={false} /></p>
     <div class="x-hscroll" style="margin-top:40px;gap:20px">
       {liveCards.map((e) => (
-        <a href={e.url} class="xt-ev" data-track="show" data-show={e.id} data-place="home-now">
-          <img src={e.img} alt={e.title} width={e.w} height={e.h} loading="lazy" decoding="async">
-          {e.soldout && <span class="xt-ev-stamp" aria-hidden="true">完売</span>}
+        <article class="xt-ev">
+          <a href={e.url} class="xt-ev-img" data-track="show" data-show={e.id} data-place="home-now">
+            <img src={e.img} alt={e.title} width={e.w} height={e.h} loading="lazy" decoding="async">
+            {e.soldout && <span class="xt-ev-stamp" aria-hidden="true">完売</span>}
+          </a>
           <div>
-            <p class="xt-ev-org"><span class="x-bl">{e.host}</span><span class="x-bl">開催地：{e.place}{e.until === todayJst && '｜本日最終日'}</span></p>
-            {e.soldout && <p class="xt-ev-so is-big">完売</p>}
+            <p class="xt-ev-org"><span class="x-bl">{e.region && <strong class="xt-ev-rg">{e.region}</strong>}{e.host}</span><span class="x-bl">開催地：{e.place}{e.until === todayJst && '｜本日最終日'}</span></p>
+            {e.soldout ? <p class="xt-ev-so is-big">完売</p> : e.ticketUrl && <p class="xt-ev-so">開催中・予約受付中<span class="xt-ev-so-n">空席は予約サイトで確認</span></p>}
             {e.venueTag && <p class="xt-ev-pub"><span class="k">公共施設で開催</span><span class="v">{e.venueTag}</span></p>}
-            <h3 class="xt-ev-t">{e.title} ↗</h3>
+            <h3 class="xt-ev-t"><a href={e.url} data-track="show" data-show={e.id} data-place="home-now">{e.title}</a></h3>
             <p class="xt-ev-d"><Cls text={e.desc} emph={false} /></p>
+            <p class="xt-ev-links"><a href={e.url} class="xt-ev-link" data-track="show" data-show={e.id} data-place="home-now">公演詳細 →</a>{!e.soldout && e.ticketUrl && <a href={e.ticketUrl} class="xt-ev-link is-ticket" target="_blank" rel="noopener" data-track="ticket" data-show={e.id} data-place="home-body">日程・空席を見る ↗</a>}</p>
           </div>
-        </a>
+        </article>
       ))}
     </div>
     {upcomingEvents.length > 0 && (
       <div class="xt-soon">
-        <p class="xt-soon-h"><span>Coming Soon</span>開催予定・近日公開</p>
+        <p class="xt-soon-h"><span>Coming Soon</span>{upcomingEvents.some((e) => (e.from ?? '').startsWith('2026-11')) ? `2026年11月の公演（${[...new Set(upcomingEvents.filter((e) => (e.from ?? '').startsWith('2026-11')).map((e) => e.region).filter(Boolean))].join('・')}）` : '開催予定・近日公開'}</p>
         {upcomingEvents.some((e) => e.venueTag) && <p class="xt-soon-pub"><Cls text={`この秋は、${upcomingEvents.filter((e) => e.venueTag).map((e) => `${(e.venueTag ?? '').split('の')[0]}の${e.place}`).join('、')}と、公共の文化施設を舞台にした公演を開催します。`} emph={false} /></p>}
         {upcomingEvents.some((e) => e.url.endsWith('/gensou/')) && <p class="xt-soon-more"><a href="/guide/yumenoshima-night/" data-track="show" data-show="guide-yumenoshima" data-place="home-soon">夜の夢の島熱帯植物館で行われる物語体験：日程・チケットの選び方・行き方 →</a></p>}
         {upcomingEvents.some((e) => e.url.includes('/7th-composition/')) && <p class="xt-soon-more"><a href="/guide/kyoto-kyocera-museum-7th/" data-track="show" data-show="guide-kyoto7" data-place="home-soon">京都市京セラ美術館で行われる、絵画の物語体験：日程・チケット・行き方 →</a></p>}
         <div class="x-hscroll" style="margin-top:20px;gap:20px">
-          {upcomingEvents.map((e) => (
-            <a href={e.url} class="xt-ev" data-track="show" data-show={e.url.split('/').filter(Boolean).pop()} data-place="home-soon">
-              <img src={e.img} alt={e.title} width={e.w} height={e.h} loading="lazy" decoding="async">
-              {e.soldout && <span class="xt-ev-stamp" aria-hidden="true">完売</span>}
+          {upcomingEvents.map((e) => {
+            const id = e.url.split('/').filter(Boolean).pop();
+            return (
+            <article class="xt-ev">
+              <a href={e.url} class="xt-ev-img" data-track="show" data-show={id} data-place="home-soon">
+                <img src={e.img} alt={e.title} width={e.w} height={e.h} loading="lazy" decoding="async">
+                {e.soldout && <span class="xt-ev-stamp" aria-hidden="true">完売</span>}
+              </a>
               <div>
-                <p class="xt-ev-org"><span class="x-bl">{e.host}</span><span class="x-bl">開催地：{e.place}</span></p>
+                <p class="xt-ev-org"><span class="x-bl">{e.region && <strong class="xt-ev-rg">{e.region}</strong>}{e.host}</span><span class="x-bl">開催地：{e.place}</span></p>
                 {e.soldout && <p class="xt-ev-so is-big">完売</p>}
                 {e.venueTag && <p class="xt-ev-pub"><span class="k">公共施設で開催</span><span class="v">{e.venueTag}</span></p>}
-                <p class="xt-ev-so is-soon">開催｜{e.period}</p>
-                <h3 class="xt-ev-t">{e.title} ↗</h3>
+                <p class="xt-ev-so is-soon">開催｜{e.period}{!e.soldout && e.ticketUrl && '｜予約受付中'}</p>
+                <h3 class="xt-ev-t"><a href={e.url} data-track="show" data-show={id} data-place="home-soon">{e.title}</a></h3>
                 <p class="xt-ev-d"><Cls text={e.desc.replace(/\u200b/g, '')} emph={false} /></p>
+                <p class="xt-ev-links"><a href={e.url} class="xt-ev-link" data-track="show" data-show={id} data-place="home-soon">公演詳細 →</a>{!e.soldout && e.ticketUrl && <a href={e.ticketUrl} class="xt-ev-link is-ticket" target="_blank" rel="noopener" data-track="ticket" data-show={id} data-place="home-body">日程・空席を見る ↗</a>}</p>
               </div>
-            </a>
-          ))}
+            </article>
+            );
+          })}
         </div>
       </div>
     )}
@@ -536,6 +551,13 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-ev-org{margin:0;font-size:12px;line-height:1.7;color:var(--x-pale2)}
 .xt-ev-t{margin:8px 0;font-family:var(--x-min);font-weight:600;font-size:clamp(16px,4.6vw,19px);line-height:1.5}
 .xt-ev-d{margin:0;font-size:13px;line-height:1.85;color:var(--x-pale)}
+.xt-ev-img{display:block;position:relative}
+.xt-ev-t a{color:inherit;text-decoration:none}
+.xt-ev-rg{display:inline-block;margin-right:8px;padding:1px 8px;background:#fff;color:var(--x-ink);font-weight:900;font-size:11.5px;letter-spacing:.08em}
+.xt-ev-so-n{display:block;font-size:10.5px;font-weight:600;letter-spacing:.02em;opacity:.8}
+.xt-ev-links{margin:6px 0 0;display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;font-weight:700}
+.xt-ev-link{display:inline-block;padding:6px 0;color:var(--x-lime)!important;border-bottom:1px solid currentColor;text-decoration:none!important}
+.xt-ev-link.is-ticket{color:#fff!important;background:var(--x-blue);border:0;padding:8px 14px}
 .xt-ended{margin:20px 0 0;font-size:13px;line-height:1.9;color:var(--x-pale3)}
 .xt-str-no{font-family:var(--x-en);font-size:120px;line-height:.8;color:var(--x-lime)}
 .xt-str-h{margin:20px 0 16px;font-family:var(--x-min);font-weight:600;font-size:clamp(22px,3vw,30px);line-height:1.6;text-shadow:0 0 14px rgba(255,255,255,.4)}

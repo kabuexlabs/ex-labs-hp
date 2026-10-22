@@ -130,7 +130,7 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-07',
-  dateModified: '2026-09-18',
+  dateModified: '2026-10-22',
   mainEntityOfPage: new URL('/guide/immersive-tokyo/', Astro.site).toString(),
 };
 ---
@@ -150,18 +150,22 @@ const articleLd = {
 <VisualHero image="/assets/events/gensou-kv.webp" imagePos="center 28%" eyebrow="IMMERSIVE TOKYO GUIDE" catchText="東京のイマーシブ、開催日から予約へ" chips={heroChips} alt="東京で開催中のイマーシブ公演のキービジュアル">
   <h1 class="h2 serif"><span class="nobr">東京で体験できる</span><span class="nobr">イマーシブイベント</span><span class="nobr">【2026年最新】</span></h1>
 </VisualHero>
-<section class="section" style="padding-top:28px;padding-bottom:12px"><div class="wrap"><GensouFeature place="immersive-tokyo-pickup" /></div></section>
+{/* 2026-10-22 予約促進：11月の公演案内を「今週・来週」カレンダーより上に置く（開催日は公演データ、空席は予約サイト） */}
+<section class="section nov" id="nov-2026" style="padding-top:28px;padding-bottom:12px"><div class="wrap">
+<h2 class="cards-h" style="margin-bottom:14px">2026年11月に参加できるイマーシブ体験<span>開催日は公式ページの日付です。空席は予約サイトで確認できます</span></h2>
+<GensouFeature place="immersive-tokyo-top" />
+</div></section>
 
 
 <section class="section cards" id="this-week" data-week-end={week.end} data-today={today}><div class="wrap">
 <div class="gd-jump" style="margin:0 0 26px">
-<a class="is-main" href="#this-week-cal" data-track="show" data-show="this-week" data-place="guide-top">今週の開催日・予約 ↓</a>
+<a class="is-main" href="#this-week-cal" data-track="show" data-show="this-week" data-place="guide-top">今週・来週の開催日 ↓</a>
 <a href="#compare-now" data-track="show" data-show="compare" data-place="guide-top">料金・時間・場所を比較 ↓</a>
 <a href="#studio" data-track="cta" data-show="immersive" data-place="guide-top">法人の方：制作の相談 ↓</a>
 </div>
 <h2 class="cards-h" id="this-week-cal">今週・来週の開催日<span>◯は開催日です。空席は予約サイトで確認できます</span></h2>
 <div class="cal-grid">
-{calShows.map(({ s }) => <ShowCalendar show={s} place="guide-cal" now={now} />)}
+{calShows.map(({ s }) => <ShowCalendar show={s} place="guide-cal" now={now} compactWhenNone />)}
 </div>
 <p class="tw-meta">◯は開催日の印で、空席ありの印ではありません。◯をタップすると予約サイトで空席を確認できます（満席の場合もあります）。{anyStale && <strong>最新の日程は予約サイトでご確認ください。</strong>}日付・人数で絞り込むなら<a href="/events/" style="color:var(--accent)" data-track="show" data-show="events" data-place="guide-this-week">公演を探す</a>。</p>
 <script is:inline>
@@ -393,7 +397,7 @@ const articleLd = {
 .cmp-now th[scope=row]{min-width:160px;white-space:normal}
 .cmp-now th[scope=row] a{font-weight:700}
 .cmp-now td{min-width:120px;vertical-align:top}
-#this-week-cal,#compare-now,#studio{scroll-margin-top:110px}
+#this-week-cal,#compare-now,#studio,#nov-2026{scroll-margin-top:110px}
 .wrap.narrow{max-width:820px}
 .def-sub{font-size:19px;color:var(--ink);margin:28px 0 6px;text-align:left}
 #compare,#this-week{scroll-margin-top:88px}

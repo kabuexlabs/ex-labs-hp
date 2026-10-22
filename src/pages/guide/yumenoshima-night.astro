@@ -9,6 +9,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import LatestPosts from '../../components/LatestPosts.astro';
 import AuthorBox from '../../components/AuthorBox.astro';
+import StickyReserve from '../../components/StickyReserve.astro';
 import { jsonLd } from '../../lib/microcms';
 import { jstDateString } from '../../lib/thisWeek';
 
@@ -50,7 +51,7 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-10-16',
-  dateModified: '2026-10-16',
+  dateModified: '2026-10-22',
   mainEntityOfPage: new URL('/guide/yumenoshima-night/', site).toString(),
 };
 ---
@@ -74,8 +75,10 @@ const articleLd = {
     <h1 class="yn-h1 serif"><span class="nobr">夜の夢の島熱帯植物館で</span><span class="nobr">行われる物語体験</span></h1>
     <p class="lede">2026年11月5日から22日までの木〜日曜、普段は入れない夜の夢の島熱帯植物館を巡る物語体験<strong>「午前零時の幻想集 第一夜『草陰の夢』」</strong>を開催します。各日17:00〜20:00に12分おきに始まり、所要時間は約50分。館内を歩きながら、キャストとの会話を通して物語に入り込みます。</p>
     <ul class="yn-keys">
-      <li><span>料金</span>個別3,500円／グループ14,000円（最大4名で貸切）。税込・入館料込み</li>
-      <li><span>対象</span>中学生以上（18歳未満は保護者同伴）。怖さは控えめ</li>
+      <li><span>開催</span>2026年11月5日（木）〜22日（日）の木〜日曜・全12日間</li>
+      <li><span>所要</span>約50分。各日17:00〜20:00の間に12分おきに開始</li>
+      <li><span>料金</span>個別チケット1名3,500円（2名なら合計7,000円。ほかのお客様と同じ組になる場合あり）／グループチケット1組14,000円（最大4名で貸切）。税込・入館料込み</li>
+      <li><span>対象</span>1名から参加可。中学生以上（18歳未満は保護者同伴）。怖さは控えめ（暗い場所やキャストとの会話あり）</li>
       <li><span>会場</span>夢の島熱帯植物館（東京都江東区）。新木場駅から徒歩約15分</li>
     </ul>
     {phase !== 'ended' && <p class="yn-cta"><a class="yn-btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="yumenoshima-hero">日時を選んでチケットを購入（escape.id）↗</a><a class="yn-sub" href="/gensou/" data-track="show" data-show="gensou" data-place="yumenoshima-hero">公式サイトであらすじを見る →</a></p>}
@@ -110,6 +113,7 @@ const articleLd = {
 <tbody>{party.map((p) => <tr><th scope="row">{p.n}</th><td>{p.solo}</td><td>{p.group}</td><td>{p.note}</td></tr>)}</tbody>
 </table></div>
 <p class="lede" style="margin-top:20px">2回目以降に参加する場合は、グループチケットを購入する決まりです。お客様の都合によるキャンセル・日時変更はできません。</p>
+{phase !== 'ended' && <p class="yn-cta" style="margin-top:22px"><a class="btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="yumenoshima-body">日程・空席を見る（escape.id）↗</a><a class="yn-sub2" href="/gensou/#story" data-track="show" data-show="gensou" data-place="yumenoshima-body">物語・参加条件を確認する →</a></p>}
 </div></section>
 
 <section class="section" id="flow"><div class="wrap narrow">
@@ -186,6 +190,8 @@ const articleLd = {
 
 <LatestPosts category="immersive" />
 
+<StickyReserve href={TICKET} label="日程・空席を見る" show="gensou" place="yumenoshima-sticky" until={TO} />
+
 </BaseLayout>
 
 <style>
@@ -200,6 +206,7 @@ const articleLd = {
 .yn-cta{margin:22px 0 0;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
 .yn-btn{display:inline-block;padding:14px 22px;background:#0E1424;color:#fff!important;font-weight:800;font-size:15px;border-radius:999px;text-decoration:none!important;border:1px solid #C9A961}
 .yn-sub{font-weight:700;font-size:14.5px;color:#fff!important;border-bottom:1px solid currentColor}
+.yn-sub2{font-weight:700;font-size:14.5px;color:var(--accent);border-bottom:1px solid currentColor}
 .toc{max-width:520px;margin:40px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:24px 28px}
 .toc-h{margin:0 0 12px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}

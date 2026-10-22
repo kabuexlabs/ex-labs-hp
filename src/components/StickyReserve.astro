@@ -1,0 +1,40 @@
+---
+// スマホ（640px以下）で画面下部に固定する予約ボタン（2026-10-22 予約促進）。
+// 公演の最終日（日本時間）を過ぎたら出さない。表示中は本文の下端に余白を足し、「上へ戻る」ボタンを上にずらして重ならないようにする。
+// 計測は既存の data-track="ticket"（data-place は「<ページ>-sticky」）。空席の有無は書かない。
+import { jstDateString } from '../lib/thisWeek';
+interface Props {
+  href: string;
+  label: string;
+  show: string;
+  place: string;
+  /** 最終開催日（YYYY-MM-DD）。これを過ぎると表示しない */
+  until: string;
+  note?: string;
+  /** 右端に固定要素があるページ（/gensou/ の縦書きレール）で、重ならないように空ける幅 */
+  offsetRight?: number;
+  theme?: 'light' | 'dark';
+}
+const { href, label, show, place, until, note, offsetRight = 0, theme = 'light' } = Astro.props;
+const live = jstDateString(new Date()) <= until;
+---
+{live && (
+<div class:list={['sticky-rsv', { 'is-dark': theme === 'dark' }]} style={offsetRight ? `right:${offsetRight}px` : undefined} data-sticky-reserve={show}>
+  <a class="sticky-rsv__btn" href={href} target="_blank" rel="noopener" data-track="ticket" data-show={show} data-place={place}>{label}<span>escape.id ↗</span></a>
+  {note && <p class="sticky-rsv__note">{note}</p>}
+</div>
+)}
+<style is:global>
+.sticky-rsv{display:none}
+@media (max-width:640px){
+  .sticky-rsv{display:block;position:fixed;left:0;right:0;bottom:0;z-index:45;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid rgba(0,0,0,.08);box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+  .sticky-rsv.is-dark{background:rgba(7,7,14,.94);border-top-color:rgba(243,242,248,.18)}
+  .sticky-rsv__btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 16px;background:var(--x-blue,var(--accent,#0B35C8));color:#fff!important;font-weight:800;font-size:15px;line-height:1.3;border-radius:999px;text-decoration:none!important}
+  .sticky-rsv.is-dark .sticky-rsv__btn{background:#e2c43c;color:#07070e!important;border-radius:0}
+  .sticky-rsv__btn span{font-size:11px;font-weight:600;opacity:.85}
+  .sticky-rsv__note{margin:4px 0 0;font-size:11px;line-height:1.5;color:rgba(0,0,0,.6);text-align:center}
+  .sticky-rsv.is-dark .sticky-rsv__note{color:rgba(243,242,248,.7)}
+  body:has(.sticky-rsv){padding-bottom:76px}
+  body:has(.sticky-rsv) .totop{bottom:88px}
+}
+</style>

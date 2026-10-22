@@ -207,6 +207,8 @@ export async function testMailSend(to: string): Promise<{ ok: boolean; detail: s
 // 情報は一切含めない。
 export type MetricEvent = 'view' | 'start' | 'cta' | 'ai-visit' | 'submit' | 'ticket' | 'show' | 'ev-search' | 'ev-zero' | 'ev-view' | 'ev-ext';
 // ticket＝外部チケットサイトへのクリック、show＝自社の公演詳細へのクリック（購入完了ではない）
+//   ticket の値は「公演-掲載位置-リンク先ドメイン」（例 gensou-yumenoshima-sticky-escape-id。2026-10-22 から。それ以前は 公演-掲載位置）。
+//   掲載位置の末尾: top＝冒頭、body＝本文（料金・日程の直後）、bottom＝末尾、sticky＝スマホの固定ボタン。購入完了は予約サイト側にしか無く、ここでは数えない
 // ev-search＝公演検索の利用（値は 日付種別-人数-エリア-ジャンル）、ev-zero＝検索結果ゼロ、ev-view＝公演詳細の閲覧（値は 作品-own|3rd）、ev-ext＝外部サイトへのクリック（値は サイトID-掲載箇所）
 // start＝お問い合わせフォームへの最初の入力（表示しただけでは数えない。値は選択中の相談種別）
 // ai-visit＝AI検索・チャットからの訪問（セッションの最初の1回。値は参照元のドメイン、ページは入口）

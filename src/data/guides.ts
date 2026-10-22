@@ -121,6 +121,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/immersive-tokyo-solo.webp',
   },
   {
+    href: '/guide/kyoto-november-experience/',
+    title: '2026年11月の京都で楽しむ物語体験｜7枚目のコンポジション',
+    desc: '京都市京セラ美術館の本館地下1階で行う60分の物語体験。絵画を観ることが物語に参加するきっかけになる体験を初めての人向けに説明し、料金・対象・各回の時間と休日への組み込み方を紹介。',
+    date: '2026-10-22',
+    category: 'immersive',
+    thumb: '/assets/events/7th-composition-kv.webp',
+  },
+  {
     href: '/guide/kyoto-okazaki-november/',
     title: '「禅とジブリ」京都展と同じ日に回る岡崎の半日｜永観堂ライトアップと美術館の物語体験（2026年11月）',
     desc: '京都市京セラ美術館の「禅とジブリ」京都展、同じ美術館の本館地下1階で行う60分の物語体験「7枚目のコンポジション」、永観堂ライトアップを、開館時間と公演時刻をもとに同じ日に回す組み立て。',

@@ -1,35 +1,67 @@
 ---
 // 「午前零時の幻想集」（自社公演、東京都の夢の島熱帯植物館）を東京イマーシブ・デート・お出かけ系の記事で目立たせる枠。
-// 内容は公式ページ /gensou/ と公演データ（src/data/events/）の記載だけ。会期の前は「開催｜」、会期中は「開催中」、終了後は表示しない。
-import { jstDateString } from '../../lib/thisWeek';
-interface Props { place: string; lead?: string }
-const { place, lead } = Astro.props;
-const FROM = '2026-11-05';
-const TO = '2026-11-22';
-const TICKET = 'https://escape.id/gensou-org/e-ichi/';
+// 開催日は公演データ（src/data/events/occurrences.ts）から取り、連続する日付をまとめて「11月5日（木）〜8日（日）」の形で出す。
+// 料金・人数・怖さの説明は公式ページ /gensou/ の記載だけ（2026-10-22 予約促進：人数別の料金と相席条件、暗い場所・会話がある旨を明記）。
+// 会期の前は「開催｜」、会期中は「開催中」、終了後は表示しない。主ボタンは予約サイト、補助リンクは公式ページ（物語・参加条件）。
+import { eventsData } from '../../data/events/index';
+import { jstDateString, jstWeekday } from '../../lib/thisWeek';
+interface Props {
+  place: string;
+  lead?: string;
+  /** 主ボタンの文言（既定「11月の開催日・空席を見る」） */
+  primaryLabel?: string;
+  /** 補助リンクの文言（既定「物語・参加条件を確認する」→ /gensou/） */
+  secondaryLabel?: string;
+}
+const { place, lead, primaryLabel = '11月の開催日・空席を見る', secondaryLabel = '物語・参加条件を確認する' } = Astro.props;
+const WORK_ID = 'gensou';
+const w = eventsData.works.find((x) => x.id === WORK_ID);
+const TICKET = w?.ticketUrl ?? 'https://escape.id/gensou-org/e-ichi/';
+const dates = eventsData.occurrences.filter((o) => o.workId === WORK_ID && o.published && !o.test && o.eventStatus !== 'cancelled').map((o) => o.date).sort();
+const FROM = dates[0] ?? w?.period?.from ?? '2026-11-05';
+const TO = dates[dates.length - 1] ?? w?.period?.to ?? '2026-11-22';
 const today = jstDateString(new Date());
 const phase = today > TO ? 'ended' : today >= FROM ? 'live' : 'before';
+const DAYS = ['日', '月', '火', '水', '木', '金', '土'];
+const md = (d: string) => `${Number(d.slice(5, 7))}月${Number(d.slice(8, 10))}日（${DAYS[jstWeekday(d)]}）`;
+const dd = (d: string) => `${Number(d.slice(8, 10))}日（${DAYS[jstWeekday(d)]}）`;
+// 連続する日付をひとまとまりにする（11/5〜8、11/12〜15、11/19〜22）
+const groups: { from: string; to: string; n: number }[] = [];
+for (const d of dates) {
+  const last = groups[groups.length - 1];
+  const next = last ? new Date(Date.parse(last.to) + 86400000).toISOString().slice(0, 10) : '';
+  if (last && next === d) { last.to = d; last.n += 1; } else groups.push({ from: d, to: d, n: 1 });
+}
+const groupLabel = (g: { from: string; to: string }) => (g.from === g.to ? md(g.from) : g.from.slice(5, 7) === g.to.slice(5, 7) ? `${md(g.from)}〜${dd(g.to)}` : `${md(g.from)}〜${md(g.to)}`);
+const futureGroups = groups.filter((g) => g.to >= today);
 const facts: [string, string][] = [
-  ['開催', '2026年11月5日〜22日の木〜日曜（全12日間）'],
-  ['開始', '各日17:00〜20:00に12分おき・約50分'],
-  ['料金', '個別チケット3,500円（1名）／グループチケット14,000円（最大4名で貸切）。税込・入館料込み'],
-  ['会場', '夢の島熱帯植物館（東京都の施設）。新木場駅から徒歩約15分'],
-  ['対象', '中学生以上（18歳未満は保護者同伴）。怖さは控えめ'],
+  ['時間', '各日17:00〜20:00の間に12分おきに開始。所要約50分（最終回は20:00開始・20:50終了予定）'],
+  ['料金', '個別チケット 1名3,500円（2名なら合計7,000円。ほかのお客様と同じ組になる場合があります）／グループチケット 1組14,000円（最大4名で貸切。仲間だけで参加したい場合はこちら）。税込・入館料込み'],
+  ['人数・対象', '1名から参加できます。中学生以上（18歳未満は保護者同伴）'],
+  ['怖さ', '控えめ。暗い場所やキャストとの会話があります'],
+  ['会場', '夢の島熱帯植物館（東京都江東区）。新木場駅から徒歩約15分'],
 ];
 ---
 {phase !== 'ended' && (
 <aside class="gf" aria-label="午前零時の幻想集">
-  <a class="gf-img" href="/gensou/" data-track="show" data-show="gensou" data-place={place}><img src="/assets/events/gensou-kv.webp" alt="午前零時の幻想集 第一夜「草陰の夢」" width="880" height="1246" loading="lazy" decoding="async"></a>
+  <a class="gf-img" href="/gensou/" data-track="show" data-show="gensou" data-place={place}><img src="/assets/events/gensou-kv.webp" alt="午前零時の幻想集 第一夜「草陰の夢」" width="880" height="1246" loading="lazy" decoding="async" /></a>
   <div class="gf-b">
-    <p class="gf-k">{phase === 'live' ? '開催中｜11月22日まで' : '開催｜2026年11月5日〜22日'}<span>公共施設で開催</span></p>
-    <p class="gf-t">夜の植物館を歩くイマーシブ<br>「午前零時の幻想集 第一夜『草陰の夢』」</p>
-    <p class="gf-l">{lead ?? '東京都の夢の島熱帯植物館で、夜に開催するイマーシブ体験です。館内を巡り、キャストとの会話を通して物語に入り込みます。怖さは控えめで、1名から参加できます。'}</p>
+    <p class="gf-k">{phase === 'live' ? `開催中｜${md(TO)}まで` : `開催｜2026年${md(FROM)}〜${dd(TO)}`}<span>公共施設で開催</span></p>
+    <p class="gf-t">夜の夢の島熱帯植物館を巡る物語体験<br>「午前零時の幻想集 第一夜『草陰の夢』」</p>
+    <p class="gf-l">{lead ?? '東京都の夢の島熱帯植物館で、閉館後の夜に開催する物語体験です。館内を巡り、キャストとの会話を通して物語が進みます。暗い場所はありますが、怖さは控えめです。'}</p>
+    {futureGroups.length > 0 && (
+      <div class="gf-dates">
+        <p class="gf-dh">開催日（{phase === 'live' ? '残りの日程' : '2026年11月'}）</p>
+        <ul>{futureGroups.map((g) => <li><strong>{groupLabel(g)}</strong><span>{g.n}日間</span></li>)}</ul>
+      </div>
+    )}
     <dl class="gf-f">{facts.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
     <p class="gf-a">
-      <a class="gf-btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place={place}>チケットを購入する（escape.id）↗</a>
-      <a class="gf-sub" href="/gensou/" data-track="show" data-show="gensou" data-place={place}>公演の詳細・あらすじ →</a>
-      <a class="gf-sub" href="/guide/yumenoshima-night/" data-track="show" data-show="guide-yumenoshima" data-place={place}>夜の夢の島熱帯植物館：日程・チケットの選び方・行き方 →</a>
+      <a class="gf-btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place={place}>{primaryLabel}<span>escape.id ↗</span></a>
+      <a class="gf-sub" href="/gensou/" data-track="show" data-show="gensou" data-place={place}>{secondaryLabel} →</a>
+      <a class="gf-sub" href="/guide/yumenoshima-night/" data-track="show" data-show="guide-yumenoshima" data-place={place}>日程・チケットの選び方・行き方 →</a>
     </p>
+    <p class="gf-note">開催日は公式ページの日付です。空席は予約サイト（escape.id）の表示が最新です。</p>
   </div>
 </aside>
 )}
@@ -40,12 +72,19 @@ const facts: [string, string][] = [
 .gf-k span{padding:2px 10px;border:1px solid #C9A961;border-radius:999px;font-size:12px;letter-spacing:.04em}
 .gf-t{margin:10px 0 0;font-family:var(--font-serif,serif);font-weight:800;font-size:clamp(19px,2.6vw,24px);line-height:1.55;color:#fff}
 .gf-l{margin:10px 0 0;font-size:14.5px;line-height:1.9;color:rgba(237,232,220,.9)}
+.gf-dates{margin:14px 0 0;padding:12px 14px;background:rgba(201,169,97,.1);border:1px solid rgba(201,169,97,.35);border-radius:10px}
+.gf-dh{margin:0 0 6px;font-size:12px;font-weight:800;letter-spacing:.08em;color:#C9A961}
+.gf-dates ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px}
+.gf-dates li{display:flex;align-items:baseline;gap:8px;font-size:15px;color:#fff;font-variant-numeric:tabular-nums}
+.gf-dates li span{font-size:12px;color:rgba(237,232,220,.75)}
 .gf-f{margin:14px 0 0;display:grid;gap:6px;font-size:13.5px;line-height:1.7}
-.gf-f div{display:grid;grid-template-columns:3.2em minmax(0,1fr);gap:10px}
+.gf-f div{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:10px}
 .gf-f dt{margin:0;font-weight:800;color:#C9A961}
 .gf-f dd{margin:0}
 .gf-a{margin:18px 0 0;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
-.gf-btn{display:inline-block;padding:12px 20px;background:#C9A961;color:#0E1424!important;font-weight:800;font-size:14.5px;border-radius:999px;text-decoration:none!important}
+.gf-btn{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:12px 20px;background:#C9A961;color:#0E1424!important;font-weight:800;font-size:15px;border-radius:999px;text-decoration:none!important}
+.gf-btn span{font-size:11px;font-weight:700;opacity:.8}
 .gf-sub{color:#EDE8DC!important;font-weight:700;font-size:14px;border-bottom:1px solid currentColor;text-decoration:none!important}
-@media(max-width:640px){.gf{grid-template-columns:110px minmax(0,1fr);gap:14px;padding:16px}.gf-f,.gf-a,.gf-l{grid-column:1 / -1}.gf-b{display:contents}.gf-k,.gf-t{grid-column:2}.gf-img{grid-row:1 / span 2}}
+.gf-note{margin:10px 0 0;font-size:12px;line-height:1.6;color:rgba(237,232,220,.65)}
+@media(max-width:640px){.gf{grid-template-columns:110px minmax(0,1fr);gap:14px;padding:16px}.gf-f,.gf-a,.gf-l,.gf-dates,.gf-note{grid-column:1 / -1}.gf-b{display:contents}.gf-k,.gf-t{grid-column:2}.gf-img{grid-row:1 / span 2}.gf-btn{width:100%;justify-content:center}.gf-dates li{font-size:14.5px}}
 </style>

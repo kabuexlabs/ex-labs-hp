@@ -21,7 +21,10 @@ try{var k='exl_src',F='exl_first',N='exl_n',now=Date.now();if(!sessionStorage.ge
     var a=e.target&&e.target.closest?e.target.closest('a[href]'):null;if(!a)return;
     var h=a.getAttribute('href')||'';
     if(/#contact(\b|$)/.test(h)){try{sessionStorage.setItem('exl_cta',location.pathname)}catch(_){}}
-    if(a.hasAttribute('data-track')){send(a.getAttribute('data-track'),(a.getAttribute('data-show')||'')+'-'+(a.getAttribute('data-place')||''));return}
+    if(a.hasAttribute('data-track')){var ev=a.getAttribute('data-track'),c=(a.getAttribute('data-show')||'')+'-'+(a.getAttribute('data-place')||'');
+    // ticket＝予約サイトへのクリック（購入完了ではない）。値は 公演-掲載位置-リンク先ドメイン（例 gensou-yumenoshima-top-escape-id）
+    if(ev==='ticket'){var hm=/^https?:\/\/(?:www\.)?([a-z0-9.-]+)\//i.exec(h);if(hm)c+='-'+hm[1].toLowerCase().replace(/\./g,'-')}
+    send(ev,c);return}
     if(/#contact(\b|$)/.test(h)||a.hasAttribute('data-cta')){send('cta',cat(h)||a.getAttribute('data-cta')||'');return}
     // チケット販売サイトへのクリック（data-track の付いていないリンク）。購入完了ではない
     var tm=/^https:\/\/(?:www\.)?(escape\.id|peatix\.com|eplus\.jp|t\.pia\.jp|l-tike\.com|ticket\.rakuten\.co\.jp|tiget\.net)\//.exec(h);if(tm){send('ticket','link-'+tm[1].replace(/\./g,'-'));return}
