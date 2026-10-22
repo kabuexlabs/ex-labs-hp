@@ -1,0 +1,30 @@
+---
+// 探偵ランクの表示ブロック。値はクライアント側スクリプトが
+// data-rank-* フックへ書き込む。
+---
+
+<div class="rank-block">
+  <p class="en-label rank-eyebrow">あなたの探偵評価</p>
+  <p class="rank-letter">
+    <span class="en-label rank-letter-main" data-rank-letter>–</span>
+    <span class="en-label rank-letter-sub">Rank</span>
+  </p>
+  <p class="rank-title" data-rank-title></p>
+  <p class="rank-desc" data-rank-desc></p>
+</div>
+
+<style>
+.rank-block{text-align:center}
+.rank-eyebrow{
+  margin:0;font-size:11px;color:var(--sub);
+  font-family:var(--font-jp);letter-spacing:.3em;text-transform:none;
+}
+.rank-letter{
+  display:flex;align-items:baseline;justify-content:center;gap:10px;
+  margin:14px 0 0;
+}
+.rank-letter-main{font-size:clamp(72px,24vw,104px);font-weight:700;line-height:1;letter-spacing:0}
+.rank-letter-sub{font-size:15px;color:var(--sub)}
+.rank-title{margin:12px 0 0;font-size:20px;font-weight:700;letter-spacing:.28em;text-indent:.28em}
+.rank-desc{margin:14px auto 0;max-width:30em;font-size:13.5px;color:var(--sub);line-height:2}
+</style>

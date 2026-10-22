@@ -1,0 +1,47 @@
+---
+// 問題一覧上部の進捗表示。数値はクライアント側スクリプトが
+// data-progress-* フックへ書き込む（進捗は localStorage 由来のため）。
+export interface Props {
+  total: number;
+}
+const { total } = Astro.props;
+---
+
+<div class="progress-block">
+  <div class="progress-meta">
+    <span class="progress-label">調査進捗</span>
+    <span class="progress-count">
+      <span class="progress-num" data-progress-attempted>0</span>
+      <span class="progress-total">/ {total}</span>
+    </span>
+  </div>
+  <div class="progress-bar" role="progressbar" aria-label="調査進捗" aria-valuemin="0" aria-valuemax={total} data-progress-bar>
+    <div class="progress-fill" data-progress-fill></div>
+  </div>
+  <p class="progress-solved">解決 <span data-progress-solved>0</span></p>
+</div>
+
+<style>
+.progress-block{padding:4px 0 0}
+.progress-meta{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:8px;
+}
+.progress-label{font-size:12px;font-weight:500;color:var(--sub);letter-spacing:.14em}
+.progress-count{font-family:var(--font-en);color:var(--ink)}
+.progress-num{font-size:22px;font-weight:600;letter-spacing:.04em}
+.progress-total{font-size:13px;color:var(--sub);margin-left:2px}
+.progress-bar{
+  height:4px;background:var(--line-soft);
+  border-radius:2px;overflow:hidden;
+}
+.progress-fill{
+  height:100%;width:0;background:var(--ink);border-radius:2px;
+  transition:width 400ms var(--ease);
+}
+.progress-solved{
+  margin:8px 0 0;font-size:12px;color:var(--sub);letter-spacing:.1em;
+  text-align:right;
+}
+.progress-solved span{font-family:var(--font-en);font-weight:600;color:var(--ink)}
+</style>

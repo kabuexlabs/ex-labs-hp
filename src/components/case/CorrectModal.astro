@@ -1,0 +1,27 @@
+---
+// 正解時の演出モーダル。表示制御は問題詳細ページのスクリプトが行う。
+---
+
+<div class="overlay center" id="correct-overlay" aria-hidden="true">
+  <div class="sheet correct-sheet" role="dialog" aria-modal="true" aria-labelledby="correct-title">
+    <div class="correct-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    </div>
+    <p class="en-label correct-en" id="correct-title">Correct</p>
+    <p class="correct-jp">調査完了</p>
+    <p class="correct-desc">この問題は解決しました。</p>
+    <a href="/case/questions/" class="btn btn-primary">一覧へ戻る</a>
+  </div>
+</div>
+
+<style>
+.correct-sheet{text-align:center}
+.correct-icon{
+  display:flex;align-items:center;justify-content:center;
+  width:56px;height:56px;margin:4px auto 18px;
+  border:1px solid var(--ink);border-radius:50%;color:var(--ink);
+}
+.correct-en{margin:0;font-size:13px}
+.correct-jp{margin:10px 0 0;font-size:24px;font-weight:700;letter-spacing:.12em}
+.correct-desc{margin:8px 0 24px;font-size:14px;color:var(--sub)}
+</style>
