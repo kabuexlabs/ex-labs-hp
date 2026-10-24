@@ -13,15 +13,15 @@ const pt = (i: number, r: number) => [cx + r * Math.cos(angle(i)), cy + r * Math
 const ring = (frac: number) => TYPES.map((_, i) => pt(i, R * frac).map((v) => v.toFixed(1)).join(',')).join(' ');
 const data = TYPES.map((t, i) => pt(i, (R * Math.max(0, Math.min(100, pct[t]))) / 100).map((v) => v.toFixed(1)).join(',')).join(' ');
 const labelR = R * 1.26;
-const desc = TYPES.map((t) => `${TYPE_DEFS[t].name} ${pct[t]}%`).join('、');
+const desc = TYPES.map((t) => `${TYPE_DEFS[t].name} ${pct[t]}点`).join('、');
 ---
 <svg class="kp-radar" viewBox={`-56 0 ${size + 112} ${size}`} width="100%" role="img" aria-label={`${title}：${desc}`}>
   <title>{title}</title>
   {[0.2, 0.4, 0.6, 0.8, 1].map((f) => (
-    <polygon points={ring(f)} fill={f === 1 ? '#FAF8F4' : 'none'} stroke="#D9D3C7" stroke-width={f === 1 ? 1.5 : 1} />
+    <polygon points={ring(f)} fill={f === 1 ? "#F7FBFD" : "none"} stroke="#D9D9D9" stroke-width={f === 1 ? 1.5 : 1} />
   ))}
-  {TYPES.map((_, i) => { const [x, y] = pt(i, R); return <line x1={cx} y1={cy} x2={x.toFixed(1)} y2={y.toFixed(1)} stroke="#D9D3C7" stroke-width="1" />; })}
-  <polygon points={data} fill="#2E7D6B" fill-opacity="0.28" stroke="#2E7D6B" stroke-width="2.5" stroke-linejoin="round" />
+  {TYPES.map((_, i) => { const [x, y] = pt(i, R); return <line x1={cx} y1={cy} x2={x.toFixed(1)} y2={y.toFixed(1)} stroke="#D9D9D9" stroke-width="1" />; })}
+  <polygon points={data} fill="#86CDE8" fill-opacity="0.35" stroke="#5FB8DD" stroke-width="2.5" stroke-linejoin="round" />
   {TYPES.map((t, i) => { const [x, y] = pt(i, (R * pct[t]) / 100); return <circle cx={x.toFixed(1)} cy={y.toFixed(1)} r="5" fill={TYPE_DEFS[t].color} stroke="#fff" stroke-width="1.5" />; })}
   {TYPES.map((t, i) => {
     const [x, y] = pt(i, labelR);
@@ -30,7 +30,7 @@ const desc = TYPES.map((t) => `${TYPE_DEFS[t].name} ${pct[t]}%`).join('、');
     return (
       <text x={x.toFixed(1)} y={y.toFixed(1)} text-anchor={anchor} dominant-baseline="middle" font-size={size * 0.04} font-weight="700" fill="#2B2B2B">
         {TYPE_DEFS[t].name}
-        <tspan font-size={size * 0.034} font-weight="500" fill="#6B6B6B"> {pct[t]}%</tspan>
+        <tspan font-size={size * 0.034} font-weight="500" fill="#6B6B6B"> {pct[t]}点</tspan>
       </text>
     );
   })}

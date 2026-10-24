@@ -17,7 +17,6 @@ import { randomBytes } from 'node:crypto';
 import { QUESTIONNAIRE, type TypeKey } from './masters.ts';
 import type { Answers, ScoreResult } from './scoring.ts';
 import type { SafetyFlag, FreeTexts } from './safety.ts';
-import type { Candidate } from './recommend.ts';
 
 export function readEnv(name: string): string | undefined {
   const v = (import.meta.env as Record<string, string | undefined>)[name] ?? process.env[name];
@@ -67,8 +66,8 @@ export interface KampoCustomer {
 
 export interface KampoProposal {
   staffName: string;
-  /** 表示した候補（監査用） */
-  candidates: Candidate[];
+  /** 表示した候補（監査用。主訴ごとの候補と判定の要約＝selectionSnapshot） */
+  candidates: unknown;
   selected: { formulaCode: string; name: string; reason?: string }[];
   note?: string;
   deliveredVia?: 'screen' | 'print' | '';

@@ -1,987 +1,1805 @@
 {
-  "version": "2026-10-21",
+  "version": "2026-10-24",
+  "source": "効能・効果は一般用漢方製剤製造販売承認基準（厚生労働省）の記載に基づく初期値（2026-10-24 作成。原文PDFには接続できず、製品の添付文書・承認基準の抜粋で照合）。取り扱う製品の添付文書で薬剤師が確認し、確認済みは verified: true にする。",
+  "symptoms": {
+    "fatigue": {"label": "疲れやすい・だるい"},
+    "recovery": {"label": "病後・術後などの体力低下"},
+    "poor_appetite": {"label": "食欲不振"},
+    "night_sweat": {"label": "寝汗"},
+    "cold": {"label": "冷え症"},
+    "cold_lower": {"label": "腰・下半身の冷え"},
+    "chilblain": {"label": "しもやけ"},
+    "acne": {"label": "ニキビ"},
+    "eczema": {"label": "湿疹・皮膚炎"},
+    "itch": {"label": "かゆみ"},
+    "spots": {"label": "しみ"},
+    "rough_hands": {"label": "手あれ"},
+    "hair": {"label": "抜け毛・白髪"},
+    "stomach_heavy": {"label": "胃もたれ・消化不良"},
+    "stomach_pain": {"label": "胃痛・胸やけ・胃炎"},
+    "nausea": {"label": "吐き気"},
+    "abdominal_pain": {"label": "腹痛"},
+    "constipation": {"label": "便秘"},
+    "diarrhea": {"label": "下痢・軟便"},
+    "alternating": {"label": "便秘と下痢をくり返す"},
+    "hemorrhoid": {"label": "痔"},
+    "frequent_urination": {"label": "頻尿・夜間尿"},
+    "dysuria": {"label": "排尿困難・残尿感"},
+    "edema": {"label": "むくみ"},
+    "insomnia": {"label": "不眠"},
+    "nerves": {"label": "神経の高ぶり・不安・気分の落ち込み"},
+    "throat_lump": {"label": "のどのつかえ感"},
+    "stiff_shoulder": {"label": "肩こり"},
+    "headache": {"label": "頭痛"},
+    "low_back": {"label": "腰痛"},
+    "joint": {"label": "関節や筋肉の痛み・神経痛"},
+    "cramps": {"label": "こむら返り"},
+    "numbness": {"label": "しびれ"},
+    "dysmenorrhea": {"label": "月経痛"},
+    "irregular_menses": {"label": "月経不順"},
+    "blood_path": {"label": "月経前後・産後などの不調（血の道症）"},
+    "menopause": {"label": "更年期の不調"},
+    "obesity": {"label": "肥満"},
+    "weak_constitution": {"label": "虚弱体質・風邪をひきやすい"},
+    "dry_cough": {"label": "痰の少ない咳"},
+    "dizziness": {"label": "めまい・立ちくらみ"},
+    "tinnitus": {"label": "耳鳴り"}
+  },
   "formulas": [
     {
       "code": "F01",
       "name": "補中益気湯",
       "reading": "ほちゅうえっきとう",
-      "description": "体力がなく疲れやすい方の、疲労倦怠・食欲不振・病後の体力低下などに用いられます。胃腸の働きを高めて「気」を補う代表的な漢方薬です。",
-      "types": {
-        "qi_def": 1.0
-      },
-      "deficiency": "def",
+      "efficacy": "体力虚弱で、元気がなく、胃腸のはたらきが衰えて、疲れやすいものの次の諸症：虚弱体質、疲労倦怠、病後・術後の衰弱、食欲不振、ねあせ、感冒",
+      "indications": [
+        {"symptom": "weak_constitution", "term": "虚弱体質"},
+        {"symptom": "fatigue", "term": "疲労倦怠"},
+        {"symptom": "recovery", "term": "病後・術後の衰弱"},
+        {"symptom": "poor_appetite", "term": "食欲不振"},
+        {"symptom": "night_sweat", "term": "ねあせ"}
+      ],
+      "useTarget": "体力虚弱で、元気がなく、胃腸のはたらきが衰えて、疲れやすい",
+      "strength": ["def"],
+      "action": "胃腸の働きを高めて「気」を補い、元気を引き上げる（補気・升提）",
+      "targetLabel": "元気がなく胃腸が弱り、疲れやすい",
+      "types": {"qi_def": 1.0},
       "thermal": "warm",
-      "complaints": [
-        "fatigue",
-        "cold_prone"
-      ],
-      "keySigns": [
-        "B1-1",
-        "B2-1",
-        "B4-1"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["spleen", "lung"],
+      "signs": ["B1-1", "B1-2", "B2-1", "B4-1", "B5-1", "B8-1", "B12-1", "A3a-1", "A3a-3"],
+      "cautionHerbs": ["甘草", "柴胡"],
       "contraindications": [],
       "priority": 1,
+      "verified": false,
       "active": true
     },
     {
       "code": "F02",
       "name": "六君子湯",
       "reading": "りっくんしとう",
-      "description": "胃腸が弱く食欲がなく、みぞおちがつかえて疲れやすい方の胃もたれ・食欲不振に用いられます。胃腸の働きを整えながら気を補います。",
-      "types": {
-        "qi_def": 0.9,
-        "fluid": 0.4
-      },
-      "deficiency": "def",
+      "efficacy": "体力中等度以下で、胃腸が弱く、食欲がなく、みぞおちがつかえ、疲れやすく、貧血性で手足が冷えやすいものの次の諸症：胃炎、胃腸虚弱、胃下垂、消化不良、食欲不振、胃痛、嘔吐",
+      "indications": [
+        {"symptom": "stomach_pain", "term": "胃炎"},
+        {"symptom": "stomach_heavy", "term": "胃腸虚弱"},
+        {"symptom": "stomach_heavy", "term": "消化不良"},
+        {"symptom": "poor_appetite", "term": "食欲不振"},
+        {"symptom": "stomach_pain", "term": "胃痛"},
+        {"symptom": "nausea", "term": "嘔吐"}
+      ],
+      "useTarget": "体力中等度以下で、胃腸が弱く、食欲がなく、みぞおちがつかえ、疲れやすく、貧血性で手足が冷えやすい",
+      "strength": ["def", "mid"],
+      "action": "胃腸の働きを高めて「気」を補い、胃にたまった余分な水分をさばく（補気・健脾・化痰）",
+      "targetLabel": "胃腸が弱く、みぞおちがつかえて食欲がない",
+      "types": {"qi_def": 0.9, "fluid": 0.4},
       "thermal": "warm",
-      "complaints": [
-        "gi",
-        "fatigue"
-      ],
-      "keySigns": [
-        "B5-1",
-        "B5-6"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["spleen"],
+      "signs": ["B5-1", "B5-6", "B5-4", "B3-2", "B1-1", "A3d-1", "A3d-2"],
+      "cautionHerbs": ["甘草"],
       "contraindications": [],
-      "priority": 2,
+      "priority": 1,
+      "verified": false,
       "active": true
     },
     {
       "code": "F03",
       "name": "四君子湯",
       "reading": "しくんしとう",
-      "description": "体力が低下して胃腸が弱く、疲れやすく顔色がすぐれない方の食欲不振・疲労に用いられます。気を補う基本の漢方薬です。",
-      "types": {
-        "qi_def": 0.8
-      },
-      "deficiency": "def",
+      "efficacy": "体力虚弱で、痩せて顔色が悪くて、食欲がなく、疲れやすいものの次の諸症：胃腸虚弱、慢性胃炎、胃のもたれ、嘔吐、下痢、夜尿症",
+      "indications": [
+        {"symptom": "stomach_heavy", "term": "胃腸虚弱"},
+        {"symptom": "stomach_pain", "term": "慢性胃炎"},
+        {"symptom": "stomach_heavy", "term": "胃のもたれ"},
+        {"symptom": "nausea", "term": "嘔吐"},
+        {"symptom": "diarrhea", "term": "下痢"}
+      ],
+      "useTarget": "体力虚弱で、痩せて顔色が悪くて、食欲がなく、疲れやすい",
+      "strength": ["def"],
+      "action": "胃腸の働きを高めて「気」を補う基本の漢方薬（補気・健脾）",
+      "targetLabel": "痩せて顔色が悪く、食欲がなく疲れやすい",
+      "types": {"qi_def": 0.9},
       "thermal": "neutral",
-      "complaints": [
-        "gi",
-        "fatigue"
-      ],
-      "keySigns": [
-        "B5-1"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["spleen"],
+      "signs": ["B5-1", "B1-1", "B2-2", "B1-3", "B6-1"],
+      "cautionHerbs": ["甘草"],
       "contraindications": [],
-      "priority": 5,
+      "priority": 3,
+      "verified": false,
       "active": true
     },
     {
       "code": "F04",
       "name": "十全大補湯",
       "reading": "じゅうぜんたいほとう",
-      "description": "体力が低下し、疲労倦怠・顔色不良・冷えがある方の病後の体力回復や貧血傾向に用いられます。「気」と「血」の両方を補います。",
-      "types": {
-        "qi_def": 0.7,
-        "blood_def": 0.7
-      },
-      "deficiency": "def",
+      "efficacy": "体力虚弱なものの次の諸症：病後・術後の体力低下、疲労倦怠、食欲不振、ねあせ、手足の冷え、貧血",
+      "indications": [
+        {"symptom": "recovery", "term": "病後・術後の体力低下"},
+        {"symptom": "fatigue", "term": "疲労倦怠"},
+        {"symptom": "poor_appetite", "term": "食欲不振"},
+        {"symptom": "night_sweat", "term": "ねあせ"},
+        {"symptom": "cold", "term": "手足の冷え"}
+      ],
+      "useTarget": "体力虚弱な",
+      "strength": ["def"],
+      "action": "「気」と「血」の両方を補い、体を温めて体力を回復させる（気血双補）",
+      "targetLabel": "気と血がともに不足し、冷えや貧血傾向がある",
+      "types": {"qi_def": 0.7, "blood_def": 0.7},
       "thermal": "warm",
-      "complaints": [
-        "fatigue",
-        "cold",
-        "skin"
-      ],
-      "keySigns": [
-        "B2-2",
-        "B3-2"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["spleen", "liver"],
+      "signs": ["B2-2", "B3-2", "B1-1", "B12-2", "B2-3", "A3a-2"],
+      "cautionHerbs": ["甘草", "地黄"],
       "contraindications": [],
-      "priority": 3,
+      "priority": 2,
+      "verified": false,
       "active": true
     },
     {
       "code": "F05",
       "name": "人参養栄湯",
       "reading": "にんじんようえいとう",
-      "description": "体力低下に加えて不眠・不安・食欲不振がある方の疲労や病後の体力回復に用いられます。気と血を補い、心を落ち着かせます。",
-      "types": {
-        "qi_def": 0.6,
-        "blood_def": 0.6,
-        "yin_def": 0.3
-      },
-      "deficiency": "def",
+      "efficacy": "体力虚弱なものの次の諸症：病後・術後などの体力低下、疲労倦怠、食欲不振、ねあせ、手足の冷え、貧血",
+      "indications": [
+        {"symptom": "recovery", "term": "病後・術後などの体力低下"},
+        {"symptom": "fatigue", "term": "疲労倦怠"},
+        {"symptom": "poor_appetite", "term": "食欲不振"},
+        {"symptom": "night_sweat", "term": "ねあせ"},
+        {"symptom": "cold", "term": "手足の冷え"}
+      ],
+      "useTarget": "体力虚弱な",
+      "strength": ["def"],
+      "action": "「気」と「血」を補い、肺と心の働きを助けて体力を回復させる（気血双補・養心）",
+      "targetLabel": "気と血の不足に、咳や不眠・物忘れを伴う",
+      "types": {"qi_def": 0.6, "blood_def": 0.6, "yin_def": 0.2},
       "thermal": "warm",
-      "complaints": [
-        "fatigue",
-        "sleep"
-      ],
-      "keySigns": [
-        "B8-2",
-        "B9-1"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["spleen", "lung", "heart"],
+      "signs": ["B8-2", "B9-2", "B9-1", "B12-6", "B2-2"],
+      "cautionHerbs": ["甘草", "地黄"],
       "contraindications": [],
-      "priority": 6,
+      "priority": 4,
+      "verified": false,
       "active": true
     },
     {
       "code": "F06",
       "name": "四物湯",
       "reading": "しもつとう",
-      "description": "顔色が悪く皮膚が乾燥しやすい方の、血色不良・冷え・月経不順などに用いられます。「血」を補う基本の漢方薬です。",
-      "types": {
-        "blood_def": 1.0
-      },
-      "deficiency": "def",
+      "efficacy": "体力虚弱で、冷え症で皮膚が乾燥、色つやの悪い体質で胃腸障害のないものの次の諸症：月経不順、月経異常、更年期障害、血の道症、冷え症、しもやけ、しみ、貧血、産後あるいは流産後の疲労回復",
+      "indications": [
+        {"symptom": "irregular_menses", "term": "月経不順"},
+        {"symptom": "irregular_menses", "term": "月経異常"},
+        {"symptom": "menopause", "term": "更年期障害"},
+        {"symptom": "blood_path", "term": "血の道症"},
+        {"symptom": "cold", "term": "冷え症"},
+        {"symptom": "chilblain", "term": "しもやけ"},
+        {"symptom": "spots", "term": "しみ"},
+        {"symptom": "recovery", "term": "産後あるいは流産後の疲労回復"}
+      ],
+      "useTarget": "体力虚弱で、冷え症で皮膚が乾燥、色つやの悪い体質で胃腸障害のない",
+      "strength": ["def"],
+      "action": "「血」を補い、めぐらせる基本の漢方薬（補血）",
+      "targetLabel": "皮膚が乾燥して色つやが悪い（胃腸は丈夫）",
+      "types": {"blood_def": 1.0},
       "thermal": "neutral",
-      "complaints": [
-        "skin",
-        "menstrual"
-      ],
-      "keySigns": [
-        "B2-2",
-        "B2-3"
-      ],
-      "cautionHerbs": [],
+      "organs": ["liver"],
+      "signs": ["B2-2", "B2-3", "B2-8", "B3-2", "B11-2"],
+      "cautionHerbs": ["地黄"],
       "contraindications": [],
-      "priority": 4,
+      "priority": 3,
+      "verified": false,
       "active": true
     },
     {
       "code": "F07",
       "name": "当帰芍薬散",
       "reading": "とうきしゃくやくさん",
-      "description": "体力があまりなく冷えやむくみがある方の、月経不順・月経痛・めまい・肩こりなどに用いられます。血を補いながら余分な水をさばきます。",
-      "types": {
-        "blood_def": 0.8,
-        "fluid": 0.6,
-        "yang_def": 0.3
-      },
-      "deficiency": "def",
+      "efficacy": "体力虚弱で、冷え症で貧血の傾向があり疲労しやすく、ときに下腹部痛、頭重、めまい、肩こり、耳鳴り、動悸などを訴えるものの次の諸症：月経不順、月経異常、月経痛、更年期障害、産前産後あるいは流産による障害（貧血、疲労倦怠、めまい、むくみ）、めまい・立ちくらみ、頭重、肩こり、腰痛、足腰の冷え症、しもやけ、むくみ、しみ、耳鳴り",
+      "indications": [
+        {"symptom": "irregular_menses", "term": "月経不順"},
+        {"symptom": "irregular_menses", "term": "月経異常"},
+        {"symptom": "dysmenorrhea", "term": "月経痛"},
+        {"symptom": "menopause", "term": "更年期障害"},
+        {"symptom": "dizziness", "term": "めまい・立ちくらみ"},
+        {"symptom": "stiff_shoulder", "term": "肩こり"},
+        {"symptom": "low_back", "term": "腰痛"},
+        {"symptom": "cold", "term": "足腰の冷え症"},
+        {"symptom": "cold_lower", "term": "足腰の冷え症"},
+        {"symptom": "chilblain", "term": "しもやけ"},
+        {"symptom": "edema", "term": "むくみ"},
+        {"symptom": "spots", "term": "しみ"},
+        {"symptom": "tinnitus", "term": "耳鳴り"}
+      ],
+      "useTarget": "体力虚弱で、冷え症で貧血の傾向があり疲労しやすく、ときに下腹部痛、頭重、めまい、肩こり、耳鳴り、動悸などを訴える",
+      "strength": ["def"],
+      "action": "「血」を補ってめぐらせ、余分な水分をさばいて体を温める（補血・利水）",
+      "targetLabel": "冷え症で貧血傾向・むくみがあり、疲れやすい",
+      "types": {"blood_def": 0.8, "fluid": 0.6, "yang_def": 0.3},
       "thermal": "warm",
-      "complaints": [
-        "cold",
-        "menstrual",
-        "edema"
-      ],
-      "keySigns": [
-        "B3-2",
-        "B11-2",
-        "B7-1"
-      ],
+      "organs": ["liver", "spleen"],
+      "signs": ["B3-2", "B11-2", "B7-1", "B12-2", "B12-7", "B2-2", "B10-2", "A3b-1", "A3b-2"],
       "cautionHerbs": [],
       "contraindications": [],
       "priority": 1,
+      "verified": false,
       "active": true
     },
     {
       "code": "F08",
       "name": "帰脾湯",
       "reading": "きひとう",
-      "description": "体力が低下して血色が悪く、不眠や不安がある方の貧血傾向・不眠に用いられます。胃腸を助けながら血を補い、心を養います。",
-      "types": {
-        "blood_def": 0.8,
-        "qi_def": 0.5
-      },
-      "deficiency": "def",
+      "efficacy": "体力中等度以下で、心身が疲れ、血色が悪いものの次の諸症：貧血、不眠症、神経症、精神不安",
+      "indications": [
+        {"symptom": "insomnia", "term": "不眠症"},
+        {"symptom": "nerves", "term": "精神不安"},
+        {"symptom": "nerves", "term": "神経症"}
+      ],
+      "useTarget": "体力中等度以下で、心身が疲れ、血色が悪い",
+      "strength": ["def", "mid"],
+      "action": "胃腸の働きを助けながら「気」と「血」を補い、心を落ち着かせる（補気・補血・安神）",
+      "targetLabel": "心身が疲れて血色が悪く、不安や不眠がある",
+      "types": {"blood_def": 0.8, "qi_def": 0.6},
       "thermal": "neutral",
-      "complaints": [
-        "sleep",
-        "mood"
-      ],
-      "keySigns": [
-        "B8-2",
-        "B9-2"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["heart", "spleen"],
+      "signs": ["B8-2", "B9-2", "B2-2", "B1-1", "B5-1", "A3g-2", "A3g-3", "A3h-2"],
+      "cautionHerbs": ["甘草"],
       "contraindications": [],
       "priority": 2,
+      "verified": false,
       "active": true
     },
     {
       "code": "F09",
       "name": "酸棗仁湯",
       "reading": "さんそうにんとう",
-      "description": "心身が疲れて眠れない方の不眠や神経の高ぶりに用いられます。血を補って心を落ち着かせる漢方薬です。",
-      "types": {
-        "blood_def": 0.6,
-        "yin_def": 0.4
-      },
-      "deficiency": "def",
+      "efficacy": "体力中等度以下で、心身が疲れ、精神不安、不眠などがあるものの次の諸症：不眠症、神経症",
+      "indications": [
+        {"symptom": "insomnia", "term": "不眠症"},
+        {"symptom": "nerves", "term": "神経症"}
+      ],
+      "useTarget": "体力中等度以下で、心身が疲れ、精神不安、不眠などがある",
+      "strength": ["def", "mid"],
+      "action": "「血」を補って心を養い、高ぶった神経をしずめて眠りを助ける（養血安神）",
+      "targetLabel": "心身が疲れて眠れない・眠りが浅い",
+      "types": {"blood_def": 0.6, "yin_def": 0.4},
       "thermal": "neutral",
-      "complaints": [
-        "sleep"
-      ],
-      "keySigns": [
-        "B8-2",
-        "B8-3"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["liver", "heart"],
+      "signs": ["B8-2", "B8-3", "B8-6", "B9-7", "A3g-2", "A3g-3"],
+      "cautionHerbs": ["甘草"],
       "contraindications": [],
-      "priority": 7,
+      "priority": 1,
+      "verified": false,
       "active": true
     },
     {
       "code": "F10",
       "name": "半夏厚朴湯",
       "reading": "はんげこうぼくとう",
-      "description": "気分がふさぎ、喉に何かつかえた感じがある方の不安・不眠・咳などに用いられます。滞った「気」の巡りを整えます。",
-      "types": {
-        "qi_stag": 1.0,
-        "fluid": 0.3
-      },
-      "deficiency": "mid",
+      "efficacy": "体力中等度をめやすとして、気分がふさいで、咽喉・食道部に異物感があり、ときに動悸、めまい、嘔気などを伴う次の諸症：不安神経症、神経性胃炎、つわり、せき、しわがれ声、のどのつかえ感",
+      "indications": [
+        {"symptom": "nerves", "term": "不安神経症"},
+        {"symptom": "stomach_pain", "term": "神経性胃炎"},
+        {"symptom": "throat_lump", "term": "のどのつかえ感"}
+      ],
+      "useTarget": "体力中等度をめやすとして、気分がふさいで、咽喉・食道部に異物感があり、ときに動悸、めまい、嘔気などを伴う",
+      "strength": ["mid"],
+      "action": "滞った「気」のめぐりを整え、のどや胸のつかえを取る（理気・化痰）",
+      "targetLabel": "気分がふさぎ、のどに異物感がある",
+      "types": {"qi_stag": 1.0, "fluid": 0.3},
       "thermal": "neutral",
-      "complaints": [
-        "mood",
-        "gi"
-      ],
-      "keySigns": [
-        "B5-4",
-        "B9-3"
-      ],
+      "organs": ["lung", "spleen", "liver"],
+      "signs": ["B5-4", "B9-3", "B9-4", "A3h-3", "A3h-4"],
       "cautionHerbs": [],
       "contraindications": [],
       "priority": 1,
+      "verified": false,
       "active": true
     },
     {
       "code": "F11",
       "name": "加味逍遥散",
       "reading": "かみしょうようさん",
-      "description": "疲れやすく肩がこり、イライラやのぼせがある方の冷え症・月経不順・更年期の不調などに用いられます。気の巡りを整え、こもった熱を冷まします。",
-      "types": {
-        "qi_stag": 0.9,
-        "blood_def": 0.4,
-        "yang_exc": 0.3
-      },
-      "deficiency": "mid",
-      "thermal": "cool",
-      "complaints": [
-        "mood",
-        "menstrual",
-        "cold"
+      "efficacy": "体力中等度以下で、のぼせ感があり、肩がこり、疲れやすく、精神不安やいらだちなどの精神神経症状、ときに便秘の傾向のあるものの次の諸症：冷え症、虚弱体質、月経不順、月経困難、更年期障害、血の道症、不眠症",
+      "indications": [
+        {"symptom": "cold", "term": "冷え症"},
+        {"symptom": "weak_constitution", "term": "虚弱体質"},
+        {"symptom": "irregular_menses", "term": "月経不順"},
+        {"symptom": "dysmenorrhea", "term": "月経困難"},
+        {"symptom": "menopause", "term": "更年期障害"},
+        {"symptom": "blood_path", "term": "血の道症"},
+        {"symptom": "insomnia", "term": "不眠症"}
       ],
-      "keySigns": [
-        "B3-3",
-        "B3-4",
-        "B11-3"
-      ],
-      "cautionHerbs": [
-        "甘草",
-        "山梔子"
-      ],
+      "useTarget": "体力中等度以下で、のぼせ感があり、肩がこり、疲れやすく、精神不安やいらだちなどの精神神経症状、ときに便秘の傾向のある",
+      "strength": ["def", "mid"],
+      "action": "滞った「気」をめぐらせ、「血」を補い、こもった熱を冷ます（疏肝解鬱・清熱）",
+      "targetLabel": "のぼせ・肩こり・イライラや不安があり、疲れやすい",
+      "types": {"qi_stag": 0.9, "blood_def": 0.4, "yang_exc": 0.2},
+      "thermal": "neutral",
+      "organs": ["liver", "spleen"],
+      "signs": ["B3-3", "B3-4", "B9-3", "B9-4", "B11-3", "B9-2", "A3h-1", "A3j-3", "A3j-4"],
+      "cautionHerbs": ["甘草", "柴胡", "牡丹皮", "山梔子"],
       "contraindications": [],
       "priority": 1,
+      "verified": false,
       "active": true
     },
     {
       "code": "F12",
       "name": "香蘇散",
       "reading": "こうそさん",
-      "description": "胃腸が弱く気分がすぐれない方のかぜの初期や神経性の胃炎に用いられます。香りで気を巡らせる、穏やかな漢方薬です。",
-      "types": {
-        "qi_stag": 0.8,
-        "qi_def": 0.3
-      },
-      "deficiency": "mid",
-      "thermal": "warm",
-      "complaints": [
-        "mood",
-        "gi"
+      "efficacy": "体力虚弱で、神経過敏で気分がすぐれず胃腸の弱いものの次の諸症：かぜの初期、血の道症",
+      "indications": [
+        {"symptom": "blood_path", "term": "血の道症"}
       ],
-      "keySigns": [
-        "B9-5",
-        "B5-4"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "useTarget": "体力虚弱で、神経過敏で気分がすぐれず胃腸の弱い",
+      "strength": ["def"],
+      "action": "香りの生薬で「気」をめぐらせ、胃腸を整える（理気）",
+      "targetLabel": "体力がなく、気分がすぐれず胃腸が弱い",
+      "types": {"qi_stag": 0.7, "qi_def": 0.4},
+      "thermal": "neutral",
+      "organs": ["lung", "spleen"],
+      "signs": ["B5-1", "B9-4", "B9-5"],
+      "cautionHerbs": ["甘草"],
       "contraindications": [],
       "priority": 6,
+      "verified": false,
       "active": true
     },
     {
       "code": "F13",
       "name": "四逆散",
       "reading": "しぎゃくさん",
-      "description": "手足の冷えや脇腹の張りがあり、ストレスで症状が出やすい方の胃炎・神経症などに用いられます。気の滞りをほぐします。",
-      "types": {
-        "qi_stag": 0.9
-      },
-      "deficiency": "mid",
+      "efficacy": "体力中等度以上で、胸腹部に重苦しさがあり、ときに不安、不眠などがあるものの次の諸症：胃炎、胃痛、腹痛、神経症",
+      "indications": [
+        {"symptom": "stomach_pain", "term": "胃炎"},
+        {"symptom": "stomach_pain", "term": "胃痛"},
+        {"symptom": "abdominal_pain", "term": "腹痛"},
+        {"symptom": "nerves", "term": "神経症"}
+      ],
+      "useTarget": "体力中等度以上で、胸腹部に重苦しさがあり、ときに不安、不眠などがある",
+      "strength": ["mid", "exc"],
+      "action": "滞った「気」をめぐらせ、緊張をゆるめる（疏肝理気）",
+      "targetLabel": "胸やお腹が重苦しく、ストレスで不調が出る",
+      "types": {"qi_stag": 0.9},
       "thermal": "neutral",
-      "complaints": [
-        "mood",
-        "pain",
-        "cold"
-      ],
-      "keySigns": [
-        "B3-2",
-        "B9-4"
-      ],
-      "cautionHerbs": [
-        "甘草",
-        "柴胡"
-      ],
-      "contraindications": [
-        "interferon"
-      ],
-      "priority": 5,
+      "organs": ["liver", "spleen"],
+      "signs": ["B5-3", "B9-4", "B3-2", "B10-3", "B8-3"],
+      "cautionHerbs": ["甘草", "柴胡"],
+      "contraindications": ["interferon"],
+      "priority": 4,
+      "verified": false,
       "active": true
     },
     {
       "code": "F14",
       "name": "柴胡加竜骨牡蛎湯",
       "reading": "さいこかりゅうこつぼれいとう",
-      "description": "精神的に不安定で動悸・不眠があり、便秘がちな方の神経症・不眠・高血圧に伴う症状などに用いられます。気の高ぶりを鎮めます。",
-      "types": {
-        "qi_stag": 0.9,
-        "yang_exc": 0.4
-      },
-      "deficiency": "exc",
+      "efficacy": "体力中等度以上で、精神不安があって、動悸、不眠、便秘などを伴う次の諸症：高血圧の随伴症状（動悸、不安、不眠）、神経症、更年期神経症、小児夜なき、便秘",
+      "indications": [
+        {"symptom": "insomnia", "term": "高血圧の随伴症状（動悸、不安、不眠）", "requires": ["C2-1"]},
+        {"symptom": "nerves", "term": "神経症"},
+        {"symptom": "menopause", "term": "更年期神経症"},
+        {"symptom": "constipation", "term": "便秘"}
+      ],
+      "useTarget": "体力中等度以上で、精神不安があって、動悸、不眠、便秘などを伴う",
+      "strength": ["mid", "exc"],
+      "action": "高ぶった「気」をしずめ、こもった熱を冷まして心を落ち着かせる（疏肝・安神）",
+      "targetLabel": "精神不安があり、動悸・不眠・便秘を伴う",
+      "types": {"qi_stag": 0.9, "yang_exc": 0.4},
       "thermal": "cool",
-      "complaints": [
-        "mood",
-        "sleep"
-      ],
-      "keySigns": [
-        "B8-3",
-        "B9-1",
-        "B6-9"
-      ],
-      "cautionHerbs": [
-        "柴胡"
-      ],
-      "contraindications": [
-        "interferon"
-      ],
-      "priority": 3,
+      "heat": "excess",
+      "organs": ["liver", "heart"],
+      "signs": ["B8-3", "B10-1", "B6-9", "B9-4", "B9-9", "A3h-2"],
+      "cautionHerbs": ["柴胡", "黄芩", "大黄", "甘草"],
+      "contraindications": ["interferon"],
+      "priority": 2,
+      "verified": false,
+      "note": "製品によって大黄・黄芩・甘草を含まないものがあります。取り扱う製品の成分で確認してください。",
       "active": true
     },
     {
       "code": "F15",
       "name": "大柴胡湯",
       "reading": "だいさいことう",
-      "description": "体力があり、便秘がちで脇腹からみぞおちが張って苦しい方の肥満症・高血圧に伴う症状などに用いられます。熱と滞りを取り除きます。",
-      "types": {
-        "qi_stag": 0.6,
-        "yang_exc": 0.8
-      },
-      "deficiency": "exc",
+      "efficacy": "体力が充実して、脇腹からみぞおちあたりにかけて苦しく、便秘の傾向があるものの次の諸症：胃炎、常習便秘、高血圧や肥満に伴う肩こり・頭痛・便秘、神経症、肥満症",
+      "indications": [
+        {"symptom": "stomach_pain", "term": "胃炎"},
+        {"symptom": "constipation", "term": "常習便秘"},
+        {"symptom": "stiff_shoulder", "term": "高血圧や肥満に伴う肩こり・頭痛・便秘", "requires": ["C2-1", "A3-11", "B1-5", "B1-6"]},
+        {"symptom": "headache", "term": "高血圧や肥満に伴う肩こり・頭痛・便秘", "requires": ["C2-1", "A3-11", "B1-5", "B1-6"]},
+        {"symptom": "nerves", "term": "神経症"},
+        {"symptom": "obesity", "term": "肥満症"}
+      ],
+      "useTarget": "体力が充実して、脇腹からみぞおちあたりにかけて苦しく、便秘の傾向がある",
+      "strength": ["exc"],
+      "action": "胸や脇腹の張りをゆるめ、熱と滞りを便通とともに出す（和解・瀉下）",
+      "targetLabel": "体力が充実し、脇腹の張りと便秘がある",
+      "types": {"qi_stag": 0.6, "yang_exc": 0.8},
       "thermal": "cool",
-      "complaints": [
-        "weight",
-        "bowel",
-        "gi"
-      ],
-      "keySigns": [
-        "B5-10",
-        "B6-9",
-        "B1-9"
-      ],
-      "cautionHerbs": [
-        "大黄",
-        "柴胡"
-      ],
-      "contraindications": [
-        "pregnancy",
-        "interferon",
-        "gi_weak"
-      ],
-      "priority": 7,
+      "heat": "excess",
+      "organs": ["liver", "spleen"],
+      "signs": ["B5-3", "B5-10", "B6-9", "B1-9", "B1-4", "B9-9"],
+      "cautionHerbs": ["柴胡", "黄芩", "大黄"],
+      "contraindications": ["pregnancy", "interferon", "gi_weak"],
+      "priority": 3,
+      "verified": false,
       "active": true
     },
     {
       "code": "F16",
       "name": "桂枝茯苓丸",
       "reading": "けいしぶくりょうがん",
-      "description": "比較的体力があり、のぼせて足が冷え、下腹部に張りがある方の月経不順・月経痛・肩こり・しみなどに用いられます。「血」の巡りを改善する代表的な漢方薬です。",
-      "types": {
-        "blood_stasis": 1.0
-      },
-      "deficiency": "exc",
+      "efficacy": "比較的体力があり、ときに下腹部痛、肩こり、頭重、めまい、のぼせて足冷えなどを訴えるものの次の諸症：月経不順、月経異常、月経痛、更年期障害、血の道症、肩こり、めまい、頭重、打ち身（打撲症）、しもやけ、しみ、湿疹・皮膚炎、にきび",
+      "indications": [
+        {"symptom": "irregular_menses", "term": "月経不順"},
+        {"symptom": "irregular_menses", "term": "月経異常"},
+        {"symptom": "dysmenorrhea", "term": "月経痛"},
+        {"symptom": "menopause", "term": "更年期障害"},
+        {"symptom": "blood_path", "term": "血の道症"},
+        {"symptom": "stiff_shoulder", "term": "肩こり"},
+        {"symptom": "dizziness", "term": "めまい"},
+        {"symptom": "chilblain", "term": "しもやけ"},
+        {"symptom": "spots", "term": "しみ"},
+        {"symptom": "eczema", "term": "湿疹・皮膚炎"},
+        {"symptom": "acne", "term": "にきび"}
+      ],
+      "useTarget": "比較的体力があり、ときに下腹部痛、肩こり、頭重、めまい、のぼせて足冷えなどを訴える",
+      "strength": ["mid", "exc"],
+      "action": "滞った「血」のめぐりを改善する（活血化瘀）",
+      "targetLabel": "のぼせて足が冷え、下腹部痛や肩こりがある（瘀血）",
+      "types": {"blood_stasis": 1.0},
       "thermal": "neutral",
-      "complaints": [
-        "menstrual",
-        "pain",
-        "skin"
-      ],
-      "keySigns": [
-        "B1-5",
-        "B11-4",
-        "B3-4"
-      ],
-      "cautionHerbs": [
-        "牡丹皮",
-        "桃仁"
-      ],
-      "contraindications": [
-        "pregnancy"
-      ],
-      "priority": 1,
+      "organs": ["liver"],
+      "signs": ["B1-5", "B11-4", "B3-4", "B10-4", "B2-5", "B12-4", "B7-3"],
+      "cautionHerbs": ["牡丹皮", "桃仁"],
+      "contraindications": ["pregnancy"],
+      "priority": 2,
+      "verified": false,
       "active": true
     },
     {
       "code": "F17",
       "name": "桃核承気湯",
       "reading": "とうかくじょうきとう",
-      "description": "体力があり、のぼせて便秘しがちな方の月経不順・月経痛・便秘などに用いられます。滞った血と熱を便通とともに下ろします。",
-      "types": {
-        "blood_stasis": 0.9,
-        "yang_exc": 0.6
-      },
-      "deficiency": "exc",
+      "efficacy": "体力中等度以上で、のぼせて便秘しがちなものの次の諸症：月経不順、月経困難症、月経痛、月経時や産後の精神不安、腰痛、便秘、高血圧の随伴症状（頭痛、めまい、肩こり）、痔疾、打撲症",
+      "indications": [
+        {"symptom": "irregular_menses", "term": "月経不順"},
+        {"symptom": "dysmenorrhea", "term": "月経困難症"},
+        {"symptom": "dysmenorrhea", "term": "月経痛"},
+        {"symptom": "blood_path", "term": "月経時や産後の精神不安"},
+        {"symptom": "low_back", "term": "腰痛"},
+        {"symptom": "constipation", "term": "便秘"},
+        {"symptom": "headache", "term": "高血圧の随伴症状（頭痛、めまい、肩こり）", "requires": ["C2-1"]},
+        {"symptom": "dizziness", "term": "高血圧の随伴症状（頭痛、めまい、肩こり）", "requires": ["C2-1"]},
+        {"symptom": "stiff_shoulder", "term": "高血圧の随伴症状（頭痛、めまい、肩こり）", "requires": ["C2-1"]},
+        {"symptom": "hemorrhoid", "term": "痔疾"}
+      ],
+      "useTarget": "体力中等度以上で、のぼせて便秘しがちな",
+      "strength": ["mid", "exc"],
+      "action": "滞った「血」と熱を、便通とともに下ろす（活血・瀉下）",
+      "targetLabel": "のぼせて便秘しがち（瘀血と熱）",
+      "types": {"blood_stasis": 0.9, "yang_exc": 0.6},
       "thermal": "cool",
-      "complaints": [
-        "bowel",
-        "menstrual",
-        "pain"
-      ],
-      "keySigns": [
-        "B6-9",
-        "B3-4",
-        "B11-4"
-      ],
-      "cautionHerbs": [
-        "大黄",
-        "桃仁"
-      ],
-      "contraindications": [
-        "pregnancy",
-        "gi_weak"
-      ],
-      "priority": 4,
+      "heat": "excess",
+      "organs": ["liver"],
+      "signs": ["B6-9", "B3-4", "B11-4", "B1-5", "B6-4"],
+      "cautionHerbs": ["桃仁", "大黄", "甘草", "芒硝"],
+      "contraindications": ["pregnancy", "gi_weak"],
+      "priority": 3,
+      "verified": false,
       "active": true
     },
     {
       "code": "F18",
       "name": "芎帰調血飲",
       "reading": "きゅうきちょうけついん",
-      "description": "産後の体力低下や疲労、月経不順などに用いられます。血を補いながら巡りを整え、体を温めます。",
-      "types": {
-        "blood_stasis": 0.6,
-        "blood_def": 0.6
-      },
-      "deficiency": "def",
+      "efficacy": "体力中等度以下のものの次の諸症：月経不順、産後の神経症・体力低下",
+      "indications": [
+        {"symptom": "irregular_menses", "term": "月経不順"},
+        {"symptom": "blood_path", "term": "産後の神経症・体力低下"},
+        {"symptom": "recovery", "term": "産後の神経症・体力低下"}
+      ],
+      "useTarget": "体力中等度以下の",
+      "strength": ["def", "mid"],
+      "action": "「血」を補いながらめぐらせ、体を温めて産後の回復を助ける（補血・活血・理気）",
+      "targetLabel": "産後の体力低下・月経不順",
+      "types": {"blood_def": 0.6, "blood_stasis": 0.5, "qi_stag": 0.3},
       "thermal": "warm",
-      "complaints": [
-        "menstrual",
-        "fatigue"
-      ],
-      "keySigns": [
-        "B11-2",
-        "B11-4"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
-      "contraindications": [],
-      "priority": 8,
+      "organs": ["liver", "spleen"],
+      "signs": ["B11-2", "B11-4", "B2-2"],
+      "cautionHerbs": ["地黄", "牡丹皮", "甘草"],
+      "contraindications": ["pregnancy"],
+      "priority": 6,
+      "verified": false,
       "active": true
     },
     {
       "code": "F19",
       "name": "温経湯",
       "reading": "うんけいとう",
-      "description": "手足はほてりながら腰や下半身は冷える方の、月経不順・月経痛・更年期の不調・肌荒れなどに用いられます。血を補い温めて巡らせます。",
-      "types": {
-        "blood_def": 0.6,
-        "yang_def": 0.5,
-        "yin_def": 0.4,
-        "blood_stasis": 0.3
-      },
-      "deficiency": "def",
+      "efficacy": "体力中等度以下で、手足がほてり、唇がかわくものの次の諸症：月経不順、月経困難、こしけ（おりもの）、更年期障害、不眠、神経症、湿疹・皮膚炎、足腰の冷え、しもやけ、手あれ（手の湿疹・皮膚炎）",
+      "indications": [
+        {"symptom": "irregular_menses", "term": "月経不順"},
+        {"symptom": "dysmenorrhea", "term": "月経困難"},
+        {"symptom": "menopause", "term": "更年期障害"},
+        {"symptom": "insomnia", "term": "不眠"},
+        {"symptom": "nerves", "term": "神経症"},
+        {"symptom": "eczema", "term": "湿疹・皮膚炎"},
+        {"symptom": "cold", "term": "足腰の冷え"},
+        {"symptom": "cold_lower", "term": "足腰の冷え"},
+        {"symptom": "chilblain", "term": "しもやけ"},
+        {"symptom": "rough_hands", "term": "手あれ"}
+      ],
+      "useTarget": "体力中等度以下で、手足がほてり、唇がかわく",
+      "strength": ["def", "mid"],
+      "action": "体を温めて「血」を補い、めぐらせながら潤いを与える（温経・補血・活血）",
+      "targetLabel": "手足がほてり唇が乾くが、下腹部や足腰は冷える",
+      "types": {"blood_def": 0.6, "yang_def": 0.5, "yin_def": 0.4, "blood_stasis": 0.3},
       "thermal": "warm",
-      "complaints": [
-        "menstrual",
-        "cold",
-        "skin"
-      ],
-      "keySigns": [
-        "B11-7",
-        "B3-6",
-        "B3-7"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["liver", "kidney"],
+      "signs": ["B3-6", "B5-7", "B3-7", "B11-7", "B2-8", "A3c-7"],
+      "cautionHerbs": ["牡丹皮", "甘草"],
       "contraindications": [],
-      "priority": 5,
+      "priority": 2,
+      "verified": false,
       "active": true
     },
     {
       "code": "F20",
       "name": "通導散",
       "reading": "つうどうさん",
-      "description": "体力があり、のぼせて便秘しがちな方の月経不順・月経痛・打撲による腫れや痛みなどに用いられます。滞った血を強く巡らせます。",
-      "types": {
-        "blood_stasis": 0.9,
-        "yang_exc": 0.4
-      },
-      "deficiency": "exc",
+      "efficacy": "体力中等度以上で、下腹部に圧痛があって便秘しがちなものの次の諸症：月経不順、月経痛、更年期障害、腰痛、便秘、打ち身（打撲）、高血圧の随伴症状（頭痛、めまい、肩こり）",
+      "indications": [
+        {"symptom": "irregular_menses", "term": "月経不順"},
+        {"symptom": "dysmenorrhea", "term": "月経痛"},
+        {"symptom": "menopause", "term": "更年期障害"},
+        {"symptom": "low_back", "term": "腰痛"},
+        {"symptom": "constipation", "term": "便秘"},
+        {"symptom": "headache", "term": "高血圧の随伴症状（頭痛、めまい、肩こり）", "requires": ["C2-1"]},
+        {"symptom": "dizziness", "term": "高血圧の随伴症状（頭痛、めまい、肩こり）", "requires": ["C2-1"]},
+        {"symptom": "stiff_shoulder", "term": "高血圧の随伴症状（頭痛、めまい、肩こり）", "requires": ["C2-1"]}
+      ],
+      "useTarget": "体力中等度以上で、下腹部に圧痛があって便秘しがちな",
+      "strength": ["mid", "exc"],
+      "action": "滞った「血」を強くめぐらせ、便通とともに下ろす（活血・瀉下）",
+      "targetLabel": "下腹部に圧痛があり便秘しがち（強い瘀血）",
+      "types": {"blood_stasis": 0.9, "yang_exc": 0.4},
       "thermal": "cool",
-      "complaints": [
-        "pain",
-        "bowel",
-        "menstrual"
-      ],
-      "keySigns": [
-        "B10-4",
-        "B6-9"
-      ],
-      "cautionHerbs": [
-        "大黄",
-        "紅花"
-      ],
-      "contraindications": [
-        "pregnancy",
-        "gi_weak"
-      ],
-      "priority": 9,
+      "heat": "excess",
+      "organs": ["liver"],
+      "signs": ["B1-5", "B10-4", "B6-9", "B11-4"],
+      "cautionHerbs": ["大黄", "芒硝", "紅花", "甘草"],
+      "contraindications": ["pregnancy", "gi_weak"],
+      "priority": 5,
+      "verified": false,
       "active": true
     },
     {
       "code": "F21",
       "name": "五苓散",
       "reading": "ごれいさん",
-      "description": "のどが渇いて尿量が少なく、むくみ・頭痛・めまいがある方に用いられます。体内の水分バランスを整える代表的な漢方薬です。",
-      "types": {
-        "fluid": 1.0
-      },
-      "deficiency": "mid",
+      "efficacy": "体力に関わらず使用でき、のどが渇いて尿量が少ないもので、めまい、はきけ、嘔吐、腹痛、頭痛、むくみなどのいずれかを伴う次の諸症：水様性下痢、急性胃腸炎（しぶり腹のものには使用しないこと）、暑気あたり、頭痛、むくみ、二日酔",
+      "indications": [
+        {"symptom": "diarrhea", "term": "水様性下痢"},
+        {"symptom": "headache", "term": "頭痛"},
+        {"symptom": "edema", "term": "むくみ"}
+      ],
+      "useTarget": "体力に関わらず使用でき、のどが渇いて尿量が少ないもので、めまい、はきけ、嘔吐、腹痛、頭痛、むくみなどのいずれかを伴う",
+      "strength": ["def", "mid", "exc"],
+      "action": "体内の水分の偏りを整え、余分な水を尿として出す（利水）",
+      "targetLabel": "のどが渇いて尿量が少ない（水の偏り）",
+      "types": {"fluid": 1.0},
       "thermal": "neutral",
-      "complaints": [
-        "edema",
-        "gi"
-      ],
-      "keySigns": [
-        "B7-5",
-        "B7-6",
-        "B5-6"
-      ],
+      "organs": ["spleen", "kidney"],
+      "signs": ["B7-5", "B7-6", "B5-6", "B6-5", "B7-4", "B12-5", "A3f-2"],
       "cautionHerbs": [],
       "contraindications": [],
       "priority": 1,
+      "verified": false,
       "active": true
     },
     {
       "code": "F22",
       "name": "苓桂朮甘湯",
       "reading": "りょうけいじゅつかんとう",
-      "description": "めまい・立ちくらみ・動悸があり、体力があまりない方の頭痛・神経質に用いられます。余分な水をさばきながら体を温めます。",
-      "types": {
-        "fluid": 0.9,
-        "qi_def": 0.3
-      },
-      "deficiency": "def",
+      "efficacy": "体力中等度以下で、めまい、ふらつきがあり、ときにのぼせや動悸があるものの次の諸症：立ちくらみ、めまい、頭痛、耳鳴り、動悸、息切れ、神経症、神経過敏",
+      "indications": [
+        {"symptom": "dizziness", "term": "立ちくらみ"},
+        {"symptom": "dizziness", "term": "めまい"},
+        {"symptom": "headache", "term": "頭痛"},
+        {"symptom": "tinnitus", "term": "耳鳴り"},
+        {"symptom": "nerves", "term": "神経症"},
+        {"symptom": "nerves", "term": "神経過敏"}
+      ],
+      "useTarget": "体力中等度以下で、めまい、ふらつきがあり、ときにのぼせや動悸がある",
+      "strength": ["def", "mid"],
+      "action": "胃にたまった余分な水をさばき、突き上げる「気」をしずめる（利水・降気）",
+      "targetLabel": "めまい・ふらつきに、のぼせや動悸を伴う",
+      "types": {"fluid": 0.9, "qi_def": 0.3},
       "thermal": "warm",
-      "complaints": [
-        "edema",
-        "pain"
-      ],
-      "keySigns": [
-        "B7-6",
-        "B12-5"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["spleen", "heart"],
+      "signs": ["B7-6", "B10-1", "B12-5", "B7-5", "A3m-1", "A3m-2"],
+      "cautionHerbs": ["甘草"],
       "contraindications": [],
-      "priority": 3,
+      "priority": 1,
+      "verified": false,
       "active": true
     },
     {
       "code": "F23",
       "name": "防已黄耆湯",
       "reading": "ぼういおうぎとう",
-      "description": "色白で汗をかきやすく、疲れやすい方のむくみ・水太り・関節の腫れや痛みに用いられます。気を補いながら余分な水を取り除きます。",
-      "types": {
-        "fluid": 0.8,
-        "qi_def": 0.6
-      },
-      "deficiency": "def",
+      "efficacy": "体力中等度以下で、疲れやすく、汗のかきやすい傾向があるものの次の諸症：肥満に伴う関節の腫れや痛み、むくみ、多汗症、肥満症（筋肉にしまりのない、いわゆる水ぶとり）",
+      "indications": [
+        {"symptom": "joint", "term": "肥満に伴う関節の腫れや痛み", "requires": ["A3-11", "B1-5", "B1-6"]},
+        {"symptom": "edema", "term": "むくみ"},
+        {"symptom": "obesity", "term": "肥満症"}
+      ],
+      "useTarget": "体力中等度以下で、疲れやすく、汗のかきやすい傾向がある",
+      "strength": ["def", "mid"],
+      "action": "「気」を補って汗を整え、皮下にたまった水をさばく（益気・利水）",
+      "targetLabel": "色白で疲れやすく汗かきの水太り",
+      "types": {"fluid": 0.8, "qi_def": 0.6},
       "thermal": "neutral",
-      "complaints": [
-        "edema",
-        "weight",
-        "pain"
-      ],
-      "keySigns": [
-        "B1-6",
-        "B4-1",
-        "B7-1"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["spleen", "lung"],
+      "signs": ["B1-6", "B4-1", "B7-1", "B1-1", "A3f-3", "A3k-2"],
+      "cautionHerbs": ["甘草"],
       "contraindications": [],
       "priority": 2,
+      "verified": false,
       "active": true
     },
     {
       "code": "F24",
       "name": "真武湯",
       "reading": "しんぶとう",
-      "description": "体力がなく手足が冷え、めまいや下痢がある方の胃腸の不調・冷え・むくみに用いられます。体の奥から温めて水をさばきます。",
-      "types": {
-        "fluid": 0.7,
-        "yang_def": 0.8
-      },
-      "deficiency": "def",
+      "efficacy": "体力虚弱で、冷えがあって、疲労倦怠感があり、ときに下痢、腹痛、めまいがあるものの次の諸症：下痢、急・慢性胃腸炎、胃腸虚弱、めまい、動悸、感冒、むくみ、湿疹・皮膚炎、皮膚のかゆみ",
+      "indications": [
+        {"symptom": "diarrhea", "term": "下痢"},
+        {"symptom": "stomach_heavy", "term": "胃腸虚弱"},
+        {"symptom": "dizziness", "term": "めまい"},
+        {"symptom": "edema", "term": "むくみ"},
+        {"symptom": "eczema", "term": "湿疹・皮膚炎"},
+        {"symptom": "itch", "term": "皮膚のかゆみ"}
+      ],
+      "useTarget": "体力虚弱で、冷えがあって、疲労倦怠感があり、ときに下痢、腹痛、めまいがある",
+      "strength": ["def"],
+      "action": "体の奥から温めて「陽」を補い、余分な水をさばく（温陽・利水）",
+      "targetLabel": "冷えと疲労倦怠があり、下痢やめまいを伴う",
+      "types": {"yang_def": 0.8, "fluid": 0.7},
       "thermal": "warm",
-      "complaints": [
-        "cold",
-        "edema",
-        "gi"
-      ],
-      "keySigns": [
-        "B6-7",
-        "B7-8",
-        "B3-7"
-      ],
-      "cautionHerbs": [
-        "附子"
-      ],
-      "contraindications": [
-        "heart"
-      ],
-      "priority": 6,
+      "organs": ["kidney", "spleen"],
+      "signs": ["B6-7", "B7-8", "B3-7", "B3-8", "B3-1", "B9-8"],
+      "cautionHerbs": ["附子"],
+      "contraindications": ["pregnancy"],
+      "priority": 3,
+      "verified": false,
       "active": true
     },
     {
       "code": "F25",
       "name": "二陳湯",
       "reading": "にちんとう",
-      "description": "胃に水分が停滞しやすく、吐き気や痰が気になる方の胃炎・吐き気に用いられます。余分な水と痰を取り除きます。",
-      "types": {
-        "fluid": 0.8
-      },
-      "deficiency": "mid",
+      "efficacy": "体力中等度で、悪心、嘔吐があるものの次の諸症：悪心、嘔吐、胃部不快感、慢性胃炎、二日酔",
+      "indications": [
+        {"symptom": "nausea", "term": "悪心"},
+        {"symptom": "nausea", "term": "嘔吐"},
+        {"symptom": "stomach_heavy", "term": "胃部不快感"},
+        {"symptom": "stomach_pain", "term": "慢性胃炎"}
+      ],
+      "useTarget": "体力中等度で、悪心、嘔吐がある",
+      "strength": ["mid"],
+      "action": "胃にたまった余分な水（痰）を取り除き、吐き気をしずめる（化痰・和胃）",
+      "targetLabel": "胃に水がたまり、吐き気がある",
+      "types": {"fluid": 0.8},
       "thermal": "neutral",
-      "complaints": [
-        "gi",
-        "edema"
-      ],
-      "keySigns": [
-        "B5-6",
-        "B12-5"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["spleen", "lung"],
+      "signs": ["B5-6", "B12-5", "B9-6"],
+      "cautionHerbs": ["甘草"],
       "contraindications": [],
-      "priority": 8,
+      "priority": 5,
+      "verified": false,
       "active": true
     },
     {
       "code": "F26",
       "name": "防風通聖散",
       "reading": "ぼうふうつうしょうさん",
-      "description": "体力があり、腹部に皮下脂肪が多く便秘がちな方の肥満症・むくみ・便秘などに用いられます。熱と余分な水を便通・発汗で出します。",
-      "types": {
-        "yang_exc": 0.8,
-        "fluid": 0.5
-      },
-      "deficiency": "exc",
+      "efficacy": "体力充実して、腹部に皮下脂肪が多く、便秘がちなものの次の諸症：高血圧や肥満に伴う動悸・肩こり・のぼせ・むくみ・便秘、蓄膿症（副鼻腔炎）、湿疹・皮膚炎、ふきでもの（にきび）、肥満症",
+      "indications": [
+        {"symptom": "stiff_shoulder", "term": "高血圧や肥満に伴う動悸・肩こり・のぼせ・むくみ・便秘", "requires": ["C2-1", "A3-11", "B1-5", "B1-6"]},
+        {"symptom": "edema", "term": "高血圧や肥満に伴う動悸・肩こり・のぼせ・むくみ・便秘", "requires": ["C2-1", "A3-11", "B1-5", "B1-6"]},
+        {"symptom": "constipation", "term": "高血圧や肥満に伴う動悸・肩こり・のぼせ・むくみ・便秘", "requires": ["C2-1", "A3-11", "B1-5", "B1-6"]},
+        {"symptom": "eczema", "term": "湿疹・皮膚炎"},
+        {"symptom": "acne", "term": "ふきでもの（にきび）"},
+        {"symptom": "obesity", "term": "肥満症"}
+      ],
+      "useTarget": "体力充実して、腹部に皮下脂肪が多く、便秘がちな",
+      "strength": ["exc"],
+      "action": "こもった熱と余分な水を、便通・発汗・尿で外へ出す（表裏双解）",
+      "targetLabel": "体力が充実し、腹部の皮下脂肪が多く便秘がち",
+      "types": {"yang_exc": 0.8, "fluid": 0.5},
       "thermal": "cool",
-      "complaints": [
-        "weight",
-        "bowel",
-        "skin"
-      ],
-      "keySigns": [
-        "B1-9",
-        "B6-9",
-        "B2-10"
-      ],
-      "cautionHerbs": [
-        "大黄",
-        "麻黄",
-        "甘草",
-        "山梔子"
-      ],
-      "contraindications": [
-        "pregnancy",
-        "hypertension",
-        "heart",
-        "thyroid",
-        "glaucoma_bph",
-        "gi_weak"
-      ],
-      "priority": 5,
+      "heat": "excess",
+      "organs": ["lung", "spleen"],
+      "signs": ["B1-9", "B1-5", "B6-9", "B2-10", "B3-9", "A3k-1"],
+      "cautionHerbs": ["麻黄", "大黄", "芒硝", "山梔子", "黄芩", "甘草", "石膏"],
+      "contraindications": ["pregnancy", "hypertension", "heart", "thyroid", "glaucoma_bph", "gi_weak"],
+      "priority": 4,
+      "verified": false,
       "active": true
     },
     {
       "code": "F27",
       "name": "六味丸",
       "reading": "ろくみがん",
-      "description": "疲れやすく、腰や足がだるい、尿量が多い（または少なくて乾きがある）方の排尿の不調・むくみ・ほてりに用いられます。潤いを補う基本の漢方薬です。",
-      "types": {
-        "yin_def": 1.0
-      },
-      "deficiency": "def",
+      "efficacy": "体力中等度以下で、疲れやすくて尿量減少又は多尿で、ときに手足のほてり、口渇があるものの次の諸症：排尿困難、残尿感、頻尿、むくみ、かゆみ、夜尿症、しびれ",
+      "indications": [
+        {"symptom": "dysuria", "term": "排尿困難"},
+        {"symptom": "dysuria", "term": "残尿感"},
+        {"symptom": "frequent_urination", "term": "頻尿"},
+        {"symptom": "edema", "term": "むくみ"},
+        {"symptom": "itch", "term": "かゆみ"},
+        {"symptom": "numbness", "term": "しびれ"}
+      ],
+      "useTarget": "体力中等度以下で、疲れやすくて尿量減少又は多尿で、ときに手足のほてり、口渇がある",
+      "strength": ["def", "mid"],
+      "action": "「腎」の潤い（陰）を補う基本の漢方薬（補腎・滋陰）",
+      "targetLabel": "手足のほてり・口渇があり、尿の異常がある（潤い不足）",
+      "types": {"yin_def": 1.0},
       "thermal": "neutral",
-      "complaints": [
-        "fatigue",
-        "skin"
-      ],
-      "keySigns": [
-        "B3-6",
-        "B6-8",
-        "B12-6"
-      ],
-      "cautionHerbs": [],
+      "organs": ["kidney", "liver"],
+      "signs": ["B3-6", "B6-6", "B5-7", "B1-7", "B12-6", "B4-6"],
+      "cautionHerbs": ["地黄", "牡丹皮"],
       "contraindications": [],
-      "priority": 1,
+      "priority": 2,
+      "verified": false,
       "active": true
     },
     {
       "code": "F28",
       "name": "麦門冬湯",
       "reading": "ばくもんどうとう",
-      "description": "痰が切れにくく、のどが乾いて咳き込む方の乾いた咳・気管支炎に用いられます。のどと肺を潤します。",
-      "types": {
-        "yin_def": 0.8
-      },
-      "deficiency": "def",
+      "efficacy": "体力中等度以下で、たんが切れにくく、ときに強くせきこみ、又は咽頭の乾燥感があるものの次の諸症：からぜき、気管支炎、気管支ぜんそく、咽頭炎、しわがれ声",
+      "indications": [
+        {"symptom": "dry_cough", "term": "からぜき"},
+        {"symptom": "dry_cough", "term": "咽頭炎"}
+      ],
+      "useTarget": "体力中等度以下で、たんが切れにくく、ときに強くせきこみ、又は咽頭の乾燥感がある",
+      "strength": ["def", "mid"],
+      "action": "のどと肺を潤して、乾いた咳をしずめる（滋陰・潤肺）",
+      "targetLabel": "痰が切れにくく、のどが乾燥して咳き込む",
+      "types": {"yin_def": 0.8},
       "thermal": "neutral",
-      "complaints": [
-        "cold_prone"
-      ],
-      "keySigns": [
-        "B12-6",
-        "B5-7"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["lung", "spleen"],
+      "signs": ["B12-6", "B5-7", "A3l-2"],
+      "cautionHerbs": ["甘草"],
       "contraindications": [],
-      "priority": 4,
+      "priority": 1,
+      "verified": false,
       "active": true
     },
     {
       "code": "F29",
       "name": "滋陰降火湯",
       "reading": "じいんこうかとう",
-      "description": "のどに潤いがなく痰が出しにくい方の乾いた咳に用いられます。潤いを補いながらこもった熱を冷まします。",
-      "types": {
-        "yin_def": 0.9,
-        "yang_exc": 0.3
-      },
-      "deficiency": "def",
+      "efficacy": "体力虚弱で、のどにうるおいがなく、たんが切れにくくてせきこみ、皮膚が浅黒く乾燥し、便秘傾向のあるものの次の諸症：気管支炎、せき",
+      "indications": [
+        {"symptom": "dry_cough", "term": "せき"}
+      ],
+      "useTarget": "体力虚弱で、のどにうるおいがなく、たんが切れにくくてせきこみ、皮膚が浅黒く乾燥し、便秘傾向のある",
+      "strength": ["def"],
+      "action": "潤いを補いながら、こもった熱を冷まして咳をしずめる（滋陰降火）",
+      "targetLabel": "のどに潤いがなく、皮膚が浅黒く乾燥し便秘傾向",
+      "types": {"yin_def": 0.9, "yang_exc": 0.3},
       "thermal": "cool",
-      "complaints": [
-        "skin",
-        "bowel"
-      ],
-      "keySigns": [
-        "B6-6",
-        "B5-7"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "heat": "deficient",
+      "organs": ["lung", "kidney"],
+      "signs": ["B12-6", "B6-6", "B2-8", "B2-5", "B5-7"],
+      "cautionHerbs": ["地黄", "甘草"],
       "contraindications": [],
-      "priority": 7,
+      "priority": 3,
+      "verified": false,
       "active": true
     },
     {
       "code": "F30",
       "name": "知柏地黄丸",
       "reading": "ちばくじおうがん",
-      "description": "疲れやすく、手足のほてりや寝汗があり、尿量の異常がある方の排尿の不調・むくみ・かゆみに用いられます。潤いを補い、こもった熱を冷まします。",
-      "types": {
-        "yin_def": 0.9,
-        "yang_exc": 0.4
-      },
-      "deficiency": "mid",
+      "efficacy": "体力中等度以下で、疲れやすく胃腸障害がなく、口渇があるものの次の諸症：顔や四肢のほてり、排尿困難、頻尿、むくみ",
+      "indications": [
+        {"symptom": "dysuria", "term": "排尿困難"},
+        {"symptom": "frequent_urination", "term": "頻尿"},
+        {"symptom": "edema", "term": "むくみ"}
+      ],
+      "useTarget": "体力中等度以下で、疲れやすく胃腸障害がなく、口渇がある",
+      "strength": ["def", "mid"],
+      "action": "「腎」の潤いを補い、ほてりなどの虚熱を冷ます（滋陰降火）",
+      "targetLabel": "ほてりと口渇があり、尿の異常がある（虚熱）",
+      "types": {"yin_def": 0.9, "yang_exc": 0.3},
       "thermal": "cool",
-      "complaints": [
-        "sleep",
-        "fatigue"
-      ],
-      "keySigns": [
-        "B4-6",
-        "B8-6"
-      ],
-      "cautionHerbs": [],
+      "heat": "deficient",
+      "organs": ["kidney"],
+      "signs": ["B3-6", "B1-7", "B4-6", "B8-6", "B5-7"],
+      "cautionHerbs": ["地黄", "牡丹皮"],
       "contraindications": [],
-      "priority": 5,
+      "priority": 4,
+      "verified": false,
       "active": true
     },
     {
       "code": "F31",
       "name": "八味地黄丸",
       "reading": "はちみじおうがん",
-      "description": "疲れやすく手足が冷え、夜間尿が多い方の腰痛・下肢痛・排尿の不調・むくみなどに用いられます。体を温めて「腎」を補う代表的な漢方薬です。",
-      "types": {
-        "yang_def": 1.0,
-        "yin_def": 0.3
-      },
-      "deficiency": "def",
+      "efficacy": "体力中等度以下で、疲れやすくて、四肢が冷えやすく、尿量減少又は多尿でときに口渇があるものの次の諸症：下肢痛、腰痛、しびれ、高齢者のかすみ目、かゆみ、排尿困難、残尿感、夜間尿、頻尿、むくみ、高血圧に伴う随伴症状の改善（肩こり、頭重、耳鳴り）、軽い尿漏れ",
+      "indications": [
+        {"symptom": "joint", "term": "下肢痛"},
+        {"symptom": "low_back", "term": "腰痛"},
+        {"symptom": "numbness", "term": "しびれ"},
+        {"symptom": "itch", "term": "かゆみ"},
+        {"symptom": "dysuria", "term": "排尿困難"},
+        {"symptom": "dysuria", "term": "残尿感"},
+        {"symptom": "frequent_urination", "term": "夜間尿"},
+        {"symptom": "frequent_urination", "term": "頻尿"},
+        {"symptom": "edema", "term": "むくみ"},
+        {"symptom": "tinnitus", "term": "高血圧に伴う随伴症状の改善（肩こり、頭重、耳鳴り）", "requires": ["C2-1"]},
+        {"symptom": "stiff_shoulder", "term": "高血圧に伴う随伴症状の改善（肩こり、頭重、耳鳴り）", "requires": ["C2-1"]}
+      ],
+      "useTarget": "体力中等度以下で、疲れやすくて、四肢が冷えやすく、尿量減少又は多尿でときに口渇がある",
+      "strength": ["def", "mid"],
+      "action": "「腎」を温めて補い、下半身の冷えや排尿の働きを整える（補腎・温陽）",
+      "targetLabel": "疲れやすく手足が冷え、尿の異常がある（腎の衰え）",
+      "types": {"yang_def": 1.0, "yin_def": 0.3},
       "thermal": "warm",
-      "complaints": [
-        "cold",
-        "pain",
-        "edema"
-      ],
-      "keySigns": [
-        "B6-8",
-        "B10-8",
-        "B3-7"
-      ],
-      "cautionHerbs": [
-        "附子"
-      ],
-      "contraindications": [
-        "heart"
-      ],
+      "organs": ["kidney"],
+      "signs": ["B6-8", "B10-8", "B3-7", "B1-8", "B12-7", "B8-7"],
+      "cautionHerbs": ["地黄", "牡丹皮", "附子"],
+      "contraindications": ["pregnancy"],
       "priority": 1,
+      "verified": false,
       "active": true
     },
     {
       "code": "F32",
       "name": "牛車腎気丸",
       "reading": "ごしゃじんきがん",
-      "description": "疲れやすく手足が冷えてむくみ、尿量が多い方の腰痛・下肢のしびれや痛み・むくみに用いられます。体を温めて水の巡りも整えます。",
-      "types": {
-        "yang_def": 0.9,
-        "fluid": 0.5
-      },
-      "deficiency": "def",
+      "efficacy": "体力中等度以下で、疲れやすくて、四肢が冷えやすく尿量減少し、むくみがあり、ときに口渇があるものの次の諸症：下肢痛、腰痛、しびれ、高齢者のかすみ目、かゆみ、排尿困難、頻尿、むくみ、高血圧に伴う随伴症状の改善（肩こり、頭重、耳鳴り）",
+      "indications": [
+        {"symptom": "joint", "term": "下肢痛"},
+        {"symptom": "low_back", "term": "腰痛"},
+        {"symptom": "numbness", "term": "しびれ"},
+        {"symptom": "itch", "term": "かゆみ"},
+        {"symptom": "dysuria", "term": "排尿困難"},
+        {"symptom": "frequent_urination", "term": "頻尿"},
+        {"symptom": "edema", "term": "むくみ"},
+        {"symptom": "tinnitus", "term": "高血圧に伴う随伴症状の改善（肩こり、頭重、耳鳴り）", "requires": ["C2-1"]}
+      ],
+      "useTarget": "体力中等度以下で、疲れやすくて、四肢が冷えやすく尿量減少し、むくみがあり、ときに口渇がある",
+      "strength": ["def", "mid"],
+      "action": "「腎」を温めて補い、水のめぐりを整えてむくみ・しびれを和らげる（補腎・温陽・利水）",
+      "targetLabel": "手足が冷えてむくみ、しびれや痛みがある",
+      "types": {"yang_def": 0.9, "fluid": 0.5},
       "thermal": "warm",
-      "complaints": [
-        "edema",
-        "cold",
-        "pain"
-      ],
-      "keySigns": [
-        "B7-8",
-        "B10-8",
-        "B6-8"
-      ],
-      "cautionHerbs": [
-        "附子"
-      ],
-      "contraindications": [
-        "heart"
-      ],
-      "priority": 3,
+      "organs": ["kidney"],
+      "signs": ["B7-8", "B10-8", "B6-8", "B3-7", "B1-8"],
+      "cautionHerbs": ["地黄", "牡丹皮", "附子", "牛膝"],
+      "contraindications": ["pregnancy"],
+      "priority": 2,
+      "verified": false,
       "active": true
     },
     {
       "code": "F33",
       "name": "人参湯",
       "reading": "にんじんとう",
-      "description": "体力がなく手足が冷え、胃腸が弱い方の胃もたれ・下痢・食欲不振に用いられます。胃腸を温める漢方薬です。",
-      "types": {
-        "yang_def": 0.8,
-        "qi_def": 0.6
-      },
-      "deficiency": "def",
+      "efficacy": "体力虚弱で、疲れやすくて手足などが冷えやすいものの次の諸症：胃腸虚弱、下痢、嘔吐、胃痛、腹痛、急・慢性胃炎",
+      "indications": [
+        {"symptom": "stomach_heavy", "term": "胃腸虚弱"},
+        {"symptom": "diarrhea", "term": "下痢"},
+        {"symptom": "nausea", "term": "嘔吐"},
+        {"symptom": "stomach_pain", "term": "胃痛"},
+        {"symptom": "abdominal_pain", "term": "腹痛"},
+        {"symptom": "stomach_pain", "term": "急・慢性胃炎"}
+      ],
+      "useTarget": "体力虚弱で、疲れやすくて手足などが冷えやすい",
+      "strength": ["def"],
+      "action": "冷えた胃腸を温めて働きを高める（温中・補気）",
+      "targetLabel": "胃腸が冷えて弱く、手足が冷えやすい",
+      "types": {"yang_def": 0.8, "qi_def": 0.6},
       "thermal": "warm",
-      "complaints": [
-        "gi",
-        "cold"
-      ],
-      "keySigns": [
-        "B5-8",
-        "B6-7"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["spleen"],
+      "signs": ["B5-8", "B6-7", "B3-1", "B5-1", "B3-8"],
+      "cautionHerbs": ["甘草"],
       "contraindications": [],
       "priority": 2,
+      "verified": false,
       "active": true
     },
     {
       "code": "F34",
       "name": "当帰四逆加呉茱萸生姜湯",
       "reading": "とうきしぎゃくかごしゅゆしょうきょうとう",
-      "description": "手足の冷えが強く、下腹部や腰が冷えて痛む方の冷え症・しもやけ・頭痛・月経痛などに用いられます。血を補いながら手足の先まで温めます。",
-      "types": {
-        "yang_def": 0.8,
-        "blood_def": 0.5
-      },
-      "deficiency": "def",
+      "efficacy": "体力中等度以下で、手足の冷えを感じ、下肢の冷えが強く、下肢又は下腹部が痛くなりやすいものの次の諸症：冷え症、しもやけ、頭痛、下腹部痛、腰痛、下痢、月経痛",
+      "indications": [
+        {"symptom": "cold", "term": "冷え症"},
+        {"symptom": "chilblain", "term": "しもやけ"},
+        {"symptom": "headache", "term": "頭痛"},
+        {"symptom": "abdominal_pain", "term": "下腹部痛"},
+        {"symptom": "low_back", "term": "腰痛"},
+        {"symptom": "diarrhea", "term": "下痢"},
+        {"symptom": "dysmenorrhea", "term": "月経痛"}
+      ],
+      "useTarget": "体力中等度以下で、手足の冷えを感じ、下肢の冷えが強く、下肢又は下腹部が痛くなりやすい",
+      "strength": ["def", "mid"],
+      "action": "「血」を補い、手足の先まで温めて冷えによる痛みを和らげる（温経散寒・補血）",
+      "targetLabel": "手足、とくに下肢の冷えが強く、冷えで痛む",
+      "types": {"yang_def": 0.8, "blood_def": 0.5},
       "thermal": "warm",
-      "complaints": [
-        "cold",
-        "pain"
-      ],
-      "keySigns": [
-        "B3-2",
-        "B3-8"
-      ],
-      "cautionHerbs": [
-        "甘草"
-      ],
+      "organs": ["liver"],
+      "signs": ["B3-2", "B3-8", "B10-8", "B11-7", "A3b-1", "A3b-4"],
+      "cautionHerbs": ["甘草"],
       "contraindications": [],
-      "priority": 4,
+      "priority": 1,
+      "verified": false,
       "active": true
     },
     {
       "code": "F35",
       "name": "黄連解毒湯",
       "reading": "おうれんげどくとう",
-      "description": "体力があり、のぼせて顔が赤く、イライラや不眠がある方の鼻血・不眠・胃炎・皮膚のかゆみなどに用いられます。こもった熱を冷ます漢方薬です。",
-      "types": {
-        "yang_exc": 1.0
-      },
-      "deficiency": "exc",
+      "efficacy": "体力中等度以上で、のぼせぎみで顔色赤く、いらいらして落ち着かない傾向のあるものの次の諸症：鼻出血、不眠症、神経症、胃炎、二日酔い、血の道症、めまい、動悸、更年期障害、湿疹・皮膚炎、皮膚のかゆみ、口内炎",
+      "indications": [
+        {"symptom": "insomnia", "term": "不眠症"},
+        {"symptom": "nerves", "term": "神経症"},
+        {"symptom": "stomach_pain", "term": "胃炎"},
+        {"symptom": "blood_path", "term": "血の道症"},
+        {"symptom": "dizziness", "term": "めまい"},
+        {"symptom": "menopause", "term": "更年期障害"},
+        {"symptom": "eczema", "term": "湿疹・皮膚炎"},
+        {"symptom": "itch", "term": "皮膚のかゆみ"}
+      ],
+      "useTarget": "体力中等度以上で、のぼせぎみで顔色赤く、いらいらして落ち着かない傾向のある",
+      "strength": ["mid", "exc"],
+      "action": "体にこもった強い熱を冷まし、炎症や高ぶりをしずめる（清熱）",
+      "targetLabel": "のぼせて顔が赤く、イライラして落ち着かない（実熱）",
+      "types": {"yang_exc": 1.0},
       "thermal": "cool",
-      "complaints": [
-        "mood",
-        "skin",
-        "sleep"
-      ],
-      "keySigns": [
-        "B9-9",
-        "B2-10",
-        "B8-8"
-      ],
-      "cautionHerbs": [
-        "山梔子"
-      ],
+      "heat": "excess",
+      "organs": ["heart", "liver"],
+      "signs": ["B3-9", "B9-9", "B8-8", "B2-10", "B13-8", "A3h-1"],
+      "cautionHerbs": ["黄芩", "山梔子"],
       "contraindications": [],
-      "priority": 1,
+      "priority": 2,
+      "verified": false,
       "active": true
     },
     {
       "code": "F36",
       "name": "清上防風湯",
       "reading": "せいじょうぼうふうとう",
-      "description": "体力があり、顔が赤くのぼせやすい方のにきび・顔面の湿疹に用いられます。上半身にこもった熱を冷まします。",
-      "types": {
-        "yang_exc": 0.9
-      },
-      "deficiency": "exc",
+      "efficacy": "体力中等度以上で、赤ら顔でときにのぼせがあるものの次の諸症：にきび、顔面・頭部の湿疹・皮膚炎、あかはな（酒さ）",
+      "indications": [
+        {"symptom": "acne", "term": "にきび"},
+        {"symptom": "eczema", "term": "顔面・頭部の湿疹・皮膚炎"}
+      ],
+      "useTarget": "体力中等度以上で、赤ら顔でときにのぼせがある",
+      "strength": ["mid", "exc"],
+      "action": "顔など上半身にこもった熱を冷まし、炎症をしずめる（清熱・散風）",
+      "targetLabel": "赤ら顔でのぼせがあり、赤く腫れるにきび",
+      "types": {"yang_exc": 0.9},
       "thermal": "cool",
-      "complaints": [
-        "skin"
+      "heat": "excess",
+      "organs": ["lung"],
+      "signs": ["B3-9", "B2-10", "A3c-1"],
+      "cautionHerbs": ["山梔子", "黄芩", "甘草"],
+      "contraindications": [],
+      "priority": 1,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F37",
+      "name": "荊芥連翹湯",
+      "reading": "けいがいれんぎょうとう",
+      "efficacy": "体力中等度以上で、皮膚の色が浅黒く、ときに手足の裏に脂汗をかきやすく腹壁が緊張しているものの次の諸症：蓄膿症（副鼻腔炎）、慢性鼻炎、慢性扁桃炎、にきび",
+      "indications": [
+        {"symptom": "acne", "term": "にきび"}
       ],
-      "keySigns": [
-        "B2-10"
-      ],
-      "cautionHerbs": [
-        "甘草",
-        "山梔子"
-      ],
+      "useTarget": "体力中等度以上で、皮膚の色が浅黒く、ときに手足の裏に脂汗をかきやすく腹壁が緊張している",
+      "strength": ["mid", "exc"],
+      "action": "「血」を補いながら熱と炎症を冷まし、慢性化した皮膚や鼻・のどの炎症を整える（清熱・解毒・養血）",
+      "targetLabel": "皮膚が浅黒く、慢性的に繰り返すにきび",
+      "types": {"yang_exc": 0.6, "blood_def": 0.3, "qi_stag": 0.3},
+      "thermal": "cool",
+      "heat": "excess",
+      "organs": ["lung", "liver"],
+      "signs": ["B2-5", "B4-3", "B12-5", "A3c-2", "A4-4", "A4-5"],
+      "cautionHerbs": ["地黄", "黄芩", "山梔子", "柴胡", "甘草"],
       "contraindications": [],
       "priority": 2,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F38",
+      "name": "桂枝茯苓丸加薏苡仁",
+      "reading": "けいしぶくりょうがんかよくいにん",
+      "efficacy": "比較的体力があり、ときに下腹部痛、肩こり、頭重、めまい、のぼせて足冷えなどを訴えるものの次の諸症：にきび、しみ、手足のあれ（手足の湿疹・皮膚炎）、月経不順、血の道症",
+      "indications": [
+        {"symptom": "acne", "term": "にきび"},
+        {"symptom": "spots", "term": "しみ"},
+        {"symptom": "rough_hands", "term": "手足のあれ"},
+        {"symptom": "eczema", "term": "手足の湿疹・皮膚炎"},
+        {"symptom": "irregular_menses", "term": "月経不順"},
+        {"symptom": "blood_path", "term": "血の道症"}
+      ],
+      "useTarget": "比較的体力があり、ときに下腹部痛、肩こり、頭重、めまい、のぼせて足冷えなどを訴える",
+      "strength": ["mid", "exc"],
+      "action": "滞った「血」のめぐりを改善し、肌の余分な水分や炎症を整える（活血化瘀・利湿）",
+      "targetLabel": "のぼせて足が冷え、月経の不調を伴う肌トラブル（瘀血）",
+      "types": {"blood_stasis": 1.0},
+      "thermal": "neutral",
+      "organs": ["liver"],
+      "signs": ["B3-4", "B1-5", "B11-4", "B11-3", "B10-4", "B2-5", "A3c-3"],
+      "cautionHerbs": ["牡丹皮", "桃仁"],
+      "contraindications": ["pregnancy"],
+      "priority": 1,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F39",
+      "name": "十味敗毒湯",
+      "reading": "じゅうみはいどくとう",
+      "efficacy": "体力中等度なものの皮膚疾患で、発赤があり、ときに化膿するものの次の諸症：化膿性皮膚疾患・急性皮膚疾患の初期、じんましん、湿疹・皮膚炎、水虫",
+      "indications": [
+        {"symptom": "eczema", "term": "化膿性皮膚疾患・急性皮膚疾患の初期"},
+        {"symptom": "eczema", "term": "湿疹・皮膚炎"}
+      ],
+      "useTarget": "体力中等度なものの皮膚疾患で、発赤があり、ときに化膿する",
+      "strength": ["mid"],
+      "action": "皮膚の炎症や化膿をしずめ、毒を発散させる（解毒・散風）",
+      "targetLabel": "発赤があり化膿しやすい皮膚疾患の初期",
+      "types": {"yang_exc": 0.5, "fluid": 0.5},
+      "thermal": "cool",
+      "heat": "excess",
+      "organs": ["lung"],
+      "signs": ["B2-10", "B2-7", "A3c-1", "A4-1", "A4-2"],
+      "cautionHerbs": ["柴胡", "甘草"],
+      "contraindications": [],
+      "priority": 2,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F40",
+      "name": "消風散",
+      "reading": "しょうふうさん",
+      "efficacy": "体力中等度以上の人の皮膚疾患で、かゆみが強くて分泌物が多く、ときに局所の熱感があるものの次の諸症：湿疹・皮膚炎、じんましん、水虫、あせも",
+      "indications": [
+        {"symptom": "eczema", "term": "湿疹・皮膚炎"}
+      ],
+      "useTarget": "体力中等度以上の人の皮膚疾患で、かゆみが強くて分泌物が多く、ときに局所の熱感がある",
+      "strength": ["mid", "exc"],
+      "action": "皮膚の熱と湿り気を取り、強いかゆみをしずめる（清熱・去風・除湿）",
+      "targetLabel": "かゆみが強く、分泌物が多い湿疹",
+      "types": {"yang_exc": 0.5, "fluid": 0.5, "blood_def": 0.2},
+      "thermal": "cool",
+      "heat": "excess",
+      "organs": ["lung", "spleen"],
+      "signs": ["B2-7", "B2-10", "B4-5"],
+      "cautionHerbs": ["地黄", "石膏", "甘草"],
+      "contraindications": [],
+      "priority": 3,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F41",
+      "name": "温清飲",
+      "reading": "うんせいいん",
+      "efficacy": "体力中等度で、皮膚はかさかさして色つやが悪く、のぼせるものの次の諸症：月経不順、月経困難、血の道症、更年期障害、神経症、湿疹・皮膚炎",
+      "indications": [
+        {"symptom": "irregular_menses", "term": "月経不順"},
+        {"symptom": "dysmenorrhea", "term": "月経困難"},
+        {"symptom": "blood_path", "term": "血の道症"},
+        {"symptom": "menopause", "term": "更年期障害"},
+        {"symptom": "nerves", "term": "神経症"},
+        {"symptom": "eczema", "term": "湿疹・皮膚炎"}
+      ],
+      "useTarget": "体力中等度で、皮膚はかさかさして色つやが悪く、のぼせる",
+      "strength": ["mid"],
+      "action": "「血」を補って潤しながら、こもった熱を冷ます（補血・清熱）",
+      "targetLabel": "皮膚がかさかさして色つやが悪く、のぼせる",
+      "types": {"blood_def": 0.6, "yang_exc": 0.5},
+      "thermal": "cool",
+      "organs": ["liver"],
+      "signs": ["B2-8", "B2-2", "B3-6", "B3-4", "B10-7"],
+      "cautionHerbs": ["地黄", "黄芩", "山梔子"],
+      "contraindications": [],
+      "priority": 3,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F42",
+      "name": "当帰飲子",
+      "reading": "とうきいんし",
+      "efficacy": "体力中等度以下で、冷え症で、皮膚が乾燥するものの次の諸症：湿疹・皮膚炎（分泌物の少ないもの）、かゆみ",
+      "indications": [
+        {"symptom": "eczema", "term": "湿疹・皮膚炎（分泌物の少ないもの）"},
+        {"symptom": "itch", "term": "かゆみ"}
+      ],
+      "useTarget": "体力中等度以下で、冷え症で、皮膚が乾燥する",
+      "strength": ["def", "mid"],
+      "action": "「血」を補って肌を潤し、乾燥によるかゆみをしずめる（養血・潤燥・去風）",
+      "targetLabel": "冷え症で、乾燥して分泌物の少ない湿疹・かゆみ",
+      "types": {"blood_def": 0.8, "yin_def": 0.3},
+      "thermal": "neutral",
+      "organs": ["liver", "lung"],
+      "signs": ["B2-8", "B10-7", "B3-2", "A3c-5"],
+      "cautionHerbs": ["地黄", "甘草"],
+      "contraindications": [],
+      "priority": 1,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F43",
+      "name": "加味帰脾湯",
+      "reading": "かみきひとう",
+      "efficacy": "体力中等度以下で、心身が疲れ、血色が悪く、ときに熱感を伴うものの次の諸症：貧血、不眠症、精神不安、神経症",
+      "indications": [
+        {"symptom": "insomnia", "term": "不眠症"},
+        {"symptom": "nerves", "term": "精神不安"},
+        {"symptom": "nerves", "term": "神経症"}
+      ],
+      "useTarget": "体力中等度以下で、心身が疲れ、血色が悪く、ときに熱感を伴う",
+      "strength": ["def", "mid"],
+      "action": "「気」と「血」を補って心を落ち着かせ、こもった熱を冷ます（補気・補血・安神・清熱）",
+      "targetLabel": "心身が疲れて血色が悪く、ときに熱感やイライラを伴う",
+      "types": {"blood_def": 0.7, "qi_def": 0.5, "qi_stag": 0.3},
+      "thermal": "neutral",
+      "organs": ["heart", "spleen", "liver"],
+      "signs": ["B8-2", "B9-2", "B2-2", "B1-7", "B9-3", "A3g-1"],
+      "cautionHerbs": ["柴胡", "山梔子", "甘草", "牡丹皮"],
+      "contraindications": [],
+      "priority": 2,
+      "verified": false,
+      "note": "製品によって牡丹皮を含むものがあります（含む場合は妊娠中の方は服用前に相談）。",
+      "active": true
+    },
+    {
+      "code": "F44",
+      "name": "抑肝散",
+      "reading": "よくかんさん",
+      "efficacy": "体力中等度をめやすとして、神経がたかぶり、怒りやすい、イライラなどがあるものの次の諸症：神経症、不眠症、小児夜なき、小児疳症（神経過敏）、歯ぎしり、更年期障害、血の道症",
+      "indications": [
+        {"symptom": "nerves", "term": "神経症"},
+        {"symptom": "insomnia", "term": "不眠症"},
+        {"symptom": "menopause", "term": "更年期障害"},
+        {"symptom": "blood_path", "term": "血の道症"}
+      ],
+      "useTarget": "体力中等度をめやすとして、神経がたかぶり、怒りやすい、イライラなどがある",
+      "strength": ["mid"],
+      "action": "高ぶった神経（肝の高ぶり）をしずめ、「血」を補って緊張をゆるめる（平肝・熄風）",
+      "targetLabel": "神経がたかぶり、怒りやすい・イライラする",
+      "types": {"qi_stag": 0.8, "blood_def": 0.4},
+      "thermal": "neutral",
+      "organs": ["liver"],
+      "signs": ["B9-3", "B9-9", "B8-3", "B10-2", "A3h-1", "A3g-4"],
+      "cautionHerbs": ["柴胡", "甘草"],
+      "contraindications": [],
+      "priority": 1,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F45",
+      "name": "抑肝散加陳皮半夏",
+      "reading": "よくかんさんかちんぴはんげ",
+      "efficacy": "体力中等度をめやすとして、やや消化器が弱く、神経がたかぶり、怒りやすい、イライラなどがあるものの次の諸症：神経症、不眠症、小児夜なき、小児疳症（神経過敏）、更年期障害、血の道症、歯ぎしり",
+      "indications": [
+        {"symptom": "nerves", "term": "神経症"},
+        {"symptom": "insomnia", "term": "不眠症"},
+        {"symptom": "menopause", "term": "更年期障害"},
+        {"symptom": "blood_path", "term": "血の道症"}
+      ],
+      "useTarget": "体力中等度をめやすとして、やや消化器が弱く、神経がたかぶり、怒りやすい、イライラなどがある",
+      "strength": ["def", "mid"],
+      "action": "高ぶった神経をしずめ、胃腸の水分の滞りも整える（平肝・化痰）",
+      "targetLabel": "イライラ・神経のたかぶりがあり、胃腸がやや弱い",
+      "types": {"qi_stag": 0.7, "blood_def": 0.3, "fluid": 0.3, "qi_def": 0.2},
+      "thermal": "neutral",
+      "organs": ["liver", "spleen"],
+      "signs": ["B9-3", "B9-9", "B8-3", "B5-1", "B5-6", "A3h-1"],
+      "cautionHerbs": ["柴胡", "甘草"],
+      "contraindications": [],
+      "priority": 3,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F46",
+      "name": "桂枝加竜骨牡蛎湯",
+      "reading": "けいしかりゅうこつぼれいとう",
+      "efficacy": "体力中等度以下で、疲れやすく、神経過敏で、興奮しやすいものの次の諸症：神経質、不眠症、小児夜なき、夜尿症、眼精疲労、神経症",
+      "indications": [
+        {"symptom": "nerves", "term": "神経質"},
+        {"symptom": "insomnia", "term": "不眠症"},
+        {"symptom": "nerves", "term": "神経症"}
+      ],
+      "useTarget": "体力中等度以下で、疲れやすく、神経過敏で、興奮しやすい",
+      "strength": ["def", "mid"],
+      "action": "「気」と「血」の調和をはかり、高ぶった神経をしずめる（調和・安神）",
+      "targetLabel": "疲れやすく、神経過敏で興奮しやすい",
+      "types": {"qi_def": 0.5, "yin_def": 0.3, "qi_stag": 0.3},
+      "thermal": "neutral",
+      "organs": ["heart", "kidney"],
+      "signs": ["B9-1", "B9-4", "B1-1", "B8-6", "A3h-2"],
+      "cautionHerbs": ["甘草"],
+      "contraindications": [],
+      "priority": 3,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F47",
+      "name": "柴胡桂枝乾姜湯",
+      "reading": "さいこけいしかんきょうとう",
+      "efficacy": "体力中等度以下で、冷え症、貧血気味、神経過敏で、動悸、息切れ、ときにねあせ、頭部の発汗、口の乾きがあるものの次の諸症：更年期障害、血の道症、不眠症、神経症、動悸、息切れ、かぜの後期の症状、気管支炎",
+      "indications": [
+        {"symptom": "menopause", "term": "更年期障害"},
+        {"symptom": "blood_path", "term": "血の道症"},
+        {"symptom": "insomnia", "term": "不眠症"},
+        {"symptom": "nerves", "term": "神経症"}
+      ],
+      "useTarget": "体力中等度以下で、冷え症、貧血気味、神経過敏で、動悸、息切れ、ときにねあせ、頭部の発汗、口の乾きがある",
+      "strength": ["def", "mid"],
+      "action": "「気」のめぐりを整えつつ体を温め、神経の過敏をしずめる（和解・温裏）",
+      "targetLabel": "冷え症・貧血気味で、神経過敏・動悸・寝汗がある",
+      "types": {"qi_stag": 0.5, "blood_def": 0.3, "yang_def": 0.3, "yin_def": 0.2},
+      "thermal": "neutral",
+      "organs": ["liver", "heart"],
+      "signs": ["B3-2", "B10-1", "B4-6", "B4-3", "B5-7", "A3h-2"],
+      "cautionHerbs": ["柴胡", "黄芩", "甘草"],
+      "contraindications": ["interferon"],
+      "priority": 4,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F48",
+      "name": "安中散",
+      "reading": "あんちゅうさん",
+      "efficacy": "体力中等度以下で、腹部は力がなくて、胃痛又は腹痛があって、ときに胸やけや、げっぷ、胃もたれ、食欲不振、はきけ、嘔吐などを伴うものの次の諸症：神経性胃炎、慢性胃炎、胃腸虚弱",
+      "indications": [
+        {"symptom": "stomach_pain", "term": "神経性胃炎"},
+        {"symptom": "stomach_pain", "term": "慢性胃炎"},
+        {"symptom": "stomach_heavy", "term": "胃腸虚弱"}
+      ],
+      "useTarget": "体力中等度以下で、腹部は力がなくて、胃痛又は腹痛があって、ときに胸やけや、げっぷ、胃もたれ、食欲不振、はきけ、嘔吐などを伴う",
+      "strength": ["def", "mid"],
+      "action": "冷えた胃を温め、「気」のめぐりを整えて痛みをしずめる（温中・理気・止痛）",
+      "targetLabel": "腹部に力がなく、胃痛や胸やけを伴う（胃の冷え）",
+      "types": {"qi_def": 0.5, "yang_def": 0.5, "qi_stag": 0.3},
+      "thermal": "warm",
+      "organs": ["spleen"],
+      "signs": ["B5-1", "B5-8", "B3-1", "A3d-3"],
+      "cautionHerbs": ["甘草"],
+      "contraindications": [],
+      "priority": 1,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F49",
+      "name": "半夏瀉心湯",
+      "reading": "はんげしゃしんとう",
+      "efficacy": "体力中等度で、みぞおちがつかえた感じがあり、ときに悪心、嘔吐があり食欲不振で腹が鳴って軟便又は下痢の傾向のあるものの次の諸症：急・慢性胃腸炎、下痢・軟便、消化不良、胃下垂、神経性胃炎、胃弱、二日酔、げっぷ、胸やけ、口内炎、神経症",
+      "indications": [
+        {"symptom": "diarrhea", "term": "下痢・軟便"},
+        {"symptom": "stomach_heavy", "term": "消化不良"},
+        {"symptom": "stomach_pain", "term": "神経性胃炎"},
+        {"symptom": "stomach_heavy", "term": "胃弱"},
+        {"symptom": "stomach_pain", "term": "胸やけ"},
+        {"symptom": "nerves", "term": "神経症"}
+      ],
+      "useTarget": "体力中等度で、みぞおちがつかえた感じがあり、ときに悪心、嘔吐があり食欲不振で腹が鳴って軟便又は下痢の傾向のある",
+      "strength": ["mid"],
+      "action": "胃腸の冷えと熱の偏りを整え、みぞおちのつかえを取る（和胃・降逆）",
+      "targetLabel": "みぞおちがつかえ、腹が鳴って軟便・下痢の傾向",
+      "types": {"fluid": 0.5, "qi_stag": 0.4, "qi_def": 0.3},
+      "thermal": "neutral",
+      "organs": ["spleen"],
+      "signs": ["B5-4", "B6-1", "B5-6", "B5-10", "A3d-1"],
+      "cautionHerbs": ["黄芩", "甘草"],
+      "contraindications": [],
+      "priority": 2,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F50",
+      "name": "平胃散",
+      "reading": "へいいさん",
+      "efficacy": "体力中等度以上で、胃がもたれて消化が悪く、ときにはきけ、食後に腹が鳴って下痢の傾向のあるものの次の諸症：食べすぎによる胃のもたれ、急・慢性胃炎、消化不良、食欲不振",
+      "indications": [
+        {"symptom": "stomach_heavy", "term": "食べすぎによる胃のもたれ"},
+        {"symptom": "stomach_pain", "term": "急・慢性胃炎"},
+        {"symptom": "stomach_heavy", "term": "消化不良"},
+        {"symptom": "poor_appetite", "term": "食欲不振"}
+      ],
+      "useTarget": "体力中等度以上で、胃がもたれて消化が悪く、ときにはきけ、食後に腹が鳴って下痢の傾向のある",
+      "strength": ["mid", "exc"],
+      "action": "胃腸にたまった余分な湿り気を取り、消化を助ける（燥湿・健胃）",
+      "targetLabel": "食べすぎで胃がもたれ、消化が悪い",
+      "types": {"fluid": 0.8, "qi_stag": 0.3},
+      "thermal": "neutral",
+      "organs": ["spleen"],
+      "signs": ["B5-6", "D1-3", "B6-5", "B4-5"],
+      "cautionHerbs": ["甘草"],
+      "contraindications": [],
+      "priority": 4,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F51",
+      "name": "啓脾湯",
+      "reading": "けいひとう",
+      "efficacy": "体力虚弱で、痩せて顔色が悪く、食欲がなく、下痢の傾向があるものの次の諸症：胃腸虚弱、慢性胃腸炎、消化不良、下痢",
+      "indications": [
+        {"symptom": "stomach_heavy", "term": "胃腸虚弱"},
+        {"symptom": "stomach_heavy", "term": "消化不良"},
+        {"symptom": "diarrhea", "term": "下痢"}
+      ],
+      "useTarget": "体力虚弱で、痩せて顔色が悪く、食欲がなく、下痢の傾向がある",
+      "strength": ["def"],
+      "action": "胃腸の働きを高め、消化を助けて下痢を整える（補気・健脾・止瀉）",
+      "targetLabel": "痩せて顔色が悪く、食欲がなく下痢しやすい",
+      "types": {"qi_def": 0.8, "fluid": 0.4},
+      "thermal": "neutral",
+      "organs": ["spleen"],
+      "signs": ["B5-1", "B6-1", "B2-2", "B1-3", "D1-1"],
+      "cautionHerbs": ["甘草"],
+      "contraindications": [],
+      "priority": 4,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F52",
+      "name": "桂枝加芍薬湯",
+      "reading": "けいしかしゃくやくとう",
+      "efficacy": "体力中等度以下で、腹部膨満感のあるものの次の諸症：しぶり腹、腹痛、下痢、便秘",
+      "indications": [
+        {"symptom": "abdominal_pain", "term": "腹痛"},
+        {"symptom": "diarrhea", "term": "下痢"},
+        {"symptom": "constipation", "term": "便秘"},
+        {"symptom": "alternating", "term": "下痢、便秘"}
+      ],
+      "useTarget": "体力中等度以下で、腹部膨満感のある",
+      "strength": ["def", "mid"],
+      "action": "お腹の緊張をゆるめ、腹部の張りや痛みを和らげる（温中・緩急止痛）",
+      "targetLabel": "お腹が張り、腹痛と便通の乱れがある",
+      "types": {"qi_def": 0.4, "qi_stag": 0.5},
+      "thermal": "warm",
+      "organs": ["spleen", "liver"],
+      "signs": ["B5-3", "B6-3", "A3e-4", "A3d-5"],
+      "cautionHerbs": ["甘草"],
+      "contraindications": [],
+      "priority": 1,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F53",
+      "name": "小建中湯",
+      "reading": "しょうけんちゅうとう",
+      "efficacy": "体力虚弱で、疲労しやすく腹痛があり、血色がすぐれず、ときに動悸、手足のほてり、冷え、ねあせ、鼻血、頻尿および多尿などを伴うものの次の諸症：小児虚弱体質、疲労倦怠、慢性胃腸炎、腹痛、神経質、小児夜尿症、夜なき",
+      "indications": [
+        {"symptom": "fatigue", "term": "疲労倦怠"},
+        {"symptom": "stomach_pain", "term": "慢性胃腸炎"},
+        {"symptom": "abdominal_pain", "term": "腹痛"},
+        {"symptom": "nerves", "term": "神経質"}
+      ],
+      "useTarget": "体力虚弱で、疲労しやすく腹痛があり、血色がすぐれず、ときに動悸、手足のほてり、冷え、ねあせ、鼻血、頻尿および多尿などを伴う",
+      "strength": ["def"],
+      "action": "胃腸を温めて「気」と「血」を補い、お腹の痛みや疲れを和らげる（温中補虚・緩急止痛）",
+      "targetLabel": "疲れやすく腹痛があり、血色がすぐれない",
+      "types": {"qi_def": 0.8, "yang_def": 0.3, "blood_def": 0.3},
+      "thermal": "warm",
+      "organs": ["spleen"],
+      "signs": ["B1-1", "B2-2", "B10-1", "B4-6", "B6-8", "A3d-5"],
+      "cautionHerbs": ["甘草"],
+      "contraindications": [],
+      "priority": 3,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F54",
+      "name": "黄耆建中湯",
+      "reading": "おうぎけんちゅうとう",
+      "efficacy": "体力虚弱で、疲労しやすいものの次の諸症：虚弱体質、病後の衰弱、ねあせ、湿疹・皮膚炎、皮膚のただれ、腹痛、冷え症",
+      "indications": [
+        {"symptom": "weak_constitution", "term": "虚弱体質"},
+        {"symptom": "recovery", "term": "病後の衰弱"},
+        {"symptom": "night_sweat", "term": "ねあせ"},
+        {"symptom": "eczema", "term": "湿疹・皮膚炎"},
+        {"symptom": "abdominal_pain", "term": "腹痛"},
+        {"symptom": "cold", "term": "冷え症"}
+      ],
+      "useTarget": "体力虚弱で、疲労しやすい",
+      "strength": ["def"],
+      "action": "胃腸を温めて「気」を補い、汗や皮膚の回復を助ける（補気・温中）",
+      "targetLabel": "体力が弱く疲れやすく、汗をかきやすい",
+      "types": {"qi_def": 0.9, "blood_def": 0.2},
+      "thermal": "warm",
+      "organs": ["spleen", "lung"],
+      "signs": ["B1-1", "B1-2", "B4-1", "B4-2", "A3l-1"],
+      "cautionHerbs": ["甘草"],
+      "contraindications": [],
+      "priority": 2,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F55",
+      "name": "芍薬甘草湯",
+      "reading": "しゃくやくかんぞうとう",
+      "efficacy": "体力に関わらず使用でき、筋肉の急激なけいれんを伴う痛みのあるものの次の諸症：こむらがえり、筋肉のけいれん、腹痛、腰痛",
+      "indications": [
+        {"symptom": "cramps", "term": "こむらがえり"},
+        {"symptom": "cramps", "term": "筋肉のけいれん"},
+        {"symptom": "abdominal_pain", "term": "腹痛"},
+        {"symptom": "low_back", "term": "腰痛"}
+      ],
+      "useTarget": "体力に関わらず使用でき、筋肉の急激なけいれんを伴う痛みのある",
+      "strength": ["def", "mid", "exc"],
+      "action": "筋肉の急なけいれんと痛みをゆるめる（緩急止痛）",
+      "targetLabel": "筋肉の急なけいれん・こむら返り（症状があるときだけ）",
+      "types": {"blood_def": 0.5},
+      "thermal": "neutral",
+      "organs": ["liver"],
+      "signs": ["B10-2", "A3i-5"],
+      "cautionHerbs": ["甘草"],
+      "contraindications": ["heart", "hypertension", "kidney"],
+      "priority": 1,
+      "verified": false,
+      "note": "甘草を多く含むため、症状があるときだけ服用し、続けて飲まない漢方薬です。",
+      "active": true
+    },
+    {
+      "code": "F56",
+      "name": "麻子仁丸",
+      "reading": "ましにんがん",
+      "efficacy": "体力中等度以下で、ときに便が硬く塊状なものの次の諸症：便秘、便秘に伴う頭重・のぼせ・湿疹・皮膚炎・ふきでもの（にきび）・食欲不振（食欲減退）・腹部膨満・腸内異常醗酵・痔などの症状の緩和",
+      "indications": [
+        {"symptom": "constipation", "term": "便秘"},
+        {"symptom": "acne", "term": "便秘に伴う頭重・のぼせ・湿疹・皮膚炎・ふきでもの（にきび）", "requires": ["A3e-1", "A3e-2", "B6-2", "B6-6", "B6-9"]},
+        {"symptom": "eczema", "term": "便秘に伴う頭重・のぼせ・湿疹・皮膚炎", "requires": ["A3e-1", "A3e-2", "B6-2", "B6-6", "B6-9"]},
+        {"symptom": "hemorrhoid", "term": "痔などの症状の緩和", "requires": ["A3e-1", "A3e-2", "B6-2", "B6-6", "B6-9"]}
+      ],
+      "useTarget": "体力中等度以下で、ときに便が硬く塊状な",
+      "strength": ["def", "mid"],
+      "action": "腸を潤して、硬い便を出しやすくする（潤腸通便）",
+      "targetLabel": "便が硬く塊状（コロコロ便）",
+      "types": {"yin_def": 0.5, "blood_def": 0.3, "yang_exc": 0.3},
+      "thermal": "neutral",
+      "organs": ["spleen"],
+      "signs": ["B6-2", "B6-6", "A3e-2"],
+      "cautionHerbs": ["大黄"],
+      "contraindications": ["pregnancy"],
+      "priority": 1,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F57",
+      "name": "潤腸湯",
+      "reading": "じゅんちょうとう",
+      "efficacy": "体力中等度又はやや虚弱で、ときに皮膚乾燥などがあるものの次の症状：便秘",
+      "indications": [
+        {"symptom": "constipation", "term": "便秘"}
+      ],
+      "useTarget": "体力中等度又はやや虚弱で、ときに皮膚乾燥などがある",
+      "strength": ["def", "mid"],
+      "action": "「血」と潤いを補って腸を潤し、便通を助ける（潤腸通便・養血）",
+      "targetLabel": "皮膚の乾燥などを伴う、硬い便の便秘",
+      "types": {"blood_def": 0.5, "yin_def": 0.5},
+      "thermal": "neutral",
+      "organs": ["spleen", "lung"],
+      "signs": ["B6-2", "B2-8", "B1-3", "A3e-2"],
+      "cautionHerbs": ["地黄", "桃仁", "黄芩", "大黄", "甘草"],
+      "contraindications": ["pregnancy"],
+      "priority": 2,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F58",
+      "name": "大黄甘草湯",
+      "reading": "だいおうかんぞうとう",
+      "efficacy": "便秘、便秘に伴う頭重・のぼせ・湿疹・皮膚炎・ふきでもの（にきび）・食欲不振（食欲減退）・腹部膨満・腸内異常醗酵・痔などの症状の緩和",
+      "indications": [
+        {"symptom": "constipation", "term": "便秘"}
+      ],
+      "useTarget": "体力に関わらず使用できる（効能関連注意）",
+      "strength": ["def", "mid", "exc"],
+      "action": "腸の動きを促して便通をつける（瀉下）",
+      "targetLabel": "便秘全般（体力に関わらず。体質による選び分けは少ない）",
+      "types": {"yang_exc": 0.5},
+      "thermal": "cool",
+      "organs": ["spleen"],
+      "signs": ["B6-9"],
+      "cautionHerbs": ["大黄", "甘草"],
+      "contraindications": ["pregnancy"],
+      "priority": 5,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F59",
+      "name": "乙字湯",
+      "reading": "おつじとう",
+      "efficacy": "体力中等度以上で、大便がかたく、便秘傾向のあるものの次の諸症：痔核（いぼ痔）、きれ痔、便秘、軽度の脱肛",
+      "indications": [
+        {"symptom": "hemorrhoid", "term": "痔核（いぼ痔）"},
+        {"symptom": "hemorrhoid", "term": "きれ痔"},
+        {"symptom": "constipation", "term": "便秘"}
+      ],
+      "useTarget": "体力中等度以上で、大便がかたく、便秘傾向のある",
+      "strength": ["mid", "exc"],
+      "action": "肛門部のうっ血と炎症をしずめ、便通を整える（清熱・活血・升提）",
+      "targetLabel": "便が硬く便秘傾向のある痔",
+      "types": {"blood_stasis": 0.5, "yang_exc": 0.4},
+      "thermal": "cool",
+      "heat": "excess",
+      "organs": ["liver"],
+      "signs": ["B6-4", "B6-9", "A3e-5"],
+      "cautionHerbs": ["柴胡", "黄芩", "甘草", "大黄"],
+      "contraindications": ["pregnancy"],
+      "priority": 1,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F60",
+      "name": "猪苓湯",
+      "reading": "ちょれいとう",
+      "efficacy": "体力に関わらず使用でき、排尿異常があり、ときに口が渇くものの次の諸症：排尿困難、排尿痛、残尿感、頻尿、むくみ",
+      "indications": [
+        {"symptom": "dysuria", "term": "排尿困難"},
+        {"symptom": "dysuria", "term": "排尿痛"},
+        {"symptom": "dysuria", "term": "残尿感"},
+        {"symptom": "frequent_urination", "term": "頻尿"},
+        {"symptom": "edema", "term": "むくみ"}
+      ],
+      "useTarget": "体力に関わらず使用でき、排尿異常があり、ときに口が渇く",
+      "strength": ["def", "mid", "exc"],
+      "action": "尿の通りをよくしながら潤いを補い、排尿時の熱や痛みをしずめる（利水・清熱・滋陰）",
+      "targetLabel": "排尿痛・残尿感があり、ときに口が渇く",
+      "types": {"fluid": 0.6, "yin_def": 0.5},
+      "thermal": "cool",
+      "heat": "deficient",
+      "organs": ["kidney"],
+      "signs": ["B6-6", "B7-7", "A3e-7"],
+      "cautionHerbs": [],
+      "contraindications": [],
+      "priority": 1,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F61",
+      "name": "清心蓮子飲",
+      "reading": "せいしんれんしいん",
+      "efficacy": "体力中等度以下で、胃腸が弱く、全身倦怠感があり、口や舌が乾き、尿が出しぶるものの次の諸症：残尿感、頻尿、排尿痛、尿のにごり、排尿困難、こしけ（おりもの）",
+      "indications": [
+        {"symptom": "dysuria", "term": "残尿感"},
+        {"symptom": "frequent_urination", "term": "頻尿"},
+        {"symptom": "dysuria", "term": "排尿痛"},
+        {"symptom": "dysuria", "term": "排尿困難"}
+      ],
+      "useTarget": "体力中等度以下で、胃腸が弱く、全身倦怠感があり、口や舌が乾き、尿が出しぶる",
+      "strength": ["def", "mid"],
+      "action": "「気」と潤いを補い、こもった熱を冷まして排尿を整える（補気・滋陰・清熱）",
+      "targetLabel": "胃腸が弱く倦怠感があり、口が乾いて尿が出しぶる",
+      "types": {"qi_def": 0.6, "yin_def": 0.5},
+      "thermal": "neutral",
+      "organs": ["heart", "kidney"],
+      "signs": ["B5-1", "B1-1", "B5-7", "A3e-7"],
+      "cautionHerbs": ["黄芩", "甘草"],
+      "contraindications": [],
+      "priority": 3,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F62",
+      "name": "疎経活血湯",
+      "reading": "そけいかっけつとう",
+      "efficacy": "体力中等度で、痛みがあり、ときにしびれがあるものの次の諸症：関節痛、神経痛、腰痛、筋肉痛",
+      "indications": [
+        {"symptom": "joint", "term": "関節痛"},
+        {"symptom": "joint", "term": "神経痛"},
+        {"symptom": "low_back", "term": "腰痛"},
+        {"symptom": "joint", "term": "筋肉痛"}
+      ],
+      "useTarget": "体力中等度で、痛みがあり、ときにしびれがある",
+      "strength": ["mid"],
+      "action": "「血」を補ってめぐらせ、筋肉や関節の痛み・しびれを和らげる（活血・去風湿）",
+      "targetLabel": "痛みがあり、ときにしびれを伴う（血の滞り）",
+      "types": {"blood_stasis": 0.6, "blood_def": 0.4, "fluid": 0.3},
+      "thermal": "neutral",
+      "organs": ["liver", "kidney"],
+      "signs": ["B10-4", "B10-6", "B10-2", "A3i-6"],
+      "cautionHerbs": ["地黄", "桃仁", "牛膝", "甘草"],
+      "contraindications": ["pregnancy"],
+      "priority": 1,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F63",
+      "name": "薏苡仁湯",
+      "reading": "よくいにんとう",
+      "efficacy": "体力中等度で、関節や筋肉のはれや痛みがあるものの次の諸症：関節痛、筋肉痛、神経痛",
+      "indications": [
+        {"symptom": "joint", "term": "関節痛"},
+        {"symptom": "joint", "term": "筋肉痛"},
+        {"symptom": "joint", "term": "神経痛"}
+      ],
+      "useTarget": "体力中等度で、関節や筋肉のはれや痛みがある",
+      "strength": ["mid"],
+      "action": "関節や筋肉にたまった余分な水分を取り、はれと痛みを和らげる（去湿・止痛）",
+      "targetLabel": "関節や筋肉のはれと痛み（湿り気）",
+      "types": {"fluid": 0.8, "qi_stag": 0.2},
+      "thermal": "warm",
+      "organs": ["spleen"],
+      "signs": ["B10-6", "B7-6", "B7-5"],
+      "cautionHerbs": ["麻黄", "甘草"],
+      "contraindications": ["hypertension", "heart", "thyroid", "glaucoma_bph"],
+      "priority": 2,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F64",
+      "name": "桂枝加朮附湯",
+      "reading": "けいしかじゅつぶとう",
+      "efficacy": "体力虚弱で、汗が出、手足が冷えてこわばり、ときに尿量が少ないものの次の諸症：関節痛、神経痛",
+      "indications": [
+        {"symptom": "joint", "term": "関節痛"},
+        {"symptom": "joint", "term": "神経痛"}
+      ],
+      "useTarget": "体力虚弱で、汗が出、手足が冷えてこわばり、ときに尿量が少ない",
+      "strength": ["def"],
+      "action": "体を温めて冷えと湿り気を取り、関節のこわばりと痛みを和らげる（温陽・去湿）",
+      "targetLabel": "冷えてこわばり、汗が出やすい関節痛",
+      "types": {"yang_def": 0.8, "fluid": 0.5},
+      "thermal": "warm",
+      "organs": ["kidney", "spleen"],
+      "signs": ["B4-2", "B3-8", "B7-6", "B10-8"],
+      "cautionHerbs": ["甘草", "附子"],
+      "contraindications": ["pregnancy"],
+      "priority": 3,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F65",
+      "name": "呉茱萸湯",
+      "reading": "ごしゅゆとう",
+      "efficacy": "体力中等度以下で、手足が冷えて肩がこり、ときにみぞおちが膨満するものの次の諸症：頭痛、頭痛に伴うはきけ・嘔吐、しゃっくり",
+      "indications": [
+        {"symptom": "headache", "term": "頭痛"},
+        {"symptom": "nausea", "term": "頭痛に伴うはきけ・嘔吐", "requires": ["A3i-2"]}
+      ],
+      "useTarget": "体力中等度以下で、手足が冷えて肩がこり、ときにみぞおちが膨満する",
+      "strength": ["def", "mid"],
+      "action": "冷えた胃を温め、突き上げる冷えをしずめて頭痛と吐き気を和らげる（温中・降逆）",
+      "targetLabel": "手足が冷えて肩がこり、吐き気を伴う頭痛",
+      "types": {"yang_def": 0.6, "fluid": 0.5},
+      "thermal": "warm",
+      "organs": ["liver", "spleen"],
+      "signs": ["B3-2", "B3-8", "B5-4", "B12-3", "A3i-1"],
+      "cautionHerbs": [],
+      "contraindications": [],
+      "priority": 1,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F66",
+      "name": "釣藤散",
+      "reading": "ちょうとうさん",
+      "efficacy": "体力中等度で、慢性に経過する頭痛、めまい、肩こりなどがあるものの次の諸症：慢性頭痛、神経症、高血圧の傾向のあるもの",
+      "indications": [
+        {"symptom": "headache", "term": "慢性頭痛"},
+        {"symptom": "nerves", "term": "神経症"}
+      ],
+      "useTarget": "体力中等度で、慢性に経過する頭痛、めまい、肩こりなどがある",
+      "strength": ["mid"],
+      "action": "頭に上った「気」の高ぶりをしずめ、めぐりを整える（平肝・熄風）",
+      "targetLabel": "慢性的な頭痛・めまい・肩こり",
+      "types": {"qi_stag": 0.5, "yang_exc": 0.3, "fluid": 0.3},
+      "thermal": "neutral",
+      "organs": ["liver"],
+      "signs": ["B12-3", "B12-8", "A4-4", "A4-5", "C2-1", "A3i-1"],
+      "cautionHerbs": ["甘草", "石膏"],
+      "contraindications": [],
+      "priority": 2,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F67",
+      "name": "半夏白朮天麻湯",
+      "reading": "はんげびゃくじゅつてんまとう",
+      "efficacy": "体力中等度以下で、胃腸が弱く下肢が冷えるものの次の諸症：頭痛、頭重、立ちくらみ、めまい、蓄膿症（副鼻腔炎）",
+      "indications": [
+        {"symptom": "headache", "term": "頭痛"},
+        {"symptom": "dizziness", "term": "立ちくらみ"},
+        {"symptom": "dizziness", "term": "めまい"}
+      ],
+      "useTarget": "体力中等度以下で、胃腸が弱く下肢が冷える",
+      "strength": ["def", "mid"],
+      "action": "胃腸を整えて余分な水（痰）を取り、めまいや頭痛をしずめる（健脾・化痰・熄風）",
+      "targetLabel": "胃腸が弱く下肢が冷える方の頭痛・めまい",
+      "types": {"fluid": 0.7, "qi_def": 0.5},
+      "thermal": "warm",
+      "organs": ["spleen"],
+      "signs": ["B5-1", "B1-8", "B3-7", "B7-6", "B12-5"],
+      "cautionHerbs": [],
+      "contraindications": [],
+      "priority": 2,
+      "verified": false,
+      "active": true
+    },
+    {
+      "code": "F68",
+      "name": "女神散",
+      "reading": "にょしんさん",
+      "efficacy": "体力中等度以上で、のぼせとめまいのあるものの次の諸症：更年期障害、神経症、血の道症、月経不順、産前産後の神経症",
+      "indications": [
+        {"symptom": "menopause", "term": "更年期障害"},
+        {"symptom": "nerves", "term": "神経症"},
+        {"symptom": "blood_path", "term": "血の道症"},
+        {"symptom": "irregular_menses", "term": "月経不順"},
+        {"symptom": "nerves", "term": "産前産後の神経症"}
+      ],
+      "useTarget": "体力中等度以上で、のぼせとめまいのある",
+      "strength": ["mid", "exc"],
+      "action": "「気」のめぐりを整え、のぼせとめまいをしずめる（理気・清熱）",
+      "targetLabel": "のぼせとめまいがある",
+      "types": {"qi_stag": 0.6, "blood_stasis": 0.3, "yang_exc": 0.3},
+      "thermal": "neutral",
+      "organs": ["liver", "heart"],
+      "signs": ["B3-4", "B12-2", "B3-9", "A3j-4"],
+      "cautionHerbs": ["黄芩", "甘草", "大黄"],
+      "contraindications": [],
+      "priority": 3,
+      "verified": false,
+      "note": "製品によって大黄を含むものがあります。取り扱う製品の成分で確認してください。",
       "active": true
     }
   ]

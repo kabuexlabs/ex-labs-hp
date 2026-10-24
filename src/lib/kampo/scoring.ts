@@ -4,7 +4,7 @@
 // 表示されなかった設問（B11・B13 のスキップ）と「閉経している」を選んだ B11 は
 // 理論最大点から除く。「どれもあてはまらない」は 0 点。
 // ---------------------------------------------------------------------------
-import { TYPES, type TypeKey, type Question } from './masters.ts';
+import { TYPES, ORGANS, type TypeKey, type OrganKey, type Question } from './masters.ts';
 
 export const DEFICIENT: TypeKey[] = ['qi_def', 'blood_def', 'yin_def', 'yang_def']; // 虚
 export const EXCESS: TypeKey[] = ['qi_stag', 'blood_stasis', 'fluid', 'yang_exc']; // 実
@@ -15,6 +15,9 @@ export type Level = 'balanced' | 'tendency' | 'caution' | 'strong';
 export const LEVEL_LABEL: Record<Level, string> = { balanced: 'バランス', tendency: '傾向あり', caution: '注意', strong: '強い' };
 export type DefExcLabel = 'def' | 'mid' | 'exc';
 export type ThermalLabel = 'cold' | 'neutral' | 'hot';
+/** 熱寄りのときの熱の種類：実熱（陽盛が主）／虚熱（陰虚＝潤い不足が主） */
+export type HeatKindLabel = 'excess' | 'deficient';
+export const HEAT_KIND_LABEL: Record<HeatKindLabel, string> = { excess: '実熱（余分な熱）', deficient: '虚熱（潤い不足による熱）' };
 export const DEF_EXC_LABEL: Record<DefExcLabel, string> = { def: '虚証寄り', mid: '虚実間', exc: '実証寄り' };
 export const THERMAL_STATE_LABEL: Record<ThermalLabel, string> = { cold: '寒（冷え）寄り', neutral: '中間', hot: '熱寄り' };
 
@@ -24,6 +27,8 @@ export type Answers = Record<string, string[]>;
 export interface ScoreContext {
   sex?: string; // female / male / none
   tongueMode: 'self' | 'staff';
+  /** 選ばれている選択肢ID（主訴の詳細の showIf.chosen 判定用） */
+  chosen?: Set<string>;
   /** 薬剤師が入力・上書きした舌所見（B13 の選択肢ID）。あればセルフ回答より優先 */
   tongueOverride?: string[];
 }
@@ -36,22 +41,30 @@ export interface Classification {
   defExcLabel: DefExcLabel;
   thermalIndex: number;
   thermalLabel: ThermalLabel;
+  /** 熱寄り（thermalLabel=hot）のときの熱の種類 */
+  heatKind?: HeatKindLabel;
   isBalanced: boolean;
 }
 export interface ScoreResult extends Classification {
   raw: Record<TypeKey, number>;
   max: Record<TypeKey, number>;
   pct: Record<TypeKey, number>;
+  /** 五臓の傾向（0〜100）。設問の organs の重みで集計 */
+  organRaw: Record<OrganKey, number>;
+  organMax: Record<OrganKey, number>;
+  organPct: Record<OrganKey, number>;
 }
 
 export const zero = (): Record<TypeKey, number> => Object.fromEntries(TYPES.map((t) => [t, 0])) as Record<TypeKey, number>;
 const mapTypes = <T,>(fn: (t: TypeKey) => T) => Object.fromEntries(TYPES.map((t) => [t, fn(t)])) as Record<TypeKey, T>;
+export const zeroOrgans = (): Record<OrganKey, number> => Object.fromEntries(ORGANS.map((o) => [o, 0])) as Record<OrganKey, number>;
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-/** showIf による表示判定（B13 はセルフモードのみ、B11・C3 は女性のみ） */
-export function isVisible(q: Question, ctx: Pick<ScoreContext, 'sex' | 'tongueMode'>): boolean {
+/** showIf による表示判定（B13 はセルフモードのみ、B11・C3 は女性のみ、主訴の詳細は該当する主訴を選んだときだけ） */
+export function isVisible(q: Question, ctx: Pick<ScoreContext, 'sex' | 'tongueMode' | 'chosen'>): boolean {
   if (q.showIf?.sex && ctx.sex !== q.showIf.sex) return false;
   if (q.showIf?.tongueMode && ctx.tongueMode !== q.showIf.tongueMode) return false;
+  if (q.showIf?.chosen && !q.showIf.chosen.some((id) => ctx.chosen?.has(id))) return false;
   return true;
 }
 
@@ -85,16 +98,20 @@ export function classify(pct: Record<TypeKey, number>): Classification {
   const idx = (pos: TypeKey[], neg: TypeKey[]) => (sum(pos) + sum(neg) === 0 ? 0 : round2((sum(pos) - sum(neg)) / (sum(pos) + sum(neg))));
   const defExcIndex = idx(EXCESS, DEFICIENT);
   const thermalIndex = idx(HOT, COLD);
+  const thermalLabel: ThermalLabel = thermalIndex < -0.2 ? 'cold' : thermalIndex > 0.2 ? 'hot' : 'neutral';
   return {
     level, mainTypes, subTypes, isBalanced,
     defExcIndex, defExcLabel: defExcIndex < -0.2 ? 'def' : defExcIndex > 0.2 ? 'exc' : 'mid',
-    thermalIndex, thermalLabel: thermalIndex < -0.2 ? 'cold' : thermalIndex > 0.2 ? 'hot' : 'neutral',
+    thermalIndex, thermalLabel,
+    heatKind: thermalLabel === 'hot' ? (pct.yin_def > pct.yang_exc ? 'deficient' : 'excess') : undefined,
   };
 }
 
 export function score(answers: Answers, questions: Question[], ctx: ScoreContext): ScoreResult {
   const raw = zero();
   const max = zero();
+  const organRaw = zeroOrgans();
+  const organMax = zeroOrgans();
   for (const q of questions) {
     if (!q.scored) continue;
     let chosen: string[];
@@ -106,13 +123,24 @@ export function score(answers: Answers, questions: Question[], ctx: ScoreContext
       if (!isVisible(q, ctx)) continue;
       chosen = answers[q.id] ?? [];
     }
-    // 理論最大点：その問の全選択肢の重みをタイプごとに合算
+    // 理論最大点：その問の全選択肢の重みをタイプごと・五臓ごとに合算
     const qMax = zero();
-    for (const o of allOptions(q)) for (const [t, w] of Object.entries(o.weights ?? {})) qMax[t as TypeKey] += w ?? 0;
+    const qOrganMax = zeroOrgans();
+    for (const o of allOptions(q)) {
+      for (const [t, w] of Object.entries(o.weights ?? {})) qMax[t as TypeKey] += w ?? 0;
+      for (const [k, w] of Object.entries(o.organs ?? {})) qOrganMax[k as OrganKey] += w ?? 0;
+    }
     if (chosen.some((id) => findOption(q, id)?.flags?.includes('skip_max'))) continue; // 閉経など：この問は max に入れない
     for (const t of TYPES) max[t] += qMax[t];
-    for (const id of chosen) for (const [t, w] of Object.entries(findOption(q, id)?.weights ?? {})) raw[t as TypeKey] += w ?? 0;
+    for (const k of ORGANS) organMax[k] += qOrganMax[k];
+    for (const id of chosen) {
+      const o = findOption(q, id);
+      for (const [t, w] of Object.entries(o?.weights ?? {})) raw[t as TypeKey] += w ?? 0;
+      for (const [k, w] of Object.entries(o?.organs ?? {})) organRaw[k as OrganKey] += w ?? 0;
+    }
   }
   const pct = mapTypes((t) => (max[t] === 0 ? 0 : Math.round((100 * raw[t]) / max[t])));
-  return { raw, max, pct, ...classify(pct) };
+  const organPct = Object.fromEntries(ORGANS.map((k) => [k, organMax[k] === 0 ? 0 : Math.round((100 * organRaw[k]) / organMax[k])])) as Record<OrganKey, number>;
+  return { raw, max, pct, organRaw: roundMap(organRaw), organMax: roundMap(organMax), organPct, ...classify(pct) };
 }
+const roundMap = (m: Record<OrganKey, number>) => Object.fromEntries(ORGANS.map((k) => [k, round2(m[k])])) as Record<OrganKey, number>;

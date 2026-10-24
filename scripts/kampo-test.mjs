@@ -1,10 +1,10 @@
 // 漢方体質チェック（/kampo/）のロジック回帰テスト。
 //   node --experimental-strip-types scripts/kampo-test.mjs
-// マスタ検証・スコアリング（仕様書 第6節の検算例）・安全確認・候補提示・設問フローを確認する。
+// マスタ検証・スコアリング（仕様書 第6節の検算例）・安全確認・二段階の漢方薬選定・設問フローを確認する。
 import { QUESTIONS, TYPES, FORMULAS, validateMasters, TYPE_DEFS } from '../src/lib/kampo/masters.ts';
 import { score, classify, zero } from '../src/lib/kampo/scoring.ts';
 import { safetyFlags } from '../src/lib/kampo/safety.ts';
-import { recommend, recommendForCustomer, conflictsOf, primaryType, defExcMatch, thermalMatch } from '../src/lib/kampo/recommend.ts';
+import { selectFormulas, customerPicks, complaintGroups, buildReasons } from '../src/lib/kampo/recommend.ts';
 import { visibleQuestions, normalizeAnswer, isAnswered, firstUnansweredStep, personalTips, sexFromAnswers } from '../src/lib/kampo/flow.ts';
 import fs from 'node:fs';
 
@@ -21,7 +21,7 @@ const qj = JSON.parse(fs.readFileSync('src/data/kampo/questions.json', 'utf8'));
 const tj = JSON.parse(fs.readFileSync('src/data/kampo/types.json', 'utf8'));
 const fj = JSON.parse(fs.readFileSync('src/data/kampo/formulas.json', 'utf8'));
 eq('マスタ検証 合格', validateMasters(qj, tj, fj), []);
-eq('設問数 27', QUESTIONS.length, 27);
+eq('設問数 40（基本27＋主訴の詳細13）', QUESTIONS.length, 40);
 eq('B設問に none あり', QUESTIONS.filter((x) => x.block === 'B').every((x) => x.options.some((o) => o.flags?.includes('none'))), true);
 {
   const broken = JSON.parse(JSON.stringify(qj));
@@ -31,10 +31,17 @@ eq('B設問に none あり', QUESTIONS.filter((x) => x.block === 'B').every((x) 
   dup.questions[1].options[0].id = 'A1-1';
   eq('選択肢ID重複を検出', validateMasters(dup, tj, fj).some((e) => e.includes('重複')), true);
   const badF = JSON.parse(JSON.stringify(fj));
-  badF.formulas[0].keySigns.push('B99-1');
-  eq('存在しない keySigns を検出', validateMasters(qj, tj, badF).some((e) => e.includes('B99-1')), true);
+  badF.formulas[0].signs.push('B99-1');
+  eq('存在しない signs を検出', validateMasters(qj, tj, badF).some((e) => e.includes('B99-1')), true);
+  const badT = JSON.parse(JSON.stringify(fj));
+  badT.formulas[0].indications[0].term = '存在しない語';
+  eq('効能の語が efficacy 本文にないと検出', validateMasters(qj, tj, badT).some((e) => e.includes('存在しない語')), true);
+  const badS = JSON.parse(JSON.stringify(fj));
+  badS.formulas[0].indications[0].symptom = 'unknown_symptom';
+  eq('未定義の症状コードを検出', validateMasters(qj, tj, badS).some((e) => e.includes('unknown_symptom')), true);
 }
-eq('処方 36 件', FORMULAS.length, 36);
+eq('処方 68 件', FORMULAS.length, 68);
+eq('全処方に承認効能・使用目標・漢方の考え方', FORMULAS.every((f) => f.efficacy && f.useTarget && f.action && f.indications.length > 0), true);
 eq('タイプ 8 件', Object.keys(TYPE_DEFS).length, 8);
 
 // ---- スコアリング ----
@@ -109,107 +116,92 @@ const noneAll = Object.fromEntries(QUESTIONS.filter((x) => x.scored).map((x) => 
   eq('安全：授乳は info', safetyFlags({ C3: ['C3-2'] }).map((x) => [x.code, x.level]), [['lactation', 'info']]);
 }
 
-// ---- 候補提示 ----
-eq('虚実一致 +0.3', defExcMatch('def', 'def'), 0.3);
-eq('虚実隣接 +0.1', [defExcMatch('def', 'mid'), defExcMatch('mid', 'exc')], [0.1, 0.1]);
-eq('虚実逆 -0.3', defExcMatch('def', 'exc'), -0.3);
-eq('寒熱 warm×cold +0.2', thermalMatch('warm', 'cold'), 0.2);
-eq('寒熱 warm×hot -0.3', thermalMatch('warm', 'hot'), -0.3);
-eq('寒熱 neutral 0', [thermalMatch('neutral', 'hot'), thermalMatch('cool', 'neutral')], [0, 0]);
+// ---- 五臓・熱の種類 ----
 {
-  const ids = ['B1-1', 'B1-2', 'B2-1', 'B3-1', 'B4-1', 'B4-2', 'B5-1', 'B6-1', 'B7-1', 'B8-1', 'B9-1', 'B10-1', 'B12-1', 'B13-1', 'D1-1'];
-  const answers = { A3: ['A3-1', 'A3-12'] };
-  for (const id of ids) (answers[id.split('-')[0]] ??= []).push(id);
-  const r = score(answers, QUESTIONS, { sex: 'male', tongueMode: 'self' });
-  const c = recommend(r, answers, [], FORMULAS);
-  eq('気虚 → 候補3件', c.length, 3);
-  eq('気虚＋疲れ → 1位 補中益気湯', c[0].name, '補中益気湯');
-  eq('根拠に主体質とキー所見', c[0].reasons.some((x) => x.includes('気虚 100%（主体質）')) && c[0].reasons.some((x) => x.startsWith('所見:')), true);
-}
-{
-  // 瘀血＋妊娠 → 桂枝茯苓丸は残るが警告つき・スコア -1.0
-  const answers = { B1: ['B1-5'], B2: ['B2-5'], B3: ['B3-4'], B10: ['B10-4'], B11: ['B11-4'], C3: ['C3-1'], A3: ['A3-10'] };
-  const r = score(answers, QUESTIONS, { sex: 'female', tongueMode: 'staff' });
-  const flags = safetyFlags(answers);
-  const all = recommend(r, answers, flags, FORMULAS, undefined, 36);
-  const kb = all.find((x) => x.name === '桂枝茯苓丸');
-  eq('妊娠 → 桂枝茯苓丸に警告', kb.warnings, ['pregnancy']);
-  const noFlag = recommend(r, answers, [], FORMULAS, undefined, 36).find((x) => x.name === '桂枝茯苓丸');
-  eq('妊娠 → 桂枝茯苓丸のスコアが 1.0 下がる', Math.round((noFlag.score - kb.score) * 100) / 100, 1);
-  eq('注意生薬 × フラグ（牡丹皮 — 妊娠）', kb.herbCautions.map((h) => `${h.herb}—${h.flag}`), ['牡丹皮—pregnancy', '桃仁—pregnancy']);
-}
-{
-  // 高血圧で防風通聖散の甘草・麻黄に注意
-  const flags = safetyFlags({ C2: ['C2-1'] });
-  const r = score({ B1: ['B1-9'], B6: ['B6-9'] }, QUESTIONS, { sex: 'male', tongueMode: 'staff' });
-  const c = recommend(r, { B1: ['B1-9'], B6: ['B6-9'] }, flags, FORMULAS, undefined, 36).find((x) => x.name === '防風通聖散');
-  eq('高血圧 → 防風通聖散に注意生薬', c.herbCautions.map((h) => h.herb).sort(), ['甘草', '附子', '麻黄'].filter((h) => ['大黄', '麻黄', '甘草', '山梔子'].includes(h)).sort());
-  eq('高血圧 → 防風通聖散は禁忌警告', c.warnings, ['hypertension']);
-}
-{
-  // 全問 none でもエラーにならず候補が出る
-  const r = score(noneAll, QUESTIONS, { sex: 'female', tongueMode: 'self' });
-  eq('バランス良好でも候補3件（エラーなし）', recommend(r, noneAll, [], FORMULAS).length, 3);
+  const r = score({ B5: ['B5-1'], B6: ['B6-1'] }, QUESTIONS, { sex: 'male', tongueMode: 'self' });
+  eq('五臓：胃腸の回答で脾が上がる', r.organPct.spleen > 0 && r.organPct.liver === 0, true);
+  const h1 = classify({ ...zero(), yang_exc: 80, yin_def: 20 });
+  eq('熱寄り・陽盛が主 → 実熱', [h1.thermalLabel, h1.heatKind], ['hot', 'excess']);
+  const h2 = classify({ ...zero(), yang_exc: 20, yin_def: 80 });
+  eq('熱寄り・陰虚が主 → 虚熱', [h2.thermalLabel, h2.heatKind], ['hot', 'deficient']);
 }
 
-// ---- 来店客向けのおすすめ（矛盾・警告なしのみ） ----
-eq('全処方に来店客向け説明文', FORMULAS.every((f) => typeof f.description === 'string' && f.description.length >= 10), true);
+// ---- 二段階の漢方薬選定 ----
+const mk = (ids) => { const a = {}; for (const id of ids) { const q = id.replace(/-[^-]+$/, ''); (a[q] ??= []).push(id); } return a; };
+const BASE = ['A1-1', 'A2-3', 'A4-4', 'A4s-2', 'A5-2', 'C1-2', 'C2-0', 'C3-4', 'C4-2'];
+const sel = (ids, texts = {}) => {
+  const a = mk([...BASE.filter((b) => !ids.some((x) => x.split('-')[0] === b.split('-')[0])), ...ids]);
+  const r = score(a, QUESTIONS, { sex: 'female', tongueMode: 'self' });
+  const fl = safetyFlags(a, texts);
+  return { a, r, fl, s: selectFormulas(r, a, texts, fl, FORMULAS) };
+};
+const HEAT = ['B1-9', 'B2-10', 'B3-9', 'B5-9', 'B6-9', 'B9-9', 'B8-8', 'B13-8', 'D1-6', 'B4-7', 'B12-8'];
+const STASIS = ['B1-5', 'B2-5', 'B2-6', 'B3-4', 'B10-4', 'B11-4', 'B12-4', 'B7-3', 'B9-5', 'B13-4', 'B6-4'];
+const QIDEF = ['B1-1', 'B1-2', 'B2-1', 'B3-1', 'B4-1', 'B5-1', 'B6-1', 'B8-1', 'B9-1', 'B10-1', 'B12-1', 'B13-1', 'D1-1', 'B3-8'];
+const ACNE_POOL = ['清上防風湯', '荊芥連翹湯', '桂枝茯苓丸加薏苡仁', '桂枝茯苓丸', '防風通聖散'];
 {
-  const r = score(noneAll, QUESTIONS, { sex: 'female', tongueMode: 'self' });
-  eq('バランス良好 → 来店客向けは出さない', recommendForCustomer(r, noneAll, [], FORMULAS), []);
+  // STEP 1：主訴で候補群を決める（体質で無関係な漢方薬を足さない）
+  const { s } = sel(['A3-3', 'A3c-1', ...QIDEF]);
+  const pool = s.groups[0].candidates.map((c) => c.name);
+  eq('STEP1 ニキビの候補群は効能に「にきび」を持つものだけ', pool.every((n) => ACNE_POOL.includes(n)) && ACNE_POOL.every((n) => pool.includes(n)), true);
+  eq('STEP1 気虚が強くても補中益気湯を候補に足さない', pool.includes('補中益気湯'), false);
+  // 合う候補がなければ推薦しない
+  eq('冷え・虚証の人のニキビ → 体質に合う候補なし（推薦しない）', [s.groups[0].outcome, s.groups[0].pick?.name], ['no_fit', undefined]);
+  eq('不適合の理由（寒熱が逆）を記録', s.groups[0].candidates.find((c) => c.name === '清上防風湯').mismatches.some((m) => m.axis === '寒熱'), true);
 }
 {
-  const ids = ['B1-1', 'B1-2', 'B2-1', 'B3-1', 'B4-1', 'B4-2', 'B5-1', 'B6-1', 'B7-1', 'B8-1', 'B9-1', 'B10-1', 'B12-1', 'B13-1', 'D1-1'];
-  const answers = { A3: ['A3-1'] };
-  for (const id of ids) (answers[id.split('-')[0]] ??= []).push(id);
-  const r = score(answers, QUESTIONS, { sex: 'male', tongueMode: 'self' });
-  const picks = recommendForCustomer(r, answers, [], FORMULAS);
-  eq('気虚 → 来店客向け 3件・1位 補中益気湯', [picks.length, picks[0]?.name], [3, '補中益気湯']);
-  eq('来店客向けは主な対象タイプが主体質・副体質', picks.every((c) => [...r.mainTypes, ...r.subTypes].includes(primaryType(FORMULAS.find((f) => f.code === c.code)))), true);
-  eq('来店客向けに矛盾・警告なし', picks.every((c) => c.conflicts.length === 0 && c.warnings.length === 0 && c.herbCautions.length === 0), true);
-  eq('来店客向けの根拠文', picks[0].customerReason.includes('気虚（100点）') && picks[0].customerReason.includes('疲れ・だるさ') && picks[0].customerReason.includes('冷えを温める'), true);
-  // 受診勧奨があれば出さない
-  const flags = safetyFlags({ ...answers, A4: ['A4-5', 'A4s-3'] });
-  eq('受診勧奨 → 来店客向けは出さない', recommendForCustomer(r, answers, flags, FORMULAS), []);
-  // 高血圧（甘草の注意）があると補中益気湯は来店客向けから外れ、担当者画面の候補には残る
-  const hb = safetyFlags({ C2: ['C2-1'] });
-  const picksHb = recommendForCustomer(r, answers, hb, FORMULAS);
-  eq('高血圧 → 甘草入りは来店客向けから外れる', picksHb.some((c) => c.cautionHerbs.includes('甘草')), false);
-  eq('高血圧 → 担当者画面の候補には残る', recommend(r, answers, hb, FORMULAS).some((c) => c.name === '補中益気湯'), true);
+  // STEP 2〜3：同じニキビでも体質で選ぶ漢方薬が変わる
+  eq('炎症・赤み＋体力あり（実熱）→ 清上防風湯', sel(['A3-3', 'A3c-1', ...HEAT]).s.groups[0].pick?.name, '清上防風湯');
+  eq('慢性に繰り返す・皮膚が浅黒い → 荊芥連翹湯', sel(['A3-3', 'A3c-2', 'A4-5', 'B2-5', 'B4-3', 'B12-5', 'B2-10', 'B3-9', 'B9-3', 'B5-10']).s.groups[0].pick?.name, '荊芥連翹湯');
+  const st = sel(['A3-3', 'A3c-3', 'A3-10', 'A3j-2', ...STASIS]).s;
+  eq('月経不順・のぼせを伴う（瘀血）→ 桂枝茯苓丸加薏苡仁', st.groups.map((g) => g.pick?.name), ['桂枝茯苓丸加薏苡仁', '桂枝茯苓丸加薏苡仁']);
+  eq('2つの主訴を1つでカバーする漢方薬は1枚にまとめる', customerPicks(st, sel(['A3-3', 'A3c-3', 'A3-10', 'A3j-2', ...STASIS]).r).picks.length, 1);
 }
 {
-  // 瘀血＋妊娠：桂枝茯苓丸は担当者画面に警告つきで出るが、来店客向けには出ない
-  const answers = { B1: ['B1-5'], B2: ['B2-5'], B3: ['B3-4'], B10: ['B10-4'], B11: ['B11-4'], C3: ['C3-1'], A3: ['A3-10'] };
-  const r = score(answers, QUESTIONS, { sex: 'female', tongueMode: 'staff' });
-  const flags = safetyFlags(answers);
-  eq('妊娠 → 来店客向けに桂枝茯苓丸は出ない', recommendForCustomer(r, answers, flags, FORMULAS).some((c) => c.name === '桂枝茯苓丸'), false);
-  eq('妊娠 → 担当者画面には警告つきで残る', recommend(r, answers, flags, FORMULAS, undefined, 36).find((c) => c.name === '桂枝茯苓丸').warnings, ['pregnancy']);
+  // 条件つきの効能（高血圧や肥満に伴う便秘）は条件を満たすときだけ候補
+  const no = sel(['A3-5', 'A3e-1', ...HEAT]).s.groups[0].candidates.map((c) => c.name);
+  const yes = sel(['A3-5', 'A3e-1', 'A3-11', 'A3k-1', ...HEAT]).s.groups[0].candidates.map((c) => c.name);
+  eq('防風通聖散の「肥満に伴う便秘」は肥満の主訴がないと候補にしない', [no.includes('防風通聖散'), yes.includes('防風通聖散')], [false, true]);
 }
 {
-  // 陽盛（熱寄り）に温める処方は矛盾
-  const answers = { B1: ['B1-9'], B2: ['B2-10'], B3: ['B3-9'], B4: ['B4-7'], B5: ['B5-9'], B6: ['B6-9'], B8: ['B8-8'], B9: ['B9-9'], B10: ['B10-9'], B12: ['B12-8'], B13: ['B13-8'], D1: ['D1-6'], A3: ['A3-2'] };
-  const r = score(answers, QUESTIONS, { sex: 'male', tongueMode: 'self' });
-  eq('陽盛 → thermalLabel hot', r.thermalLabel, 'hot');
-  const picks = recommendForCustomer(r, answers, [], FORMULAS);
-  eq('熱寄りの来店客向けに温める処方は出ない', picks.every((c) => FORMULAS.find((f) => f.code === c.code).thermal !== 'warm'), true);
-  eq('陽盛 → 1位 黄連解毒湯', picks[0]?.name, '黄連解毒湯');
-  const warmF = FORMULAS.find((f) => f.code === 'F31'); // 八味地黄丸（温・陽虚）
-  eq('矛盾の説明（主体質にない・虚実が逆・寒熱が逆）', conflictsOf(warmF, r).length, 3);
+  // STEP 4：安全性
+  const preg = sel(['A3-3', 'A3c-3', ...STASIS, 'C3-1']).s.groups[0];
+  eq('妊娠中 → 桂枝茯苓丸系は除外され、推薦されない', [preg.candidates.find((c) => c.name === '桂枝茯苓丸加薏苡仁').safety.status, ['桂枝茯苓丸', '桂枝茯苓丸加薏苡仁'].includes(preg.pick?.name)], ['excluded', false]);
+  const meds = sel(['A3-1', 'A3a-1', ...QIDEF, 'C1-1'], { 'C1-1': '' }).s.groups[0];
+  eq('服用薬の名前が未記入 → 推薦を確定せず要確認', [meds.outcome, meds.pick?.name, meds.pick?.safety.check.some((x) => x.includes('情報不足'))], ['pick_check', '補中益気湯', true]);
+  const hyp = sel(['A3-1', 'A3a-1', ...QIDEF, 'C2-1']).s.groups[0];
+  eq('高血圧 × 甘草 → 要確認（理由つき）', hyp.pick?.safety.check.some((x) => x.startsWith('甘草を含むため、高血圧')), true);
+  const ok = sel(['A3-1', 'A3a-1', ...QIDEF]).s.groups[0];
+  eq('安全上の問題がなければ確定の推薦', [ok.outcome, ok.pick?.name], ['pick', '補中益気湯']);
+  const refer = sel(['A3-1', 'A3a-1', ...QIDEF, 'A4-5', 'A4s-3']);
+  eq('受診勧奨 → 来店客向けの推薦は出さない', [refer.s.refer, customerPicks(refer.s, refer.r).picks.length], [true, 0]);
 }
 {
-  // 水滞が主体質で気虚がないとき、六君子湯（主な対象は気虚）は来店客向けに出ない
-  const answers = { B1: ['B1-6'], B2: ['B2-7'], B3: ['B3-5'], B4: ['B4-5'], B5: ['B5-6'], B6: ['B6-5'], B7: ['B7-4', 'B7-5'], B8: ['B8-5'], B9: ['B9-6'], B10: ['B10-6'], B12: ['B12-5'], B13: ['B13-5'], D1: ['D1-3'], A3: ['A3-6', 'A3-4'] };
-  const r = score(answers, QUESTIONS, { sex: 'male', tongueMode: 'self' });
-  eq('水滞 → mainTypes', r.mainTypes, ['fluid']);
-  const picks = recommendForCustomer(r, answers, [], FORMULAS);
-  eq('水滞 → 来店客向けは水滞が主な対象の処方だけ', picks.every((c) => primaryType(FORMULAS.find((f) => f.code === c.code)) === 'fluid'), true);
-  eq('水滞 → 1位 五苓散', picks[0]?.name, '五苓散');
+  // STEP 5：推薦理由の順序と内容
+  const x = sel(['A3-3', 'A3c-1', ...HEAT]);
+  const g = x.s.groups[0];
+  const rs = buildReasons(g, g.pick, x.r, { forCustomer: true });
+  eq('理由① 主訴：選んだ症状と承認効能の語', rs.complaint.includes('赤く腫れる・化膿しやすいニキビ') && rs.complaint.includes('「にきび」') && rs.complaint.includes('効能・効果'), true);
+  eq('理由② 体質：気血水・寒熱・虚実を実際の点数で', ['【気血水】', '【寒熱】', '【虚実】'].every((a) => rs.constitution.some((c) => c.startsWith(a))) && rs.constitution.some((c) => /陽盛 \d+点/.test(c)), true);
+  eq('理由② 使用目標と漢方の考え方は別の欄', [rs.useTarget.startsWith('体力中等度以上'), rs.action.includes('清熱')], [true, true]);
+  eq('理由③ 他の候補との比較（便秘があるので麻子仁丸も候補＝6種類）', rs.comparison.length >= 2 && rs.comparison[0].includes('候補6種類') && rs.comparison.some((c) => c.startsWith('荊芥連翹湯')), true);
+  eq('理由④ 服用前の注意（含まれる生薬）', rs.cautions.some((c) => c.startsWith('山梔子を含みます')) && rs.cautions.some((c) => c.startsWith('黄芩を含みます')), true);
+}
+{
+  // 主訴の詳細なし・候補なし・その他
+  const nd = sel(['A3-3', 'A3c-0', ...HEAT]).s.groups[0];
+  eq('詳細で「このなかにはない」→ 候補を絞らない', nd.outcome, 'no_detail');
+  const hair = sel(['A3-3', 'A3c-8', ...HEAT]).s.groups[0];
+  eq('抜け毛・白髪 → 承認効能に該当なし（候補なし）', hair.outcome, 'no_pool');
+  eq('主訴グループは A3 の選択順', complaintGroups(mk(['A3-10', 'A3-3', 'A3c-1', 'A3j-1'])).map((g) => g.key), ['A3-3', 'A3-10']);
 }
 
 // ---- 設問フロー ----
 eq('表示設問：女性・セルフ 27', visibleQuestions({ A1: ['A1-1'] }, 'self').length, 27);
 eq('表示設問：男性・スタッフ 24', visibleQuestions({ A1: ['A1-2'] }, 'staff').length, 24);
 eq('表示設問：性別未回答・セルフ 25（B11・C3 なし）', visibleQuestions({}, 'self').length, 25);
+eq('主訴「肌・髪」を選ぶと詳細 A3c が出る', visibleQuestions({ A1: ['A1-1'], A3: ['A3-3'] }, 'self').map((q) => q.id).includes('A3c'), true);
+eq('主訴の詳細は A3 の直後', visibleQuestions({ A1: ['A1-1'], A3: ['A3-3', 'A3-7'] }, 'self').slice(2, 6).map((q) => q.id), ['A3', 'A3c', 'A3g', 'A4']);
 eq('性別の読み取り', [sexFromAnswers({ A1: ['A1-1'] }), sexFromAnswers({ A1: ['A1-3'] }), sexFromAnswers({})], ['female', 'none', undefined]);
 {
   const b1 = q('B1');

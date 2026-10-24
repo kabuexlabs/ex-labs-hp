@@ -31,10 +31,12 @@ if (Astro.request.method === 'POST') {
 }
 ---
 <KampoLayout title="ログイン" width="narrow">
-  <div class="kp-card" style="max-width:520px;margin:40px auto 0">
-    <p class="kp-eyebrow">ESSENCE薬局</p>
-    <h1 class="kp-title">体質チェック（試験サイト）</h1>
-    <p class="kp-lede">スタッフ用のパスワードを入力してください。</p>
+  <section class="kp-hero kp-hero-sm">
+    <div class="kp-hero-title"><span>BODY</span><span>CHECK</span><span class="sky">KAMPO</span><small>体質チェック ／ 漢方（試験サイト）</small></div>
+  </section>
+  <div class="kp-card" style="max-width:560px;margin:0 auto">
+    <p class="kp-eyebrow">LOGIN</p>
+    <h1 class="kp-title" style="font-size:22px">スタッフ用パスワードを入力してください</h1>
     {loggedOut && <p class="kp-ok">ログアウトしました。</p>}
     {!isAuthConfigured() && <p class="kp-error">パスワードが未設定です。Vercel の環境変数に KAMPO_PASSWORD（または YOYAKU_ADMIN_KEY）を設定してください。</p>}
     {!isKvConfigured() && <p class="kp-notice">データ保存先（KV_REST_API_URL / KV_REST_API_TOKEN）が未設定のため、チェックの保存ができません。</p>}
@@ -43,8 +45,8 @@ if (Astro.request.method === 'POST') {
       <label class="kp-field">パスワード
         <input class="kp-input" type="password" name="password" required autofocus autocapitalize="off" autocomplete="current-password">
       </label>
-      <button class="kp-btn block" type="submit" style="margin-top:20px">ログイン</button>
+      <div style="text-align:center;margin-top:28px"><button class="kp-btn" type="submit" style="min-width:260px">ログイン</button></div>
     </form>
   </div>
-  <p class="kp-foot">このページは検索エンジンに掲載されません。株式会社ex Labs</p>
+  <p class="kp-foot"><span>このページは検索エンジンに掲載されません。</span><span>株式会社ex Labs</span></p>
 </KampoLayout>

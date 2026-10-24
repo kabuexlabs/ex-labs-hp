@@ -3,6 +3,7 @@
 // 性別が女性以外なら B11・C3 を、舌モードがスタッフなら B13 をスキップ（進捗は表示される問数で数える）。
 export const prerender = false;
 import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
+import QMark from '../../../../../../components/kampo/QMark.astro';
 import { BLOCK_LABEL, QUESTIONS } from '../../../../../../lib/kampo/masters';
 import { getSession, saveSession, getCustomer, saveCustomer } from '../../../../../../lib/kampo/store';
 import { visibleQuestions, firstUnansweredStep, normalizeAnswer, isAnswered, sexFromAnswers, ageBandFromAnswers } from '../../../../../../lib/kampo/flow';
@@ -62,67 +63,67 @@ const selected = new Set(s.answers[q.id] ?? []);
 const texts = s.texts;
 const isLast = stepNum === vis.length;
 const multi = q.type === 'multi';
-const hint = q.type === 'text' ? (q.optional ? '任意です。なければそのまま「次へ」を押してください。' : '') : multi ? `あてはまるものをすべて選んでください（複数回答可${q.max ? `・最大${q.max}つ` : ''}）` : '1つ選んでください';
+const hint = q.type === 'text' ? (q.optional ? '任意です。なければそのまま「次へ」を押してください。' : '') : multi ? `※複数回答可${q.max ? `（最大${q.max}つまで）` : ''}` : '';
 const withImages = q.options.some((o) => o.image);
-const qIndexInBlock = QUESTIONS.filter((x) => x.block === q.block).findIndex((x) => x.id === q.id) + 1;
+const qIndexInBlock = QUESTIONS.filter((x) => x.block === q.block && !x.showIf?.chosen).findIndex((x) => x.id === q.id) + 1;
+const meta = q.meta ?? `${BLOCK_LABEL[q.block]}　${q.block}${qIndexInBlock}`;
+// 短い選択肢は4列・3列で並べる（参考：横並びの枠）
+const maxLen = Math.max(...q.options.map((o) => o.text.length), 0);
+const cols = withImages ? '' : maxLen <= 8 && q.options.length >= 3 ? 'cols4' : maxLen <= 14 && q.options.length >= 3 ? 'cols3' : '';
 ---
-<KampoLayout title={`Q${stepNum} ${q.title}`} width="normal" withBar>
-  <div class="kp-progress" aria-label={`${vis.length}問中 ${stepNum}問目`}>
-    {vis.map((_, i) => <i class:list={[{ done: i < stepNum - 1, cur: i === stepNum - 1 }]}></i>)}
-  </div>
-  <div class="kp-card">
-    <div class="kp-qmeta"><span>{BLOCK_LABEL[q.block]}　{q.block}{qIndexInBlock}</span><span>Q{stepNum} / {vis.length}</span></div>
-    {q.block === 'C' && <p class="kp-eyebrow" style="margin-bottom:6px">安心してご提案するための確認です</p>}
-    <h1 class="kp-qtitle">{q.title}</h1>
+<KampoLayout title={`Q${stepNum} ${q.title}`} width="normal" progress={{ done: stepNum - 1, total: vis.length }}>
+  <form method="post" id="qform" data-type={q.type} data-max={q.max ?? 0} data-sub={q.sub ? '1' : '0'} data-optional={q.optional ? '1' : '0'}>
+    <p class="kp-qmeta">{meta}　Q{stepNum} / {vis.length}</p>
+    {q.block === 'C' && <p class="kp-eyebrow" style="letter-spacing:.14em;margin-bottom:4px">安心してご提案するための確認です</p>}
+    <div class="kp-q"><QMark /><h1 class="kp-qtitle">{q.title}</h1></div>
     {hint && <p class="kp-qhint">{hint}</p>}
-    {q.help && <p class="kp-note" style="margin:-8px 0 16px">{q.help}</p>}
-    {error && <p class="kp-error" style="margin-bottom:12px">{error}</p>}
-    <form method="post" id="qform" data-type={q.type} data-max={q.max ?? 0} data-sub={q.sub ? '1' : '0'} data-optional={q.optional ? '1' : '0'}>
-      {q.type === 'text' ? (
-        <textarea class="kp-input" name="text" rows="4" placeholder={q.placeholder}>{texts[q.id] ?? ''}</textarea>
-      ) : (
-        <div class:list={['kp-opts', { one: withImages }]}>
-          {q.options.map((o) => {
-            const none = o.flags?.includes('none');
-            const on = selected.has(o.id);
-            return (
-              <>
-                <label class:list={['kp-opt', { radio: !multi, none, 'is-on': on }]}>
-                  <input type={multi ? 'checkbox' : 'radio'} name="opt" value={o.id} checked={on} data-none={none ? '1' : '0'}>
-                  {o.image && <img class="kp-opt-img" src={o.image} alt="" width="72" height="90">}
-                  <span class="kp-opt-text">{o.text}</span>
-                </label>
-                {o.freeText && (
-                  <div class="kp-free" id={`free-${o.id}`} hidden={!on}>
-                    <input type="text" name={`t_${o.id}`} value={texts[o.id] ?? ''} placeholder={o.placeholder ?? '詳しく'} maxlength="300" autocomplete="off">
-                  </div>
-                )}
-              </>
-            );
-          })}
-        </div>
-      )}
-      {q.sub && (
-        <div class="kp-sub">
-          <h3>{q.sub.title}</h3>
-          <div class="kp-opts">
-            {q.sub.options.map((o) => (
-              <label class:list={['kp-opt', 'radio', { 'is-on': selected.has(o.id) }]}>
-                <input type="radio" name="sub" value={o.id} checked={selected.has(o.id)}>
+    {q.help && <p class="kp-qhelp">{q.help}</p>}
+    {error && <p class="kp-error" style="margin:0 0 16px">{error}</p>}
+    {q.type === 'text' ? (
+      <textarea class="kp-input" name="text" rows="4" placeholder={q.placeholder}>{texts[q.id] ?? ''}</textarea>
+    ) : (
+      <div class:list={['kp-opts', cols, { one: false }]}>
+        {q.options.map((o) => {
+          const none = o.flags?.includes('none');
+          const on = selected.has(o.id);
+          return (
+            <>
+              <label class:list={['kp-opt', { check: multi, none, 'is-on': on, 'has-img': !!o.image }]}>
+                <input type={multi ? 'checkbox' : 'radio'} name="opt" value={o.id} checked={on} data-none={none ? '1' : '0'}>
+                {o.image && <img class="kp-opt-img" src={o.image} alt="" width="150" height="186">}
                 <span class="kp-opt-text">{o.text}</span>
               </label>
-            ))}
-          </div>
-        </div>
-      )}
-      <div class="kp-bar">
-        <div class="kp-bar-in">
-          {stepNum > 1 ? <a class="kp-btn ghost" href={`/kampo/check/${s.id}/q/${stepNum - 1}/`}>戻る</a> : <span class="kp-btn ghost" aria-disabled="true" style="visibility:hidden">戻る</span>}
-          <button class="kp-btn" type="submit" id="nextBtn" disabled>{isLast ? '結果を見る' : '次へ'}</button>
+              {o.freeText && (
+                <div class="kp-free" id={`free-${o.id}`} hidden={!on}>
+                  <input type="text" name={`t_${o.id}`} value={texts[o.id] ?? ''} placeholder={o.placeholder ?? '詳しく'} maxlength="300" autocomplete="off">
+                </div>
+              )}
+            </>
+          );
+        })}
+      </div>
+    )}
+    {q.sub && (
+      <div class="kp-sub">
+        <div class="kp-q" style="margin-bottom:22px"><QMark /><h2 class="kp-qtitle" style="font-size:26px">{q.sub.title}</h2></div>
+        <div class:list={['kp-opts', q.sub.options.length >= 3 ? 'cols3' : '']}>
+          {q.sub.options.map((o) => (
+            <label class:list={['kp-opt', { 'is-on': selected.has(o.id) }]}>
+              <input type="radio" name="sub" value={o.id} checked={selected.has(o.id)}>
+              <span class="kp-opt-text">{o.text}</span>
+            </label>
+          ))}
         </div>
       </div>
-    </form>
-  </div>
+    )}
+    <hr class="kp-rule" style="margin:44px 0 36px">
+    <div class="kp-nav">
+      <div class="kp-nav-pill">
+        {stepNum > 1 ? <a class="tri-l" href={`/kampo/check/${s.id}/q/${stepNum - 1}/`}>戻る</a> : <span class="tri-l" aria-disabled="true">戻る</span>}
+        <button class="tri-r" type="submit" id="nextBtn" disabled>{isLast ? '結果を見る' : '次へ'}</button>
+      </div>
+    </div>
+  </form>
   <script is:inline>
   (function(){
     var form=document.getElementById('qform');if(!form)return;

@@ -31,18 +31,8 @@ const DISEASE: Record<string, { code: string; label: string; level: SafetyLevel;
   'C2-10': { code: 'other_disease', label: 'その他の病気', level: 'info' },
 };
 
-/** 安全フラグ → 候補カードで赤字にする注意生薬 */
-export const FLAG_HERBS: Record<string, string[]> = {
-  hypertension: ['麻黄', '附子', '甘草'],
-  heart: ['麻黄', '附子', '甘草'],
-  thyroid: ['麻黄', '附子', '甘草'],
-  glaucoma_bph: ['麻黄', '附子', '甘草'],
-  gi_weak: ['大黄', '石膏', '地黄'],
-  pregnancy: ['大黄', '芒硝', '牡丹皮', '桃仁', '紅花', '牛膝', '附子', '麻黄'],
-  lactation: ['大黄'],
-  interferon: ['柴胡'],
-};
 export const FLAG_LABEL: Record<string, string> = {
+  elderly: '高齢（70代以上）',
   meds: '服用中の薬あり', interferon: 'インターフェロン使用', hypertension: '高血圧', heart: '心臓の病気', thyroid: '甲状腺の病気',
   glaucoma_bph: '緑内障・前立腺肥大', kidney: '腎臓の病気', liver: '肝臓の病気', diabetes: '糖尿病', cancer: 'がん治療中', other_disease: 'その他の病気',
   gi_weak: '胃腸が弱い', pregnancy: '妊娠中・可能性あり', lactation: '授乳中', allergy: 'アレルギー歴', acute: '急性症状',
@@ -106,3 +96,95 @@ export function safetyFlags(answers: Answers, texts: FreeTexts = {}, tongueOverr
 }
 
 export const hasRefer = (flags: SafetyFlag[]) => flags.some((f) => f.level === 'refer');
+
+// ---------------------------------------------------------------------------
+// 漢方薬ごとの安全性の判定（二段階選定の STEP 4）。
+//   exclude … 推薦から除外（formulas.json の contraindications に当たる安全フラグ）
+//   check   … 推薦を確定せず「薬剤師の確認が必要」にする（相談事項・情報不足）
+//   notes   … 服用前に伝える一般的な注意（生薬ごと）。判定には影響しない
+// 一般用医薬品の添付文書の「相談すること」を初期値の目安にしている。薬剤師が調整する。
+// ---------------------------------------------------------------------------
+export interface FormulaSafetyInput {
+  name: string;
+  cautionHerbs: string[];
+  contraindications: string[];
+}
+export interface FormulaSafety {
+  status: 'ok' | 'check' | 'excluded';
+  exclude: string[];
+  check: string[];
+  notes: string[];
+}
+
+/** 生薬 × 安全フラグ → 確認が必要な理由 */
+const HERB_CHECKS: { herb: string; flags: string[]; text: string }[] = [
+  { herb: '甘草', flags: ['hypertension', 'heart', 'kidney'], text: '甘草を含むため、高血圧・心臓・腎臓の病気がある方は服用前に確認が必要です（むくみ・血圧上昇に注意）' },
+  { herb: '甘草', flags: ['elderly'], text: '甘草を含むため、高齢の方は服用前に確認が必要です' },
+  { herb: '麻黄', flags: ['hypertension', 'heart', 'thyroid', 'glaucoma_bph', 'elderly'], text: '麻黄を含むため、高血圧・心臓や甲状腺の病気・排尿困難がある方や高齢の方は服用前に確認が必要です' },
+  { herb: '大黄', flags: ['lactation'], text: '大黄を含むため、授乳中は服用前に確認が必要です（乳児の下痢）' },
+  { herb: '大黄', flags: ['gi_weak'], text: '大黄を含むため、胃腸が弱く下痢しやすい方は服用前に確認が必要です' },
+  { herb: '芒硝', flags: ['gi_weak', 'pregnancy'], text: '芒硝を含むため、胃腸が弱い方・妊娠中の方は服用前に確認が必要です' },
+  { herb: '附子', flags: ['pregnancy', 'heart'], text: '附子を含むため、妊娠中・妊娠の可能性がある方や心臓の病気がある方は服用前に確認が必要です' },
+  { herb: '柴胡', flags: ['interferon'], text: '柴胡を含むため、インターフェロン製剤を使用中の方は服用前に確認が必要です（間質性肺炎）' },
+  { herb: '桃仁', flags: ['pregnancy'], text: '桃仁を含むため、妊娠中・妊娠の可能性がある方は服用前に確認が必要です' },
+  { herb: '牡丹皮', flags: ['pregnancy'], text: '牡丹皮を含むため、妊娠中・妊娠の可能性がある方は服用前に確認が必要です' },
+  { herb: '紅花', flags: ['pregnancy'], text: '紅花を含むため、妊娠中・妊娠の可能性がある方は服用前に確認が必要です' },
+  { herb: '牛膝', flags: ['pregnancy'], text: '牛膝を含むため、妊娠中・妊娠の可能性がある方は服用前に確認が必要です' },
+  { herb: '地黄', flags: ['gi_weak'], text: '地黄を含むため、胃腸が弱い方は服用前に確認が必要です（胃の不快感・下痢）' },
+  { herb: '石膏', flags: ['gi_weak'], text: '石膏を含むため、胃腸が弱い方は服用前に確認が必要です' },
+  { herb: '黄芩', flags: ['liver'], text: '黄芩を含むため、肝臓の病気がある方は服用前に確認が必要です' },
+];
+/** 生薬ごとの一般的な注意（来店客にも伝える） */
+export const HERB_NOTES: Record<string, string> = {
+  甘草: '甘草を含みます。長く飲む場合や、甘草を含むほかの薬と一緒に飲む場合は、むくみ・血圧上昇などに注意します。',
+  麻黄: '麻黄を含みます。動悸・不眠・発汗過多・排尿困難などに注意します。',
+  大黄: '大黄を含みます。下痢・腹痛に注意し、ほかの下剤とは併用しません。',
+  芒硝: '芒硝を含みます。下痢・腹痛に注意し、ほかの下剤とは併用しません。',
+  附子: '附子を含みます。のぼせ・動悸・舌のしびれなどが出たら服用を中止して相談します。',
+  地黄: '地黄を含みます。胃の不快感・食欲不振・下痢に注意します。',
+  石膏: '石膏を含みます。胃腸の弱い方は注意します。',
+  桃仁: '桃仁を含みます。妊娠中・妊娠の可能性がある方は服用前に相談してください。',
+  牡丹皮: '牡丹皮を含みます。妊娠中・妊娠の可能性がある方は服用前に相談してください。',
+  紅花: '紅花を含みます。妊娠中・妊娠の可能性がある方は服用前に相談してください。',
+  牛膝: '牛膝を含みます。妊娠中・妊娠の可能性がある方は服用前に相談してください。',
+  山梔子: '山梔子を含みます。長期間（多くは5年以上）続けて飲む場合は、定期的に相談してください。',
+  黄芩: '黄芩を含みます。まれに間質性肺炎・肝機能障害の報告があります。から咳・息切れ・発熱や、強いだるさ・皮膚や白目が黄色くなるなどが出たら服用を中止して相談します。',
+};
+export const GENERAL_NOTES = [
+  '服用後に発疹・かゆみ・胃の不快感などが出たら、服用を中止して相談してください。',
+  'しばらく（目安として1か月ほど）服用しても改善がみられない場合は、薬剤師にご相談ください。',
+];
+
+/** 安全確認の回答から、その人の安全フラグ（高齢など設問から読み取るものを含む）の集合を作る */
+export function safetyContext(flags: SafetyFlag[], answers: Answers, texts: FreeTexts = {}): { codes: Set<string>; general: string[] } {
+  const codes = new Set(flags.map((f) => f.code));
+  if ((answers['A2'] ?? []).includes('A2-7')) codes.add('elderly');
+  const general: string[] = [];
+  // 安全確認の回答そのものが足りない → 推薦を確定しない
+  const missing: string[] = [];
+  if (!answers['C1']?.length) missing.push('服用中の薬');
+  if (!answers['C2']?.length) missing.push('治療中の病気');
+  if (!answers['C4']?.length) missing.push('アレルギー歴');
+  if ((answers['A1'] ?? []).includes('A1-1') && !answers['C3']?.length) missing.push('妊娠・授乳');
+  if (missing.length) general.push(`安全確認（${missing.join('・')}）の回答がないため、確認が必要です（情報不足）`);
+  if (codes.has('meds')) {
+    general.push((texts['C1-1'] ?? '').trim()
+      ? '服用中のお薬があるため、飲み合わせ（甘草などの重複を含む）の確認が必要です'
+      : '服用中のお薬の名前が未記入のため、飲み合わせを確認できていません（情報不足）');
+  }
+  const disease = ['kidney', 'liver', 'diabetes', 'cancer', 'other_disease', 'hypertension', 'heart', 'thyroid', 'glaucoma_bph'].filter((c) => codes.has(c));
+  if (disease.length) general.push(`治療中の病気（${disease.map((c) => FLAG_LABEL[c] ?? c).join('・')}）があるため、主治医の指示とあわせて確認が必要です`);
+  if (codes.has('allergy')) general.push('アレルギー・漢方で体調を崩した経験があるため、含まれる生薬との照合が必要です');
+  if (codes.has('pregnancy')) general.push('妊娠中・妊娠の可能性があるため、服用前に確認が必要です');
+  return { codes, general };
+}
+
+export function assessFormulaSafety(f: FormulaSafetyInput, ctx: { codes: Set<string>; general: string[] }): FormulaSafety {
+  const exclude = f.contraindications.filter((c) => ctx.codes.has(c)).map((c) => `${FLAG_LABEL[c] ?? c}に当たるため除外`);
+  const check: string[] = [...ctx.general];
+  for (const r of HERB_CHECKS) {
+    if (f.cautionHerbs.includes(r.herb) && r.flags.some((c) => ctx.codes.has(c)) && !check.includes(r.text)) check.push(r.text);
+  }
+  const notes = [...new Set(f.cautionHerbs.map((h) => HERB_NOTES[h]).filter((x): x is string => !!x))];
+  return { status: exclude.length ? 'excluded' : check.length ? 'check' : 'ok', exclude, check, notes };
+}

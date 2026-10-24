@@ -3,6 +3,7 @@
 export const prerender = false;
 import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
 import AdviceBlock from '../../../../../../components/kampo/AdviceBlock.astro';
+import ResultTabs from '../../../../../../components/kampo/ResultTabs.astro';
 import { isTypeKey, TYPE_DEFS } from '../../../../../../lib/kampo/masters';
 import { getSession } from '../../../../../../lib/kampo/store';
 
@@ -16,15 +17,18 @@ const d = TYPE_DEFS[type];
 const others = [...(s.scores?.mainTypes ?? []), ...(s.scores?.subTypes ?? [])].filter((t) => t !== type);
 ---
 <KampoLayout title={`${d.name}の改善アドバイス`} width="normal">
-  <a slot="actions" class="kp-btn ghost small no-print" href={`/kampo/check/${s.id}/result/`}>結果に戻る</a>
-  <button slot="actions" class="kp-btn ghost small no-print" type="button" onclick="window.print()">印刷</button>
+  <button slot="actions" class="kp-btn pink small no-print" type="button" onclick="window.print()">印刷する</button>
+  <ResultTabs id={s.id} active="advice" adviceType={type} />
+  <h1 class="kp-h1">あなたの<span class="sky">改善アドバイス</span></h1>
   <AdviceBlock type={type} answers={s.answers} pct={pct} />
-  <div class="kp-card no-print" style="margin-top:16px;background:var(--accent-soft);border-color:#CFE3DB">
-    <h2 style="font-size:18px">薬剤師があなたに合う漢方をご提案します</h2>
-    <p style="font-size:15px;margin-top:6px">養生とあわせて、体質と安全確認の内容に合う漢方を薬剤師がご提案します。気になることはお気軽にご相談ください。</p>
+  <div class="kp-panel no-print" style="background:var(--sky-mist)">
+    <h2>薬剤師があなたに合う漢方をご提案します</h2>
+    <div class="kp-panel-b"><p style="font-size:15px">養生とあわせて、気になる症状と体質に合う漢方薬を薬剤師がご提案します。<a href={`/kampo/check/${s.id}/result/#kampo`}>おすすめの漢方薬を見る</a></p></div>
   </div>
-  <div class="no-print" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:20px">
-    <a class="kp-btn ghost" href={`/kampo/check/${s.id}/result/`}>結果に戻る</a>
-    {others.map((t) => <a class="kp-btn ghost" href={`/kampo/check/${s.id}/advice/${t}/`}>{TYPE_DEFS[t].name}のアドバイスを見る</a>)}
-  </div>
+  {others.length > 0 && (
+    <div class="kp-panel no-print"><h2>ほかの体質の改善アドバイス</h2>
+      <div class="kp-panel-b" style="display:flex;gap:12px;flex-wrap:wrap">{others.map((t) => <a class="kp-btn ghost" href={`/kampo/check/${s.id}/advice/${t}/`}>{TYPE_DEFS[t].name}のアドバイスを見る</a>)}</div>
+    </div>
+  )}
+  <div class="kp-nav no-print" style="margin-top:36px"><div class="kp-nav-pill"><a class="tri-l" href={`/kampo/check/${s.id}/result/`}>結果に戻る</a><a class="tri-r" href={`/kampo/check/${s.id}/result/#kampo`}>漢方薬を見る</a></div></div>
 </KampoLayout>
