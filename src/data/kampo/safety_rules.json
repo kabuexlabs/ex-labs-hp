@@ -1,0 +1,31 @@
+{
+ "version": "v2-draft-2026-10-25",
+ "review": {"status": "draft", "source": "開発用の草案（2026-10-25 作成。仕様書 v2 の例と一般的な漢方の成書の記載を参考にした。専門家未確認）", "reviewer": null, "reviewedAt": null},
+ "note": "安全性の確認規則（草案）。製品の禁忌・相互作用・副作用は products.json（公式資料）を正とし、ここは製品情報が未登録の間の保守的な確認項目。",
+ "herbChecks": [
+   {"herb": "甘草", "when": ["dx_hypertension", "dx_heart", "dx_kidney", "med_diuretic", "age_70s"], "text": "甘草を含むため、高血圧・心臓・腎臓の病気、利尿薬の併用、高齢の方は偽アルドステロン症（むくみ・血圧上昇・低カリウム）に注意が必要です"},
+   {"herb": "甘草", "when": ["med_licorice", "med_kampo"], "text": "甘草を含むため、甘草を含むほかの薬（漢方薬・かぜ薬・胃腸薬など）との重複に注意が必要です"},
+   {"herb": "麻黄", "when": ["dx_hypertension", "dx_heart", "dx_thyroid", "dx_glaucoma", "dx_prostate", "med_antihypertensive", "med_thyroid", "age_70s"], "text": "麻黄を含むため、高血圧・心臓や甲状腺の病気・緑内障・排尿障害・高齢、関連する薬の併用に注意が必要です"},
+   {"herb": "大黄", "when": ["lactation"], "text": "大黄を含むため、授乳中は乳児の下痢に注意が必要です"},
+   {"herb": "大黄", "when": ["dx_gi", "med_laxative"], "text": "大黄を含むため、胃腸の病気や下剤の併用に注意が必要です"},
+   {"herb": "芒硝", "when": ["dx_gi", "med_laxative", "dx_kidney"], "text": "芒硝を含むため、胃腸の病気・下剤の併用・腎臓の病気に注意が必要です"},
+   {"herb": "附子", "when": ["dx_heart", "age_10s"], "text": "附子を含むため、心臓の病気・小児（10代）に注意が必要です"},
+   {"herb": "柴胡", "when": ["med_interferon"], "text": "柴胡を含むため、インターフェロン製剤との併用に注意が必要です（小柴胡湯は併用禁忌）"},
+   {"herb": "地黄", "when": ["dx_gi"], "text": "地黄を含むため、胃腸の弱い方は胃の不快感・下痢に注意が必要です"},
+   {"herb": "石膏", "when": ["dx_gi"], "text": "石膏を含むため、胃腸の弱い方は注意が必要です"},
+   {"herb": "黄芩", "when": ["dx_liver"], "text": "黄芩を含むため、肝臓の病気がある方は肝機能障害・間質性肺炎の報告に注意が必要です"},
+   {"herb": "山梔子", "when": ["dx_gi"], "text": "山梔子を含むため、長期服用時は腸間膜静脈硬化症の報告に注意が必要です"}
+ ],
+ "pregnancyExcludeHerbs": ["大黄", "芒硝", "桃仁", "牡丹皮", "紅花", "牛膝", "附子"],
+ "pregnancyCheckHerbs": ["麻黄", "枳実", "厚朴", "呉茱萸", "乾姜"],
+ "medChecks": [
+   {"when": "med_anticoagulant", "text": "血液をサラサラにする薬を服用中のため、併用の可否を確認してください"},
+   {"when": "med_steroid", "text": "ステロイドを服用中のため、甘草含有製剤の併用（低カリウム血症）などを確認してください"},
+   {"when": "med_anticancer", "text": "抗がん剤を服用中のため、主治医への確認が必要です"},
+   {"when": "med_other", "text": "その他の薬を服用中のため、薬名を確認してください"},
+   {"when": "med_hormone", "text": "ホルモン剤を服用中のため、月経関連の所見の解釈と併用を確認してください"}
+ ],
+ "formulaRules": [
+   {"formulas": ["F55"], "when": ["dx_hypertension", "dx_heart", "dx_kidney", "med_diuretic", "age_70s"], "state": "check", "text": "芍薬甘草湯は1日量あたりの甘草が多い処方です。偽アルドステロン症・低カリウム血症のリスクを確認してください"}
+ ]
+}

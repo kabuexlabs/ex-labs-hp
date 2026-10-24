@@ -1,34 +1,30 @@
 ---
-// 改善アドバイス（来店客向け）：特徴／生活養生（心・食・動・休）／おすすめのツボ／あなたへの一言／監修者。
+// 養生アドバイス（薬剤師の説明用。PIN 必須）：特徴／生活養生（心・食・動・休）／おすすめのツボ／あなたへの一言／監修者。
+// 漢方薬は出さない（仕様書 §25⑪）。
 export const prerender = false;
 import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
 import AdviceBlock from '../../../../../../components/kampo/AdviceBlock.astro';
 import ResultTabs from '../../../../../../components/kampo/ResultTabs.astro';
-import { isTypeKey, TYPE_DEFS } from '../../../../../../lib/kampo/masters';
-import { getSession } from '../../../../../../lib/kampo/store';
+import { isAdviceKey, TYPE_DEFS, ADVICE_KEYS } from '../../../../../../lib/kampo/masters';
+import { getSession, isV2 } from '../../../../../../lib/kampo/store';
 
 const s = await getSession(Astro.params.id ?? '');
-if (!s) return Astro.redirect('/kampo/check/new/?msg=notfound', 303);
+if (!s) return Astro.redirect('/kampo/staff/?msg=notfound', 303);
 const type = Astro.params.type ?? '';
-if (!isTypeKey(type)) return Astro.redirect(`/kampo/check/${s.id}/result/`, 303);
-if (s.status === 'in_progress') return Astro.redirect(`/kampo/check/${s.id}/`, 303);
-const pct = s.scores?.pct[type];
+if (!isV2(s) || !isAdviceKey(type)) return Astro.redirect(`/kampo/check/${s.id}/result/`, 303);
+if (s.status === 'in_progress') return Astro.redirect(`/kampo/staff/session/${s.id}/`, 303);
 const d = TYPE_DEFS[type];
-const others = [...(s.scores?.mainTypes ?? []), ...(s.scores?.subTypes ?? [])].filter((t) => t !== type);
+const others = ADVICE_KEYS.filter((k) => k !== type);
 ---
-<KampoLayout title={`${d.name}の改善アドバイス`} width="normal">
+<KampoLayout title={`${d.name}の養生アドバイス`} width="normal">
+  <a slot="actions" class="kp-btn ghost small no-print" href={`/kampo/staff/session/${s.id}/`}>担当者画面へ戻る</a>
   <button slot="actions" class="kp-btn pink small no-print" type="button" onclick="window.print()">印刷する</button>
   <ResultTabs id={s.id} active="advice" adviceType={type} />
-  <h1 class="kp-h1">あなたの<span class="sky">改善アドバイス</span></h1>
-  <AdviceBlock type={type} answers={s.answers} pct={pct} />
-  <div class="kp-panel no-print" style="background:var(--sky-mist)">
-    <h2>薬剤師があなたに合う漢方をご提案します</h2>
-    <div class="kp-panel-b"><p style="font-size:15px">養生とあわせて、気になる症状と体質に合う漢方薬を薬剤師がご提案します。<a href={`/kampo/check/${s.id}/result/#kampo`}>おすすめの漢方薬を見る</a></p></div>
-  </div>
-  {others.length > 0 && (
-    <div class="kp-panel no-print"><h2>ほかの体質の改善アドバイス</h2>
-      <div class="kp-panel-b" style="display:flex;gap:12px;flex-wrap:wrap">{others.map((t) => <a class="kp-btn ghost" href={`/kampo/check/${s.id}/advice/${t}/`}>{TYPE_DEFS[t].name}のアドバイスを見る</a>)}</div>
-    </div>
-  )}
-  <div class="kp-nav no-print" style="margin-top:36px"><div class="kp-nav-pill"><a class="tri-l" href={`/kampo/check/${s.id}/result/`}>結果に戻る</a><a class="tri-r" href={`/kampo/check/${s.id}/result/#kampo`}>漢方薬を見る</a></div></div>
+  <h1 class="kp-h1">あなたの<span class="sky">養生アドバイス</span></h1>
+  <AdviceBlock type={type} answers={s.answers} />
+  <details class="kp-fold no-print">
+    <summary>ほかの体質の養生アドバイス</summary>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">{others.map((k) => <a class="kp-btn ghost small" href={`/kampo/check/${s.id}/advice/${k}/`}>{TYPE_DEFS[k].name}</a>)}</div>
+  </details>
+  <div class="kp-nav no-print" style="margin-top:36px"><div class="kp-nav-pill"><a class="tri-l" href={`/kampo/check/${s.id}/result/`}>体質の説明に戻る</a><a class="tri-r" href={`/kampo/staff/session/${s.id}/`}>担当者画面へ</a></div></div>
 </KampoLayout>

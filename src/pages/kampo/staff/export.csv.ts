@@ -1,10 +1,13 @@
-// スタッフ画面の CSV 書き出し（全セッションの一覧と回答）。middleware の kampoGuard で PIN 認証必須。
+// スタッフ画面の CSV 書き出し（全セッションの一覧・判定の要約・回答）。middleware の kampoGuard で PIN 認証必須。
+// v2 のセッションは患者向けの各設問（主訴の詳細問診・安全上の確認はまとめて1列）、薬剤師の追加質問は1列にまとめる。
+// v1 のセッションは回答を「v1の回答」1列にまとめる（判定は再計算しない）。
 export const prerender = false;
 import type { APIRoute } from 'astro';
-import { TYPES, TYPE_DEFS, QUESTIONS, optionText } from '../../../lib/kampo/masters';
+import { QUESTIONS, STAFF_QUESTIONS, LEGACY, optionText, questionById } from '../../../lib/kampo/masters';
 import { isStaffAuthed } from '../../../lib/kampo/auth';
-import { mainComplaintGroup, companionComplaints } from '../../../lib/kampo/recommend';
-import { isKvConfigured, listAllSessions, audit, fmtJst, jstDate } from '../../../lib/kampo/store';
+import { walk } from '../../../lib/kampo/flow';
+import { complaintLabel } from '../../../lib/kampo/compute';
+import { isKvConfigured, listAllSessions, audit, fmtJst, jstDate, isV2 } from '../../../lib/kampo/store';
 
 const esc = (v: unknown) => {
   const s = v === undefined || v === null ? '' : String(v);
@@ -16,31 +19,33 @@ export const GET: APIRoute = async ({ cookies }) => {
   if (!isKvConfigured()) return new Response('kv not configured', { status: 503 });
   const sessions = await listAllSessions();
   await audit('export_csv', `${sessions.length}件`);
-  // 主訴の詳細問診（S*。100問）は列にせず「主訴の詳細」1列にまとめる
-  const cols = QUESTIONS.filter((q) => q.role !== 'detail');
+  const cols = QUESTIONS.filter((q) => q.section !== 'detail' && q.section !== 'redflag');
+  const legacyQ = new Map(LEGACY.questions.map((q) => [q.id, q]));
   const header = [
-    'セッションID', '開始日時', '完了日時', '状態', 'お客様', '顧客ID', '入力者', '舌モード', '設問版',
-    '主体質', '副体質', ...TYPES.map((t) => `${TYPE_DEFS[t].name}%`), '虚実指数', '虚実', '寒熱指数', '寒熱', 'バランス良好',
-    '安全フラグ', '薬剤師の舌所見', '担当', '提案', '渡し方', 'メモ', '提案保存日時',
-    'いちばん改善したい主訴', '主訴の詳細', 'ほかの主訴（随伴症状）',
-    ...cols.map((q) => `${q.id} ${q.title.replace(/「\{main\}」/g, '主訴')}`),
+    'セッションID', '開始日時', '送信日時', '状態', 'お客様', '顧客ID', '入力者', '舌モード', '設問版',
+    '優先主訴', 'その他の主訴', '主証', '併存証', '寒熱', '虚実', '五臓', '整合性', '緊急', '受診勧奨', '安全性',
+    '優先検討候補', '検討候補', '確認待ち', '除外・対象外', '候補（分類）',
+    '担当', '提案', '渡し方', 'メモ', '提案保存日時',
+    '主訴の詳細', '安全上の確認', ...cols.map((q) => `${q.id} ${q.title}`), '薬剤師の追加質問', '副作用歴の原因生薬の記録', 'v1の回答',
   ];
   const rows = sessions.map((s) => {
-    const r = s.scores;
-    const g = mainComplaintGroup(s.answers, s.texts);
-    const ans = cols.map((q) => {
-      if (q.type === 'text') return s.texts[q.id] ?? '';
-      return (s.answers[q.id] ?? []).map((id) => optionText(id) + (s.texts[id] ? `（${s.texts[id]}）` : '')).join('｜');
-    });
+    const sn = s.snapshot;
+    const v2 = isV2(s);
+    const w = v2 ? walk(s.answers, s.tongueMode) : null;
+    const ans = (sec: string) => (w ? w.steps.filter((x) => x.q.section === sec).map((x) => `${x.q.id}:${x.ids.map(optionText).join('・')}`).join('｜') : '');
+    const cand = (sn?.candidates as { candidates?: { name: string; klass: string }[] } | undefined)?.candidates ?? [];
     return [
       s.id, fmtJst(s.startedAt), s.completedAt ? fmtJst(s.completedAt) : '', s.status, s.customerLabel, s.customerId ?? '', s.inputBy, s.tongueMode, s.questionnaireVersion,
-      r ? r.mainTypes.map((t) => TYPE_DEFS[t].name).join('・') : '', r ? r.subTypes.map((t) => TYPE_DEFS[t].name).join('・') : '',
-      ...TYPES.map((t) => (r ? r.pct[t] : '')), r?.defExcIndex ?? '', r?.defExcLabel ?? '', r?.thermalIndex ?? '', r?.thermalLabel ?? '', r ? (r.isBalanced ? '1' : '0') : '',
-      (s.safetyFlags ?? []).map((f) => `${f.level}:${f.code}`).join('｜'), (s.tongueOverride ?? []).map(optionText).join('｜'),
+      v2 ? complaintLabel(sn?.primaryComplaint) : '', (sn?.complaints ?? []).filter((c) => c !== sn?.primaryComplaint).map((c) => complaintLabel(c)).join('｜'),
+      sn ? (sn.primaryPattern.status === 'determined' ? sn.primaryPattern.name : '保留') : '', (sn?.coexisting ?? []).join('・'), sn?.coldHeat ?? '', sn?.defExc ?? '', sn?.zang ?? '', sn?.consistency ?? '',
+      sn ? (sn.emergency ? '1' : '0') : '', sn?.redflags ?? '', sn?.safetyState ?? '',
+      sn?.classes.priority ?? '', sn?.classes.consider ?? '', sn?.classes.pending ?? '', sn?.classes.excluded ?? '', cand.map((c) => `${c.name}:${c.klass}`).join('｜'),
       s.proposal?.staffName ?? '', (s.proposal?.selected ?? []).map((x) => x.name).join('・'), s.proposal?.deliveredVia ?? '', s.proposal?.note ?? '', s.proposal ? fmtJst(s.proposal.updatedAt) : '',
-      g ? `${g.label}（${g.category}）` : '', g ? g.details.map((d) => d.text).join('｜') : '',
-      companionComplaints(s.answers, s.texts).map((c) => `${c.label}（${c.category}）`).join('｜'),
-      ...ans,
+      ans('detail'), ans('redflag'),
+      ...cols.map((q) => (w ? (w.steps.find((x) => x.q.id === q.id)?.ids ?? []).map(optionText).join('｜') : '')),
+      Object.entries(s.staffAnswers ?? {}).filter(([k]) => STAFF_QUESTIONS.some((q) => q.id === k)).map(([k, v]) => `${k} ${questionById(k)?.title ?? ''}：${v.map(optionText).join('・')}`).join('｜'),
+      (s.adverseRecords ?? []).map((r) => `${r.formulaId}:${r.causalHerbs.join('・')}（${r.staffName} ${fmtJst(r.at)}）`).join('｜'),
+      v2 ? '' : Object.entries(s.answers).map(([k, v]) => `${k}:${v.map((x) => (legacyQ.get(k)?.options[x] ?? x) + (s.texts?.[x] ? `（${s.texts[x]}）` : '')).join('・')}`).join('｜'),
     ].map(esc).join(',');
   });
   const csv = '﻿' + [header.map(esc).join(','), ...rows].join('\r\n') + '\r\n';

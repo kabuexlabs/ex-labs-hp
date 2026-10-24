@@ -1,12 +1,11 @@
 ---
-// 結果まわりのタブ（体質チェック結果／改善アドバイス／おすすめの漢方薬）
-export interface Props { id: string; active: 'result' | 'advice' | 'kampo'; adviceType?: string }
+// 体質の説明画面のタブ（体質の説明／養生アドバイス）。漢方薬は患者向けの画面に出さない（仕様書 §25⑪）
+export interface Props { id: string; active: 'result' | 'advice'; adviceType?: string }
 const { id, active, adviceType } = Astro.props;
 const base = `/kampo/check/${id}`;
 const tabs = [
-  { key: 'result', label: '体質チェック結果', href: `${base}/result/#result` },
-  { key: 'advice', label: '改善アドバイス', href: adviceType ? `${base}/advice/${adviceType}/` : `${base}/result/#advice` },
-  { key: 'kampo', label: 'おすすめの漢方薬', href: `${base}/result/#kampo` },
+  { key: 'result', label: '体質の説明', href: `${base}/result/#result` },
+  { key: 'advice', label: '養生アドバイス', href: adviceType ? `${base}/advice/${adviceType}/` : `${base}/result/#advice` },
 ];
 ---
 <nav class="kp-tabs no-print" aria-label="結果の項目">

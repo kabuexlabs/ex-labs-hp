@@ -1,0 +1,21 @@
+---
+// 担当薬剤師の入力（KAMPO_STAFF_NAMES があれば選択式＋「その他」、なければ文字入力）。
+// 受け取り側：value = form.get(name) === '__other' ? form.get(`${name}Other`) : form.get(name)
+export interface Props { names: string[]; current?: string; name?: string; label?: string; required?: boolean }
+const { names, current = '', name = 'staffName', label = '担当薬剤師', required = false } = Astro.props;
+const other = !!current && !names.includes(current);
+---
+<label class="kp-field" style="margin-top:0">{label}
+  {names.length ? (
+    <>
+      <select class="kp-input" name={name} data-staffname required={required}>
+        <option value="">選択してください</option>
+        {names.map((n) => <option value={n} selected={n === current}>{n}</option>)}
+        <option value="__other" selected={other}>その他（入力）</option>
+      </select>
+      <input class="kp-input" type="text" name={`${name}Other`} value={other ? current : ''} placeholder="担当者名" style="margin-top:8px" hidden={!other} data-staffname-other maxlength="40">
+    </>
+  ) : (
+    <input class="kp-input" type="text" name={name} value={current} placeholder="氏名（KAMPO_STAFF_NAMES に登録すると選択式になります）" required={required} maxlength="40">
+  )}
+</label>

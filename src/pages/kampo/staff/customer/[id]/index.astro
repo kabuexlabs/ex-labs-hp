@@ -1,16 +1,22 @@
 ---
-// 顧客履歴：同一識別子の過去セッションを新しい順に。スコアの推移と提案の履歴。
+// 顧客履歴：同一識別子の過去セッションを新しい順に。判定の要約（送信・提案時のスナップショット）と提案の履歴、気血水の得点の推移。
 export const prerender = false;
 import KampoLayout from '../../../../../layouts/KampoLayout.astro';
-import { TYPES, TYPE_DEFS } from '../../../../../lib/kampo/masters';
+import { PATTERNS, TYPE_DEFS, LEGACY } from '../../../../../lib/kampo/masters';
 import { SEX_LABEL, AGE_BAND_LABEL, type Sex } from '../../../../../lib/kampo/flow';
-import { getCustomer, listCustomerSessions, audit, fmtJst, customerLabel, STATUS_LABEL, typeNamesOf } from '../../../../../lib/kampo/store';
+import { complaintLabel } from '../../../../../lib/kampo/compute';
+import { getCustomer, listCustomerSessions, audit, fmtJst, customerLabel, STATUS_LABEL, isV2 } from '../../../../../lib/kampo/store';
 
 const c = await getCustomer(Astro.params.id ?? '');
 if (!c) return Astro.redirect('/kampo/staff/?msg=notfound', 303);
 const sessions = await listCustomerSessions(c.id);
 await audit('view_customer', c.id);
-const scored = sessions.filter((s) => s.scores);
+const scored = sessions.filter((s) => isV2(s) && s.snapshot?.patternScores);
+const primaryOf = (s: (typeof sessions)[number]) => {
+  if (!isV2(s)) return `${(s.scores?.mainTypes ?? []).map((t) => LEGACY.types[t] ?? t).join('・') || '—'}（v1）`;
+  const p = s.snapshot?.primaryPattern;
+  return !p ? '—' : p.status === 'determined' ? p.name : '保留';
+};
 ---
 <KampoLayout title={`顧客履歴 ${customerLabel(c)}`} mode="staff" width="wide">
   <a slot="actions" class="kp-btn ghost small" href="/kampo/staff/">一覧へ</a>
@@ -32,13 +38,14 @@ const scored = sessions.filter((s) => s.scores);
     <h2 class="kp-h2" style="margin-top:0">チェックと提案の履歴</h2>
     {sessions.length === 0 ? <p class="kp-note">まだチェックがありません。</p> : (
       <table class="kp-table">
-        <thead><tr><th>日時</th><th>状態</th><th>主体質</th><th>副体質</th><th>提案</th><th>担当</th><th>メモ</th><th></th></tr></thead>
+        <thead><tr><th>日時</th><th>状態</th><th>優先主訴</th><th>主証</th><th>寒熱</th><th>提案</th><th>担当</th><th>メモ</th><th></th></tr></thead>
         <tbody>{sessions.map((s) => (
           <tr>
             <td>{fmtJst(s.startedAt)}</td>
             <td><span class:list={['kp-chip', { ok: s.status === 'proposed' }]}>{STATUS_LABEL[s.status]}</span></td>
-            <td>{s.scores ? (s.scores.isBalanced ? 'バランス良好' : typeNamesOf(s.scores.mainTypes, TYPE_DEFS)) : '—'}</td>
-            <td>{s.scores ? typeNamesOf(s.scores.subTypes, TYPE_DEFS) || '—' : '—'}</td>
+            <td>{isV2(s) ? complaintLabel(s.snapshot?.primaryComplaint) : '—'}</td>
+            <td>{primaryOf(s)}</td>
+            <td>{s.snapshot?.coldHeat ?? '—'}</td>
             <td>{s.proposal?.selected.map((x) => x.name).join('・') || '—'}</td>
             <td>{s.proposal?.staffName ?? '—'}</td>
             <td style="max-width:260px;white-space:pre-wrap">{s.proposal?.note ?? ''}</td>
@@ -51,14 +58,14 @@ const scored = sessions.filter((s) => s.scores);
 
   {scored.length > 0 && (
     <div class="kp-card">
-      <h2 class="kp-h2" style="margin-top:0">スコアの推移（%）</h2>
+      <h2 class="kp-h2" style="margin-top:0">気血水の得点の推移 <small class="kp-note">重み 3/2/1 の暫定点（草案）</small></h2>
       <table class="kp-table">
-        <thead><tr><th>タイプ</th>{scored.map((s) => <th class="num">{fmtJst(s.startedAt).slice(0, 10)}</th>)}</tr></thead>
-        <tbody>{TYPES.map((k) => (
-          <tr><td><span style={`display:inline-block;width:10px;height:10px;border-radius:3px;background:${TYPE_DEFS[k].color};margin-right:6px`}></span>{TYPE_DEFS[k].name}</td>{scored.map((s) => <td class="num" style={s.scores!.mainTypes.includes(k) ? 'font-weight:700' : ''}>{s.scores!.pct[k]}</td>)}</tr>
+        <thead><tr><th>証</th>{scored.map((s) => <th class="num">{fmtJst(s.startedAt).slice(0, 10)}</th>)}</tr></thead>
+        <tbody>{PATTERNS.map((p) => (
+          <tr><td><span style={`display:inline-block;width:10px;height:10px;border-radius:3px;background:${TYPE_DEFS[p.id].color};margin-right:6px`}></span>{p.name}</td>{scored.map((s) => <td class="num" style={s.snapshot!.primaryPattern.id === p.id ? 'font-weight:700' : ''}>{s.snapshot!.patternScores[p.id] ?? 0}</td>)}</tr>
         ))}
-          <tr><td>虚実指数</td>{scored.map((s) => <td class="num">{s.scores!.defExcIndex}</td>)}</tr>
-          <tr><td>寒熱指数</td>{scored.map((s) => <td class="num">{s.scores!.thermalIndex}</td>)}</tr>
+          <tr><td>寒熱</td>{scored.map((s) => <td class="num">{s.snapshot!.coldHeat}</td>)}</tr>
+          <tr><td>虚実</td>{scored.map((s) => <td class="num">{s.snapshot!.defExc}</td>)}</tr>
         </tbody>
       </table>
     </div>

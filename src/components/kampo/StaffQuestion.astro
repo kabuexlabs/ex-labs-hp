@@ -1,0 +1,40 @@
+---
+// 薬剤師の追加質問（選択式）1問分のフォーム。回答は所見に統合して再計算する（担当者画面の action=staffq）。
+// 各選択肢の横に、患者の回答での状態（あり／なし／わからない／未質問）を出す。
+import { STAFF_CATEGORY_LABEL, type Question } from '../../lib/kampo/masters';
+import { statusOf, ANSWER_STATUS_LABEL, type FindingState } from '../../lib/kampo/findings';
+export interface Props { q: Question; current?: string[]; patient: FindingState; reasons?: string[]; answeredAt?: string; compact?: boolean }
+const { q, current = [], patient, reasons = [], answeredAt, compact = false } = Astro.props;
+const on = new Set(current);
+const multi = q.type === 'multi';
+const st = (o: Question['options'][number]) => {
+  const f = o.findings?.[0];
+  if (!f) return '';
+  const s = statusOf(patient, f);
+  return s === 'not_asked' ? '' : `患者：${ANSWER_STATUS_LABEL[s]}`;
+};
+---
+<form method="post" class="kp-sq" id={`sq-${q.id}`} data-staffq>
+  <input type="hidden" name="action" value="staffq">
+  <input type="hidden" name="qid" value={q.id}>
+  <div class="kp-sq-h">
+    <b>{q.title}</b>
+    <span class="kp-chip">{STAFF_CATEGORY_LABEL[q.staff!.category]}</span>
+    {q.staff!.source === 'pharmacist_observation' && <span class="kp-chip ok">薬剤師の観察</span>}
+    {current.length > 0 && <span class="kp-chip ok">回答済み{answeredAt ? `（${answeredAt}）` : ''}</span>}
+  </div>
+  {reasons.length > 0 && <ul class="kp-sq-why">{reasons.map((r) => <li>{r}</li>)}</ul>}
+  {q.searchable && <input class="kp-input kp-sq-search" type="search" placeholder="名前の一部で絞り込み" style="min-height:40px;padding:6px 10px;font-size:14px" data-sq-search>}
+  <div class:list={['kp-sq-opts', { compact, long: q.options.length > 16 }]}>
+    {q.options.map((o) => (
+      <label class="kp-check small" data-search={q.searchable && !o.exclusive ? [o.text, o.kana ?? '', ...(o.aliases ?? [])].join(' ') : undefined}>
+        <input type={multi ? 'checkbox' : 'radio'} name="opt" value={o.id} checked={on.has(o.id)} data-ex={o.exclusive ? '1' : '0'}>
+        <span>{o.text}{o.alert === 'emergency' && <span class="kp-chip refer" style="margin-left:4px">緊急</span>}{o.alert === 'refer' && <span class="kp-chip warn" style="margin-left:4px">受診</span>}{st(o) && <small class="kp-sq-pt">{st(o)}</small>}</span>
+      </label>
+    ))}
+  </div>
+  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+    <button class="kp-btn small" type="submit">回答して再計算</button>
+    {current.length > 0 && <button class="kp-btn ghost small" type="submit" name="action" value="staffq-clear">回答を消す</button>}
+  </div>
+</form>
