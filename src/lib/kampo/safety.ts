@@ -4,6 +4,8 @@
 // 来店客画面には内容を出さない。
 // ---------------------------------------------------------------------------
 import type { Answers } from './scoring.ts';
+import { optionById, questionOfOption } from './masters.ts';
+import { mainComplaintId, complaintLabel } from './complaints.ts';
 
 export type SafetyLevel = 'refer' | 'warn' | 'info';
 export interface SafetyFlag {
@@ -58,6 +60,21 @@ export function safetyFlags(answers: Answers, texts: FreeTexts = {}, tongueOverr
   // 「半年以上」＝A4-5（それ以上）
   if (has(answers, 'B9-2') && has(answers, 'B8-3') && duration === 'A4-5') {
     push({ code: 'long_mood', level: 'refer', label: '抑うつ・不眠が長期', detail: '必要に応じて受診を案内する', source: 'B9・B8・A4' });
+  }
+  // 主訴の詳細問診で選んだ「受診をおすすめする症状」（refer）と「受診も検討したい症状」（consult）
+  const main = mainComplaintId(answers);
+  for (const [qid, ids] of Object.entries(answers)) {
+    for (const id of ids) {
+      if (id === 'B13-10') continue;
+      const o = optionById(id);
+      if (!o?.flags) continue;
+      const about = questionOfOption(id)?.role === 'detail' && main ? `「${complaintLabel(main, texts)}」：` : '';
+      if (o.flags.includes('refer')) {
+        push({ code: `refer:${id}`, level: 'refer', label: `受診をおすすめする症状 ${about}${o.text}`, detail: '医療機関の受診を案内する', source: qid });
+      } else if (o.flags.includes('consult')) {
+        push({ code: `consult:${id}`, level: 'warn', label: `受診も検討したい症状 ${about}${o.text}`, detail: '医療機関の受診もあわせて案内する。漢方薬は薬剤師が確認してから提案する', source: qid });
+      }
+    }
   }
 
   // --- 注意（warn） ---
@@ -176,6 +193,8 @@ export function safetyContext(flags: SafetyFlag[], answers: Answers, texts: Free
   if (disease.length) general.push(`治療中の病気（${disease.map((c) => FLAG_LABEL[c] ?? c).join('・')}）があるため、主治医の指示とあわせて確認が必要です`);
   if (codes.has('allergy')) general.push('アレルギー・漢方で体調を崩した経験があるため、含まれる生薬との照合が必要です');
   if (codes.has('pregnancy')) general.push('妊娠中・妊娠の可能性があるため、服用前に確認が必要です');
+  const consult = flags.filter((f) => f.code.startsWith('consult:')).map((f) => optionById(f.code.slice('consult:'.length))?.text ?? '');
+  if (consult.length) general.push(`医療機関の受診も検討したい症状（${consult.join('・')}）があるため、薬剤師の確認が必要です`);
   return { codes, general };
 }
 

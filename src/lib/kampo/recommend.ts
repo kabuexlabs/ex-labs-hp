@@ -2,9 +2,10 @@
 // 漢方薬の選定（純粋関数）：主訴を起点とした二段階選定方式。
 //
 //   STEP 1 主訴 → 候補群
-//     来店客が選んだ主訴（A3）と、その詳細（A3a〜A3m の症状）に対応する漢方薬を、
-//     承認された効能・効果（formulas.json の indications）だけで抽出する。
-//     体質スコアを理由に、主訴と関係のない漢方薬を候補に加えることはしない。
+//     いちばん改善したい主訴（大カテゴリー K1 → 具体的な主訴 KA〜KH → 複数なら KM で1つ）と、
+//     その詳細問診（S*）で特定した症状に対応する漢方薬を、承認された効能・効果（formulas.json の
+//     indications）だけで抽出する。体質スコアを理由に、主訴と関係のない漢方薬を候補に加えることはしない。
+//     ほかに選んだ主訴と、詳細問診の随伴症状（also）は候補群に加えず、STEP 2 の加点にだけ使う。
 //   STEP 2 候補群の中で体質との適合性を評価
 //     ① 気血水（気虚・血虚・気滞・瘀血・水滞・陰虚=水不足）② 寒熱（実熱・虚熱を含む）
 //     ③ 虚実（使用目標の体力の範囲）④ 五臓 ⑤ 主訴の詳細・随伴症状（使用目標に当たる回答）
@@ -15,13 +16,15 @@
 //          ④服用前の確認事項」の順で作る
 //
 // 候補群の中に体質的に適合する漢方薬がなければ、無理に推薦しない（pick なし）。
+// 主訴が承認された効能・効果に当たらない（毛穴・たるみ・抜け毛など）ときは候補群が空になり、推薦しない。
 // 重み・しきい値は SELECTION の初期値。店頭の実データで薬剤師が調整する。
 // ---------------------------------------------------------------------------
 import {
-  TYPE_DEFS, ORGAN_LABEL, ORGAN_PLAIN, THERMAL_LABEL, HEAT_LABEL, QUESTIONS,
-  optionText, questionById, symptomLabel, strengthRangeLabel,
+  TYPE_DEFS, ORGAN_PLAIN, THERMAL_LABEL, HEAT_LABEL, QUESTIONS,
+  optionText, symptomLabel, strengthRangeLabel, questionOfOption,
   type Formula, type TypeKey, type OrganKey, type Strength, type Question,
 } from './masters.ts';
+import { chosenComplaintIds, mainComplaintId, complaintInfo } from './complaints.ts';
 import { DEF_EXC_LABEL, THERMAL_STATE_LABEL, HEAT_KIND_LABEL, type Answers, type ScoreResult } from './scoring.ts';
 import { hasRefer, safetyContext, assessFormulaSafety, GENERAL_NOTES, type SafetyFlag, type FreeTexts, type FormulaSafety } from './safety.ts';
 
@@ -34,8 +37,10 @@ export const SELECTION = {
     heatSoft: -0.05, // 熱の種類がずれる（虚熱向けを実熱の人に など）
     strengthIn: 0.1, // 体力の範囲に入る
     strengthNear: -0.05, // 体力の範囲から1段ずれる
-    sign: 0.1, // 使用目標・随伴症状に当たる回答 1つにつき
+    sign: 0.1, // 使用目標・随伴症状に当たる回答（体質チェックなど）1つにつき
     signCap: 0.3,
+    signDetail: 0.1, // 使用目標に当たる、主訴とその詳細問診の回答 1つにつき（主訴の性質に合うかを別枠で重く見る）
+    signDetailCap: 0.2,
     extra: 0.05, // ほかに選んだ主訴の症状も効能に含まれる 1つにつき
     extraCap: 0.1,
   },
@@ -44,13 +49,11 @@ export const SELECTION = {
   fair: 0.25,
   /** 「傾向あり」とみなす点数 */
   tendency: 20,
-  /** 先の主訴で選んだ漢方薬を、この主訴でも優先してよい一致度の差 */
-  reuseMargin: 0.1,
 };
 
 export type FitLevel = 'good' | 'fair' | 'weak' | 'unfit';
 export const FIT_LEVEL_LABEL: Record<FitLevel, string> = { good: '適合', fair: 'やや適合', weak: '一致が弱い', unfit: '不適合' };
-export type Axis = '気血水' | '寒熱' | '虚実' | '五臓' | '随伴症状';
+export type Axis = '主訴の詳細' | '気血水' | '寒熱' | '虚実' | '五臓' | '随伴症状';
 export interface FitPoint { axis: Axis; text: string }
 
 export interface Candidate {
@@ -77,20 +80,41 @@ export interface Candidate {
   efficacyIndex: number;
 }
 
-export type GroupOutcome = 'pick' | 'pick_check' | 'no_detail' | 'no_pool' | 'no_fit' | 'all_excluded';
+export type GroupOutcome = 'pick' | 'pick_check' | 'no_pool' | 'no_fit' | 'all_excluded' | 'other';
+export interface DetailAnswer {
+  id: string;
+  text: string;
+  /** 回答した詳細問診の設問ID */
+  question: string;
+  /** 主訴の性質として候補群の抽出に加える症状コード */
+  symptoms: string[];
+  /** 随伴症状の症状コード（加点のみ） */
+  also: string[];
+}
 export interface ComplaintGroup {
-  /** A3 の選択肢ID */
+  /** いちばん改善したい主訴の選択肢ID */
   key: string;
   label: string;
-  /** 選ばれた詳細の選択肢ID と文言 */
-  details: { id: string; text: string }[];
+  /** 大カテゴリー名 */
+  category: string;
+  /** 詳細問診で選んだ回答（「特になし」などは除く） */
+  details: DetailAnswer[];
+  /** 主訴そのものの症状コード */
+  ownSymptoms: string[];
+  /** 候補群の抽出に使う症状コード（主訴そのもの＋詳細問診で特定した症状） */
   symptoms: string[];
+  /** 随伴症状の症状コード（詳細問診の随伴症状＋ほかに選んだ主訴）。候補群には加えない */
+  also: string[];
   candidates: Candidate[];
   pick?: Candidate;
   outcome: GroupOutcome;
 }
+export interface Companion { id: string; label: string; category: string; symptoms: string[] }
 export interface Selection {
+  /** いちばん改善したい主訴（0件か1件。主訴が未選択の旧データは0件） */
   groups: ComplaintGroup[];
+  /** ほかに選んだ主訴（随伴症状として扱う） */
+  companions: Companion[];
   /** 受診勧奨があれば来店客向けの推薦は出さない */
   refer: boolean;
   /** その他（自由記入）の主訴 */
@@ -100,18 +124,19 @@ export interface Selection {
 export const OUTCOME_LABEL: Record<GroupOutcome, string> = {
   pick: '推薦',
   pick_check: '推薦（要確認）',
-  no_detail: '症状の詳細なし',
-  no_pool: '候補なし',
+  no_pool: '効能に当たる候補なし',
   no_fit: '体質に合う候補なし',
   all_excluded: '安全性で全て除外',
+  other: 'その他（自由記入）',
 };
 
 const STRENGTH_ORDER: Record<Strength, number> = { def: 0, mid: 1, exc: 2 };
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-/** 主訴（A3）ごとの詳細設問（showIf.chosen で対応づけ） */
-export function detailQuestionFor(a3OptionId: string, questions: Question[] = QUESTIONS): Question | undefined {
-  return questions.find((q) => q.showIf?.chosen?.includes(a3OptionId));
+/** 主訴の詳細問診の設問（いちばん改善したい主訴の detail と showIf.mainDetail で対応づけ） */
+export function detailQuestionsFor(complaintId: string, questions: Question[] = QUESTIONS): Question[] {
+  const tpl = complaintInfo(complaintId)?.option.detail;
+  return tpl ? questions.filter((q) => q.role === 'detail' && q.showIf?.mainDetail === tpl) : [];
 }
 
 /** 選ばれている選択肢ID（舌は薬剤師の所見があれば差し替え） */
@@ -125,21 +150,35 @@ export function chosenSet(answers: Answers, tongueOverride?: string[]): Set<stri
   return ids;
 }
 
-/** 主訴のグループ（A3 の選択順＝選択肢の並び順）と、その症状コード */
-export function complaintGroups(answers: Answers, questions: Question[] = QUESTIONS): { key: string; label: string; details: { id: string; text: string }[]; symptoms: string[] }[] {
-  const a3 = questionById('A3');
-  if (!a3) return [];
-  const chosenA3 = new Set(answers['A3'] ?? []);
-  const out: { key: string; label: string; details: { id: string; text: string }[]; symptoms: string[] }[] = [];
-  for (const o of a3.options) {
-    if (!chosenA3.has(o.id) || o.freeText) continue;
-    const dq = detailQuestionFor(o.id, questions);
-    const ids = dq ? (answers[dq.id] ?? []).filter((id) => !dq.options.find((x) => x.id === id)?.flags?.includes('none')) : [];
-    const details = ids.map((id) => ({ id, text: optionText(id) }));
-    const symptoms = [...new Set(ids.flatMap((id) => dq?.options.find((x) => x.id === id)?.symptoms ?? []))];
-    out.push({ key: o.id, label: o.text, details, symptoms });
+const uniq = <T,>(xs: T[]) => [...new Set(xs)];
+
+/** ほかに選んだ主訴（随伴症状） */
+export function companionComplaints(answers: Answers, texts: FreeTexts = {}): Companion[] {
+  const main = mainComplaintId(answers);
+  return chosenComplaintIds(answers).filter((id) => id !== main).map((id) => {
+    const info = complaintInfo(id, texts)!;
+    return { id, label: info.label, category: info.category, symptoms: info.option.symptoms ?? [] };
+  });
+}
+
+/** いちばん改善したい主訴と、その詳細問診の回答から症状コードをまとめる */
+export function mainComplaintGroup(answers: Answers, texts: FreeTexts = {}, questions: Question[] = QUESTIONS): Omit<ComplaintGroup, 'candidates' | 'pick' | 'outcome'> | undefined {
+  const main = mainComplaintId(answers);
+  const info = main ? complaintInfo(main, texts) : undefined;
+  if (!main || !info) return undefined;
+  const details: DetailAnswer[] = [];
+  for (const dq of detailQuestionsFor(main, questions)) {
+    for (const id of answers[dq.id] ?? []) {
+      const o = dq.options.find((x) => x.id === id);
+      if (!o || o.flags?.includes('none')) continue;
+      const t = (texts[id] ?? '').trim();
+      details.push({ id, text: o.freeText && t ? `${o.text}（${t}）` : o.text, question: dq.id, symptoms: o.symptoms ?? [], also: o.also ?? [] });
+    }
   }
-  return out;
+  const ownSymptoms = info.option.symptoms ?? [];
+  const symptoms = uniq([...ownSymptoms, ...details.flatMap((d) => d.symptoms)]);
+  const also = uniq([...details.flatMap((d) => d.also), ...companionComplaints(answers, texts).flatMap((c) => c.symptoms)]).filter((x) => !symptoms.includes(x));
+  return { key: main, label: info.label, category: info.category, details, ownSymptoms, symptoms, also };
 }
 
 /** 効能・効果のうち、症状コードに当たるもの（条件つきの効能は条件を満たすときだけ） */
@@ -225,17 +264,21 @@ export function evaluateFit(f: Formula, result: ScoreResult, chosen: Set<string>
 
   // ⑤ 主訴の詳細・随伴症状（使用目標に当たる回答）
   const signsMatched = f.signs.filter((id) => chosen.has(id));
-  fit += Math.min(W.signCap, W.sign * signsMatched.length);
-  if (signsMatched.length) {
-    const shown = signsMatched.slice(0, 4).map(optionText);
-    matches.push({ axis: '随伴症状', text: `回答「${shown.join('」「')}」${signsMatched.length > 4 ? `ほか${signsMatched.length - 4}件` : ''}が、使用目標「${f.useTarget}」に当てはまります` });
-  }
-  // ほかの主訴の症状も効能に含むか（同じ症状を指す語が複数あっても1つと数える）
+  const isComplaintSign = (id: string) => ['complaint', 'detail'].includes(questionOfOption(id)?.role ?? '');
+  const nDetail = signsMatched.filter(isComplaintSign).length;
+  fit += Math.min(W.signCap, W.sign * (signsMatched.length - nDetail)) + Math.min(W.signDetailCap, W.signDetail * nDetail);
+  const signText = (ids: string[]) => `回答「${ids.slice(0, 4).map(optionText).join('」「')}」${ids.length > 4 ? `ほか${ids.length - 4}件` : ''}が、使用目標「${f.useTarget}」に当てはまります`;
+  const detailSigns = signsMatched.filter(isComplaintSign);
+  const otherSigns = signsMatched.filter((id) => !isComplaintSign(id));
+  // 主訴とその詳細問診の一致を先に出す（主訴の性質に合うかがいちばん大事）
+  if (detailSigns.length) matches.unshift({ axis: '主訴の詳細', text: signText(detailSigns) });
+  if (otherSigns.length) matches.push({ axis: '随伴症状', text: signText(otherSigns) });
+  // 随伴症状（詳細問診の随伴症状・ほかに選んだ主訴）も効能に含むか（同じ症状を指す語が複数あっても1つと数える）
   const alsoCovers: { symptom: string; term: string }[] = [];
   for (const m of matchIndications(f, otherSymptoms, chosen)) if (!alsoCovers.some((x) => x.symptom === m.symptom)) alsoCovers.push({ symptom: m.symptom, term: m.term });
   fit += Math.min(W.extraCap, W.extra * alsoCovers.length);
   if (alsoCovers.length) {
-    matches.push({ axis: '随伴症状', text: `ほかに選んだ「${alsoCovers.map((x) => symptomLabel(x.symptom)).join('」「')}」も、効能・効果（${alsoCovers.map((x) => x.term).join('、')}）に含まれます` });
+    matches.push({ axis: '随伴症状', text: `あわせて気になる「${alsoCovers.map((x) => symptomLabel(x.symptom)).join('」「')}」も、効能・効果（${alsoCovers.map((x) => x.term).join('、')}）に含まれます` });
   }
 
   fit = round2(fit);
@@ -250,15 +293,16 @@ export function compareCandidates(a: Candidate, b: Candidate): number {
   return ex(a) - ex(b) || LEVEL_ORDER[a.level] - LEVEL_ORDER[b.level] || b.fit - a.fit || a.efficacyIndex - b.efficacyIndex || a.formula.priority - b.formula.priority;
 }
 
-/** 二段階選定の本体 */
+/** 二段階選定の本体（いちばん改善したい主訴を中心に、候補群 → 体質で選ぶ） */
 export function selectFormulas(result: ScoreResult, answers: Answers, texts: FreeTexts, flags: SafetyFlag[], formulas: Formula[], tongueOverride?: string[]): Selection {
   const chosen = chosenSet(answers, tongueOverride);
   const sctx = safetyContext(flags, answers, texts);
-  const groups0 = complaintGroups(answers);
-  const allSymptoms = new Set(groups0.flatMap((g) => g.symptoms));
-  const groups: ComplaintGroup[] = groups0.map((g) => {
+  const g = mainComplaintGroup(answers, texts);
+  const companions = companionComplaints(answers, texts);
+  const groups: ComplaintGroup[] = [];
+  if (g) {
     const own = new Set(g.symptoms);
-    const others = new Set([...allSymptoms].filter((s) => !own.has(s)));
+    const others = new Set(g.also);
     // STEP 1：主訴の症状に対応する効能・効果を持つ漢方薬だけを候補にする
     const candidates: Candidate[] = [];
     for (const f of formulas) {
@@ -277,33 +321,23 @@ export function selectFormulas(result: ScoreResult, answers: Answers, texts: Fre
     candidates.sort(compareCandidates); // STEP 3
     const usable = candidates.filter((c) => c.safety.status !== 'excluded');
     const pick = usable.find((c) => c.level === 'good');
-    const outcome: GroupOutcome = !g.details.length
-      ? 'no_detail'
-      : !candidates.length
-        ? 'no_pool'
-        : !usable.length
-          ? 'all_excluded'
-          : !pick
-            ? 'no_fit'
-            : pick.safety.status === 'check'
-              ? 'pick_check'
-              : 'pick';
-    return { ...g, candidates, pick, outcome };
-  });
-  // STEP 3 の補正：先の主訴で選んだ漢方薬が、この主訴でも「適合」かつ一致度が僅差なら、それを優先する
-  // （1つで複数の主訴をカバーし、似た漢方薬を重ねて飲むことを避ける）
-  const picked: Candidate[] = [];
-  for (const g of groups) {
-    if (!g.pick) continue;
-    const reuse = g.candidates.find((c) => c.code !== g.pick!.code && c.level === 'good' && c.safety.status !== 'excluded' && picked.some((p) => p.code === c.code) && c.fit >= g.pick!.fit - SELECTION.reuseMargin);
-    if (reuse) {
-      g.pick = reuse;
-      g.outcome = reuse.safety.status === 'check' ? 'pick_check' : 'pick';
-    }
-    picked.push(g.pick);
+    const isOther = !!complaintInfo(g.key)?.option.freeText;
+    const outcome: GroupOutcome = !candidates.length
+      ? (isOther ? 'other' : 'no_pool')
+      : !usable.length
+        ? 'all_excluded'
+        : !pick
+          ? 'no_fit'
+          : pick.safety.status === 'check'
+            ? 'pick_check'
+            : 'pick';
+    groups.push({ ...g, candidates, pick, outcome });
   }
-  const other = (answers['A3'] ?? []).includes('A3-13') ? (texts['A3-13'] ?? '').trim() || '（記入なし）' : undefined;
-  return { groups, refer: hasRefer(flags), otherComplaint: other };
+  const others = chosenComplaintIds(answers).filter((id) => complaintInfo(id)?.option.freeText);
+  const otherComplaint = others.length
+    ? others.map((id) => { const i = complaintInfo(id)!; return `${i.category}：${(texts[id] ?? '').trim() || '（記入なし）'}`; }).join('／')
+    : undefined;
+  return { groups, companions, refer: hasRefer(flags), otherComplaint };
 }
 
 // --- STEP 5：推薦理由 ----------------------------------------------------------
@@ -327,9 +361,6 @@ function comparisonLine(c: Candidate, pick: Candidate, result: ScoreResult, forC
   const head = `${c.name}（${c.formula.targetLabel}）`;
   if (c.safety.status === 'excluded') return forCustomer ? `${head}：安全確認の回答から、今回は候補から外しました。` : `${head}：除外（${c.safety.exclude.join('、')}）`;
   if (c.mismatches.length) return `${head}：${c.mismatches[0].text}。`;
-  if (c.level === 'good' && c.fit > pick.fit) {
-    return `${head}：一致度はわずかに高いものの、${pick.name}はほかに選んだお悩みにも使えるため、1つにまとめました。`;
-  }
   if (c.level === 'good' && c.fit === pick.fit) {
     return `${head}：体質との一致は同程度ですが、${pick.name}は効能・効果の中で「${pick.matched[0]?.term ?? ''}」をより主な対象として挙げているため優先しました。`;
   }
@@ -347,13 +378,14 @@ function comparisonLine(c: Candidate, pick: Candidate, result: ScoreResult, forC
 /** STEP 5：推薦理由（実際の回答と体質チェックの結果だけを使う） */
 export function buildReasons(group: ComplaintGroup, c: Candidate, result: ScoreResult, opts: { forCustomer?: boolean; maxCompare?: number } = {}): Reasons {
   const forCustomer = opts.forCustomer ?? false;
-  const detailTexts = group.details.filter((d) => {
-    const dq = detailQuestionFor(group.key);
-    const sy = dq?.options.find((o) => o.id === d.id)?.symptoms ?? [];
-    return sy.some((x) => c.matched.some((m) => m.symptom === x));
-  }).map((d) => d.text);
-  const terms = c.matched.map((m) => m.term);
-  const complaint = `あなたが選んだ「${detailTexts.join('」「') || group.label}」は、${c.name}の効能・効果（承認された内容）にある「${terms.join('」「')}」に当たるため、候補になりました。`;
+  const matchedSy = new Set(c.matched.map((m) => m.symptom));
+  const fromMain = group.ownSymptoms.some((x) => matchedSy.has(x));
+  const fromDetails = group.details.filter((d) => d.symptoms.some((x) => matchedSy.has(x))).map((d) => d.text);
+  const terms = uniq(c.matched.map((m) => m.term));
+  const what = fromMain
+    ? `「${group.label}」（${group.category}）${fromDetails.length ? `の「${fromDetails.join('」「')}」` : ''}`
+    : `「${group.label}」の詳しい症状「${fromDetails.join('」「')}」`;
+  const complaint = `いちばん改善したいお悩み${what}は、${c.name}の効能・効果（承認された内容）にある「${terms.join('」「')}」に当たるため、候補になりました。`;
   const constitution = c.matches.map((m) => `【${m.axis}】${m.text}`);
   if (!forCustomer) for (const g of c.gaps) constitution.push(`【${g.axis}・ずれ】${g.text}`);
   const others = group.candidates.filter((x) => x.code !== c.code && (!forCustomer || x.safety.status !== 'excluded'));
@@ -388,13 +420,13 @@ export function customerPicks(sel: Selection, result: ScoreResult): { picks: Cus
       picks.push({ candidate: g.pick, groups: [g], reasons: buildReasons(g, g.pick, result, { forCustomer: true }), status: g.pick.safety.status === 'check' ? 'check' : 'ok' });
       continue;
     }
-    const text: Record<Exclude<GroupOutcome, 'pick' | 'pick_check'>, string> = {
-      no_detail: '具体的な症状の選択がなかったため、漢方薬の候補を絞り込めませんでした。薬剤師がお話を伺います。',
-      no_pool: `選んだ症状（${g.details.map((d) => d.text).join('・')}）に対応する漢方薬の候補がありません。薬剤師にご相談ください。`,
+    if (g.outcome === 'other') continue; // 「その他のお悩み」として別に表示する
+    const text: Record<Exclude<GroupOutcome, 'pick' | 'pick_check' | 'other'>, string> = {
+      no_pool: `「${g.label}」を効能・効果に持つ一般用の漢方薬がないため、ここでは漢方薬の候補を挙げていません。体質に合わせた養生とあわせて、薬剤師がお話を伺います。`,
       no_fit: `候補になる漢方薬（${g.candidates.filter((c) => c.safety.status !== 'excluded').length}種類）の中に、あなたの体質にはっきり合うものが見つかりませんでした。無理におすすめせず、薬剤師が詳しくお話を伺います。`,
       all_excluded: '安全確認の回答から、候補になる漢方薬をおすすめできませんでした。薬剤師にご相談ください。',
     };
-    messages.push({ label: g.label, text: text[g.outcome as Exclude<GroupOutcome, 'pick' | 'pick_check'>] });
+    messages.push({ label: g.label, text: text[g.outcome as Exclude<GroupOutcome, 'pick' | 'pick_check' | 'other'>] });
   }
   // 同じ注意生薬を含む漢方薬が複数並ぶときは、重複に注意を促す
   for (const herb of ['甘草', '麻黄', '大黄', '附子']) {
@@ -414,6 +446,8 @@ export function customerPicks(sel: Selection, result: ScoreResult): { picks: Cus
 export function selectionSnapshot(sel: Selection) {
   return sel.groups.map((g) => ({
     complaint: g.label,
+    category: g.category,
+    companions: sel.companions.map((c) => c.label),
     details: g.details.map((d) => d.text),
     outcome: g.outcome,
     pick: g.pick?.code,

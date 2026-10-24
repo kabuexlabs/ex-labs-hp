@@ -5,6 +5,8 @@
 // 検証に失敗したら例外を投げてページを落とす（壊れたマスタで店頭運用しない）。
 // 依存ライブラリを増やさないため zod ではなく手書きの検証にしている。
 //
+// 主訴は3段階で選ぶ：大カテゴリー（K1）→ 具体的な主訴（KA〜KH）→ いちばん改善したい主訴（KM・複数のときだけ）
+// → その主訴の詳細問診（S*。主訴の選択肢の detail と設問の showIf.mainDetail で対応づけ）。
 // 漢方薬の選定は「主訴 → 候補群 → 体質で選ぶ」の二段階（src/lib/kampo/recommend.ts）。
 // そのため処方マスタでは次の3つを混同しないよう別の欄に持つ：
 //   efficacy / indications … 承認された効能・効果（候補群の抽出＝STEP 1 に使う）
@@ -43,8 +45,14 @@ export interface Option {
   weights?: Partial<Record<TypeKey, number>>;
   /** 五臓の傾向への加点（0〜1） */
   organs?: Partial<Record<OrganKey, number>>;
-  /** 主訴の詳細：この選択肢が表す症状コード（formulas.json の symptoms のキー） */
+  /** 主訴・主訴の詳細：この選択肢が表す症状コード（formulas.json の symptoms のキー）。候補群の抽出に使う */
   symptoms?: string[];
+  /** 主訴の詳細：随伴症状の症状コード。候補群には加えず、効能・効果に含まれていれば適合度に加点する */
+  also?: string[];
+  /** 具体的な主訴：詳細問診のテンプレート名（設問の showIf.mainDetail と対応） */
+  detail?: string;
+  /** 女性にだけ出す選択肢（性別が男性なら表示しない） */
+  femaleOnly?: boolean;
   flags?: string[];
   image?: string;
   freeText?: boolean;
@@ -58,8 +66,16 @@ export interface Question {
   title: string;
   type: 'single' | 'multi' | 'text';
   scored: boolean;
-  /** 表示条件。chosen は「これらの選択肢のどれかが選ばれていれば表示」（主訴の詳細） */
-  showIf?: { sex?: 'female'; tongueMode?: 'self'; chosen?: string[] };
+  /**
+   * 表示条件。chosen は「これらの選択肢のどれかが選ばれていれば表示」（具体的な主訴）、
+   * mainDetail は「いちばん改善したい主訴の detail がこれなら表示」（主訴の詳細問診）、
+   * minComplaints は「具体的な主訴をこの数以上選んでいれば表示」（いちばん改善したい主訴）
+   */
+  showIf?: { sex?: 'female'; tongueMode?: 'self'; chosen?: string[]; mainDetail?: string; minComplaints?: number };
+  /** 主訴の3段階での役割：大カテゴリー／具体的な主訴／いちばん改善したい主訴／主訴の詳細 */
+  role?: 'category' | 'complaint' | 'main' | 'detail';
+  /** 選択肢を回答から作る設問（complaints＝選んだ具体的な主訴を選択肢にする） */
+  dynamic?: 'complaints';
   options: Option[];
   /** multi の最大選択数 */
   max?: number;
@@ -68,7 +84,7 @@ export interface Question {
   help?: string;
   placeholder?: string;
   optional?: boolean;
-  /** 設問画面の上部に出す区分名（例: 主訴の詳細） */
+  /** 設問画面の上部に出す区分名（例: STEP 3　お悩みの詳細）。title の {main} はいちばん改善したい主訴に置き換わる */
   meta?: string;
 }
 export interface Questionnaire { version: string; questions: Question[] }
@@ -151,6 +167,9 @@ export function validateMasters(q: unknown, t: unknown, f: unknown): string[] {
   const optionIds = new Set<string>();
   const usedSymptoms = new Set<string>();
   const showIfRefs: [string, string][] = [];
+  const detailRefs: [string, string][] = []; // [主訴の選択肢ID, テンプレート名]
+  const detailTemplates = new Set<string>();
+  const roles: Record<string, string[]> = {};
   if (!isObj(q) || !isStr(q.version) || !Array.isArray(q.questions)) {
     errs.push('questions.json: version と questions が必要');
   } else {
@@ -165,14 +184,30 @@ export function validateMasters(q: unknown, t: unknown, f: unknown): string[] {
       if (!['single', 'multi', 'text'].includes(String(raw.type))) errs.push(`${id}: type が single/multi/text でない`);
       if (typeof raw.scored !== 'boolean') errs.push(`${id}: scored が真偽値でない`);
       const opts = Array.isArray(raw.options) ? (raw.options as unknown[]) : [];
-      if (raw.type !== 'text' && opts.length === 0) errs.push(`${id}: 選択肢がない`);
-      const isDetail = isObj(raw.showIf) && Array.isArray(raw.showIf.chosen);
-      if ((raw.block === 'B' || isDetail) && !opts.some((o) => isObj(o) && Array.isArray(o.flags) && (o.flags as string[]).includes('none'))) {
-        errs.push(`${id}: 「どれもあてはまらない／このなかにはない」(flags: none) がない`);
+      if (raw.dynamic !== undefined && raw.dynamic !== 'complaints') errs.push(`${id}: dynamic は complaints のみ`);
+      if (raw.type !== 'text' && opts.length === 0 && raw.dynamic === undefined) errs.push(`${id}: 選択肢がない`);
+      if (raw.block === 'B' && !opts.some((o) => isObj(o) && Array.isArray(o.flags) && (o.flags as string[]).includes('none'))) {
+        errs.push(`${id}: 「どれもあてはまらない」(flags: none) がない`);
+      }
+      if (raw.role !== undefined) {
+        if (!['category', 'complaint', 'main', 'detail'].includes(String(raw.role))) errs.push(`${id}: role が category/complaint/main/detail でない`);
+        (roles[String(raw.role)] ??= []).push(id);
       }
       if (isObj(raw.showIf) && raw.showIf.chosen !== undefined) {
         if (!Array.isArray(raw.showIf.chosen) || raw.showIf.chosen.length === 0) errs.push(`${id}: showIf.chosen は選択肢IDの配列`);
         else for (const c of raw.showIf.chosen as unknown[]) showIfRefs.push([id, String(c)]);
+      }
+      if (isObj(raw.showIf) && raw.showIf.mainDetail !== undefined) {
+        if (!isStr(raw.showIf.mainDetail)) errs.push(`${id}: showIf.mainDetail はテンプレート名`);
+        else detailTemplates.add(raw.showIf.mainDetail);
+        if (raw.role !== 'detail') errs.push(`${id}: showIf.mainDetail を持つ設問は role: detail`);
+      }
+      if (raw.role === 'complaint') {
+        for (const o of opts) {
+          if (!isObj(o)) continue;
+          if (!isStr(o.detail)) errs.push(`${id}: 主訴 ${String(o.id)} に detail（詳細問診のテンプレート名）がない`);
+          else detailRefs.push([String(o.id), o.detail]);
+        }
       }
       const checkOpt = (o: unknown, where: string) => {
         if (!isObj(o) || !isStr(o.id) || !isStr(o.text)) { errs.push(`${where}: id/text のない選択肢`); return; }
@@ -192,13 +227,15 @@ export function validateMasters(q: unknown, t: unknown, f: unknown): string[] {
             if (typeof v !== 'number' || v < 0 || v > 1) errs.push(`${o.id}: organs.${k} は 0〜1 の数値`);
           }
         }
-        if (o.symptoms !== undefined) {
-          if (!Array.isArray(o.symptoms)) errs.push(`${o.id}: symptoms が配列でない`);
-          else for (const s of o.symptoms as unknown[]) {
+        for (const key of ['symptoms', 'also'] as const) {
+          if (o[key] === undefined) continue;
+          if (!Array.isArray(o[key])) errs.push(`${o.id}: ${key} が配列でない`);
+          else for (const s of o[key] as unknown[]) {
             if (!symptomKeys.has(String(s))) errs.push(`${o.id}: 症状コード ${String(s)} が formulas.json の symptoms にない`);
             usedSymptoms.add(String(s));
           }
         }
+        if (o.femaleOnly !== undefined && typeof o.femaleOnly !== 'boolean') errs.push(`${o.id}: femaleOnly が真偽値でない`);
         if (o.flags !== undefined && !Array.isArray(o.flags)) errs.push(`${o.id}: flags が配列でない`);
       };
       for (const o of opts) checkOpt(o, id);
@@ -211,6 +248,12 @@ export function validateMasters(q: unknown, t: unknown, f: unknown): string[] {
       }
     }
     for (const [qid, ref] of showIfRefs) if (!optionIds.has(ref)) errs.push(`${qid}: showIf.chosen の ${ref} は存在しない選択肢ID`);
+    for (const [oid, tpl] of detailRefs) if (!detailTemplates.has(tpl)) errs.push(`${oid}: 詳細問診のテンプレート ${tpl} の設問（showIf.mainDetail）がない`);
+    const referenced = new Set(detailRefs.map(([, tpl]) => tpl));
+    for (const tpl of detailTemplates) if (!referenced.has(tpl)) errs.push(`詳細問診のテンプレート ${tpl} を使う主訴がない`);
+    if ((roles.category ?? []).length !== 1) errs.push('questions.json: role: category（大カテゴリー）の設問は1つ');
+    if ((roles.main ?? []).length > 1) errs.push('questions.json: role: main（いちばん改善したい主訴）の設問は1つまで');
+    if (!(roles.complaint ?? []).length) errs.push('questions.json: role: complaint（具体的な主訴）の設問がない');
   }
 
   // タイプ
@@ -304,6 +347,17 @@ export const optionById = (id: string) => OPTION_BY_ID.get(id)?.o;
 export const questionOfOption = (id: string) => OPTION_BY_ID.get(id)?.q;
 export const optionText = (id: string) => OPTION_BY_ID.get(id)?.o.text ?? id;
 export const formulaByCode = (code: string) => FORMULAS.find((f) => f.code === code);
+/** 主訴の3段階の設問 */
+export const CATEGORY_QUESTION = QUESTIONS.find((q) => q.role === 'category')!;
+export const COMPLAINT_QUESTIONS = QUESTIONS.filter((q) => q.role === 'complaint');
+export const MAIN_QUESTION = QUESTIONS.find((q) => q.role === 'main');
+/** 具体的な主訴の選択肢 → その大カテゴリー名 */
+const CATEGORY_OF = new Map<string, string>();
+for (const q of COMPLAINT_QUESTIONS) {
+  const cat = CATEGORY_QUESTION.options.find((o) => q.showIf?.chosen?.includes(o.id));
+  for (const o of q.options) CATEGORY_OF.set(o.id, cat?.text ?? '');
+}
+export const categoryOfComplaint = (optionId: string) => CATEGORY_OF.get(optionId) ?? '';
 export const symptomLabel = (code: string) => SYMPTOMS[code]?.label ?? code;
 
 export const STRENGTH_LABEL: Record<Strength, string> = { def: '虚証（体力虚弱）', mid: '虚実間（体力中等度）', exc: '実証（体力充実）' };

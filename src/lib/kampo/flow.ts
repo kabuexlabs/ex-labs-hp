@@ -1,10 +1,12 @@
 // ---------------------------------------------------------------------------
 // 設問フロー（純粋関数）：表示する設問の決定・1問ごとの回答の正規化・必須判定。
 // 性別が女性以外なら B11 と C3 を、舌モードがスタッフなら B13 をスキップする。
-// 進捗は「実際に表示される問数」で数える。
+// 主訴は「大カテゴリー → 具体的な主訴 →（複数なら）いちばん改善したい主訴 → その主訴の詳細問診」の順に出す。
+// 進捗は「実際に表示される問数」で数える（主訴を選ぶと詳細問診の分だけ増える）。
 // ---------------------------------------------------------------------------
 import { QUESTIONS, TIPS, type Question, type TypeKey } from './masters.ts';
-import { isVisible, type Answers, type ScoreContext } from './scoring.ts';
+import { isVisible, optionVisible, visibilityContext, type Answers } from './scoring.ts';
+import { chosenComplaintIds, mainComplaintId, complaintLabel, complaintInfo } from './complaints.ts';
 import type { FreeTexts } from './safety.ts';
 
 export type Sex = 'female' | 'male' | 'none';
@@ -22,8 +24,32 @@ export function ageBandFromAnswers(answers: Answers): string | undefined {
 
 /** 表示する設問（順序は A1→…→D4） */
 export function visibleQuestions(answers: Answers, tongueMode: 'self' | 'staff', questions: Question[] = QUESTIONS): Question[] {
-  const ctx: Pick<ScoreContext, 'sex' | 'tongueMode' | 'chosen'> = { sex: sexFromAnswers(answers), tongueMode, chosen: new Set(Object.values(answers).flat()) };
+  const ctx = visibilityContext(answers, sexFromAnswers(answers), tongueMode);
   return questions.filter((q) => isVisible(q, ctx));
+}
+
+/**
+ * 画面に出す形の設問：
+ *  - 「いちばん改善したい主訴」は、選んだ具体的な主訴を選択肢にする（同じ名前が別カテゴリーにあればカテゴリー名を添える）
+ *  - 女性向けの選択肢は、性別が男性なら外す
+ *  - title の {main} を、いちばん改善したい主訴の名前に置き換える
+ * normalizeAnswer・isAnswered にも、この形を渡す。
+ */
+export function resolveQuestion(q: Question, answers: Answers, texts: FreeTexts = {}): Question {
+  const sex = sexFromAnswers(answers);
+  let options = q.options.filter((o) => optionVisible(o, { sex }));
+  if (q.dynamic === 'complaints') {
+    const ids = chosenComplaintIds(answers);
+    const labels = ids.map((id) => complaintLabel(id, texts));
+    options = ids.map((id, i) => ({
+      id,
+      text: labels.filter((l) => l === labels[i]).length > 1 ? `${labels[i]}（${complaintInfo(id)?.category ?? ''}）` : labels[i],
+    }));
+  }
+  const main = mainComplaintId(answers);
+  const name = main ? complaintLabel(main, texts) : '';
+  const title = q.title.replace(/「\{main\}」/g, name ? `「${name}」` : 'その症状').replace(/\{main\}/g, name || 'その症状');
+  return { ...q, title, options };
 }
 
 export interface Normalized { ids: string[]; texts: FreeTexts }
@@ -79,7 +105,7 @@ export function isAnswered(q: Question, ids: string[] | undefined, texts: FreeTe
 /** 最初の未回答設問の step（1始まり）。全問回答済みなら visible.length + 1 */
 export function firstUnansweredStep(visible: Question[], answers: Answers, texts: FreeTexts): number {
   for (let i = 0; i < visible.length; i++) {
-    if (!isAnswered(visible[i], answers[visible[i].id], texts)) return i + 1;
+    if (!isAnswered(resolveQuestion(visible[i], answers, texts), answers[visible[i].id], texts)) return i + 1;
   }
   return visible.length + 1;
 }

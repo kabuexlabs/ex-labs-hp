@@ -10,7 +10,7 @@ import { LEVEL_LABEL, DEF_EXC_LABEL, THERMAL_STATE_LABEL } from '../../../../../
 import { SAFETY_LEVEL_LABEL, hasRefer } from '../../../../../lib/kampo/safety';
 import { selectFormulas, buildReasons, customerPicks, selectionSnapshot, FIT_LEVEL_LABEL, OUTCOME_LABEL, type Candidate } from '../../../../../lib/kampo/recommend';
 import { strengthRangeLabel, THERMAL_LABEL, HEAT_LABEL, ORGAN_LABEL, symptomLabel } from '../../../../../lib/kampo/masters';
-import { visibleQuestions, SEX_LABEL, AGE_BAND_LABEL, sexFromAnswers, ageBandFromAnswers } from '../../../../../lib/kampo/flow';
+import { visibleQuestions, resolveQuestion, SEX_LABEL, AGE_BAND_LABEL, sexFromAnswers, ageBandFromAnswers } from '../../../../../lib/kampo/flow';
 import { computeSession, finalize, staffNames } from '../../../../../lib/kampo/compute';
 import { clearStaffCookie } from '../../../../../lib/kampo/auth';
 import {
@@ -127,7 +127,8 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', t
         <dt>性別・年代</dt><dd>{sex ? SEX_LABEL[sex] : '—'}／{age ? AGE_BAND_LABEL[age] : '—'}</dd>
         <dt>入力</dt><dd>{INPUT_BY_LABEL[s.inputBy]}／舌: {TONGUE_MODE_LABEL[s.tongueMode]}</dd>
         <dt>開始・状態</dt><dd>{fmtJst(s.startedAt)}　<span class:list={['kp-chip', { ok: s.status === 'proposed' }]}>{STATUS_LABEL[s.status]}</span></dd>
-        <dt>気になること</dt><dd><b>{joinOpts('A3') || '—'}</b></dd>
+        <dt>いちばん改善したい主訴</dt><dd><b>{sel.groups[0] ? `${sel.groups[0].label}（${sel.groups[0].category}）` : '—'}</b>{sel.groups[0]?.details.length ? <><br><small>{sel.groups[0].details.map((d) => d.text).join('／')}</small></> : null}</dd>
+        <dt>ほかの主訴（随伴症状）</dt><dd>{sel.companions.map((c) => `${c.label}（${c.category}）`).join('、') || '—'}</dd>
         <dt>いつから・影響</dt><dd>{joinOpts('A4') || '—'}</dd>
         <dt>なりたい自分</dt><dd>{joinOpts('A5') || '—'}</dd>
         <dt>服用中の薬</dt><dd>{a['C1']?.includes('C1-1') ? (t['C1-1'] || 'あり（薬名の記入なし）') : a['C1'] ? 'なし' : '—'}</dd>
@@ -182,7 +183,7 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', t
     <div class="kp-card">
       <table class="kp-table">
         <tbody>{vis.map((q) => (
-          <tr><th style="width:40%">{q.block === 'A' || q.block === 'C' || q.block === 'D' ? `${BLOCK_LABEL[q.block]} ` : ''}{q.id}　{q.title}</th><td>{q.type === 'text' ? (t[q.id] || '—') : (joinOpts(q.id) || '—')}</td></tr>
+          <tr><th style="width:40%">{q.block === 'A' || q.block === 'C' || q.block === 'D' ? `${BLOCK_LABEL[q.block]} ` : ''}{q.id}　{resolveQuestion(q, a, t).title}</th><td>{q.type === 'text' ? (t[q.id] || '—') : (joinOpts(q.id) || '—')}</td></tr>
         ))}</tbody>
       </table>
     </div>
@@ -192,15 +193,17 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', t
   <div class="kp-card" style="margin-top:16px">
     <h2 class="kp-h2" style="margin-top:0">漢方薬の選定（主訴 → 候補群 → 体質で選ぶ）</h2>
     {refer && <p class="kp-notice" style="margin:0 0 8px">受診勧奨の対象です。来店客の結果画面には漢方薬を表示していません。提案は薬剤師の判断で行ってください。</p>}
-    <p class="kp-note">STEP 1：主訴の詳細に当たる効能・効果（承認内容）を持つ漢方薬だけを候補にします。STEP 2〜3：候補の中で気血水・寒熱・虚実・五臓・随伴症状を照合し、「適合」のうち一致度が最も高いものを推薦します（不適合＝逆の虚実・寒熱）。STEP 4：除外フラグに当たるものは除外、相談事項や情報不足は「要確認」。最終判断は薬剤師が行います。</p>
+    <p class="kp-note">STEP 1：いちばん改善したい主訴と、その詳細問診で特定した症状に当たる効能・効果（承認内容）を持つ漢方薬だけを候補にします（ほかに選んだ主訴と詳細問診の随伴症状は候補に加えず、効能に含まれていれば加点）。STEP 2〜3：候補の中で気血水・寒熱・虚実・五臓・主訴の詳細と随伴症状を照合し、「適合」のうち一致度が最も高いものを推薦します（不適合＝逆の虚実・寒熱）。STEP 4：除外フラグに当たるものは除外、相談事項・情報不足・受診も検討したい症状は「要確認」。最終判断は薬剤師が行います。</p>
     <form method="post" id="propForm">
       <input type="hidden" name="action" value="proposal">
-      {sel.groups.length === 0 && <p class="kp-notice">主訴（A3）の選択がありません（旧版の設問の可能性があります）。</p>}
+      {sel.groups.length === 0 && <p class="kp-notice">いちばん改善したい主訴が決まっていません（回答の途中、または旧版の設問の可能性があります）。</p>}
       {sel.groups.map((g) => (
         <div class="kp-sel-group">
-          <h3 class="kp-sel-h">主訴：{g.label}<small>{g.details.length ? `（${g.details.map((d) => d.text).join('／')}）` : '（詳細の選択なし）'}</small>
+          <h3 class="kp-sel-h">主訴：{g.label}（{g.category}）<small>{g.details.length ? `詳細：${g.details.map((d) => d.text).join('／')}` : '（詳細の選択なし）'}</small>
             <span class:list={['kp-chip', { ok: g.outcome === 'pick', check: g.outcome === 'pick_check', warn: g.outcome === 'all_excluded' }]}>{OUTCOME_LABEL[g.outcome]}{g.pick ? `：${g.pick.name}` : ''}</span></h3>
-          {g.outcome === 'no_pool' && <p class="kp-note">症状（{g.symptoms.map(symptomLabel).join('・')}）を効能・効果に持つ漢方薬がマスタにありません。</p>}
+          {g.outcome === 'no_pool' && <p class="kp-note">{g.symptoms.length ? `症状（${g.symptoms.map(symptomLabel).join('・')}）を効能・効果に持つ漢方薬がマスタにありません。` : `「${g.label}」に当たる承認効能の語がないため、候補群がありません（体質に合わせた養生の相談）。`}</p>}
+          {g.outcome === 'other' && <p class="kp-note">自由記入の主訴のため、マスタの候補はありません。聞き取りで判断してください。</p>}
+          {(g.symptoms.length > 0 || g.also.length > 0) && <p class="kp-note">候補抽出に使う症状：{g.symptoms.map(symptomLabel).join('・') || '—'}　／　加点に使う随伴症状：{g.also.map(symptomLabel).join('・') || '—'}</p>}
           {g.candidates.length > 0 && (
             <div class="kp-sel-scroll">
               <table class="kp-table kp-sel-table">
@@ -215,7 +218,7 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', t
                       <td class="num">{Math.round(c.qbf * 100)}</td>
                       <td class="num">{Math.round(c.organ * 100)}<br><small>{c.formula.organs.map((o) => ORGAN_LABEL[o]).join('・')}</small></td>
                       <td>{thermalCell(c)}{c.mismatches.map((m) => <div class="kp-sel-bad">不適合：{m.text}</div>)}{c.gaps.map((m) => <div class="kp-sel-gap">ずれ：{m.text}</div>)}</td>
-                      <td>{c.signsMatched.length}件{c.alsoCovers.length > 0 && <><br><small>他の主訴：{c.alsoCovers.map((x) => symptomLabel(x.symptom)).join('・')}</small></>}</td>
+                      <td>{c.signsMatched.length}件{c.alsoCovers.length > 0 && <><br><small>随伴症状：{c.alsoCovers.map((x) => symptomLabel(x.symptom)).join('・')}</small></>}</td>
                       <td class="num"><b>{c.fit.toFixed(2)}</b></td>
                       <td>{c.safety.status === 'excluded' ? <span class="kp-chip refer">除外</span> : c.safety.status === 'check' ? <span class="kp-chip check">要確認</span> : <span class="kp-chip ok">問題なし</span>}
                         {c.safety.exclude.map((x) => <div class="kp-sel-bad">{x}</div>)}
