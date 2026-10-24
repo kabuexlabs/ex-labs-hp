@@ -22,7 +22,7 @@ export function ageBandFromAnswers(answers: Answers): string | undefined {
 
 /** 表示する設問（順序は A1→…→D4） */
 export function visibleQuestions(answers: Answers, tongueMode: 'self' | 'staff', questions: Question[] = QUESTIONS): Question[] {
-  const ctx: Pick<ScoreContext, 'sex' | 'tongueMode'> = { sex: sexFromAnswers(answers), tongueMode };
+  const ctx: Pick<ScoreContext, 'sex' | 'tongueMode' | 'chosen'> = { sex: sexFromAnswers(answers), tongueMode, chosen: new Set(Object.values(answers).flat()) };
   return questions.filter((q) => isVisible(q, ctx));
 }
 

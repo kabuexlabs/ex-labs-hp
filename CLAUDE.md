@@ -102,11 +102,13 @@
 - 販売URL・メインビジュアル・キャスト（CAST：読みのあいうえお順で自動）・所要時間・アクセスは index.astro 冒頭の定数で入れる（空なら非表示）。公演回は本文の開演時刻リストと PERFORMANCES（構造化データ）の両方を直す。
 - case1 /uwasabanashi/ は終了表示中に case2 へ誘導（固定ボタン・チケット欄）。正確な住所・地図・緯度経度は載せない。
 
-## 漢方体質チェック 試験サイト /kampo/（2026-10-20 仮実装・本公開なし）
+## 漢方体質チェック 試験サイト /kampo/（2026-10-20 仮実装。2026-10-21〜 main に反映・noindex＋合言葉で非公開運用）
 - ESSENCE薬局 武蔵小杉店の店頭 iPad 用。仕様の正本は docs/kampo-spec.md（実装指示書 v0.1）、仕様との差分は docs/kampo-decisions.md、運用・環境変数は docs/kampo-setup.md。
 - 仕様書は Next.js+Prisma+PostgreSQL の別リポジトリを想定しているが、仮実装は **この Astro サイトに `/kampo/` として組み込み、Upstash Redis（`kampo:` プレフィックス）に保存**。ロジック（`src/lib/kampo/` の scoring / safety / recommend / flow）は純粋関数、マスタは `src/data/kampo/*.json`（薬剤師が直接編集）。
 - 認証は2段：共通パスワード `KAMPO_PASSWORD`（未設定なら YOYAKU_ADMIN_KEY）＋スタッフ画面の `KAMPO_STAFF_PIN`。ルート保護は `src/middleware.ts` → `kampoGuard`。全ページ noindex・no-store。
-- 画面で「診断」「処方」「治る」を使わない（「体質チェック」「ご提案」「漢方薬」）。来店客向け結果には「体質に合う漢方薬（例）」を最大3件だけ出す（2026-10-21 ユーザー指示。矛盾・警告のないものだけ＝`recommendForCustomer`。バランス良好・受診勧奨なら出さない）。
+- 画面で「診断」「処方」「治る」を使わない（「体質チェック」「ご提案」「漢方薬」）。
+- **漢方薬の選定は「主訴を起点とした二段階選定」（2026-10-24 ユーザー指示・最重要）**：主訴の詳細の症状 → 承認効能（indications）に持つ漢方薬だけを候補群にし、その中で気血水・寒熱・虚実・五臓・随伴症状が最も合うものを主訴ごとに推薦する。体質スコアで主訴と無関係な漢方薬を足さない／合うものがなければ推薦しない／禁忌は除外・相談事項や情報不足は「要確認」／理由は①主訴②体質③比較④注意の順。承認効能・使用目標・漢方の考え方は別の欄（混同しない）。`src/lib/kampo/recommend.ts` の `selectFormulas`。効能・効果は全件 verified: false（製品の添付文書で薬剤師が確認する）。
+- デザイン（2026-10-24〜）：白地×淡い水色（#86CDE8）、「BODY CHECK KAMPO」の細身英字、枠線の選択肢、Qマーク、丸いSTART、左右一体の戻る｜次へ、水色帯の見出し、結果のタブ。参考画像の雰囲気のみで、他社名・ロゴ・文言は使わない。
 - `npm run test:kampo`（`npm run check` に含む）がマスタ検証と仕様書の検算例を通す。マスタ JSON を変えたら必ず実行。
 - Vercel Cron は追加していない（Hobby の上限）。保持期限 3年は Redis TTL ＋ スタッフ画面表示時の掃除。
-- **本公開はしていない**：ブランチ `claude/jolly-mayer-khrsji` のみ。main に入れるかはユーザー判断。
+- 2026-10-21 ユーザー指示で main に反映（https://kabuexlabs.com/kampo/）。検索に出さない運用（noindex・sitemap/llms.txt 非掲載・合言葉）を崩さない。
