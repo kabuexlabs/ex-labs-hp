@@ -1,0 +1,32 @@
+{
+ "version": "v2-draft-2026-10-25",
+ "review": {"status": "draft", "source": "開発用の草案（2026-10-25 作成。仕様書 v2 の例と一般的な漢方の成書の記載を参考にした。専門家未確認）", "reviewer": null, "reviewedAt": null},
+ "note": "重み 3＝比較的強く示唆／2＝支持／1＝補助。カットオフは仕様書 §8 の開発テスト用暫定値（未検証）。寒・熱は各5点以上（§10 の開発用暫定値）。虚実は数値カットオフ未確定のため所見の組み合わせ（独立グループ数）で評価する。",
+ "patterns": [
+   {"id": "qi_def", "name": "気虚", "reading": "ききょ", "cutoff": {"candidate": 5, "strong": 8}, "weights": {"fatigue": 2, "fatigue_exertion": 3, "fatigue_persistent": 1, "low_motivation": 2, "heavy_body": 1, "shortness_breath": 2, "weak_voice": 3, "catch_cold": 2, "sleepy_after_meal": 2, "poor_appetite": 2, "stomach_heavy": 1, "early_satiety": 1, "craving_sweet": 1, "loose_stool": 1, "sweat_easy": 2, "cold_after_sweat": 1, "weak_after_illness": 3, "mod_fatigue": 2, "daytime_sleepy": 1, "tongue_teeth": 2, "tongue_pale": 1, "startle": 1, "weak_defecation": 2, "edema_evening": 1, "vertigo_floating": 1, "after_illness": 2}, "keyFindings": ["fatigue_exertion", "weak_voice", "weak_after_illness"]},
+   {"id": "blood_def", "name": "血虚", "reading": "けっきょ", "cutoff": {"candidate": 5, "strong": 7}, "weights": {"pale_face": 3, "pale_lips": 2, "orthostatic": 2, "dry_skin": 2, "dry_hair": 2, "brittle_nails": 2, "skin_flaking": 1, "split_ends": 1, "eye_fatigue": 2, "blurred_vision": 1, "numbness": 1, "cramps": 2, "light_sleep": 2, "dreams": 2, "wake_night": 1, "scanty_menses": 3, "pale_menses": 2, "cycle_long": 1, "dull_pain_after": 2, "tongue_pale": 2, "tongue_thin": 2, "palpitation": 1, "forgetful": 1, "anxiety": 1, "tearful": 1, "hair_loss": 1, "hair_fine": 1, "after_birth": 2, "itch_night": 1, "dry_eye": 1, "fatigue_persistent": 1}, "keyFindings": ["pale_face", "scanty_menses"]},
+   {"id": "qi_stag", "name": "気滞", "reading": "きたい", "cutoff": {"candidate": 5, "strong": 8}, "weights": {"irritability": 3, "chest_distension": 3, "sighing": 2, "mod_stress": 2, "stress_illness": 2, "throat_lump": 3, "bloating": 2, "gas_relief": 2, "incomplete_evacuation": 1, "belching": 1, "alternating_bowel": 2, "pms": 2, "pms_breast": 2, "mod_premenstrual": 1, "mood_swing": 2, "low_mood": 2, "insomnia_onset": 1, "wandering_pain": 2, "distending_pain": 2, "tension_social": 1, "bruxism": 1, "sweat_tension": 1, "headache_tight": 1, "tinnitus_high": 1}, "keyFindings": ["irritability", "chest_distension", "throat_lump"]},
+   {"id": "blood_stasis", "name": "瘀血", "reading": "おけつ", "cutoff": {"candidate": 5, "strong": 7}, "weights": {"stabbing_pain": 3, "night_pain": 1, "menstrual_clots": 3, "dark_menses": 2, "dysmenorrhea": 1, "dark_complexion": 2, "dark_lips": 2, "dark_circles": 1, "dull_skin": 1, "spots": 1, "melasma": 1, "acne_scar": 1, "tongue_purple": 3, "tongue_spots": 3, "sublingual_veins": 3, "varicose": 2, "trauma_history": 1, "chilblain": 1, "mod_night": 1}, "keyFindings": ["stabbing_pain", "menstrual_clots", "tongue_purple", "tongue_spots", "sublingual_veins"]},
+   {"id": "fluid", "name": "水滞", "reading": "すいたい", "cutoff": {"candidate": 5, "strong": 8}, "weights": {"edema": 3, "edema_evening": 2, "edema_morning": 2, "heavy_body": 2, "mod_weather": 2, "dizziness": 1, "vertigo_rotary": 2, "vertigo_floating": 1, "motion_sickness": 1, "head_heavy": 2, "stomach_splash": 3, "scanty_urine": 1, "nausea": 1, "watery_stool": 2, "loose_stool": 1, "runny_nose": 1, "nasal_watery": 2, "phlegm": 2, "phlegm_watery": 2, "tongue_big": 2, "tongue_teeth": 1, "coat_thick": 2, "coat_greasy": 2, "tongue_wet": 1, "mouth_sticky": 1, "skin_moist": 1, "morning_stiffness": 1, "obesity": 1}, "keyFindings": ["edema", "stomach_splash"]},
+   {"id": "yin_def", "name": "陰虚", "reading": "いんきょ", "cutoff": {"candidate": 5, "strong": 8}, "weights": {"hot_palms": 3, "night_sweat": 3, "evening_fever": 2, "dry_mouth": 2, "dry_stool": 2, "dry_skin": 1, "dry_eye": 1, "dry_lips": 1, "tongue_red": 1, "tongue_cracks": 2, "tongue_dry": 2, "coat_none": 3, "wake_early": 1, "cough_dry": 2, "phlegm_sticky": 1, "tinnitus_low": 1, "hot_flash": 1, "dark_urine": 1}, "keyFindings": ["hot_palms", "night_sweat", "coat_none"]}
+ ],
+ "axes": {
+   "cold": {"name": "寒", "cutoff": 5, "weights": {"mod_warm_relief": 2, "mod_cold": 2, "prefer_warm": 2, "cold_limbs": 2, "chilblain": 1, "cold_abdomen": 2, "cold_whole": 3, "cold_lowback": 2, "tongue_pale": 1, "coat_white": 1, "tongue_wet": 1, "morning_diarrhea": 2, "clear_urine": 1, "nasal_watery": 1, "phlegm_watery": 1, "cold_after_sweat": 1}},
+   "heat": {"name": "熱", "cutoff": 5, "weights": {"mod_cool_relief": 2, "mod_heat_aggr": 1, "skin_inflamed": 2, "acne_inflamed": 2, "acne_pus": 2, "skin_suppurative": 2, "scalp_inflamed": 2, "joint_hot": 2, "strong_thirst": 2, "prefer_cold": 2, "tongue_red": 2, "tongue_crimson": 3, "coat_yellow": 2, "hot_upper": 2, "red_face": 1, "hot_flash": 1, "hot_palms": 1, "heat_intolerance": 2, "red_eyes": 1, "dark_urine": 1, "nasal_yellow": 1, "phlegm_yellow": 2, "bright_red_menses": 2, "mouth_bitter": 1, "dysuria_pain": 1}},
+   "def": {"name": "虚", "weights": {"fatigue_exertion": 3, "weak_voice": 2, "weak_after_illness": 3, "poor_appetite": 2, "early_satiety": 1, "loose_stool": 1, "sweat_easy": 2, "catch_cold": 1, "shortness_breath": 1, "weak_defecation": 1}},
+   "exc": {"name": "実", "weights": {"abdominal_fullness": 3, "constipation_fullness": 3, "intense_symptoms": 2, "robust": 2, "loud_voice": 1, "strong_appetite": 1, "obesity": 1}}
+ },
+ "rules": {
+   "primary": {"minGroups": 2, "requireStrongFinding": true, "tieMargin": 1},
+   "coexisting": {"minGroups": 2, "requireStrongFinding": true},
+   "complaintRelated": {"minScore": 3, "minGroups": 2},
+   "axisMinGroups": 2,
+   "zangMinGroups": 2
+ },
+ "consistency": [
+   {"id": "yin_cold", "pattern": "yin_def", "coldHeat": "cold", "message": "陰虚が示唆される一方で寒の傾向があります。ほてりの部位・時間帯、口渇の性状を確認してください。", "needs": ["hot_palms", "evening_fever", "dry_mouth", "mod_warm_relief"]},
+   {"id": "qidef_exc", "pattern": "qi_def", "defExc": "exc", "message": "気虚が示唆される一方で実の所見があります。体力の充実度と症状の勢いを確認してください。", "needs": ["robust", "intense_symptoms", "fatigue_exertion", "abdominal_fullness"]},
+   {"id": "blooddef_exc", "pattern": "blood_def", "defExc": "exc", "message": "血虚が示唆される一方で実の所見があります。体力の充実度を確認してください。", "needs": ["robust", "intense_symptoms", "abdominal_fullness"]},
+   {"id": "fluid_heat", "pattern": "fluid", "coldHeat": "heat", "message": "水滞と熱の所見があります（湿熱の可能性も含め未判定）。口の粘り・舌苔の色と性状を確認してください。", "needs": ["mouth_sticky", "coat_yellow", "coat_greasy", "strong_thirst"]}
+ ]
+}

@@ -1,0 +1,68 @@
+---
+// 回答確認：表示した設問と回答を区分ごとに一覧にし、各設問へ戻って修正できる。送信で判定の要約を保存し、送信完了へ。
+// 患者向けの画面なので、判定結果や漢方薬は出さない（仕様書 §2-1・§25⑪）。
+export const prerender = false;
+import KampoLayout from '../../../../../layouts/KampoLayout.astro';
+import { SECTION_LABEL, optionText, type Section } from '../../../../../lib/kampo/masters';
+import { getSession, saveSession, audit } from '../../../../../lib/kampo/store';
+import { walk, firstUnansweredStep } from '../../../../../lib/kampo/flow';
+import { submit } from '../../../../../lib/kampo/compute';
+
+const s = await getSession(Astro.params.id ?? '');
+if (!s) return Astro.redirect('/kampo/check/new/?msg=notfound', 303);
+if (s.status !== 'in_progress') return Astro.redirect(`/kampo/check/${s.id}/done/`, 303);
+const w = walk(s.answers, s.tongueMode);
+const open = firstUnansweredStep(w.steps);
+if (open <= w.steps.length) return Astro.redirect(`/kampo/check/${s.id}/q/${open}/`, 303);
+
+if (Astro.request.method === 'POST') {
+  const form = await Astro.request.formData();
+  if (String(form.get('action') ?? '') === 'submit') {
+    submit(s);
+    await saveSession(s);
+    await audit('submit', s.id);
+    return Astro.redirect(`/kampo/check/${s.id}/done/`, 303);
+  }
+}
+
+const groups: { section: Section; label: string; rows: { step: number; title: string; answer: string }[] }[] = [];
+w.steps.forEach((st, i) => {
+  const label = SECTION_LABEL[st.q.section];
+  let g = groups[groups.length - 1];
+  if (!g || g.label !== label) { g = { section: st.q.section, label, rows: [] }; groups.push(g); }
+  g.rows.push({ step: i + 1, title: st.q.title, answer: st.ids.map(optionText).join('、') });
+});
+---
+<KampoLayout title="回答の確認" width="normal" progress={{ done: w.steps.length, total: w.steps.length }}>
+  <h1 class="kp-h1">回答の<span class="sky">確認</span></h1>
+  <p class="kp-result-lede" style="font-size:16px;line-height:2">ご回答ありがとうございました。内容をご確認のうえ、いちばん下の「送信する」を押してください。直したいところは「修正する」から変更できます。送信したあとに気づいたことは、スタッフにお伝えください。</p>
+  {groups.map((g) => (
+    <section class="kp-panel">
+      <h2>{g.label}</h2>
+      <div class="kp-panel-b" style="padding-top:8px;padding-bottom:8px">
+        <dl class="kp-confirm">
+          {g.rows.map((r) => (
+            <div class="kp-confirm-row">
+              <dt>{r.title}</dt>
+              <dd>{r.answer}</dd>
+              <a class="kp-btn ghost small" href={`/kampo/check/${s.id}/q/${r.step}/?from=confirm`}>修正する</a>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  ))}
+  <form method="post" style="text-align:center;margin-top:48px">
+    <input type="hidden" name="action" value="submit">
+    <button class="kp-btn start" type="submit" style="font-family:'Noto Sans JP',sans-serif;font-size:22px;letter-spacing:.14em">送信する</button>
+    <p class="kp-note" style="margin-top:12px">送信すると、回答はスタッフの画面に届きます。</p>
+  </form>
+  <style is:global>
+  .kp-confirm{margin:0}
+  .kp-confirm-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) auto;gap:18px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line-soft)}
+  .kp-confirm-row:last-child{border-bottom:0}
+  .kp-confirm-row dt{font-size:15px;color:var(--ink-2)}
+  .kp-confirm-row dd{margin:0;font-size:16px}
+  @media(max-width:760px){.kp-confirm-row{grid-template-columns:1fr;gap:6px}.kp-confirm-row .kp-btn{justify-self:start}}
+  </style>
+</KampoLayout>

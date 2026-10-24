@@ -3,13 +3,14 @@
 // 「来店客モードへ戻る」でスタッフ Cookie を消す（iPad を渡す前に押す）。
 export const prerender = false;
 import KampoLayout from '../../../layouts/KampoLayout.astro';
-import { TYPE_DEFS } from '../../../lib/kampo/masters';
+import { LEGACY, MASTER_REVIEWS, REVIEW_LABEL } from '../../../lib/kampo/masters';
+import { complaintLabel } from '../../../lib/kampo/compute';
 import { SEX_LABEL, AGE_BAND_LABEL, type Sex } from '../../../lib/kampo/flow';
 import { clearStaffCookie, pinConfigured } from '../../../lib/kampo/auth';
 import { supervisorName } from '../../../lib/kampo/compute';
 import {
   isKvConfigured, listSessionsByDay, searchCustomers, countSessions, purgeExpired, jstDate, fmtJst, customerLabel,
-  STATUS_LABEL, INPUT_BY_LABEL, TONGUE_MODE_LABEL, typeNamesOf,
+  STATUS_LABEL, INPUT_BY_LABEL, TONGUE_MODE_LABEL, isV2,
 } from '../../../lib/kampo/store';
 
 if (Astro.request.method === 'POST') {
@@ -39,11 +40,10 @@ if (kv) {
     loadError = String((e as Error).message ?? e);
   }
 }
-const flagSummary = (s: (typeof sessions)[number]) => {
-  const f = s.safetyFlags ?? [];
-  const refer = f.filter((x) => x.level === 'refer').length;
-  const warn = f.filter((x) => x.level === 'warn').length;
-  return { refer, warn };
+const primaryOf = (s: (typeof sessions)[number]) => {
+  if (!isV2(s)) return s.scores?.mainTypes?.length ? `${s.scores.mainTypes.map((t) => LEGACY.types[t] ?? t).join('・')}（v1）` : '—（v1）';
+  const p = s.snapshot?.primaryPattern;
+  return !p ? '—' : p.status === 'determined' ? p.name : '保留';
 };
 ---
 <KampoLayout title="スタッフ画面" mode="staff" width="wide">
@@ -69,20 +69,20 @@ const flagSummary = (s: (typeof sessions)[number]) => {
       <p class="kp-note" style="margin-top:12px">この日のチェックはありません。</p>
     ) : (
       <table class="kp-table" style="margin-top:12px">
-        <thead><tr><th>時刻</th><th>お客様</th><th>入力</th><th>主体質</th><th>副体質</th><th>警告</th><th>状態</th><th></th></tr></thead>
+        <thead><tr><th>時刻</th><th>お客様</th><th>入力</th><th>優先主訴</th><th>主証</th><th>安全性</th><th>状態</th><th></th></tr></thead>
         <tbody>
-          {sessions.map((s) => { const f = flagSummary(s); return (
+          {sessions.map((s) => (
             <tr>
               <td>{fmtJst(s.startedAt, false)}</td>
               <td>{s.customerLabel}</td>
               <td>{INPUT_BY_LABEL[s.inputBy]}／舌: {TONGUE_MODE_LABEL[s.tongueMode]}</td>
-              <td>{s.scores ? (s.scores.isBalanced ? 'バランス良好' : typeNamesOf(s.scores.mainTypes, TYPE_DEFS)) : '—'}</td>
-              <td>{s.scores ? typeNamesOf(s.scores.subTypes, TYPE_DEFS) || '—' : '—'}</td>
-              <td>{f.refer > 0 && <span class="kp-chip refer">受診勧奨 {f.refer}</span>} {f.warn > 0 && <span class="kp-chip warn">注意 {f.warn}</span>} {f.refer + f.warn === 0 && <span class="kp-chip ok">なし</span>}</td>
+              <td>{isV2(s) ? complaintLabel(s.snapshot?.primaryComplaint) : '—'}</td>
+              <td>{primaryOf(s)}</td>
+              <td>{s.snapshot?.emergency ? <span class="kp-chip refer">緊急対応優先</span> : s.snapshot?.redflags ? <span class="kp-chip warn">受診勧奨 {s.snapshot.redflags}</span> : s.snapshot ? <span class="kp-chip check">{s.snapshot.safetyState}</span> : '—'}</td>
               <td><span class:list={['kp-chip', { ok: s.status === 'proposed' }]}>{STATUS_LABEL[s.status]}</span></td>
               <td><a class="kp-btn ghost small" href={`/kampo/staff/session/${s.id}/`}>開く</a></td>
             </tr>
-          ); })}
+          ))}
         </tbody>
       </table>
     )}
@@ -113,7 +113,8 @@ const flagSummary = (s: (typeof sessions)[number]) => {
       <dt>監修者表示</dt><dd>{supervisorName() || <span style="color:var(--danger)">未設定（KAMPO_SUPERVISOR_NAME）</span>}</dd>
       <dt>スタッフPIN</dt><dd>{pinConfigured() ? '設定済み' : <span style="color:var(--danger)">未設定（KAMPO_STAFF_PIN）。ログインの合言葉で代用中</span>}</dd>
       <dt>CSV書き出し</dt><dd><a href="/kampo/staff/export.csv">全チェックの一覧と回答（CSV）</a></dd>
-      <dt>マスタ編集</dt><dd>設問・文面・処方は <code>src/data/kampo/</code> の JSON を直して再デプロイ</dd>
+      <dt>マスタ編集</dt><dd>設問・所見・証の重み・処方（5種類）は <code>src/data/kampo/</code> の JSON を直して再デプロイ。確認状態（草案／資料確認済み／専門家確認済み／検証済み／更新確認待ち）は各ファイルの review</dd>
+      <dt>確認状態</dt><dd>{MASTER_REVIEWS.map((m) => `${m.label}：${REVIEW_LABEL[m.status]}`).join('／')}</dd>
     </dl>
   </div>
 </KampoLayout>
