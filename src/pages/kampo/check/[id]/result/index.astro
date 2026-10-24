@@ -1,6 +1,6 @@
 ---
 // 来店客向け結果：体質チェック結果（8軸レーダー・点数と段階・主体質／副体質）、改善アドバイスへの導線、
-// おすすめの漢方薬（主訴ごとの二段階選定。理由は ①主訴 ②体質 ③他の候補との比較 ④服用前の確認）。
+// おすすめの漢方薬（いちばん改善したい主訴を起点にした二段階選定。理由は ①主訴 ②体質 ③他の候補との比較 ④服用前の確認）。
 // 受診勧奨があるときは漢方薬を出さない。安全確認の内容そのものは出さない。
 // 右下の隠しボタン（長押し）からスタッフ画面へ。
 export const prerender = false;
@@ -106,7 +106,11 @@ const summary = r.isBalanced
       <div class="kp-panel"><h2>薬剤師がお話を伺います</h2><div class="kp-panel-b"><p style="font-size:16px">回答の内容から、まず薬剤師が詳しくお話を伺います。漢方薬のご提案はそのあとで行います。</p></div></div>
     ) : (
       <>
-        <p class="kp-result-lede">気になっている症状（主訴）に使われる漢方薬の中から、あなたの体質にもっとも合うものを選びました。体質に合うものがない場合は、無理におすすめしません。</p>
+        <p class="kp-result-lede">いちばん改善したいお悩み（主訴）に使われる漢方薬の中から、あなたの体質にもっとも合うものを選びました。体質に合うものがない場合は、無理におすすめしません。</p>
+        {sel.companions.length > 0 && <p class="kp-note" style="margin-top:-6px">あわせて選んだお悩み（{sel.companions.map((c) => c.label).join('・')}）は、体質に合うかを判断する参考にしました。</p>}
+        {sel.groups.length === 0 && !sel.otherComplaint && (
+          <div class="kp-panel"><h2>薬剤師がお話を伺います</h2><div class="kp-panel-b"><p style="font-size:15.5px">お悩みの選択がなかったため、漢方薬の候補を絞り込めませんでした。薬剤師がお話を伺います。</p></div></div>
+        )}
         {picks.map((p, i) => (
           <article class="kp-panel kp-fml">
             <h2>「{p.groups.map((g) => g.label).join('」「')}」のお悩みに</h2>

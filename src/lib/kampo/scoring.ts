@@ -1,10 +1,12 @@
 // ---------------------------------------------------------------------------
 // 体質スコアリング（純粋関数）。仕様書 第6節。
 // 等重み（選択肢1つ＝1点、2タイプにまたがるものは0.5ずつ）。
-// 表示されなかった設問（B11・B13 のスキップ）と「閉経している」を選んだ B11 は
+// 表示されなかった設問（B11・B13 のスキップ、選んだ主訴と関係のない詳細問診）と「閉経している」を選んだ B11 は
 // 理論最大点から除く。「どれもあてはまらない」は 0 点。
+// 主訴の詳細問診（S*）の選択肢にも重み（多くは 0.5）があり、体質の評価に加わる。
 // ---------------------------------------------------------------------------
-import { TYPES, ORGANS, type TypeKey, type OrganKey, type Question } from './masters.ts';
+import { TYPES, ORGANS, type TypeKey, type OrganKey, type Question, type Option } from './masters.ts';
+import { chosenComplaintIds, mainDetailOf } from './complaints.ts';
 
 export const DEFICIENT: TypeKey[] = ['qi_def', 'blood_def', 'yin_def', 'yang_def']; // 虚
 export const EXCESS: TypeKey[] = ['qi_stag', 'blood_stasis', 'fluid', 'yang_exc']; // 実
@@ -27,8 +29,12 @@ export type Answers = Record<string, string[]>;
 export interface ScoreContext {
   sex?: string; // female / male / none
   tongueMode: 'self' | 'staff';
-  /** 選ばれている選択肢ID（主訴の詳細の showIf.chosen 判定用） */
+  /** 選ばれている選択肢ID（具体的な主訴の showIf.chosen 判定用） */
   chosen?: Set<string>;
+  /** いちばん改善したい主訴の詳細問診テンプレート名（showIf.mainDetail 判定用） */
+  mainDetail?: string;
+  /** 選んだ具体的な主訴の数（showIf.minComplaints 判定用） */
+  complaintCount?: number;
   /** 薬剤師が入力・上書きした舌所見（B13 の選択肢ID）。あればセルフ回答より優先 */
   tongueOverride?: string[];
 }
@@ -60,13 +66,32 @@ const mapTypes = <T,>(fn: (t: TypeKey) => T) => Object.fromEntries(TYPES.map((t)
 export const zeroOrgans = (): Record<OrganKey, number> => Object.fromEntries(ORGANS.map((o) => [o, 0])) as Record<OrganKey, number>;
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-/** showIf による表示判定（B13 はセルフモードのみ、B11・C3 は女性のみ、主訴の詳細は該当する主訴を選んだときだけ） */
-export function isVisible(q: Question, ctx: Pick<ScoreContext, 'sex' | 'tongueMode' | 'chosen'>): boolean {
+export type VisibilityContext = Pick<ScoreContext, 'sex' | 'tongueMode' | 'chosen' | 'mainDetail' | 'complaintCount'>;
+
+/** 回答から表示判定の材料を作る */
+export function visibilityContext(answers: Answers, sex: string | undefined, tongueMode: 'self' | 'staff'): VisibilityContext {
+  return {
+    sex, tongueMode,
+    chosen: new Set(Object.values(answers).flat()),
+    mainDetail: mainDetailOf(answers),
+    complaintCount: chosenComplaintIds(answers).length,
+  };
+}
+
+/**
+ * showIf による表示判定（B13 はセルフモードのみ、B11・C3 は女性のみ、具体的な主訴は選んだカテゴリーだけ、
+ * いちばん改善したい主訴は2つ以上選んだときだけ、詳細問診はいちばん改善したい主訴のテンプレートだけ）
+ */
+export function isVisible(q: Question, ctx: VisibilityContext): boolean {
   if (q.showIf?.sex && ctx.sex !== q.showIf.sex) return false;
   if (q.showIf?.tongueMode && ctx.tongueMode !== q.showIf.tongueMode) return false;
   if (q.showIf?.chosen && !q.showIf.chosen.some((id) => ctx.chosen?.has(id))) return false;
+  if (q.showIf?.mainDetail && ctx.mainDetail !== q.showIf.mainDetail) return false;
+  if (q.showIf?.minComplaints && (ctx.complaintCount ?? 0) < q.showIf.minComplaints) return false;
   return true;
 }
+/** 選択肢の表示判定（女性向けの選択肢は、性別が男性なら出さない） */
+export const optionVisible = (o: Option, ctx: Pick<ScoreContext, 'sex'>) => !(o.femaleOnly && ctx.sex === 'male');
 
 /**
  * B13（舌）の採点に使う選択肢。
@@ -108,6 +133,7 @@ export function classify(pct: Record<TypeKey, number>): Classification {
 }
 
 export function score(answers: Answers, questions: Question[], ctx: ScoreContext): ScoreResult {
+  const vctx = visibilityContext(answers, ctx.sex, ctx.tongueMode);
   const raw = zero();
   const max = zero();
   const organRaw = zeroOrgans();
@@ -120,13 +146,14 @@ export function score(answers: Answers, questions: Question[], ctx: ScoreContext
       if (c === null) continue;
       chosen = c;
     } else {
-      if (!isVisible(q, ctx)) continue;
+      if (!isVisible(q, vctx)) continue;
       chosen = answers[q.id] ?? [];
     }
     // 理論最大点：その問の全選択肢の重みをタイプごと・五臓ごとに合算
     const qMax = zero();
     const qOrganMax = zeroOrgans();
     for (const o of allOptions(q)) {
+      if (!optionVisible(o, ctx)) continue;
       for (const [t, w] of Object.entries(o.weights ?? {})) qMax[t as TypeKey] += w ?? 0;
       for (const [k, w] of Object.entries(o.organs ?? {})) qOrganMax[k as OrganKey] += w ?? 0;
     }

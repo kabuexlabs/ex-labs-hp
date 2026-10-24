@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-24",
+  "version": "2026-10-24b",
   "questions": [
     {"id": "A1", "block": "A", "title": "性別", "type": "single", "scored": false, "options": [
       {"id": "A1-1", "text": "女性"},
@@ -15,127 +15,889 @@
       {"id": "A2-6", "text": "60代"},
       {"id": "A2-7", "text": "70代以上"} ] },
 
-    {"id": "A3", "block": "A", "title": "今いちばん気になっていること", "type": "multi", "scored": false, "max": 3, "help": "次の画面で、選んだお悩みごとに具体的な症状を伺います。", "options": [
-      {"id": "A3-1", "text": "疲れ・だるさ"},
-      {"id": "A3-2", "text": "冷え"},
-      {"id": "A3-3", "text": "肌・髪"},
-      {"id": "A3-4", "text": "胃腸"},
-      {"id": "A3-5", "text": "便通・排尿"},
-      {"id": "A3-6", "text": "むくみ"},
-      {"id": "A3-7", "text": "睡眠"},
-      {"id": "A3-8", "text": "ストレス・気分"},
-      {"id": "A3-9", "text": "痛み・こり"},
-      {"id": "A3-10", "text": "月経・更年期"},
-      {"id": "A3-11", "text": "体重"},
-      {"id": "A3-12", "text": "風邪をひきやすい・せき"},
-      {"id": "A3-14", "text": "めまい・耳鳴り"},
-      {"id": "A3-13", "text": "その他", "freeText": true, "placeholder": "気になることを一言で"} ] },
+    {"id": "K1", "block": "A", "role": "category", "title": "どのようなお悩みがありますか", "type": "multi", "max": 3, "scored": false, "meta": "STEP 1　お悩みのカテゴリー", "help": "あてはまるカテゴリーを選んでください。次の画面で、具体的なお悩みを選びます。", "options": [
+      {"id": "K1-A", "text": "肌の悩み"},
+      {"id": "K1-B", "text": "髪・頭皮の悩み"},
+      {"id": "K1-C", "text": "年齢による見た目の変化"},
+      {"id": "K1-D", "text": "生理前・生理中の不調", "femaleOnly": true},
+      {"id": "K1-E", "text": "更年期・ホルモン変化"},
+      {"id": "K1-F", "text": "疲れ・だるさ・体力低下"},
+      {"id": "K1-G", "text": "冷え・血行の悩み"},
+      {"id": "K1-H", "text": "ストレス・気分の不調"} ] },
 
-    {"id": "A3a", "block": "A", "title": "「疲れ・だるさ」について、あてはまる症状", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-1"]}, "options": [
-      {"id": "A3a-1", "text": "疲れやすく、だるさが続く", "symptoms": ["fatigue"]},
-      {"id": "A3a-2", "text": "病気や手術のあと、体力が戻らない", "symptoms": ["recovery"]},
-      {"id": "A3a-3", "text": "食欲がなく、疲れやすい", "symptoms": ["fatigue", "poor_appetite"]},
-      {"id": "A3a-4", "text": "寝汗をかく", "symptoms": ["night_sweat"]},
-      {"id": "A3a-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "KA", "block": "A", "role": "complaint", "title": "「肌の悩み」で、気になるものを選んでください", "type": "multi", "scored": false, "showIf": {"chosen": ["K1-A"]}, "meta": "STEP 2　具体的なお悩み", "help": "気になるものをすべて選んでください。いくつ選んでもかまいません。", "options": [
+      {"id": "KA-acne", "text": "ニキビ・吹き出物", "symptoms": ["acne"], "detail": "acne"},
+      {"id": "KA-flush", "text": "顔のほてり・熱感", "symptoms": ["flush"], "detail": "face_flush"},
+      {"id": "KA-red", "text": "肌の赤み", "detail": "redness"},
+      {"id": "KA-dry", "text": "肌の乾燥", "detail": "dry_skin"},
+      {"id": "KA-itch", "text": "肌のかゆみ", "symptoms": ["itch"], "detail": "itch"},
+      {"id": "KA-eczema", "text": "湿疹・肌荒れ", "symptoms": ["eczema"], "detail": "eczema"},
+      {"id": "KA-dull", "text": "肌のくすみ", "detail": "complexion"},
+      {"id": "KA-spots", "text": "シミ・色素沈着", "symptoms": ["spots"], "detail": "spots"},
+      {"id": "KA-melasma", "text": "肝斑", "symptoms": ["spots"], "detail": "spots"},
+      {"id": "KA-pores", "text": "毛穴の開き", "detail": "skin_texture"},
+      {"id": "KA-blackhead", "text": "毛穴の黒ずみ", "detail": "skin_texture"},
+      {"id": "KA-oily", "text": "皮脂が多い・テカリ", "detail": "skin_texture"},
+      {"id": "KA-rough", "text": "肌のざらつき", "detail": "skin_texture"},
+      {"id": "KA-firm", "text": "肌のハリ・弾力の低下", "detail": "aging"},
+      {"id": "KA-wrinkle", "text": "小ジワ・乾燥ジワ", "detail": "aging"},
+      {"id": "KA-other", "text": "その他", "detail": "other", "freeText": true, "placeholder": "気になっていることを具体的に"} ] },
 
-    {"id": "A3b", "block": "A", "title": "「冷え」について、あてはまる症状", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-2"]}, "options": [
-      {"id": "A3b-1", "text": "手足の先が冷える", "symptoms": ["cold"]},
-      {"id": "A3b-2", "text": "腰や下半身が冷える", "symptoms": ["cold", "cold_lower"]},
-      {"id": "A3b-3", "text": "全身が冷えて寒がり", "symptoms": ["cold"]},
-      {"id": "A3b-4", "text": "しもやけになりやすい", "symptoms": ["chilblain"]},
-      {"id": "A3b-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "KB", "block": "A", "role": "complaint", "title": "「髪・頭皮の悩み」で、気になるものを選んでください", "type": "multi", "scored": false, "showIf": {"chosen": ["K1-B"]}, "meta": "STEP 2　具体的なお悩み", "help": "気になるものをすべて選んでください。いくつ選んでもかまいません。", "options": [
+      {"id": "KB-loss", "text": "抜け毛", "detail": "hair_loss"},
+      {"id": "KB-thin", "text": "薄毛", "detail": "hair_loss"},
+      {"id": "KB-volume", "text": "髪のボリューム低下", "detail": "hair_loss"},
+      {"id": "KB-fine", "text": "髪が細くなった", "detail": "hair_loss"},
+      {"id": "KB-dry", "text": "髪のパサつき", "detail": "hair_dry"},
+      {"id": "KB-gloss", "text": "髪のツヤの低下", "detail": "hair_dry"},
+      {"id": "KB-gray", "text": "白髪", "detail": "gray_hair"},
+      {"id": "KB-scalp_dry", "text": "頭皮の乾燥", "detail": "scalp"},
+      {"id": "KB-scalp_oily", "text": "頭皮の脂っぽさ", "detail": "scalp"},
+      {"id": "KB-dandruff", "text": "フケ", "detail": "scalp"},
+      {"id": "KB-scalp_itch", "text": "頭皮のかゆみ", "symptoms": ["itch"], "detail": "scalp"},
+      {"id": "KB-scalp_eczema", "text": "頭皮の湿疹", "symptoms": ["eczema"], "detail": "scalp"},
+      {"id": "KB-other", "text": "その他", "detail": "other", "freeText": true, "placeholder": "気になっていることを具体的に"} ] },
 
-    {"id": "A3c", "block": "A", "title": "「肌・髪」について、あてはまる症状", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-3"]}, "options": [
-      {"id": "A3c-1", "text": "赤く腫れる・化膿しやすいニキビ", "symptoms": ["acne"]},
-      {"id": "A3c-2", "text": "繰り返しできる・治りにくいニキビ", "symptoms": ["acne"]},
-      {"id": "A3c-3", "text": "月経前に悪化するニキビ・吹き出物", "symptoms": ["acne"]},
-      {"id": "A3c-4", "text": "湿疹・皮膚炎", "symptoms": ["eczema"]},
-      {"id": "A3c-5", "text": "乾燥してかゆい", "symptoms": ["itch"]},
-      {"id": "A3c-6", "text": "しみ", "symptoms": ["spots"]},
-      {"id": "A3c-7", "text": "手あれ・手足のあれ", "symptoms": ["rough_hands"]},
-      {"id": "A3c-8", "text": "抜け毛・白髪", "symptoms": ["hair"]},
-      {"id": "A3c-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "KC", "block": "A", "role": "complaint", "title": "「年齢による見た目の変化」で、気になるものを選んでください", "type": "multi", "scored": false, "showIf": {"chosen": ["K1-C"]}, "meta": "STEP 2　具体的なお悩み", "help": "気になるものをすべて選んでください。いくつ選んでもかまいません。", "options": [
+      {"id": "KC-sag", "text": "顔のたるみ", "detail": "aging"},
+      {"id": "KC-nasolabial", "text": "ほうれい線", "detail": "aging"},
+      {"id": "KC-mouth", "text": "口元のたるみ", "detail": "aging"},
+      {"id": "KC-eyelid", "text": "目元のたるみ", "detail": "aging"},
+      {"id": "KC-circles", "text": "目の下のクマ", "detail": "complexion"},
+      {"id": "KC-eyebag", "text": "目の下のむくみ", "symptoms": ["edema"], "detail": "puffiness"},
+      {"id": "KC-puffy", "text": "顔全体のむくみ", "symptoms": ["edema"], "detail": "puffiness"},
+      {"id": "KC-wrinkle", "text": "シワ", "detail": "aging"},
+      {"id": "KC-firm", "text": "肌のハリ・弾力の低下", "detail": "aging"},
+      {"id": "KC-pale", "text": "顔色の悪さ", "detail": "complexion"},
+      {"id": "KC-tired", "text": "顔が疲れて見える", "detail": "complexion"},
+      {"id": "KC-dull", "text": "肌のくすみ", "detail": "complexion"},
+      {"id": "KC-line", "text": "フェイスラインの変化", "detail": "aging"},
+      {"id": "KC-aged", "text": "老けて見えることが気になる", "detail": "aging"},
+      {"id": "KC-other", "text": "その他", "detail": "other", "freeText": true, "placeholder": "気になっていることを具体的に"} ] },
 
-    {"id": "A3d", "block": "A", "title": "「胃腸」について、あてはまる症状", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-4"]}, "options": [
-      {"id": "A3d-1", "text": "胃がもたれる・消化が悪い", "symptoms": ["stomach_heavy"]},
-      {"id": "A3d-2", "text": "食欲がない", "symptoms": ["poor_appetite"]},
-      {"id": "A3d-3", "text": "胃が痛む・胸やけがする", "symptoms": ["stomach_pain"]},
-      {"id": "A3d-4", "text": "吐き気がする", "symptoms": ["nausea"]},
-      {"id": "A3d-5", "text": "お腹が痛くなりやすい", "symptoms": ["abdominal_pain"]},
-      {"id": "A3d-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "KD", "block": "A", "role": "complaint", "title": "「生理前・生理中の不調」で、気になるものを選んでください", "type": "multi", "scored": false, "showIf": {"chosen": ["K1-D"]}, "meta": "STEP 2　具体的なお悩み", "help": "気になるものをすべて選んでください。いくつ選んでもかまいません。", "options": [
+      {"id": "KD-pain", "text": "生理痛", "symptoms": ["dysmenorrhea"], "detail": "period_pain"},
+      {"id": "KD-irritable", "text": "生理前のイライラ", "symptoms": ["blood_path"], "detail": "pms_mood"},
+      {"id": "KD-low", "text": "生理前の気分の落ち込み", "symptoms": ["blood_path"], "detail": "pms_mood"},
+      {"id": "KD-anxious", "text": "生理前の不安感", "symptoms": ["blood_path"], "detail": "pms_mood"},
+      {"id": "KD-headache", "text": "生理前の頭痛", "symptoms": ["blood_path", "headache"], "detail": "pms_headache"},
+      {"id": "KD-edema", "text": "生理前のむくみ", "symptoms": ["blood_path", "edema"], "detail": "pms_edema"},
+      {"id": "KD-breast", "text": "生理前の胸の張り", "symptoms": ["blood_path"], "detail": "pms_body"},
+      {"id": "KD-skin", "text": "生理前の肌荒れ", "symptoms": ["blood_path"], "detail": "pms_skin"},
+      {"id": "KD-acne", "text": "生理前のニキビ", "symptoms": ["acne"], "detail": "acne"},
+      {"id": "KD-sleepy", "text": "生理前の眠気", "symptoms": ["blood_path"], "detail": "pms_body"},
+      {"id": "KD-tired", "text": "生理前の疲労感", "symptoms": ["blood_path"], "detail": "pms_body"},
+      {"id": "KD-appetite", "text": "生理前の食欲増加", "symptoms": ["blood_path"], "detail": "pms_body"},
+      {"id": "KD-irregular", "text": "生理不順", "symptoms": ["irregular_menses"], "detail": "irregular"},
+      {"id": "KD-heavy", "text": "経血量が多い", "symptoms": ["irregular_menses"], "detail": "flow_heavy"},
+      {"id": "KD-light", "text": "経血量が少ない", "symptoms": ["irregular_menses"], "detail": "flow_light"},
+      {"id": "KD-other", "text": "その他", "detail": "other", "freeText": true, "placeholder": "気になっていることを具体的に"} ] },
 
-    {"id": "A3e", "block": "A", "title": "「便通・排尿」について、あてはまる症状", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-5"]}, "options": [
-      {"id": "A3e-1", "text": "便秘がち", "symptoms": ["constipation"]},
-      {"id": "A3e-2", "text": "便が硬く、コロコロしている", "symptoms": ["constipation"]},
-      {"id": "A3e-3", "text": "下痢・軟便になりやすい", "symptoms": ["diarrhea"]},
-      {"id": "A3e-4", "text": "便秘と下痢をくり返す", "symptoms": ["alternating"]},
-      {"id": "A3e-5", "text": "痔がある", "symptoms": ["hemorrhoid"]},
-      {"id": "A3e-6", "text": "トイレが近い・夜中にトイレに起きる", "symptoms": ["frequent_urination"]},
-      {"id": "A3e-7", "text": "尿が出にくい・残尿感がある", "symptoms": ["dysuria"]},
-      {"id": "A3e-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "KE", "block": "A", "role": "complaint", "title": "「更年期・ホルモン変化」で、気になるものを選んでください", "type": "multi", "scored": false, "showIf": {"chosen": ["K1-E"]}, "meta": "STEP 2　具体的なお悩み", "help": "気になるものをすべて選んでください。いくつ選んでもかまいません。", "options": [
+      {"id": "KE-hotflash", "text": "ホットフラッシュ", "symptoms": ["menopause", "flush"], "detail": "hot_flash"},
+      {"id": "KE-flush", "text": "のぼせ・ほてり", "symptoms": ["menopause", "flush"], "detail": "hot_flash"},
+      {"id": "KE-sweat", "text": "発汗", "symptoms": ["menopause", "sweating"], "detail": "sweat"},
+      {"id": "KE-nightsweat", "text": "寝汗", "symptoms": ["menopause", "night_sweat"], "detail": "sweat"},
+      {"id": "KE-irritable", "text": "イライラ", "symptoms": ["menopause", "nerves"], "detail": "irritability"},
+      {"id": "KE-low", "text": "気分の落ち込み", "symptoms": ["menopause", "nerves"], "detail": "low_mood"},
+      {"id": "KE-anxious", "text": "不安感", "symptoms": ["menopause", "nerves"], "detail": "anxiety"},
+      {"id": "KE-palpitation", "text": "動悸", "symptoms": ["menopause", "palpitation"], "detail": "palpitation"},
+      {"id": "KE-insomnia", "text": "不眠", "symptoms": ["menopause", "insomnia"], "detail": "insomnia"},
+      {"id": "KE-tired", "text": "疲労感", "symptoms": ["menopause", "fatigue"], "detail": "fatigue"},
+      {"id": "KE-headache", "text": "頭痛", "symptoms": ["menopause", "headache"], "detail": "headache"},
+      {"id": "KE-dizzy", "text": "めまい", "symptoms": ["menopause", "dizziness"], "detail": "dizziness"},
+      {"id": "KE-shoulder", "text": "肩こり", "symptoms": ["menopause", "stiff_shoulder"], "detail": "stiff_shoulder"},
+      {"id": "KE-cold", "text": "手足の冷え", "symptoms": ["menopause", "cold"], "detail": "cold"},
+      {"id": "KE-dry", "text": "肌の乾燥", "detail": "dry_skin"},
+      {"id": "KE-hair", "text": "抜け毛", "detail": "hair_loss"},
+      {"id": "KE-other", "text": "その他", "detail": "other", "freeText": true, "placeholder": "気になっていることを具体的に"} ] },
 
-    {"id": "A3f", "block": "A", "title": "「むくみ」について、あてはまる症状", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-6"]}, "options": [
-      {"id": "A3f-1", "text": "足がむくむ", "symptoms": ["edema"]},
-      {"id": "A3f-2", "text": "顔やまぶたがむくむ", "symptoms": ["edema"]},
-      {"id": "A3f-3", "text": "水太りで体が重い", "symptoms": ["edema"]},
-      {"id": "A3f-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "KF", "block": "A", "role": "complaint", "title": "「疲れ・だるさ・体力低下」で、気になるものを選んでください", "type": "multi", "scored": false, "showIf": {"chosen": ["K1-F"]}, "meta": "STEP 2　具体的なお悩み", "help": "気になるものをすべて選んでください。いくつ選んでもかまいません。", "options": [
+      {"id": "KF-morning", "text": "朝から疲れている", "symptoms": ["fatigue"], "detail": "fatigue"},
+      {"id": "KF-evening", "text": "夕方になると疲れる", "symptoms": ["fatigue"], "detail": "fatigue"},
+      {"id": "KF-easily", "text": "少し動くだけで疲れる", "symptoms": ["fatigue"], "detail": "fatigue"},
+      {"id": "KF-rest", "text": "休んでも疲れが取れない", "symptoms": ["fatigue"], "detail": "fatigue"},
+      {"id": "KF-dull", "text": "常に体がだるい", "symptoms": ["fatigue"], "detail": "fatigue"},
+      {"id": "KF-spirit", "text": "気力が出ない", "symptoms": ["fatigue"], "detail": "fatigue"},
+      {"id": "KF-stamina", "text": "体力が落ちた", "symptoms": ["fatigue", "weak_constitution"], "detail": "fatigue"},
+      {"id": "KF-meal", "text": "食後の眠気", "symptoms": ["fatigue"], "detail": "fatigue"},
+      {"id": "KF-appetite", "text": "食欲不振を伴う疲労", "symptoms": ["fatigue", "poor_appetite"], "detail": "fatigue"},
+      {"id": "KF-recovery", "text": "病後の体力低下", "symptoms": ["recovery"], "detail": "fatigue"},
+      {"id": "KF-cold", "text": "疲れると風邪をひきやすい", "symptoms": ["weak_constitution"], "detail": "fatigue"},
+      {"id": "KF-other", "text": "その他", "detail": "other", "freeText": true, "placeholder": "気になっていることを具体的に"} ] },
 
-    {"id": "A3g", "block": "A", "title": "「睡眠」について、あてはまる症状", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-7"]}, "options": [
-      {"id": "A3g-1", "text": "寝つきが悪い", "symptoms": ["insomnia"]},
-      {"id": "A3g-2", "text": "眠りが浅い・夜中に目が覚める", "symptoms": ["insomnia"]},
-      {"id": "A3g-3", "text": "夢が多く、熟睡感がない", "symptoms": ["insomnia"]},
-      {"id": "A3g-4", "text": "考え事やイライラで眠れない", "symptoms": ["insomnia"]},
-      {"id": "A3g-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "KG", "block": "A", "role": "complaint", "title": "「冷え・血行の悩み」で、気になるものを選んでください", "type": "multi", "scored": false, "showIf": {"chosen": ["K1-G"]}, "meta": "STEP 2　具体的なお悩み", "help": "気になるものをすべて選んでください。いくつ選んでもかまいません。", "options": [
+      {"id": "KG-limbs", "text": "手足の冷え", "symptoms": ["cold"], "detail": "cold"},
+      {"id": "KG-feet", "text": "足先の冷え", "symptoms": ["cold"], "detail": "cold"},
+      {"id": "KG-hands", "text": "手先の冷え", "symptoms": ["cold"], "detail": "cold"},
+      {"id": "KG-belly", "text": "お腹の冷え", "symptoms": ["cold"], "detail": "cold"},
+      {"id": "KG-waist", "text": "腰の冷え", "symptoms": ["cold", "cold_lower"], "detail": "cold"},
+      {"id": "KG-whole", "text": "全身の冷え", "symptoms": ["cold"], "detail": "cold"},
+      {"id": "KG-flushcold", "text": "顔はほてるのに足が冷える", "symptoms": ["cold"], "detail": "cold"},
+      {"id": "KG-bellypain", "text": "冷えによる腹痛", "symptoms": ["cold", "abdominal_pain"], "detail": "cold_pain"},
+      {"id": "KG-headache", "text": "冷えによる頭痛", "symptoms": ["cold", "headache"], "detail": "cold_pain"},
+      {"id": "KG-period", "text": "冷えによる生理痛の悪化", "symptoms": ["cold", "dysmenorrhea"], "detail": "period_pain", "femaleOnly": true},
+      {"id": "KG-summer", "text": "夏でも冷える", "symptoms": ["cold"], "detail": "cold"},
+      {"id": "KG-chilblain", "text": "しもやけ", "symptoms": ["chilblain"], "detail": "chilblain"},
+      {"id": "KG-other", "text": "その他", "detail": "other", "freeText": true, "placeholder": "気になっていることを具体的に"} ] },
 
-    {"id": "A3h", "block": "A", "title": "「ストレス・気分」について、あてはまる症状", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-8"]}, "options": [
-      {"id": "A3h-1", "text": "イライラしやすい・怒りっぽい", "symptoms": ["nerves"]},
-      {"id": "A3h-2", "text": "不安になりやすい・緊張しやすい・動悸がする", "symptoms": ["nerves"]},
-      {"id": "A3h-3", "text": "気分が落ち込む・ふさぎこむ", "symptoms": ["nerves"]},
-      {"id": "A3h-4", "text": "喉に何かつかえた感じがする", "symptoms": ["throat_lump"]},
-      {"id": "A3h-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "KH", "block": "A", "role": "complaint", "title": "「ストレス・気分の不調」で、気になるものを選んでください", "type": "multi", "scored": false, "showIf": {"chosen": ["K1-H"]}, "meta": "STEP 2　具体的なお悩み", "help": "気になるものをすべて選んでください。いくつ選んでもかまいません。", "options": [
+      {"id": "KH-irritable", "text": "イライラ", "symptoms": ["nerves"], "detail": "irritability"},
+      {"id": "KH-anger", "text": "怒りっぽさ", "symptoms": ["nerves"], "detail": "irritability"},
+      {"id": "KH-anxious", "text": "不安感", "symptoms": ["nerves"], "detail": "anxiety"},
+      {"id": "KH-low", "text": "気分の落ち込み", "symptoms": ["nerves"], "detail": "low_mood"},
+      {"id": "KH-motivation", "text": "やる気の低下", "symptoms": ["nerves"], "detail": "low_mood"},
+      {"id": "KH-tense", "text": "緊張しやすい", "symptoms": ["nerves"], "detail": "anxiety"},
+      {"id": "KH-swing", "text": "気分の浮き沈み", "symptoms": ["nerves"], "detail": "irritability"},
+      {"id": "KH-stomach", "text": "ストレスによる胃痛", "symptoms": ["stomach_pain"], "detail": "stress_gi"},
+      {"id": "KH-diarrhea", "text": "ストレスによる下痢", "symptoms": ["diarrhea"], "detail": "stress_gi"},
+      {"id": "KH-throat", "text": "喉のつかえ感", "symptoms": ["throat_lump"], "detail": "throat"},
+      {"id": "KH-onset", "text": "寝つきの悪さ", "symptoms": ["insomnia"], "detail": "insomnia"},
+      {"id": "KH-wake", "text": "中途覚醒", "symptoms": ["insomnia"], "detail": "insomnia"},
+      {"id": "KH-palpitation", "text": "動悸", "symptoms": ["palpitation"], "detail": "palpitation"},
+      {"id": "KH-breath", "text": "息苦しさ", "symptoms": ["short_breath"], "detail": "breath"},
+      {"id": "KH-other", "text": "その他", "detail": "other", "freeText": true, "placeholder": "気になっていることを具体的に"} ] },
 
-    {"id": "A3i", "block": "A", "title": "「痛み・こり」について、あてはまる症状", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-9"]}, "options": [
-      {"id": "A3i-1", "text": "肩こり", "symptoms": ["stiff_shoulder"]},
-      {"id": "A3i-2", "text": "頭痛", "symptoms": ["headache"]},
-      {"id": "A3i-3", "text": "腰痛", "symptoms": ["low_back"]},
-      {"id": "A3i-4", "text": "関節や筋肉の痛み・神経痛", "symptoms": ["joint"]},
-      {"id": "A3i-5", "text": "足がつる（こむら返り）", "symptoms": ["cramps"]},
-      {"id": "A3i-6", "text": "手足のしびれ", "symptoms": ["numbness"]},
-      {"id": "A3i-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "KM", "block": "A", "role": "main", "dynamic": "complaints", "title": "いちばん改善したいお悩みを1つ選んでください", "type": "single", "scored": false, "showIf": {"minComplaints": 2}, "meta": "STEP 2　いちばん改善したいお悩み", "help": "ここで選んだお悩みを中心に、詳しい症状をお聞きします。ほかに選んだお悩みも、漢方薬を選ぶときの参考にします。", "options": []},
 
-    {"id": "A3j", "block": "A", "title": "「月経・更年期」について、あてはまる症状", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-10"]}, "options": [
-      {"id": "A3j-1", "text": "月経痛がつらい", "symptoms": ["dysmenorrhea"]},
-      {"id": "A3j-2", "text": "月経の周期が乱れる", "symptoms": ["irregular_menses"]},
-      {"id": "A3j-3", "text": "月経前後や産後に、イライラ・不安・のぼせなどの不調が出る", "symptoms": ["blood_path"]},
-      {"id": "A3j-4", "text": "更年期のほてり・のぼせ・気分の不調", "symptoms": ["menopause"]},
-      {"id": "A3j-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "Sacne1", "block": "A", "role": "detail", "title": "「{main}」は、どのようなタイプですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "acne"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sacne1-red", "text": "赤く腫れるニキビ", "weights": {"yang_exc": 0.5}, "organs": {"lung": 0.5}},
+      {"id": "Sacne1-pus", "text": "膿を持つニキビ", "weights": {"yang_exc": 0.5}, "organs": {"lung": 0.5}, "symptoms": ["pyoderma"]},
+      {"id": "Sacne1-comedo", "text": "白ニキビ・黒ニキビ", "weights": {"fluid": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sacne1-recur", "text": "繰り返しできるニキビ", "weights": {"blood_stasis": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sacne1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
 
-    {"id": "A3k", "block": "A", "title": "「体重」について、あてはまるもの", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-11"]}, "options": [
-      {"id": "A3k-1", "text": "お腹まわりに脂肪がつきやすく、便秘がち", "symptoms": ["obesity"]},
-      {"id": "A3k-2", "text": "水太りで、汗をかきやすく疲れやすい", "symptoms": ["obesity"]},
-      {"id": "A3k-3", "text": "ストレスで食べすぎてしまう", "symptoms": ["obesity"]},
-      {"id": "A3k-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "Sacne2", "block": "A", "role": "detail", "title": "どこにできやすいですか", "type": "multi", "scored": false, "showIf": {"mainDetail": "acne"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sacne2-forehead", "text": "額"},
+      {"id": "Sacne2-cheek", "text": "頬"},
+      {"id": "Sacne2-jaw", "text": "顎・フェイスライン"},
+      {"id": "Sacne2-back", "text": "背中"},
+      {"id": "Sacne2-chest", "text": "胸元"},
+      {"id": "Sacne2-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
 
-    {"id": "A3l", "block": "A", "title": "「風邪をひきやすい・せき」について、あてはまる症状", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-12"]}, "options": [
-      {"id": "A3l-1", "text": "風邪をひきやすい・体が弱い", "symptoms": ["weak_constitution"]},
-      {"id": "A3l-2", "text": "痰の少ない咳が出る・のどが乾燥する", "symptoms": ["dry_cough"]},
-      {"id": "A3l-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "Sacne3", "block": "A", "role": "detail", "title": "どんなときに悪化しやすいですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "acne"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sacne3-menses", "text": "生理前", "weights": {"qi_stag": 0.25, "blood_stasis": 0.25}, "organs": {"liver": 0.5}, "femaleOnly": true},
+      {"id": "Sacne3-stress", "text": "ストレスが強いとき", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sacne3-sleep", "text": "睡眠不足のとき", "weights": {"yin_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Sacne3-food", "text": "脂っこいもの・甘いものを食べたあと", "weights": {"fluid": 0.25, "yang_exc": 0.25}, "organs": {"spleen": 0.5}},
+      {"id": "Sacne3-none", "text": "特に決まっていない", "flags": ["none"]} ] },
 
-    {"id": "A3m", "block": "A", "title": "「めまい・耳鳴り」について、あてはまる症状", "type": "multi", "scored": false, "meta": "気になる症状の詳細", "showIf": {"chosen": ["A3-14"]}, "options": [
-      {"id": "A3m-1", "text": "めまい・ふらつき", "symptoms": ["dizziness"]},
-      {"id": "A3m-2", "text": "立ちくらみ", "symptoms": ["dizziness"]},
-      {"id": "A3m-3", "text": "耳鳴り", "symptoms": ["tinnitus"]},
-      {"id": "A3m-0", "text": "このなかにはない", "flags": ["none"]} ] },
+    {"id": "Sface_flush1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "face_flush"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sface_flush1-whole", "text": "顔全体が熱くなる", "weights": {"yang_exc": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Sface_flush1-cheek", "text": "頬だけ熱くなる", "weights": {"yin_def": 0.5}, "organs": {"lung": 0.5}},
+      {"id": "Sface_flush1-red", "text": "赤みを伴う", "weights": {"yang_exc": 0.5}, "organs": {"lung": 0.5}},
+      {"id": "Sface_flush1-sweat", "text": "汗を伴う", "weights": {"yang_exc": 0.25, "yin_def": 0.25}},
+      {"id": "Sface_flush1-coldlimb", "text": "ほてりと同時に手足が冷える", "weights": {"qi_stag": 0.25, "blood_stasis": 0.25}, "organs": {"liver": 0.5}, "also": ["cold"]},
+      {"id": "Sface_flush1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
 
-    {"id": "A4", "block": "A", "title": "その症状はいつからですか", "type": "single", "scored": false, "sub": { "title": "日常生活への影響", "options": [
-        {"id": "A4s-1", "text": "ほとんどない"},
-        {"id": "A4s-2", "text": "少しある"},
-        {"id": "A4s-3", "text": "大きい", "flags": ["severe"]} ] }, "options": [
+    {"id": "Sface_flush2", "block": "A", "role": "detail", "title": "どんなときに悪化しますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "face_flush"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sface_flush2-bath", "text": "入浴後", "weights": {"yin_def": 0.25, "yang_exc": 0.25}},
+      {"id": "Sface_flush2-exercise", "text": "運動後", "weights": {"yang_exc": 0.5}},
+      {"id": "Sface_flush2-tension", "text": "緊張したとき", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sface_flush2-meal", "text": "食後", "weights": {"yang_exc": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sface_flush2-evening", "text": "夕方から夜にかけて", "weights": {"yin_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Sface_flush2-none", "text": "特に決まっていない", "flags": ["none"]} ] },
+
+    {"id": "Sredness1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "redness"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sredness1-nose", "text": "鼻や頬が赤く、赤ら顔になりやすい", "weights": {"yang_exc": 0.5}, "organs": {"lung": 0.5}, "symptoms": ["rosacea"]},
+      {"id": "Sredness1-acne", "text": "ニキビの赤みが残る", "weights": {"yang_exc": 0.25, "blood_stasis": 0.25}, "symptoms": ["acne"]},
+      {"id": "Sredness1-itchy", "text": "かゆみや湿疹を伴う", "weights": {"fluid": 0.25, "yang_exc": 0.25}, "symptoms": ["eczema"]},
+      {"id": "Sredness1-flush", "text": "ほてり・熱感を伴う", "weights": {"yang_exc": 0.5}, "symptoms": ["flush"]},
+      {"id": "Sredness1-thin", "text": "皮膚が薄く、すぐに赤くなる", "weights": {"yin_def": 0.5}, "organs": {"lung": 0.5}},
+      {"id": "Sredness1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sredness2", "block": "A", "role": "detail", "title": "どんなときに赤みが強くなりますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "redness"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sredness2-warm", "text": "温まったとき", "weights": {"yin_def": 0.25, "yang_exc": 0.25}},
+      {"id": "Sredness2-alcohol", "text": "お酒や辛いものをとったあと", "weights": {"yang_exc": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sredness2-tension", "text": "緊張したとき", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sredness2-season", "text": "季節の変わり目・乾燥する時期", "weights": {"yin_def": 0.5}, "organs": {"lung": 0.5}},
+      {"id": "Sredness2-none", "text": "特に決まっていない", "flags": ["none"]} ] },
+
+    {"id": "Sdry_skin1", "block": "A", "role": "detail", "title": "「{main}」は、どこに気になりますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "dry_skin"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sdry_skin1-face", "text": "顔全体"},
+      {"id": "Sdry_skin1-cheek", "text": "頬"},
+      {"id": "Sdry_skin1-mouth", "text": "口周り", "organs": {"spleen": 0.5}},
+      {"id": "Sdry_skin1-eye", "text": "目元", "organs": {"liver": 0.5}},
+      {"id": "Sdry_skin1-hands", "text": "手足", "symptoms": ["rough_hands"]},
+      {"id": "Sdry_skin1-body", "text": "全身", "weights": {"yin_def": 0.5}, "organs": {"lung": 0.5}} ] },
+
+    {"id": "Sdry_skin2", "block": "A", "role": "detail", "title": "乾燥に伴う症状はありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "dry_skin"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sdry_skin2-itch", "text": "かゆみ", "weights": {"blood_def": 0.25, "yin_def": 0.25}, "symptoms": ["itch"]},
+      {"id": "Sdry_skin2-flake", "text": "粉ふき", "weights": {"blood_def": 0.5}},
+      {"id": "Sdry_skin2-red", "text": "赤み", "weights": {"yin_def": 0.5}},
+      {"id": "Sdry_skin2-crack", "text": "ひび割れ", "weights": {"blood_def": 0.25, "yin_def": 0.25}, "organs": {"lung": 0.5}},
+      {"id": "Sdry_skin2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sdry_skin3", "block": "A", "role": "detail", "title": "どんなときに悪化しますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "dry_skin"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sdry_skin3-winter", "text": "冬", "weights": {"blood_def": 0.5}},
+      {"id": "Sdry_skin3-wash", "text": "洗顔後", "weights": {"blood_def": 0.25, "yin_def": 0.25}},
+      {"id": "Sdry_skin3-bath", "text": "入浴後", "weights": {"yin_def": 0.5}},
+      {"id": "Sdry_skin3-always", "text": "常に乾燥している", "weights": {"blood_def": 0.25, "yin_def": 0.25}, "organs": {"kidney": 0.5}} ] },
+
+    {"id": "Sitch1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "itch"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sitch1-dry", "text": "乾燥してかゆい", "weights": {"blood_def": 0.5}, "organs": {"lung": 0.5}},
+      {"id": "Sitch1-red", "text": "赤みや熱感を伴う", "weights": {"yang_exc": 0.5}},
+      {"id": "Sitch1-wet", "text": "じゅくじゅくして分泌物がある", "weights": {"fluid": 0.5}, "organs": {"spleen": 0.5}, "symptoms": ["eczema"]},
+      {"id": "Sitch1-hives", "text": "赤く盛り上がる（じんましんのよう）", "weights": {"yang_exc": 0.25, "fluid": 0.25}, "symptoms": ["hives"]},
+      {"id": "Sitch1-night", "text": "夜や温まるとかゆみが強くなる", "weights": {"yin_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Sitch1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sitch2", "block": "A", "role": "detail", "title": "どこがかゆくなりますか", "type": "multi", "scored": false, "showIf": {"mainDetail": "itch"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sitch2-face", "text": "顔・首"},
+      {"id": "Sitch2-arms", "text": "腕・手"},
+      {"id": "Sitch2-legs", "text": "脚"},
+      {"id": "Sitch2-trunk", "text": "背中・お腹"},
+      {"id": "Sitch2-whole", "text": "全身"} ] },
+
+    {"id": "Sitch3", "block": "A", "role": "detail", "title": "どんなときに悪化しますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "itch"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sitch3-warm", "text": "温まったとき・入浴後", "weights": {"yin_def": 0.25, "yang_exc": 0.25}},
+      {"id": "Sitch3-sweat", "text": "汗をかいたとき", "weights": {"fluid": 0.5}},
+      {"id": "Sitch3-dry", "text": "空気が乾燥する季節", "weights": {"blood_def": 0.5}},
+      {"id": "Sitch3-stress", "text": "ストレスが強いとき", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sitch3-none", "text": "特に決まっていない", "flags": ["none"]} ] },
+
+    {"id": "Seczema1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "eczema"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Seczema1-red", "text": "赤みや熱感が強い", "weights": {"yang_exc": 0.5}},
+      {"id": "Seczema1-wet", "text": "じゅくじゅくして分泌物が多い", "weights": {"fluid": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Seczema1-dry", "text": "乾燥してカサカサしている", "weights": {"blood_def": 0.5}, "organs": {"lung": 0.5}},
+      {"id": "Seczema1-pus", "text": "化膿しやすい", "weights": {"yang_exc": 0.5}, "symptoms": ["pyoderma"]},
+      {"id": "Seczema1-itchy", "text": "かゆみが強い", "weights": {"yang_exc": 0.25, "fluid": 0.25}, "also": ["itch"]},
+      {"id": "Seczema1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Seczema2", "block": "A", "role": "detail", "title": "どこにできますか", "type": "multi", "scored": false, "showIf": {"mainDetail": "eczema"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Seczema2-face", "text": "顔・頭"},
+      {"id": "Seczema2-hands", "text": "手足", "symptoms": ["rough_hands"]},
+      {"id": "Seczema2-body", "text": "体（背中・お腹など）"},
+      {"id": "Seczema2-whole", "text": "全身"} ] },
+
+    {"id": "Seczema3", "block": "A", "role": "detail", "title": "どんなときに悪化しますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "eczema"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Seczema3-warm", "text": "温まったとき", "weights": {"yang_exc": 0.5}},
+      {"id": "Seczema3-sweat", "text": "汗をかいたとき", "weights": {"fluid": 0.5}},
+      {"id": "Seczema3-dry", "text": "空気が乾燥する季節", "weights": {"blood_def": 0.5}},
+      {"id": "Seczema3-stress", "text": "ストレスが強いとき", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Seczema3-none", "text": "特に決まっていない", "flags": ["none"]} ] },
+
+    {"id": "Scomplexion1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "complexion"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Scomplexion1-yellow", "text": "黄色っぽくくすむ", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Scomplexion1-pale", "text": "青白く、血色がない", "weights": {"blood_def": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Scomplexion1-dark", "text": "茶色っぽく暗い", "weights": {"blood_stasis": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Scomplexion1-bluecircle", "text": "目の下に青っぽいクマがある", "weights": {"blood_stasis": 0.25, "blood_def": 0.25}},
+      {"id": "Scomplexion1-browncircle", "text": "目の下に茶色っぽいクマがある", "weights": {"blood_stasis": 0.5}},
+      {"id": "Scomplexion1-evening", "text": "朝より夕方に目立つ", "weights": {"qi_def": 0.5}},
+      {"id": "Scomplexion1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Scomplexion2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "complexion"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Scomplexion2-tired", "text": "疲れやすく、食が細い", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}, "also": ["fatigue"]},
+      {"id": "Scomplexion2-dizzy", "text": "立ちくらみ・めまいがある", "weights": {"blood_def": 0.5}, "organs": {"liver": 0.5}, "also": ["dizziness"]},
+      {"id": "Scomplexion2-anemia", "text": "貧血といわれたことがある", "weights": {"blood_def": 0.5}, "symptoms": ["anemia"]},
+      {"id": "Scomplexion2-cold", "text": "手足が冷える", "weights": {"yang_def": 0.25, "blood_def": 0.25}, "also": ["cold"]},
+      {"id": "Scomplexion2-shoulder", "text": "肩こり・頭痛がある", "weights": {"blood_stasis": 0.5}, "also": ["stiff_shoulder", "headache"]},
+      {"id": "Scomplexion2-menses", "text": "月経痛がある・経血に塊が混じる", "weights": {"blood_stasis": 0.5}, "organs": {"liver": 0.5}, "also": ["dysmenorrhea"], "femaleOnly": true},
+      {"id": "Scomplexion2-sleep", "text": "寝不足が続いている", "weights": {"blood_def": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Scomplexion2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sspots1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "spots"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sspots1-sym", "text": "頬骨のあたりに左右対称に広がる", "weights": {"blood_stasis": 0.25, "qi_stag": 0.25}, "organs": {"liver": 0.5}},
+      {"id": "Sspots1-sun", "text": "日焼けのあとにできた", "weights": {"blood_stasis": 0.25}},
+      {"id": "Sspots1-acne", "text": "ニキビ跡が茶色く残っている", "weights": {"blood_stasis": 0.5}},
+      {"id": "Sspots1-spread", "text": "全体的に色ムラ・くすみがある", "weights": {"blood_stasis": 0.5}},
+      {"id": "Sspots1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sspots2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "spots"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sspots2-menses", "text": "月経痛がある・経血に塊が混じる", "weights": {"blood_stasis": 0.5}, "organs": {"liver": 0.5}, "also": ["dysmenorrhea"], "femaleOnly": true},
+      {"id": "Sspots2-flush", "text": "のぼせて足が冷える", "weights": {"blood_stasis": 0.25, "qi_stag": 0.25}, "organs": {"liver": 0.5}},
+      {"id": "Sspots2-shoulder", "text": "肩こり・頭痛がある", "weights": {"blood_stasis": 0.5}, "also": ["stiff_shoulder", "headache"]},
+      {"id": "Sspots2-dry", "text": "肌が乾燥しやすい", "weights": {"blood_def": 0.5}},
+      {"id": "Sspots2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sspots3", "block": "A", "role": "detail", "title": "どんなときに濃くなりやすいですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "spots"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sspots3-uv", "text": "紫外線を浴びたあと"},
+      {"id": "Sspots3-menses", "text": "生理前", "weights": {"qi_stag": 0.25, "blood_stasis": 0.25}, "organs": {"liver": 0.5}, "femaleOnly": true},
+      {"id": "Sspots3-stress", "text": "ストレス・寝不足のとき", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sspots3-preg", "text": "妊娠・出産のあと", "weights": {"blood_stasis": 0.25, "blood_def": 0.25}, "femaleOnly": true},
+      {"id": "Sspots3-none", "text": "特に決まっていない", "flags": ["none"]} ] },
+
+    {"id": "Sskin_texture1", "block": "A", "role": "detail", "title": "肌の状態で、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "skin_texture"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sskin_texture1-oily", "text": "顔全体が脂っぽく、べたつく", "weights": {"fluid": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sskin_texture1-tzone", "text": "Tゾーンは脂っぽく、頬は乾燥する", "weights": {"fluid": 0.25, "yin_def": 0.25}},
+      {"id": "Sskin_texture1-thick", "text": "角質が厚く、ごわつく", "weights": {"blood_stasis": 0.5}},
+      {"id": "Sskin_texture1-acne", "text": "ニキビができやすい", "weights": {"fluid": 0.25, "yang_exc": 0.25}, "also": ["acne"]},
+      {"id": "Sskin_texture1-dull", "text": "くすみやすい", "weights": {"blood_stasis": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sskin_texture1-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sskin_texture2", "block": "A", "role": "detail", "title": "「{main}」は、どんなときに目立ちますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "skin_texture"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sskin_texture2-food", "text": "脂っこいもの・甘いものを食べたあと", "weights": {"fluid": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sskin_texture2-sleep", "text": "睡眠不足のとき", "weights": {"yin_def": 0.25, "blood_def": 0.25}},
+      {"id": "Sskin_texture2-stress", "text": "ストレスが強いとき", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sskin_texture2-menses", "text": "生理前", "weights": {"qi_stag": 0.25, "blood_stasis": 0.25}, "femaleOnly": true},
+      {"id": "Sskin_texture2-season", "text": "季節の変わり目", "weights": {"fluid": 0.25, "yin_def": 0.25}},
+      {"id": "Sskin_texture2-none", "text": "特に決まっていない", "flags": ["none"]} ] },
+
+    {"id": "Saging1", "block": "A", "role": "detail", "title": "「{main}」と一緒に、気になる変化はありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "aging"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Saging1-tired", "text": "疲れやすく、気力が出ない", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Saging1-puffy", "text": "むくみやすい", "weights": {"fluid": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Saging1-dry", "text": "肌や髪が乾燥しやすい", "weights": {"blood_def": 0.25, "yin_def": 0.25}, "organs": {"lung": 0.5}},
+      {"id": "Saging1-dull", "text": "顔色が悪い・くすむ", "weights": {"blood_stasis": 0.5}},
+      {"id": "Saging1-hair", "text": "白髪・抜け毛が増えた", "weights": {"yin_def": 0.25, "blood_def": 0.25}, "organs": {"kidney": 0.5}},
+      {"id": "Saging1-legs", "text": "腰や膝がだるい", "weights": {"yang_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Saging1-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Saging2", "block": "A", "role": "detail", "title": "ふだんの生活や体調で、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "aging"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Saging2-sleep", "text": "睡眠不足が続いている", "weights": {"blood_def": 0.5}},
+      {"id": "Saging2-weight", "text": "体重が急に増えた・減った", "weights": {"qi_def": 0.25, "fluid": 0.25}},
+      {"id": "Saging2-gi", "text": "胃腸が弱く、食が細い", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Saging2-cold", "text": "冷えやすい", "weights": {"yang_def": 0.5}},
+      {"id": "Saging2-stress", "text": "ストレスが多い", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Saging2-none", "text": "特にない", "flags": ["none"]} ] },
+
+    {"id": "Spuffiness1", "block": "A", "role": "detail", "title": "「{main}」は、いつ気になりますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "puffiness"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spuffiness1-morning", "text": "朝起きたとき", "weights": {"fluid": 0.5}, "organs": {"lung": 0.25, "spleen": 0.25}},
+      {"id": "Spuffiness1-evening", "text": "夕方", "weights": {"qi_def": 0.25, "fluid": 0.25}, "organs": {"spleen": 0.5}},
+      {"id": "Spuffiness1-menses", "text": "生理前", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}, "femaleOnly": true},
+      {"id": "Spuffiness1-salt", "text": "お酒や塩辛いものをとったあと", "weights": {"fluid": 0.5}},
+      {"id": "Spuffiness1-always", "text": "いつも"} ] },
+
+    {"id": "Spuffiness2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "puffiness"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spuffiness2-legs", "text": "足もむくむ", "weights": {"fluid": 0.5}},
+      {"id": "Spuffiness2-heavy", "text": "体が重だるい", "weights": {"fluid": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Spuffiness2-urine", "text": "尿の量が少ない", "weights": {"fluid": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Spuffiness2-thirst", "text": "のどが渇く", "weights": {"fluid": 0.25, "yin_def": 0.25}},
+      {"id": "Spuffiness2-cold", "text": "冷えるとむくむ", "weights": {"yang_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Spuffiness2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Shair_loss1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "hair_loss"}, "meta": "STEP 3　お悩みの詳細", "help": "一部分だけ丸く抜ける場合は、皮膚科の受診もおすすめします。", "options": [
+      {"id": "Shair_loss1-whole", "text": "全体的に抜ける", "weights": {"blood_def": 0.25, "qi_def": 0.25}},
+      {"id": "Shair_loss1-part", "text": "分け目が目立つ", "weights": {"blood_def": 0.5}},
+      {"id": "Shair_loss1-front", "text": "生え際が薄くなった", "organs": {"kidney": 0.5}},
+      {"id": "Shair_loss1-patch", "text": "一部分だけ丸く抜ける", "flags": ["consult"]},
+      {"id": "Shair_loss1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Shair_loss2", "block": "A", "role": "detail", "title": "いつ頃から気になりますか", "type": "single", "scored": false, "showIf": {"mainDetail": "hair_loss"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Shair_loss2-m1", "text": "最近1か月以内"},
+      {"id": "Shair_loss2-m3", "text": "1〜3か月前"},
+      {"id": "Shair_loss2-m6", "text": "半年以上前"},
+      {"id": "Shair_loss2-years", "text": "数年前から"} ] },
+
+    {"id": "Shair_loss3", "block": "A", "role": "detail", "title": "気になり始めたころに、次のような変化はありましたか", "type": "multi", "scored": true, "showIf": {"mainDetail": "hair_loss"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Shair_loss3-birth", "text": "出産", "weights": {"blood_def": 0.5}, "femaleOnly": true},
+      {"id": "Shair_loss3-stress", "text": "強いストレス", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Shair_loss3-weight", "text": "急激な体重減少", "weights": {"qi_def": 0.25, "blood_def": 0.25}},
+      {"id": "Shair_loss3-ill", "text": "体調不良", "weights": {"qi_def": 0.5}},
+      {"id": "Shair_loss3-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Shair_dry1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "hair_dry"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Shair_dry1-dry", "text": "パサついて広がる", "weights": {"blood_def": 0.5}},
+      {"id": "Shair_dry1-split", "text": "枝毛・切れ毛が多い", "weights": {"blood_def": 0.5}},
+      {"id": "Shair_dry1-dull", "text": "ツヤがない", "weights": {"blood_def": 0.25, "qi_def": 0.25}},
+      {"id": "Shair_dry1-thin", "text": "細く、コシがない", "weights": {"qi_def": 0.25, "blood_def": 0.25}, "organs": {"kidney": 0.5}},
+      {"id": "Shair_dry1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Shair_dry2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "hair_dry"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Shair_dry2-nail", "text": "爪が割れやすい", "weights": {"blood_def": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Shair_dry2-skin", "text": "肌が乾燥しやすい", "weights": {"blood_def": 0.25, "yin_def": 0.25}},
+      {"id": "Shair_dry2-eye", "text": "目が疲れやすい・かすむ", "weights": {"blood_def": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Shair_dry2-dizzy", "text": "立ちくらみがある", "weights": {"blood_def": 0.5}, "also": ["dizziness"]},
+      {"id": "Shair_dry2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sgray_hair1", "block": "A", "role": "detail", "title": "「{main}」は、いつ頃から気になりますか", "type": "single", "scored": false, "showIf": {"mainDetail": "gray_hair"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sgray_hair1-young", "text": "20代以前から"},
+      {"id": "Sgray_hair1-mid", "text": "30〜40代から"},
+      {"id": "Sgray_hair1-late", "text": "50代以降"},
+      {"id": "Sgray_hair1-sudden", "text": "最近急に増えた"} ] },
+
+    {"id": "Sgray_hair2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "gray_hair"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sgray_hair2-loss", "text": "抜け毛も増えた", "weights": {"blood_def": 0.25, "yin_def": 0.25}, "organs": {"kidney": 0.5}},
+      {"id": "Sgray_hair2-eye", "text": "目が疲れやすい・かすむ", "weights": {"blood_def": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sgray_hair2-back", "text": "腰や膝がだるい", "weights": {"yang_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Sgray_hair2-ear", "text": "耳鳴りがある", "weights": {"yin_def": 0.5}, "organs": {"kidney": 0.5}, "also": ["tinnitus"]},
+      {"id": "Sgray_hair2-stress", "text": "ストレスが多い", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sgray_hair2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sscalp1", "block": "A", "role": "detail", "title": "頭皮の状態で、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "scalp"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sscalp1-dry", "text": "乾燥してつっぱる", "weights": {"blood_def": 0.25, "yin_def": 0.25}},
+      {"id": "Sscalp1-oily", "text": "脂っぽく、べたつく", "weights": {"fluid": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sscalp1-dryflake", "text": "乾いた細かいフケが出る", "weights": {"blood_def": 0.5}},
+      {"id": "Sscalp1-wetflake", "text": "湿った大きめのフケが出る", "weights": {"fluid": 0.25, "yang_exc": 0.25}},
+      {"id": "Sscalp1-itch", "text": "かゆみがある", "symptoms": ["itch"]},
+      {"id": "Sscalp1-red", "text": "赤み・湿疹がある", "weights": {"yang_exc": 0.5}, "symptoms": ["eczema"]},
+      {"id": "Sscalp1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sscalp2", "block": "A", "role": "detail", "title": "「{main}」は、どんなときに悪化しますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "scalp"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sscalp2-winter", "text": "空気が乾燥する季節", "weights": {"blood_def": 0.5}},
+      {"id": "Sscalp2-sweat", "text": "汗をかいたあと", "weights": {"fluid": 0.5}},
+      {"id": "Sscalp2-stress", "text": "ストレス・寝不足のとき", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sscalp2-food", "text": "脂っこいもの・甘いもの・お酒のあと", "weights": {"fluid": 0.25, "yang_exc": 0.25}, "organs": {"spleen": 0.5}},
+      {"id": "Sscalp2-none", "text": "特に決まっていない", "flags": ["none"]} ] },
+
+    {"id": "Speriod_pain1", "block": "A", "role": "detail", "title": "「{main}」は、どのような痛み方ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "period_pain"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Speriod_pain1-cold", "text": "下腹部が冷えて痛み、温めると楽になる", "weights": {"yang_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Speriod_pain1-stab", "text": "刺すように痛み、経血に塊が混じる", "weights": {"blood_stasis": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Speriod_pain1-bloat", "text": "張るように痛み、イライラする", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Speriod_pain1-dull", "text": "鈍い痛みが生理後も続く", "weights": {"blood_def": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Speriod_pain1-back", "text": "腰の痛みが強い", "weights": {"yang_def": 0.25, "blood_stasis": 0.25}, "also": ["low_back"]},
+      {"id": "Speriod_pain1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Speriod_pain2", "block": "A", "role": "detail", "title": "痛みの程度はどれくらいですか", "type": "single", "scored": false, "showIf": {"mainDetail": "period_pain"}, "meta": "STEP 3　お悩みの詳細", "help": "寝込むほどつらい場合や、年々痛みが強くなる場合は、婦人科の受診もおすすめします。", "options": [
+      {"id": "Speriod_pain2-mild", "text": "鎮痛薬を飲まなくても過ごせる"},
+      {"id": "Speriod_pain2-mid", "text": "鎮痛薬を飲めば過ごせる"},
+      {"id": "Speriod_pain2-severe", "text": "鎮痛薬を飲んでも寝込むほどつらい", "flags": ["consult"]} ] },
+
+    {"id": "Speriod_pain3", "block": "A", "role": "detail", "title": "生理のときに、ほかに出やすい症状はありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "period_pain"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Speriod_pain3-headache", "text": "頭痛", "also": ["headache"]},
+      {"id": "Speriod_pain3-nausea", "text": "吐き気", "also": ["nausea"]},
+      {"id": "Speriod_pain3-diarrhea", "text": "下痢", "also": ["diarrhea"]},
+      {"id": "Speriod_pain3-edema", "text": "むくみ", "weights": {"fluid": 0.5}, "also": ["edema"]},
+      {"id": "Speriod_pain3-constipation", "text": "便秘", "also": ["constipation"]},
+      {"id": "Speriod_pain3-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Spms_mood1", "block": "A", "role": "detail", "title": "生理前は、どのような状態になりますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "pms_mood"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spms_mood1-angry", "text": "イライラして怒りっぽくなる", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Spms_mood1-tearful", "text": "落ち込んで涙もろくなる", "weights": {"qi_stag": 0.25, "blood_def": 0.25}, "organs": {"liver": 0.25, "heart": 0.25}},
+      {"id": "Spms_mood1-anxious", "text": "不安で落ち着かない", "weights": {"blood_def": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Spms_mood1-sleep", "text": "眠れなくなる", "weights": {"blood_def": 0.25, "qi_stag": 0.25}, "organs": {"heart": 0.5}, "also": ["insomnia"]},
+      {"id": "Spms_mood1-breast", "text": "胸や脇が張る", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Spms_mood1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Spms_mood2", "block": "A", "role": "detail", "title": "いつ頃から始まりますか", "type": "single", "scored": true, "showIf": {"mainDetail": "pms_mood"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spms_mood2-early", "text": "生理の1週間以上前から"},
+      {"id": "Spms_mood2-late", "text": "生理の数日前から"},
+      {"id": "Spms_mood2-during", "text": "生理中も続く", "weights": {"blood_stasis": 0.5}} ] },
+
+    {"id": "Spms_mood3", "block": "A", "role": "detail", "title": "生活への影響はどれくらいですか", "type": "single", "scored": true, "showIf": {"mainDetail": "pms_mood"}, "meta": "STEP 3　お悩みの詳細", "help": "日常生活が送れないほどつらい場合は、婦人科などの受診もおすすめします。", "options": [
+      {"id": "Spms_mood3-ok", "text": "仕事や家事は普段どおりできる"},
+      {"id": "Spms_mood3-people", "text": "人間関係に影響が出ることがある", "weights": {"qi_stag": 0.5}},
+      {"id": "Spms_mood3-severe", "text": "日常生活が送れないほどつらい", "flags": ["consult"]} ] },
+
+    {"id": "Spms_headache1", "block": "A", "role": "detail", "title": "「{main}」は、どのような痛み方ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "pms_headache"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spms_headache1-throb", "text": "ズキズキと脈打つように痛む", "weights": {"qi_stag": 0.25, "yang_exc": 0.25}, "organs": {"liver": 0.5}},
+      {"id": "Spms_headache1-band", "text": "締めつけられるように重い", "weights": {"blood_stasis": 0.25, "qi_stag": 0.25}},
+      {"id": "Spms_headache1-side", "text": "こめかみや片側が痛む", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Spms_headache1-nausea", "text": "吐き気を伴う", "weights": {"fluid": 0.25, "yang_def": 0.25}, "also": ["nausea"]},
+      {"id": "Spms_headache1-puffy", "text": "むくみを伴う", "weights": {"fluid": 0.5}, "also": ["edema"]},
+      {"id": "Spms_headache1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Spms_headache2", "block": "A", "role": "detail", "title": "いつ痛みやすいですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "pms_headache"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spms_headache2-before", "text": "生理前"},
+      {"id": "Spms_headache2-during", "text": "生理中"},
+      {"id": "Spms_headache2-after", "text": "生理後", "weights": {"blood_def": 0.5}} ] },
+
+    {"id": "Spms_edema1", "block": "A", "role": "detail", "title": "「{main}」は、どこに出ますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "pms_edema"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spms_edema1-face", "text": "顔・まぶた"},
+      {"id": "Spms_edema1-hand", "text": "手指"},
+      {"id": "Spms_edema1-leg", "text": "足"},
+      {"id": "Spms_edema1-belly", "text": "お腹が張る", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}} ] },
+
+    {"id": "Spms_edema2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "pms_edema"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spms_edema2-urine", "text": "尿の量が少ない", "weights": {"fluid": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Spms_edema2-thirst", "text": "のどが渇く", "weights": {"fluid": 0.5}},
+      {"id": "Spms_edema2-heavy", "text": "体が重だるい", "weights": {"fluid": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Spms_edema2-headache", "text": "頭痛がする", "also": ["headache"]},
+      {"id": "Spms_edema2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Spms_body1", "block": "A", "role": "detail", "title": "生理前に、ほかに出やすい不調はありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "pms_body"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spms_body1-angry", "text": "イライラ", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Spms_body1-low", "text": "気分の落ち込み", "weights": {"qi_stag": 0.25, "blood_def": 0.25}},
+      {"id": "Spms_body1-puffy", "text": "むくみ", "weights": {"fluid": 0.5}, "also": ["edema"]},
+      {"id": "Spms_body1-breast", "text": "胸の張り", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Spms_body1-sleepy", "text": "眠気・だるさ", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Spms_body1-sweet", "text": "甘いものが欲しくなる", "weights": {"qi_def": 0.25, "fluid": 0.25}, "organs": {"spleen": 0.5}},
+      {"id": "Spms_body1-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Spms_body2", "block": "A", "role": "detail", "title": "いつ頃から始まりますか", "type": "single", "scored": true, "showIf": {"mainDetail": "pms_body"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spms_body2-early", "text": "生理の1週間以上前から"},
+      {"id": "Spms_body2-late", "text": "生理の数日前から"},
+      {"id": "Spms_body2-during", "text": "生理中も続く", "weights": {"blood_stasis": 0.5}} ] },
+
+    {"id": "Spms_skin1", "block": "A", "role": "detail", "title": "生理前の肌は、どのような状態になりますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "pms_skin"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spms_skin1-acne", "text": "ニキビ・吹き出物ができる", "weights": {"yang_exc": 0.25, "blood_stasis": 0.25}, "symptoms": ["acne"]},
+      {"id": "Spms_skin1-itch", "text": "湿疹・かゆみが出る", "weights": {"fluid": 0.25, "yang_exc": 0.25}, "symptoms": ["eczema"]},
+      {"id": "Spms_skin1-dry", "text": "乾燥する", "weights": {"blood_def": 0.5}},
+      {"id": "Spms_skin1-dull", "text": "くすむ", "weights": {"blood_stasis": 0.5}},
+      {"id": "Spms_skin1-red", "text": "赤みが出る", "weights": {"yang_exc": 0.5}},
+      {"id": "Spms_skin1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Spms_skin2", "block": "A", "role": "detail", "title": "どこに出やすいですか", "type": "multi", "scored": false, "showIf": {"mainDetail": "pms_skin"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spms_skin2-forehead", "text": "額"},
+      {"id": "Spms_skin2-cheek", "text": "頬"},
+      {"id": "Spms_skin2-jaw", "text": "顎・フェイスライン"},
+      {"id": "Spms_skin2-mouth", "text": "口周り"},
+      {"id": "Spms_skin2-whole", "text": "顔全体"} ] },
+
+    {"id": "Sirregular1", "block": "A", "role": "detail", "title": "生理の周期は、どのような状態ですか", "type": "single", "scored": true, "showIf": {"mainDetail": "irregular"}, "meta": "STEP 3　お悩みの詳細", "help": "3か月以上来ない場合は、婦人科の受診もおすすめします。", "options": [
+      {"id": "Sirregular1-early", "text": "早まりがち（24日以内）", "weights": {"qi_def": 0.25, "yang_exc": 0.25}},
+      {"id": "Sirregular1-late", "text": "遅れがち（39日以上）", "weights": {"blood_def": 0.25, "yang_def": 0.25}},
+      {"id": "Sirregular1-random", "text": "バラバラで予測できない", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sirregular1-skip", "text": "3か月以上来ないことがある", "weights": {"blood_def": 0.5}, "flags": ["consult"]} ] },
+
+    {"id": "Sirregular2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "irregular"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sirregular2-heavy", "text": "経血量が多い"},
+      {"id": "Sirregular2-light", "text": "経血量が少ない", "weights": {"blood_def": 0.5}},
+      {"id": "Sirregular2-clot", "text": "経血に塊が混じる", "weights": {"blood_stasis": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sirregular2-pain", "text": "月経痛がある", "also": ["dysmenorrhea"]},
+      {"id": "Sirregular2-mood", "text": "イライラ・気分の波がある", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}, "also": ["blood_path"]},
+      {"id": "Sirregular2-cold", "text": "冷えやすい", "weights": {"yang_def": 0.5}, "also": ["cold"]},
+      {"id": "Sirregular2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sirregular3", "block": "A", "role": "detail", "title": "乱れ始めたころに、次のようなことはありましたか", "type": "multi", "scored": true, "showIf": {"mainDetail": "irregular"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sirregular3-stress", "text": "強いストレス", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sirregular3-weight", "text": "急な体重の変化", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sirregular3-birth", "text": "出産", "weights": {"blood_def": 0.5}},
+      {"id": "Sirregular3-diet", "text": "激しい運動・食事制限", "weights": {"blood_def": 0.5}},
+      {"id": "Sirregular3-none", "text": "特にない", "flags": ["none"]} ] },
+
+    {"id": "Sflow_heavy1", "block": "A", "role": "detail", "title": "経血の状態で、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "flow_heavy"}, "meta": "STEP 3　お悩みの詳細", "help": "量が非常に多い場合や、生理以外の出血がある場合は、婦人科の受診をおすすめします。", "options": [
+      {"id": "Sflow_heavy1-clot", "text": "レバーのような塊が多い", "weights": {"blood_stasis": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sflow_heavy1-fast", "text": "1〜2時間でナプキンを替えないと漏れる", "flags": ["consult"]},
+      {"id": "Sflow_heavy1-long", "text": "生理が8日以上続く", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}, "flags": ["consult"]},
+      {"id": "Sflow_heavy1-between", "text": "生理以外のときにも出血がある", "flags": ["refer"]},
+      {"id": "Sflow_heavy1-bright", "text": "鮮やかな赤色の出血が多い", "weights": {"yang_exc": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sflow_heavy1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sflow_heavy2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "flow_heavy"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sflow_heavy2-dizzy", "text": "立ちくらみ・めまいがある", "weights": {"blood_def": 0.5}, "also": ["dizziness", "anemia"]},
+      {"id": "Sflow_heavy2-tired", "text": "疲れやすい", "weights": {"qi_def": 0.5}, "also": ["fatigue"]},
+      {"id": "Sflow_heavy2-pain", "text": "月経痛がある", "also": ["dysmenorrhea"]},
+      {"id": "Sflow_heavy2-pale", "text": "顔色が悪い", "weights": {"blood_def": 0.5}},
+      {"id": "Sflow_heavy2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sflow_light1", "block": "A", "role": "detail", "title": "経血の状態で、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "flow_light"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sflow_light1-pale", "text": "色が薄い", "weights": {"blood_def": 0.5}},
+      {"id": "Sflow_light1-dark", "text": "色が暗い・塊がある", "weights": {"blood_stasis": 0.5}},
+      {"id": "Sflow_light1-short", "text": "2日ほどで終わる", "weights": {"blood_def": 0.25, "yin_def": 0.25}},
+      {"id": "Sflow_light1-late", "text": "周期が遅れがち", "weights": {"blood_def": 0.25, "yang_def": 0.25}},
+      {"id": "Sflow_light1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sflow_light2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "flow_light"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sflow_light2-cold", "text": "冷えやすい", "weights": {"yang_def": 0.5}, "also": ["cold"]},
+      {"id": "Sflow_light2-tired", "text": "疲れやすい", "weights": {"qi_def": 0.5}, "also": ["fatigue"]},
+      {"id": "Sflow_light2-dry", "text": "肌や髪が乾燥する", "weights": {"blood_def": 0.5}},
+      {"id": "Sflow_light2-weight", "text": "体重が減った・食事を減らしている", "weights": {"qi_def": 0.25, "blood_def": 0.25}},
+      {"id": "Sflow_light2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Shot_flash1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "hot_flash"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Shot_flash1-sudden", "text": "急に顔や上半身がカーッと熱くなる", "weights": {"yang_exc": 0.25, "yin_def": 0.25}},
+      {"id": "Shot_flash1-headsweat", "text": "顔や頭に汗をかく", "weights": {"yang_exc": 0.25, "qi_stag": 0.25}},
+      {"id": "Shot_flash1-palms", "text": "手のひら・足の裏がほてる", "weights": {"yin_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Shot_flash1-coldfeet", "text": "のぼせるのに足は冷える", "weights": {"qi_stag": 0.25, "blood_stasis": 0.25}, "organs": {"liver": 0.5}, "also": ["cold"]},
+      {"id": "Shot_flash1-evening", "text": "夕方から夜にほてる", "weights": {"yin_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Shot_flash1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Shot_flash2", "block": "A", "role": "detail", "title": "どれくらいの頻度で起こりますか", "type": "single", "scored": false, "showIf": {"mainDetail": "hot_flash"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Shot_flash2-many", "text": "1日に何度も"},
+      {"id": "Shot_flash2-once", "text": "1日1回くらい"},
+      {"id": "Shot_flash2-sometimes", "text": "ときどき"} ] },
+
+    {"id": "Shot_flash3", "block": "A", "role": "detail", "title": "一緒に出やすい症状はありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "hot_flash"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Shot_flash3-irritable", "text": "イライラ", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}, "also": ["nerves"]},
+      {"id": "Shot_flash3-palpitation", "text": "動悸", "organs": {"heart": 0.5}, "also": ["palpitation"]},
+      {"id": "Shot_flash3-insomnia", "text": "眠れない", "organs": {"heart": 0.5}, "also": ["insomnia"]},
+      {"id": "Shot_flash3-shoulder", "text": "肩こり", "weights": {"blood_stasis": 0.25, "qi_stag": 0.25}, "also": ["stiff_shoulder"]},
+      {"id": "Shot_flash3-dizzy", "text": "めまい", "also": ["dizziness"]},
+      {"id": "Shot_flash3-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Ssweat1", "block": "A", "role": "detail", "title": "「{main}」は、どのような汗ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "sweat"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Ssweat1-flush", "text": "急なほてりと一緒に汗が出る", "weights": {"yin_def": 0.25, "yang_exc": 0.25}},
+      {"id": "Ssweat1-move", "text": "少し動くだけで汗が出る", "weights": {"qi_def": 0.5}, "organs": {"lung": 0.5}},
+      {"id": "Ssweat1-night", "text": "寝ている間に汗をかく", "weights": {"yin_def": 0.5}, "organs": {"kidney": 0.5}, "symptoms": ["night_sweat"]},
+      {"id": "Ssweat1-tension", "text": "緊張すると手や脇に汗をかく", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Ssweat1-head", "text": "頭や顔だけ汗をかく", "weights": {"qi_stag": 0.25, "yang_exc": 0.25}},
+      {"id": "Ssweat1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Ssweat2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "sweat"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Ssweat2-tired", "text": "疲れやすい", "weights": {"qi_def": 0.5}, "also": ["fatigue"]},
+      {"id": "Ssweat2-thirst", "text": "のどや口が渇く", "weights": {"yin_def": 0.5}},
+      {"id": "Ssweat2-palms", "text": "手足がほてる", "weights": {"yin_def": 0.5}, "also": ["flush"]},
+      {"id": "Ssweat2-cold", "text": "汗のあとに冷える", "weights": {"qi_def": 0.25, "yang_def": 0.25}},
+      {"id": "Ssweat2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sirritability1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "irritability"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sirritability1-flare", "text": "カッとなって顔が赤くなる", "weights": {"yang_exc": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sirritability1-small", "text": "些細なことが気になり、神経が高ぶる", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sirritability1-sigh", "text": "ため息が多く、胸や脇が張る", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sirritability1-swing", "text": "気分の浮き沈みが激しい", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sirritability1-grind", "text": "歯ぎしり・食いしばりがある", "weights": {"qi_stag": 0.25, "blood_def": 0.25}, "organs": {"liver": 0.5}},
+      {"id": "Sirritability1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sirritability2", "block": "A", "role": "detail", "title": "どんなときに強くなりますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "irritability"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sirritability2-work", "text": "仕事や人間関係のストレス", "weights": {"qi_stag": 0.5}},
+      {"id": "Sirritability2-menses", "text": "生理前", "weights": {"qi_stag": 0.25, "blood_stasis": 0.25}, "also": ["blood_path"], "femaleOnly": true},
+      {"id": "Sirritability2-tired", "text": "疲れているとき", "weights": {"qi_def": 0.25, "blood_def": 0.25}},
+      {"id": "Sirritability2-hungry", "text": "空腹のとき", "weights": {"qi_def": 0.5}},
+      {"id": "Sirritability2-none", "text": "特に決まっていない", "flags": ["none"]} ] },
+
+    {"id": "Sirritability3", "block": "A", "role": "detail", "title": "一緒に出やすい症状はありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "irritability"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sirritability3-headache", "text": "頭痛", "also": ["headache"]},
+      {"id": "Sirritability3-shoulder", "text": "肩こり", "also": ["stiff_shoulder"]},
+      {"id": "Sirritability3-stomach", "text": "胃痛・お腹の張り", "organs": {"spleen": 0.5}, "also": ["stomach_pain"]},
+      {"id": "Sirritability3-insomnia", "text": "眠れない", "organs": {"heart": 0.5}, "also": ["insomnia"]},
+      {"id": "Sirritability3-flush", "text": "のぼせ", "weights": {"yang_exc": 0.5}, "also": ["flush"]},
+      {"id": "Sirritability3-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sanxiety1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "anxiety"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sanxiety1-vague", "text": "理由もなく不安になる", "weights": {"blood_def": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Sanxiety1-tense", "text": "人前などで強く緊張する", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sanxiety1-startle", "text": "驚きやすく、ビクッとしやすい", "weights": {"qi_def": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Sanxiety1-worry", "text": "考え事が頭から離れない", "weights": {"qi_def": 0.25, "blood_def": 0.25}, "organs": {"spleen": 0.5}},
+      {"id": "Sanxiety1-palpitation", "text": "動悸がする", "organs": {"heart": 0.5}, "also": ["palpitation"]},
+      {"id": "Sanxiety1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sanxiety2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "anxiety"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sanxiety2-tired", "text": "疲れやすい", "weights": {"qi_def": 0.5}, "also": ["fatigue"]},
+      {"id": "Sanxiety2-forget", "text": "物忘れ・集中力の低下", "weights": {"blood_def": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Sanxiety2-throat", "text": "のどがつかえる", "weights": {"qi_stag": 0.5}, "also": ["throat_lump"]},
+      {"id": "Sanxiety2-sweat", "text": "汗をかきやすい", "weights": {"qi_def": 0.5}},
+      {"id": "Sanxiety2-insomnia", "text": "眠りが浅い", "weights": {"blood_def": 0.5}, "also": ["insomnia"]},
+      {"id": "Sanxiety2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Slow_mood1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "low_mood"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Slow_mood1-heavy", "text": "気分がふさぎ、重い", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Slow_mood1-lazy", "text": "何をするのも億劫", "weights": {"qi_def": 0.25, "yang_def": 0.25}},
+      {"id": "Slow_mood1-tearful", "text": "涙もろい", "weights": {"blood_def": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Slow_mood1-appetite", "text": "食欲がない", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}, "also": ["poor_appetite"]},
+      {"id": "Slow_mood1-throat", "text": "のどがつかえる", "weights": {"qi_stag": 0.5}, "also": ["throat_lump"]},
+      {"id": "Slow_mood1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Slow_mood2", "block": "A", "role": "detail", "title": "どれくらい続いていますか", "type": "single", "scored": true, "showIf": {"mainDetail": "low_mood"}, "meta": "STEP 3　お悩みの詳細", "help": "2週間以上ほぼ毎日続く場合は、医療機関の受診もおすすめします。", "options": [
+      {"id": "Slow_mood2-short", "text": "2週間未満"},
+      {"id": "Slow_mood2-long", "text": "2週間以上、ほぼ毎日続いている", "flags": ["consult"]},
+      {"id": "Slow_mood2-menses", "text": "生理前だけ", "weights": {"qi_stag": 0.5}, "also": ["blood_path"], "femaleOnly": true} ] },
+
+    {"id": "Slow_mood3", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "low_mood"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Slow_mood3-insomnia", "text": "眠れない・朝早く目が覚める", "organs": {"heart": 0.5}, "also": ["insomnia"]},
+      {"id": "Slow_mood3-tired", "text": "疲れやすい", "weights": {"qi_def": 0.5}, "also": ["fatigue"]},
+      {"id": "Slow_mood3-headache", "text": "頭が重い", "weights": {"fluid": 0.5}, "also": ["headache"]},
+      {"id": "Slow_mood3-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Spalpitation1", "block": "A", "role": "detail", "title": "「{main}」は、どのようなときに起こりますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "palpitation"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Spalpitation1-stress", "text": "緊張や不安を感じたとき", "weights": {"qi_stag": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Spalpitation1-move", "text": "少し動いただけで", "weights": {"qi_def": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Spalpitation1-rest", "text": "安静にしているとき", "weights": {"yin_def": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Spalpitation1-sudden", "text": "急に始まり、急に止まる", "flags": ["consult"]},
+      {"id": "Spalpitation1-skip", "text": "脈が飛ぶ・乱れる感じがする", "flags": ["consult"]},
+      {"id": "Spalpitation1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Spalpitation2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "palpitation"}, "meta": "STEP 3　お悩みの詳細", "help": "胸の痛み・圧迫感や、気が遠くなる感じがある場合は、医療機関の受診をおすすめします。", "options": [
+      {"id": "Spalpitation2-chest", "text": "胸の痛みや圧迫感がある", "flags": ["refer"]},
+      {"id": "Spalpitation2-faint", "text": "気が遠くなる・失神しそうになる", "flags": ["refer"]},
+      {"id": "Spalpitation2-breath", "text": "息切れ", "weights": {"qi_def": 0.5}, "also": ["short_breath"]},
+      {"id": "Spalpitation2-dizzy", "text": "めまい・ふらつき", "weights": {"fluid": 0.5}, "also": ["dizziness"]},
+      {"id": "Spalpitation2-sweat", "text": "汗をかく", "weights": {"qi_def": 0.5}},
+      {"id": "Spalpitation2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sinsomnia1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "insomnia"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sinsomnia1-onset", "text": "寝つきが悪い", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sinsomnia1-wake", "text": "夜中に何度も目が覚める", "weights": {"blood_def": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Sinsomnia1-early", "text": "朝早く目が覚めてしまう", "weights": {"yin_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Sinsomnia1-dream", "text": "夢が多く、眠りが浅い", "weights": {"blood_def": 0.5}, "organs": {"heart": 0.5}},
+      {"id": "Sinsomnia1-unrest", "text": "寝ても疲れが取れない", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sinsomnia1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sinsomnia2", "block": "A", "role": "detail", "title": "眠れない原因で、思い当たるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "insomnia"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sinsomnia2-worry", "text": "考え事・不安", "weights": {"qi_def": 0.25, "blood_def": 0.25}, "organs": {"heart": 0.25, "spleen": 0.25}},
+      {"id": "Sinsomnia2-irritable", "text": "イライラ・気持ちの高ぶり", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sinsomnia2-hot", "text": "体のほてり・暑さ", "weights": {"yin_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Sinsomnia2-toilet", "text": "トイレに起きる", "weights": {"yang_def": 0.5}, "organs": {"kidney": 0.5}, "also": ["frequent_urination"]},
+      {"id": "Sinsomnia2-none", "text": "特に思い当たらない", "flags": ["none"]} ] },
+
+    {"id": "Sinsomnia3", "block": "A", "role": "detail", "title": "日中の様子で、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "insomnia"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sinsomnia3-sleepy", "text": "日中に眠くなる", "weights": {"qi_def": 0.5}},
+      {"id": "Sinsomnia3-tired", "text": "だるさがある", "also": ["fatigue"]},
+      {"id": "Sinsomnia3-irritable", "text": "イライラする", "weights": {"qi_stag": 0.5}},
+      {"id": "Sinsomnia3-palpitation", "text": "動悸がする", "also": ["palpitation"]},
+      {"id": "Sinsomnia3-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sfatigue1", "block": "A", "role": "detail", "title": "「{main}」に伴って、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "fatigue"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sfatigue1-appetite", "text": "食欲がない", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}, "also": ["poor_appetite"]},
+      {"id": "Sfatigue1-heavy", "text": "食後に眠くなる・胃がもたれる", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}, "also": ["stomach_heavy"]},
+      {"id": "Sfatigue1-breath", "text": "少し動くと息切れ・汗をかく", "weights": {"qi_def": 0.5}, "organs": {"lung": 0.5}, "also": ["short_breath"]},
+      {"id": "Sfatigue1-sweat", "text": "寝汗をかく", "weights": {"yin_def": 0.5}, "organs": {"kidney": 0.5}, "also": ["night_sweat"]},
+      {"id": "Sfatigue1-cold", "text": "手足が冷える", "weights": {"yang_def": 0.5}, "also": ["cold"]},
+      {"id": "Sfatigue1-pale", "text": "顔色が悪い・立ちくらみがする", "weights": {"blood_def": 0.5}, "also": ["dizziness"]},
+      {"id": "Sfatigue1-low", "text": "気分が落ち込む", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sfatigue1-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sfatigue2", "block": "A", "role": "detail", "title": "疲れやすくなったきっかけで、思い当たるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "fatigue"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sfatigue2-ill", "text": "病気や手術のあと", "weights": {"qi_def": 0.5}, "symptoms": ["recovery"]},
+      {"id": "Sfatigue2-birth", "text": "出産のあと", "weights": {"blood_def": 0.5}, "symptoms": ["recovery"], "femaleOnly": true},
+      {"id": "Sfatigue2-busy", "text": "忙しさ・睡眠不足が続いている", "weights": {"qi_def": 0.25, "blood_def": 0.25}},
+      {"id": "Sfatigue2-stress", "text": "強いストレス", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sfatigue2-heat", "text": "暑さ・季節の変わり目", "weights": {"qi_def": 0.25, "fluid": 0.25}},
+      {"id": "Sfatigue2-none", "text": "特にない", "flags": ["none"]} ] },
+
+    {"id": "Sfatigue3", "block": "A", "role": "detail", "title": "次のような症状はありますか", "type": "multi", "scored": false, "showIf": {"mainDetail": "fatigue"}, "meta": "STEP 3　お悩みの詳細", "help": "あてはまる場合は、医療機関の受診をおすすめします。回答はこのまま続けられます。", "options": [
+      {"id": "Sfatigue3-weight", "text": "理由もなく体重が減ってきた", "flags": ["consult"]},
+      {"id": "Sfatigue3-fever", "text": "微熱が続いている", "flags": ["consult"]},
+      {"id": "Sfatigue3-none", "text": "どれもない", "flags": ["none"]} ] },
+
+    {"id": "Scold1", "block": "A", "role": "detail", "title": "「{main}」は、どのような冷え方ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "cold"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Scold1-touch", "text": "触ると冷たく、血色が悪い", "weights": {"blood_def": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Scold1-deep", "text": "体の芯から冷える感じがする", "weights": {"yang_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Scold1-pain", "text": "冷えると痛む・しびれる", "weights": {"blood_stasis": 0.25, "yang_def": 0.25}},
+      {"id": "Scold1-diarrhea", "text": "冷えるとお腹を壊す", "weights": {"yang_def": 0.25, "qi_def": 0.25}, "organs": {"spleen": 0.5}, "also": ["diarrhea"]},
+      {"id": "Scold1-puffy", "text": "冷えるとむくむ", "weights": {"fluid": 0.5}, "also": ["edema"]},
+      {"id": "Scold1-toilet", "text": "冷えるとトイレが近くなる", "weights": {"yang_def": 0.5}, "organs": {"kidney": 0.5}, "also": ["frequent_urination"]},
+      {"id": "Scold1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Scold2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "cold"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Scold2-tired", "text": "疲れやすい", "weights": {"qi_def": 0.5}, "also": ["fatigue"]},
+      {"id": "Scold2-pale", "text": "顔色が悪い・貧血気味", "weights": {"blood_def": 0.5}, "also": ["anemia"]},
+      {"id": "Scold2-shoulder", "text": "肩こり・頭痛がある", "weights": {"blood_stasis": 0.5}, "also": ["stiff_shoulder", "headache"]},
+      {"id": "Scold2-menses", "text": "月経痛・月経不順がある", "weights": {"blood_stasis": 0.5}, "also": ["dysmenorrhea", "irregular_menses"], "femaleOnly": true},
+      {"id": "Scold2-flush", "text": "のぼせ・顔のほてりがある", "weights": {"qi_stag": 0.25, "blood_stasis": 0.25}, "also": ["flush"]},
+      {"id": "Scold2-chilblain", "text": "しもやけになりやすい", "also": ["chilblain"]},
+      {"id": "Scold2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Scold_pain1", "block": "A", "role": "detail", "title": "「{main}」は、どのような痛み方ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "cold_pain"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Scold_pain1-warm", "text": "温めると楽になる", "weights": {"yang_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Scold_pain1-cramp", "text": "差し込むように痛む", "weights": {"yang_def": 0.25, "qi_stag": 0.25}},
+      {"id": "Scold_pain1-dull", "text": "鈍く重い痛みが続く", "weights": {"fluid": 0.25, "yang_def": 0.25}},
+      {"id": "Scold_pain1-diarrhea", "text": "下痢を伴う", "weights": {"qi_def": 0.25, "yang_def": 0.25}, "organs": {"spleen": 0.5}, "also": ["diarrhea"]},
+      {"id": "Scold_pain1-nausea", "text": "吐き気を伴う", "weights": {"fluid": 0.5}, "also": ["nausea"]},
+      {"id": "Scold_pain1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Scold_pain2", "block": "A", "role": "detail", "title": "とくに冷えるのはどこですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "cold_pain"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Scold_pain2-hands", "text": "手足の先", "weights": {"blood_def": 0.5}},
+      {"id": "Scold_pain2-legs", "text": "下半身・足", "weights": {"yang_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Scold_pain2-belly", "text": "お腹", "weights": {"yang_def": 0.25, "qi_def": 0.25}, "organs": {"spleen": 0.5}},
+      {"id": "Scold_pain2-whole", "text": "全身", "weights": {"yang_def": 0.5}} ] },
+
+    {"id": "Scold_pain3", "block": "A", "role": "detail", "title": "次のような症状はありますか", "type": "multi", "scored": false, "showIf": {"mainDetail": "cold_pain"}, "meta": "STEP 3　お悩みの詳細", "help": "あてはまる場合は、医療機関の受診をおすすめします。回答はこのまま続けられます。", "options": [
+      {"id": "Scold_pain3-sudden", "text": "突然、今までにない激しい痛みが起きた", "flags": ["refer"]},
+      {"id": "Scold_pain3-worse", "text": "痛みがどんどん強くなっている", "flags": ["refer"]},
+      {"id": "Scold_pain3-fever", "text": "発熱を伴う", "flags": ["consult"]},
+      {"id": "Scold_pain3-none", "text": "どれもない", "flags": ["none"]} ] },
+
+    {"id": "Schilblain1", "block": "A", "role": "detail", "title": "「{main}」は、どこにできやすいですか", "type": "multi", "scored": false, "showIf": {"mainDetail": "chilblain"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Schilblain1-fingers", "text": "手の指"},
+      {"id": "Schilblain1-toes", "text": "足の指"},
+      {"id": "Schilblain1-ear", "text": "耳・顔"} ] },
+
+    {"id": "Schilblain2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "chilblain"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Schilblain2-cold", "text": "手足が冷えやすい", "weights": {"blood_def": 0.25, "yang_def": 0.25}, "also": ["cold"]},
+      {"id": "Schilblain2-pain", "text": "下腹部や腰が冷えて痛む", "weights": {"yang_def": 0.5}, "also": ["abdominal_pain", "low_back"]},
+      {"id": "Schilblain2-pale", "text": "顔色が悪い", "weights": {"blood_def": 0.5}},
+      {"id": "Schilblain2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sheadache1", "block": "A", "role": "detail", "title": "「{main}」は、どのような痛み方ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "headache"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sheadache1-band", "text": "締めつけられるように痛む", "weights": {"qi_stag": 0.25, "blood_stasis": 0.25}, "organs": {"liver": 0.5}},
+      {"id": "Sheadache1-throb", "text": "ズキズキ脈打つように痛む", "weights": {"qi_stag": 0.25, "yang_exc": 0.25}, "organs": {"liver": 0.5}},
+      {"id": "Sheadache1-heavy", "text": "頭が重い", "weights": {"fluid": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sheadache1-cold", "text": "冷えると痛む", "weights": {"yang_def": 0.5}},
+      {"id": "Sheadache1-weather", "text": "雨の日や低気圧で痛む", "weights": {"fluid": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sheadache1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sheadache2", "block": "A", "role": "detail", "title": "一緒に出やすい症状はありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "headache"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sheadache2-shoulder", "text": "肩こり", "weights": {"blood_stasis": 0.25}, "also": ["stiff_shoulder"]},
+      {"id": "Sheadache2-dizzy", "text": "めまい", "also": ["dizziness"]},
+      {"id": "Sheadache2-nausea", "text": "吐き気", "also": ["nausea"]},
+      {"id": "Sheadache2-puffy", "text": "むくみ・のどの渇き", "weights": {"fluid": 0.5}, "also": ["edema"]},
+      {"id": "Sheadache2-flush", "text": "のぼせ", "weights": {"yang_exc": 0.5}, "also": ["flush"]},
+      {"id": "Sheadache2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sheadache3", "block": "A", "role": "detail", "title": "次のような症状はありますか", "type": "multi", "scored": false, "showIf": {"mainDetail": "headache"}, "meta": "STEP 3　お悩みの詳細", "help": "あてはまる場合は、医療機関の受診をおすすめします。回答はこのまま続けられます。", "options": [
+      {"id": "Sheadache3-sudden", "text": "突然、今までにない激しい頭痛が起きた", "flags": ["refer"]},
+      {"id": "Sheadache3-numb", "text": "手足のしびれ・ろれつが回らない", "flags": ["refer"]},
+      {"id": "Sheadache3-worse", "text": "日に日に痛みが強くなっている", "flags": ["refer"]},
+      {"id": "Sheadache3-none", "text": "どれもない", "flags": ["none"]} ] },
+
+    {"id": "Sdizziness1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "dizziness"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sdizziness1-spin", "text": "ぐるぐる回る", "weights": {"fluid": 0.5}},
+      {"id": "Sdizziness1-float", "text": "ふわふわ浮く感じ", "weights": {"fluid": 0.25, "qi_def": 0.25}, "organs": {"spleen": 0.5}},
+      {"id": "Sdizziness1-stand", "text": "立ちくらみ", "weights": {"blood_def": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sdizziness1-heavy", "text": "頭が重い", "weights": {"fluid": 0.5}},
+      {"id": "Sdizziness1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sdizziness2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "dizziness"}, "meta": "STEP 3　お悩みの詳細", "help": "手足のしびれやろれつが回らない場合は、すぐに医療機関を受診してください。", "options": [
+      {"id": "Sdizziness2-ear", "text": "耳鳴り", "organs": {"kidney": 0.5}, "also": ["tinnitus"]},
+      {"id": "Sdizziness2-nausea", "text": "吐き気", "also": ["nausea"]},
+      {"id": "Sdizziness2-palpitation", "text": "動悸", "also": ["palpitation"]},
+      {"id": "Sdizziness2-flush", "text": "のぼせ", "weights": {"yang_exc": 0.25, "qi_stag": 0.25}, "also": ["flush"]},
+      {"id": "Sdizziness2-numb", "text": "手足のしびれ・ろれつが回らない", "flags": ["refer"]},
+      {"id": "Sdizziness2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sstiff_shoulder1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "stiff_shoulder"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sstiff_shoulder1-tight", "text": "張るようにこる", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sstiff_shoulder1-stab", "text": "刺すような痛みが同じ場所にある", "weights": {"blood_stasis": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sstiff_shoulder1-heavy", "text": "重だるい", "weights": {"fluid": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sstiff_shoulder1-cold", "text": "冷えると悪化する", "weights": {"yang_def": 0.5}},
+      {"id": "Sstiff_shoulder1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sstiff_shoulder2", "block": "A", "role": "detail", "title": "一緒に出やすい症状はありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "stiff_shoulder"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sstiff_shoulder2-headache", "text": "頭痛", "also": ["headache"]},
+      {"id": "Sstiff_shoulder2-eye", "text": "目の疲れ", "weights": {"blood_def": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sstiff_shoulder2-flush", "text": "のぼせ", "weights": {"qi_stag": 0.25, "blood_stasis": 0.25}, "also": ["flush"]},
+      {"id": "Sstiff_shoulder2-irritable", "text": "イライラ", "weights": {"qi_stag": 0.5}, "also": ["nerves"]},
+      {"id": "Sstiff_shoulder2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sstress_gi1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "stress_gi"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sstress_gi1-pit", "text": "みぞおちが痛む・つかえる", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.25, "spleen": 0.25}},
+      {"id": "Sstress_gi1-heavy", "text": "胃がもたれる", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}, "also": ["stomach_heavy"]},
+      {"id": "Sstress_gi1-burn", "text": "胸やけがする", "weights": {"yang_exc": 0.25, "qi_stag": 0.25}, "also": ["stomach_pain"]},
+      {"id": "Sstress_gi1-bloat", "text": "お腹が張る・ガスがたまる", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sstress_gi1-diarrhea", "text": "下痢しやすい", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}, "also": ["diarrhea"]},
+      {"id": "Sstress_gi1-alt", "text": "便秘と下痢をくり返す", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}, "symptoms": ["alternating"]},
+      {"id": "Sstress_gi1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sstress_gi2", "block": "A", "role": "detail", "title": "どんなときに起こりやすいですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "stress_gi"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sstress_gi2-before", "text": "緊張する前・大事な予定の前", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sstress_gi2-after", "text": "食後", "weights": {"qi_def": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sstress_gi2-empty", "text": "空腹のとき", "weights": {"qi_def": 0.25, "yang_exc": 0.25}},
+      {"id": "Sstress_gi2-morning", "text": "朝起きてすぐ", "weights": {"yang_def": 0.5}, "organs": {"kidney": 0.5}},
+      {"id": "Sstress_gi2-cold", "text": "冷たいものをとったあと", "weights": {"yang_def": 0.5}, "organs": {"spleen": 0.5}},
+      {"id": "Sstress_gi2-none", "text": "特に決まっていない", "flags": ["none"]} ] },
+
+    {"id": "Sstress_gi3", "block": "A", "role": "detail", "title": "次のような症状はありますか", "type": "multi", "scored": false, "showIf": {"mainDetail": "stress_gi"}, "meta": "STEP 3　お悩みの詳細", "help": "あてはまる場合は、医療機関の受診をおすすめします。回答はこのまま続けられます。", "options": [
+      {"id": "Sstress_gi3-black", "text": "便が黒い・便に血が混じる", "flags": ["refer"]},
+      {"id": "Sstress_gi3-vomit", "text": "血を吐いた・コーヒーのようなものを吐いた", "flags": ["refer"]},
+      {"id": "Sstress_gi3-weight", "text": "理由もなく体重が減ってきた", "flags": ["consult"]},
+      {"id": "Sstress_gi3-none", "text": "どれもない", "flags": ["none"]} ] },
+
+    {"id": "Sthroat1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "throat"}, "meta": "STEP 3　お悩みの詳細", "help": "食べ物がつかえる・飲み込みにくい場合は、医療機関の受診もおすすめします。", "options": [
+      {"id": "Sthroat1-lump", "text": "のどに何か詰まった感じがする", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.25, "lung": 0.25}},
+      {"id": "Sthroat1-swallow", "text": "飲み込みにくい・食べ物がつかえる", "flags": ["consult"]},
+      {"id": "Sthroat1-cough", "text": "咳払いが多い", "weights": {"qi_stag": 0.25, "fluid": 0.25}, "organs": {"lung": 0.5}},
+      {"id": "Sthroat1-hoarse", "text": "声がかすれる", "weights": {"yin_def": 0.5}, "organs": {"lung": 0.5}},
+      {"id": "Sthroat1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sthroat2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "throat"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sthroat2-mood", "text": "気分がふさぐ", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}, "also": ["nerves"]},
+      {"id": "Sthroat2-nausea", "text": "吐き気", "weights": {"fluid": 0.5}, "also": ["nausea"]},
+      {"id": "Sthroat2-palpitation", "text": "動悸", "also": ["palpitation"]},
+      {"id": "Sthroat2-dizzy", "text": "めまい", "also": ["dizziness"]},
+      {"id": "Sthroat2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sbreath1", "block": "A", "role": "detail", "title": "「{main}」は、どのような状態ですか", "type": "multi", "scored": true, "showIf": {"mainDetail": "breath"}, "meta": "STEP 3　お悩みの詳細", "help": "安静にしていても息苦しい場合や胸の痛みを伴う場合は、医療機関の受診をおすすめします。", "options": [
+      {"id": "Sbreath1-deep", "text": "深く息が吸えない感じがする", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.25, "lung": 0.25}},
+      {"id": "Sbreath1-tense", "text": "緊張すると息苦しくなる", "weights": {"qi_stag": 0.5}, "organs": {"liver": 0.5}},
+      {"id": "Sbreath1-move", "text": "少し動くと息切れする", "weights": {"qi_def": 0.5}, "organs": {"lung": 0.5}},
+      {"id": "Sbreath1-rest", "text": "安静にしていても息苦しい", "flags": ["refer"]},
+      {"id": "Sbreath1-chest", "text": "胸の痛みを伴う", "flags": ["refer"]},
+      {"id": "Sbreath1-other", "text": "その他", "freeText": true, "placeholder": "具体的に"} ] },
+
+    {"id": "Sbreath2", "block": "A", "role": "detail", "title": "あわせて、あてはまるものはありますか", "type": "multi", "scored": true, "showIf": {"mainDetail": "breath"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sbreath2-palpitation", "text": "動悸", "also": ["palpitation"]},
+      {"id": "Sbreath2-throat", "text": "のどのつかえ", "weights": {"qi_stag": 0.5}, "also": ["throat_lump"]},
+      {"id": "Sbreath2-dizzy", "text": "めまい", "also": ["dizziness"]},
+      {"id": "Sbreath2-cough", "text": "乾いた咳", "weights": {"yin_def": 0.25, "fluid": 0.25}, "also": ["dry_cough"]},
+      {"id": "Sbreath2-none", "text": "特になし", "flags": ["none"]} ] },
+
+    {"id": "Sother1", "block": "A", "role": "detail", "title": "「{main}」は、どんなときに気になりますか", "type": "multi", "scored": false, "showIf": {"mainDetail": "other"}, "meta": "STEP 3　お悩みの詳細", "options": [
+      {"id": "Sother1-morning", "text": "朝"},
+      {"id": "Sother1-evening", "text": "夕方から夜"},
+      {"id": "Sother1-menses", "text": "生理の前後", "femaleOnly": true},
+      {"id": "Sother1-season", "text": "季節の変わり目"},
+      {"id": "Sother1-stress", "text": "ストレスがあるとき"},
+      {"id": "Sother1-none", "text": "特に決まっていない", "flags": ["none"]} ] },
+
+    {"id": "A4", "block": "A", "title": "「{main}」は、いつごろから気になっていますか", "type": "single", "scored": false, "options": [
       {"id": "A4-1", "text": "3日以内", "flags": ["acute"]},
       {"id": "A4-2", "text": "1〜2週間"},
       {"id": "A4-3", "text": "1か月以内"},
       {"id": "A4-4", "text": "半年以内"},
-      {"id": "A4-5", "text": "それ以上"} ] },
+      {"id": "A4-5", "text": "それ以上"} ], "sub": {"title": "日常生活への影響", "options": [
+        {"id": "A4s-1", "text": "ほとんどない"},
+        {"id": "A4s-2", "text": "少しある"},
+        {"id": "A4s-3", "text": "大きい", "flags": ["severe"]} ] } },
 
     {"id": "A5", "block": "A", "title": "なりたい自分", "type": "multi", "scored": false, "options": [
       {"id": "A5-1", "text": "元気で体力のある自分でいたい", "goal": "energy"},
@@ -326,7 +1088,7 @@
       {"id": "C4-1", "text": "はい", "freeText": true, "placeholder": "何で、どんな症状が出ましたか", "flags": ["allergy"]},
       {"id": "C4-2", "text": "いいえ"} ] },
 
-    {"id": "C5", "block": "C", "title": "これまでに飲んだ漢方があれば教えてください", "type": "text", "scored": false, "optional": true, "placeholder": "例: 補中益気湯を半年。元気は出たが胃がもたれた" },
+    {"id": "C5", "block": "C", "title": "これまでに飲んだ漢方があれば教えてください", "type": "text", "scored": false, "optional": true, "placeholder": "例: 補中益気湯を半年。元気は出たが胃がもたれた"},
 
     {"id": "D1", "block": "D", "title": "食事の傾向", "type": "multi", "scored": true, "options": [
       {"id": "D1-1", "text": "食事を抜くことが多い、少食", "weights": {"qi_def": 0.5, "blood_def": 0.5}, "organs": {"spleen": 1}},
@@ -338,19 +1100,19 @@
       {"id": "D1-7", "text": "外食・コンビニが多い", "weights": {}},
       {"id": "D1-0", "text": "どれもあてはまらない", "flags": ["none"]} ] },
 
-    {"id": "D2", "block": "D", "title": "睡眠時間と就寝時刻", "type": "single", "scored": false, "sub": { "title": "就寝は", "options": [
-        {"id": "D2s-1", "text": "24時前"},
-        {"id": "D2s-2", "text": "24時以降"} ] }, "options": [
+    {"id": "D2", "block": "D", "title": "睡眠時間と就寝時刻", "type": "single", "scored": false, "options": [
       {"id": "D2-1", "text": "6時間未満"},
       {"id": "D2-2", "text": "6〜7時間"},
-      {"id": "D2-3", "text": "7時間以上"} ] },
+      {"id": "D2-3", "text": "7時間以上"} ], "sub": {"title": "就寝は", "options": [
+        {"id": "D2s-1", "text": "24時前"},
+        {"id": "D2s-2", "text": "24時以降"} ] } },
 
-    {"id": "D3", "block": "D", "title": "運動と入浴", "type": "single", "scored": false, "sub": { "title": "入浴は", "options": [
-        {"id": "D3s-1", "text": "シャワーのみ"},
-        {"id": "D3s-2", "text": "湯船につかる"} ] }, "options": [
+    {"id": "D3", "block": "D", "title": "運動と入浴", "type": "single", "scored": false, "options": [
       {"id": "D3-1", "text": "運動はほぼしない"},
       {"id": "D3-2", "text": "週1〜2回"},
-      {"id": "D3-3", "text": "週3回以上"} ] },
+      {"id": "D3-3", "text": "週3回以上"} ], "sub": {"title": "入浴は", "options": [
+        {"id": "D3s-1", "text": "シャワーのみ"},
+        {"id": "D3s-2", "text": "湯船につかる"} ] } },
 
     {"id": "D4", "block": "D", "title": "飲酒・喫煙・仕事", "type": "multi", "scored": false, "options": [
       {"id": "D4-1", "text": "お酒を週3回以上飲む"},

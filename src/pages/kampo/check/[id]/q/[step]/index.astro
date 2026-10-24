@@ -1,12 +1,14 @@
 ---
 // 設問（1画面1問）。回答は1問ごとに保存し、途中離脱しても同じ URL で再開できる。
 // 性別が女性以外なら B11・C3 を、舌モードがスタッフなら B13 をスキップ（進捗は表示される問数で数える）。
+// 主訴は STEP 1 大カテゴリー → STEP 2 具体的な主訴（複数なら、いちばん改善したいものを1つ）→ STEP 3 その主訴の詳細問診。
+// 受診をおすすめする選択肢（refer／consult）を選ぶと、その場で注意を表示する（回答は続けられる）。
 export const prerender = false;
 import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
 import QMark from '../../../../../../components/kampo/QMark.astro';
 import { BLOCK_LABEL, QUESTIONS } from '../../../../../../lib/kampo/masters';
 import { getSession, saveSession, getCustomer, saveCustomer } from '../../../../../../lib/kampo/store';
-import { visibleQuestions, firstUnansweredStep, normalizeAnswer, isAnswered, sexFromAnswers, ageBandFromAnswers } from '../../../../../../lib/kampo/flow';
+import { visibleQuestions, firstUnansweredStep, normalizeAnswer, isAnswered, sexFromAnswers, ageBandFromAnswers, resolveQuestion } from '../../../../../../lib/kampo/flow';
 import { finalize } from '../../../../../../lib/kampo/compute';
 import type { FreeTexts } from '../../../../../../lib/kampo/safety';
 
@@ -21,7 +23,7 @@ const firstOpen = firstUnansweredStep(vis, s.answers, s.texts);
 if (stepNum > vis.length || stepNum > firstOpen) {
   return Astro.redirect(firstOpen > vis.length ? `/kampo/check/${s.id}/result/` : `/kampo/check/${s.id}/q/${firstOpen}/`, 303);
 }
-const q = vis[stepNum - 1];
+const q = resolveQuestion(vis[stepNum - 1], s.answers, s.texts);
 let error = '';
 
 if (Astro.request.method === 'POST') {
@@ -35,10 +37,11 @@ if (Astro.request.method === 'POST') {
     error = q.type === 'text' ? '入力してください。' : q.sub ? '上下それぞれ1つずつ選んでください。' : '1つ以上選んでください。';
   } else {
     s.answers[q.id] = ids;
-    for (const o of q.options) delete s.texts[o.id];
+    // 自由記入はこの設問の freeText の選択肢だけ入れ替える（KM の選択肢は主訴のIDなので、主訴の記入を消さない）
+    for (const o of q.options) if (o.freeText) delete s.texts[o.id];
     delete s.texts[q.id];
     Object.assign(s.texts, texts);
-    // 性別が変わって表示されなくなった設問の回答は捨てる（採点・安全確認に混ざらないように）
+    // 性別・主訴が変わって表示されなくなった設問の回答は捨てる（採点・安全確認に混ざらないように）
     vis = visibleQuestions(s.answers, s.tongueMode);
     const visIds = new Set(vis.map((x) => x.id));
     for (const qq of QUESTIONS) if (!visIds.has(qq.id)) delete s.answers[qq.id];
@@ -65,14 +68,14 @@ const isLast = stepNum === vis.length;
 const multi = q.type === 'multi';
 const hint = q.type === 'text' ? (q.optional ? '任意です。なければそのまま「次へ」を押してください。' : '') : multi ? `※複数回答可${q.max ? `（最大${q.max}つまで）` : ''}` : '';
 const withImages = q.options.some((o) => o.image);
-const qIndexInBlock = QUESTIONS.filter((x) => x.block === q.block && !x.showIf?.chosen).findIndex((x) => x.id === q.id) + 1;
+const qIndexInBlock = QUESTIONS.filter((x) => x.block === q.block && !x.role).findIndex((x) => x.id === q.id) + 1;
 const meta = q.meta ?? `${BLOCK_LABEL[q.block]}　${q.block}${qIndexInBlock}`;
 // 短い選択肢は4列・3列で並べる（参考：横並びの枠）
 const maxLen = Math.max(...q.options.map((o) => o.text.length), 0);
 const cols = withImages ? '' : maxLen <= 8 && q.options.length >= 3 ? 'cols4' : maxLen <= 14 && q.options.length >= 3 ? 'cols3' : '';
 ---
 <KampoLayout title={`Q${stepNum} ${q.title}`} width="normal" progress={{ done: stepNum - 1, total: vis.length }}>
-  <form method="post" id="qform" data-type={q.type} data-max={q.max ?? 0} data-sub={q.sub ? '1' : '0'} data-optional={q.optional ? '1' : '0'}>
+  <form method="post" id="qform" data-qid={q.id} data-type={q.type} data-max={q.max ?? 0} data-sub={q.sub ? '1' : '0'} data-optional={q.optional ? '1' : '0'}>
     <p class="kp-qmeta">{meta}　Q{stepNum} / {vis.length}</p>
     {q.block === 'C' && <p class="kp-eyebrow" style="letter-spacing:.14em;margin-bottom:4px">安心してご提案するための確認です</p>}
     <div class="kp-q"><QMark /><h1 class="kp-qtitle">{q.title}</h1></div>
@@ -89,7 +92,7 @@ const cols = withImages ? '' : maxLen <= 8 && q.options.length >= 3 ? 'cols4' : 
           return (
             <>
               <label class:list={['kp-opt', { check: multi, none, 'is-on': on, 'has-img': !!o.image }]}>
-                <input type={multi ? 'checkbox' : 'radio'} name="opt" value={o.id} checked={on} data-none={none ? '1' : '0'}>
+                <input type={multi ? 'checkbox' : 'radio'} name="opt" value={o.id} checked={on} data-none={none ? '1' : '0'} data-alert={o.flags?.includes('refer') ? 'refer' : o.flags?.includes('consult') ? 'consult' : ''}>
                 {o.image && <img class="kp-opt-img" src={o.image} alt="" width="150" height="186">}
                 <span class="kp-opt-text">{o.text}</span>
               </label>
@@ -103,6 +106,8 @@ const cols = withImages ? '' : maxLen <= 8 && q.options.length >= 3 ? 'cols4' : 
         })}
       </div>
     )}
+    <p class="kp-alert refer" id="alert-refer" hidden>この症状がある場合は、早めに医療機関を受診してください。回答はこのまま続けられます。結果画面をお渡しするときに、薬剤師にもお伝えください。</p>
+    <p class="kp-alert consult" id="alert-consult" hidden>あてはまる場合は、医療機関の受診もあわせてご検討ください。漢方薬のご提案は、薬剤師がお話を伺ってから行います。</p>
     {q.sub && (
       <div class="kp-sub">
         <div class="kp-q" style="margin-bottom:22px"><QMark /><h2 class="kp-qtitle" style="font-size:26px">{q.sub.title}</h2></div>
@@ -141,6 +146,7 @@ const cols = withImages ? '' : maxLen <= 8 && q.options.length >= 3 ? 'cols4' : 
         i.disabled=off;l.classList.toggle('is-off',off);
       });
       subs.forEach(function(i){i.closest('.kp-opt').classList.toggle('is-on',i.checked)});
+      ['refer','consult'].forEach(function(k){var el=document.getElementById('alert-'+k);if(el)el.hidden=!checked.some(function(i){return i.dataset.alert===k})});
       var ok;
       if(type==='text'){ok=optional||(text&&text.value.trim().length>0)}
       else{ok=checked.length>0&&(!hasSub||subs.some(function(i){return i.checked}))}
