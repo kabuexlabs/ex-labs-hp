@@ -1,13 +1,13 @@
 ---
 // 改善アドバイス：特徴（summary）→ 生活養生（心・食・動・休）→ おすすめのツボ → あなたへの一言 → 監修者。
-// 改善アドバイス画面と、体質の説明画面の印刷用2ページ目で共用する。
-import { TYPE_DEFS, type AdviceKey } from '../../lib/kampo/masters';
+// 改善アドバイス画面と、結果画面の印刷用2ページ目で共用する。
+import { TYPE_DEFS, type TypeKey } from '../../lib/kampo/masters';
 import { personalTips } from '../../lib/kampo/flow';
 import { typeIconSvg } from '../../lib/kampo/icons';
 import { supervisorName, supervisorBio } from '../../lib/kampo/compute';
-import type { Answers } from '../../lib/kampo/flow';
-export interface Props { type: AdviceKey; answers: Answers; showSupervisor?: boolean }
-const { type, answers, showSupervisor = true } = Astro.props;
+import type { Answers } from '../../lib/kampo/scoring';
+export interface Props { type: TypeKey; answers: Answers; pct?: number; showSupervisor?: boolean }
+const { type, answers, pct, showSupervisor = true } = Astro.props;
 const d = TYPE_DEFS[type];
 const tips = personalTips(answers, type);
 const sup = supervisorName();
@@ -18,7 +18,7 @@ const ADVICE: [keyof typeof d.advice, string][] = [['mind', '心'], ['food', '�
   <h2>{d.name}（{d.reading}）の改善アドバイス</h2>
   <div class="kp-panel-b">
     <div class="kp-advice-head">
-      <div class="kp-ring" style={`--c:${d.color}`}><small>{d.name}</small><span class="kp-advice-icon"><Fragment set:html={typeIconSvg(type, 40)} /></span></div>
+      <div class="kp-ring" style={`--c:${d.color}`}><small>{d.name}</small>{pct !== undefined ? <b>{pct}</b> : <span class="kp-advice-icon"><Fragment set:html={typeIconSvg(type, 40)} /></span>}{pct !== undefined && <small>点</small>}</div>
       <div>
         <p class="kp-advice-headline">{d.headline}</p>
         <p class="kp-advice-text">{d.summary}</p>

@@ -1,12 +1,12 @@
 ---
-// スタッフ画面の PIN 入力。成功でスタッフ Cookie（12時間）。送信完了画面から来た場合はその担当者画面へ直行。
+// スタッフ画面の PIN 入力。成功でスタッフ Cookie（12時間）。結果画面から来た場合はその担当者画面へ直行。
 export const prerender = false;
 import KampoLayout from '../../../../layouts/KampoLayout.astro';
-import { checkPin, pinConfigured, isStaffAuthed, setStaffCookie, safeNext, clientIp, isStaffPath } from '../../../../lib/kampo/auth';
+import { checkPin, pinConfigured, isStaffAuthed, setStaffCookie, safeNext, clientIp } from '../../../../lib/kampo/auth';
 import { loginAllowed, recordLoginFailure } from '../../../../lib/contact';
 
 let next = safeNext(Astro.url.searchParams.get('next'), '/kampo/staff/');
-if (!isStaffPath(next)) next = '/kampo/staff/';
+if (!next.startsWith('/kampo/staff/')) next = '/kampo/staff/';
 let error = '';
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();

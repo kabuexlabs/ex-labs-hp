@@ -9,16 +9,14 @@
 //   kampo:idx:phone:<num>   … 電話番号（ハイフンなし）→ 顧客ID
 //   kampo:customers         … 顧客IDの SET（LINE表示名の検索用）
 //   kampo:audit             … スタッフ画面の閲覧・保存の記録（LIST、新しい順、最大 5000）
-// 設問・所見・証・処方のマスタはリポジトリ内 JSON（src/data/kampo/）。
-// v2（2026-10-25〜）のセッションは questionnaireVersion が v2 で始まる。それより前（v1）のセッションは
-// texts・scores・safetyFlags・tongueOverride を持ち、担当者画面では回答の文言だけを表示する（再計算しない）。
+// 設問・タイプ・処方のマスタはリポジトリ内 JSON（src/data/kampo/）。
 // 保持期限：セッション本体は Redis の TTL で消える。索引（ZSET）側は
 // purgeExpired() が期限切れ分を掃除し、セッションが0になった顧客も削除する。
 // ---------------------------------------------------------------------------
 import { randomBytes } from 'node:crypto';
-import { VERSION } from './masters.ts';
-import type { Answers } from './flow.ts';
-import type { AdverseRecord } from './safety.ts';
+import { QUESTIONNAIRE, type TypeKey } from './masters.ts';
+import type { Answers, ScoreResult } from './scoring.ts';
+import type { SafetyFlag, FreeTexts } from './safety.ts';
 
 export function readEnv(name: string): string | undefined {
   const v = (import.meta.env as Record<string, string | undefined>)[name] ?? process.env[name];
@@ -51,7 +49,7 @@ async function redis(...command: (string | number)[]): Promise<unknown> {
 export type TongueMode = 'self' | 'staff';
 export type InputBy = 'customer' | 'staff';
 export type SessionStatus = 'in_progress' | 'completed' | 'proposed';
-export const STATUS_LABEL: Record<SessionStatus, string> = { in_progress: '回答中', completed: '送信済み', proposed: '提案済み' };
+export const STATUS_LABEL: Record<SessionStatus, string> = { in_progress: '回答中', completed: '回答完了', proposed: '提案済み' };
 export const TONGUE_MODE_LABEL: Record<TongueMode, string> = { self: 'ご自分で', staff: 'スタッフが確認' };
 export const INPUT_BY_LABEL: Record<InputBy, string> = { customer: 'ご本人', staff: 'スタッフ聞き取り' };
 
@@ -68,7 +66,7 @@ export interface KampoCustomer {
 
 export interface KampoProposal {
   staffName: string;
-  /** 提案時に表示していた判定・候補の要約（監査用。compute.ts の snapshotOf） */
+  /** 表示した候補（監査用。主訴ごとの候補と判定の要約＝selectionSnapshot） */
   candidates: unknown;
   selected: { formulaCode: string; name: string; reason?: string }[];
   note?: string;
@@ -87,40 +85,15 @@ export interface KampoSession {
   inputBy: InputBy;
   consentAt: string;
   answers: Answers;
-  /** 薬剤師の追加質問・舌の観察の回答（設問ID → 選択肢ID） */
-  staffAnswers?: Answers;
-  staffAnsweredAt?: Record<string, string>;
-  staffLog?: { at: string; staffName?: string; questionId: string; ids: string[] }[];
-  /** 副作用歴の原因生薬の記録（薬剤師。自動解除には使わない） */
-  adverseRecords?: AdverseRecord[];
-  /** 除外理由を薬剤師が確認した記録（処方ごと） */
-  exclusionChecks?: { formulaId: string; staffName: string; at: string }[];
-  /** 送信時・追加質問の回答時・提案保存時の判定の要約 */
-  snapshot?: SessionSnapshot;
+  texts: FreeTexts;
+  tongueOverride?: string[];
+  scores?: ScoreResult;
+  safetyFlags?: SafetyFlag[];
   status: SessionStatus;
   startedAt: string;
-  /** 送信（回答確認 → 送信）した日時 */
   completedAt?: string;
   expiresAt: string;
   proposal?: KampoProposal;
-  // --- v1（2026-10-24 版まで）のセッションだけが持つ ---
-  texts?: Record<string, string>;
-  tongueOverride?: string[];
-  scores?: { mainTypes?: string[]; subTypes?: string[]; pct?: Record<string, number>; isBalanced?: boolean; defExcIndex?: number; thermalIndex?: number };
-  safetyFlags?: { level: string; code: string; label?: string }[];
-}
-
-/** 一覧・CSV 用の判定の要約（compute.ts の snapshotOf が作る） */
-export interface SessionSnapshot {
-  version: string; computedAt: string;
-  primaryComplaint?: string; complaints: string[];
-  primaryPattern: { status: 'determined' | 'hold'; id?: string; name?: string };
-  /** 気血水6証の得点（顧客履歴の推移表示用） */
-  patternScores: Record<string, number>;
-  coexisting: string[]; coldHeat: string; defExc: string; zang: string; consistency: string;
-  emergency: boolean; redflags: number; safetyState: string;
-  classes: Record<string, number>;
-  candidates: unknown;
 }
 
 export interface AuditEntry { at: string; action: string; target: string; staffName?: string }
@@ -246,11 +219,12 @@ export async function createSession(input: { customer: KampoCustomer | null; ton
     id: newId(),
     customerId: input.customer?.id,
     customerLabel: customerLabel(input.customer),
-    questionnaireVersion: VERSION,
+    questionnaireVersion: QUESTIONNAIRE.version,
     tongueMode: input.tongueMode,
     inputBy: input.inputBy,
     consentAt: now.toISOString(),
     answers: {},
+    texts: {},
     status: 'in_progress',
     startedAt: now.toISOString(),
     expiresAt: exp.toISOString(),
@@ -352,5 +326,4 @@ export async function recentAudit(limit = 50): Promise<AuditEntry[]> {
 
 // --- 表示用 -------------------------------------------------------------------
 
-/** v2 の設問で回答したセッションか（v1 は判定を再計算しない） */
-export const isV2 = (s: Pick<KampoSession, 'questionnaireVersion'>) => s.questionnaireVersion.startsWith('v2');
+export const typeNamesOf = (keys: TypeKey[] | undefined, defs: Record<TypeKey, { name: string }>) => (keys ?? []).map((k) => defs[k].name).join('・');

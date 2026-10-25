@@ -2,8 +2,7 @@
 // 漢方体質チェック（/kampo/）の認証。2段構え：
 //   1) 共通パスワード（KAMPO_PASSWORD。未設定なら YOYAKU_ADMIN_KEY を流用）で
 //      /kampo/ 全体を守る。成功で署名付き Cookie（30日）。
-//   2) スタッフ画面 /kampo/staff/ と、薬剤師が説明に使う体質の説明画面（/kampo/check/<id>/result/・advice/）は
-//      4桁 PIN（KAMPO_STAFF_PIN）で再認証（患者の回答導線は送信完了で終わり、結果は薬剤師が開く）。
+//   2) スタッフ画面 /kampo/staff/ は 4桁 PIN（KAMPO_STAFF_PIN）で再認証。
 //      成功で署名付き Cookie（12時間）。「来店客モードへ戻る」で消す（iPad を渡す前に押す）。
 // Cookie にはパスワードそのものを入れず、HMAC 署名つきの期限トークンを入れる。
 // 署名鍵は KAMPO_SESSION_SECRET（未設定ならパスワードから派生）。
@@ -73,14 +72,10 @@ export function safeNext(raw: string | null | undefined, fallback: string): stri
   return raw;
 }
 
-/** PIN が必要なパス（スタッフ画面と体質の説明画面） */
-export const isStaffPath = (pathname: string) =>
-  (pathname.startsWith('/kampo/staff/') && pathname !== PIN_PATH) || /^\/kampo\/check\/[^/]+\/(result|advice)\//.test(pathname);
-
 /**
  * middleware から呼ぶルート保護。保護対象なら Response（リダイレクト）、通してよければ undefined。
  *  - /kampo/login/ 以外の /kampo/* は共通パスワードのログイン必須
- *  - /kampo/staff/pin/ 以外の /kampo/staff/* と、体質の説明画面はさらに PIN 必須
+ *  - /kampo/staff/pin/ 以外の /kampo/staff/* はさらに PIN 必須
  */
 export function kampoGuard(context: APIContext): Response | undefined {
   const { pathname, search } = context.url;
@@ -91,7 +86,7 @@ export function kampoGuard(context: APIContext): Response | undefined {
     if (pathname.endsWith('.csv') || pathname.endsWith('.json')) return new Response('unauthorized', { status: 401 });
     return context.redirect(`${LOGIN_PATH}?next=${next}`, 303);
   }
-  if (isStaffPath(pathname) && !isStaffAuthed(context.cookies)) {
+  if (pathname.startsWith('/kampo/staff/') && pathname !== PIN_PATH && !isStaffAuthed(context.cookies)) {
     if (pathname.endsWith('.csv') || pathname.endsWith('.json')) return new Response('unauthorized', { status: 401 });
     return context.redirect(`${PIN_PATH}?next=${next}`, 303);
   }
