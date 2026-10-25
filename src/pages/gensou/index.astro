@@ -387,6 +387,14 @@ img{max-width:100%}
 .fin-c{margin:0;font-size:clamp(26px,7vw,40px);font-weight:600;line-height:1.5;letter-spacing:.06em}
 .fin-s{font-size:.6em;letter-spacing:.12em}
 .fin-l{margin:28px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#d0d5e6}
+.route{margin:24px 0 0}
+.route img{display:block;width:100%;height:auto;border:1px solid rgba(217,174,44,.78)}
+.route figcaption{margin-top:8px;font-size:13px;color:#aeb5cf}
+/* スマホ持参の注意（当日の流れ・注意事項の冒頭） */
+.phone{display:flex;gap:16px;align-items:flex-start;margin:0 0 32px;padding:18px 18px 18px 16px;border:2px solid #e2c43c;background:rgba(226,196,60,.08);color:#e6d23f}
+.phone svg{flex:none;margin-top:2px}
+.phone-h{margin:0;font-size:18px;font-weight:600;letter-spacing:.06em;color:#e6d23f}
+.phone-t{margin:6px 0 0;font-size:14px;line-height:1.85;color:#f3f2f8}
 .map{margin-top:24px;aspect-ratio:16/10;border:1px solid rgba(217,174,44,.78);background:#101019}
 .map iframe{display:block;width:100%;height:100%;border:0}
 .map-link{display:inline-flex;gap:8px;margin-top:14px;font-size:14px;color:#d0d5e6;text-underline-offset:4px}
@@ -640,6 +648,7 @@ img{max-width:100%}
           </div>
         </div>
         <div class="row"><span>所要時間</span><span>約50分</span></div>
+        <div class="row"><span>持ち物</span><span><strong style="color:#e6d23f;font-weight:600">通信できるスマートフォン（必須）</strong></span></div>
         <div class="row"><span>開催人数</span><span><J t="参加者1名から開催します。" /></span></div>
         <div class="row"><span>対象年齢</span><span><J t="中学生以上（18歳未満の方は保護者同伴）" /></span></div>
         <div class="row"><span>販売</span><span>{RESERVE_URL ? <a href={RESERVE_URL} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="gensou-row">escape.id</a> : 'escape.id'}{!RESERVE_URL && <><br><span style="font-size:13px;color:#bdb8ab"><J t="販売開始日は決まり次第お知らせします。" /></span></>}</span></div>
@@ -654,6 +663,10 @@ img{max-width:100%}
 
     <section id="flow" class="sec">
       <SecHead ja="当日の流れ" side="l" />
+      <div class="phone" role="note">
+        <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="10" y1="18.5" x2="14" y2="18.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <div><p class="phone-h">スマートフォンを必ずお持ちください</p><p class="phone-t"><J t="当日は、通信できるスマートフォンが必要です。イヤホン・アプリのダウンロード・事前登録は不要です。" /></p></div>
+      </div>
       <ol class="flow">
         {flow.map((f) => <li><span class="no">{f.no}</span><span class="tx"><strong class="lb">{f.label}</strong><J t={f.text} /></span></li>)}
       </ol>
@@ -661,6 +674,10 @@ img{max-width:100%}
 
     <section id="notice" class="sec">
       <SecHead ja="注意事項" side="r" />
+      <div class="phone" role="note">
+        <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="10" y1="18.5" x2="14" y2="18.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <div><p class="phone-h">スマートフォンを必ずお持ちください</p><p class="phone-t"><J t="当日は、通信できるスマートフォンが必要です。イヤホン・アプリのダウンロード・事前登録は不要です。" /></p></div>
+      </div>
       {notes.map((g) => (
         <div class="ng">
           <h3 class="ng-h">{g.group}</h3>
@@ -679,6 +696,10 @@ img{max-width:100%}
         <div class="row"><span>住所</span>{ADDRESS ? <span><J t={ADDRESS} /></span> : <span style="color:#bdb8ab">追記予定</span>}</div>
         <div class="row"><span>最寄り駅</span><span><J t={ACCESS} /></span></div>
       </div>
+      <figure class="route">
+        <img src="/assets/gensou/route-map.webp" alt="新木場駅から夢の島熱帯植物館までの徒歩ルート図。駅を出て北へ進み、夢の島公園の中を通って植物館へ向かう" width="1200" height="1154" loading="lazy" decoding="async">
+        <figcaption>新木場駅から夢の島熱帯植物館までの道順（赤い矢印）</figcaption>
+      </figure>
       <div class="map"><iframe src={MAP_EMBED} title="夢の島熱帯植物館の地図" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>
       <a class="map-link" href={MAP_LINK} target="_blank" rel="noopener">Google マップで開く<span class="arc">→</span></a>
       <br><a class="map-link" href="/guide/yumenoshima-night/#access" data-track="show" data-show="guide-yumenoshima" data-place="gensou-access-guide">夜の夢の島熱帯植物館：日程・行き方・通常の開館情報（案内ページ）<span class="arc">→</span></a>

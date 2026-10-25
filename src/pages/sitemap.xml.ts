@@ -263,7 +263,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/services/shisetsu-event/': '2026-10-16',
     '/karma/': '2026-09-18',
     '/uwasabanashi/kotohogi/': '2026-10-06',
-    '/gensou/': '2026-10-17',
+    '/gensou/': '2026-10-25',
     '/uwasabanashi/iinkai/': '2026-10-06',
   };
   // 公演検索サービスの作品詳細（公開作品のみ。テストデータ・非公開は src/data/events/index が除外済み）。
