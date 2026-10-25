@@ -203,9 +203,11 @@ async function deleteCustomer(c: KampoCustomer): Promise<void> {
 
 // --- セッション ---------------------------------------------------------------
 
+// 2026-10-25 に一時反映して取り消した v2 の設問で保存されたセッションは texts を持たないので補う（画面・CSV が落ちないように）
+const normalizeSession = (s: KampoSession | null): KampoSession | null => { if (s) s.texts ??= {}; return s; };
 export async function getSession(id: string): Promise<KampoSession | null> {
   if (!/^[a-f0-9]{16}$/.test(id)) return null;
-  return parse<KampoSession>(await redis('GET', sKey(id)));
+  return normalizeSession(parse<KampoSession>(await redis('GET', sKey(id))));
 }
 export async function saveSession(s: KampoSession): Promise<void> {
   const exp = Math.floor(new Date(s.expiresAt).getTime() / 1000);
@@ -239,7 +241,7 @@ async function mgetSessions(ids: string[]): Promise<KampoSession[]> {
   for (let i = 0; i < ids.length; i += 100) {
     const raws = await redis('MGET', ...ids.slice(i, i + 100).map(sKey));
     if (Array.isArray(raws)) raws.forEach((r, j) => {
-      const s = parse<KampoSession>(r);
+      const s = normalizeSession(parse<KampoSession>(r));
       if (s) out.push(s);
       else void redis('ZREM', SESSIONS, ids[i + j]).catch(() => {}); // TTL で消えた本体の索引を掃除
     });
