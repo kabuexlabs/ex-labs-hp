@@ -55,6 +55,10 @@ export interface Venue {
   setting?: 'indoor' | 'outdoor' | 'mixed';
   /** 最寄り駅（公式ページに記載があるものだけ） */
   station?: string;
+  /** 会場の公式サイト（確認できたものだけ。構造化データの Place.url に使う） */
+  url?: string;
+  /** 会場を指す外部ページ（公式サイト・Wikipedia・Tokyo Art Beat など。構造化データの Place.sameAs に使う） */
+  sameAs?: string[];
   sourceIds: string[];
 }
 
@@ -112,6 +116,8 @@ export interface Work {
   /** URL スラッグ（/events/<slug>/） */
   slug: string;
   title: string;
+  /** /events/<slug>/ の title・description に入れる場所の表記（省略時は地域・エリア）。会場名で検索する人向けに会場名を入れる用途 */
+  seoPlace?: string;
   organizerId: string;
   genres: Genre[];
   /** 1〜2文の紹介（自社作成の文章、または利用条件を確認した文章） */

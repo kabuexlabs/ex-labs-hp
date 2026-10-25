@@ -236,7 +236,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/case-uwasabanashi/': '2026-10-16',
     '/guide/case-lostframe/': '2026-10-09',
     '/guide/bonenkai-nazotoki/': '2026-10-14',
-    '/guide/yumenoshima-night/': '2026-10-22',
+    '/guide/yumenoshima-night/': '2026-10-25',
     '/guide/kyoto-kyocera-museum-7th/': '2026-10-22',
     '/guide/kyoto-okazaki-november/': '2026-10-19',
     '/guide/kyoto-november-experience/': '2026-10-22',
