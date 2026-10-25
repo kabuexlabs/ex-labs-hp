@@ -1,12 +1,13 @@
 ---
-// 途中再開：同じ URL を開けば続きから答えられる（最初の未回答へ。終わっていれば結果へ）
+// 途中再開：同じ URL を開けば続きから答えられる（最初の未回答へ。全部答えていれば回答の確認へ、送信済みなら完了画面へ）
 export const prerender = false;
 import { getSession } from '../../../../lib/kampo/store';
-import { visibleQuestions, firstUnansweredStep } from '../../../../lib/kampo/flow';
+import { walk, firstUnansweredStep } from '../../../../lib/kampo/flow';
+import { isLegacy } from '../../../../lib/kampo/compute';
 const s = await getSession(Astro.params.id ?? '');
 if (!s) return Astro.redirect('/kampo/check/new/?msg=notfound', 303);
-if (s.status !== 'in_progress') return Astro.redirect(`/kampo/check/${s.id}/result/`, 303);
-const vis = visibleQuestions(s.answers, s.tongueMode);
-const step = firstUnansweredStep(vis, s.answers, s.texts);
-return Astro.redirect(step > vis.length ? `/kampo/check/${s.id}/result/` : `/kampo/check/${s.id}/q/${step}/`, 303);
+if (s.status !== 'in_progress' || isLegacy(s)) return Astro.redirect(`/kampo/check/${s.id}/done/`, 303);
+const { steps } = walk(s.answers);
+const step = firstUnansweredStep(steps);
+return Astro.redirect(step > steps.length ? `/kampo/check/${s.id}/confirm/` : `/kampo/check/${s.id}/q/${step}/`, 303);
 ---

@@ -1,21 +1,23 @@
 // ---------------------------------------------------------------------------
-// 漢方体質チェック（/kampo/）のマスタデータ。
-// 設問・体質タイプ・処方の正本は src/data/kampo/*.json（薬剤師が直接編集する）。
-// このモジュールは JSON を読み込み、起動時（モジュール読込時）に形を検証する。
-// 検証に失敗したら例外を投げてページを落とす（壊れたマスタで店頭運用しない）。
-// 依存ライブラリを増やさないため zod ではなく手書きの検証にしている。
-//
-// 主訴は3段階で選ぶ：大カテゴリー（K1）→ 具体的な主訴（KA〜KH）→ いちばん改善したい主訴（KM・複数のときだけ）
-// → その主訴の詳細問診（S*。主訴の選択肢の detail と設問の showIf.mainDetail で対応づけ）。
-// 漢方薬の選定は「主訴 → 候補群 → 体質で選ぶ」の二段階（src/lib/kampo/recommend.ts）。
-// そのため処方マスタでは次の3つを混同しないよう別の欄に持つ：
-//   efficacy / indications … 承認された効能・効果（候補群の抽出＝STEP 1 に使う）
-//   useTarget / strength   … 使用目標（効能・効果の前段「体力…で、〜もの」。体質照合＝STEP 2 に使う）
-//   action                 … 漢方医学的な作用の説明（推薦理由の補足。抽出には使わない）
+// 漢方体質チェック（/kampo/）のマスタデータ（2026-10-25 v3）。
+// 正本は src/data/kampo/*.json（薬剤師が直接編集する）。読込時に形を検証し、壊れていたら例外でページを落とす。
+//   questions.json   … 設問（section：basic／category／complaint／primary／detail／constitution／safety／lifestyle／staff）
+//   complaints.json  … 主訴カテゴリー A〜H と具体的な主訴（主訴の選択画面はここから作る）
+//   findings.json    … 所見（回答から作る1つ1つの症状・状態。重み・五臓は草案）
+//   safety_tags.json … 安全確認タグ（証のスコアとは別。薬剤師画面に確認事項を出す）
+//   formulas.json    … 漢方薬（承認効能・使用目標・漢方の考え方は別の欄）
+//   types.json       … 体質タイプの説明・養生
+//   legacy.json      … 旧版のセッションを表示するための文言（判定には使わない）
+// 回答は「選択肢ID」で保存し、選択肢の findings を所見に変換して判定に使う（flow.ts の walk）。
+// 主訴・深掘りで答えた所見は、あとの設問では表示しない（回答の引き継ぎ）。
 // ---------------------------------------------------------------------------
 import questionsJson from '../../data/kampo/questions.json' with { type: 'json' };
+import complaintsJson from '../../data/kampo/complaints.json' with { type: 'json' };
+import findingsJson from '../../data/kampo/findings.json' with { type: 'json' };
+import tagsJson from '../../data/kampo/safety_tags.json' with { type: 'json' };
 import typesJson from '../../data/kampo/types.json' with { type: 'json' };
 import formulasJson from '../../data/kampo/formulas.json' with { type: 'json' };
+import legacyJson from '../../data/kampo/legacy.json' with { type: 'json' };
 
 export type TypeKey = 'qi_def' | 'blood_def' | 'qi_stag' | 'blood_stasis' | 'fluid' | 'yin_def' | 'yang_def' | 'yang_exc';
 /** レーダーの軸順（上から時計回り）。気虚・血虚・気滞・瘀血・水滞・陰虚・陽虚・陽盛 */
@@ -36,58 +38,95 @@ export const ORGAN_PLAIN: Record<OrganKey, string> = {
   kidney: '腎（成長・老化・水分代謝・足腰の働き）',
 };
 
-export type Block = 'A' | 'B' | 'C' | 'D';
-export const BLOCK_LABEL: Record<Block, string> = { A: '基本情報', B: '体質チェック', C: '安全確認', D: '生活習慣' };
+export type Section = 'basic' | 'category' | 'complaint' | 'primary' | 'detail' | 'constitution' | 'safety' | 'lifestyle' | 'staff';
+export const SECTION_LABEL: Record<Section, string> = {
+  basic: '基本情報', category: 'お悩みのカテゴリー', complaint: '具体的なお悩み', primary: 'いちばん改善したいお悩み', detail: 'お悩みの詳細',
+  constitution: '体質チェック', safety: '安全確認', lifestyle: '生活習慣', staff: '薬剤師の観察',
+};
+/** 「特にない」「わからない」「回答しない」：ほかの選択肢と同時に選べない */
+export type Exclusive = 'none' | 'unknown' | 'declined';
 
 export interface Option {
   id: string;
   text: string;
-  weights?: Partial<Record<TypeKey, number>>;
-  /** 五臓の傾向への加点（0〜1） */
-  organs?: Partial<Record<OrganKey, number>>;
-  /** 主訴・主訴の詳細：この選択肢が表す症状コード（formulas.json の symptoms のキー）。候補群の抽出に使う */
+  /** 選んだときに present になる所見 */
+  findings?: string[];
+  /** 主訴・深掘り：漢方薬の候補を抽出する症状コード（formulas.json の symptoms） */
   symptoms?: string[];
-  /** 主訴の詳細：随伴症状の症状コード。候補群には加えず、効能・効果に含まれていれば適合度に加点する */
+  /** 深掘り：随伴症状の症状コード（候補には加えず、効能に含まれていれば適合度に加点） */
   also?: string[];
-  /** 具体的な主訴：詳細問診のテンプレート名（設問の showIf.mainDetail と対応） */
-  detail?: string;
-  /** 女性にだけ出す選択肢（性別が男性なら表示しない） */
+  /** 安全確認タグ（safety_tags.json） */
+  tags?: string[];
+  /** 直ちに対応が必要な例外（改修指示 5-5） */
+  urgent?: boolean;
+  /** 性別が男性なら出さない */
   femaleOnly?: boolean;
-  flags?: string[];
+  exclusive?: Exclusive;
   image?: string;
-  freeText?: boolean;
-  placeholder?: string;
-  /** A5 なりたい自分 */
-  goal?: string;
+  /** 基本情報の値（A1 の female など） */
+  value?: string;
+  /** 安全確認のフラグ（C1〜C4） */
+  flags?: string[];
+  /** 漢方薬の選択肢（C1K・C4K）の処方コード */
+  formula?: string;
+  /** 主訴の選択肢の主訴ID・カテゴリー */
+  complaint?: string;
+  category?: string;
+}
+export interface Trigger {
+  sexNot?: 'male';
+  /** 月経がある（周期一定・不規則）と答えたときだけ */
+  menses?: boolean;
+  mensesNot?: 'post';
+  category?: string;
+  minComplaints?: number;
+  /** いちばん改善したい主訴の深掘りテンプレート */
+  primaryDetail?: string;
+  /** これらの所見のどれかが present なら */
+  findingsPresent?: string[];
+  /** これらの選択肢のどれかが選ばれていれば */
+  chosen?: string[];
 }
 export interface Question {
   id: string;
-  block: Block;
+  section: Section;
   title: string;
-  type: 'single' | 'multi' | 'text';
-  scored: boolean;
-  /**
-   * 表示条件。chosen は「これらの選択肢のどれかが選ばれていれば表示」（具体的な主訴）、
-   * mainDetail は「いちばん改善したい主訴の detail がこれなら表示」（主訴の詳細問診）、
-   * minComplaints は「具体的な主訴をこの数以上選んでいれば表示」（いちばん改善したい主訴）
-   */
-  showIf?: { sex?: 'female'; tongueMode?: 'self'; chosen?: string[]; mainDetail?: string; minComplaints?: number };
-  /** 主訴の3段階での役割：大カテゴリー／具体的な主訴／いちばん改善したい主訴／主訴の詳細 */
-  role?: 'category' | 'complaint' | 'main' | 'detail';
-  /** 選択肢を回答から作る設問（complaints＝選んだ具体的な主訴を選択肢にする） */
-  dynamic?: 'complaints';
+  type: 'single' | 'multi';
+  trigger?: Trigger;
   options: Option[];
-  /** multi の最大選択数 */
-  max?: number;
-  /** 同じ画面に出す補助の単一選択（A4 影響・D2 就寝・D3 入浴） */
+  /** 同じ画面に出す補助の単一選択（D2 就寝・D3 入浴） */
   sub?: { title: string; options: Option[] };
   help?: string;
-  placeholder?: string;
-  optional?: boolean;
-  /** 設問画面の上部に出す区分名（例: STEP 3　お悩みの詳細）。title の {main} はいちばん改善したい主訴に置き換わる */
-  meta?: string;
+  /** 深掘りのテンプレート名 */
+  template?: string;
+  /** 主訴の設問のカテゴリー */
+  category?: string;
 }
-export interface Questionnaire { version: string; questions: Question[] }
+export interface Finding {
+  id: string;
+  label: string;
+  weights?: Partial<Record<TypeKey, number>>;
+  organs?: Partial<Record<OrganKey, number>>;
+  /** 意味の近い所見のまとまり。同じ group は同じタイプへ1回分しか加点しない */
+  group?: string;
+  /** present なら present にする所見 */
+  implies?: string[];
+  /** 重みを引き継いだ 2026-10-24 版の選択肢 */
+  from?: string[];
+}
+export interface Category { id: string; name: string; femaleOnly?: boolean }
+export interface Complaint {
+  id: string;
+  name: string;
+  categories: string[];
+  findings: string[];
+  symptoms: string[];
+  detail: string;
+  tags?: string[];
+  femaleOnly?: boolean;
+}
+export interface SafetyTagDef { id: string; label: string; checks: string[]; urgent?: boolean }
+export interface Review { status: string; source?: string; reviewer?: string | null; reviewedAt?: string | null }
 
 export interface TypeDef {
   name: string;
@@ -106,11 +145,9 @@ export type Strength = 'def' | 'mid' | 'exc';
 export type Thermal = 'warm' | 'neutral' | 'cool';
 export type HeatKind = 'excess' | 'deficient';
 export interface Indication {
-  /** 症状コード（主訴の詳細の選択肢と対応） */
   symptom: string;
-  /** 効能・効果に書かれている語（例: にきび） */
   term: string;
-  /** 条件つきの効能（例:「高血圧や肥満に伴う便秘」）。どれかの選択肢が選ばれているときだけ候補にする */
+  /** 条件つきの効能（例:「高血圧や肥満に伴う便秘」）。所見ID・選択肢IDのどれかがあるときだけ候補にする */
   requires?: string[];
 }
 export interface SymptomDef { label: string }
@@ -118,34 +155,21 @@ export interface Formula {
   code: string;
   name: string;
   reading: string;
-  /** 承認された効能・効果の全文（一般用漢方製剤製造販売承認基準） */
   efficacy: string;
-  /** 効能・効果の諸症を症状コードに対応づけたもの（並びは効能・効果の記載順） */
   indications: Indication[];
-  /** 使用目標（効能・効果の前段のしばり。体質照合に使う） */
   useTarget: string;
-  /** 使用目標の体力の範囲（体力虚弱=def／中等度=mid／充実=exc） */
   strength: Strength[];
-  /** 漢方医学的な作用の説明（推薦理由の補足） */
   action: string;
-  /** 他の候補と比べたときの特徴（スタッフ・比較用の短い語） */
   targetLabel: string;
-  /** 気血水（陰虚=水不足、陽虚・陽盛を含む8タイプ）の対象と重み */
   types: Partial<Record<TypeKey, number>>;
   thermal: Thermal;
-  /** 冷ます処方が対象とする熱：実熱（excess）／虚熱（deficient） */
   heat?: HeatKind;
-  /** 主に働きかける五臓 */
   organs: OrganKey[];
-  /** 使用目標・随伴症状・症状の性質に対応する選択肢ID（一致すると適合度に加点） */
+  /** 使用目標・随伴症状・症状の性質に当たる所見ID（または選択肢ID） */
   signs: string[];
-  /** 注意が必要な生薬（甘草・麻黄・大黄・附子・地黄・山梔子・黄芩・桃仁 など） */
   cautionHerbs: string[];
-  /** この安全フラグがあれば推薦から除外する */
   contraindications: string[];
-  /** 同点時の並び順（小さいほど上） */
   priority: number;
-  /** 効能・効果の出典確認済みか（製品の添付文書で薬剤師が確認したら true） */
   verified: boolean;
   note?: string;
   active: boolean;
@@ -153,135 +177,160 @@ export interface Formula {
 export interface FormulasData { version: string; source?: string; symptoms: Record<string, SymptomDef>; formulas: Formula[] }
 
 export const CONTRA_CODES = ['pregnancy', 'lactation', 'interferon', 'hypertension', 'heart', 'kidney', 'thyroid', 'glaucoma_bph', 'gi_weak'] as const;
+const SECTIONS: Section[] = ['basic', 'category', 'complaint', 'primary', 'detail', 'constitution', 'safety', 'lifestyle', 'staff'];
+
+type Raw = Record<string, unknown>;
+const isObj = (v: unknown): v is Raw => !!v && typeof v === 'object' && !Array.isArray(v);
+const isStr = (v: unknown): v is string => typeof v === 'string' && v.length > 0;
+const strArr = (v: unknown): string[] => (Array.isArray(v) ? v.map(String) : []);
+
+// --- 主訴の設問を complaints.json から作る ------------------------------------
+
+/** questions.json の generated（categories／complaints／primary）を実際の設問に展開する */
+export function expandQuestions(rawQuestions: Raw[], cj: { categories: Category[]; complaints: Complaint[] }): Raw[] {
+  const out: Raw[] = [];
+  for (const q of rawQuestions) {
+    if (q.generated === 'categories') {
+      out.push({ ...q, options: cj.categories.map((c) => ({ id: `K1-${c.id}`, text: c.name, category: c.id, ...(c.femaleOnly ? { femaleOnly: true } : {}) })) });
+    } else if (q.generated === 'complaints') {
+      for (const c of cj.categories) {
+        out.push({
+          ...q, id: `K_${c.id}`, category: c.id, title: String(q.title).replace('{category}', c.name), trigger: { category: c.id },
+          options: cj.complaints.filter((x) => x.categories.includes(c.id)).map((x) => ({
+            id: `K${c.id}-${x.id}`, text: x.name, complaint: x.id, category: c.id, findings: x.findings, symptoms: x.symptoms,
+            ...(x.tags?.length ? { tags: x.tags } : {}), ...(x.femaleOnly ? { femaleOnly: true } : {}),
+          })),
+        });
+      }
+    } else out.push(q);
+  }
+  return out;
+}
 
 // --- 検証 ------------------------------------------------------------------
 
 /** 検証エラーを集めて返す（空配列なら合格）。テストからも呼ぶ。 */
-export function validateMasters(q: unknown, t: unknown, f: unknown): string[] {
+export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unknown, ty: unknown, fo: unknown): string[] {
   const errs: string[] = [];
-  const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
-  const isStr = (v: unknown): v is string => typeof v === 'string' && v.length > 0;
-  const symptomKeys = new Set<string>(isObj(f) && isObj(f.symptoms) ? Object.keys(f.symptoms) : []);
-
-  // 設問
-  const optionIds = new Set<string>();
-  const usedSymptoms = new Set<string>();
-  const showIfRefs: [string, string][] = [];
-  const detailRefs: [string, string][] = []; // [主訴の選択肢ID, テンプレート名]
-  const detailTemplates = new Set<string>();
-  const roles: Record<string, string[]> = {};
-  if (!isObj(q) || !isStr(q.version) || !Array.isArray(q.questions)) {
-    errs.push('questions.json: version と questions が必要');
-  } else {
-    const qIds = new Set<string>();
-    for (const raw of q.questions as unknown[]) {
-      if (!isObj(raw) || !isStr(raw.id)) { errs.push('questions.json: id のない設問'); continue; }
-      const id = raw.id;
-      if (qIds.has(id)) errs.push(`questions.json: 設問ID重複 ${id}`);
-      qIds.add(id);
-      if (!['A', 'B', 'C', 'D'].includes(String(raw.block))) errs.push(`${id}: block が A〜D でない`);
-      if (!isStr(raw.title)) errs.push(`${id}: title がない`);
-      if (!['single', 'multi', 'text'].includes(String(raw.type))) errs.push(`${id}: type が single/multi/text でない`);
-      if (typeof raw.scored !== 'boolean') errs.push(`${id}: scored が真偽値でない`);
-      const opts = Array.isArray(raw.options) ? (raw.options as unknown[]) : [];
-      if (raw.dynamic !== undefined && raw.dynamic !== 'complaints') errs.push(`${id}: dynamic は complaints のみ`);
-      if (raw.type !== 'text' && opts.length === 0 && raw.dynamic === undefined) errs.push(`${id}: 選択肢がない`);
-      if (raw.block === 'B' && !opts.some((o) => isObj(o) && Array.isArray(o.flags) && (o.flags as string[]).includes('none'))) {
-        errs.push(`${id}: 「どれもあてはまらない」(flags: none) がない`);
-      }
-      if (raw.role !== undefined) {
-        if (!['category', 'complaint', 'main', 'detail'].includes(String(raw.role))) errs.push(`${id}: role が category/complaint/main/detail でない`);
-        (roles[String(raw.role)] ??= []).push(id);
-      }
-      if (isObj(raw.showIf) && raw.showIf.chosen !== undefined) {
-        if (!Array.isArray(raw.showIf.chosen) || raw.showIf.chosen.length === 0) errs.push(`${id}: showIf.chosen は選択肢IDの配列`);
-        else for (const c of raw.showIf.chosen as unknown[]) showIfRefs.push([id, String(c)]);
-      }
-      if (isObj(raw.showIf) && raw.showIf.mainDetail !== undefined) {
-        if (!isStr(raw.showIf.mainDetail)) errs.push(`${id}: showIf.mainDetail はテンプレート名`);
-        else detailTemplates.add(raw.showIf.mainDetail);
-        if (raw.role !== 'detail') errs.push(`${id}: showIf.mainDetail を持つ設問は role: detail`);
-      }
-      if (raw.role === 'complaint') {
-        for (const o of opts) {
-          if (!isObj(o)) continue;
-          if (!isStr(o.detail)) errs.push(`${id}: 主訴 ${String(o.id)} に detail（詳細問診のテンプレート名）がない`);
-          else detailRefs.push([String(o.id), o.detail]);
+  const symptomKeys = new Set<string>(isObj(fo) && isObj(fo.symptoms) ? Object.keys(fo.symptoms) : []);
+  // 所見
+  const findingIds = new Set<string>();
+  if (!isObj(fj) || !Array.isArray(fj.findings)) errs.push('findings.json: findings が必要');
+  else {
+    for (const f of fj.findings as unknown[]) {
+      if (!isObj(f) || !isStr(f.id) || !isStr(f.label)) { errs.push('findings.json: id/label のない所見'); continue; }
+      if (findingIds.has(f.id)) errs.push(`findings.json: 所見ID重複 ${f.id}`);
+      findingIds.add(f.id);
+      for (const key of ['weights', 'organs'] as const) {
+        if (f[key] === undefined) continue;
+        if (!isObj(f[key])) { errs.push(`${f.id}: ${key} がオブジェクトでない`); continue; }
+        for (const [k, v] of Object.entries(f[key] as Raw)) {
+          if (key === 'weights' ? !isTypeKey(k) : !isOrganKey(k)) errs.push(`${f.id}: ${key} のキー ${k} が不正`);
+          if (typeof v !== 'number' || v < 0 || v > 1) errs.push(`${f.id}: ${key}.${k} は 0〜1 の数値`);
         }
-      }
-      const checkOpt = (o: unknown, where: string) => {
-        if (!isObj(o) || !isStr(o.id) || !isStr(o.text)) { errs.push(`${where}: id/text のない選択肢`); return; }
-        if (optionIds.has(o.id)) errs.push(`選択肢ID重複 ${o.id}`);
-        optionIds.add(o.id);
-        if (o.weights !== undefined) {
-          if (!isObj(o.weights)) errs.push(`${o.id}: weights がオブジェクトでない`);
-          else for (const [k, v] of Object.entries(o.weights)) {
-            if (!isTypeKey(k)) errs.push(`${o.id}: weights のキー ${k} が TypeKey でない`);
-            if (typeof v !== 'number' || v < 0 || v > 1) errs.push(`${o.id}: weights.${k} は 0〜1 の数値`);
-          }
-        }
-        if (o.organs !== undefined) {
-          if (!isObj(o.organs)) errs.push(`${o.id}: organs がオブジェクトでない`);
-          else for (const [k, v] of Object.entries(o.organs)) {
-            if (!isOrganKey(k)) errs.push(`${o.id}: organs のキー ${k} が五臓（liver/heart/spleen/lung/kidney）でない`);
-            if (typeof v !== 'number' || v < 0 || v > 1) errs.push(`${o.id}: organs.${k} は 0〜1 の数値`);
-          }
-        }
-        for (const key of ['symptoms', 'also'] as const) {
-          if (o[key] === undefined) continue;
-          if (!Array.isArray(o[key])) errs.push(`${o.id}: ${key} が配列でない`);
-          else for (const s of o[key] as unknown[]) {
-            if (!symptomKeys.has(String(s))) errs.push(`${o.id}: 症状コード ${String(s)} が formulas.json の symptoms にない`);
-            usedSymptoms.add(String(s));
-          }
-        }
-        if (o.femaleOnly !== undefined && typeof o.femaleOnly !== 'boolean') errs.push(`${o.id}: femaleOnly が真偽値でない`);
-        if (o.flags !== undefined && !Array.isArray(o.flags)) errs.push(`${o.id}: flags が配列でない`);
-      };
-      for (const o of opts) checkOpt(o, id);
-      if (raw.sub !== undefined) {
-        if (!isObj(raw.sub) || !isStr(raw.sub.title) || !Array.isArray(raw.sub.options)) errs.push(`${id}: sub は title と options を持つ`);
-        else for (const o of raw.sub.options as unknown[]) checkOpt(o, `${id}.sub`);
-      }
-      if (raw.scored === true && !opts.some((o) => isObj(o) && isObj(o.weights) && Object.keys(o.weights).length > 0)) {
-        errs.push(`${id}: scored なのに weights を持つ選択肢がない`);
       }
     }
-    for (const [qid, ref] of showIfRefs) if (!optionIds.has(ref)) errs.push(`${qid}: showIf.chosen の ${ref} は存在しない選択肢ID`);
-    for (const [oid, tpl] of detailRefs) if (!detailTemplates.has(tpl)) errs.push(`${oid}: 詳細問診のテンプレート ${tpl} の設問（showIf.mainDetail）がない`);
-    const referenced = new Set(detailRefs.map(([, tpl]) => tpl));
-    for (const tpl of detailTemplates) if (!referenced.has(tpl)) errs.push(`詳細問診のテンプレート ${tpl} を使う主訴がない`);
-    if ((roles.category ?? []).length !== 1) errs.push('questions.json: role: category（大カテゴリー）の設問は1つ');
-    if ((roles.main ?? []).length > 1) errs.push('questions.json: role: main（いちばん改善したい主訴）の設問は1つまで');
-    if (!(roles.complaint ?? []).length) errs.push('questions.json: role: complaint（具体的な主訴）の設問がない');
+    for (const f of fj.findings as Raw[]) for (const i of strArr(f.implies)) if (!findingIds.has(i)) errs.push(`${String(f.id)}: implies の ${i} がない`);
   }
-
+  // タグ
+  const tagIds = new Set<string>();
+  if (!isObj(tj) || !Array.isArray(tj.tags)) errs.push('safety_tags.json: tags が必要');
+  else for (const t of tj.tags as unknown[]) {
+    if (!isObj(t) || !isStr(t.id) || !isStr(t.label) || !Array.isArray(t.checks) || !t.checks.length) { errs.push('safety_tags.json: id/label/checks が必要'); continue; }
+    if (tagIds.has(t.id)) errs.push(`safety_tags.json: タグ重複 ${t.id}`);
+    tagIds.add(t.id);
+  }
+  // 主訴
+  const complaintIds = new Set<string>();
+  const templatesUsed = new Set<string>();
+  let categories: Category[] = [];
+  if (!isObj(cj) || !Array.isArray(cj.categories) || !Array.isArray(cj.complaints)) errs.push('complaints.json: categories と complaints が必要');
+  else {
+    categories = cj.categories as Category[];
+    const catIds = new Set(categories.map((c) => c.id));
+    for (const c of cj.complaints as unknown[]) {
+      if (!isObj(c) || !isStr(c.id) || !isStr(c.name) || !isStr(c.detail)) { errs.push('complaints.json: id/name/detail のない主訴'); continue; }
+      if (complaintIds.has(c.id)) errs.push(`complaints.json: 主訴ID重複 ${c.id}`);
+      complaintIds.add(c.id);
+      templatesUsed.add(c.detail);
+      if (!strArr(c.categories).length || !strArr(c.categories).every((x) => catIds.has(x))) errs.push(`主訴 ${c.id}: categories が不正`);
+      for (const f of strArr(c.findings)) if (!findingIds.has(f)) errs.push(`主訴 ${c.id}: 所見 ${f} がない`);
+      for (const s of strArr(c.symptoms)) if (!symptomKeys.has(s)) errs.push(`主訴 ${c.id}: 症状コード ${s} がない`);
+      for (const t of strArr(c.tags)) if (!tagIds.has(t)) errs.push(`主訴 ${c.id}: タグ ${t} がない`);
+    }
+  }
+  // 設問
+  const optionIds = new Set<string>();
+  const templates = new Set<string>();
+  const chosenRefs: [string, string][] = [];
+  if (!isObj(qj) || !isStr(qj.version) || !Array.isArray(qj.questions)) errs.push('questions.json: version と questions が必要');
+  else {
+    const expanded = isObj(cj) && Array.isArray(cj.complaints) ? expandQuestions(qj.questions as Raw[], cj as { categories: Category[]; complaints: Complaint[] }) : [];
+    const qIds = new Set<string>();
+    for (const q of expanded) {
+      const id = String(q.id);
+      if (qIds.has(id)) errs.push(`設問ID重複 ${id}`);
+      qIds.add(id);
+      if (!SECTIONS.includes(q.section as Section)) errs.push(`${id}: section が不正`);
+      if (!isStr(q.title)) errs.push(`${id}: title がない`);
+      if (!['single', 'multi'].includes(String(q.type))) errs.push(`${id}: type は single/multi`);
+      if (q.section === 'detail') { if (!isStr(q.template)) errs.push(`${id}: 深掘りに template がない`); else templates.add(q.template); }
+      const opts = Array.isArray(q.options) ? (q.options as unknown[]) : [];
+      if (!opts.length && q.generated !== 'primary') errs.push(`${id}: 選択肢がない`);
+      if ((q.section === 'detail' || q.section === 'constitution') && q.type === 'multi' && !opts.some((o) => isObj(o) && o.exclusive)) {
+        errs.push(`${id}: 「特にない」「わからない」（exclusive）がない`);
+      }
+      const trig = q.trigger;
+      if (trig !== undefined) {
+        if (!isObj(trig)) errs.push(`${id}: trigger がオブジェクトでない`);
+        else {
+          for (const c of strArr(trig.chosen)) chosenRefs.push([id, c]);
+          for (const f of strArr(trig.findingsPresent)) if (!findingIds.has(f)) errs.push(`${id}: trigger.findingsPresent の ${f} がない`);
+        }
+      }
+      const checkOpt = (o: unknown) => {
+        if (!isObj(o) || !isStr(o.id) || !isStr(o.text)) { errs.push(`${id}: id/text のない選択肢`); return; }
+        if (optionIds.has(o.id)) errs.push(`選択肢ID重複 ${o.id}`);
+        optionIds.add(o.id);
+        for (const f of strArr(o.findings)) if (!findingIds.has(f)) errs.push(`${o.id}: 所見 ${f} がない`);
+        for (const s of [...strArr(o.symptoms), ...strArr(o.also)]) if (!symptomKeys.has(s)) errs.push(`${o.id}: 症状コード ${s} がない`);
+        for (const t of strArr(o.tags)) if (!tagIds.has(t)) errs.push(`${o.id}: タグ ${t} がない`);
+        if (o.exclusive !== undefined && !['none', 'unknown', 'declined'].includes(String(o.exclusive))) errs.push(`${o.id}: exclusive が不正`);
+        if (o.exclusive && strArr(o.findings).length) errs.push(`${o.id}: exclusive の選択肢に所見を付けない`);
+        if (o.urgent && !strArr(o.tags).length) errs.push(`${o.id}: urgent の選択肢にタグがない`);
+      };
+      for (const o of opts) checkOpt(o);
+      if (isObj(q.sub)) for (const o of (q.sub.options as unknown[]) ?? []) checkOpt(o);
+    }
+    for (const [qid, c] of chosenRefs) if (!optionIds.has(c)) errs.push(`${qid}: trigger.chosen の ${c} は存在しない選択肢ID`);
+    for (const t of templatesUsed) if (!templates.has(t)) errs.push(`深掘りテンプレート ${t} の設問がない`);
+    for (const t of templates) if (!templatesUsed.has(t)) errs.push(`深掘りテンプレート ${t} を使う主訴がない`);
+  }
   // タイプ
-  if (!isObj(t) || !isObj(t.types)) errs.push('types.json: types が必要');
+  if (!isObj(ty) || !isObj(ty.types)) errs.push('types.json: types が必要');
   else {
     for (const key of TYPES) {
-      const d = (t.types as Record<string, unknown>)[key];
+      const d = (ty.types as Raw)[key];
       if (!isObj(d)) { errs.push(`types.json: ${key} がない`); continue; }
       for (const k of ['name', 'reading', 'color', 'headline', 'summary']) if (!isStr(d[k])) errs.push(`types.${key}.${k} がない`);
       if (!Array.isArray(d.symptoms) || d.symptoms.length !== 5) errs.push(`types.${key}.symptoms は5つ`);
-      if (!isObj(d.advice) || !['mind', 'food', 'move', 'rest'].every((k) => isStr((d.advice as Record<string, unknown>)[k]))) errs.push(`types.${key}.advice は mind/food/move/rest`);
-      if (!isObj(d.tsubo) || !['name', 'reading', 'position', 'effect'].every((k) => isStr((d.tsubo as Record<string, unknown>)[k]))) errs.push(`types.${key}.tsubo は name/reading/position/effect`);
+      if (!isObj(d.advice) || !['mind', 'food', 'move', 'rest'].every((k) => isStr((d.advice as Raw)[k]))) errs.push(`types.${key}.advice は mind/food/move/rest`);
+      if (!isObj(d.tsubo) || !['name', 'reading', 'position', 'effect'].every((k) => isStr((d.tsubo as Raw)[k]))) errs.push(`types.${key}.tsubo は name/reading/position/effect`);
     }
-    const tips = Array.isArray(t.tips) ? (t.tips as unknown[]) : [];
-    tips.forEach((tip, i) => {
-      if (!isObj(tip) || !isStr(tip.when) || !Array.isArray(tip.types) || !isStr(tip.text)) { errs.push(`tips[${i}]: when/types/text が必要`); return; }
-      if (optionIds.size && !optionIds.has(tip.when)) errs.push(`tips[${i}]: when=${tip.when} は存在しない選択肢ID`);
-      for (const ty of tip.types as unknown[]) if (!isTypeKey(String(ty))) errs.push(`tips[${i}]: types に不正な値 ${String(ty)}`);
-    });
+    for (const [i, tip] of ((Array.isArray(ty.tips) ? ty.tips : []) as unknown[]).entries()) {
+      if (!isObj(tip) || !isStr(tip.when) || !Array.isArray(tip.types) || !isStr(tip.text)) { errs.push(`tips[${i}]: when/types/text が必要`); continue; }
+      if (!optionIds.has(tip.when)) errs.push(`tips[${i}]: when=${tip.when} は存在しない選択肢ID`);
+      for (const t of tip.types as unknown[]) if (!isTypeKey(String(t))) errs.push(`tips[${i}]: types に不正な値 ${String(t)}`);
+    }
   }
-
   // 処方
-  if (!isObj(f) || !Array.isArray(f.formulas) || !isObj(f.symptoms)) errs.push('formulas.json: symptoms と formulas が必要');
+  const ref = (x: string) => findingIds.has(x) || optionIds.has(x);
+  if (!isObj(fo) || !Array.isArray(fo.formulas) || !isObj(fo.symptoms)) errs.push('formulas.json: symptoms と formulas が必要');
   else {
-    for (const [k, v] of Object.entries(f.symptoms)) if (!isObj(v) || !isStr(v.label)) errs.push(`symptoms.${k}: label がない`);
+    for (const [k, v] of Object.entries(fo.symptoms)) if (!isObj(v) || !isStr(v.label)) errs.push(`symptoms.${k}: label がない`);
     const codes = new Set<string>();
     const names = new Set<string>();
-    for (const raw of f.formulas as unknown[]) {
+    for (const raw of fo.formulas as unknown[]) {
       if (!isObj(raw) || !isStr(raw.code)) { errs.push('formulas.json: code のない処方'); continue; }
       const c = raw.code;
       if (codes.has(c)) errs.push(`formulas.json: code 重複 ${c}`);
@@ -296,8 +345,8 @@ export function validateMasters(q: unknown, t: unknown, f: unknown): string[] {
         if (!symptomKeys.has(ind.symptom)) errs.push(`${c}: indications の症状コード ${ind.symptom} が symptoms にない`);
         if (isStr(raw.efficacy) && !raw.efficacy.includes(ind.term)) errs.push(`${c}: 効能の語「${ind.term}」が efficacy の本文にない`);
         if (ind.requires !== undefined) {
-          if (!Array.isArray(ind.requires) || ind.requires.length === 0) errs.push(`${c}: requires は選択肢IDの配列`);
-          else for (const r of ind.requires as unknown[]) if (optionIds.size && !optionIds.has(String(r))) errs.push(`${c}: requires の ${String(r)} は存在しない選択肢ID`);
+          if (!Array.isArray(ind.requires) || ind.requires.length === 0) errs.push(`${c}: requires は所見IDまたは選択肢IDの配列`);
+          else for (const r of ind.requires as unknown[]) if (!ref(String(r))) errs.push(`${c}: requires の ${String(r)} は存在しない所見・選択肢`);
         }
       }
       if (!Array.isArray(raw.strength) || raw.strength.length === 0 || !(raw.strength as unknown[]).every((s) => ['def', 'mid', 'exc'].includes(String(s)))) errs.push(`${c}: strength は def/mid/exc の配列`);
@@ -310,8 +359,8 @@ export function validateMasters(q: unknown, t: unknown, f: unknown): string[] {
       if (raw.heat !== undefined && !['excess', 'deficient'].includes(String(raw.heat))) errs.push(`${c}: heat は excess/deficient`);
       if (!Array.isArray(raw.organs) || raw.organs.length === 0 || !(raw.organs as unknown[]).every((o) => isOrganKey(String(o)))) errs.push(`${c}: organs は五臓の配列`);
       for (const k of ['signs', 'cautionHerbs', 'contraindications']) if (!Array.isArray(raw[k])) errs.push(`${c}: ${k} が配列でない`);
-      for (const ks of (Array.isArray(raw.signs) ? raw.signs : []) as string[]) if (optionIds.size && !optionIds.has(ks)) errs.push(`${c}: signs の ${ks} は存在しない選択肢ID`);
-      for (const ct of (Array.isArray(raw.contraindications) ? raw.contraindications : []) as string[]) if (!(CONTRA_CODES as readonly string[]).includes(ct)) errs.push(`${c}: 除外フラグ ${ct} が不明`);
+      for (const s of strArr(raw.signs)) if (!ref(s)) errs.push(`${c}: signs の ${s} は存在しない所見・選択肢`);
+      for (const ct of strArr(raw.contraindications)) if (!(CONTRA_CODES as readonly string[]).includes(ct)) errs.push(`${c}: 除外フラグ ${ct} が不明`);
       if (typeof raw.priority !== 'number') errs.push(`${c}: priority が数値でない`);
       if (typeof raw.verified !== 'boolean') errs.push(`${c}: verified が真偽値でない`);
       if (typeof raw.active !== 'boolean') errs.push(`${c}: active が真偽値でない`);
@@ -320,45 +369,54 @@ export function validateMasters(q: unknown, t: unknown, f: unknown): string[] {
   return errs;
 }
 
-const problems = validateMasters(questionsJson, typesJson, formulasJson);
+const problems = validateMasters(questionsJson, complaintsJson, findingsJson, tagsJson, typesJson, formulasJson);
 if (problems.length) {
   throw new Error(`[kampo] マスタデータの検証に失敗:\n  - ${problems.join('\n  - ')}`);
 }
 
-const rawQuestionnaire = questionsJson as unknown as Questionnaire;
-// text 型（C5）は選択肢を持たないので空配列で揃える
-export const QUESTIONS: Question[] = rawQuestionnaire.questions.map((q) => ({ ...q, options: q.options ?? [] }));
-export const QUESTIONNAIRE: Questionnaire = { version: rawQuestionnaire.version, questions: QUESTIONS };
+const cj = complaintsJson as unknown as { categories: Category[]; complaints: Complaint[] };
+const qj = questionsJson as unknown as { version: string; review: Review; questions: Raw[] };
+const allQuestions = expandQuestions(qj.questions, cj) as unknown as Question[];
+/** 患者の問診に出す設問（表示順） */
+export const QUESTIONS: Question[] = allQuestions.filter((q) => q.section !== 'staff');
+/** 薬剤師が入力する設問（舌・体格・声） */
+export const STAFF_QUESTIONS: Question[] = allQuestions.filter((q) => q.section === 'staff');
+export const QUESTIONNAIRE = { version: qj.version, review: qj.review, questions: QUESTIONS };
+export const CATEGORIES: Category[] = cj.categories;
+export const COMPLAINTS: Complaint[] = cj.complaints;
+export const FINDINGS: Finding[] = (findingsJson as unknown as { findings: Finding[] }).findings;
+export const SAFETY_TAGS: SafetyTagDef[] = (tagsJson as unknown as { tags: SafetyTagDef[] }).tags;
 export const TYPE_DEFS: Record<TypeKey, TypeDef> = (typesJson as unknown as TypesData).types;
 export const TIPS: Tip[] = (typesJson as unknown as TypesData).tips;
 const formulasData = formulasJson as unknown as FormulasData;
 export const FORMULAS: Formula[] = formulasData.formulas;
 export const SYMPTOMS: Record<string, SymptomDef> = formulasData.symptoms;
 export const FORMULAS_SOURCE = formulasData.source ?? '';
+export const LEGACY = legacyJson as unknown as { types: Record<string, string>; versions: Record<string, { id: string; title: string; options: Record<string, string> }[]> };
 
-const QUESTION_BY_ID = new Map(QUESTIONS.map((q) => [q.id, q]));
-const OPTION_BY_ID = new Map<string, { q: Question; o: Option; sub: boolean }>();
-for (const q of QUESTIONS) {
-  for (const o of q.options) OPTION_BY_ID.set(o.id, { q, o, sub: false });
-  for (const o of q.sub?.options ?? []) OPTION_BY_ID.set(o.id, { q, o, sub: true });
-}
+const QUESTION_BY_ID = new Map(allQuestions.map((q) => [q.id, q]));
+const OPTION_BY_ID = new Map<string, { q: Question; o: Option }>();
+for (const q of allQuestions) for (const o of [...q.options, ...(q.sub?.options ?? [])]) OPTION_BY_ID.set(o.id, { q, o });
+const FINDING_BY_ID = new Map(FINDINGS.map((f) => [f.id, f]));
+const COMPLAINT_BY_ID = new Map(COMPLAINTS.map((c) => [c.id, c]));
+const TAG_BY_ID = new Map(SAFETY_TAGS.map((t) => [t.id, t]));
 export const questionById = (id: string) => QUESTION_BY_ID.get(id);
 export const optionById = (id: string) => OPTION_BY_ID.get(id)?.o;
 export const questionOfOption = (id: string) => OPTION_BY_ID.get(id)?.q;
 export const optionText = (id: string) => OPTION_BY_ID.get(id)?.o.text ?? id;
+export const findingById = (id: string) => FINDING_BY_ID.get(id);
+export const findingLabel = (id: string) => FINDING_BY_ID.get(id)?.label ?? optionText(id);
+export const complaintById = (id: string) => COMPLAINT_BY_ID.get(id);
+export const categoryById = (id: string) => CATEGORIES.find((c) => c.id === id);
+export const tagById = (id: string) => TAG_BY_ID.get(id);
 export const formulaByCode = (code: string) => FORMULAS.find((f) => f.code === code);
-/** 主訴の3段階の設問 */
-export const CATEGORY_QUESTION = QUESTIONS.find((q) => q.role === 'category')!;
-export const COMPLAINT_QUESTIONS = QUESTIONS.filter((q) => q.role === 'complaint');
-export const MAIN_QUESTION = QUESTIONS.find((q) => q.role === 'main');
-/** 具体的な主訴の選択肢 → その大カテゴリー名 */
-const CATEGORY_OF = new Map<string, string>();
-for (const q of COMPLAINT_QUESTIONS) {
-  const cat = CATEGORY_QUESTION.options.find((o) => q.showIf?.chosen?.includes(o.id));
-  for (const o of q.options) CATEGORY_OF.set(o.id, cat?.text ?? '');
-}
-export const categoryOfComplaint = (optionId: string) => CATEGORY_OF.get(optionId) ?? '';
 export const symptomLabel = (code: string) => SYMPTOMS[code]?.label ?? code;
+/** 旧版のセッションの選択肢ID → 文言（版ごとに探し、なければ全版から） */
+export function legacyOptionText(version: string, id: string): string {
+  for (const q of LEGACY.versions[version] ?? []) if (q.options[id]) return q.options[id];
+  for (const qs of Object.values(LEGACY.versions)) for (const q of qs) if (q.options[id]) return q.options[id];
+  return id;
+}
 
 export const STRENGTH_LABEL: Record<Strength, string> = { def: '虚証（体力虚弱）', mid: '虚実間（体力中等度）', exc: '実証（体力充実）' };
 export const THERMAL_LABEL: Record<Thermal, string> = { warm: '温める', neutral: '中間', cool: '冷ます' };

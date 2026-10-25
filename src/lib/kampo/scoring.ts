@@ -1,12 +1,13 @@
 // ---------------------------------------------------------------------------
-// 体質スコアリング（純粋関数）。仕様書 第6節。
-// 等重み（選択肢1つ＝1点、2タイプにまたがるものは0.5ずつ）。
-// 表示されなかった設問（B11・B13 のスキップ、選んだ主訴と関係のない詳細問診）と「閉経している」を選んだ B11 は
-// 理論最大点から除く。「どれもあてはまらない」は 0 点。
-// 主訴の詳細問診（S*）の選択肢にも重み（多くは 0.5）があり、体質の評価に加わる。
+// 体質スコア（純粋関数）。2026-10-25 フェーズ2 の暫定版（フェーズ3 で証の判定条件に置き換える）。
+// 所見ごとに草案の重み（findings.json。2026-10-24 版の選択肢の値を引き継いだもの）を使い、
+//  - 同じ所見は何問で答えても1回だけ数える
+//  - 同じ group（例：冷えで悪化／温めると楽になる）は、同じタイプへ1回分（group 内の最大）しか加点しない
+//  - 回答済み（あり・なし）の所見だけを理論最大点に入れる。未質問・わからない・回答しないは入れない
+// 主体質・副体質の区切り（20／40／60 点、最高点の0.7倍）は 2026-10-24 版のまま。出典のない暫定値で、検証前に新しく決めない。
 // ---------------------------------------------------------------------------
-import { TYPES, ORGANS, type TypeKey, type OrganKey, type Question, type Option } from './masters.ts';
-import { chosenComplaintIds, mainDetailOf } from './complaints.ts';
+import { TYPES, ORGANS, findingById, type TypeKey, type OrganKey } from './masters.ts';
+import type { FindingState } from './findings.ts';
 
 export const DEFICIENT: TypeKey[] = ['qi_def', 'blood_def', 'yin_def', 'yang_def']; // 虚
 export const EXCESS: TypeKey[] = ['qi_stag', 'blood_stasis', 'fluid', 'yang_exc']; // 実
@@ -23,21 +24,7 @@ export const HEAT_KIND_LABEL: Record<HeatKindLabel, string> = { excess: '実熱�
 export const DEF_EXC_LABEL: Record<DefExcLabel, string> = { def: '虚証寄り', mid: '虚実間', exc: '実証寄り' };
 export const THERMAL_STATE_LABEL: Record<ThermalLabel, string> = { cold: '寒（冷え）寄り', neutral: '中間', hot: '熱寄り' };
 
-/** 回答：設問ID → 選んだ選択肢ID（sub の選択肢も同じ配列に入れる） */
-export type Answers = Record<string, string[]>;
-
-export interface ScoreContext {
-  sex?: string; // female / male / none
-  tongueMode: 'self' | 'staff';
-  /** 選ばれている選択肢ID（具体的な主訴の showIf.chosen 判定用） */
-  chosen?: Set<string>;
-  /** いちばん改善したい主訴の詳細問診テンプレート名（showIf.mainDetail 判定用） */
-  mainDetail?: string;
-  /** 選んだ具体的な主訴の数（showIf.minComplaints 判定用） */
-  complaintCount?: number;
-  /** 薬剤師が入力・上書きした舌所見（B13 の選択肢ID）。あればセルフ回答より優先 */
-  tongueOverride?: string[];
-}
+export type { Answers } from './flow.ts';
 
 export interface Classification {
   level: Record<TypeKey, Level>;
@@ -55,58 +42,18 @@ export interface ScoreResult extends Classification {
   raw: Record<TypeKey, number>;
   max: Record<TypeKey, number>;
   pct: Record<TypeKey, number>;
-  /** 五臓の傾向（0〜100）。設問の organs の重みで集計 */
+  /** 五臓の傾向（0〜100）。所見の organs の重みで集計 */
   organRaw: Record<OrganKey, number>;
   organMax: Record<OrganKey, number>;
   organPct: Record<OrganKey, number>;
+  /** タイプごとに加点した所見（薬剤師画面の根拠表示用） */
+  evidence?: Record<TypeKey, string[]>;
 }
 
 export const zero = (): Record<TypeKey, number> => Object.fromEntries(TYPES.map((t) => [t, 0])) as Record<TypeKey, number>;
 const mapTypes = <T,>(fn: (t: TypeKey) => T) => Object.fromEntries(TYPES.map((t) => [t, fn(t)])) as Record<TypeKey, T>;
 export const zeroOrgans = (): Record<OrganKey, number> => Object.fromEntries(ORGANS.map((o) => [o, 0])) as Record<OrganKey, number>;
 const round2 = (n: number) => Math.round(n * 100) / 100;
-
-export type VisibilityContext = Pick<ScoreContext, 'sex' | 'tongueMode' | 'chosen' | 'mainDetail' | 'complaintCount'>;
-
-/** 回答から表示判定の材料を作る */
-export function visibilityContext(answers: Answers, sex: string | undefined, tongueMode: 'self' | 'staff'): VisibilityContext {
-  return {
-    sex, tongueMode,
-    chosen: new Set(Object.values(answers).flat()),
-    mainDetail: mainDetailOf(answers),
-    complaintCount: chosenComplaintIds(answers).length,
-  };
-}
-
-/**
- * showIf による表示判定（B13 はセルフモードのみ、B11・C3 は女性のみ、具体的な主訴は選んだカテゴリーだけ、
- * いちばん改善したい主訴は2つ以上選んだときだけ、詳細問診はいちばん改善したい主訴のテンプレートだけ）
- */
-export function isVisible(q: Question, ctx: VisibilityContext): boolean {
-  if (q.showIf?.sex && ctx.sex !== q.showIf.sex) return false;
-  if (q.showIf?.tongueMode && ctx.tongueMode !== q.showIf.tongueMode) return false;
-  if (q.showIf?.chosen && !q.showIf.chosen.some((id) => ctx.chosen?.has(id))) return false;
-  if (q.showIf?.mainDetail && ctx.mainDetail !== q.showIf.mainDetail) return false;
-  if (q.showIf?.minComplaints && (ctx.complaintCount ?? 0) < q.showIf.minComplaints) return false;
-  return true;
-}
-/** 選択肢の表示判定（女性向けの選択肢は、性別が男性なら出さない） */
-export const optionVisible = (o: Option, ctx: Pick<ScoreContext, 'sex'>) => !(o.femaleOnly && ctx.sex === 'male');
-
-/**
- * B13（舌）の採点に使う選択肢。
- *  - 薬剤師の所見（tongueOverride）があればモードを問わずそれを使う
- *  - スタッフモードで所見未入力なら null（max からも除く）
- *  - セルフモードなら来店客の回答
- */
-export function tongueChoice(answers: Answers, ctx: ScoreContext): string[] | null {
-  if (ctx.tongueOverride && ctx.tongueOverride.length) return ctx.tongueOverride;
-  if (ctx.tongueMode === 'staff') return null;
-  return answers['B13'] ?? [];
-}
-
-const allOptions = (q: Question) => [...q.options, ...(q.sub?.options ?? [])];
-const findOption = (q: Question, id: string) => allOptions(q).find((o) => o.id === id);
 
 /** pct から主体質・副体質・指数を決める後半部分（テスト用に分離） */
 export function classify(pct: Record<TypeKey, number>): Classification {
@@ -132,42 +79,39 @@ export function classify(pct: Record<TypeKey, number>): Classification {
   };
 }
 
-export function score(answers: Answers, questions: Question[], ctx: ScoreContext): ScoreResult {
-  const vctx = visibilityContext(answers, ctx.sex, ctx.tongueMode);
-  const raw = zero();
-  const max = zero();
-  const organRaw = zeroOrgans();
-  const organMax = zeroOrgans();
-  for (const q of questions) {
-    if (!q.scored) continue;
-    let chosen: string[];
-    if (q.id === 'B13') {
-      const c = tongueChoice(answers, ctx);
-      if (c === null) continue;
-      chosen = c;
-    } else {
-      if (!isVisible(q, vctx)) continue;
-      chosen = answers[q.id] ?? [];
+/** 所見の状態からスコアを出す（暫定） */
+export function score(state: FindingState): ScoreResult {
+  // group（なければ所見ID）ごとに、タイプ別の最大値を取る
+  const rawG = new Map<string, Partial<Record<TypeKey | OrganKey, number>>>();
+  const maxG = new Map<string, Partial<Record<TypeKey | OrganKey, number>>>();
+  const ev = new Map<string, Partial<Record<TypeKey, string>>>();
+  for (const [id, e] of state) {
+    if (e.status !== 'present' && e.status !== 'absent') continue;
+    const f = findingById(id);
+    if (!f || (!f.weights && !f.organs)) continue;
+    const key = f.group ?? id;
+    const mx = maxG.get(key) ?? {};
+    const rw = rawG.get(key) ?? {};
+    const evg = ev.get(key) ?? {};
+    for (const [k, w] of [...Object.entries(f.weights ?? {}), ...Object.entries(f.organs ?? {})] as [TypeKey | OrganKey, number][]) {
+      mx[k] = Math.max(mx[k] ?? 0, w);
+      if (e.status === 'present' && w > (rw[k] ?? 0)) {
+        rw[k] = w;
+        if ((TYPES as string[]).includes(k)) evg[k as TypeKey] = f.id;
+      }
     }
-    // 理論最大点：その問の全選択肢の重みをタイプごと・五臓ごとに合算
-    const qMax = zero();
-    const qOrganMax = zeroOrgans();
-    for (const o of allOptions(q)) {
-      if (!optionVisible(o, ctx)) continue;
-      for (const [t, w] of Object.entries(o.weights ?? {})) qMax[t as TypeKey] += w ?? 0;
-      for (const [k, w] of Object.entries(o.organs ?? {})) qOrganMax[k as OrganKey] += w ?? 0;
-    }
-    if (chosen.some((id) => findOption(q, id)?.flags?.includes('skip_max'))) continue; // 閉経など：この問は max に入れない
-    for (const t of TYPES) max[t] += qMax[t];
-    for (const k of ORGANS) organMax[k] += qOrganMax[k];
-    for (const id of chosen) {
-      const o = findOption(q, id);
-      for (const [t, w] of Object.entries(o?.weights ?? {})) raw[t as TypeKey] += w ?? 0;
-      for (const [k, w] of Object.entries(o?.organs ?? {})) organRaw[k as OrganKey] += w ?? 0;
-    }
+    maxG.set(key, mx); rawG.set(key, rw); ev.set(key, evg);
+  }
+  const raw = zero(); const max = zero(); const organRaw = zeroOrgans(); const organMax = zeroOrgans();
+  const evidence = mapTypes<string[]>(() => []);
+  for (const [key, mx] of maxG) {
+    const rw = rawG.get(key) ?? {};
+    for (const t of TYPES) { max[t] += mx[t] ?? 0; raw[t] += rw[t] ?? 0; }
+    for (const o of ORGANS) { organMax[o] += mx[o] ?? 0; organRaw[o] += rw[o] ?? 0; }
+    for (const [t, fid] of Object.entries(ev.get(key) ?? {}) as [TypeKey, string][]) evidence[t].push(fid);
   }
   const pct = mapTypes((t) => (max[t] === 0 ? 0 : Math.round((100 * raw[t]) / max[t])));
   const organPct = Object.fromEntries(ORGANS.map((k) => [k, organMax[k] === 0 ? 0 : Math.round((100 * organRaw[k]) / organMax[k])])) as Record<OrganKey, number>;
-  return { raw, max, pct, organRaw: roundMap(organRaw), organMax: roundMap(organMax), organPct, ...classify(pct) };
+  return { raw: mapTypes((t) => round2(raw[t])), max: mapTypes((t) => round2(max[t])), pct, organRaw: roundMap(organRaw), organMax: roundMap(organMax), organPct, evidence, ...classify(pct) };
 }
 const roundMap = (m: Record<OrganKey, number>) => Object.fromEntries(ORGANS.map((k) => [k, round2(m[k])])) as Record<OrganKey, number>;

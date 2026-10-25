@@ -32,7 +32,7 @@ const scored = sessions.filter((s) => s.scores);
     <h2 class="kp-h2" style="margin-top:0">チェックと提案の履歴</h2>
     {sessions.length === 0 ? <p class="kp-note">まだチェックがありません。</p> : (
       <table class="kp-table">
-        <thead><tr><th>日時</th><th>状態</th><th>主体質</th><th>副体質</th><th>提案</th><th>担当</th><th>メモ</th><th></th></tr></thead>
+        <thead><tr><th>日時</th><th>状態</th><th>主となる体質</th><th>併存する傾向</th><th>提案</th><th>担当</th><th>メモ</th><th></th></tr></thead>
         <tbody>{sessions.map((s) => (
           <tr>
             <td>{fmtJst(s.startedAt)}</td>
@@ -51,7 +51,7 @@ const scored = sessions.filter((s) => s.scores);
 
   {scored.length > 0 && (
     <div class="kp-card">
-      <h2 class="kp-h2" style="margin-top:0">スコアの推移（%）</h2>
+      <h2 class="kp-h2" style="margin-top:0">スコアの推移（暫定。設問版が違う回は単純に比べられません）</h2>
       <table class="kp-table">
         <thead><tr><th>タイプ</th>{scored.map((s) => <th class="num">{fmtJst(s.startedAt).slice(0, 10)}</th>)}</tr></thead>
         <tbody>{TYPES.map((k) => (

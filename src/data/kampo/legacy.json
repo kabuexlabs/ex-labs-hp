@@ -1,0 +1,4231 @@
+{
+ "note": "旧版のセッションを担当者画面で表示するための文言だけの写し。判定には使わない（再計算しない）。",
+ "types": {
+  "qi_def": "気虚",
+  "blood_def": "血虚",
+  "qi_stag": "気滞",
+  "blood_stasis": "瘀血",
+  "fluid": "水滞",
+  "yin_def": "陰虚",
+  "yang_def": "陽虚",
+  "yang_exc": "陽盛"
+ },
+ "versions": {
+  "2026-10-24b": [
+   {
+    "id": "A1",
+    "title": "性別",
+    "options": {
+     "A1-1": "女性",
+     "A1-2": "男性",
+     "A1-3": "回答しない"
+    }
+   },
+   {
+    "id": "A2",
+    "title": "年代",
+    "options": {
+     "A2-1": "10代",
+     "A2-2": "20代",
+     "A2-3": "30代",
+     "A2-4": "40代",
+     "A2-5": "50代",
+     "A2-6": "60代",
+     "A2-7": "70代以上"
+    }
+   },
+   {
+    "id": "K1",
+    "title": "どのようなお悩みがありますか",
+    "options": {
+     "K1-A": "肌の悩み",
+     "K1-B": "髪・頭皮の悩み",
+     "K1-C": "年齢による見た目の変化",
+     "K1-D": "生理前・生理中の不調",
+     "K1-E": "更年期・ホルモン変化",
+     "K1-F": "疲れ・だるさ・体力低下",
+     "K1-G": "冷え・血行の悩み",
+     "K1-H": "ストレス・気分の不調"
+    }
+   },
+   {
+    "id": "KA",
+    "title": "「肌の悩み」で、気になるものを選んでください",
+    "options": {
+     "KA-acne": "ニキビ・吹き出物",
+     "KA-flush": "顔のほてり・熱感",
+     "KA-red": "肌の赤み",
+     "KA-dry": "肌の乾燥",
+     "KA-itch": "肌のかゆみ",
+     "KA-eczema": "湿疹・肌荒れ",
+     "KA-dull": "肌のくすみ",
+     "KA-spots": "シミ・色素沈着",
+     "KA-melasma": "肝斑",
+     "KA-pores": "毛穴の開き",
+     "KA-blackhead": "毛穴の黒ずみ",
+     "KA-oily": "皮脂が多い・テカリ",
+     "KA-rough": "肌のざらつき",
+     "KA-firm": "肌のハリ・弾力の低下",
+     "KA-wrinkle": "小ジワ・乾燥ジワ",
+     "KA-other": "その他"
+    }
+   },
+   {
+    "id": "KB",
+    "title": "「髪・頭皮の悩み」で、気になるものを選んでください",
+    "options": {
+     "KB-loss": "抜け毛",
+     "KB-thin": "薄毛",
+     "KB-volume": "髪のボリューム低下",
+     "KB-fine": "髪が細くなった",
+     "KB-dry": "髪のパサつき",
+     "KB-gloss": "髪のツヤの低下",
+     "KB-gray": "白髪",
+     "KB-scalp_dry": "頭皮の乾燥",
+     "KB-scalp_oily": "頭皮の脂っぽさ",
+     "KB-dandruff": "フケ",
+     "KB-scalp_itch": "頭皮のかゆみ",
+     "KB-scalp_eczema": "頭皮の湿疹",
+     "KB-other": "その他"
+    }
+   },
+   {
+    "id": "KC",
+    "title": "「年齢による見た目の変化」で、気になるものを選んでください",
+    "options": {
+     "KC-sag": "顔のたるみ",
+     "KC-nasolabial": "ほうれい線",
+     "KC-mouth": "口元のたるみ",
+     "KC-eyelid": "目元のたるみ",
+     "KC-circles": "目の下のクマ",
+     "KC-eyebag": "目の下のむくみ",
+     "KC-puffy": "顔全体のむくみ",
+     "KC-wrinkle": "シワ",
+     "KC-firm": "肌のハリ・弾力の低下",
+     "KC-pale": "顔色の悪さ",
+     "KC-tired": "顔が疲れて見える",
+     "KC-dull": "肌のくすみ",
+     "KC-line": "フェイスラインの変化",
+     "KC-aged": "老けて見えることが気になる",
+     "KC-other": "その他"
+    }
+   },
+   {
+    "id": "KD",
+    "title": "「生理前・生理中の不調」で、気になるものを選んでください",
+    "options": {
+     "KD-pain": "生理痛",
+     "KD-irritable": "生理前のイライラ",
+     "KD-low": "生理前の気分の落ち込み",
+     "KD-anxious": "生理前の不安感",
+     "KD-headache": "生理前の頭痛",
+     "KD-edema": "生理前のむくみ",
+     "KD-breast": "生理前の胸の張り",
+     "KD-skin": "生理前の肌荒れ",
+     "KD-acne": "生理前のニキビ",
+     "KD-sleepy": "生理前の眠気",
+     "KD-tired": "生理前の疲労感",
+     "KD-appetite": "生理前の食欲増加",
+     "KD-irregular": "生理不順",
+     "KD-heavy": "経血量が多い",
+     "KD-light": "経血量が少ない",
+     "KD-other": "その他"
+    }
+   },
+   {
+    "id": "KE",
+    "title": "「更年期・ホルモン変化」で、気になるものを選んでください",
+    "options": {
+     "KE-hotflash": "ホットフラッシュ",
+     "KE-flush": "のぼせ・ほてり",
+     "KE-sweat": "発汗",
+     "KE-nightsweat": "寝汗",
+     "KE-irritable": "イライラ",
+     "KE-low": "気分の落ち込み",
+     "KE-anxious": "不安感",
+     "KE-palpitation": "動悸",
+     "KE-insomnia": "不眠",
+     "KE-tired": "疲労感",
+     "KE-headache": "頭痛",
+     "KE-dizzy": "めまい",
+     "KE-shoulder": "肩こり",
+     "KE-cold": "手足の冷え",
+     "KE-dry": "肌の乾燥",
+     "KE-hair": "抜け毛",
+     "KE-other": "その他"
+    }
+   },
+   {
+    "id": "KF",
+    "title": "「疲れ・だるさ・体力低下」で、気になるものを選んでください",
+    "options": {
+     "KF-morning": "朝から疲れている",
+     "KF-evening": "夕方になると疲れる",
+     "KF-easily": "少し動くだけで疲れる",
+     "KF-rest": "休んでも疲れが取れない",
+     "KF-dull": "常に体がだるい",
+     "KF-spirit": "気力が出ない",
+     "KF-stamina": "体力が落ちた",
+     "KF-meal": "食後の眠気",
+     "KF-appetite": "食欲不振を伴う疲労",
+     "KF-recovery": "病後の体力低下",
+     "KF-cold": "疲れると風邪をひきやすい",
+     "KF-other": "その他"
+    }
+   },
+   {
+    "id": "KG",
+    "title": "「冷え・血行の悩み」で、気になるものを選んでください",
+    "options": {
+     "KG-limbs": "手足の冷え",
+     "KG-feet": "足先の冷え",
+     "KG-hands": "手先の冷え",
+     "KG-belly": "お腹の冷え",
+     "KG-waist": "腰の冷え",
+     "KG-whole": "全身の冷え",
+     "KG-flushcold": "顔はほてるのに足が冷える",
+     "KG-bellypain": "冷えによる腹痛",
+     "KG-headache": "冷えによる頭痛",
+     "KG-period": "冷えによる生理痛の悪化",
+     "KG-summer": "夏でも冷える",
+     "KG-chilblain": "しもやけ",
+     "KG-other": "その他"
+    }
+   },
+   {
+    "id": "KH",
+    "title": "「ストレス・気分の不調」で、気になるものを選んでください",
+    "options": {
+     "KH-irritable": "イライラ",
+     "KH-anger": "怒りっぽさ",
+     "KH-anxious": "不安感",
+     "KH-low": "気分の落ち込み",
+     "KH-motivation": "やる気の低下",
+     "KH-tense": "緊張しやすい",
+     "KH-swing": "気分の浮き沈み",
+     "KH-stomach": "ストレスによる胃痛",
+     "KH-diarrhea": "ストレスによる下痢",
+     "KH-throat": "喉のつかえ感",
+     "KH-onset": "寝つきの悪さ",
+     "KH-wake": "中途覚醒",
+     "KH-palpitation": "動悸",
+     "KH-breath": "息苦しさ",
+     "KH-other": "その他"
+    }
+   },
+   {
+    "id": "KM",
+    "title": "いちばん改善したいお悩みを1つ選んでください",
+    "options": {}
+   },
+   {
+    "id": "Sacne1",
+    "title": "「{main}」は、どのようなタイプですか",
+    "options": {
+     "Sacne1-red": "赤く腫れるニキビ",
+     "Sacne1-pus": "膿を持つニキビ",
+     "Sacne1-comedo": "白ニキビ・黒ニキビ",
+     "Sacne1-recur": "繰り返しできるニキビ",
+     "Sacne1-other": "その他"
+    }
+   },
+   {
+    "id": "Sacne2",
+    "title": "どこにできやすいですか",
+    "options": {
+     "Sacne2-forehead": "額",
+     "Sacne2-cheek": "頬",
+     "Sacne2-jaw": "顎・フェイスライン",
+     "Sacne2-back": "背中",
+     "Sacne2-chest": "胸元",
+     "Sacne2-other": "その他"
+    }
+   },
+   {
+    "id": "Sacne3",
+    "title": "どんなときに悪化しやすいですか",
+    "options": {
+     "Sacne3-menses": "生理前",
+     "Sacne3-stress": "ストレスが強いとき",
+     "Sacne3-sleep": "睡眠不足のとき",
+     "Sacne3-food": "脂っこいもの・甘いものを食べたあと",
+     "Sacne3-none": "特に決まっていない"
+    }
+   },
+   {
+    "id": "Sface_flush1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Sface_flush1-whole": "顔全体が熱くなる",
+     "Sface_flush1-cheek": "頬だけ熱くなる",
+     "Sface_flush1-red": "赤みを伴う",
+     "Sface_flush1-sweat": "汗を伴う",
+     "Sface_flush1-coldlimb": "ほてりと同時に手足が冷える",
+     "Sface_flush1-other": "その他"
+    }
+   },
+   {
+    "id": "Sface_flush2",
+    "title": "どんなときに悪化しますか",
+    "options": {
+     "Sface_flush2-bath": "入浴後",
+     "Sface_flush2-exercise": "運動後",
+     "Sface_flush2-tension": "緊張したとき",
+     "Sface_flush2-meal": "食後",
+     "Sface_flush2-evening": "夕方から夜にかけて",
+     "Sface_flush2-none": "特に決まっていない"
+    }
+   },
+   {
+    "id": "Sredness1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Sredness1-nose": "鼻や頬が赤く、赤ら顔になりやすい",
+     "Sredness1-acne": "ニキビの赤みが残る",
+     "Sredness1-itchy": "かゆみや湿疹を伴う",
+     "Sredness1-flush": "ほてり・熱感を伴う",
+     "Sredness1-thin": "皮膚が薄く、すぐに赤くなる",
+     "Sredness1-other": "その他"
+    }
+   },
+   {
+    "id": "Sredness2",
+    "title": "どんなときに赤みが強くなりますか",
+    "options": {
+     "Sredness2-warm": "温まったとき",
+     "Sredness2-alcohol": "お酒や辛いものをとったあと",
+     "Sredness2-tension": "緊張したとき",
+     "Sredness2-season": "季節の変わり目・乾燥する時期",
+     "Sredness2-none": "特に決まっていない"
+    }
+   },
+   {
+    "id": "Sdry_skin1",
+    "title": "「{main}」は、どこに気になりますか",
+    "options": {
+     "Sdry_skin1-face": "顔全体",
+     "Sdry_skin1-cheek": "頬",
+     "Sdry_skin1-mouth": "口周り",
+     "Sdry_skin1-eye": "目元",
+     "Sdry_skin1-hands": "手足",
+     "Sdry_skin1-body": "全身"
+    }
+   },
+   {
+    "id": "Sdry_skin2",
+    "title": "乾燥に伴う症状はありますか",
+    "options": {
+     "Sdry_skin2-itch": "かゆみ",
+     "Sdry_skin2-flake": "粉ふき",
+     "Sdry_skin2-red": "赤み",
+     "Sdry_skin2-crack": "ひび割れ",
+     "Sdry_skin2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sdry_skin3",
+    "title": "どんなときに悪化しますか",
+    "options": {
+     "Sdry_skin3-winter": "冬",
+     "Sdry_skin3-wash": "洗顔後",
+     "Sdry_skin3-bath": "入浴後",
+     "Sdry_skin3-always": "常に乾燥している"
+    }
+   },
+   {
+    "id": "Sitch1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Sitch1-dry": "乾燥してかゆい",
+     "Sitch1-red": "赤みや熱感を伴う",
+     "Sitch1-wet": "じゅくじゅくして分泌物がある",
+     "Sitch1-hives": "赤く盛り上がる（じんましんのよう）",
+     "Sitch1-night": "夜や温まるとかゆみが強くなる",
+     "Sitch1-other": "その他"
+    }
+   },
+   {
+    "id": "Sitch2",
+    "title": "どこがかゆくなりますか",
+    "options": {
+     "Sitch2-face": "顔・首",
+     "Sitch2-arms": "腕・手",
+     "Sitch2-legs": "脚",
+     "Sitch2-trunk": "背中・お腹",
+     "Sitch2-whole": "全身"
+    }
+   },
+   {
+    "id": "Sitch3",
+    "title": "どんなときに悪化しますか",
+    "options": {
+     "Sitch3-warm": "温まったとき・入浴後",
+     "Sitch3-sweat": "汗をかいたとき",
+     "Sitch3-dry": "空気が乾燥する季節",
+     "Sitch3-stress": "ストレスが強いとき",
+     "Sitch3-none": "特に決まっていない"
+    }
+   },
+   {
+    "id": "Seczema1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Seczema1-red": "赤みや熱感が強い",
+     "Seczema1-wet": "じゅくじゅくして分泌物が多い",
+     "Seczema1-dry": "乾燥してカサカサしている",
+     "Seczema1-pus": "化膿しやすい",
+     "Seczema1-itchy": "かゆみが強い",
+     "Seczema1-other": "その他"
+    }
+   },
+   {
+    "id": "Seczema2",
+    "title": "どこにできますか",
+    "options": {
+     "Seczema2-face": "顔・頭",
+     "Seczema2-hands": "手足",
+     "Seczema2-body": "体（背中・お腹など）",
+     "Seczema2-whole": "全身"
+    }
+   },
+   {
+    "id": "Seczema3",
+    "title": "どんなときに悪化しますか",
+    "options": {
+     "Seczema3-warm": "温まったとき",
+     "Seczema3-sweat": "汗をかいたとき",
+     "Seczema3-dry": "空気が乾燥する季節",
+     "Seczema3-stress": "ストレスが強いとき",
+     "Seczema3-none": "特に決まっていない"
+    }
+   },
+   {
+    "id": "Scomplexion1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Scomplexion1-yellow": "黄色っぽくくすむ",
+     "Scomplexion1-pale": "青白く、血色がない",
+     "Scomplexion1-dark": "茶色っぽく暗い",
+     "Scomplexion1-bluecircle": "目の下に青っぽいクマがある",
+     "Scomplexion1-browncircle": "目の下に茶色っぽいクマがある",
+     "Scomplexion1-evening": "朝より夕方に目立つ",
+     "Scomplexion1-other": "その他"
+    }
+   },
+   {
+    "id": "Scomplexion2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Scomplexion2-tired": "疲れやすく、食が細い",
+     "Scomplexion2-dizzy": "立ちくらみ・めまいがある",
+     "Scomplexion2-anemia": "貧血といわれたことがある",
+     "Scomplexion2-cold": "手足が冷える",
+     "Scomplexion2-shoulder": "肩こり・頭痛がある",
+     "Scomplexion2-menses": "月経痛がある・経血に塊が混じる",
+     "Scomplexion2-sleep": "寝不足が続いている",
+     "Scomplexion2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sspots1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Sspots1-sym": "頬骨のあたりに左右対称に広がる",
+     "Sspots1-sun": "日焼けのあとにできた",
+     "Sspots1-acne": "ニキビ跡が茶色く残っている",
+     "Sspots1-spread": "全体的に色ムラ・くすみがある",
+     "Sspots1-other": "その他"
+    }
+   },
+   {
+    "id": "Sspots2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Sspots2-menses": "月経痛がある・経血に塊が混じる",
+     "Sspots2-flush": "のぼせて足が冷える",
+     "Sspots2-shoulder": "肩こり・頭痛がある",
+     "Sspots2-dry": "肌が乾燥しやすい",
+     "Sspots2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sspots3",
+    "title": "どんなときに濃くなりやすいですか",
+    "options": {
+     "Sspots3-uv": "紫外線を浴びたあと",
+     "Sspots3-menses": "生理前",
+     "Sspots3-stress": "ストレス・寝不足のとき",
+     "Sspots3-preg": "妊娠・出産のあと",
+     "Sspots3-none": "特に決まっていない"
+    }
+   },
+   {
+    "id": "Sskin_texture1",
+    "title": "肌の状態で、あてはまるものはありますか",
+    "options": {
+     "Sskin_texture1-oily": "顔全体が脂っぽく、べたつく",
+     "Sskin_texture1-tzone": "Tゾーンは脂っぽく、頬は乾燥する",
+     "Sskin_texture1-thick": "角質が厚く、ごわつく",
+     "Sskin_texture1-acne": "ニキビができやすい",
+     "Sskin_texture1-dull": "くすみやすい",
+     "Sskin_texture1-none": "特になし"
+    }
+   },
+   {
+    "id": "Sskin_texture2",
+    "title": "「{main}」は、どんなときに目立ちますか",
+    "options": {
+     "Sskin_texture2-food": "脂っこいもの・甘いものを食べたあと",
+     "Sskin_texture2-sleep": "睡眠不足のとき",
+     "Sskin_texture2-stress": "ストレスが強いとき",
+     "Sskin_texture2-menses": "生理前",
+     "Sskin_texture2-season": "季節の変わり目",
+     "Sskin_texture2-none": "特に決まっていない"
+    }
+   },
+   {
+    "id": "Saging1",
+    "title": "「{main}」と一緒に、気になる変化はありますか",
+    "options": {
+     "Saging1-tired": "疲れやすく、気力が出ない",
+     "Saging1-puffy": "むくみやすい",
+     "Saging1-dry": "肌や髪が乾燥しやすい",
+     "Saging1-dull": "顔色が悪い・くすむ",
+     "Saging1-hair": "白髪・抜け毛が増えた",
+     "Saging1-legs": "腰や膝がだるい",
+     "Saging1-none": "特になし"
+    }
+   },
+   {
+    "id": "Saging2",
+    "title": "ふだんの生活や体調で、あてはまるものはありますか",
+    "options": {
+     "Saging2-sleep": "睡眠不足が続いている",
+     "Saging2-weight": "体重が急に増えた・減った",
+     "Saging2-gi": "胃腸が弱く、食が細い",
+     "Saging2-cold": "冷えやすい",
+     "Saging2-stress": "ストレスが多い",
+     "Saging2-none": "特にない"
+    }
+   },
+   {
+    "id": "Spuffiness1",
+    "title": "「{main}」は、いつ気になりますか",
+    "options": {
+     "Spuffiness1-morning": "朝起きたとき",
+     "Spuffiness1-evening": "夕方",
+     "Spuffiness1-menses": "生理前",
+     "Spuffiness1-salt": "お酒や塩辛いものをとったあと",
+     "Spuffiness1-always": "いつも"
+    }
+   },
+   {
+    "id": "Spuffiness2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Spuffiness2-legs": "足もむくむ",
+     "Spuffiness2-heavy": "体が重だるい",
+     "Spuffiness2-urine": "尿の量が少ない",
+     "Spuffiness2-thirst": "のどが渇く",
+     "Spuffiness2-cold": "冷えるとむくむ",
+     "Spuffiness2-none": "特になし"
+    }
+   },
+   {
+    "id": "Shair_loss1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Shair_loss1-whole": "全体的に抜ける",
+     "Shair_loss1-part": "分け目が目立つ",
+     "Shair_loss1-front": "生え際が薄くなった",
+     "Shair_loss1-patch": "一部分だけ丸く抜ける",
+     "Shair_loss1-other": "その他"
+    }
+   },
+   {
+    "id": "Shair_loss2",
+    "title": "いつ頃から気になりますか",
+    "options": {
+     "Shair_loss2-m1": "最近1か月以内",
+     "Shair_loss2-m3": "1〜3か月前",
+     "Shair_loss2-m6": "半年以上前",
+     "Shair_loss2-years": "数年前から"
+    }
+   },
+   {
+    "id": "Shair_loss3",
+    "title": "気になり始めたころに、次のような変化はありましたか",
+    "options": {
+     "Shair_loss3-birth": "出産",
+     "Shair_loss3-stress": "強いストレス",
+     "Shair_loss3-weight": "急激な体重減少",
+     "Shair_loss3-ill": "体調不良",
+     "Shair_loss3-none": "特になし"
+    }
+   },
+   {
+    "id": "Shair_dry1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Shair_dry1-dry": "パサついて広がる",
+     "Shair_dry1-split": "枝毛・切れ毛が多い",
+     "Shair_dry1-dull": "ツヤがない",
+     "Shair_dry1-thin": "細く、コシがない",
+     "Shair_dry1-other": "その他"
+    }
+   },
+   {
+    "id": "Shair_dry2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Shair_dry2-nail": "爪が割れやすい",
+     "Shair_dry2-skin": "肌が乾燥しやすい",
+     "Shair_dry2-eye": "目が疲れやすい・かすむ",
+     "Shair_dry2-dizzy": "立ちくらみがある",
+     "Shair_dry2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sgray_hair1",
+    "title": "「{main}」は、いつ頃から気になりますか",
+    "options": {
+     "Sgray_hair1-young": "20代以前から",
+     "Sgray_hair1-mid": "30〜40代から",
+     "Sgray_hair1-late": "50代以降",
+     "Sgray_hair1-sudden": "最近急に増えた"
+    }
+   },
+   {
+    "id": "Sgray_hair2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Sgray_hair2-loss": "抜け毛も増えた",
+     "Sgray_hair2-eye": "目が疲れやすい・かすむ",
+     "Sgray_hair2-back": "腰や膝がだるい",
+     "Sgray_hair2-ear": "耳鳴りがある",
+     "Sgray_hair2-stress": "ストレスが多い",
+     "Sgray_hair2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sscalp1",
+    "title": "頭皮の状態で、あてはまるものはありますか",
+    "options": {
+     "Sscalp1-dry": "乾燥してつっぱる",
+     "Sscalp1-oily": "脂っぽく、べたつく",
+     "Sscalp1-dryflake": "乾いた細かいフケが出る",
+     "Sscalp1-wetflake": "湿った大きめのフケが出る",
+     "Sscalp1-itch": "かゆみがある",
+     "Sscalp1-red": "赤み・湿疹がある",
+     "Sscalp1-other": "その他"
+    }
+   },
+   {
+    "id": "Sscalp2",
+    "title": "「{main}」は、どんなときに悪化しますか",
+    "options": {
+     "Sscalp2-winter": "空気が乾燥する季節",
+     "Sscalp2-sweat": "汗をかいたあと",
+     "Sscalp2-stress": "ストレス・寝不足のとき",
+     "Sscalp2-food": "脂っこいもの・甘いもの・お酒のあと",
+     "Sscalp2-none": "特に決まっていない"
+    }
+   },
+   {
+    "id": "Speriod_pain1",
+    "title": "「{main}」は、どのような痛み方ですか",
+    "options": {
+     "Speriod_pain1-cold": "下腹部が冷えて痛み、温めると楽になる",
+     "Speriod_pain1-stab": "刺すように痛み、経血に塊が混じる",
+     "Speriod_pain1-bloat": "張るように痛み、イライラする",
+     "Speriod_pain1-dull": "鈍い痛みが生理後も続く",
+     "Speriod_pain1-back": "腰の痛みが強い",
+     "Speriod_pain1-other": "その他"
+    }
+   },
+   {
+    "id": "Speriod_pain2",
+    "title": "痛みの程度はどれくらいですか",
+    "options": {
+     "Speriod_pain2-mild": "鎮痛薬を飲まなくても過ごせる",
+     "Speriod_pain2-mid": "鎮痛薬を飲めば過ごせる",
+     "Speriod_pain2-severe": "鎮痛薬を飲んでも寝込むほどつらい"
+    }
+   },
+   {
+    "id": "Speriod_pain3",
+    "title": "生理のときに、ほかに出やすい症状はありますか",
+    "options": {
+     "Speriod_pain3-headache": "頭痛",
+     "Speriod_pain3-nausea": "吐き気",
+     "Speriod_pain3-diarrhea": "下痢",
+     "Speriod_pain3-edema": "むくみ",
+     "Speriod_pain3-constipation": "便秘",
+     "Speriod_pain3-none": "特になし"
+    }
+   },
+   {
+    "id": "Spms_mood1",
+    "title": "生理前は、どのような状態になりますか",
+    "options": {
+     "Spms_mood1-angry": "イライラして怒りっぽくなる",
+     "Spms_mood1-tearful": "落ち込んで涙もろくなる",
+     "Spms_mood1-anxious": "不安で落ち着かない",
+     "Spms_mood1-sleep": "眠れなくなる",
+     "Spms_mood1-breast": "胸や脇が張る",
+     "Spms_mood1-other": "その他"
+    }
+   },
+   {
+    "id": "Spms_mood2",
+    "title": "いつ頃から始まりますか",
+    "options": {
+     "Spms_mood2-early": "生理の1週間以上前から",
+     "Spms_mood2-late": "生理の数日前から",
+     "Spms_mood2-during": "生理中も続く"
+    }
+   },
+   {
+    "id": "Spms_mood3",
+    "title": "生活への影響はどれくらいですか",
+    "options": {
+     "Spms_mood3-ok": "仕事や家事は普段どおりできる",
+     "Spms_mood3-people": "人間関係に影響が出ることがある",
+     "Spms_mood3-severe": "日常生活が送れないほどつらい"
+    }
+   },
+   {
+    "id": "Spms_headache1",
+    "title": "「{main}」は、どのような痛み方ですか",
+    "options": {
+     "Spms_headache1-throb": "ズキズキと脈打つように痛む",
+     "Spms_headache1-band": "締めつけられるように重い",
+     "Spms_headache1-side": "こめかみや片側が痛む",
+     "Spms_headache1-nausea": "吐き気を伴う",
+     "Spms_headache1-puffy": "むくみを伴う",
+     "Spms_headache1-other": "その他"
+    }
+   },
+   {
+    "id": "Spms_headache2",
+    "title": "いつ痛みやすいですか",
+    "options": {
+     "Spms_headache2-before": "生理前",
+     "Spms_headache2-during": "生理中",
+     "Spms_headache2-after": "生理後"
+    }
+   },
+   {
+    "id": "Spms_edema1",
+    "title": "「{main}」は、どこに出ますか",
+    "options": {
+     "Spms_edema1-face": "顔・まぶた",
+     "Spms_edema1-hand": "手指",
+     "Spms_edema1-leg": "足",
+     "Spms_edema1-belly": "お腹が張る"
+    }
+   },
+   {
+    "id": "Spms_edema2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Spms_edema2-urine": "尿の量が少ない",
+     "Spms_edema2-thirst": "のどが渇く",
+     "Spms_edema2-heavy": "体が重だるい",
+     "Spms_edema2-headache": "頭痛がする",
+     "Spms_edema2-none": "特になし"
+    }
+   },
+   {
+    "id": "Spms_body1",
+    "title": "生理前に、ほかに出やすい不調はありますか",
+    "options": {
+     "Spms_body1-angry": "イライラ",
+     "Spms_body1-low": "気分の落ち込み",
+     "Spms_body1-puffy": "むくみ",
+     "Spms_body1-breast": "胸の張り",
+     "Spms_body1-sleepy": "眠気・だるさ",
+     "Spms_body1-sweet": "甘いものが欲しくなる",
+     "Spms_body1-none": "特になし"
+    }
+   },
+   {
+    "id": "Spms_body2",
+    "title": "いつ頃から始まりますか",
+    "options": {
+     "Spms_body2-early": "生理の1週間以上前から",
+     "Spms_body2-late": "生理の数日前から",
+     "Spms_body2-during": "生理中も続く"
+    }
+   },
+   {
+    "id": "Spms_skin1",
+    "title": "生理前の肌は、どのような状態になりますか",
+    "options": {
+     "Spms_skin1-acne": "ニキビ・吹き出物ができる",
+     "Spms_skin1-itch": "湿疹・かゆみが出る",
+     "Spms_skin1-dry": "乾燥する",
+     "Spms_skin1-dull": "くすむ",
+     "Spms_skin1-red": "赤みが出る",
+     "Spms_skin1-other": "その他"
+    }
+   },
+   {
+    "id": "Spms_skin2",
+    "title": "どこに出やすいですか",
+    "options": {
+     "Spms_skin2-forehead": "額",
+     "Spms_skin2-cheek": "頬",
+     "Spms_skin2-jaw": "顎・フェイスライン",
+     "Spms_skin2-mouth": "口周り",
+     "Spms_skin2-whole": "顔全体"
+    }
+   },
+   {
+    "id": "Sirregular1",
+    "title": "生理の周期は、どのような状態ですか",
+    "options": {
+     "Sirregular1-early": "早まりがち（24日以内）",
+     "Sirregular1-late": "遅れがち（39日以上）",
+     "Sirregular1-random": "バラバラで予測できない",
+     "Sirregular1-skip": "3か月以上来ないことがある"
+    }
+   },
+   {
+    "id": "Sirregular2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Sirregular2-heavy": "経血量が多い",
+     "Sirregular2-light": "経血量が少ない",
+     "Sirregular2-clot": "経血に塊が混じる",
+     "Sirregular2-pain": "月経痛がある",
+     "Sirregular2-mood": "イライラ・気分の波がある",
+     "Sirregular2-cold": "冷えやすい",
+     "Sirregular2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sirregular3",
+    "title": "乱れ始めたころに、次のようなことはありましたか",
+    "options": {
+     "Sirregular3-stress": "強いストレス",
+     "Sirregular3-weight": "急な体重の変化",
+     "Sirregular3-birth": "出産",
+     "Sirregular3-diet": "激しい運動・食事制限",
+     "Sirregular3-none": "特にない"
+    }
+   },
+   {
+    "id": "Sflow_heavy1",
+    "title": "経血の状態で、あてはまるものはありますか",
+    "options": {
+     "Sflow_heavy1-clot": "レバーのような塊が多い",
+     "Sflow_heavy1-fast": "1〜2時間でナプキンを替えないと漏れる",
+     "Sflow_heavy1-long": "生理が8日以上続く",
+     "Sflow_heavy1-between": "生理以外のときにも出血がある",
+     "Sflow_heavy1-bright": "鮮やかな赤色の出血が多い",
+     "Sflow_heavy1-other": "その他"
+    }
+   },
+   {
+    "id": "Sflow_heavy2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Sflow_heavy2-dizzy": "立ちくらみ・めまいがある",
+     "Sflow_heavy2-tired": "疲れやすい",
+     "Sflow_heavy2-pain": "月経痛がある",
+     "Sflow_heavy2-pale": "顔色が悪い",
+     "Sflow_heavy2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sflow_light1",
+    "title": "経血の状態で、あてはまるものはありますか",
+    "options": {
+     "Sflow_light1-pale": "色が薄い",
+     "Sflow_light1-dark": "色が暗い・塊がある",
+     "Sflow_light1-short": "2日ほどで終わる",
+     "Sflow_light1-late": "周期が遅れがち",
+     "Sflow_light1-other": "その他"
+    }
+   },
+   {
+    "id": "Sflow_light2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Sflow_light2-cold": "冷えやすい",
+     "Sflow_light2-tired": "疲れやすい",
+     "Sflow_light2-dry": "肌や髪が乾燥する",
+     "Sflow_light2-weight": "体重が減った・食事を減らしている",
+     "Sflow_light2-none": "特になし"
+    }
+   },
+   {
+    "id": "Shot_flash1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Shot_flash1-sudden": "急に顔や上半身がカーッと熱くなる",
+     "Shot_flash1-headsweat": "顔や頭に汗をかく",
+     "Shot_flash1-palms": "手のひら・足の裏がほてる",
+     "Shot_flash1-coldfeet": "のぼせるのに足は冷える",
+     "Shot_flash1-evening": "夕方から夜にほてる",
+     "Shot_flash1-other": "その他"
+    }
+   },
+   {
+    "id": "Shot_flash2",
+    "title": "どれくらいの頻度で起こりますか",
+    "options": {
+     "Shot_flash2-many": "1日に何度も",
+     "Shot_flash2-once": "1日1回くらい",
+     "Shot_flash2-sometimes": "ときどき"
+    }
+   },
+   {
+    "id": "Shot_flash3",
+    "title": "一緒に出やすい症状はありますか",
+    "options": {
+     "Shot_flash3-irritable": "イライラ",
+     "Shot_flash3-palpitation": "動悸",
+     "Shot_flash3-insomnia": "眠れない",
+     "Shot_flash3-shoulder": "肩こり",
+     "Shot_flash3-dizzy": "めまい",
+     "Shot_flash3-none": "特になし"
+    }
+   },
+   {
+    "id": "Ssweat1",
+    "title": "「{main}」は、どのような汗ですか",
+    "options": {
+     "Ssweat1-flush": "急なほてりと一緒に汗が出る",
+     "Ssweat1-move": "少し動くだけで汗が出る",
+     "Ssweat1-night": "寝ている間に汗をかく",
+     "Ssweat1-tension": "緊張すると手や脇に汗をかく",
+     "Ssweat1-head": "頭や顔だけ汗をかく",
+     "Ssweat1-other": "その他"
+    }
+   },
+   {
+    "id": "Ssweat2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Ssweat2-tired": "疲れやすい",
+     "Ssweat2-thirst": "のどや口が渇く",
+     "Ssweat2-palms": "手足がほてる",
+     "Ssweat2-cold": "汗のあとに冷える",
+     "Ssweat2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sirritability1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Sirritability1-flare": "カッとなって顔が赤くなる",
+     "Sirritability1-small": "些細なことが気になり、神経が高ぶる",
+     "Sirritability1-sigh": "ため息が多く、胸や脇が張る",
+     "Sirritability1-swing": "気分の浮き沈みが激しい",
+     "Sirritability1-grind": "歯ぎしり・食いしばりがある",
+     "Sirritability1-other": "その他"
+    }
+   },
+   {
+    "id": "Sirritability2",
+    "title": "どんなときに強くなりますか",
+    "options": {
+     "Sirritability2-work": "仕事や人間関係のストレス",
+     "Sirritability2-menses": "生理前",
+     "Sirritability2-tired": "疲れているとき",
+     "Sirritability2-hungry": "空腹のとき",
+     "Sirritability2-none": "特に決まっていない"
+    }
+   },
+   {
+    "id": "Sirritability3",
+    "title": "一緒に出やすい症状はありますか",
+    "options": {
+     "Sirritability3-headache": "頭痛",
+     "Sirritability3-shoulder": "肩こり",
+     "Sirritability3-stomach": "胃痛・お腹の張り",
+     "Sirritability3-insomnia": "眠れない",
+     "Sirritability3-flush": "のぼせ",
+     "Sirritability3-none": "特になし"
+    }
+   },
+   {
+    "id": "Sanxiety1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Sanxiety1-vague": "理由もなく不安になる",
+     "Sanxiety1-tense": "人前などで強く緊張する",
+     "Sanxiety1-startle": "驚きやすく、ビクッとしやすい",
+     "Sanxiety1-worry": "考え事が頭から離れない",
+     "Sanxiety1-palpitation": "動悸がする",
+     "Sanxiety1-other": "その他"
+    }
+   },
+   {
+    "id": "Sanxiety2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Sanxiety2-tired": "疲れやすい",
+     "Sanxiety2-forget": "物忘れ・集中力の低下",
+     "Sanxiety2-throat": "のどがつかえる",
+     "Sanxiety2-sweat": "汗をかきやすい",
+     "Sanxiety2-insomnia": "眠りが浅い",
+     "Sanxiety2-none": "特になし"
+    }
+   },
+   {
+    "id": "Slow_mood1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Slow_mood1-heavy": "気分がふさぎ、重い",
+     "Slow_mood1-lazy": "何をするのも億劫",
+     "Slow_mood1-tearful": "涙もろい",
+     "Slow_mood1-appetite": "食欲がない",
+     "Slow_mood1-throat": "のどがつかえる",
+     "Slow_mood1-other": "その他"
+    }
+   },
+   {
+    "id": "Slow_mood2",
+    "title": "どれくらい続いていますか",
+    "options": {
+     "Slow_mood2-short": "2週間未満",
+     "Slow_mood2-long": "2週間以上、ほぼ毎日続いている",
+     "Slow_mood2-menses": "生理前だけ"
+    }
+   },
+   {
+    "id": "Slow_mood3",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Slow_mood3-insomnia": "眠れない・朝早く目が覚める",
+     "Slow_mood3-tired": "疲れやすい",
+     "Slow_mood3-headache": "頭が重い",
+     "Slow_mood3-none": "特になし"
+    }
+   },
+   {
+    "id": "Spalpitation1",
+    "title": "「{main}」は、どのようなときに起こりますか",
+    "options": {
+     "Spalpitation1-stress": "緊張や不安を感じたとき",
+     "Spalpitation1-move": "少し動いただけで",
+     "Spalpitation1-rest": "安静にしているとき",
+     "Spalpitation1-sudden": "急に始まり、急に止まる",
+     "Spalpitation1-skip": "脈が飛ぶ・乱れる感じがする",
+     "Spalpitation1-other": "その他"
+    }
+   },
+   {
+    "id": "Spalpitation2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Spalpitation2-chest": "胸の痛みや圧迫感がある",
+     "Spalpitation2-faint": "気が遠くなる・失神しそうになる",
+     "Spalpitation2-breath": "息切れ",
+     "Spalpitation2-dizzy": "めまい・ふらつき",
+     "Spalpitation2-sweat": "汗をかく",
+     "Spalpitation2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sinsomnia1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Sinsomnia1-onset": "寝つきが悪い",
+     "Sinsomnia1-wake": "夜中に何度も目が覚める",
+     "Sinsomnia1-early": "朝早く目が覚めてしまう",
+     "Sinsomnia1-dream": "夢が多く、眠りが浅い",
+     "Sinsomnia1-unrest": "寝ても疲れが取れない",
+     "Sinsomnia1-other": "その他"
+    }
+   },
+   {
+    "id": "Sinsomnia2",
+    "title": "眠れない原因で、思い当たるものはありますか",
+    "options": {
+     "Sinsomnia2-worry": "考え事・不安",
+     "Sinsomnia2-irritable": "イライラ・気持ちの高ぶり",
+     "Sinsomnia2-hot": "体のほてり・暑さ",
+     "Sinsomnia2-toilet": "トイレに起きる",
+     "Sinsomnia2-none": "特に思い当たらない"
+    }
+   },
+   {
+    "id": "Sinsomnia3",
+    "title": "日中の様子で、あてはまるものはありますか",
+    "options": {
+     "Sinsomnia3-sleepy": "日中に眠くなる",
+     "Sinsomnia3-tired": "だるさがある",
+     "Sinsomnia3-irritable": "イライラする",
+     "Sinsomnia3-palpitation": "動悸がする",
+     "Sinsomnia3-none": "特になし"
+    }
+   },
+   {
+    "id": "Sfatigue1",
+    "title": "「{main}」に伴って、あてはまるものはありますか",
+    "options": {
+     "Sfatigue1-appetite": "食欲がない",
+     "Sfatigue1-heavy": "食後に眠くなる・胃がもたれる",
+     "Sfatigue1-breath": "少し動くと息切れ・汗をかく",
+     "Sfatigue1-sweat": "寝汗をかく",
+     "Sfatigue1-cold": "手足が冷える",
+     "Sfatigue1-pale": "顔色が悪い・立ちくらみがする",
+     "Sfatigue1-low": "気分が落ち込む",
+     "Sfatigue1-none": "特になし"
+    }
+   },
+   {
+    "id": "Sfatigue2",
+    "title": "疲れやすくなったきっかけで、思い当たるものはありますか",
+    "options": {
+     "Sfatigue2-ill": "病気や手術のあと",
+     "Sfatigue2-birth": "出産のあと",
+     "Sfatigue2-busy": "忙しさ・睡眠不足が続いている",
+     "Sfatigue2-stress": "強いストレス",
+     "Sfatigue2-heat": "暑さ・季節の変わり目",
+     "Sfatigue2-none": "特にない"
+    }
+   },
+   {
+    "id": "Sfatigue3",
+    "title": "次のような症状はありますか",
+    "options": {
+     "Sfatigue3-weight": "理由もなく体重が減ってきた",
+     "Sfatigue3-fever": "微熱が続いている",
+     "Sfatigue3-none": "どれもない"
+    }
+   },
+   {
+    "id": "Scold1",
+    "title": "「{main}」は、どのような冷え方ですか",
+    "options": {
+     "Scold1-touch": "触ると冷たく、血色が悪い",
+     "Scold1-deep": "体の芯から冷える感じがする",
+     "Scold1-pain": "冷えると痛む・しびれる",
+     "Scold1-diarrhea": "冷えるとお腹を壊す",
+     "Scold1-puffy": "冷えるとむくむ",
+     "Scold1-toilet": "冷えるとトイレが近くなる",
+     "Scold1-other": "その他"
+    }
+   },
+   {
+    "id": "Scold2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Scold2-tired": "疲れやすい",
+     "Scold2-pale": "顔色が悪い・貧血気味",
+     "Scold2-shoulder": "肩こり・頭痛がある",
+     "Scold2-menses": "月経痛・月経不順がある",
+     "Scold2-flush": "のぼせ・顔のほてりがある",
+     "Scold2-chilblain": "しもやけになりやすい",
+     "Scold2-none": "特になし"
+    }
+   },
+   {
+    "id": "Scold_pain1",
+    "title": "「{main}」は、どのような痛み方ですか",
+    "options": {
+     "Scold_pain1-warm": "温めると楽になる",
+     "Scold_pain1-cramp": "差し込むように痛む",
+     "Scold_pain1-dull": "鈍く重い痛みが続く",
+     "Scold_pain1-diarrhea": "下痢を伴う",
+     "Scold_pain1-nausea": "吐き気を伴う",
+     "Scold_pain1-other": "その他"
+    }
+   },
+   {
+    "id": "Scold_pain2",
+    "title": "とくに冷えるのはどこですか",
+    "options": {
+     "Scold_pain2-hands": "手足の先",
+     "Scold_pain2-legs": "下半身・足",
+     "Scold_pain2-belly": "お腹",
+     "Scold_pain2-whole": "全身"
+    }
+   },
+   {
+    "id": "Scold_pain3",
+    "title": "次のような症状はありますか",
+    "options": {
+     "Scold_pain3-sudden": "突然、今までにない激しい痛みが起きた",
+     "Scold_pain3-worse": "痛みがどんどん強くなっている",
+     "Scold_pain3-fever": "発熱を伴う",
+     "Scold_pain3-none": "どれもない"
+    }
+   },
+   {
+    "id": "Schilblain1",
+    "title": "「{main}」は、どこにできやすいですか",
+    "options": {
+     "Schilblain1-fingers": "手の指",
+     "Schilblain1-toes": "足の指",
+     "Schilblain1-ear": "耳・顔"
+    }
+   },
+   {
+    "id": "Schilblain2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Schilblain2-cold": "手足が冷えやすい",
+     "Schilblain2-pain": "下腹部や腰が冷えて痛む",
+     "Schilblain2-pale": "顔色が悪い",
+     "Schilblain2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sheadache1",
+    "title": "「{main}」は、どのような痛み方ですか",
+    "options": {
+     "Sheadache1-band": "締めつけられるように痛む",
+     "Sheadache1-throb": "ズキズキ脈打つように痛む",
+     "Sheadache1-heavy": "頭が重い",
+     "Sheadache1-cold": "冷えると痛む",
+     "Sheadache1-weather": "雨の日や低気圧で痛む",
+     "Sheadache1-other": "その他"
+    }
+   },
+   {
+    "id": "Sheadache2",
+    "title": "一緒に出やすい症状はありますか",
+    "options": {
+     "Sheadache2-shoulder": "肩こり",
+     "Sheadache2-dizzy": "めまい",
+     "Sheadache2-nausea": "吐き気",
+     "Sheadache2-puffy": "むくみ・のどの渇き",
+     "Sheadache2-flush": "のぼせ",
+     "Sheadache2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sheadache3",
+    "title": "次のような症状はありますか",
+    "options": {
+     "Sheadache3-sudden": "突然、今までにない激しい頭痛が起きた",
+     "Sheadache3-numb": "手足のしびれ・ろれつが回らない",
+     "Sheadache3-worse": "日に日に痛みが強くなっている",
+     "Sheadache3-none": "どれもない"
+    }
+   },
+   {
+    "id": "Sdizziness1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Sdizziness1-spin": "ぐるぐる回る",
+     "Sdizziness1-float": "ふわふわ浮く感じ",
+     "Sdizziness1-stand": "立ちくらみ",
+     "Sdizziness1-heavy": "頭が重い",
+     "Sdizziness1-other": "その他"
+    }
+   },
+   {
+    "id": "Sdizziness2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Sdizziness2-ear": "耳鳴り",
+     "Sdizziness2-nausea": "吐き気",
+     "Sdizziness2-palpitation": "動悸",
+     "Sdizziness2-flush": "のぼせ",
+     "Sdizziness2-numb": "手足のしびれ・ろれつが回らない",
+     "Sdizziness2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sstiff_shoulder1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Sstiff_shoulder1-tight": "張るようにこる",
+     "Sstiff_shoulder1-stab": "刺すような痛みが同じ場所にある",
+     "Sstiff_shoulder1-heavy": "重だるい",
+     "Sstiff_shoulder1-cold": "冷えると悪化する",
+     "Sstiff_shoulder1-other": "その他"
+    }
+   },
+   {
+    "id": "Sstiff_shoulder2",
+    "title": "一緒に出やすい症状はありますか",
+    "options": {
+     "Sstiff_shoulder2-headache": "頭痛",
+     "Sstiff_shoulder2-eye": "目の疲れ",
+     "Sstiff_shoulder2-flush": "のぼせ",
+     "Sstiff_shoulder2-irritable": "イライラ",
+     "Sstiff_shoulder2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sstress_gi1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Sstress_gi1-pit": "みぞおちが痛む・つかえる",
+     "Sstress_gi1-heavy": "胃がもたれる",
+     "Sstress_gi1-burn": "胸やけがする",
+     "Sstress_gi1-bloat": "お腹が張る・ガスがたまる",
+     "Sstress_gi1-diarrhea": "下痢しやすい",
+     "Sstress_gi1-alt": "便秘と下痢をくり返す",
+     "Sstress_gi1-other": "その他"
+    }
+   },
+   {
+    "id": "Sstress_gi2",
+    "title": "どんなときに起こりやすいですか",
+    "options": {
+     "Sstress_gi2-before": "緊張する前・大事な予定の前",
+     "Sstress_gi2-after": "食後",
+     "Sstress_gi2-empty": "空腹のとき",
+     "Sstress_gi2-morning": "朝起きてすぐ",
+     "Sstress_gi2-cold": "冷たいものをとったあと",
+     "Sstress_gi2-none": "特に決まっていない"
+    }
+   },
+   {
+    "id": "Sstress_gi3",
+    "title": "次のような症状はありますか",
+    "options": {
+     "Sstress_gi3-black": "便が黒い・便に血が混じる",
+     "Sstress_gi3-vomit": "血を吐いた・コーヒーのようなものを吐いた",
+     "Sstress_gi3-weight": "理由もなく体重が減ってきた",
+     "Sstress_gi3-none": "どれもない"
+    }
+   },
+   {
+    "id": "Sthroat1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Sthroat1-lump": "のどに何か詰まった感じがする",
+     "Sthroat1-swallow": "飲み込みにくい・食べ物がつかえる",
+     "Sthroat1-cough": "咳払いが多い",
+     "Sthroat1-hoarse": "声がかすれる",
+     "Sthroat1-other": "その他"
+    }
+   },
+   {
+    "id": "Sthroat2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Sthroat2-mood": "気分がふさぐ",
+     "Sthroat2-nausea": "吐き気",
+     "Sthroat2-palpitation": "動悸",
+     "Sthroat2-dizzy": "めまい",
+     "Sthroat2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sbreath1",
+    "title": "「{main}」は、どのような状態ですか",
+    "options": {
+     "Sbreath1-deep": "深く息が吸えない感じがする",
+     "Sbreath1-tense": "緊張すると息苦しくなる",
+     "Sbreath1-move": "少し動くと息切れする",
+     "Sbreath1-rest": "安静にしていても息苦しい",
+     "Sbreath1-chest": "胸の痛みを伴う",
+     "Sbreath1-other": "その他"
+    }
+   },
+   {
+    "id": "Sbreath2",
+    "title": "あわせて、あてはまるものはありますか",
+    "options": {
+     "Sbreath2-palpitation": "動悸",
+     "Sbreath2-throat": "のどのつかえ",
+     "Sbreath2-dizzy": "めまい",
+     "Sbreath2-cough": "乾いた咳",
+     "Sbreath2-none": "特になし"
+    }
+   },
+   {
+    "id": "Sother1",
+    "title": "「{main}」は、どんなときに気になりますか",
+    "options": {
+     "Sother1-morning": "朝",
+     "Sother1-evening": "夕方から夜",
+     "Sother1-menses": "生理の前後",
+     "Sother1-season": "季節の変わり目",
+     "Sother1-stress": "ストレスがあるとき",
+     "Sother1-none": "特に決まっていない"
+    }
+   },
+   {
+    "id": "A4",
+    "title": "「{main}」は、いつごろから気になっていますか",
+    "options": {
+     "A4-1": "3日以内",
+     "A4-2": "1〜2週間",
+     "A4-3": "1か月以内",
+     "A4-4": "半年以内",
+     "A4-5": "それ以上",
+     "A4s-1": "ほとんどない",
+     "A4s-2": "少しある",
+     "A4s-3": "大きい"
+    }
+   },
+   {
+    "id": "A5",
+    "title": "なりたい自分",
+    "options": {
+     "A5-1": "元気で体力のある自分でいたい",
+     "A5-2": "肌や髪のツヤを保ちたい",
+     "A5-3": "気持ちを穏やかに保ちたい",
+     "A5-4": "体を軽くすっきりさせたい",
+     "A5-5": "冷えやほてりを整えたい",
+     "A5-6": "年齢に負けない体を作りたい"
+    }
+   },
+   {
+    "id": "B1",
+    "title": "体型・体力・声",
+    "options": {
+     "B1-1": "疲れやすく、少し動くと息切れする",
+     "B1-2": "風邪をひきやすく、声が小さくて聞き返される",
+     "B1-3": "やせていて、肌や髪が乾燥しやすい",
+     "B1-4": "体重の増減が激しく、ストレスで食べ過ぎたり食べられなくなったりする",
+     "B1-5": "お腹周りが太りやすく、下腹部を押すと痛いところがある",
+     "B1-6": "水太り気味で、体が重だるい",
+     "B1-7": "夕方になると微熱っぽく、体がほてる",
+     "B1-8": "下半身が冷えて太りやすく、腰や膝がだるい",
+     "B1-9": "がっちりした体型で暑がり、声が大きく体力がある",
+     "B1-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "B2",
+    "title": "顔色・肌・髪",
+    "options": {
+     "B2-1": "肌のたるみが気になる",
+     "B2-2": "顔色が白く血色がなく、肌にツヤがない",
+     "B2-3": "髪が細くパサつく、爪が薄く割れやすい",
+     "B2-4": "ストレスがたまると肌荒れやニキビが出やすい",
+     "B2-5": "顔色が暗く、シミ・くすみ・目の下のクマが目立つ",
+     "B2-6": "唇の色が暗い、紫っぽい",
+     "B2-7": "湿疹やイボが出やすく、肌がジュクジュクしやすい",
+     "B2-8": "肌が乾燥しやすく、同年代より白髪・抜け毛が多い",
+     "B2-9": "顔色が青白く、冷えると青くなる",
+     "B2-10": "肌が赤く、ニキビが化膿しやすい、目が充血しやすい",
+     "B2-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "B3",
+    "title": "冷え・ほてり",
+    "options": {
+     "B3-1": "冷えるとお腹を壊す、疲れると冷えが強くなる",
+     "B3-2": "手足の先が冷える",
+     "B3-3": "冷えたりほてったり、日や気分で変わる",
+     "B3-4": "上半身はのぼせるのに足は冷える、肩がこる",
+     "B3-5": "冷えるとむくみ、体が重くなる",
+     "B3-6": "手のひらや足の裏がほてる、顔がのぼせる",
+     "B3-7": "手よりもお腹や腰が冷たい",
+     "B3-8": "全身が冷えて寒がり、温かい飲み物や食べ物を好む",
+     "B3-9": "暑がりで顔が赤くのぼせやすく、冷たい飲み物をよく飲む",
+     "B3-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "B4",
+    "title": "汗",
+    "options": {
+     "B4-1": "少し動いただけで汗をかく、汗かき",
+     "B4-2": "動いていないのに汗が出て、汗のあと冷えてぐったりする",
+     "B4-3": "緊張すると手のひらや脇に汗をかく、首から上だけ汗をかく",
+     "B4-4": "汗をかきにくい",
+     "B4-5": "汗がべたつく",
+     "B4-6": "寝汗をかく",
+     "B4-7": "汗の量が多く、においが強い",
+     "B4-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "B5",
+    "title": "食欲・胃腸・口",
+    "options": {
+     "B5-1": "食が細く、食後に眠くなる・胃がもたれる",
+     "B5-2": "食欲にムラがある、ストレスで食欲が変わる",
+     "B5-3": "お腹や脇腹が張る、ゲップやガスが出ると楽になる",
+     "B5-4": "喉に何かつまった感じがする、みぞおちがつかえる",
+     "B5-5": "口は渇くが水はあまり飲みたくない、唇が乾いて暗い",
+     "B5-6": "口の中が粘る、水分をとるとお腹がチャポチャポする・もたれる",
+     "B5-7": "口や唇が乾くが、少量しか飲めない",
+     "B5-8": "冷たい物や生ものでお腹を壊す、薄いつばが口にたまる",
+     "B5-9": "口が渇いて冷たい物をごくごく飲みたい、食欲旺盛",
+     "B5-10": "口臭が気になる、起床時に口が粘って苦い",
+     "B5-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "B6",
+    "title": "便通・排尿",
+    "options": {
+     "B6-1": "軟便・下痢になりやすい、力まないと出ない",
+     "B6-2": "便が硬くコロコロしている",
+     "B6-3": "便秘と下痢を繰り返す、出てもすっきりしない",
+     "B6-4": "便が黒っぽい、痔がある",
+     "B6-5": "水っぽい下痢をする、尿の量が少なくむくむ",
+     "B6-6": "尿の色が濃く量が少ない、便が乾いて出にくい",
+     "B6-7": "冷えると下痢する、朝起きてすぐ下痢する",
+     "B6-8": "トイレが近い、夜中に1回以上トイレに起きる、尿が薄く多い",
+     "B6-9": "便秘がちで便が硬く、においが強い",
+     "B6-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "B7",
+    "title": "むくみ・水分・天候",
+    "options": {
+     "B7-1": "夕方に足がむくみ、靴下の跡が残る",
+     "B7-2": "ストレスや月経前にむくみ、お腹が張る",
+     "B7-3": "むくみと一緒に肩こりや頭痛が強くなる",
+     "B7-4": "朝、顔やまぶたがむくむ",
+     "B7-5": "雨の日や低気圧が近づくと体調が悪くなる",
+     "B7-6": "車酔いしやすい、ふわふわしためまいがする、朝に手がこわばる",
+     "B7-7": "水をよく飲むのに喉が渇く、尿が濃く少ない",
+     "B7-8": "冷えるとむくみが強くなる、尿が薄く多い",
+     "B7-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "B8",
+    "title": "睡眠",
+    "options": {
+     "B8-1": "日中も眠くなることが多い、いくら寝ても眠い",
+     "B8-2": "夢が多く眠りが浅い、熟睡した感じがない",
+     "B8-3": "寝つきが悪い、考え事で眠れない、寝起きが悪い",
+     "B8-4": "寝ても肩こりや頭痛が取れない、痛みで目が覚める",
+     "B8-5": "体が重くて起きられない、朝むくんでいる",
+     "B8-6": "寝汗をかく、夜中や明け方に目が覚める",
+     "B8-7": "寒くて布団から出られない、夜中にトイレに起きる",
+     "B8-8": "暑くて眠れない、目が冴えて眠れない",
+     "B8-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "B9",
+    "title": "気分・ストレス",
+    "options": {
+     "B9-1": "気力が出ない、ちょっとしたことで驚く",
+     "B9-2": "不安になりやすい、物忘れが多い、集中力が続かない",
+     "B9-3": "イライラしやすい、ため息が多い",
+     "B9-4": "気分の浮き沈みが激しい、緊張すると具合が悪くなる",
+     "B9-5": "気分が沈みがちで、肩こり・頭痛を伴う",
+     "B9-6": "頭がぼーっとして考えがまとまらない、体が重い",
+     "B9-7": "落ち着かず焦りやすい、夜に気持ちが高ぶる",
+     "B9-8": "元気がなく寒がりで、何をするのも億劫",
+     "B9-9": "怒ると顔が赤くなり頭に血が上る、ふだんから怒りっぽい",
+     "B9-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "B10",
+    "title": "痛み・こり",
+    "options": {
+     "B10-1": "動悸・息切れしやすく、疲れると症状が悪化する",
+     "B10-2": "手足のしびれ、こむら返りがある",
+     "B10-3": "張るような痛みで場所が移動する、ストレスで悪化する",
+     "B10-4": "刺すような痛みがいつも同じ場所にある、肩こり・頭痛がひどい",
+     "B10-5": "過去に打撲・むち打ち・手術の経験がある、静脈瘤がある",
+     "B10-6": "雨の日や低気圧で痛みが強くなる、関節が重だるい",
+     "B10-7": "夜に痛みや熱感が強くなる、乾燥でかゆい",
+     "B10-8": "腰や膝がだるく、冷えると痛む",
+     "B10-9": "患部が赤く熱をもって腫れる、化膿しやすい",
+     "B10-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "B11",
+    "title": "月経",
+    "options": {
+     "B11-1": "周期が早まりがち、だらだら長引く、不正出血がある",
+     "B11-2": "周期が遅れがちで量が少なく、色が薄い",
+     "B11-3": "月経前にイライラして胸が張る、周期が安定しない",
+     "B11-4": "月経痛が強い、経血に塊が混じる、色が暗い",
+     "B11-5": "月経前に強くむくむ、おりものが多い",
+     "B11-6": "閉経前後でほてり・のぼせ・発汗がある、経血量が減ってきた",
+     "B11-7": "月経痛は温めると楽になる、月経後に腰が冷えてだるい",
+     "B11-8": "鮮やかな赤色の出血が多い、周期が早い",
+     "B11-9": "閉経している／月経はない",
+     "B11-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "B12",
+    "title": "目・耳・鼻・頭",
+    "options": {
+     "B12-1": "疲れると頭がぼんやりし、声に力がない",
+     "B12-2": "めまい・立ちくらみ、目が疲れやすくかすむ",
+     "B12-3": "頭が張るように痛む、緊張で頭痛がする",
+     "B12-4": "刺すような頭痛が同じ場所に出る、肩こりを伴う",
+     "B12-5": "頭が重い、鼻水・鼻づまり・痰が多い",
+     "B12-6": "目が乾く、低い音の耳鳴りが続く、乾いた咳が出る",
+     "B12-7": "疲れると耳鳴りやめまいが出て、腰がだるい",
+     "B12-8": "目が充血しやすい、急にキーンと高い耳鳴りがする",
+     "B12-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "B13",
+    "title": "舌の状態",
+    "options": {
+     "B13-1": "白っぽく、縁に歯の跡がある。大きさは普通",
+     "B13-2": "淡く白っぽい色で、薄く小さい",
+     "B13-3": "両縁が赤い、縁に赤い点々がある",
+     "B13-4": "紫がかっている、黒や茶の点がある、裏側の静脈が太く紫色に浮き出ている",
+     "B13-5": "大きくぼってりして縁に歯の跡、苔が厚くべったり・濡れている",
+     "B13-6": "やや痩せて赤く、表面が乾燥してひび割れ、苔が少ない",
+     "B13-7": "白っぽく大きく、苔が白く湿っている",
+     "B13-8": "鮮やかに赤い、苔が黄色い、口内炎や舌炎ができやすい",
+     "B13-9": "きれいなピンクで、薄く白い苔がある（健康的）",
+     "B13-10": "苔が灰色・黒い／苔がまったくなくつるつる光る／舌が曲がる・震える・戻しにくい",
+     "B13-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "C1",
+    "title": "現在、病院の薬・市販薬・サプリメントを飲んでいますか",
+    "options": {
+     "C1-1": "はい",
+     "C1-2": "いいえ"
+    }
+   },
+   {
+    "id": "C2",
+    "title": "医師の治療を受けている病気はありますか",
+    "options": {
+     "C2-1": "高血圧",
+     "C2-2": "心臓の病気",
+     "C2-3": "腎臓の病気",
+     "C2-4": "肝臓の病気",
+     "C2-5": "甲状腺の病気",
+     "C2-6": "緑内障・前立腺肥大",
+     "C2-7": "糖尿病",
+     "C2-8": "胃腸の病気",
+     "C2-9": "がんの治療中",
+     "C2-10": "その他",
+     "C2-0": "ない"
+    }
+   },
+   {
+    "id": "C3",
+    "title": "妊娠中・授乳中、または妊娠の可能性がありますか",
+    "options": {
+     "C3-1": "妊娠中",
+     "C3-2": "授乳中",
+     "C3-3": "妊娠の可能性がある",
+     "C3-4": "いいえ"
+    }
+   },
+   {
+    "id": "C4",
+    "title": "薬・食品・生薬でアレルギーが出た、または漢方で体調を崩したことがありますか",
+    "options": {
+     "C4-1": "はい",
+     "C4-2": "いいえ"
+    }
+   },
+   {
+    "id": "C5",
+    "title": "これまでに飲んだ漢方があれば教えてください",
+    "options": {}
+   },
+   {
+    "id": "D1",
+    "title": "食事の傾向",
+    "options": {
+     "D1-1": "食事を抜くことが多い、少食",
+     "D1-2": "食欲にムラがある",
+     "D1-3": "甘いもの・味の濃いもの・脂っこいものをよく食べる",
+     "D1-4": "果物や冷たい飲み物をとることが多い",
+     "D1-5": "冷たいものは苦手",
+     "D1-6": "辛いものやお酒をよくとる",
+     "D1-7": "外食・コンビニが多い",
+     "D1-0": "どれもあてはまらない"
+    }
+   },
+   {
+    "id": "D2",
+    "title": "睡眠時間と就寝時刻",
+    "options": {
+     "D2-1": "6時間未満",
+     "D2-2": "6〜7時間",
+     "D2-3": "7時間以上",
+     "D2s-1": "24時前",
+     "D2s-2": "24時以降"
+    }
+   },
+   {
+    "id": "D3",
+    "title": "運動と入浴",
+    "options": {
+     "D3-1": "運動はほぼしない",
+     "D3-2": "週1〜2回",
+     "D3-3": "週3回以上",
+     "D3s-1": "シャワーのみ",
+     "D3s-2": "湯船につかる"
+    }
+   },
+   {
+    "id": "D4",
+    "title": "飲酒・喫煙・仕事",
+    "options": {
+     "D4-1": "お酒を週3回以上飲む",
+     "D4-2": "タバコを吸う",
+     "D4-3": "デスクワークが多い",
+     "D4-4": "立ち仕事が多い",
+     "D4-5": "目をよく使う",
+     "D4-0": "どれもあてはまらない"
+    }
+   }
+  ],
+  "v2-draft-2026-10-25": [
+   {
+    "id": "K1",
+    "title": "お悩みのカテゴリー",
+    "options": {
+     "cat:A": "疲れ・体力・全身の不調",
+     "cat:B": "胃腸・便通",
+     "cat:C": "肌・美容",
+     "cat:D": "髪・頭皮",
+     "cat:E": "睡眠・こころ",
+     "cat:F": "女性の健康",
+     "cat:G": "痛み・こり・しびれ",
+     "cat:H": "その他の身体症状"
+    }
+   },
+   {
+    "id": "P1",
+    "title": "性別",
+    "options": {
+     "P1:female": "女性",
+     "P1:male": "男性",
+     "P1:declined": "回答しない"
+    }
+   },
+   {
+    "id": "P2",
+    "title": "年代",
+    "options": {
+     "P2:10s": "10代",
+     "P2:20s": "20代",
+     "P2:30s": "30代",
+     "P2:40s": "40代",
+     "P2:50s": "50代",
+     "P2:60s": "60代",
+     "P2:70s": "70代以上"
+    }
+   },
+   {
+    "id": "P3",
+    "title": "月経の状況を教えてください",
+    "options": {
+     "P3:menses_regular": "月経がある（ほぼ周期的に来る）",
+     "P3:menses_irregular": "月経が不規則にある",
+     "P3:menses_post": "閉経した（1年以上ない）",
+     "P3:menses_none_preg": "妊娠中・授乳中のため来ていない",
+     "P3:menses_none_other": "その他の理由で来ていない",
+     "P3:declined": "回答しない"
+    }
+   },
+   {
+    "id": "P4",
+    "title": "妊娠・授乳について教えてください",
+    "options": {
+     "P4:pregnancy": "妊娠中",
+     "P4:pregnancy_possible": "妊娠の可能性がある",
+     "P4:lactation": "授乳中",
+     "P4:none": "いずれもない",
+     "P4:unknown": "わからない",
+     "P4:declined": "回答しない"
+    }
+   },
+   {
+    "id": "S1",
+    "title": "今、次のような症状はありますか",
+    "options": {
+     "S1:em_headache": "突然、今までにない激しい頭痛",
+     "S1:em_chest": "胸の痛みや締めつけ感",
+     "S1:em_dyspnea": "安静にしていても息苦しい",
+     "S1:em_neuro": "手足のしびれ・動かしにくさ、ろれつが回らない",
+     "S1:em_syncope": "気が遠くなる・失神した",
+     "S1:em_gi_bleed": "血を吐いた・黒い便や血便が出た",
+     "S1:em_fever": "38度以上の熱が続いている",
+     "S1:none": "いずれもない",
+     "S1:unknown": "わからない"
+    }
+   },
+   {
+    "id": "S2",
+    "title": "医師の治療を受けている病気はありますか",
+    "options": {
+     "S2:dx_hypertension": "高血圧",
+     "S2:dx_heart": "心臓の病気",
+     "S2:dx_kidney": "腎臓の病気",
+     "S2:dx_liver": "肝臓の病気",
+     "S2:dx_thyroid": "甲状腺の病気",
+     "S2:dx_glaucoma": "緑内障",
+     "S2:dx_prostate": "前立腺肥大・排尿の病気",
+     "S2:dx_diabetes": "糖尿病",
+     "S2:dx_gi": "胃腸の病気",
+     "S2:dx_cancer": "がんの治療中",
+     "S2:dx_respiratory": "ぜんそく・呼吸器の病気",
+     "S2:dx_other": "上記以外の病気",
+     "S2:none": "ない",
+     "S2:unknown": "わからない"
+    }
+   },
+   {
+    "id": "S3",
+    "title": "現在、飲んでいる薬・サプリメントはありますか（種類を選んでください）",
+    "options": {
+     "S3:med_antihypertensive": "血圧の薬",
+     "S3:med_diuretic": "利尿薬（むくみ・血圧の薬）",
+     "S3:med_anticoagulant": "血液をサラサラにする薬",
+     "S3:med_diabetes": "糖尿病の薬",
+     "S3:med_thyroid": "甲状腺の薬",
+     "S3:med_steroid": "ステロイド（飲み薬）",
+     "S3:med_hypnotic": "睡眠薬・抗不安薬",
+     "S3:med_antidepressant": "抗うつ薬",
+     "S3:med_interferon": "インターフェロン製剤",
+     "S3:med_anticancer": "抗がん剤",
+     "S3:med_laxative": "便秘薬・下剤",
+     "S3:med_gi": "胃腸薬",
+     "S3:med_analgesic": "痛み止め",
+     "S3:med_hormone": "女性ホルモン剤・低用量ピル",
+     "S3:med_licorice": "かぜ薬・胃腸薬など甘草を含む市販薬",
+     "S3:med_kampo": "漢方薬",
+     "S3:med_supplement": "サプリメント・健康食品",
+     "S3:med_other": "上記以外の薬",
+     "S3:med_unknown_name": "名前や種類がわからない薬がある",
+     "S3:none": "飲んでいない",
+     "S3:unknown": "わからない"
+    }
+   },
+   {
+    "id": "S3K",
+    "title": "飲んでいる漢方薬を選んでください",
+    "options": {
+     "S3K:F01": "補中益気湯",
+     "S3K:F02": "六君子湯",
+     "S3K:F03": "四君子湯",
+     "S3K:F04": "十全大補湯",
+     "S3K:F05": "人参養栄湯",
+     "S3K:F06": "四物湯",
+     "S3K:F07": "当帰芍薬散",
+     "S3K:F08": "帰脾湯",
+     "S3K:F09": "酸棗仁湯",
+     "S3K:F10": "半夏厚朴湯",
+     "S3K:F11": "加味逍遥散",
+     "S3K:F12": "香蘇散",
+     "S3K:F13": "四逆散",
+     "S3K:F14": "柴胡加竜骨牡蛎湯",
+     "S3K:F15": "大柴胡湯",
+     "S3K:F16": "桂枝茯苓丸",
+     "S3K:F17": "桃核承気湯",
+     "S3K:F18": "芎帰調血飲",
+     "S3K:F19": "温経湯",
+     "S3K:F20": "通導散",
+     "S3K:F21": "五苓散",
+     "S3K:F22": "苓桂朮甘湯",
+     "S3K:F23": "防已黄耆湯",
+     "S3K:F24": "真武湯",
+     "S3K:F25": "二陳湯",
+     "S3K:F26": "防風通聖散",
+     "S3K:F27": "六味丸",
+     "S3K:F28": "麦門冬湯",
+     "S3K:F29": "滋陰降火湯",
+     "S3K:F30": "知柏地黄丸",
+     "S3K:F31": "八味地黄丸",
+     "S3K:F32": "牛車腎気丸",
+     "S3K:F33": "人参湯",
+     "S3K:F34": "当帰四逆加呉茱萸生姜湯",
+     "S3K:F35": "黄連解毒湯",
+     "S3K:F36": "清上防風湯",
+     "S3K:F37": "荊芥連翹湯",
+     "S3K:F38": "桂枝茯苓丸加薏苡仁",
+     "S3K:F39": "十味敗毒湯",
+     "S3K:F40": "消風散",
+     "S3K:F41": "温清飲",
+     "S3K:F42": "当帰飲子",
+     "S3K:F43": "加味帰脾湯",
+     "S3K:F44": "抑肝散",
+     "S3K:F45": "抑肝散加陳皮半夏",
+     "S3K:F46": "桂枝加竜骨牡蛎湯",
+     "S3K:F47": "柴胡桂枝乾姜湯",
+     "S3K:F48": "安中散",
+     "S3K:F49": "半夏瀉心湯",
+     "S3K:F50": "平胃散",
+     "S3K:F51": "啓脾湯",
+     "S3K:F52": "桂枝加芍薬湯",
+     "S3K:F53": "小建中湯",
+     "S3K:F54": "黄耆建中湯",
+     "S3K:F55": "芍薬甘草湯",
+     "S3K:F56": "麻子仁丸",
+     "S3K:F57": "潤腸湯",
+     "S3K:F58": "大黄甘草湯",
+     "S3K:F59": "乙字湯",
+     "S3K:F60": "猪苓湯",
+     "S3K:F61": "清心蓮子飲",
+     "S3K:F62": "疎経活血湯",
+     "S3K:F63": "薏苡仁湯",
+     "S3K:F64": "桂枝加朮附湯",
+     "S3K:F65": "呉茱萸湯",
+     "S3K:F66": "釣藤散",
+     "S3K:F67": "半夏白朮天麻湯",
+     "S3K:F68": "女神散",
+     "S3K:F69": "小青竜湯",
+     "S3K:F70": "葛根湯",
+     "S3K:F71": "葛根湯加川芎辛夷",
+     "S3K:F72": "辛夷清肺湯",
+     "S3K:F73": "清肺湯",
+     "S3K:F74": "大建中湯",
+     "S3K:R01": "小柴胡湯",
+     "S3K:R02": "柴胡桂枝湯",
+     "S3K:R03": "麻黄湯",
+     "S3K:R04": "桂枝湯",
+     "S3K:R05": "柴朴湯",
+     "S3K:R06": "柴苓湯",
+     "S3K:R07": "麻黄附子細辛湯",
+     "S3K:R08": "麻杏甘石湯",
+     "S3K:R09": "越婢加朮湯",
+     "S3K:R10": "茵蔯蒿湯",
+     "S3K:R11": "芎帰膠艾湯",
+     "S3K:R12": "当帰建中湯",
+     "S3K:R13": "七物降下湯",
+     "S3K:R14": "桂枝加芍薬大黄湯",
+     "S3K:R15": "竹茹温胆湯",
+     "S3K:R16": "参蘇飲",
+     "S3K:R17": "胃苓湯",
+     "S3K:R18": "苓甘姜味辛夏仁湯",
+     "S3K:R19": "桔梗湯",
+     "S3K:R20": "排膿散及湯",
+     "S3K:R21": "治頭瘡一方",
+     "S3K:R22": "猪苓湯合四物湯",
+     "S3K:unknown": "名前がわからない"
+    }
+   },
+   {
+    "id": "S4",
+    "title": "アレルギーはありますか",
+    "options": {
+     "S4:allergy_drug": "薬で発疹・かゆみなどが出たことがある",
+     "S4:allergy_food": "食べ物のアレルギー",
+     "S4:allergy_pollen": "花粉症・アレルギー性鼻炎",
+     "S4:none": "ない",
+     "S4:unknown": "わからない"
+    }
+   },
+   {
+    "id": "S5",
+    "title": "これまでに漢方薬で体調を崩したことはありますか",
+    "options": {
+     "S5:ar_history": "ある",
+     "S5:none": "ない",
+     "S5:unknown": "わからない"
+    }
+   },
+   {
+    "id": "S5A",
+    "title": "体調を崩した漢方薬を選んでください",
+    "options": {
+     "S5A:F01": "補中益気湯",
+     "S5A:F02": "六君子湯",
+     "S5A:F03": "四君子湯",
+     "S5A:F04": "十全大補湯",
+     "S5A:F05": "人参養栄湯",
+     "S5A:F06": "四物湯",
+     "S5A:F07": "当帰芍薬散",
+     "S5A:F08": "帰脾湯",
+     "S5A:F09": "酸棗仁湯",
+     "S5A:F10": "半夏厚朴湯",
+     "S5A:F11": "加味逍遥散",
+     "S5A:F12": "香蘇散",
+     "S5A:F13": "四逆散",
+     "S5A:F14": "柴胡加竜骨牡蛎湯",
+     "S5A:F15": "大柴胡湯",
+     "S5A:F16": "桂枝茯苓丸",
+     "S5A:F17": "桃核承気湯",
+     "S5A:F18": "芎帰調血飲",
+     "S5A:F19": "温経湯",
+     "S5A:F20": "通導散",
+     "S5A:F21": "五苓散",
+     "S5A:F22": "苓桂朮甘湯",
+     "S5A:F23": "防已黄耆湯",
+     "S5A:F24": "真武湯",
+     "S5A:F25": "二陳湯",
+     "S5A:F26": "防風通聖散",
+     "S5A:F27": "六味丸",
+     "S5A:F28": "麦門冬湯",
+     "S5A:F29": "滋陰降火湯",
+     "S5A:F30": "知柏地黄丸",
+     "S5A:F31": "八味地黄丸",
+     "S5A:F32": "牛車腎気丸",
+     "S5A:F33": "人参湯",
+     "S5A:F34": "当帰四逆加呉茱萸生姜湯",
+     "S5A:F35": "黄連解毒湯",
+     "S5A:F36": "清上防風湯",
+     "S5A:F37": "荊芥連翹湯",
+     "S5A:F38": "桂枝茯苓丸加薏苡仁",
+     "S5A:F39": "十味敗毒湯",
+     "S5A:F40": "消風散",
+     "S5A:F41": "温清飲",
+     "S5A:F42": "当帰飲子",
+     "S5A:F43": "加味帰脾湯",
+     "S5A:F44": "抑肝散",
+     "S5A:F45": "抑肝散加陳皮半夏",
+     "S5A:F46": "桂枝加竜骨牡蛎湯",
+     "S5A:F47": "柴胡桂枝乾姜湯",
+     "S5A:F48": "安中散",
+     "S5A:F49": "半夏瀉心湯",
+     "S5A:F50": "平胃散",
+     "S5A:F51": "啓脾湯",
+     "S5A:F52": "桂枝加芍薬湯",
+     "S5A:F53": "小建中湯",
+     "S5A:F54": "黄耆建中湯",
+     "S5A:F55": "芍薬甘草湯",
+     "S5A:F56": "麻子仁丸",
+     "S5A:F57": "潤腸湯",
+     "S5A:F58": "大黄甘草湯",
+     "S5A:F59": "乙字湯",
+     "S5A:F60": "猪苓湯",
+     "S5A:F61": "清心蓮子飲",
+     "S5A:F62": "疎経活血湯",
+     "S5A:F63": "薏苡仁湯",
+     "S5A:F64": "桂枝加朮附湯",
+     "S5A:F65": "呉茱萸湯",
+     "S5A:F66": "釣藤散",
+     "S5A:F67": "半夏白朮天麻湯",
+     "S5A:F68": "女神散",
+     "S5A:F69": "小青竜湯",
+     "S5A:F70": "葛根湯",
+     "S5A:F71": "葛根湯加川芎辛夷",
+     "S5A:F72": "辛夷清肺湯",
+     "S5A:F73": "清肺湯",
+     "S5A:F74": "大建中湯",
+     "S5A:R01": "小柴胡湯",
+     "S5A:R02": "柴胡桂枝湯",
+     "S5A:R03": "麻黄湯",
+     "S5A:R04": "桂枝湯",
+     "S5A:R05": "柴朴湯",
+     "S5A:R06": "柴苓湯",
+     "S5A:R07": "麻黄附子細辛湯",
+     "S5A:R08": "麻杏甘石湯",
+     "S5A:R09": "越婢加朮湯",
+     "S5A:R10": "茵蔯蒿湯",
+     "S5A:R11": "芎帰膠艾湯",
+     "S5A:R12": "当帰建中湯",
+     "S5A:R13": "七物降下湯",
+     "S5A:R14": "桂枝加芍薬大黄湯",
+     "S5A:R15": "竹茹温胆湯",
+     "S5A:R16": "参蘇飲",
+     "S5A:R17": "胃苓湯",
+     "S5A:R18": "苓甘姜味辛夏仁湯",
+     "S5A:R19": "桔梗湯",
+     "S5A:R20": "排膿散及湯",
+     "S5A:R21": "治頭瘡一方",
+     "S5A:R22": "猪苓湯合四物湯",
+     "S5A:unknown": "名前がわからない"
+    }
+   },
+   {
+    "id": "S5B",
+    "title": "そのとき、どのような症状が出ましたか",
+    "options": {
+     "S5B:ar_rash": "発疹・かゆみ",
+     "S5B:ar_gi": "胃の不快感・吐き気・下痢",
+     "S5B:ar_pseudoaldo": "むくみ・血圧が上がる・手足のだるさ",
+     "S5B:ar_pneumonitis": "空咳・息切れ・発熱",
+     "S5B:ar_liver": "強いだるさ・皮膚や白目が黄色い",
+     "S5B:ar_palpitation": "動悸・のぼせ",
+     "S5B:ar_other": "上記以外の症状",
+     "S5B:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_A01",
+    "title": "「疲れやすい」は、どのような状態ですか",
+    "options": {
+     "D_A01:fatigue_exertion": "少し動いただけで疲れる",
+     "D_A01:fatigue_persistent": "休んでも疲れが取れない",
+     "D_A01:sleepy_after_meal": "食後に眠くなる・だるくなる",
+     "D_A01:sweat_easy": "汗をかきやすい",
+     "D_A01:catch_cold": "風邪をひきやすい",
+     "D_A01:low_mood": "気分の落ち込みを伴う",
+     "D_A01:none": "特にない",
+     "D_A01:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_A02",
+    "title": "「身体がだるい・重い」は、どのような状態ですか",
+    "options": {
+     "D_A02:mod_weather": "雨の日や低気圧で重くなる",
+     "D_A02:edema": "むくみを伴う",
+     "D_A02:head_heavy": "頭も重い",
+     "D_A02:sleepy_after_meal": "食後に重くなる",
+     "D_A02:mod_cold": "冷えると重くなる",
+     "D_A02:mod_fatigue": "疲れると重くなる",
+     "D_A02:none": "特にない",
+     "D_A02:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_A03",
+    "title": "「気力が出ない」は、どのような状態ですか",
+    "options": {
+     "D_A03:weak_voice": "声に力がない",
+     "D_A03:low_mood": "気分が落ち込む",
+     "D_A03:cold_whole": "寒がりで何をするのも億劫",
+     "D_A03:poor_appetite": "食欲がない",
+     "D_A03:mod_stress": "ストレスで悪化する",
+     "D_A03:none": "特にない",
+     "D_A03:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_A04",
+    "title": "「手足が冷える」は、どのような状態ですか",
+    "options": {
+     "D_A04:mod_warm_relief": "温めると楽になる",
+     "D_A04:mod_cold": "冷えると痛む・しびれる",
+     "D_A04:chilblain": "しもやけになりやすい",
+     "D_A04:hot_upper": "顔や上半身はほてる",
+     "D_A04:cold_lowback": "腰や下半身も冷える",
+     "D_A04:dysmenorrhea": "月経痛がある",
+     "D_A04:none": "特にない",
+     "D_A04:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_A05",
+    "title": "「全身が冷える」は、どのような状態ですか",
+    "options": {
+     "D_A05:prefer_warm": "温かい飲み物を好む",
+     "D_A05:loose_stool+mod_cold": "冷えるとお腹を壊す",
+     "D_A05:nocturia": "夜中にトイレに起きる",
+     "D_A05:lowback_weak": "腰や膝がだるい",
+     "D_A05:fatigue": "疲れやすい",
+     "D_A05:edema": "むくみやすい",
+     "D_A05:none": "特にない",
+     "D_A05:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_A06",
+    "title": "「顔や上半身がほてる」は、どのような状態ですか",
+    "options": {
+     "D_A06:cold_limbs": "足は冷える",
+     "D_A06:evening_fever": "夕方から夜にほてる",
+     "D_A06:sweat_head": "頭や顔に汗をかく",
+     "D_A06:mod_stress": "イライラや緊張で強くなる",
+     "D_A06:hot_flash": "急にカーッと熱くなる",
+     "D_A06:red_face": "顔が赤くなる",
+     "D_A06:none": "特にない",
+     "D_A06:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_A07",
+    "title": "「手足がほてる」は、どのような状態ですか",
+    "options": {
+     "D_A07:evening_fever": "夕方から夜に強くなる",
+     "D_A07:night_sweat": "寝汗をかく",
+     "D_A07:dry_mouth": "口や喉が乾く",
+     "D_A07:dry_lips": "唇が乾く",
+     "D_A07:cold_lowback": "下腹部や足腰は冷える",
+     "D_A07:none": "特にない",
+     "D_A07:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_A08",
+    "title": "「汗をかきやすい」は、どのような汗ですか",
+    "options": {
+     "D_A08:fatigue_exertion": "少し動くだけで汗が出る",
+     "D_A08:sweat_tension": "緊張すると手や脇に汗をかく",
+     "D_A08:sweat_head": "頭や顔だけ汗をかく",
+     "D_A08:cold_after_sweat": "汗のあとに冷える",
+     "D_A08:heat_intolerance": "暑がり",
+     "D_A08:fatigue": "疲れやすい",
+     "D_A08:none": "特にない",
+     "D_A08:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_A09",
+    "title": "「寝汗をかく」に伴って、あてはまるものはありますか",
+    "options": {
+     "D_A09:hot_palms": "手足がほてる",
+     "D_A09:dry_mouth": "口や喉が乾く",
+     "D_A09:fatigue": "疲れやすい",
+     "D_A09:evening_fever": "夕方から熱っぽい",
+     "D_A09:wake_night": "夜中に目が覚める",
+     "D_A09:none": "特にない",
+     "D_A09:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_A10",
+    "title": "「病後・産後の体力低下」について、あてはまるものはありますか",
+    "options": {
+     "D_A10:after_illness": "病気や手術のあとから",
+     "D_A10:after_birth": "出産のあとから",
+     "D_A10:poor_appetite": "食欲がない",
+     "D_A10:pale_face": "顔色が悪い・貧血ぎみ",
+     "D_A10:night_sweat": "寝汗をかく",
+     "D_A10:shortness_breath": "息切れしやすい",
+     "D_A10:none": "特にない",
+     "D_A10:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_B01",
+    "title": "「胃痛」は、どのような痛みですか",
+    "options": {
+     "D_B01:stomach_pain_empty": "空腹時に痛む",
+     "D_B01:mod_after_meal": "食後に痛む",
+     "D_B01:mod_stress": "ストレスで悪化する",
+     "D_B01:mod_cold": "冷えると悪化する",
+     "D_B01:mod_warm_relief": "温めると楽になる",
+     "D_B01:heartburn": "胸やけを伴う",
+     "D_B01:epigastric_fullness": "みぞおちがつかえる",
+     "D_B01:none": "特にない",
+     "D_B01:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_B02",
+    "title": "「胃もたれ」は、どのような状態ですか",
+    "options": {
+     "D_B02:mod_after_meal": "食後に悪化",
+     "D_B02:early_satiety": "少量で満腹",
+     "D_B02:bloating": "お腹が張る",
+     "D_B02:mod_stress": "ストレスで悪化",
+     "D_B02:mod_cold": "冷たいもので悪化",
+     "D_B02:none": "特にない",
+     "D_B02:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_B03",
+    "title": "「お腹の張り」は、どのような状態ですか",
+    "options": {
+     "D_B03:gas_relief": "ガスが出ると楽になる",
+     "D_B03:mod_stress": "ストレスで悪化する",
+     "D_B03:constipation": "便秘を伴う",
+     "D_B03:abdominal_fullness": "張って苦しい（強い膨満感）",
+     "D_B03:mod_after_meal": "食後に張る",
+     "D_B03:cold_abdomen": "お腹が冷える",
+     "D_B03:none": "特にない",
+     "D_B03:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_B04",
+    "title": "「食欲不振」は、どのような状態ですか",
+    "options": {
+     "D_B04:early_satiety": "少量で満腹になる",
+     "D_B04:sleepy_after_meal": "食後に眠くなる",
+     "D_B04:stomach_heavy": "胃もたれがする",
+     "D_B04:fatigue": "疲れやすい",
+     "D_B04:mod_stress": "ストレスで食欲が変わる",
+     "D_B04:nausea": "吐き気がある",
+     "D_B04:none": "特にない",
+     "D_B04:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_B05",
+    "title": "「吐き気」は、どのような状態ですか",
+    "options": {
+     "D_B05:headache": "頭痛を伴う",
+     "D_B05:dizziness": "めまいを伴う",
+     "D_B05:throat_lump": "のどに何かつかえる",
+     "D_B05:epigastric_fullness": "みぞおちがつかえる",
+     "D_B05:motion_sickness": "乗り物酔いしやすい",
+     "D_B05:mod_cold": "冷えると悪化する",
+     "D_B05:none": "特にない",
+     "D_B05:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_B06",
+    "title": "「胸やけ」は、どのような状態ですか",
+    "options": {
+     "D_B06:mod_after_meal": "食後に悪化する",
+     "D_B06:mod_stress": "ストレスで悪化する",
+     "D_B06:epigastric_fullness": "みぞおちがつかえる",
+     "D_B06:belching": "げっぷが多い",
+     "D_B06:mouth_bitter": "口が苦い・粘る",
+     "D_B06:none": "特にない",
+     "D_B06:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_B07",
+    "title": "「便秘」は、どのような状態ですか",
+    "options": {
+     "D_B07:dry_stool": "便が硬くコロコロ",
+     "D_B07:constipation_fullness": "お腹が張って苦しい（出るとすっきり）",
+     "D_B07:mod_stress": "ストレスで悪化する",
+     "D_B07:weak_defecation": "便意が弱く出しにくい",
+     "D_B07:hot_upper": "のぼせを伴う",
+     "D_B07:abdominal_pain": "腹痛を伴う",
+     "D_B07:none": "特にない",
+     "D_B07:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_B08",
+    "title": "「下痢・軟便」は、どのような状態ですか",
+    "options": {
+     "D_B08:mod_cold": "冷えると悪化する",
+     "D_B08:morning_diarrhea": "朝起きてすぐ下痢をする",
+     "D_B08:mod_stress": "ストレスで悪化する",
+     "D_B08:watery_stool": "水のような便",
+     "D_B08:mod_after_meal": "食後すぐに便意がある",
+     "D_B08:abdominal_pain": "腹痛を伴う",
+     "D_B08:fatigue": "疲れやすい",
+     "D_B08:none": "特にない",
+     "D_B08:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_B09",
+    "title": "「便秘と下痢を繰り返す」は、どのような状態ですか",
+    "options": {
+     "D_B09:mod_stress": "ストレスで悪化する",
+     "D_B09:bloating": "お腹が張る",
+     "D_B09:abdominal_pain": "腹痛を伴う",
+     "D_B09:mod_cold": "冷えると悪化する",
+     "D_B09:incomplete_evacuation": "出てもすっきりしない",
+     "D_B09:none": "特にない",
+     "D_B09:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_C01",
+    "title": "「ニキビ」は、どのような状態ですか",
+    "options": {
+     "D_C01:acne_inflamed": "赤く炎症",
+     "D_C01:acne_pus": "膿を伴う",
+     "D_C01:dry_skin": "肌の乾燥もある",
+     "D_C01:mod_premenstrual": "月経周期と関連して悪化",
+     "D_C01:none": "特にない",
+     "D_C01:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_C02",
+    "title": "「顔のほてり・熱感」は、どのような状態ですか",
+    "options": {
+     "D_C02:red_face": "赤みを伴う",
+     "D_C02:cold_limbs": "足は冷える",
+     "D_C02:mod_heat_aggr": "入浴や温まると悪化する",
+     "D_C02:mod_stress": "緊張やストレスで悪化する",
+     "D_C02:evening_fever": "夕方から夜に強い",
+     "D_C02:hot_flash": "急にカーッと熱くなる",
+     "D_C02:none": "特にない",
+     "D_C02:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_C03",
+    "title": "「肌の乾燥」は、どのような状態ですか",
+    "options": {
+     "D_C03:itchy_skin": "かゆみを伴う",
+     "D_C03:skin_flaking": "粉をふく",
+     "D_C03:rough_hands": "手足があれる・ひび割れる",
+     "D_C03:dry_lips": "唇も乾く",
+     "D_C03:dry_hair": "髪もパサつく",
+     "D_C03:brittle_nails": "爪が割れやすい",
+     "D_C03:none": "特にない",
+     "D_C03:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_C04",
+    "title": "「肌のかゆみ」は、どのような状態ですか",
+    "options": {
+     "D_C04:dry_skin": "乾燥してかゆい",
+     "D_C04:skin_inflamed": "赤みや熱感を伴う",
+     "D_C04:skin_moist": "じゅくじゅくしている",
+     "D_C04:mod_heat_aggr": "温まると悪化する",
+     "D_C04:itch_night": "夜にかゆみが強い",
+     "D_C04:hives": "赤く盛り上がる（じんましんのよう）",
+     "D_C04:none": "特にない",
+     "D_C04:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_C05",
+    "title": "「湿疹・肌荒れ」は、どのような状態ですか",
+    "options": {
+     "D_C05:skin_inflamed": "赤みや熱感が強い",
+     "D_C05:skin_moist": "じゅくじゅくして分泌物が多い",
+     "D_C05:dry_skin": "乾燥してカサカサ",
+     "D_C05:skin_suppurative": "化膿しやすい",
+     "D_C05:itchy_skin": "かゆみが強い",
+     "D_C05:eczema_hands": "手足に出やすい",
+     "D_C05:none": "特にない",
+     "D_C05:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_C06",
+    "title": "「肌のくすみ」と一緒に、あてはまるものはありますか",
+    "options": {
+     "D_C06:dark_circles": "目の下のクマ",
+     "D_C06:dark_complexion": "顔色が暗い",
+     "D_C06:pale_face": "血色がなく白っぽい",
+     "D_C06:stiff_shoulder": "肩こりがある",
+     "D_C06:menstrual_clots": "経血に塊が混じる",
+     "D_C06:mod_fatigue": "疲れると目立つ",
+     "D_C06:none": "特にない",
+     "D_C06:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_C07",
+    "title": "「シミ・色素沈着」と一緒に、あてはまるものはありますか",
+    "options": {
+     "D_C07:menstrual_clots": "経血に塊が混じる",
+     "D_C07:hot_upper": "のぼせやすい",
+     "D_C07:cold_limbs": "足が冷える",
+     "D_C07:stiff_shoulder": "肩こりがある",
+     "D_C07:mod_uv": "紫外線で濃くなる",
+     "D_C07:acne_scar": "ニキビ跡が残りやすい",
+     "D_C07:none": "特にない",
+     "D_C07:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_C08",
+    "title": "「肝斑」と一緒に、あてはまるものはありますか",
+    "options": {
+     "D_C08:mod_premenstrual": "月経周期で濃さが変わる",
+     "D_C08:mod_stress": "ストレスで濃くなる",
+     "D_C08:after_birth": "妊娠・出産のあとから",
+     "D_C08:menstrual_clots": "経血に塊が混じる",
+     "D_C08:irritability": "イライラしやすい",
+     "D_C08:none": "特にない",
+     "D_C08:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_D01",
+    "title": "「抜け毛」について、あてはまるものはありますか",
+    "options": {
+     "D_D01:after_birth": "出産のあとから増えた",
+     "D_D01:mod_stress": "強いストレスのあとから",
+     "D_D01:diet_restriction": "急な体重減少・食事制限のあと",
+     "D_D01:fatigue": "疲れやすい",
+     "D_D01:scalp_oily": "頭皮が脂っぽい",
+     "D_D01:none": "特にない",
+     "D_D01:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_D02",
+    "title": "「薄毛・髪が細くなった」と一緒に、あてはまるものはありますか",
+    "options": {
+     "D_D02:hair_fine": "髪が細くコシがない",
+     "D_D02:hair_loss": "抜け毛も増えた",
+     "D_D02:lowback_weak": "腰や膝がだるい",
+     "D_D02:tinnitus": "耳鳴りがある",
+     "D_D02:brittle_nails": "爪が割れやすい",
+     "D_D02:fatigue": "疲れやすい",
+     "D_D02:none": "特にない",
+     "D_D02:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_D03",
+    "title": "「髪の乾燥・パサつき」と一緒に、あてはまるものはありますか",
+    "options": {
+     "D_D03:split_ends": "枝毛・切れ毛が多い",
+     "D_D03:dry_skin": "肌も乾燥する",
+     "D_D03:brittle_nails": "爪が割れやすい",
+     "D_D03:eye_fatigue": "目が疲れやすい",
+     "D_D03:orthostatic": "立ちくらみがある",
+     "D_D03:none": "特にない",
+     "D_D03:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_D04",
+    "title": "「白髪」と一緒に、あてはまるものはありますか",
+    "options": {
+     "D_D04:hair_loss": "抜け毛も多い",
+     "D_D04:lowback_weak": "腰や膝がだるい",
+     "D_D04:tinnitus": "耳鳴りがある",
+     "D_D04:eye_fatigue": "目が疲れやすい",
+     "D_D04:mod_stress": "ストレスが多い",
+     "D_D04:none": "特にない",
+     "D_D04:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_D05",
+    "title": "「頭皮の乾燥」と一緒に、あてはまるものはありますか",
+    "options": {
+     "D_D05:dandruff_dry": "乾いた細かいフケが出る",
+     "D_D05:scalp_itch": "かゆみがある",
+     "D_D05:dry_skin": "肌も乾燥する",
+     "D_D05:dry_hair": "髪もパサつく",
+     "D_D05:none": "特にない",
+     "D_D05:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_D06",
+    "title": "「頭皮のかゆみ」は、どのような状態ですか",
+    "options": {
+     "D_D06:scalp_dry": "乾燥してかゆい",
+     "D_D06:scalp_oily": "脂っぽく、べたつく",
+     "D_D06:scalp_inflamed": "赤みや湿疹がある",
+     "D_D06:mod_sweat_aggr": "汗をかくと悪化する",
+     "D_D06:mod_heat_aggr": "温まると悪化する",
+     "D_D06:none": "特にない",
+     "D_D06:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_D07",
+    "title": "「フケ」は、どのような状態ですか",
+    "options": {
+     "D_D07:dandruff_dry": "乾いた細かいフケ",
+     "D_D07:dandruff_oily": "湿った大きなフケ",
+     "D_D07:scalp_itch": "かゆみがある",
+     "D_D07:scalp_inflamed": "赤みがある",
+     "D_D07:none": "特にない",
+     "D_D07:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_D08",
+    "title": "「頭皮の赤み・炎症」は、どのような状態ですか",
+    "options": {
+     "D_D08:skin_suppurative": "化膿する",
+     "D_D08:scalp_itch": "かゆみが強い",
+     "D_D08:skin_moist": "じゅくじゅくする",
+     "D_D08:red_face": "顔も赤くなりやすい",
+     "D_D08:mod_heat_aggr": "温まると悪化する",
+     "D_D08:none": "特にない",
+     "D_D08:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_E01",
+    "title": "「寝つきが悪い」のは、どのようなときですか",
+    "options": {
+     "D_E01:rumination": "考え事が頭から離れない",
+     "D_E01:irritability": "イライラや興奮で眠れない",
+     "D_E01:evening_fever": "体がほてって眠れない",
+     "D_E01:anxiety": "不安で眠れない",
+     "D_E01:cold_limbs": "足が冷えて眠れない",
+     "D_E01:palpitation": "動悸がする",
+     "D_E01:none": "特にない",
+     "D_E01:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_E02",
+    "title": "「夜中に目が覚める」に伴って、あてはまるものはありますか",
+    "options": {
+     "D_E02:nocturia": "トイレに起きる",
+     "D_E02:dreams": "夢が多い",
+     "D_E02:night_sweat": "寝汗をかく",
+     "D_E02:anxiety": "不安で目が覚める",
+     "D_E02:heat_intolerance": "暑くて目が覚める",
+     "D_E02:none": "特にない",
+     "D_E02:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_E03",
+    "title": "「朝早く目が覚める」に伴って、あてはまるものはありますか",
+    "options": {
+     "D_E03:low_mood": "気分が落ち込む",
+     "D_E03:night_sweat": "寝汗やほてりがある",
+     "D_E03:anxiety": "不安がある",
+     "D_E03:fatigue_persistent": "疲れが取れない",
+     "D_E03:none": "特にない",
+     "D_E03:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_E04",
+    "title": "「眠りが浅い」に伴って、あてはまるものはありますか",
+    "options": {
+     "D_E04:dreams": "夢が多い",
+     "D_E04:fatigue_persistent": "疲れが取れない",
+     "D_E04:palpitation": "動悸がする",
+     "D_E04:anxiety": "不安がある",
+     "D_E04:forgetful": "物忘れが多い",
+     "D_E04:none": "特にない",
+     "D_E04:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_E05",
+    "title": "「日中の眠気」は、どのような状態ですか",
+    "options": {
+     "D_E05:sleepy_after_meal": "食後に強い",
+     "D_E05:heavy_body": "体が重だるい",
+     "D_E05:fatigue": "疲れやすい",
+     "D_E05:light_sleep": "夜によく眠れていない",
+     "D_E05:mod_weather": "雨の日に強い",
+     "D_E05:none": "特にない",
+     "D_E05:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_E06",
+    "title": "「不安・緊張」に伴って、あてはまるものはありますか",
+    "options": {
+     "D_E06:palpitation": "動悸がする",
+     "D_E06:startle": "驚きやすい",
+     "D_E06:throat_lump": "のどがつかえる",
+     "D_E06:tension_social": "人前で強く緊張する",
+     "D_E06:forgetful": "物忘れが多い",
+     "D_E06:sweat_tension": "緊張すると手や脇に汗をかく",
+     "D_E06:none": "特にない",
+     "D_E06:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_E07",
+    "title": "「イライラ」に伴って、あてはまるものはありますか",
+    "options": {
+     "D_E07:red_face": "カッとなって顔が赤くなる",
+     "D_E07:sighing": "ため息が多い",
+     "D_E07:chest_distension": "胸や脇腹が張る",
+     "D_E07:mod_premenstrual": "月経前に強くなる",
+     "D_E07:bruxism": "歯ぎしり・食いしばりがある",
+     "D_E07:insomnia_onset": "眠れない",
+     "D_E07:none": "特にない",
+     "D_E07:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_E08",
+    "title": "「気分の落ち込み」に伴って、あてはまるものはありますか",
+    "options": {
+     "D_E08:throat_lump": "のどがつかえる",
+     "D_E08:poor_appetite": "食欲がない",
+     "D_E08:low_motivation": "何をするのも億劫",
+     "D_E08:tearful": "涙もろい",
+     "D_E08:insomnia_onset": "眠れない",
+     "D_E08:mod_premenstrual": "月経前だけ落ち込む",
+     "D_E08:none": "特にない",
+     "D_E08:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_E09",
+    "title": "「ストレスによる体調不良」は、どのような症状ですか",
+    "options": {
+     "D_E09:bloating": "お腹が張る",
+     "D_E09:stomach_pain": "胃が痛む",
+     "D_E09:loose_stool": "下痢をする",
+     "D_E09:throat_lump": "のどがつかえる",
+     "D_E09:stiff_shoulder": "肩こりがある",
+     "D_E09:insomnia_onset": "眠れない",
+     "D_E09:palpitation": "動悸がする",
+     "D_E09:none": "特にない",
+     "D_E09:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_F01",
+    "title": "「月経痛」は、どのような痛みですか",
+    "options": {
+     "D_F01:mod_warm_relief": "温めると楽になる",
+     "D_F01:stabbing_pain": "刺すように痛む",
+     "D_F01:menstrual_clots": "経血に塊が混じる",
+     "D_F01:distending_pain": "張るように痛む",
+     "D_F01:dull_pain_after": "鈍い痛みが月経後も続く",
+     "D_F01:low_back_pain": "腰の痛みが強い",
+     "D_F01:nausea": "吐き気を伴う",
+     "D_F01:none": "特にない",
+     "D_F01:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_F02",
+    "title": "「月経不順」は、どのような状態ですか",
+    "options": {
+     "D_F02:cycle_short": "周期が早まる",
+     "D_F02:cycle_long": "周期が遅れる",
+     "D_F02:mod_stress": "ストレスで乱れる",
+     "D_F02:diet_restriction": "急な体重変化・食事制限のあとから",
+     "D_F02:menstrual_clots": "経血に塊が混じる",
+     "D_F02:none": "特にない",
+     "D_F02:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_F03",
+    "title": "「PMS」では、どのような症状が出ますか",
+    "options": {
+     "D_F03:irritability": "イライラする",
+     "D_F03:tearful": "落ち込む・涙もろい",
+     "D_F03:pms_breast": "胸が張る",
+     "D_F03:edema": "むくむ",
+     "D_F03:headache": "頭痛",
+     "D_F03:daytime_sleepy": "眠気・だるさ",
+     "D_F03:acne": "ニキビ・肌荒れ",
+     "D_F03:craving_sweet": "甘いものが欲しくなる",
+     "D_F03:none": "特にない",
+     "D_F03:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_F04",
+    "title": "「経血量が多い」は、どのような状態ですか",
+    "options": {
+     "D_F04:menstrual_clots": "レバー状の塊が多い",
+     "D_F04:bright_red_menses": "鮮やかな赤色",
+     "D_F04:menses_long": "8日以上続く",
+     "D_F04:orthostatic": "立ちくらみがある",
+     "D_F04:fatigue": "疲れやすい",
+     "D_F04:none": "特にない",
+     "D_F04:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_F05",
+    "title": "「経血量が少ない」は、どのような状態ですか",
+    "options": {
+     "D_F05:pale_menses": "色が薄い",
+     "D_F05:dark_menses": "色が暗い",
+     "D_F05:cycle_long": "周期が遅れがち",
+     "D_F05:cold_limbs": "手足が冷える",
+     "D_F05:dry_skin": "肌や髪が乾燥する",
+     "D_F05:fatigue": "疲れやすい",
+     "D_F05:none": "特にない",
+     "D_F05:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_F06",
+    "title": "「更年期に伴う不調」では、どのような症状がありますか",
+    "options": {
+     "D_F06:hot_flash": "急にカーッと熱くなる",
+     "D_F06:sweat_head": "頭や顔に汗をかく",
+     "D_F06:night_sweat": "寝汗をかく",
+     "D_F06:irritability": "イライラ",
+     "D_F06:low_mood": "気分の落ち込み",
+     "D_F06:insomnia_onset": "眠れない",
+     "D_F06:palpitation": "動悸",
+     "D_F06:dizziness": "めまい",
+     "D_F06:stiff_shoulder": "肩こり",
+     "D_F06:cold_limbs": "手足の冷え",
+     "D_F06:hot_palms": "手足のほてり",
+     "D_F06:none": "特にない",
+     "D_F06:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_F07",
+    "title": "「産後の不調」では、どのような症状がありますか",
+    "options": {
+     "D_F07:fatigue": "疲れやすい",
+     "D_F07:low_mood": "気分の落ち込み",
+     "D_F07:pale_face": "顔色が悪い・貧血ぎみ",
+     "D_F07:hair_loss": "抜け毛",
+     "D_F07:low_back_pain": "腰痛",
+     "D_F07:anxiety": "不安",
+     "D_F07:none": "特にない",
+     "D_F07:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_G01",
+    "title": "「頭痛」は、どのような痛みですか",
+    "options": {
+     "D_G01:headache_throbbing": "ズキズキする",
+     "D_G01:headache_tight": "締めつけられる",
+     "D_G01:head_heavy": "頭が重だるい",
+     "D_G01:mod_stress": "ストレスで悪化",
+     "D_G01:mod_cold": "冷えると悪化",
+     "D_G01:none": "特にない",
+     "D_G01:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_G02",
+    "title": "「肩こり・首こり」は、どのような状態ですか",
+    "options": {
+     "D_G02:mod_stress": "ストレスで悪化する",
+     "D_G02:mod_cold": "冷えると悪化する",
+     "D_G02:stabbing_pain": "刺すような痛みが同じ場所にある",
+     "D_G02:headache": "頭痛を伴う",
+     "D_G02:eye_fatigue": "目が疲れる",
+     "D_G02:heavy_pain": "重だるい",
+     "D_G02:none": "特にない",
+     "D_G02:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_G03",
+    "title": "「腰痛」は、どのような痛みですか",
+    "options": {
+     "D_G03:mod_cold": "冷えると悪化する",
+     "D_G03:lowback_weak": "腰や膝がだるい",
+     "D_G03:stabbing_pain": "刺すような痛み",
+     "D_G03:numbness": "足がしびれる",
+     "D_G03:night_pain": "夜間・明け方に痛む",
+     "D_G03:heavy_pain": "重だるい",
+     "D_G03:none": "特にない",
+     "D_G03:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_G04",
+    "title": "「関節痛」は、どのような状態ですか",
+    "options": {
+     "D_G04:joint_hot": "腫れて熱をもつ",
+     "D_G04:mod_cold": "冷えると悪化する",
+     "D_G04:mod_weather": "雨の日に悪化する",
+     "D_G04:edema": "むくみを伴う",
+     "D_G04:morning_stiffness": "朝にこわばる",
+     "D_G04:obesity": "体重が多い",
+     "D_G04:none": "特にない",
+     "D_G04:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_G05",
+    "title": "「筋肉痛」は、どのような状態ですか",
+    "options": {
+     "D_G05:mod_cold": "冷えると悪化する",
+     "D_G05:cramps": "足がつりやすい",
+     "D_G05:heavy_pain": "重だるい",
+     "D_G05:fatigue": "疲れやすい",
+     "D_G05:none": "特にない",
+     "D_G05:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_G06",
+    "title": "「手足のしびれ」は、どのような状態ですか",
+    "options": {
+     "D_G06:mod_cold": "冷えると悪化する",
+     "D_G06:mod_night": "夜に強くなる",
+     "D_G06:lowback_weak": "腰や膝がだるい",
+     "D_G06:cramps": "足がつる",
+     "D_G06:pale_face": "顔色が悪い・貧血ぎみ",
+     "D_G06:none": "特にない",
+     "D_G06:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_G07",
+    "title": "「足がつる」のは、どのようなときですか",
+    "options": {
+     "D_G07:mod_night": "夜間・明け方",
+     "D_G07:mod_cold": "冷えたとき",
+     "D_G07:eye_fatigue": "目の疲れや乾きもある",
+     "D_G07:orthostatic": "立ちくらみもある",
+     "D_G07:none": "特にない",
+     "D_G07:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_G08",
+    "title": "「その他の痛み」は、どのような痛みですか",
+    "options": {
+     "D_G08:stabbing_pain": "刺すような痛みが同じ場所にある",
+     "D_G08:wandering_pain": "張るような痛みで場所が移る",
+     "D_G08:heavy_pain": "重だるい",
+     "D_G08:mod_cold": "冷えると悪化する",
+     "D_G08:mod_warm_relief": "温めると楽になる",
+     "D_G08:mod_stress": "ストレスで悪化する",
+     "D_G08:none": "特にない",
+     "D_G08:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H01",
+    "title": "「めまい」は、どのような状態ですか",
+    "options": {
+     "D_H01:vertigo_rotary": "ぐるぐる回る",
+     "D_H01:vertigo_floating": "ふわふわする",
+     "D_H01:orthostatic": "立ちくらみ",
+     "D_H01:head_heavy": "頭が重い",
+     "D_H01:tinnitus": "耳鳴りを伴う",
+     "D_H01:nausea": "吐き気を伴う",
+     "D_H01:palpitation": "動悸を伴う",
+     "D_H01:hot_upper": "のぼせを伴う",
+     "D_H01:none": "特にない",
+     "D_H01:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H02",
+    "title": "「立ちくらみ」に伴って、あてはまるものはありますか",
+    "options": {
+     "D_H02:pale_face": "顔色が悪い・貧血ぎみ",
+     "D_H02:fatigue": "疲れやすい",
+     "D_H02:palpitation": "動悸がする",
+     "D_H02:eye_fatigue": "目が疲れやすい",
+     "D_H02:none": "特にない",
+     "D_H02:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H03",
+    "title": "「耳鳴り」は、どのような状態ですか",
+    "options": {
+     "D_H03:tinnitus_low": "低い音",
+     "D_H03:tinnitus_high": "高いキーンという音",
+     "D_H03:lowback_weak": "腰や膝がだるい",
+     "D_H03:mod_fatigue": "疲れると悪化する",
+     "D_H03:mod_stress": "ストレスで悪化する",
+     "D_H03:dizziness": "めまいを伴う",
+     "D_H03:none": "特にない",
+     "D_H03:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H04",
+    "title": "「鼻水」は、どのような状態ですか",
+    "options": {
+     "D_H04:nasal_watery": "水のような鼻水",
+     "D_H04:nasal_yellow": "黄色く粘る鼻水",
+     "D_H04:sneezing": "くしゃみが出る",
+     "D_H04:mod_cold": "冷えると悪化する",
+     "D_H04:nasal_congestion": "鼻づまりもある",
+     "D_H04:none": "特にない",
+     "D_H04:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H05",
+    "title": "「鼻づまり」は、どのような状態ですか",
+    "options": {
+     "D_H05:nasal_yellow": "黄色く粘る鼻水",
+     "D_H05:nasal_watery": "水のような鼻水",
+     "D_H05:head_heavy": "頭が重い",
+     "D_H05:sneezing": "くしゃみが出る",
+     "D_H05:none": "特にない",
+     "D_H05:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H06",
+    "title": "「咳」は、どのような状態ですか",
+    "options": {
+     "D_H06:cough_dry": "痰が少なく乾いた咳",
+     "D_H06:phlegm": "痰が多い",
+     "D_H06:phlegm_watery": "白く水っぽい痰",
+     "D_H06:phlegm_yellow": "黄色い痰",
+     "D_H06:throat_lump": "のどがつかえる",
+     "D_H06:mod_cold": "冷えると悪化する",
+     "D_H06:none": "特にない",
+     "D_H06:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H07",
+    "title": "「痰」は、どのような状態ですか",
+    "options": {
+     "D_H07:phlegm_watery": "白く水っぽい",
+     "D_H07:phlegm_yellow": "黄色く粘る",
+     "D_H07:phlegm_sticky": "切れにくい",
+     "D_H07:cough": "咳を伴う",
+     "D_H07:none": "特にない",
+     "D_H07:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H08",
+    "title": "「むくみ」は、どのような状態ですか",
+    "options": {
+     "D_H08:edema_evening": "夕方に足がむくむ",
+     "D_H08:edema_morning": "朝に顔やまぶたがむくむ",
+     "D_H08:mod_premenstrual": "月経前にむくむ",
+     "D_H08:mod_cold": "冷えると強くなる",
+     "D_H08:scanty_urine": "尿の量が少ない",
+     "D_H08:strong_thirst": "のどが渇く",
+     "D_H08:heavy_body": "体が重だるい",
+     "D_H08:none": "特にない",
+     "D_H08:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H09",
+    "title": "「頻尿」は、どのような状態ですか",
+    "options": {
+     "D_H09:nocturia": "夜もトイレに起きる",
+     "D_H09:dysuria_pain": "排尿時に痛む",
+     "D_H09:residual_urine": "残尿感がある",
+     "D_H09:mod_cold": "冷えると悪化する",
+     "D_H09:clear_urine": "尿の色が薄く量が多い",
+     "D_H09:dry_mouth": "口が渇く",
+     "D_H09:none": "特にない",
+     "D_H09:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H10",
+    "title": "「夜間尿」に伴って、あてはまるものはありますか",
+    "options": {
+     "D_H10:lowback_weak": "腰や膝がだるい",
+     "D_H10:cold_lowback": "足腰が冷える",
+     "D_H10:edema": "むくみがある",
+     "D_H10:frequent_urination": "日中もトイレが近い",
+     "D_H10:dry_mouth": "口が渇く",
+     "D_H10:none": "特にない",
+     "D_H10:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H11",
+    "title": "「尿が出にくい」に伴って、あてはまるものはありますか",
+    "options": {
+     "D_H11:residual_urine": "残尿感がある",
+     "D_H11:dysuria_pain": "排尿時に痛む",
+     "D_H11:nocturia": "夜間尿がある",
+     "D_H11:edema": "むくみがある",
+     "D_H11:cold_lowback": "腰が冷える",
+     "D_H11:none": "特にない",
+     "D_H11:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H12",
+    "title": "「動悸」は、どのようなときに起こりますか",
+    "options": {
+     "D_H12:anxiety": "緊張や不安を感じたとき",
+     "D_H12:fatigue_exertion": "少し動いたとき",
+     "D_H12:palp_rest": "安静にしているとき",
+     "D_H12:shortness_breath": "息切れを伴う",
+     "D_H12:dizziness": "めまいを伴う",
+     "D_H12:sweat_easy": "汗を伴う",
+     "D_H12:insomnia_onset": "眠れない",
+     "D_H12:none": "特にない",
+     "D_H12:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H13",
+    "title": "「目の乾燥」に伴って、あてはまるものはありますか",
+    "options": {
+     "D_H13:eye_fatigue": "目が疲れる",
+     "D_H13:blurred_vision": "かすむ",
+     "D_H13:dry_mouth": "口や喉も乾く",
+     "D_H13:dry_skin": "肌も乾燥する",
+     "D_H13:red_eyes": "充血しやすい",
+     "D_H13:none": "特にない",
+     "D_H13:unknown": "わからない"
+    }
+   },
+   {
+    "id": "D_H14",
+    "title": "「目の疲れ・かすみ」に伴って、あてはまるものはありますか",
+    "options": {
+     "D_H14:blurred_vision": "かすむ",
+     "D_H14:dry_eye": "乾く",
+     "D_H14:red_eyes": "充血しやすい",
+     "D_H14:stiff_shoulder": "肩こりがある",
+     "D_H14:orthostatic": "立ちくらみがある",
+     "D_H14:none": "特にない",
+     "D_H14:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_head",
+    "title": "頭痛について、次のような症状はありますか",
+    "options": {
+     "R_head:em_headache": "突然、今までにない激しい頭痛が起きた",
+     "R_head:em_neuro": "手足のしびれ・動かしにくさ・ろれつが回らない",
+     "R_head:em_meningeal": "発熱と首のこわばりがある",
+     "R_head:rf_headache_worse": "日に日に痛みが強くなっている",
+     "R_head:none": "いずれもない",
+     "R_head:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_chest",
+    "title": "動悸について、次のような症状はありますか",
+    "options": {
+     "R_chest:em_chest": "胸の痛みや締めつけ感がある",
+     "R_chest:em_syncope": "気が遠くなる・失神しそうになる",
+     "R_chest:em_dyspnea": "安静にしていても息苦しい",
+     "R_chest:rf_palp_irregular": "脈が飛ぶ・乱れる感じがする",
+     "R_chest:none": "いずれもない",
+     "R_chest:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_gi",
+    "title": "お腹の症状について、次のようなことはありますか",
+    "options": {
+     "R_gi:em_gi_bleed": "便が黒い・血が混じる、または血を吐いた",
+     "R_gi:em_abdominal": "激しい腹痛がある",
+     "R_gi:rf_weight_loss": "理由もなく体重が減ってきた",
+     "R_gi:rf_dysphagia": "飲み込みにくい・食べ物がつかえる",
+     "R_gi:none": "いずれもない",
+     "R_gi:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_flow",
+    "title": "月経について、次のようなことはありますか",
+    "options": {
+     "R_flow:rf_bleed_irregular": "月経以外のときにも出血がある",
+     "R_flow:rf_flooding": "1〜2時間でナプキンを替えないと漏れる",
+     "R_flow:rf_amenorrhea": "3か月以上月経が来ないことがある",
+     "R_flow:none": "いずれもない",
+     "R_flow:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_mood",
+    "title": "気分について、次のようなことはありますか",
+    "options": {
+     "R_mood:em_suicidal": "消えてしまいたい・死にたいと思うことがある",
+     "R_mood:rf_mood_2w": "2週間以上、ほぼ毎日落ち込んでいる",
+     "R_mood:none": "いずれもない",
+     "R_mood:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_menspain",
+    "title": "月経痛について、次のようなことはありますか",
+    "options": {
+     "R_menspain:rf_dysmenorrhea_severe": "鎮痛薬を飲んでも寝込むほどつらい",
+     "R_menspain:rf_dysmenorrhea_progressive": "年々痛みが強くなっている",
+     "R_menspain:none": "いずれもない",
+     "R_menspain:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_pms",
+    "title": "月経前の不調について、次のようなことはありますか",
+    "options": {
+     "R_pms:rf_pms_severe": "日常生活が送れないほどつらい",
+     "R_pms:none": "いずれもない",
+     "R_pms:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_neuro",
+    "title": "しびれ・めまいについて、次のような症状はありますか",
+    "options": {
+     "R_neuro:em_neuro": "急に片側の手足がしびれる・動かしにくい、ろれつが回らない",
+     "R_neuro:em_syncope": "気が遠くなる・失神しそうになる",
+     "R_neuro:none": "いずれもない",
+     "R_neuro:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_back",
+    "title": "腰痛について、次のような症状はありますか",
+    "options": {
+     "R_back:rf_back_fever": "発熱を伴う",
+     "R_back:rf_back_neuro": "足に力が入らない・排尿や排便に異常がある",
+     "R_back:none": "いずれもない",
+     "R_back:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_joint",
+    "title": "関節痛について、次のような症状はありますか",
+    "options": {
+     "R_joint:rf_joint_acute": "急に赤く腫れて熱をもった",
+     "R_joint:rf_fever": "発熱を伴う",
+     "R_joint:none": "いずれもない",
+     "R_joint:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_cough",
+    "title": "咳・痰について、次のような症状はありますか",
+    "options": {
+     "R_cough:rf_cough_long": "2週間以上続いている",
+     "R_cough:rf_hemoptysis": "痰に血が混じる",
+     "R_cough:rf_fever": "発熱を伴う",
+     "R_cough:em_dyspnea": "安静にしていても息苦しい",
+     "R_cough:none": "いずれもない",
+     "R_cough:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_urine",
+    "title": "排尿について、次のような症状はありますか",
+    "options": {
+     "R_urine:rf_urinary_retention": "尿がまったく出ない",
+     "R_urine:rf_hematuria": "尿に血が混じる",
+     "R_urine:rf_uti_fever": "発熱と腰や背中の痛みがある",
+     "R_urine:none": "いずれもない",
+     "R_urine:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_edema",
+    "title": "むくみについて、次のような症状はありますか",
+    "options": {
+     "R_edema:em_dyspnea": "息苦しさを伴う",
+     "R_edema:rf_dvt": "片足だけ急に腫れて痛む",
+     "R_edema:none": "いずれもない",
+     "R_edema:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_ear",
+    "title": "耳について、次のような症状はありますか",
+    "options": {
+     "R_ear:rf_sudden_hearing": "急に聞こえにくくなった",
+     "R_ear:none": "いずれもない",
+     "R_ear:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_hair",
+    "title": "抜け毛について、次のようなことはありますか",
+    "options": {
+     "R_hair:rf_hair_patch": "一部分だけ丸く抜ける",
+     "R_hair:none": "いずれもない",
+     "R_hair:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_skin",
+    "title": "皮膚について、次のような症状はありますか",
+    "options": {
+     "R_skin:em_anaphylaxis": "唇やまぶたが急に腫れる・息苦しい",
+     "R_skin:rf_rash_fever": "発熱を伴う発疹がある",
+     "R_skin:none": "いずれもない",
+     "R_skin:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_fatigue",
+    "title": "疲れ・体力について、次のようなことはありますか",
+    "options": {
+     "R_fatigue:rf_weight_loss": "理由もなく体重が減ってきた",
+     "R_fatigue:rf_fever_low": "微熱が続いている",
+     "R_fatigue:none": "いずれもない",
+     "R_fatigue:unknown": "わからない"
+    }
+   },
+   {
+    "id": "R_pain",
+    "title": "痛みについて、次のようなことはありますか",
+    "options": {
+     "R_pain:rf_pain_sudden": "突然、今までにない激しい痛みが起きた",
+     "R_pain:rf_pain_worse": "痛みがどんどん強くなっている",
+     "R_pain:none": "いずれもない",
+     "R_pain:unknown": "わからない"
+    }
+   },
+   {
+    "id": "PC",
+    "title": "「{main}」は、いつごろから気になっていますか",
+    "options": {
+     "PC:course_acute": "3日以内",
+     "PC:course_1_2w": "1〜2週間",
+     "PC:course_1m": "1か月以内",
+     "PC:course_6m": "半年以内",
+     "PC:course_long": "半年以上",
+     "PCs:impact_none": "ほとんどない",
+     "PCs:impact_some": "少しある",
+     "PCs:impact_high": "大きい"
+    }
+   },
+   {
+    "id": "B1",
+    "title": "体力や疲れについて、あてはまるものはありますか",
+    "options": {
+     "B1:fatigue_exertion": "少し動くと疲れやすい",
+     "B1:shortness_breath": "少し動くと息が切れる",
+     "B1:fatigue_persistent": "休んでも疲れが残る",
+     "B1:heavy_body": "身体が重だるい",
+     "B1:low_motivation": "気力が出ない",
+     "B1:weak_voice": "声に力がない・小さいと言われる",
+     "B1:catch_cold": "風邪をひきやすい",
+     "B1:sleepy_after_meal": "食後に眠くなる",
+     "B1:robust": "体力には自信がある",
+     "B1:loud_voice": "声が大きく力強いと言われる",
+     "B1:none": "特にない",
+     "B1:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B2",
+    "title": "顔色や肌について、あてはまるものはありますか",
+    "options": {
+     "B2:pale_face": "顔色が白っぽく血色がない",
+     "B2:dark_complexion": "顔色が暗い・くすむ",
+     "B2:dark_circles": "目の下にクマができやすい",
+     "B2:pale_lips": "唇の色が薄い",
+     "B2:dark_lips": "唇の色が暗い・紫っぽい",
+     "B2:dry_skin": "肌が乾燥しやすい",
+     "B2:brittle_nails": "爪が割れやすい",
+     "B2:red_face": "顔が赤くなりやすい",
+     "B2:skin_inflamed": "肌が赤く腫れやすい",
+     "B2:skin_suppurative": "化膿しやすい",
+     "B2:skin_moist": "湿疹がじゅくじゅくしやすい",
+     "B2:none": "特にない",
+     "B2:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B3",
+    "title": "冷えやほてりについて、あてはまるものはありますか",
+    "options": {
+     "B3:cold_limbs": "手足の先が冷える",
+     "B3:cold_abdomen": "お腹が冷える",
+     "B3:cold_lowback": "腰や下半身が冷える",
+     "B3:cold_whole": "全身が冷えて寒がり",
+     "B3:mod_cold": "冷えると体調が悪くなる",
+     "B3:mod_warm_relief": "温めると楽になる",
+     "B3:hot_upper": "顔や上半身がほてる・のぼせる",
+     "B3:hot_palms": "手のひら・足の裏がほてる",
+     "B3:evening_fever": "夕方から夜に熱っぽい",
+     "B3:heat_intolerance": "暑がり",
+     "B3:mod_cool_relief": "冷やすと楽になる",
+     "B3:none": "特にない",
+     "B3:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B4",
+    "title": "汗について、あてはまるものはありますか",
+    "options": {
+     "B4:sweat_easy": "少し動くだけで汗をかく",
+     "B4:night_sweat": "寝汗をかく",
+     "B4:sweat_tension": "緊張すると手や脇に汗をかく",
+     "B4:sweat_head": "頭や顔に汗をかく",
+     "B4:sweat_less": "汗をかきにくい",
+     "B4:cold_after_sweat": "汗のあとに冷える",
+     "B4:none": "特にない",
+     "B4:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B5",
+    "title": "食欲・胃腸・のどの渇きについて、あてはまるものはありますか",
+    "options": {
+     "B5:poor_appetite": "食欲がない・食が細い",
+     "B5:stomach_heavy": "胃がもたれやすい",
+     "B5:early_satiety": "少量で満腹になる",
+     "B5:bloating": "お腹が張りやすい",
+     "B5:stomach_splash": "みぞおちでチャポチャポ音がする",
+     "B5:strong_thirst": "のどがよく渇く",
+     "B5:prefer_cold": "冷たい飲み物を好む",
+     "B5:prefer_warm": "温かい飲み物を好む",
+     "B5:dry_mouth": "口や喉が乾くが、たくさんは飲めない",
+     "B5:mouth_bitter": "口が苦い・粘る",
+     "B5:strong_appetite": "食欲が旺盛",
+     "B5:none": "特にない",
+     "B5:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B6",
+    "title": "便通や排尿について、あてはまるものはありますか",
+    "options": {
+     "B6:constipation": "便秘がち",
+     "B6:dry_stool": "便が硬くコロコロしている",
+     "B6:loose_stool": "軟便・下痢になりやすい",
+     "B6:constipation_fullness": "お腹が張って苦しく、便が出るとすっきりする",
+     "B6:frequent_urination": "トイレが近い",
+     "B6:nocturia": "夜中にトイレに起きる",
+     "B6:scanty_urine": "尿の量が少ない",
+     "B6:dark_urine": "尿の色が濃い",
+     "B6:none": "特にない",
+     "B6:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B7",
+    "title": "むくみについて、あてはまるものはありますか",
+    "options": {
+     "B7:edema_evening": "夕方に足がむくむ",
+     "B7:edema_morning": "朝に顔やまぶたがむくむ",
+     "B7:mod_weather": "雨の日や低気圧で体調が崩れる",
+     "B7:motion_sickness": "乗り物酔いしやすい",
+     "B7:head_heavy": "頭が重い",
+     "B7:edema+mod_premenstrual": "月経前にむくむ",
+     "B7:none": "特にない",
+     "B7:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B8",
+    "title": "睡眠について、あてはまるものはありますか",
+    "options": {
+     "B8:insomnia_onset": "寝つきが悪い",
+     "B8:wake_night": "夜中に目が覚める",
+     "B8:wake_early": "朝早く目が覚める",
+     "B8:dreams": "夢が多い",
+     "B8:light_sleep": "眠りが浅い",
+     "B8:daytime_sleepy": "日中に眠い",
+     "B8:none": "特にない",
+     "B8:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B9",
+    "title": "気分やストレスについて、あてはまるものはありますか",
+    "options": {
+     "B9:irritability": "イライラしやすい",
+     "B9:sighing": "ため息が多い",
+     "B9:chest_distension": "胸や脇腹が張る感じがある",
+     "B9:low_mood": "気分が落ち込みやすい",
+     "B9:anxiety": "不安になりやすい",
+     "B9:startle": "驚きやすい",
+     "B9:forgetful": "物忘れが多い・集中できない",
+     "B9:mood_swing": "気分の浮き沈みが大きい",
+     "B9:throat_lump": "のどに何かつかえた感じがある",
+     "B9:mod_stress": "ストレスで体調が変わる",
+     "B9:none": "特にない",
+     "B9:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B10",
+    "title": "痛み・こり・しびれについて、あてはまるものはありますか",
+    "options": {
+     "B10:stabbing_pain": "刺すような痛みが決まった場所にある",
+     "B10:wandering_pain": "張るような痛みで場所が移る",
+     "B10:heavy_pain": "重だるい痛みがある",
+     "B10:stiff_shoulder": "肩がこる",
+     "B10:numbness": "手足がしびれる",
+     "B10:cramps": "足がつりやすい",
+     "B10:lowback_weak": "腰や膝がだるい",
+     "B10:trauma_history": "打撲や手術の経験がある",
+     "B10:varicose": "静脈瘤がある",
+     "B10:none": "特にない",
+     "B10:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B11",
+    "title": "月経について、あてはまるものはありますか",
+    "options": {
+     "B11:dysmenorrhea": "月経痛が強い",
+     "B11:menstrual_clots": "経血に塊が混じる",
+     "B11:dark_menses": "経血の色が暗い",
+     "B11:pale_menses": "経血の色が薄い",
+     "B11:scanty_menses": "経血量が少ない",
+     "B11:heavy_menses": "経血量が多い",
+     "B11:cycle_short": "周期が早まりがち",
+     "B11:cycle_long": "周期が遅れがち",
+     "B11:irregular_menses": "周期が不規則",
+     "B11:menses_long": "月経が8日以上続く",
+     "B11:pms_breast": "月経前に胸が張る",
+     "B11:irritability+mod_premenstrual": "月経前にイライラする",
+     "B11:none": "特にない",
+     "B11:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B12",
+    "title": "めまい・目・耳・鼻について、あてはまるものはありますか",
+    "options": {
+     "B12:dizziness": "めまいがする",
+     "B12:orthostatic": "立ちくらみがする",
+     "B12:eye_fatigue": "目が疲れる・かすむ",
+     "B12:dry_eye": "目が乾く",
+     "B12:red_eyes": "目が充血しやすい",
+     "B12:tinnitus": "耳鳴りがする",
+     "B12:runny_nose": "鼻水が出やすい",
+     "B12:nasal_congestion": "鼻がつまりやすい",
+     "B12:none": "特にない",
+     "B12:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B13A",
+    "title": "鏡で舌を見て、色や形にあてはまるものを選んでください",
+    "options": {
+     "B13A:tongue_normal": "きれいなピンク色",
+     "B13A:tongue_pale": "白っぽい・淡い色",
+     "B13A:tongue_red": "赤い",
+     "B13A:tongue_purple": "紫がかっている",
+     "B13A:tongue_spots": "黒や茶色の点がある",
+     "B13A:tongue_big": "大きくぼってりしている",
+     "B13A:tongue_teeth": "縁に歯の跡がある",
+     "B13A:tongue_thin": "やせて薄い",
+     "B13A:tongue_cracks": "ひび割れがある",
+     "B13A:none": "特にない",
+     "B13A:unknown": "わからない"
+    }
+   },
+   {
+    "id": "B13B",
+    "title": "舌の表面（苔）にあてはまるものを選んでください",
+    "options": {
+     "B13B:coat_white+coat_thin": "白い苔がうっすらついている",
+     "B13B:coat_white+coat_thick": "白い苔が厚い・べったりしている",
+     "B13B:coat_yellow": "黄色い苔がある",
+     "B13B:coat_none": "苔がほとんどなく、つるつるしている",
+     "B13B:tongue_dry": "表面が乾いている",
+     "B13B:tongue_wet": "表面が濡れている",
+     "B13B:coat_black+rf_tongue_black": "苔が灰色・黒い",
+     "B13B:none": "特にない",
+     "B13B:unknown": "わからない"
+    }
+   },
+   {
+    "id": "L1",
+    "title": "食事について、あてはまるものはありますか",
+    "options": {
+     "L1:skip": "食事を抜くことが多い・少食",
+     "L1:uneven": "食欲にムラがある",
+     "L1:rich": "甘いもの・脂っこいものをよく食べる",
+     "L1:cold": "果物や冷たい飲み物が多い",
+     "L1:spicy": "辛いものやお酒をよくとる",
+     "L1:eatout": "外食・コンビニが多い",
+     "L1:none": "特にない"
+    }
+   },
+   {
+    "id": "L2",
+    "title": "睡眠時間と就寝時刻",
+    "options": {
+     "L2:lt6": "6時間未満",
+     "L2:6to7": "6〜7時間",
+     "L2:ge7": "7時間以上",
+     "L2s:early": "24時より前",
+     "L2s:late": "24時以降"
+    }
+   },
+   {
+    "id": "L3",
+    "title": "運動と入浴",
+    "options": {
+     "L3:none": "運動はほぼしない",
+     "L3:w12": "週1〜2回",
+     "L3:w3": "週3回以上",
+     "L3s:shower": "シャワーが多い",
+     "L3s:bath": "湯船につかる"
+    }
+   },
+   {
+    "id": "L4",
+    "title": "飲酒・喫煙・仕事について、あてはまるものはありますか",
+    "options": {
+     "L4:alcohol": "お酒を週3回以上飲む",
+     "L4:smoke": "タバコを吸う",
+     "L4:desk": "デスクワークが多い",
+     "L4:stand": "立ち仕事が多い",
+     "L4:eyes": "目をよく使う",
+     "L4:none": "特にない"
+    }
+   },
+   {
+    "id": "T1",
+    "title": "【舌の観察】舌の色",
+    "options": {
+     "T1:tongue_pale": "淡白",
+     "T1:tongue_normal": "淡紅（正常）",
+     "T1:tongue_red": "紅",
+     "T1:tongue_crimson": "絳（深紅）",
+     "T1:tongue_purple": "紫・暗紫",
+     "T1:unknown": "判断できない"
+    }
+   },
+   {
+    "id": "T2",
+    "title": "【舌の観察】舌の大きさ・形",
+    "options": {
+     "T2:tongue_big": "胖大",
+     "T2:tongue_teeth": "歯痕",
+     "T2:tongue_thin": "痩薄",
+     "T2:tongue_cracks": "裂紋",
+     "T2:none": "特記なし",
+     "T2:unknown": "判断できない"
+    }
+   },
+   {
+    "id": "T3",
+    "title": "【舌の観察】舌苔の色",
+    "options": {
+     "T3:coat_white": "白",
+     "T3:coat_yellow": "黄",
+     "T3:coat_black+rf_tongue_black": "灰黒",
+     "T3:unknown": "判断できない"
+    }
+   },
+   {
+    "id": "T4",
+    "title": "【舌の観察】舌苔の厚さ・性状",
+    "options": {
+     "T4:coat_thin": "薄",
+     "T4:coat_thick": "厚",
+     "T4:coat_greasy": "膩",
+     "T4:coat_none": "無苔・剥落",
+     "T4:unknown": "判断できない"
+    }
+   },
+   {
+    "id": "T5",
+    "title": "【舌の観察】乾燥・湿潤",
+    "options": {
+     "T5:tongue_dry": "乾燥",
+     "T5:tongue_wet": "湿潤",
+     "T5:none": "中間（特記なし）",
+     "T5:unknown": "判断できない"
+    }
+   },
+   {
+    "id": "T6",
+    "title": "【舌の観察】瘀点・瘀斑",
+    "options": {
+     "T6:tongue_spots": "あり",
+     "T6:none": "なし",
+     "T6:unknown": "判断できない"
+    }
+   },
+   {
+    "id": "T7",
+    "title": "【舌の観察】舌下静脈の怒張",
+    "options": {
+     "T7:sublingual_veins": "あり",
+     "T7:none": "なし",
+     "T7:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_em",
+    "title": "緊急症状の有無を確認してください",
+    "options": {
+     "X_em:em_chest": "胸の痛み・締めつけ感",
+     "X_em:em_headache": "突然の激しい頭痛",
+     "X_em:em_dyspnea": "安静時の息苦しさ",
+     "X_em:em_neuro": "手足のしびれ・麻痺・ろれつ",
+     "X_em:em_syncope": "失神・意識が遠のく",
+     "X_em:em_gi_bleed": "吐血・黒色便・血便",
+     "X_em:em_fever": "高熱が続く",
+     "X_em:none": "いずれもない",
+     "X_em:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_preg",
+    "title": "妊娠・授乳の状況を確認してください",
+    "options": {
+     "X_preg:pregnancy": "妊娠中",
+     "X_preg:pregnancy_possible": "妊娠の可能性がある",
+     "X_preg:lactation": "授乳中",
+     "X_preg:none": "いずれもない",
+     "X_preg:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_dx",
+    "title": "治療中の病気を確認してください",
+    "options": {
+     "X_dx:dx_hypertension": "高血圧",
+     "X_dx:dx_heart": "心臓の病気",
+     "X_dx:dx_kidney": "腎臓の病気",
+     "X_dx:dx_liver": "肝臓の病気",
+     "X_dx:dx_thyroid": "甲状腺の病気",
+     "X_dx:dx_glaucoma": "緑内障",
+     "X_dx:dx_prostate": "前立腺肥大・排尿の病気",
+     "X_dx:dx_diabetes": "糖尿病",
+     "X_dx:dx_gi": "胃腸の病気",
+     "X_dx:dx_cancer": "がんの治療中",
+     "X_dx:dx_respiratory": "ぜんそく・呼吸器の病気",
+     "X_dx:dx_other": "その他",
+     "X_dx:none": "ない",
+     "X_dx:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_meds",
+    "title": "服用中の薬の種類を確認してください（お薬手帳など）",
+    "options": {
+     "X_meds:med_antihypertensive": "血圧の薬",
+     "X_meds:med_diuretic": "利尿薬（むくみ・血圧の薬）",
+     "X_meds:med_anticoagulant": "血液をサラサラにする薬",
+     "X_meds:med_diabetes": "糖尿病の薬",
+     "X_meds:med_thyroid": "甲状腺の薬",
+     "X_meds:med_steroid": "ステロイド（飲み薬）",
+     "X_meds:med_hypnotic": "睡眠薬・抗不安薬",
+     "X_meds:med_antidepressant": "抗うつ薬",
+     "X_meds:med_interferon": "インターフェロン製剤",
+     "X_meds:med_anticancer": "抗がん剤",
+     "X_meds:med_laxative": "便秘薬・下剤",
+     "X_meds:med_gi": "胃腸薬",
+     "X_meds:med_analgesic": "痛み止め",
+     "X_meds:med_hormone": "女性ホルモン剤・低用量ピル",
+     "X_meds:med_licorice": "かぜ薬・胃腸薬など甘草を含む市販薬",
+     "X_meds:med_kampo": "漢方薬",
+     "X_meds:med_supplement": "サプリメント・健康食品",
+     "X_meds:med_other": "上記以外の薬",
+     "X_meds:med_unknown_name": "名前や種類がわからない薬がある",
+     "X_meds:none": "飲んでいない",
+     "X_meds:unknown": "わからない"
+    }
+   },
+   {
+    "id": "X_kampo",
+    "title": "服用中の漢方薬を確認してください",
+    "options": {
+     "X_kampo:F01": "補中益気湯",
+     "X_kampo:F02": "六君子湯",
+     "X_kampo:F03": "四君子湯",
+     "X_kampo:F04": "十全大補湯",
+     "X_kampo:F05": "人参養栄湯",
+     "X_kampo:F06": "四物湯",
+     "X_kampo:F07": "当帰芍薬散",
+     "X_kampo:F08": "帰脾湯",
+     "X_kampo:F09": "酸棗仁湯",
+     "X_kampo:F10": "半夏厚朴湯",
+     "X_kampo:F11": "加味逍遥散",
+     "X_kampo:F12": "香蘇散",
+     "X_kampo:F13": "四逆散",
+     "X_kampo:F14": "柴胡加竜骨牡蛎湯",
+     "X_kampo:F15": "大柴胡湯",
+     "X_kampo:F16": "桂枝茯苓丸",
+     "X_kampo:F17": "桃核承気湯",
+     "X_kampo:F18": "芎帰調血飲",
+     "X_kampo:F19": "温経湯",
+     "X_kampo:F20": "通導散",
+     "X_kampo:F21": "五苓散",
+     "X_kampo:F22": "苓桂朮甘湯",
+     "X_kampo:F23": "防已黄耆湯",
+     "X_kampo:F24": "真武湯",
+     "X_kampo:F25": "二陳湯",
+     "X_kampo:F26": "防風通聖散",
+     "X_kampo:F27": "六味丸",
+     "X_kampo:F28": "麦門冬湯",
+     "X_kampo:F29": "滋陰降火湯",
+     "X_kampo:F30": "知柏地黄丸",
+     "X_kampo:F31": "八味地黄丸",
+     "X_kampo:F32": "牛車腎気丸",
+     "X_kampo:F33": "人参湯",
+     "X_kampo:F34": "当帰四逆加呉茱萸生姜湯",
+     "X_kampo:F35": "黄連解毒湯",
+     "X_kampo:F36": "清上防風湯",
+     "X_kampo:F37": "荊芥連翹湯",
+     "X_kampo:F38": "桂枝茯苓丸加薏苡仁",
+     "X_kampo:F39": "十味敗毒湯",
+     "X_kampo:F40": "消風散",
+     "X_kampo:F41": "温清飲",
+     "X_kampo:F42": "当帰飲子",
+     "X_kampo:F43": "加味帰脾湯",
+     "X_kampo:F44": "抑肝散",
+     "X_kampo:F45": "抑肝散加陳皮半夏",
+     "X_kampo:F46": "桂枝加竜骨牡蛎湯",
+     "X_kampo:F47": "柴胡桂枝乾姜湯",
+     "X_kampo:F48": "安中散",
+     "X_kampo:F49": "半夏瀉心湯",
+     "X_kampo:F50": "平胃散",
+     "X_kampo:F51": "啓脾湯",
+     "X_kampo:F52": "桂枝加芍薬湯",
+     "X_kampo:F53": "小建中湯",
+     "X_kampo:F54": "黄耆建中湯",
+     "X_kampo:F55": "芍薬甘草湯",
+     "X_kampo:F56": "麻子仁丸",
+     "X_kampo:F57": "潤腸湯",
+     "X_kampo:F58": "大黄甘草湯",
+     "X_kampo:F59": "乙字湯",
+     "X_kampo:F60": "猪苓湯",
+     "X_kampo:F61": "清心蓮子飲",
+     "X_kampo:F62": "疎経活血湯",
+     "X_kampo:F63": "薏苡仁湯",
+     "X_kampo:F64": "桂枝加朮附湯",
+     "X_kampo:F65": "呉茱萸湯",
+     "X_kampo:F66": "釣藤散",
+     "X_kampo:F67": "半夏白朮天麻湯",
+     "X_kampo:F68": "女神散",
+     "X_kampo:F69": "小青竜湯",
+     "X_kampo:F70": "葛根湯",
+     "X_kampo:F71": "葛根湯加川芎辛夷",
+     "X_kampo:F72": "辛夷清肺湯",
+     "X_kampo:F73": "清肺湯",
+     "X_kampo:F74": "大建中湯",
+     "X_kampo:R01": "小柴胡湯",
+     "X_kampo:R02": "柴胡桂枝湯",
+     "X_kampo:R03": "麻黄湯",
+     "X_kampo:R04": "桂枝湯",
+     "X_kampo:R05": "柴朴湯",
+     "X_kampo:R06": "柴苓湯",
+     "X_kampo:R07": "麻黄附子細辛湯",
+     "X_kampo:R08": "麻杏甘石湯",
+     "X_kampo:R09": "越婢加朮湯",
+     "X_kampo:R10": "茵蔯蒿湯",
+     "X_kampo:R11": "芎帰膠艾湯",
+     "X_kampo:R12": "当帰建中湯",
+     "X_kampo:R13": "七物降下湯",
+     "X_kampo:R14": "桂枝加芍薬大黄湯",
+     "X_kampo:R15": "竹茹温胆湯",
+     "X_kampo:R16": "参蘇飲",
+     "X_kampo:R17": "胃苓湯",
+     "X_kampo:R18": "苓甘姜味辛夏仁湯",
+     "X_kampo:R19": "桔梗湯",
+     "X_kampo:R20": "排膿散及湯",
+     "X_kampo:R21": "治頭瘡一方",
+     "X_kampo:R22": "猪苓湯合四物湯",
+     "X_kampo:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_ar",
+    "title": "体調を崩した漢方薬を確認してください",
+    "options": {
+     "X_ar:F01": "補中益気湯",
+     "X_ar:F02": "六君子湯",
+     "X_ar:F03": "四君子湯",
+     "X_ar:F04": "十全大補湯",
+     "X_ar:F05": "人参養栄湯",
+     "X_ar:F06": "四物湯",
+     "X_ar:F07": "当帰芍薬散",
+     "X_ar:F08": "帰脾湯",
+     "X_ar:F09": "酸棗仁湯",
+     "X_ar:F10": "半夏厚朴湯",
+     "X_ar:F11": "加味逍遥散",
+     "X_ar:F12": "香蘇散",
+     "X_ar:F13": "四逆散",
+     "X_ar:F14": "柴胡加竜骨牡蛎湯",
+     "X_ar:F15": "大柴胡湯",
+     "X_ar:F16": "桂枝茯苓丸",
+     "X_ar:F17": "桃核承気湯",
+     "X_ar:F18": "芎帰調血飲",
+     "X_ar:F19": "温経湯",
+     "X_ar:F20": "通導散",
+     "X_ar:F21": "五苓散",
+     "X_ar:F22": "苓桂朮甘湯",
+     "X_ar:F23": "防已黄耆湯",
+     "X_ar:F24": "真武湯",
+     "X_ar:F25": "二陳湯",
+     "X_ar:F26": "防風通聖散",
+     "X_ar:F27": "六味丸",
+     "X_ar:F28": "麦門冬湯",
+     "X_ar:F29": "滋陰降火湯",
+     "X_ar:F30": "知柏地黄丸",
+     "X_ar:F31": "八味地黄丸",
+     "X_ar:F32": "牛車腎気丸",
+     "X_ar:F33": "人参湯",
+     "X_ar:F34": "当帰四逆加呉茱萸生姜湯",
+     "X_ar:F35": "黄連解毒湯",
+     "X_ar:F36": "清上防風湯",
+     "X_ar:F37": "荊芥連翹湯",
+     "X_ar:F38": "桂枝茯苓丸加薏苡仁",
+     "X_ar:F39": "十味敗毒湯",
+     "X_ar:F40": "消風散",
+     "X_ar:F41": "温清飲",
+     "X_ar:F42": "当帰飲子",
+     "X_ar:F43": "加味帰脾湯",
+     "X_ar:F44": "抑肝散",
+     "X_ar:F45": "抑肝散加陳皮半夏",
+     "X_ar:F46": "桂枝加竜骨牡蛎湯",
+     "X_ar:F47": "柴胡桂枝乾姜湯",
+     "X_ar:F48": "安中散",
+     "X_ar:F49": "半夏瀉心湯",
+     "X_ar:F50": "平胃散",
+     "X_ar:F51": "啓脾湯",
+     "X_ar:F52": "桂枝加芍薬湯",
+     "X_ar:F53": "小建中湯",
+     "X_ar:F54": "黄耆建中湯",
+     "X_ar:F55": "芍薬甘草湯",
+     "X_ar:F56": "麻子仁丸",
+     "X_ar:F57": "潤腸湯",
+     "X_ar:F58": "大黄甘草湯",
+     "X_ar:F59": "乙字湯",
+     "X_ar:F60": "猪苓湯",
+     "X_ar:F61": "清心蓮子飲",
+     "X_ar:F62": "疎経活血湯",
+     "X_ar:F63": "薏苡仁湯",
+     "X_ar:F64": "桂枝加朮附湯",
+     "X_ar:F65": "呉茱萸湯",
+     "X_ar:F66": "釣藤散",
+     "X_ar:F67": "半夏白朮天麻湯",
+     "X_ar:F68": "女神散",
+     "X_ar:F69": "小青竜湯",
+     "X_ar:F70": "葛根湯",
+     "X_ar:F71": "葛根湯加川芎辛夷",
+     "X_ar:F72": "辛夷清肺湯",
+     "X_ar:F73": "清肺湯",
+     "X_ar:F74": "大建中湯",
+     "X_ar:R01": "小柴胡湯",
+     "X_ar:R02": "柴胡桂枝湯",
+     "X_ar:R03": "麻黄湯",
+     "X_ar:R04": "桂枝湯",
+     "X_ar:R05": "柴朴湯",
+     "X_ar:R06": "柴苓湯",
+     "X_ar:R07": "麻黄附子細辛湯",
+     "X_ar:R08": "麻杏甘石湯",
+     "X_ar:R09": "越婢加朮湯",
+     "X_ar:R10": "茵蔯蒿湯",
+     "X_ar:R11": "芎帰膠艾湯",
+     "X_ar:R12": "当帰建中湯",
+     "X_ar:R13": "七物降下湯",
+     "X_ar:R14": "桂枝加芍薬大黄湯",
+     "X_ar:R15": "竹茹温胆湯",
+     "X_ar:R16": "参蘇飲",
+     "X_ar:R17": "胃苓湯",
+     "X_ar:R18": "苓甘姜味辛夏仁湯",
+     "X_ar:R19": "桔梗湯",
+     "X_ar:R20": "排膿散及湯",
+     "X_ar:R21": "治頭瘡一方",
+     "X_ar:R22": "猪苓湯合四物湯",
+     "X_ar:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_allergy",
+    "title": "アレルギー歴を確認してください",
+    "options": {
+     "X_allergy:allergy_drug": "薬で発疹・かゆみ等",
+     "X_allergy:allergy_food": "食べ物",
+     "X_allergy:allergy_pollen": "花粉症・アレルギー性鼻炎",
+     "X_allergy:none": "ない",
+     "X_allergy:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_coldheat",
+    "title": "冷えとほてりの部位・時間帯・随伴症状を確認してください",
+    "options": {
+     "X_coldheat:cold_heat_split": "上半身がほてり、下半身が冷える",
+     "X_coldheat:evening_fever": "ほてりは夕方〜夜に強い",
+     "X_coldheat:mod_warm_relief": "冷えは一日中あり、温めると楽",
+     "X_coldheat:mod_cool_relief": "冷やすと楽になる",
+     "X_coldheat:skin_inflamed": "局所の炎症による熱感",
+     "X_coldheat:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_thirst",
+    "title": "口渇の性状を確認してください",
+    "options": {
+     "X_thirst:strong_thirst": "強い口渇がある",
+     "X_thirst:prefer_cold": "冷たいものを好む",
+     "X_thirst:prefer_warm": "温かいものを好む",
+     "X_thirst:dry_mouth": "口は乾くが少量しか飲めない",
+     "X_thirst:mouth_sticky": "口の中が粘る",
+     "X_thirst:none": "口渇はない",
+     "X_thirst:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_defexc",
+    "title": "体力・症状の勢いを確認してください",
+    "options": {
+     "X_defexc:robust": "体力が比較的充実",
+     "X_defexc:intense_symptoms": "症状の勢いが強い",
+     "X_defexc:fatigue_exertion": "活動時の強い疲労",
+     "X_defexc:weak_voice": "声に力がない",
+     "X_defexc:abdominal_fullness": "強い腹部膨満感",
+     "X_defexc:constipation_fullness": "便秘を伴う充満感",
+     "X_defexc:sweat_easy": "自汗",
+     "X_defexc:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_sweat",
+    "title": "汗の性状を確認してください",
+    "options": {
+     "X_sweat:sweat_easy": "自汗（動くと汗が出る）",
+     "X_sweat:night_sweat": "寝汗",
+     "X_sweat:sweat_head": "頭部の汗",
+     "X_sweat:sweat_less": "汗をかきにくい",
+     "X_sweat:none": "特記なし",
+     "X_sweat:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_stool",
+    "title": "便の性状を確認してください",
+    "options": {
+     "X_stool:dry_stool": "硬くコロコロ",
+     "X_stool:loose_stool": "軟便",
+     "X_stool:watery_stool": "水様便",
+     "X_stool:constipation_fullness": "便秘を伴う充満感",
+     "X_stool:weak_defecation": "便意が弱い",
+     "X_stool:none": "特記なし",
+     "X_stool:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_pain",
+    "title": "痛みの性状を確認してください",
+    "options": {
+     "X_pain:stabbing_pain": "刺すような固定痛",
+     "X_pain:distending_pain": "張る・移動する痛み",
+     "X_pain:heavy_pain": "重だるい痛み",
+     "X_pain:mod_cold": "冷えで悪化",
+     "X_pain:mod_warm_relief": "温めて軽快",
+     "X_pain:mod_stress": "ストレスで悪化",
+     "X_pain:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_fluid",
+    "title": "水分代謝の所見を確認してください",
+    "options": {
+     "X_fluid:strong_thirst+scanty_urine": "口渇があり尿量が少ない",
+     "X_fluid:edema": "むくみ",
+     "X_fluid:mod_weather": "天候で悪化",
+     "X_fluid:stomach_splash": "胃部の振水音",
+     "X_fluid:nausea": "吐き気を伴う",
+     "X_fluid:none": "特記なし",
+     "X_fluid:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_blood",
+    "title": "血虚・瘀血の鑑別に関わる所見を確認してください",
+    "options": {
+     "X_blood:pale_face": "顔色が白く血色がない",
+     "X_blood:dry_skin": "皮膚・爪の乾燥",
+     "X_blood:dark_complexion": "顔色が暗い・唇が暗い",
+     "X_blood:stabbing_pain": "固定した刺す痛み",
+     "X_blood:menstrual_clots": "経血の塊",
+     "X_blood:varicose": "静脈瘤",
+     "X_blood:none": "特記なし",
+     "X_blood:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_qi",
+    "title": "気虚・気滞の鑑別に関わる所見を確認してください",
+    "options": {
+     "X_qi:fatigue_exertion": "活動時の強い疲労",
+     "X_qi:weak_voice": "声に力がない",
+     "X_qi:sleepy_after_meal": "食後の眠気",
+     "X_qi:irritability": "イライラ",
+     "X_qi:chest_distension": "胸脇部の張り",
+     "X_qi:throat_lump": "のどのつかえ",
+     "X_qi:none": "特記なし",
+     "X_qi:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_yin",
+    "title": "陰虚の鑑別に関わる所見を確認してください",
+    "options": {
+     "X_yin:hot_palms": "手足のほてり",
+     "X_yin:night_sweat": "寝汗",
+     "X_yin:evening_fever": "夕方の熱感",
+     "X_yin:dry_mouth": "口や喉の乾き",
+     "X_yin:dry_stool": "便が硬い",
+     "X_yin:none": "特記なし",
+     "X_yin:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "X_zang",
+    "title": "五臓に関わる所見を確認してください",
+    "options": {
+     "X_zang:palpitation": "動悸",
+     "X_zang:lowback_weak": "腰や膝のだるさ",
+     "X_zang:tinnitus": "耳鳴り",
+     "X_zang:shortness_breath": "息切れ",
+     "X_zang:chest_distension": "胸脇部の張り",
+     "X_zang:poor_appetite": "食欲不振",
+     "X_zang:none": "特記なし",
+     "X_zang:unknown": "確認できない"
+    }
+   },
+   {
+    "id": "K_A",
+    "title": "「疲れ・体力・全身の不調」のお悩み",
+    "options": {
+     "A01": "疲れやすい",
+     "A02": "身体がだるい・重い",
+     "A03": "気力が出ない",
+     "A04": "手足が冷える",
+     "A05": "全身が冷える",
+     "A06": "顔や上半身がほてる",
+     "A07": "手足がほてる",
+     "A08": "汗をかきやすい",
+     "A09": "寝汗をかく",
+     "A10": "病後・産後の体力低下"
+    }
+   },
+   {
+    "id": "K_B",
+    "title": "「胃腸・便通」のお悩み",
+    "options": {
+     "B01": "胃痛",
+     "B02": "胃もたれ",
+     "B03": "お腹の張り",
+     "B04": "食欲不振",
+     "B05": "吐き気",
+     "B06": "胸やけ",
+     "B07": "便秘",
+     "B08": "下痢・軟便",
+     "B09": "便秘と下痢を繰り返す"
+    }
+   },
+   {
+    "id": "K_C",
+    "title": "「肌・美容」のお悩み",
+    "options": {
+     "C01": "ニキビ",
+     "C02": "顔のほてり・熱感",
+     "C03": "肌の乾燥",
+     "C04": "肌のかゆみ",
+     "C05": "湿疹・肌荒れ",
+     "C06": "肌のくすみ",
+     "C07": "シミ・色素沈着",
+     "C08": "肝斑"
+    }
+   },
+   {
+    "id": "K_D",
+    "title": "「髪・頭皮」のお悩み",
+    "options": {
+     "D01": "抜け毛",
+     "D02": "薄毛・髪が細くなった",
+     "D03": "髪の乾燥・パサつき",
+     "D04": "白髪",
+     "D05": "頭皮の乾燥",
+     "D06": "頭皮のかゆみ",
+     "D07": "フケ",
+     "D08": "頭皮の赤み・炎症"
+    }
+   },
+   {
+    "id": "K_E",
+    "title": "「睡眠・こころ」のお悩み",
+    "options": {
+     "E01": "寝つきが悪い",
+     "E02": "夜中に目が覚める",
+     "E03": "朝早く目が覚める",
+     "E04": "眠りが浅い",
+     "E05": "日中の眠気",
+     "E06": "不安・緊張",
+     "E07": "イライラ",
+     "E08": "気分の落ち込み",
+     "E09": "ストレスによる体調不良"
+    }
+   },
+   {
+    "id": "K_F",
+    "title": "「女性の健康」のお悩み",
+    "options": {
+     "F01": "月経痛",
+     "F02": "月経不順",
+     "F03": "PMS",
+     "F04": "経血量が多い",
+     "F05": "経血量が少ない",
+     "F06": "更年期に伴う不調",
+     "F07": "産後の不調"
+    }
+   },
+   {
+    "id": "K_G",
+    "title": "「痛み・こり・しびれ」のお悩み",
+    "options": {
+     "G01": "頭痛",
+     "G02": "肩こり・首こり",
+     "G03": "腰痛",
+     "G04": "関節痛",
+     "G05": "筋肉痛",
+     "G06": "手足のしびれ",
+     "G07": "足がつる",
+     "G08": "その他の痛み"
+    }
+   },
+   {
+    "id": "K_H",
+    "title": "「その他の身体症状」のお悩み",
+    "options": {
+     "H01": "めまい",
+     "H02": "立ちくらみ",
+     "H03": "耳鳴り",
+     "H04": "鼻水",
+     "H05": "鼻づまり",
+     "H06": "咳",
+     "H07": "痰",
+     "H08": "むくみ",
+     "H09": "頻尿",
+     "H10": "夜間尿",
+     "H11": "尿が出にくい",
+     "H12": "動悸",
+     "H13": "目の乾燥",
+     "H14": "目の疲れ・かすみ"
+    }
+   },
+   {
+    "id": "KM",
+    "title": "いちばん改善したいお悩み",
+    "options": {
+     "KM:A01": "疲れやすい",
+     "KM:A02": "身体がだるい・重い",
+     "KM:A03": "気力が出ない",
+     "KM:A04": "手足が冷える",
+     "KM:A05": "全身が冷える",
+     "KM:A06": "顔や上半身がほてる",
+     "KM:A07": "手足がほてる",
+     "KM:A08": "汗をかきやすい",
+     "KM:A09": "寝汗をかく",
+     "KM:A10": "病後・産後の体力低下",
+     "KM:B01": "胃痛",
+     "KM:B02": "胃もたれ",
+     "KM:B03": "お腹の張り",
+     "KM:B04": "食欲不振",
+     "KM:B05": "吐き気",
+     "KM:B06": "胸やけ",
+     "KM:B07": "便秘",
+     "KM:B08": "下痢・軟便",
+     "KM:B09": "便秘と下痢を繰り返す",
+     "KM:C01": "ニキビ",
+     "KM:C02": "顔のほてり・熱感",
+     "KM:C03": "肌の乾燥",
+     "KM:C04": "肌のかゆみ",
+     "KM:C05": "湿疹・肌荒れ",
+     "KM:C06": "肌のくすみ",
+     "KM:C07": "シミ・色素沈着",
+     "KM:C08": "肝斑",
+     "KM:D01": "抜け毛",
+     "KM:D02": "薄毛・髪が細くなった",
+     "KM:D03": "髪の乾燥・パサつき",
+     "KM:D04": "白髪",
+     "KM:D05": "頭皮の乾燥",
+     "KM:D06": "頭皮のかゆみ",
+     "KM:D07": "フケ",
+     "KM:D08": "頭皮の赤み・炎症",
+     "KM:E01": "寝つきが悪い",
+     "KM:E02": "夜中に目が覚める",
+     "KM:E03": "朝早く目が覚める",
+     "KM:E04": "眠りが浅い",
+     "KM:E05": "日中の眠気",
+     "KM:E06": "不安・緊張",
+     "KM:E07": "イライラ",
+     "KM:E08": "気分の落ち込み",
+     "KM:E09": "ストレスによる体調不良",
+     "KM:F01": "月経痛",
+     "KM:F02": "月経不順",
+     "KM:F03": "PMS",
+     "KM:F04": "経血量が多い",
+     "KM:F05": "経血量が少ない",
+     "KM:F06": "更年期に伴う不調",
+     "KM:F07": "産後の不調",
+     "KM:G01": "頭痛",
+     "KM:G02": "肩こり・首こり",
+     "KM:G03": "腰痛",
+     "KM:G04": "関節痛",
+     "KM:G05": "筋肉痛",
+     "KM:G06": "手足のしびれ",
+     "KM:G07": "足がつる",
+     "KM:G08": "その他の痛み",
+     "KM:H01": "めまい",
+     "KM:H02": "立ちくらみ",
+     "KM:H03": "耳鳴り",
+     "KM:H04": "鼻水",
+     "KM:H05": "鼻づまり",
+     "KM:H06": "咳",
+     "KM:H07": "痰",
+     "KM:H08": "むくみ",
+     "KM:H09": "頻尿",
+     "KM:H10": "夜間尿",
+     "KM:H11": "尿が出にくい",
+     "KM:H12": "動悸",
+     "KM:H13": "目の乾燥",
+     "KM:H14": "目の疲れ・かすみ"
+    }
+   }
+  ]
+ }
+}

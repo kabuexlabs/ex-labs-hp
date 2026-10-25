@@ -1,13 +1,16 @@
-// 漢方体質チェック（/kampo/）のロジック回帰テスト。
+// 漢方体質チェック（/kampo/）のロジック回帰テスト（2026-10-25 v3・フェーズ2）。
 //   node --experimental-strip-types scripts/kampo-test.mjs
-// マスタ検証・スコアリング（仕様書 第6節の検算例）・安全確認・主訴の3段階・二段階の漢方薬選定・設問フローを確認する。
-import { QUESTIONS, TYPES, FORMULAS, validateMasters, TYPE_DEFS, COMPLAINT_QUESTIONS, CATEGORY_QUESTION } from '../src/lib/kampo/masters.ts';
-import { score, classify, zero } from '../src/lib/kampo/scoring.ts';
-import { safetyFlags } from '../src/lib/kampo/safety.ts';
-import { selectFormulas, customerPicks, mainComplaintGroup, buildReasons } from '../src/lib/kampo/recommend.ts';
-import { mainComplaintId, chosenComplaintIds } from '../src/lib/kampo/complaints.ts';
-import { visibleQuestions, normalizeAnswer, isAnswered, firstUnansweredStep, personalTips, sexFromAnswers, resolveQuestion } from '../src/lib/kampo/flow.ts';
+// マスタ検証・主訴と深掘り・回答の引き継ぎ（同じ所見を2回聞かない）・改修指示 4-1〜4-8 の個別修正・
+// 安全確認タグと直ちに対応・暫定スコアの重複加点防止・二段階の漢方薬選定・旧版セッションの扱いを確認する。
+import {
+  QUESTIONS, STAFF_QUESTIONS, COMPLAINTS, CATEGORIES, FORMULAS, TYPE_DEFS, validateMasters, complaintById, legacyOptionText, QUESTIONNAIRE,
+} from '../src/lib/kampo/masters.ts';
+import { walk, normalizeAnswer, firstUnansweredStep, personalTips, primaryOf, complaintsOf, applyStaffAnswers } from '../src/lib/kampo/flow.ts';
+import { score } from '../src/lib/kampo/scoring.ts';
+import { safetyFlags, safetyTags, isUrgent } from '../src/lib/kampo/safety.ts';
+import { computeSession, selectionOf, isLegacy } from '../src/lib/kampo/compute.ts';
 import fs from 'node:fs';
+import path from 'node:path';
 
 let fail = 0;
 const eq = (name, got, want) => {
@@ -15,293 +18,195 @@ const eq = (name, got, want) => {
   console.log(`${ok ? 'OK ' : 'NG '} ${name}${ok ? '' : `  got=${JSON.stringify(got)} want=${JSON.stringify(want)}`}`);
   if (!ok) fail++;
 };
-const q = (id) => QUESTIONS.find((x) => x.id === id);
+const read = (f) => JSON.parse(fs.readFileSync(`src/data/kampo/${f}`, 'utf8'));
+const M = ['questions.json', 'complaints.json', 'findings.json', 'safety_tags.json', 'types.json', 'formulas.json'].map(read);
+const qById = (id) => QUESTIONS.find((x) => x.id === id);
+const texts = (id) => (qById(id)?.options ?? []).map((o) => o.text);
 
 // ---- マスタ検証 ----
-const qj = JSON.parse(fs.readFileSync('src/data/kampo/questions.json', 'utf8'));
-const tj = JSON.parse(fs.readFileSync('src/data/kampo/types.json', 'utf8'));
-const fj = JSON.parse(fs.readFileSync('src/data/kampo/formulas.json', 'utf8'));
-eq('マスタ検証 合格', validateMasters(qj, tj, fj), []);
-eq('設問数 136（基本26＋大カテゴリー1＋具体的な主訴8＋いちばん改善したい主訴1＋詳細問診100）', QUESTIONS.length, 136);
-eq('大カテゴリーは A〜H の8つ（それぞれ独立）', CATEGORY_QUESTION.options.map((o) => o.text), ['肌の悩み', '髪・頭皮の悩み', '年齢による見た目の変化', '生理前・生理中の不調', '更年期・ホルモン変化', '疲れ・だるさ・体力低下', '冷え・血行の悩み', 'ストレス・気分の不調']);
-eq('具体的な主訴の設問はカテゴリーごとに1つ（KA〜KH）', COMPLAINT_QUESTIONS.map((x) => [x.id, x.showIf?.chosen]), 'ABCDEFGH'.split('').map((L) => [`K${L}`, [`K1-${L}`]]));
+eq('マスタ検証 合格', validateMasters(...M), []);
 {
-  const texts = (id) => COMPLAINT_QUESTIONS.find((x) => x.id === id).options.map((o) => o.text);
-  eq('肌と髪を統合しない（肌の一覧に髪、髪の一覧に肌の主訴がない）', [texts('KA').some((t) => /髪|頭皮|抜け毛/.test(t)), texts('KB').some((t) => /ニキビ|シミ|肌の/.test(t))], [false, false]);
-  eq('具体的な主訴の一覧に詳細（ニキビの種類など）を混ぜない', texts('KA').filter((t) => t.includes('ニキビ')), ['ニキビ・吹き出物']);
-  eq('すべての主訴に詳細問診がある', COMPLAINT_QUESTIONS.every((x) => x.options.every((o) => QUESTIONS.some((d) => d.role === 'detail' && d.showIf?.mainDetail === o.detail))), true);
-  eq('詳細問診は1つの主訴につき1〜3問', Math.max(...COMPLAINT_QUESTIONS.flatMap((x) => x.options.map((o) => QUESTIONS.filter((d) => d.showIf?.mainDetail === o.detail).length))), 3);
+  const [qj, cj, fj, tj, ty, fo] = M.map((x) => JSON.parse(JSON.stringify(x)));
+  const b1 = qj.questions.find((x) => x.id === 'B1');
+  b1.options = b1.options.filter((o) => !o.exclusive);
+  eq('「特にない」「わからない」を外すと検証エラー', validateMasters(qj, cj, fj, tj, ty, fo).some((e) => e.includes('B1') && e.includes('exclusive')), true);
+  const [q2, c2, f2, t2, y2, o2] = M.map((x) => JSON.parse(JSON.stringify(x)));
+  q2.questions.find((x) => x.id === 'B2').options[0].findings = ['no_such_finding'];
+  c2.complaints[0].detail = 'missing_tpl';
+  o2.formulas[0].signs.push('B99-1');
+  const errs = validateMasters(q2, c2, f2, t2, y2, o2);
+  eq('存在しない所見・深掘り・signs を検出', ['no_such_finding', 'missing_tpl', 'B99-1'].map((k) => errs.some((e) => e.includes(k))), [true, true, true]);
 }
-eq('B設問に none あり', QUESTIONS.filter((x) => x.block === 'B').every((x) => x.options.some((o) => o.flags?.includes('none'))), true);
-{
-  const broken = JSON.parse(JSON.stringify(qj));
-  broken.questions.find((x) => x.id === 'B1').options.pop();
-  eq('none を外すと検証エラー', validateMasters(broken, tj, fj).some((e) => e.includes('どれもあてはまらない')), true);
-  const dup = JSON.parse(JSON.stringify(qj));
-  dup.questions[1].options[0].id = 'A1-1';
-  eq('選択肢ID重複を検出', validateMasters(dup, tj, fj).some((e) => e.includes('重複')), true);
-  const badF = JSON.parse(JSON.stringify(fj));
-  badF.formulas[0].signs.push('B99-1');
-  eq('存在しない signs を検出', validateMasters(qj, tj, badF).some((e) => e.includes('B99-1')), true);
-  const badT = JSON.parse(JSON.stringify(fj));
-  badT.formulas[0].indications[0].term = '存在しない語';
-  eq('効能の語が efficacy 本文にないと検出', validateMasters(qj, tj, badT).some((e) => e.includes('存在しない語')), true);
-  const badS = JSON.parse(JSON.stringify(fj));
-  badS.formulas[0].indications[0].symptom = 'unknown_symptom';
-  eq('未定義の症状コードを検出', validateMasters(qj, tj, badS).some((e) => e.includes('unknown_symptom')), true);
-  const noTpl = JSON.parse(JSON.stringify(qj));
-  noTpl.questions.find((x) => x.id === 'KA').options[0].detail = 'missing_tpl';
-  eq('詳細問診のない主訴を検出', validateMasters(noTpl, tj, fj).some((e) => e.includes('missing_tpl')), true);
-}
-eq('処方 68 件', FORMULAS.length, 68);
-eq('全処方に承認効能・使用目標・漢方の考え方', FORMULAS.every((f) => f.efficacy && f.useTarget && f.action && f.indications.length > 0), true);
-eq('タイプ 8 件', Object.keys(TYPE_DEFS).length, 8);
+eq('処方 68 件・タイプ 8 件', [FORMULAS.length, Object.keys(TYPE_DEFS).length], [68, 8]);
+eq('設問版', QUESTIONNAIRE.version, '2026-10-25-v3');
 
-// ---- スコアリング ----
-const noneAll = Object.fromEntries(QUESTIONS.filter((x) => x.scored && x.block !== 'A').map((x) => [x.id, [x.options.find((o) => o.flags?.includes('none')).id]]));
+// ---- 主訴カテゴリーと具体的な主訴（改修計画 §4） ----
+eq('大カテゴリー A〜H', CATEGORIES.map((c) => `${c.id}:${c.name}`), ['A:疲れ・体力・全身の不調', 'B:胃腸・便通', 'C:肌', 'D:髪・頭皮', 'E:睡眠・こころ', 'F:女性の健康', 'G:痛み・こり・しびれ', 'H:その他の体の不調']);
+eq('K1 は複数選択・上限なし', [qById('K1').type, qById('K1').max ?? null], ['multi', null]);
+eq('肌の主訴は改修指示の8項目', texts('K_C'), ['顔や上半身のほてり・熱感', 'ニキビ', '肌の乾燥', '肌のかゆみ', '湿疹・肌荒れ', '肌のくすみ', 'シミ・色素沈着', '肝斑']);
+eq('肌と髪を混ぜない', [texts('K_C').some((t) => /髪|頭皮|抜け毛/.test(t)), texts('K_D').some((t) => /ニキビ|シミ|肌の/.test(t))], [false, false]);
+eq('自由記入の「その他」の主訴はない', COMPLAINTS.some((c) => /その他/.test(c.name)), false);
+eq('年齢による見た目（たるみ等）の主訴はない', COMPLAINTS.some((c) => /たるみ|ほうれい線|シワ|毛穴/.test(c.name)), false);
 {
-  const r = score(noneAll, QUESTIONS, { sex: 'female', tongueMode: 'self' });
-  eq('全問 none → 全タイプ 0%', TYPES.every((t) => r.pct[t] === 0), true);
-  eq('全問 none → isBalanced', r.isBalanced, true);
-  eq('全問 none → mainTypes 空', r.mainTypes, []);
-  eq('全問 none → 指数 0（ゼロ除算なし）', [r.defExcIndex, r.thermalIndex], [0, 0]);
-}
-{
-  const ids = ['B1-1', 'B1-2', 'B2-1', 'B3-1', 'B4-1', 'B4-2', 'B5-1', 'B6-1', 'B7-1', 'B8-1', 'B9-1', 'B10-1', 'B12-1', 'B13-1', 'D1-1'];
-  const answers = {};
-  for (const id of ids) (answers[id.split('-')[0]] ??= []).push(id);
-  const r = score(answers, QUESTIONS, { sex: 'male', tongueMode: 'self' });
-  eq('気虚を全問で選ぶ → qi_def 100%', r.pct.qi_def, 100);
-  eq('気虚 → mainTypes', r.mainTypes, ['qi_def']);
-  eq('気虚 → defExcLabel def', r.defExcLabel, 'def');
-  eq('気虚 → thermalLabel cold', r.thermalLabel, 'cold');
-  const rf = score(answers, QUESTIONS, { sex: 'female', tongueMode: 'self' });
-  eq('女性だと B11 の分だけ max が増える', rf.max.qi_def, r.max.qi_def + 1);
-}
-{
-  const pct = { ...zero(), blood_def: 60, qi_stag: 100, blood_stasis: 80, yin_def: 100 };
-  const c = classify(pct);
-  eq('参考例 mainTypes', c.mainTypes, ['qi_stag', 'yin_def']);
-  eq('参考例 subTypes', c.subTypes, ['blood_stasis', 'blood_def']);
-  eq('参考例 defExcIndex +0.06 mid', [c.defExcIndex, c.defExcLabel], [0.06, 'mid']);
-  eq('参考例 thermalIndex +1 hot', [c.thermalIndex, c.thermalLabel], [1, 'hot']);
-}
-{
-  const r = score({}, QUESTIONS, { sex: 'male', tongueMode: 'staff' });
-  const b11 = q('B11').options.reduce((s, o) => s + (o.weights?.qi_def ?? 0), 0);
-  const b13 = q('B13').options.reduce((s, o) => s + (o.weights?.qi_def ?? 0), 0);
-  const all = score({}, QUESTIONS, { sex: 'female', tongueMode: 'self' });
-  eq('男性・スタッフ舌・未入力 → B11/B13 が max に入らない', all.max.qi_def - r.max.qi_def, b11 + b13);
-  const r2 = score({}, QUESTIONS, { sex: 'male', tongueMode: 'staff', tongueOverride: ['B13-1'] });
-  eq('スタッフ舌所見を入れると B13 が加算される', [r2.raw.qi_def, r2.max.qi_def - r.max.qi_def], [1, b13]);
-}
-{
-  const base = score({}, QUESTIONS, { sex: 'female', tongueMode: 'self' });
-  const r = score({ B11: ['B11-9'] }, QUESTIONS, { sex: 'female', tongueMode: 'self' });
-  eq('B11 閉経 → max から B11 を除く', base.max.qi_def - r.max.qi_def, 1);
-  eq('B11 閉経 → raw は増えない', TYPES.every((t) => r.raw[t] === 0), true);
-}
-{
-  const r = score({ B1: ['B1-3'] }, QUESTIONS, { sex: 'male', tongueMode: 'self' });
-  eq('2タイプにまたがる選択肢 raw 0.5 ずつ', [r.raw.blood_def, r.raw.yin_def], [0.5, 0.5]);
-  const b1 = q('B1').options.reduce((s, o) => s + (o.weights?.blood_def ?? 0), 0);
-  eq('max にも 0.5 が積まれている', b1, 0.5);
-}
-{
-  // セルフ回答があっても薬剤師の所見が優先
-  const r = score({ B13: ['B13-8'] }, QUESTIONS, { sex: 'male', tongueMode: 'self', tongueOverride: ['B13-1'] });
-  eq('舌の上書きはセルフ回答より優先', [r.raw.qi_def, r.raw.yang_exc], [1, 0]);
+  const a = { A1: ['A1-1'], K1: ['K1-A', 'K1-C'], K_A: ['KA-hot_upper', 'KA-fatigue'], K_C: ['KC-hot_upper'] };
+  eq('同じ主訴を2つのカテゴリーで選んでも主訴は1つ', complaintsOf(a), ['fatigue', 'hot_upper']);
+  eq('主訴が2つ以上なら KM で決める', primaryOf({ ...a, KM: ['KM-hot_upper'] }), 'hot_upper');
+  eq('主訴が1つならそれがいちばん改善したい主訴', primaryOf({ K1: ['K1-G'], K_G: ['KG-headache'] }), 'headache');
 }
 
-// ---- 安全確認 ----
-{
-  eq('安全：何もなし', safetyFlags({ C1: ['C1-2'], C2: ['C2-0'], C3: ['C3-4'], C4: ['C4-2'], A4: ['A4-3', 'A4s-1'] }), []);
-  const f = safetyFlags({ C1: ['C1-1'], C2: ['C2-1', 'C2-8'], C3: ['C3-3'], C4: ['C4-1'], A4: ['A4-4', 'A4s-3'] }, { 'C1-1': 'インターフェロン注射、ロキソニン', 'C4-1': '卵' });
-  eq('安全：コード一覧（refer→warn→info 順）', f.map((x) => x.code), ['severe', 'meds', 'interferon', 'hypertension', 'gi_weak', 'pregnancy', 'allergy']);
-  eq('安全：薬名がそのまま detail', f.find((x) => x.code === 'meds').detail, 'インターフェロン注射、ロキソニン');
-  eq('安全：影響大でも1〜2週間は severe にしない', safetyFlags({ A4: ['A4-2', 'A4s-3'] }).map((x) => x.code), []);
-  eq('安全：急性は info', safetyFlags({ A4: ['A4-1', 'A4s-1'] }).map((x) => [x.code, x.level]), [['acute', 'info']]);
-  eq('安全：舌の重症サイン（セルフ）', safetyFlags({ B13: ['B13-10'] }).map((x) => x.code), ['tongue_refer']);
-  eq('安全：舌の重症サイン（スタッフ入力）', safetyFlags({}, {}, ['B13-10']).map((x) => x.code), ['tongue_refer']);
-  eq('安全：抑うつ・不眠が半年以上', safetyFlags({ B9: ['B9-2'], B8: ['B8-3'], A4: ['A4-5', 'A4s-2'] }).map((x) => x.code), ['long_mood']);
-  eq('安全：抑うつ・不眠でも半年以内は出さない', safetyFlags({ B9: ['B9-2'], B8: ['B8-3'], A4: ['A4-4', 'A4s-2'] }).map((x) => x.code), []);
-  eq('安全：軟便＋食が細い → gi_weak', safetyFlags({ B6: ['B6-1'], B5: ['B5-1'] }).map((x) => x.code), ['gi_weak']);
-  eq('安全：授乳は info', safetyFlags({ C3: ['C3-2'] }).map((x) => [x.code, x.level]), [['lactation', 'info']]);
-}
-
-// ---- 五臓・熱の種類 ----
-{
-  const r = score({ B5: ['B5-1'], B6: ['B6-1'] }, QUESTIONS, { sex: 'male', tongueMode: 'self' });
-  eq('五臓：胃腸の回答で脾が上がる', r.organPct.spleen > 0 && r.organPct.liver === 0, true);
-  const h1 = classify({ ...zero(), yang_exc: 80, yin_def: 20 });
-  eq('熱寄り・陽盛が主 → 実熱', [h1.thermalLabel, h1.heatKind], ['hot', 'excess']);
-  const h2 = classify({ ...zero(), yang_exc: 20, yin_def: 80 });
-  eq('熱寄り・陰虚が主 → 虚熱', [h2.thermalLabel, h2.heatKind], ['hot', 'deficient']);
-}
-
-// ---- 主訴の詳細問診と体質の評価 ----
-const mk = (ids) => { const a = {}; for (const id of ids) { const q = id.replace(/-[^-]+$/, ''); (a[q] ??= []).push(id); } return a; };
-/** 具体的な主訴（K?-*）を並べると大カテゴリー K1 と、複数なら KM（先頭を「いちばん改善したい」）を補う */
-const withComplaints = (ids, main) => {
-  const a = mk(ids);
-  const comp = ids.filter((x) => /^K[A-H]-/.test(x));
-  if (comp.length) a.K1 = [...new Set(comp.map((x) => `K1-${x[1]}`))];
-  if (comp.length > 1) a.KM = [main ?? comp[0]];
-  return a;
+// ---- 全主訴で深掘りが出る・同じ所見を2回聞かない（改修指示 第2章 STEP4・3-1、フェーズ6） ----
+const pick = (q, mode) => {
+  const opts = q.options.filter((o) => !o.exclusive && !o.urgent);
+  if (q.section === 'primary' || q.section === 'basic' || q.section === 'category' || q.section === 'complaint') return null;
+  if (mode === 'all') return q.type === 'single' ? [opts[0]?.id] : opts.map((o) => o.id);
+  const ex = q.options.find((o) => o.exclusive === (mode === 'none' ? 'none' : 'unknown')) ?? q.options.find((o) => o.exclusive);
+  return [ex?.id ?? opts[0]?.id];
 };
-{
-  const a = withComplaints(['KA-acne', 'Sacne1-red']);
-  const r = score(a, QUESTIONS, { sex: 'female', tongueMode: 'self' });
-  const r0 = score({}, QUESTIONS, { sex: 'female', tongueMode: 'self' });
-  eq('詳細問診の回答も体質の評価に入る（赤く腫れる→陽盛 +0.5）', r.raw.yang_exc, 0.5);
-  eq('詳細問診は、いちばん改善したい主訴のものだけ max に入る', r.max.yang_exc > r0.max.yang_exc, true);
-  const male = score(a, QUESTIONS, { sex: 'male', tongueMode: 'self' });
-  const none = score(a, QUESTIONS, { sex: 'none', tongueMode: 'self' });
-  eq('女性向けの選択肢（生理前に悪化）は男性の max に入れない', none.max.qi_stag - male.max.qi_stag, 0.25);
+/** 主訴を1つ選び、ほかの設問はすべて mode で答えて最後まで walk する */
+function simulate(cid, sex, mode) {
+  const c = complaintById(cid);
+  const cat = c.categories[0];
+  const a = { A1: [sex === 'female' ? 'A1-1' : 'A1-2'], A2: ['A2-3'], K1: [`K1-${cat}`], [`K_${cat}`]: [`K${cat}-${cid}`] };
+  if (sex === 'female') { a.A3 = ['A3-regular']; a.A3P = ['A3P-no']; }
+  for (let i = 0; i < 80; i++) {
+    const w = walk(a);
+    const n = firstUnansweredStep(w.steps);
+    if (n > w.steps.length) return { a, w };
+    const st = w.steps[n - 1];
+    const ids = pick(st.q, mode) ?? [st.q.options[0].id];
+    a[st.q.id] = normalizeAnswer(st.q, [...ids, ...(st.q.sub ? [st.q.sub.options[0].id] : [])]);
+  }
+  throw new Error(`walk が終わらない: ${cid}`);
 }
 {
-  eq('主訴が1つ → それがいちばん改善したい主訴', mainComplaintId(withComplaints(['KA-acne'])), 'KA-acne');
-  eq('主訴が複数 → KM で選んだもの', mainComplaintId(withComplaints(['KA-acne', 'KD-irregular'], 'KD-irregular')), 'KD-irregular');
-  eq('主訴が複数で KM 未回答 → 未確定', mainComplaintId({ K1: ['K1-A'], KA: ['KA-acne', 'KA-dry'] }), undefined);
-  eq('KM が選んだ主訴にない → 未確定', mainComplaintId({ K1: ['K1-A'], KA: ['KA-acne', 'KA-dry'], KM: ['KH-low'] }), undefined);
-  eq('選んだ主訴は設問→選択肢の順', chosenComplaintIds({ KD: ['KD-irregular'], KA: ['KA-dry', 'KA-acne'] }), ['KA-acne', 'KA-dry', 'KD-irregular']);
-  const g = mainComplaintGroup(withComplaints(['KA-acne', 'KD-irregular', 'Sacne1-pus', 'Sacne3-none']));
-  eq('主訴グループ：詳細の「特になし」は除き、詳細の症状を候補抽出に加える', [g.details.map((d) => d.id), g.symptoms], [['Sacne1-pus'], ['acne', 'pyoderma']]);
-  eq('ほかに選んだ主訴は随伴症状（候補抽出には使わない）', g.also, ['irregular_menses']);
-}
-
-// ---- 二段階の漢方薬選定 ----
-const BASE = ['A1-1', 'A2-3', 'A4-4', 'A4s-2', 'A5-2', 'C1-2', 'C2-0', 'C3-4', 'C4-2'];
-const sel = (ids, texts = {}, main) => {
-  const all = [...BASE.filter((b) => !ids.some((x) => x.split('-')[0] === b.split('-')[0])), ...ids];
-  const a = withComplaints(all, main);
-  const r = score(a, QUESTIONS, { sex: 'female', tongueMode: 'self' });
-  const fl = safetyFlags(a, texts);
-  return { a, r, fl, s: selectFormulas(r, a, texts, fl, FORMULAS) };
-};
-const HEAT = ['B1-9', 'B2-10', 'B3-9', 'B5-9', 'B6-9', 'B9-9', 'B8-8', 'B13-8', 'D1-6', 'B4-7', 'B12-8'];
-const STASIS = ['B1-5', 'B2-5', 'B2-6', 'B3-4', 'B10-4', 'B11-4', 'B12-4', 'B7-3', 'B9-5', 'B13-4', 'B6-4'];
-const QIDEF = ['B1-1', 'B1-2', 'B2-1', 'B3-1', 'B4-1', 'B5-1', 'B6-1', 'B8-1', 'B9-1', 'B10-1', 'B12-1', 'B13-1', 'D1-1', 'B3-8'];
-const QISTAG = ['B1-4', 'B3-3', 'B3-4', 'B5-2', 'B5-3', 'B8-3', 'B9-3', 'B9-4', 'B10-3', 'B11-3', 'B12-3', 'B13-3', 'B7-2', 'D1-2', 'B9-2', 'B2-2'];
-const COLD = ['B1-8', 'B2-9', 'B3-2', 'B3-7', 'B3-8', 'B5-8', 'B6-7', 'B7-8', 'B9-8', 'B10-8', 'B11-7', 'B13-7', 'D1-5', 'B11-2', 'B2-2'];
-const ACNE_POOL = ['清上防風湯', '荊芥連翹湯', '桂枝茯苓丸加薏苡仁', '桂枝茯苓丸', '防風通聖散'];
-{
-  // STEP 1：主訴で候補群を決める（体質で無関係な漢方薬を足さない）
-  const { s } = sel(['KA-acne', 'Sacne1-red', ...QIDEF]);
-  const pool = s.groups[0].candidates.map((c) => c.name);
-  eq('STEP1 ニキビの候補群は効能に「にきび」を持つものだけ', pool.every((n) => ACNE_POOL.includes(n)) && ACNE_POOL.every((n) => pool.includes(n)), true);
-  eq('STEP1 気虚が強くても補中益気湯を候補に足さない', pool.includes('補中益気湯'), false);
-  eq('冷え・虚証の人のニキビ → 体質に合う候補なし（推薦しない）', [s.groups[0].outcome, s.groups[0].pick?.name], ['no_fit', undefined]);
-  eq('不適合の理由（寒熱が逆）を記録', s.groups[0].candidates.find((c) => c.name === '清上防風湯').mismatches.some((m) => m.axis === '寒熱'), true);
-  eq('STEP1 膿を持つニキビ → 化膿性皮膚疾患の十味敗毒湯も候補', [pool.includes('十味敗毒湯'), sel(['KA-acne', 'Sacne1-pus', ...QIDEF]).s.groups[0].candidates.some((c) => c.name === '十味敗毒湯')], [false, true]);
-  const fat = sel(['KF-easily', 'Sfatigue1-appetite', ...QIDEF]).s.groups[0];
-  eq('STEP1 詳細の随伴症状（食欲がない）は候補群に加えない（六君子湯は候補外）', fat.candidates.some((c) => c.name === '六君子湯'), false);
-  eq('STEP2 随伴症状が効能に含まれれば加点（補中益気湯の食欲不振）', fat.pick?.alsoCovers.map((x) => x.symptom), ['poor_appetite']);
-  eq('STEP1 主訴だけでは効能に当たらない肌の乾燥も、詳細の「かゆみ」で候補群ができる', [sel(['KA-dry', 'Sdry_skin2-none', ...QIDEF]).s.groups[0].outcome, sel(['KA-dry', 'Sdry_skin2-itch', ...QIDEF]).s.groups[0].candidates.some((c) => c.name === '当帰飲子')], ['no_pool', true]);
+  const noDetail = [];
+  const repeats = [];
+  for (const c of COMPLAINTS) {
+    for (const sex of c.femaleOnly ? ['female'] : ['female', 'male']) {
+      for (const mode of ['all', 'none', 'unknown']) {
+        const { w } = simulate(c.id, sex, mode);
+        if (mode === 'all' && !w.steps.some((s) => s.q.section === 'detail' && s.q.template === c.detail)) noDetail.push(`${c.id}/${sex}`);
+        const seen = new Map();
+        for (const s of w.steps) {
+          // 主訴の一覧は「気になるもの」を選ぶ画面なので、選ばなかった主訴は聞いたことにしない（なしにもしない）
+          const shown = s.q.section === 'complaint' ? s.q.options.filter((o) => s.ids.includes(o.id)) : s.q.options;
+          for (const o of shown) for (const f of o.findings ?? []) {
+            if (seen.has(f) && seen.get(f) !== s.q.id) repeats.push(`${c.id}/${sex}/${mode}: ${f}（${seen.get(f)}→${s.q.id}）`);
+            if (!seen.has(f)) seen.set(f, s.q.id);
+          }
+        }
+      }
+    }
+  }
+  eq(`すべての主訴（${COMPLAINTS.length}件）でいちばん改善したい主訴の深掘りが出る`, noDetail, []);
+  eq('どの主訴・どの答え方でも、同じ所見を2つの設問で聞かない', repeats.slice(0, 5), []);
 }
 {
-  // STEP 2〜3：同じニキビでも体質で選ぶ漢方薬が変わる
-  eq('炎症・赤み＋体力あり（実熱）→ 清上防風湯', sel(['KA-acne', 'Sacne1-red', ...HEAT]).s.groups[0].pick?.name, '清上防風湯');
-  eq('慢性に繰り返す・皮膚が浅黒い → 荊芥連翹湯', sel(['KA-acne', 'Sacne1-recur', 'A4-5', 'B2-5', 'B4-3', 'B12-5', 'B2-10', 'B3-9', 'B9-3', 'B5-10']).s.groups[0].pick?.name, '荊芥連翹湯');
-  const st = sel(['KD-acne', 'Sacne3-menses', 'KD-irregular', ...STASIS]).s;
-  eq('生理前のニキビ＋生理不順（瘀血）→ 桂枝茯苓丸加薏苡仁', st.groups[0].pick?.name, '桂枝茯苓丸加薏苡仁');
-  eq('ほかに選んだ主訴（生理不順）は随伴症状として効能に含まれるか見る', st.groups[0].pick?.alsoCovers.map((x) => x.symptom), ['irregular_menses']);
-  eq('いちばん改善したい主訴を中心に、推薦は1件', st.groups.length, 1);
-}
-{
-  // 条件つきの効能（高血圧や肥満に伴うのぼせ）は条件を満たすときだけ候補
-  const no = sel(['KA-flush', ...HEAT]).s.groups[0].candidates.map((c) => c.name);
-  const yes = sel(['KA-flush', 'B1-5', ...HEAT]).s.groups[0].candidates.map((c) => c.name);
-  eq('防風通聖散の「肥満に伴うのぼせ」は肥満の回答がないと候補にしない', [no.includes('防風通聖散'), yes.includes('防風通聖散')], [false, true]);
-  eq('便秘の回答があれば「便秘に伴うのぼせ」の麻子仁丸も候補', no.includes('麻子仁丸'), true);
-}
-{
-  // 更年期のカテゴリー：更年期障害の効能で候補群を作り、症状の効能も加える
-  const hf = sel(['KE-hotflash', 'Shot_flash1-coldfeet', 'KH-palpitation', ...QISTAG, 'B8-2', 'B12-2', 'B3-6', 'B1-3', 'B10-2']).s.groups[0];
-  const names = hf.candidates.map((c) => c.name);
-  eq('ホットフラッシュ → 更年期障害（加味逍遥散ほか）と、ほてり（知柏地黄丸）が候補', ['加味逍遥散', '知柏地黄丸', '女神散'].every((n) => names.includes(n)), true);
-  eq('ほかに選んだ動悸は加点のみ（苓桂朮甘湯は候補外）', names.includes('苓桂朮甘湯'), false);
-  eq('のぼせて足が冷える・気滞 → 加味逍遥散', hf.pick?.name, '加味逍遥散');
-  eq('更年期の肌の乾燥・抜け毛は更年期障害の効能で拾わない', [sel(['KE-dry', 'Sdry_skin2-none']).s.groups[0].outcome, sel(['KE-hair']).s.groups[0].outcome], ['no_pool', 'no_pool']);
-}
-{
-  // STEP 4：安全性
-  const preg = sel(['KD-acne', 'Sacne3-menses', ...STASIS, 'C3-1']).s.groups[0];
-  eq('妊娠中 → 桂枝茯苓丸系は除外され、推薦されない', [preg.candidates.find((c) => c.name === '桂枝茯苓丸加薏苡仁').safety.status, ['桂枝茯苓丸', '桂枝茯苓丸加薏苡仁'].includes(preg.pick?.name)], ['excluded', false]);
-  const meds = sel(['KF-easily', ...QIDEF, 'C1-1'], { 'C1-1': '' }).s.groups[0];
-  eq('服用薬の名前が未記入 → 推薦を確定せず要確認', [meds.outcome, meds.pick?.name, meds.pick?.safety.check.some((x) => x.includes('情報不足'))], ['pick_check', '補中益気湯', true]);
-  const hyp = sel(['KF-easily', ...QIDEF, 'C2-1']).s.groups[0];
-  eq('高血圧 × 甘草 → 要確認（理由つき）', hyp.pick?.safety.check.some((x) => x.startsWith('甘草を含むため、高血圧')), true);
-  const ok = sel(['KF-easily', ...QIDEF]).s.groups[0];
-  eq('安全上の問題がなければ確定の推薦', [ok.outcome, ok.pick?.name], ['pick', '補中益気湯']);
-  const refer = sel(['KF-easily', ...QIDEF, 'A4-5', 'A4s-3']);
-  eq('受診勧奨 → 来店客向けの推薦は出さない', [refer.s.refer, customerPicks(refer.s, refer.r).picks.length], [true, 0]);
-  const red = sel(['KE-headache', 'Sheadache3-sudden', ...QIDEF]);
-  eq('詳細問診の受診勧奨（突然の激しい頭痛）→ refer で推薦を出さない', [red.fl.find((f) => f.code === 'refer:Sheadache3-sudden')?.level, red.s.refer], ['refer', true]);
-  const cons = sel(['KD-pain', 'Speriod_pain2-severe', 'Speriod_pain1-cold', ...COLD]);
-  eq('詳細問診の「受診も検討」（寝込むほどの生理痛）→ 注意フラグ＋推薦は要確認', [cons.fl.find((f) => f.code === 'consult:Speriod_pain2-severe')?.level, cons.s.groups[0].outcome, cons.s.groups[0].pick?.safety.check.some((x) => x.includes('受診も検討'))], ['warn', 'pick_check', true]);
-}
-{
-  // STEP 5：推薦理由の順序と内容
-  const x = sel(['KA-acne', 'Sacne1-red', ...HEAT]);
-  const g = x.s.groups[0];
-  const rs = buildReasons(g, g.pick, x.r, { forCustomer: true });
-  eq('理由① 主訴：いちばん改善したいお悩みと承認効能の語', rs.complaint.includes('「ニキビ・吹き出物」（肌の悩み）') && rs.complaint.includes('「にきび」') && rs.complaint.includes('効能・効果'), true);
-  eq('理由② 体質：気血水・寒熱・虚実を実際の点数で', ['【気血水】', '【寒熱】', '【虚実】'].every((a) => rs.constitution.some((c) => c.startsWith(a))) && rs.constitution.some((c) => /陽盛 \d+点/.test(c)), true);
-  eq('理由② 詳細問診の回答（赤く腫れる）を使用目標の一致として先頭に出す', rs.constitution[0].startsWith('【主訴の詳細】') && rs.constitution[0].includes('赤く腫れるニキビ'), true);
-  eq('理由② 使用目標と漢方の考え方は別の欄', [rs.useTarget.startsWith('体力中等度以上'), rs.action.includes('清熱')], [true, true]);
-  eq('理由③ 他の候補との比較（便秘があるので麻子仁丸・大黄甘草湯も候補＝7種類）', rs.comparison.length >= 2 && rs.comparison[0].includes('候補7種類') && rs.comparison.some((c) => c.startsWith('荊芥連翹湯')), true);
-  eq('理由④ 服用前の注意（含まれる生薬）', rs.cautions.some((c) => c.startsWith('山梔子を含みます')) && rs.cautions.some((c) => c.startsWith('黄芩を含みます')), true);
-  const pus = sel(['KA-acne', 'Sacne1-pus', ...HEAT]).s.groups[0];
-  const jm = pus.candidates.find((c) => c.name === '十味敗毒湯');
-  eq('理由① 詳細で候補になったときは詳細の回答を挙げる', buildReasons(pus, jm, x.r).complaint.includes('「膿を持つニキビ」'), true);
-}
-{
-  // 候補なし・その他
-  eq('ほうれい線 → 承認効能に該当なし（候補なし）', sel(['KC-nasolabial', 'Saging1-tired', ...QIDEF]).s.groups[0].outcome, 'no_pool');
-  eq('抜け毛 → 承認効能に該当なし（候補なし）', sel(['KB-loss', 'Shair_loss3-stress']).s.groups[0].outcome, 'no_pool');
-  const oth = sel(['KA-other', 'Sother1-none'], { 'KA-other': 'あざが消えにくい' });
-  eq('その他（自由記入）→ 候補を出さず、記入内容を薬剤師へ', [oth.s.groups[0].outcome, oth.s.otherComplaint], ['other', '肌の悩み：あざが消えにくい']);
-  eq('主訴の選択がない旧データ → 推薦グループなし', sel([]).s.groups.length, 0);
+  // 疲れやすい（主訴）→ 深掘りで食欲がない → 共通問診 B1・B5 に出さない
+  const a = { A1: ['A1-2'], A2: ['A2-3'], K1: ['K1-A'], K_A: ['KA-fatigue'], Sfatigue1: ['Sfatigue1-poor_appetite'] };
+  const w = walk(a);
+  const t = (id) => w.steps.find((s) => s.q.id === id)?.q.options.map((o) => o.text) ?? [];
+  eq('主訴「疲れやすい」は B1 に出さない（回答の引き継ぎ）', t('B1').includes('疲れやすい'), false);
+  eq('深掘りで答えた「食欲がない」は B5 に出さない', t('B5').includes('食欲がない'), false);
+  eq('深掘りで選ばなかった「食後に眠くなる」も B5 に出さない（なしとして引き継ぐ）', t('B5').includes('食後に眠くなる'), false);
+  eq('主訴の所見は「あり」として保持', w.state.get('fatigue_easy')?.status, 'present');
+  eq('未質問の所見は「なし」にしない（状態なし）', w.state.has('night_agitation'), false);
 }
 
-// ---- 設問フロー ----
-eq('表示設問：女性・セルフ 27', visibleQuestions({ A1: ['A1-1'] }, 'self').length, 27);
-eq('表示設問：男性・スタッフ 24', visibleQuestions({ A1: ['A1-2'] }, 'staff').length, 24);
-eq('表示設問：性別未回答・セルフ 25（B11・C3 なし）', visibleQuestions({}, 'self').length, 25);
-{
-  const ids = (a) => visibleQuestions({ A1: ['A1-1'], ...a }, 'self').map((x) => x.id);
-  eq('第1段階 → 選んだカテゴリーの具体的な主訴だけ出る', ids({ K1: ['K1-A', 'K1-B'] }).slice(2, 6), ['K1', 'KA', 'KB', 'A4']);
-  eq('主訴が1つ → 「いちばん改善したい」は出さず、その詳細問診へ', ids({ K1: ['K1-A'], KA: ['KA-acne'] }).slice(2, 8), ['K1', 'KA', 'Sacne1', 'Sacne2', 'Sacne3', 'A4']);
-  eq('主訴が複数 → KM で1つ決めるまで詳細問診は出さない', ids({ K1: ['K1-A', 'K1-B'], KA: ['KA-acne'], KB: ['KB-loss'] }).slice(2, 7), ['K1', 'KA', 'KB', 'KM', 'A4']);
-  eq('KM で選んだ主訴の詳細問診だけ出る（ほかは随伴症状）', ids({ K1: ['K1-A', 'K1-B'], KA: ['KA-acne'], KB: ['KB-loss'], KM: ['KB-loss'] }).slice(5, 9), ['KM', 'Shair_loss1', 'Shair_loss2', 'Shair_loss3']);
-  const male = { A1: ['A1-2'], K1: ['K1-A'], KA: ['KA-acne'] };
-  eq('男性には「生理前・生理中の不調」と生理前の選択肢を出さない', [resolveQuestion(q('K1'), male).options.some((o) => o.id === 'K1-D'), resolveQuestion(q('Sacne3'), male).options.some((o) => o.id === 'Sacne3-menses')], [false, false]);
-  const two = { A1: ['A1-1'], K1: ['K1-A', 'K1-E'], KA: ['KA-dry', 'KA-acne'], KE: ['KE-dry'] };
-  eq('KM の選択肢は選んだ主訴（同名はカテゴリーを添える）', resolveQuestion(q('KM'), two).options.map((o) => o.text), ['ニキビ・吹き出物', '肌の乾燥（肌の悩み）', '肌の乾燥（更年期・ホルモン変化）']);
-  eq('詳細問診の見出しに主訴名を入れる', resolveQuestion(q('Sacne1'), { K1: ['K1-A'], KA: ['KA-acne'] }).title, '「ニキビ・吹き出物」は、どのようなタイプですか');
-  eq('normalize: KM は選んだ主訴だけ受け付ける', [normalizeAnswer(resolveQuestion(q('KM'), two), ['KE-dry'], {}).ids, normalizeAnswer(resolveQuestion(q('KM'), two), ['KH-low'], {}).ids], [['KE-dry'], []]);
-  const changed = { A1: ['A1-1'], A2: ['A2-3'], K1: ['K1-A'], KA: ['KA-acne', 'KA-itch'], KM: ['KA-dry'] };
-  const vis = visibleQuestions(changed, 'self');
-  eq('主訴を選び直して KM の回答が無効 → KM から答え直す', vis[firstUnansweredStep(vis, changed, {}) - 1].id, 'KM');
-}
-eq('性別の読み取り', [sexFromAnswers({ A1: ['A1-1'] }), sexFromAnswers({ A1: ['A1-3'] }), sexFromAnswers({})], ['female', 'none', undefined]);
-{
-  const b1 = q('B1');
-  eq('normalize: none があれば他を外す', normalizeAnswer(b1, ['B1-1', 'B1-0', 'B1-4'], {}).ids, ['B1-0']);
-  eq('normalize: 不正IDを捨てる', normalizeAnswer(b1, ['B1-1', 'X-1', 'B2-2'], {}).ids, ['B1-1']);
-  eq('normalize: 大カテゴリーは最大3つ', normalizeAnswer(q('K1'), ['K1-A', 'K1-B', 'K1-C', 'K1-D'], {}).ids.length, 3);
-  eq('normalize: 自由記入は選んだ選択肢だけ', normalizeAnswer(q('C1'), ['C1-1'], { 'C1-1': ' ロキソニン ', 'C1-2': 'x' }).texts, { 'C1-1': 'ロキソニン' });
-  eq('normalize: single は1つ＋sub1つ', normalizeAnswer(q('A4'), ['A4-1', 'A4-2', 'A4s-2', 'A4s-3'], {}).ids, ['A4-1', 'A4s-2']);
-  eq('normalize: text 型', normalizeAnswer(q('C5'), [], { C5: '補中益気湯を半年' }), { ids: [], texts: { C5: '補中益気湯を半年' } });
-  eq('isAnswered: sub 必須', [isAnswered(q('A4'), ['A4-1'], {}), isAnswered(q('A4'), ['A4-1', 'A4s-1'], {})], [false, true]);
-  eq('isAnswered: C5 は任意', isAnswered(q('C5'), undefined, {}), true);
-  eq('isAnswered: multi 未選択', isAnswered(b1, [], {}), false);
-  const vis = visibleQuestions({ A1: ['A1-2'] }, 'staff');
-  eq('firstUnanswered: A1 だけ回答 → 2', firstUnansweredStep(vis, { A1: ['A1-2'] }, {}), 2);
-}
-eq('tips: 24時以降 × 血虚', personalTips({ D2: ['D2-2', 'D2s-2'] }, 'blood_def'), ['就寝時刻を23時に前倒しするだけで変化が出ます。']);
-eq('tips: 該当なし', personalTips({ D2: ['D2-2', 'D2s-1'] }, 'blood_def'), []);
+// ---- 改修指示 4-1〜4-8・第5章 の個別修正 ----
+const patientTexts = QUESTIONS.filter((x) => ['constitution', 'lifestyle', 'safety', 'basic'].includes(x.section)).flatMap((x) => x.options.map((o) => ({ q: x.id, t: o.text })));
+eq('4-1 飲酒は D4「お酒を週3回以上飲む」に一本化（体質・生活習慣で1か所）', patientTexts.filter((x) => x.t.includes('お酒')).map((x) => `${x.q}:${x.t}`), ['D4:お酒を週3回以上飲む']);
+eq('4-1 D1「辛いものをよく食べる」', texts('D1').includes('辛いものをよく食べる') && !texts('D1').some((t) => t.includes('お酒')), true);
+eq('4-2「食欲がない」と「少量で満腹になる」は別の選択肢', ['食欲がない', '少量で満腹になる'].every((t) => texts('B5').includes(t)) && !texts('B5').some((t) => t.includes('食が細')), true);
+eq('4-3「食事を抜くことが多い」（少食を含めない）', texts('D1').includes('食事を抜くことが多い') && !texts('D1').some((t) => t.includes('少食')), true);
+const allOpts = QUESTIONS.flatMap((x) => x.options.map((o) => ({ q: x, o })));
+eq('4-4「冷えると体調が悪くなる」はない', allOpts.some(({ o }) => /冷えると体調が悪/.test(o.text)), false);
+eq('4-4「温めると楽になる」は症状の深掘りにだけ置く', allOpts.filter(({ o }) => o.text.includes('温めると') || o.text.includes('温かいものをとると楽')).every(({ q }) => q.section === 'detail'), true);
+eq('4-5 痛みの性質（刺す・張る痛み）を全員向けに聞かない', allOpts.filter(({ o }) => /(刺す|張る)ような痛み|刺すように|張るように/.test(o.text)).every(({ q }) => q.section === 'detail'), true);
+eq('4-6 発症時期・頻度の質問はない', QUESTIONS.some((x) => /いつ頃から|いつごろから|どれくらいの頻度|どれくらい続いて/.test(x.title)), false);
+eq('4-7「日常生活への影響」の質問はない', QUESTIONS.some((x) => x.title.includes('日常生活') || x.options.some((o) => o.text.includes('日常生活'))), false);
+eq('4-8 顔色はイラストの設問 F1 にだけある', allOpts.filter(({ o }) => /顔色/.test(o.text)).map(({ q }) => q.id).filter((id, i, a) => a.indexOf(id) === i), ['F1']);
+eq('F1 はいただいた6種のイラスト', qById('F1').options.map((o) => o.image?.split('/').pop()), ['normal.webp', 'pale.webp', 'dark.webp', 'red.webp', 'bluish.webp', 'unknown.webp']);
+eq('3-5「体力には自信がある」はない', allOpts.some(({ o }) => o.text.includes('体力がある') || o.text.includes('体力には自信')), false);
+eq('第12章 舌は患者に聞かない（薬剤師の設問にだけある）', [QUESTIONS.some((x) => x.options.some((o) => o.image?.includes('/tongue/'))), STAFF_QUESTIONS.find((x) => x.id === 'X_tongue').options.filter((o) => o.image).length], [false, 8]);
+eq('5-1 患者向けの選択肢に受診勧奨フラグ（refer/consult）がない', allOpts.some(({ o }) => o.flags?.some((f) => f === 'refer' || f === 'consult')), false);
+eq('5-5 直ちに対応の選択肢は主訴の深掘りの中だけ', allOpts.filter(({ o }) => o.urgent).every(({ q }) => q.section === 'detail'), true);
+eq('5-6 体重減少・微熱を共通の質問で聞かない', allOpts.filter(({ q }) => q.section !== 'detail').some(({ o }) => /体重が減|微熱/.test(o.text)), false);
+eq('自由記述の設問・選択肢はない', allOpts.some(({ o }) => o.freeText) || QUESTIONS.some((x) => x.type === 'text'), false);
 
-console.log(fail ? `\n${fail} 件失敗` : '\nすべて OK');
+// ---- 安全確認タグ・直ちに対応 ----
+{
+  const a = { A1: ['A1-2'], A2: ['A2-6'], K1: ['K1-G'], K_G: ['KG-headache'], Sheadache3: ['Sheadache3-urgent_neuro'] };
+  const w = walk(a);
+  const tags = safetyTags(w);
+  eq('主訴「頭痛」に安全確認タグ', tags.some((t) => t.id === 'headache' && t.checks.includes('今までにない激しさか')), true);
+  eq('急性の神経症状は直ちに対応', [isUrgent(w), tags.find((t) => t.id === 'neuro')?.urgent], [true, true]);
+  eq('タグは証のスコアに影響しない', JSON.stringify(score(walk({ ...a, Sheadache3: ['Sheadache3-none'] }).state).pct) === JSON.stringify(score(w.state).pct), true);
+  const w2 = walk({ ...a, Sheadache3: ['Sheadache3-none'] });
+  eq('急性の選択肢を選ばなければ直ちに対応ではない', isUrgent(w2), false);
+}
+
+// ---- 暫定スコア：同じ所見・意味の近い所見は1回分（改修指示 8-2） ----
+{
+  const one = { A1: ['A1-2'], K1: ['K1-G'], K_G: ['KG-stiff_shoulder'], Sstiff_shoulder1: ['Sstiff_shoulder1-shoulder_warm_relief'] };
+  const w1 = walk(one);
+  const s1 = score(w1.state);
+  // 同じ group（cold_sensitive）の別の所見を足しても陽虚の点は増えない
+  w1.state.set('cold_warm_relief', { status: 'present', source: 'patient', question: 'test', section: 'detail' });
+  const s2 = score(w1.state);
+  eq('「温めると楽になる」が2か所でも陽虚は1回分', [s1.raw.yang_def, s2.raw.yang_def], [s1.raw.yang_def, s1.raw.yang_def]);
+  eq('未質問・わからないは理論最大点に入れない', score(walk({ A1: ['A1-2'] }).state).max.qi_def, 0);
+}
+
+// ---- 安全フラグと漢方薬の選定 ----
+{
+  const a = {
+    A1: ['A1-1'], A2: ['A2-7'], A3: ['A3-post'], K1: ['K1-A'], K_A: ['KA-fatigue'], Sfatigue1: ['Sfatigue1-poor_appetite', 'Sfatigue1-sob_exertion'],
+    C1: ['C1-kampo', 'C1-bp'], C1K: ['C1K-F01'], C2: ['C2-1'], C3: ['C3-none'], C4: ['C4-yes'], C4K: ['C4K-F01'], C4S: ['C4S-rash'],
+  };
+  const c = computeSession({ answers: a });
+  eq('閉経なら妊娠・授乳の設問を出さない', c.w.steps.some((s) => s.q.id === 'A3P'), false);
+  eq('安全フラグ：服用中の薬・漢方・高血圧・副作用歴', ['meds', 'kampo_current', 'hypertension', 'adverse_kampo'].map((k) => c.safetyFlags.some((f) => f.code === k)), [true, true, true, true]);
+  const sel = selectionOf({ answers: a }, c);
+  const g = sel.groups[0];
+  eq('主訴「疲れやすい」の候補に補中益気湯', g.candidates.some((x) => x.name === '補中益気湯'), true);
+  const f01 = g.candidates.find((x) => x.code === 'F01');
+  eq('副作用歴の漢方薬は要確認（薬剤師が判断）', f01.safety.status !== 'ok' && f01.safety.check[0].includes('体調を崩したことがある'), true);
+  eq('甘草を含む候補は服用中の漢方との重複を確認', g.candidates.filter((x) => x.formula.cautionHerbs.includes('甘草')).every((x) => x.safety.check.some((t) => t.includes('甘草の重複'))), true);
+  eq('候補はすべて主訴の効能に当たる（体質だけで足さない）', g.candidates.every((x) => x.matched.length > 0), true);
+  // 薬剤師の観察（舌）
+  const w = walk(a);
+  applyStaffAnswers(w.state, { X_tongue: ['X_tongue-tongue_p1'] });
+  eq('薬剤師の舌所見を所見に統合', w.state.get('tongue_p1')?.source, 'staff');
+}
+{
+  const a = { A1: ['A1-1'], A3: ['A3-regular'], A3P: ['A3P-no'], K1: ['K1-C'], K_C: ['KC-acne'], Sacne1: ['Sacne1-acne_red', 'Sacne1-acne_pus'], C1: ['C1-none'], C2: ['C2-0'], C3: ['C3-none'], C4: ['C4-no'] };
+  const c = computeSession({ answers: a });
+  const names = selectionOf({ answers: a }, c).groups[0].candidates.map((x) => x.name);
+  const ACNE_POOL = ['清上防風湯', '荊芥連翹湯', '桂枝茯苓丸加薏苡仁', '桂枝茯苓丸', '防風通聖散', '十味敗毒湯', '排膿散及湯'];
+  eq('ニキビの候補はニキビ・化膿の効能を持つものだけ', names.length > 0 && names.every((n) => ACNE_POOL.includes(n)), true);
+}
+
+// ---- 患者向け画面に漢方薬・点数を出さない（ソースの静的確認） ----
+{
+  const dir = 'src/pages/kampo/check';
+  const files = [];
+  const walkDir = (d) => { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (fs.statSync(p).isDirectory()) walkDir(p); else files.push(p); } };
+  walkDir(dir);
+  const bad = files.filter((f) => /recommend|FORMULAS|RadarChart/.test(fs.readFileSync(f, 'utf8')));
+  eq('患者向け画面（check/）は漢方薬の選定・レーダーを読み込まない', bad, []);
+}
+
+// ---- フローの細部 ----
+eq('「特にない」とほかを同時に選んだらほかを残す', normalizeAnswer(qById('B1'), ['B1-none', 'B1-sob_exertion']), ['B1-sob_exertion']);
+eq('単一選択は1つだけ', normalizeAnswer(qById('A2'), ['A2-1', 'A2-2']), ['A2-1']);
+eq('生活習慣の一言（就寝が遅い → 血虚）', personalTips({ D2: ['D2-1', 'D2s-2'] }, 'blood_def').length, 1);
+eq('男性にはカテゴリー「女性の健康」を出さない', walk({ A1: ['A1-2'] }).steps.find((s) => s.q.id === 'K1').q.options.some((o) => o.text === '女性の健康'), false);
+eq('むくみの設問は関連する所見があるときだけ', [walk({ A1: ['A1-2'], K1: ['K1-A'], K_A: ['KA-fatigue'] }).steps.some((s) => s.q.id === 'B7'), walk({ A1: ['A1-2'], K1: ['K1-H'], K_H: ['KH-edema'] }).steps.some((s) => s.q.id === 'B7')], [false, true]);
+
+// ---- 旧版セッション ----
+eq('旧版（2026-10-24b・v2）は再計算しない', [isLegacy({ questionnaireVersion: '2026-10-24b' }), isLegacy({ questionnaireVersion: 'v2-draft-2026-10-25' }), isLegacy({ questionnaireVersion: QUESTIONNAIRE.version })], [true, true, false]);
+eq('旧版の文言を引ける', [legacyOptionText('2026-10-24b', 'KF-easily'), legacyOptionText('2026-10-24b', 'A4s-3')], ['少し動くだけで疲れる', '大きい']);
+
+console.log(fail ? `\n${fail} 件 NG` : '\nすべて OK');
 process.exit(fail ? 1 : 0);

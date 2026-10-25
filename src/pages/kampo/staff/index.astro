@@ -1,5 +1,5 @@
 ---
-// スタッフ画面トップ：本日のチェック一覧・顧客検索・新規チェック・CSV書き出し。
+// スタッフ画面トップ：本日のチェック一覧（直ちに対応が必要な回答・安全確認タグの印つき）・顧客検索・新規チェック・CSV書き出し。
 // 「来店客モードへ戻る」でスタッフ Cookie を消す（iPad を渡す前に押す）。
 export const prerender = false;
 import KampoLayout from '../../../layouts/KampoLayout.astro';
@@ -9,7 +9,7 @@ import { clearStaffCookie, pinConfigured } from '../../../lib/kampo/auth';
 import { supervisorName } from '../../../lib/kampo/compute';
 import {
   isKvConfigured, listSessionsByDay, searchCustomers, countSessions, purgeExpired, jstDate, fmtJst, customerLabel,
-  STATUS_LABEL, INPUT_BY_LABEL, TONGUE_MODE_LABEL, typeNamesOf,
+  STATUS_LABEL, INPUT_BY_LABEL, typeNamesOf,
 } from '../../../lib/kampo/store';
 
 if (Astro.request.method === 'POST') {
@@ -43,8 +43,11 @@ const flagSummary = (s: (typeof sessions)[number]) => {
   const f = s.safetyFlags ?? [];
   const refer = f.filter((x) => x.level === 'refer').length;
   const warn = f.filter((x) => x.level === 'warn').length;
-  return { refer, warn };
+  return { refer, warn, tags: s.tags?.length ?? 0 };
 };
+// 直ちに対応が必要な回答があるチェックを一番上に
+sessions.sort((a, b) => Number(!!b.urgent) - Number(!!a.urgent));
+const urgentCount = sessions.filter((s) => s.urgent).length;
 ---
 <KampoLayout title="スタッフ画面" mode="staff" width="wide">
   <a slot="actions" class="kp-btn ghost small" href="/kampo/check/new/">新規チェックを始める</a>
@@ -54,6 +57,7 @@ const flagSummary = (s: (typeof sessions)[number]) => {
   {!kv && <p class="kp-error" style="margin-bottom:12px">データ保存先（KV）が未設定です。</p>}
   {loadError && <p class="kp-error" style="margin-bottom:12px">読み込みエラー: {loadError}</p>}
 
+  {urgentCount > 0 && <div class="kp-band">直ちに対応が必要な回答があります（{urgentCount}件）。お客様に声をかけて状況を確認してください。</div>}
   <div class="kp-card">
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
       <h1 class="kp-title" style="font-size:20px;margin:0">{date === today ? '本日' : date.replace(/-/g, '/')}のチェック<span class="kp-chip" style="margin-left:8px">{sessions.length}件</span></h1>
@@ -69,16 +73,16 @@ const flagSummary = (s: (typeof sessions)[number]) => {
       <p class="kp-note" style="margin-top:12px">この日のチェックはありません。</p>
     ) : (
       <table class="kp-table" style="margin-top:12px">
-        <thead><tr><th>時刻</th><th>お客様</th><th>入力</th><th>主体質</th><th>副体質</th><th>警告</th><th>状態</th><th></th></tr></thead>
+        <thead><tr><th>時刻</th><th>お客様</th><th>入力</th><th>主体質</th><th>副体質</th><th>安全確認</th><th>状態</th><th></th></tr></thead>
         <tbody>
           {sessions.map((s) => { const f = flagSummary(s); return (
-            <tr>
+            <tr class:list={[{ 'kp-row-urgent': s.urgent }]}>
               <td>{fmtJst(s.startedAt, false)}</td>
               <td>{s.customerLabel}</td>
-              <td>{INPUT_BY_LABEL[s.inputBy]}／舌: {TONGUE_MODE_LABEL[s.tongueMode]}</td>
+              <td>{INPUT_BY_LABEL[s.inputBy]}</td>
               <td>{s.scores ? (s.scores.isBalanced ? 'バランス良好' : typeNamesOf(s.scores.mainTypes, TYPE_DEFS)) : '—'}</td>
               <td>{s.scores ? typeNamesOf(s.scores.subTypes, TYPE_DEFS) || '—' : '—'}</td>
-              <td>{f.refer > 0 && <span class="kp-chip refer">受診勧奨 {f.refer}</span>} {f.warn > 0 && <span class="kp-chip warn">注意 {f.warn}</span>} {f.refer + f.warn === 0 && <span class="kp-chip ok">なし</span>}</td>
+              <td>{s.urgent && <span class="kp-chip refer">直ちに対応</span>} {f.tags > 0 && <span class="kp-chip warn">確認事項 {f.tags}</span>} {f.refer > 0 && <span class="kp-chip refer">受診勧奨 {f.refer}</span>} {f.warn > 0 && <span class="kp-chip check">注意 {f.warn}</span>} {!s.urgent && f.tags + f.refer + f.warn === 0 && <span class="kp-chip ok">なし</span>}</td>
               <td><span class:list={['kp-chip', { ok: s.status === 'proposed' }]}>{STATUS_LABEL[s.status]}</span></td>
               <td><a class="kp-btn ghost small" href={`/kampo/staff/session/${s.id}/`}>開く</a></td>
             </tr>
@@ -116,4 +120,5 @@ const flagSummary = (s: (typeof sessions)[number]) => {
       <dt>マスタ編集</dt><dd>設問・文面・処方は <code>src/data/kampo/</code> の JSON を直して再デプロイ</dd>
     </dl>
   </div>
+  <style is:global>.kp-row-urgent td{background:var(--danger-soft)}</style>
 </KampoLayout>

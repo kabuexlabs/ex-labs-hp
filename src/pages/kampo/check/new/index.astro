@@ -1,5 +1,6 @@
 ---
-// 受付：顧客識別（会員番号／電話番号／LINE表示名／識別なし）、舌チェックのモード、入力者、保存の同意。
+// 受付：顧客識別（会員番号／電話番号／LINE表示名／識別なし）、入力者、保存の同意。
+// 舌は薬剤師が観察して担当者画面で入力する（2026-10-25 改修計画 Q5。受付での「舌チェックの担当」の選択は廃止）。
 // 同意でセッションを作り、設問1へ。LINE表示名は同名の候補を出してスタッフが選ぶ。
 export const prerender = false;
 import KampoLayout from '../../../../layouts/KampoLayout.astro';
@@ -7,14 +8,14 @@ import consentText from '../../../../data/kampo/consent.md?raw';
 import {
   isKvConfigured, createSession, saveCustomer, getCustomer, newId, normalizePhone,
   findCustomerByMember, findCustomerByPhone, findCustomersByLineName, customerLabel, fmtJst,
-  type KampoCustomer, type TongueMode, type InputBy,
+  type KampoCustomer, type InputBy,
 } from '../../../../lib/kampo/store';
 
 const kv = isKvConfigured();
 let error = '';
 const msg = Astro.url.searchParams.get('msg') ?? '';
 let candidates: KampoCustomer[] | null = null;
-let posted = { idtype: 'none', ident: '', tongue: 'self', inputby: 'customer' };
+let posted = { idtype: 'none', ident: '', inputby: 'customer' };
 
 if (Astro.request.method === 'POST' && kv) {
   const form = await Astro.request.formData();
@@ -22,12 +23,11 @@ if (Astro.request.method === 'POST' && kv) {
   const action = get('action');
   const idtype = ['member', 'phone', 'line', 'none'].includes(get('idtype')) ? get('idtype') : 'none';
   const ident = get('ident').slice(0, 60);
-  const tongue: TongueMode = get('tongue') === 'staff' ? 'staff' : 'self';
   const inputBy: InputBy = get('inputby') === 'staff' ? 'staff' : 'customer';
-  posted = { idtype, ident, tongue, inputby: inputBy };
+  posted = { idtype, ident, inputby: inputBy };
 
   const start = async (customer: KampoCustomer | null) => {
-    const s = await createSession({ customer, tongueMode: tongue, inputBy });
+    const s = await createSession({ customer, inputBy });
     return Astro.redirect(`/kampo/check/${s.id}/q/1/`, 303);
   };
   const newCustomer = async (fields: Partial<KampoCustomer>) => {
@@ -72,8 +72,8 @@ if (Astro.request.method === 'POST' && kv) {
     <div class="kp-hero-title"><span>BODY</span><span>CHECK</span><span class="sky">KAMPO</span><small>体質チェック ／ 漢方</small></div>
     <div class="kp-hero-text">
       <p>今のお体の状態やお悩みについての質問に答えると、</p>
-      <p>あなたの体質と、体質に合う漢方薬・養生をご提案します。</p>
-      <p class="kp-note" style="margin-top:14px">所要時間は5〜7分です。スタッフが下の受付を済ませてから、iPad をお客様にお渡しください。</p>
+      <p>薬剤師が体質と養生、合いそうな漢方薬についてご説明します。</p>
+      <p class="kp-note" style="margin-top:14px">所要時間は5〜10分です。スタッフが下の受付を済ませてから、iPad をお客様にお渡しください。舌の状態は、回答のあとに薬剤師が確認します。</p>
     </div>
   </section>
   {msg === 'notfound' && <p class="kp-notice">指定のチェックが見つかりませんでした。新しく始めてください。</p>}
@@ -87,7 +87,6 @@ if (Astro.request.method === 'POST' && kv) {
         <input type="hidden" name="action" value="pick">
         <input type="hidden" name="idtype" value="line">
         <input type="hidden" name="ident" value={posted.ident}>
-        <input type="hidden" name="tongue" value={posted.tongue}>
         <input type="hidden" name="inputby" value={posted.inputby}>
         <input type="hidden" name="consent" value="on">
         <p class="kp-note">該当するお客様を選ぶか、新しいお客様として登録してください。</p>
@@ -121,12 +120,6 @@ if (Astro.request.method === 'POST' && kv) {
           <label class="kp-field" id="identField">番号または名前<small>識別なしの場合は空欄</small>
             <input class="kp-input" type="text" name="ident" value={posted.ident} autocomplete="off" placeholder="例: 12345 / 09012345678 / LINEの表示名">
           </label>
-          <hr class="kp-rule" style="margin:30px 0">
-          <p class="kp-h2" style="border:0;padding:0;margin-top:0">舌のチェック</p>
-          <div class="kp-radios">
-            <label class="kp-radio"><input type="radio" name="tongue" value="self" checked={posted.tongue === 'self'}>ご自分で（イラストを見て選ぶ）</label>
-            <label class="kp-radio"><input type="radio" name="tongue" value="staff" checked={posted.tongue === 'staff'}>スタッフが確認する</label>
-          </div>
           <hr class="kp-rule" style="margin:30px 0">
           <p class="kp-h2" style="border:0;padding:0;margin-top:0">入力する方</p>
           <div class="kp-radios">

@@ -1,113 +1,87 @@
 ---
 // 設問（1画面1問）。回答は1問ごとに保存し、途中離脱しても同じ URL で再開できる。
-// 性別が女性以外なら B11・C3 を、舌モードがスタッフなら B13 をスキップ（進捗は表示される問数で数える）。
-// 主訴は STEP 1 大カテゴリー → STEP 2 具体的な主訴（複数なら、いちばん改善したいものを1つ）→ STEP 3 その主訴の詳細問診。
-// 受診をおすすめする選択肢（refer／consult）を選ぶと、その場で注意を表示する（回答は続けられる）。
+// 表示する設問と選択肢は flow.ts の walk() が決める（回答済みの所見は出さない・月経やむくみの設問は条件つき）。
+// 全部答えたら「回答の確認」へ。患者向け画面には体質の点数・漢方薬を出さない。
+// 直ちに対応が必要な選択肢を選ぶと、その場で「すぐに近くのスタッフにお声がけください」を出す（119番の一律表示はしない）。
 export const prerender = false;
 import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
 import QMark from '../../../../../../components/kampo/QMark.astro';
-import { BLOCK_LABEL, QUESTIONS } from '../../../../../../lib/kampo/masters';
+import { SECTION_LABEL } from '../../../../../../lib/kampo/masters';
 import { getSession, saveSession, getCustomer, saveCustomer } from '../../../../../../lib/kampo/store';
-import { visibleQuestions, firstUnansweredStep, normalizeAnswer, isAnswered, sexFromAnswers, ageBandFromAnswers, resolveQuestion } from '../../../../../../lib/kampo/flow';
-import { finalize } from '../../../../../../lib/kampo/compute';
-import type { FreeTexts } from '../../../../../../lib/kampo/safety';
+import { walk, firstUnansweredStep, normalizeAnswer, isAnswered, sexFromAnswers, ageBandFromAnswers } from '../../../../../../lib/kampo/flow';
+import { isUrgent } from '../../../../../../lib/kampo/safety';
+import { isLegacy } from '../../../../../../lib/kampo/compute';
 
 const id = Astro.params.id ?? '';
 const stepNum = parseInt(Astro.params.step ?? '', 10);
 const s = await getSession(id);
 if (!s) return Astro.redirect('/kampo/check/new/?msg=notfound', 303);
-if (s.status !== 'in_progress') return Astro.redirect(`/kampo/check/${s.id}/result/`, 303);
-let vis = visibleQuestions(s.answers, s.tongueMode);
+if (s.status !== 'in_progress' || isLegacy(s)) return Astro.redirect(`/kampo/check/${s.id}/done/`, 303);
+let steps = walk(s.answers).steps;
 if (!Number.isInteger(stepNum) || stepNum < 1) return Astro.redirect(`/kampo/check/${s.id}/q/1/`, 303);
-const firstOpen = firstUnansweredStep(vis, s.answers, s.texts);
-if (stepNum > vis.length || stepNum > firstOpen) {
-  return Astro.redirect(firstOpen > vis.length ? `/kampo/check/${s.id}/result/` : `/kampo/check/${s.id}/q/${firstOpen}/`, 303);
+const firstOpen = firstUnansweredStep(steps);
+if (stepNum > steps.length || stepNum > firstOpen) {
+  return Astro.redirect(firstOpen > steps.length ? `/kampo/check/${s.id}/confirm/` : `/kampo/check/${s.id}/q/${firstOpen}/`, 303);
 }
-const q = resolveQuestion(vis[stepNum - 1], s.answers, s.texts);
+const q = steps[stepNum - 1].q;
 let error = '';
 
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   const rawIds = [...form.getAll('opt').map(String), ...(form.get('sub') ? [String(form.get('sub'))] : [])];
-  const rawTexts: FreeTexts = {};
-  for (const o of q.options) if (o.freeText) rawTexts[o.id] = String(form.get(`t_${o.id}`) ?? '');
-  if (q.type === 'text') rawTexts[q.id] = String(form.get('text') ?? '');
-  const { ids, texts } = normalizeAnswer(q, rawIds, rawTexts);
-  if (!isAnswered(q, ids, texts)) {
-    error = q.type === 'text' ? '入力してください。' : q.sub ? '上下それぞれ1つずつ選んでください。' : '1つ以上選んでください。';
+  const ids = normalizeAnswer(q, rawIds);
+  if (!isAnswered(q, ids)) {
+    error = q.sub ? '上下それぞれ1つずつ選んでください。' : '1つ以上選んでください。';
   } else {
     s.answers[q.id] = ids;
-    // 自由記入はこの設問の freeText の選択肢だけ入れ替える（KM の選択肢は主訴のIDなので、主訴の記入を消さない）
-    for (const o of q.options) if (o.freeText) delete s.texts[o.id];
-    delete s.texts[q.id];
-    Object.assign(s.texts, texts);
-    // 性別・主訴が変わって表示されなくなった設問の回答は捨てる（採点・安全確認に混ざらないように）
-    vis = visibleQuestions(s.answers, s.tongueMode);
-    const visIds = new Set(vis.map((x) => x.id));
-    for (const qq of QUESTIONS) if (!visIds.has(qq.id)) delete s.answers[qq.id];
+    // 前の回答が変わって表示されなくなった設問の回答は捨てる（判定・安全確認に混ざらないように）
+    const w = walk(s.answers);
+    const shown = new Set(w.steps.map((x) => x.q.id));
+    for (const k of Object.keys(s.answers)) if (!shown.has(k)) delete s.answers[k];
+    s.urgent = isUrgent(w);
     // 顧客レコードに性別・年代を控える（履歴画面用）
     if ((q.id === 'A1' || q.id === 'A2') && s.customerId) {
       const c = await getCustomer(s.customerId);
       if (c) { c.sex = sexFromAnswers(s.answers) ?? c.sex; c.ageBand = ageBandFromAnswers(s.answers) ?? c.ageBand; await saveCustomer(c); }
     }
-    const idx = vis.findIndex((x) => x.id === q.id);
-    const nextStep = (idx >= 0 ? idx : stepNum - 1) + 2;
-    if (nextStep > vis.length) {
-      finalize(s);
-      await saveSession(s);
-      return Astro.redirect(`/kampo/check/${s.id}/result/`, 303);
-    }
     await saveSession(s);
-    return Astro.redirect(`/kampo/check/${s.id}/q/${nextStep}/`, 303);
+    steps = walk(s.answers).steps;
+    const idx = steps.findIndex((x) => x.q.id === q.id);
+    const nextStep = (idx >= 0 ? idx : stepNum - 1) + 2;
+    return Astro.redirect(nextStep > steps.length ? `/kampo/check/${s.id}/confirm/` : `/kampo/check/${s.id}/q/${nextStep}/`, 303);
   }
 }
 
 const selected = new Set(s.answers[q.id] ?? []);
-const texts = s.texts;
-const isLast = stepNum === vis.length;
 const multi = q.type === 'multi';
-const hint = q.type === 'text' ? (q.optional ? '任意です。なければそのまま「次へ」を押してください。' : '') : multi ? `※複数回答可${q.max ? `（最大${q.max}つまで）` : ''}` : '';
+const hint = multi ? '※あてはまるものをすべて選んでください' : '';
 const withImages = q.options.some((o) => o.image);
-const qIndexInBlock = QUESTIONS.filter((x) => x.block === q.block && !x.role).findIndex((x) => x.id === q.id) + 1;
-const meta = q.meta ?? `${BLOCK_LABEL[q.block]}　${q.block}${qIndexInBlock}`;
+const meta = SECTION_LABEL[q.section];
 // 短い選択肢は4列・3列で並べる（参考：横並びの枠）
 const maxLen = Math.max(...q.options.map((o) => o.text.length), 0);
-const cols = withImages ? '' : maxLen <= 8 && q.options.length >= 3 ? 'cols4' : maxLen <= 14 && q.options.length >= 3 ? 'cols3' : '';
+const cols = withImages ? 'imgs' : maxLen <= 8 && q.options.length >= 3 ? 'cols4' : maxLen <= 14 && q.options.length >= 3 ? 'cols3' : '';
 ---
-<KampoLayout title={`Q${stepNum} ${q.title}`} width="normal" progress={{ done: stepNum - 1, total: vis.length }}>
-  <form method="post" id="qform" data-qid={q.id} data-type={q.type} data-max={q.max ?? 0} data-sub={q.sub ? '1' : '0'} data-optional={q.optional ? '1' : '0'}>
-    <p class="kp-qmeta">{meta}　Q{stepNum} / {vis.length}</p>
-    {q.block === 'C' && <p class="kp-eyebrow" style="letter-spacing:.14em;margin-bottom:4px">安心してご提案するための確認です</p>}
+<KampoLayout title={`Q${stepNum} ${q.title}`} width="normal" progress={{ done: stepNum - 1, total: steps.length }}>
+  <form method="post" id="qform" data-qid={q.id} data-type={q.type} data-sub={q.sub ? '1' : '0'}>
+    <p class="kp-qmeta">{meta}　Q{stepNum} / {steps.length}</p>
+    {q.section === 'safety' && <p class="kp-eyebrow" style="letter-spacing:.14em;margin-bottom:4px">安心してご提案するための確認です</p>}
     <div class="kp-q"><QMark /><h1 class="kp-qtitle">{q.title}</h1></div>
     {hint && <p class="kp-qhint">{hint}</p>}
     {q.help && <p class="kp-qhelp">{q.help}</p>}
     {error && <p class="kp-error" style="margin:0 0 16px">{error}</p>}
-    {q.type === 'text' ? (
-      <textarea class="kp-input" name="text" rows="4" placeholder={q.placeholder}>{texts[q.id] ?? ''}</textarea>
-    ) : (
-      <div class:list={['kp-opts', cols, { one: false }]}>
-        {q.options.map((o) => {
-          const none = o.flags?.includes('none');
-          const on = selected.has(o.id);
-          return (
-            <>
-              <label class:list={['kp-opt', { check: multi, none, 'is-on': on, 'has-img': !!o.image }]}>
-                <input type={multi ? 'checkbox' : 'radio'} name="opt" value={o.id} checked={on} data-none={none ? '1' : '0'} data-alert={o.flags?.includes('refer') ? 'refer' : o.flags?.includes('consult') ? 'consult' : ''}>
-                {o.image && <img class="kp-opt-img" src={o.image} alt="" width="150" height="186">}
-                <span class="kp-opt-text">{o.text}</span>
-              </label>
-              {o.freeText && (
-                <div class="kp-free" id={`free-${o.id}`} hidden={!on}>
-                  <input type="text" name={`t_${o.id}`} value={texts[o.id] ?? ''} placeholder={o.placeholder ?? '詳しく'} maxlength="300" autocomplete="off">
-                </div>
-              )}
-            </>
-          );
-        })}
-      </div>
-    )}
-    <p class="kp-alert refer" id="alert-refer" hidden>この症状がある場合は、早めに医療機関を受診してください。回答はこのまま続けられます。結果画面をお渡しするときに、薬剤師にもお伝えください。</p>
-    <p class="kp-alert consult" id="alert-consult" hidden>あてはまる場合は、医療機関の受診もあわせてご検討ください。漢方薬のご提案は、薬剤師がお話を伺ってから行います。</p>
+    <div class:list={['kp-opts', cols]}>
+      {q.options.map((o) => {
+        const on = selected.has(o.id);
+        return (
+          <label class:list={['kp-opt', { check: multi, none: !!o.exclusive, 'is-on': on, 'has-img': !!o.image }]}>
+            <input type={multi ? 'checkbox' : 'radio'} name="opt" value={o.id} checked={on} data-ex={o.exclusive ? '1' : '0'} data-urgent={o.urgent ? '1' : '0'}>
+            {o.image && <img class="kp-opt-img" src={o.image} alt="" width="160" height="236" loading="lazy">}
+            <span class="kp-opt-text">{o.text}</span>
+          </label>
+        );
+      })}
+    </div>
+    <p class="kp-alert refer" id="alert-urgent" hidden>すぐに近くのスタッフにお声がけください。回答はこのまま続けられます。</p>
     {q.sub && (
       <div class="kp-sub">
         <div class="kp-q" style="margin-bottom:22px"><QMark /><h2 class="kp-qtitle" style="font-size:26px">{q.sub.title}</h2></div>
@@ -125,42 +99,38 @@ const cols = withImages ? '' : maxLen <= 8 && q.options.length >= 3 ? 'cols4' : 
     <div class="kp-nav">
       <div class="kp-nav-pill">
         {stepNum > 1 ? <a class="tri-l" href={`/kampo/check/${s.id}/q/${stepNum - 1}/`}>戻る</a> : <span class="tri-l" aria-disabled="true">戻る</span>}
-        <button class="tri-r" type="submit" id="nextBtn" disabled>{isLast ? '結果を見る' : '次へ'}</button>
+        <button class="tri-r" type="submit" id="nextBtn" disabled>次へ</button>
       </div>
     </div>
   </form>
+  <style is:global>
+  .kp-opts.imgs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .kp-opts.imgs .kp-opt-img{width:100%;max-width:160px;height:auto;mix-blend-mode:multiply}
+  @media(max-width:640px){.kp-opts.imgs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  </style>
   <script is:inline>
   (function(){
     var form=document.getElementById('qform');if(!form)return;
-    var type=form.dataset.type,max=parseInt(form.dataset.max||'0',10),hasSub=form.dataset.sub==='1',optional=form.dataset.optional==='1';
+    var type=form.dataset.type,hasSub=form.dataset.sub==='1';
     var next=document.getElementById('nextBtn');
     var opts=Array.prototype.slice.call(form.querySelectorAll('input[name=opt]'));
     var subs=Array.prototype.slice.call(form.querySelectorAll('input[name=sub]'));
-    var text=form.querySelector('textarea[name=text]');
-    var isNone=function(i){return i.dataset.none==='1'};
+    var isEx=function(i){return i.dataset.ex==='1'};
     function sync(){
       var checked=opts.filter(function(i){return i.checked});
-      opts.forEach(function(i){var l=i.closest('.kp-opt');l.classList.toggle('is-on',i.checked);
-        var free=document.getElementById('free-'+i.value);if(free){free.hidden=!i.checked;if(i.checked&&document.activeElement===i){var inp=free.querySelector('input');if(inp)inp.focus();}}
-        var off=type==='multi'&&max>0&&checked.length>=max&&!i.checked&&!isNone(i);
-        i.disabled=off;l.classList.toggle('is-off',off);
-      });
+      opts.forEach(function(i){i.closest('.kp-opt').classList.toggle('is-on',i.checked)});
       subs.forEach(function(i){i.closest('.kp-opt').classList.toggle('is-on',i.checked)});
-      ['refer','consult'].forEach(function(k){var el=document.getElementById('alert-'+k);if(el)el.hidden=!checked.some(function(i){return i.dataset.alert===k})});
-      var ok;
-      if(type==='text'){ok=optional||(text&&text.value.trim().length>0)}
-      else{ok=checked.length>0&&(!hasSub||subs.some(function(i){return i.checked}))}
-      next.disabled=!ok;
+      var el=document.getElementById('alert-urgent');if(el)el.hidden=!checked.some(function(i){return i.dataset.urgent==='1'});
+      next.disabled=!(checked.length>0&&(!hasSub||subs.some(function(i){return i.checked})));
     }
     opts.forEach(function(i){i.addEventListener('change',function(){
       if(type==='multi'){
-        if(i.checked&&isNone(i)){opts.forEach(function(o){if(o!==i)o.checked=false})}
-        else if(i.checked){opts.forEach(function(o){if(isNone(o))o.checked=false})}
+        if(i.checked&&isEx(i)){opts.forEach(function(o){if(o!==i)o.checked=false})}
+        else if(i.checked){opts.forEach(function(o){if(isEx(o))o.checked=false})}
       }
       sync();
     })});
     subs.forEach(function(i){i.addEventListener('change',sync)});
-    if(text)text.addEventListener('input',sync);
     sync();
   })();
   </script>

@@ -1,0 +1,1126 @@
+{
+ "version": "2026-10-25-v3",
+ "review": {
+  "status": "draft",
+  "source": "2026-10-24 版（3段階版）の設問・重みを、2026-10-25 の改修指示と承認済みの改修計画に沿って組み直した草案。重み・五臓は現行の選択肢の値を引き継いだもので、新しい数値は作っていない（専門家未確認）",
+  "reviewer": null,
+  "reviewedAt": null
+ },
+ "note": "主訴カテゴリーと具体的な主訴（改修計画 §4）。findings は主訴を選んだときに present になる所見、symptoms は漢方薬の候補を抽出する症状コード（formulas.json の symptoms）、detail は深掘りのテンプレート（questions.json の template）、tags は安全確認タグ。",
+ "categories": [
+  {
+   "id": "A",
+   "name": "疲れ・体力・全身の不調"
+  },
+  {
+   "id": "B",
+   "name": "胃腸・便通"
+  },
+  {
+   "id": "C",
+   "name": "肌"
+  },
+  {
+   "id": "D",
+   "name": "髪・頭皮"
+  },
+  {
+   "id": "E",
+   "name": "睡眠・こころ"
+  },
+  {
+   "id": "F",
+   "name": "女性の健康",
+   "femaleOnly": true
+  },
+  {
+   "id": "G",
+   "name": "痛み・こり・しびれ"
+  },
+  {
+   "id": "H",
+   "name": "その他の体の不調"
+  }
+ ],
+ "complaints": [
+  {
+   "id": "fatigue",
+   "name": "疲れやすい",
+   "categories": [
+    "A"
+   ],
+   "findings": [
+    "fatigue_easy"
+   ],
+   "symptoms": [
+    "fatigue"
+   ],
+   "detail": "fatigue"
+  },
+  {
+   "id": "heavy",
+   "name": "体がだるい・重い",
+   "categories": [
+    "A"
+   ],
+   "findings": [
+    "heavy_body"
+   ],
+   "symptoms": [
+    "fatigue"
+   ],
+   "detail": "heavy"
+  },
+  {
+   "id": "no_energy",
+   "name": "気力が出ない",
+   "categories": [
+    "A"
+   ],
+   "findings": [
+    "lack_energy"
+   ],
+   "symptoms": [
+    "fatigue"
+   ],
+   "detail": "fatigue",
+   "tags": [
+    "mental"
+   ]
+  },
+  {
+   "id": "cold_limbs",
+   "name": "手足が冷える",
+   "categories": [
+    "A"
+   ],
+   "findings": [
+    "cold_hands_feet"
+   ],
+   "symptoms": [
+    "cold"
+   ],
+   "detail": "cold"
+  },
+  {
+   "id": "cold_body",
+   "name": "お腹・腰・全身が冷える",
+   "categories": [
+    "A"
+   ],
+   "findings": [],
+   "symptoms": [
+    "cold"
+   ],
+   "detail": "cold"
+  },
+  {
+   "id": "hot_upper",
+   "name": "顔や上半身のほてり・熱感",
+   "categories": [
+    "A",
+    "C"
+   ],
+   "findings": [
+    "hot_upper"
+   ],
+   "symptoms": [
+    "flush"
+   ],
+   "detail": "hot_upper"
+  },
+  {
+   "id": "hot_palms",
+   "name": "手足がほてる",
+   "categories": [
+    "A"
+   ],
+   "findings": [
+    "palms_hot"
+   ],
+   "symptoms": [
+    "flush"
+   ],
+   "detail": "hot_palms"
+  },
+  {
+   "id": "sweat",
+   "name": "汗をかきやすい",
+   "categories": [
+    "A"
+   ],
+   "findings": [
+    "sweat_easy"
+   ],
+   "symptoms": [
+    "sweating"
+   ],
+   "detail": "sweat"
+  },
+  {
+   "id": "night_sweat",
+   "name": "寝汗をかく",
+   "categories": [
+    "A"
+   ],
+   "findings": [
+    "night_sweat"
+   ],
+   "symptoms": [
+    "night_sweat"
+   ],
+   "detail": "sweat"
+  },
+  {
+   "id": "recovery",
+   "name": "病後・産後の体力低下",
+   "categories": [
+    "A"
+   ],
+   "findings": [
+    "weak_after_illness"
+   ],
+   "symptoms": [
+    "recovery"
+   ],
+   "detail": "fatigue"
+  },
+  {
+   "id": "stomach_pain",
+   "name": "胃痛",
+   "categories": [
+    "B"
+   ],
+   "findings": [
+    "stomach_pain"
+   ],
+   "symptoms": [
+    "stomach_pain"
+   ],
+   "detail": "stomach",
+   "tags": [
+    "abdominal"
+   ]
+  },
+  {
+   "id": "stomach_heavy",
+   "name": "胃もたれ",
+   "categories": [
+    "B"
+   ],
+   "findings": [
+    "stomach_heavy"
+   ],
+   "symptoms": [
+    "stomach_heavy"
+   ],
+   "detail": "stomach_heavy"
+  },
+  {
+   "id": "bloating",
+   "name": "お腹の張り",
+   "categories": [
+    "B"
+   ],
+   "findings": [
+    "bloating"
+   ],
+   "symptoms": [],
+   "detail": "bloating"
+  },
+  {
+   "id": "poor_appetite",
+   "name": "食欲不振",
+   "categories": [
+    "B"
+   ],
+   "findings": [
+    "poor_appetite"
+   ],
+   "symptoms": [
+    "poor_appetite"
+   ],
+   "detail": "appetite"
+  },
+  {
+   "id": "nausea",
+   "name": "吐き気",
+   "categories": [
+    "B"
+   ],
+   "findings": [
+    "nausea"
+   ],
+   "symptoms": [
+    "nausea"
+   ],
+   "detail": "nausea",
+   "tags": [
+    "abdominal"
+   ]
+  },
+  {
+   "id": "heartburn",
+   "name": "胸やけ",
+   "categories": [
+    "B"
+   ],
+   "findings": [
+    "heartburn"
+   ],
+   "symptoms": [
+    "stomach_pain"
+   ],
+   "detail": "heartburn"
+  },
+  {
+   "id": "constipation",
+   "name": "便秘",
+   "categories": [
+    "B"
+   ],
+   "findings": [
+    "constipation"
+   ],
+   "symptoms": [
+    "constipation"
+   ],
+   "detail": "constipation"
+  },
+  {
+   "id": "diarrhea",
+   "name": "下痢・軟便",
+   "categories": [
+    "B"
+   ],
+   "findings": [
+    "loose_stool"
+   ],
+   "symptoms": [
+    "diarrhea"
+   ],
+   "detail": "diarrhea",
+   "tags": [
+    "abdominal"
+   ]
+  },
+  {
+   "id": "alternating",
+   "name": "便秘と下痢をくり返す",
+   "categories": [
+    "B"
+   ],
+   "findings": [
+    "alternating"
+   ],
+   "symptoms": [
+    "alternating"
+   ],
+   "detail": "alternating",
+   "tags": [
+    "abdominal"
+   ]
+  },
+  {
+   "id": "acne",
+   "name": "ニキビ",
+   "categories": [
+    "C"
+   ],
+   "findings": [
+    "acne"
+   ],
+   "symptoms": [
+    "acne"
+   ],
+   "detail": "acne"
+  },
+  {
+   "id": "dry_skin",
+   "name": "肌の乾燥",
+   "categories": [
+    "C"
+   ],
+   "findings": [
+    "skin_dry"
+   ],
+   "symptoms": [],
+   "detail": "dry_skin"
+  },
+  {
+   "id": "itch",
+   "name": "肌のかゆみ",
+   "categories": [
+    "C"
+   ],
+   "findings": [
+    "itch"
+   ],
+   "symptoms": [
+    "itch"
+   ],
+   "detail": "itch"
+  },
+  {
+   "id": "eczema",
+   "name": "湿疹・肌荒れ",
+   "categories": [
+    "C"
+   ],
+   "findings": [
+    "eczema"
+   ],
+   "symptoms": [
+    "eczema"
+   ],
+   "detail": "eczema"
+  },
+  {
+   "id": "dull",
+   "name": "肌のくすみ",
+   "categories": [
+    "C"
+   ],
+   "findings": [
+    "dull_skin"
+   ],
+   "symptoms": [],
+   "detail": "complexion"
+  },
+  {
+   "id": "spots",
+   "name": "シミ・色素沈着",
+   "categories": [
+    "C"
+   ],
+   "findings": [
+    "spots"
+   ],
+   "symptoms": [
+    "spots"
+   ],
+   "detail": "spots"
+  },
+  {
+   "id": "melasma",
+   "name": "肝斑",
+   "categories": [
+    "C"
+   ],
+   "findings": [
+    "melasma"
+   ],
+   "symptoms": [
+    "spots"
+   ],
+   "detail": "spots"
+  },
+  {
+   "id": "hair_loss",
+   "name": "抜け毛",
+   "categories": [
+    "D"
+   ],
+   "findings": [
+    "hair_loss"
+   ],
+   "symptoms": [],
+   "detail": "hair_loss"
+  },
+  {
+   "id": "thin_hair",
+   "name": "薄毛・髪が細くなった",
+   "categories": [
+    "D"
+   ],
+   "findings": [
+    "thin_hair"
+   ],
+   "symptoms": [],
+   "detail": "hair_loss"
+  },
+  {
+   "id": "hair_dry",
+   "name": "髪のパサつき・ツヤの低下",
+   "categories": [
+    "D"
+   ],
+   "findings": [
+    "hair_dry"
+   ],
+   "symptoms": [],
+   "detail": "hair_dry"
+  },
+  {
+   "id": "gray_hair",
+   "name": "白髪",
+   "categories": [
+    "D"
+   ],
+   "findings": [
+    "gray_hair"
+   ],
+   "symptoms": [],
+   "detail": "gray_hair"
+  },
+  {
+   "id": "scalp_dry",
+   "name": "頭皮の乾燥",
+   "categories": [
+    "D"
+   ],
+   "findings": [
+    "scalp_dry"
+   ],
+   "symptoms": [],
+   "detail": "scalp"
+  },
+  {
+   "id": "scalp_oily",
+   "name": "頭皮の脂っぽさ",
+   "categories": [
+    "D"
+   ],
+   "findings": [
+    "scalp_oily"
+   ],
+   "symptoms": [],
+   "detail": "scalp"
+  },
+  {
+   "id": "dandruff",
+   "name": "フケ",
+   "categories": [
+    "D"
+   ],
+   "findings": [
+    "dandruff"
+   ],
+   "symptoms": [],
+   "detail": "scalp"
+  },
+  {
+   "id": "scalp_itch",
+   "name": "頭皮のかゆみ",
+   "categories": [
+    "D"
+   ],
+   "findings": [
+    "scalp_itch"
+   ],
+   "symptoms": [
+    "itch"
+   ],
+   "detail": "scalp"
+  },
+  {
+   "id": "scalp_eczema",
+   "name": "頭皮の湿疹・赤み",
+   "categories": [
+    "D"
+   ],
+   "findings": [
+    "scalp_eczema"
+   ],
+   "symptoms": [
+    "eczema"
+   ],
+   "detail": "scalp"
+  },
+  {
+   "id": "sleep_onset",
+   "name": "寝つきが悪い",
+   "categories": [
+    "E"
+   ],
+   "findings": [
+    "sleep_onset"
+   ],
+   "symptoms": [
+    "insomnia"
+   ],
+   "detail": "insomnia"
+  },
+  {
+   "id": "night_waking",
+   "name": "夜中に目が覚める",
+   "categories": [
+    "E"
+   ],
+   "findings": [
+    "night_waking"
+   ],
+   "symptoms": [
+    "insomnia"
+   ],
+   "detail": "insomnia"
+  },
+  {
+   "id": "early_waking",
+   "name": "朝早く目が覚める",
+   "categories": [
+    "E"
+   ],
+   "findings": [
+    "early_waking"
+   ],
+   "symptoms": [
+    "insomnia"
+   ],
+   "detail": "insomnia"
+  },
+  {
+   "id": "light_sleep",
+   "name": "眠りが浅い・夢が多い",
+   "categories": [
+    "E"
+   ],
+   "findings": [
+    "light_sleep"
+   ],
+   "symptoms": [
+    "insomnia"
+   ],
+   "detail": "insomnia"
+  },
+  {
+   "id": "daytime_sleepy",
+   "name": "日中の眠気",
+   "categories": [
+    "E"
+   ],
+   "findings": [
+    "daytime_sleepy"
+   ],
+   "symptoms": [],
+   "detail": "sleepy"
+  },
+  {
+   "id": "anxiety",
+   "name": "不安・緊張",
+   "categories": [
+    "E"
+   ],
+   "findings": [
+    "anxious"
+   ],
+   "symptoms": [
+    "nerves"
+   ],
+   "detail": "anxiety",
+   "tags": [
+    "mental"
+   ]
+  },
+  {
+   "id": "irritability",
+   "name": "イライラ・怒りっぽい",
+   "categories": [
+    "E"
+   ],
+   "findings": [
+    "irritable"
+   ],
+   "symptoms": [
+    "nerves"
+   ],
+   "detail": "irritability"
+  },
+  {
+   "id": "low_mood",
+   "name": "気分の落ち込み",
+   "categories": [
+    "E"
+   ],
+   "findings": [
+    "low_mood"
+   ],
+   "symptoms": [
+    "nerves"
+   ],
+   "detail": "low_mood",
+   "tags": [
+    "mental"
+   ]
+  },
+  {
+   "id": "stress",
+   "name": "ストレスによる体調不良",
+   "categories": [
+    "E"
+   ],
+   "findings": [
+    "stress_unwell"
+   ],
+   "symptoms": [],
+   "detail": "stress"
+  },
+  {
+   "id": "period_pain",
+   "name": "月経痛",
+   "categories": [
+    "F"
+   ],
+   "findings": [
+    "dysmenorrhea"
+   ],
+   "symptoms": [
+    "dysmenorrhea"
+   ],
+   "detail": "period_pain",
+   "tags": [
+    "abdominal"
+   ],
+   "femaleOnly": true
+  },
+  {
+   "id": "irregular",
+   "name": "月経不順",
+   "categories": [
+    "F"
+   ],
+   "findings": [
+    "irregular_menses"
+   ],
+   "symptoms": [
+    "irregular_menses"
+   ],
+   "detail": "irregular",
+   "femaleOnly": true
+  },
+  {
+   "id": "pms_mood",
+   "name": "月経前の心の不調（イライラ・落ち込み・不安）",
+   "categories": [
+    "F"
+   ],
+   "findings": [
+    "pms_mood"
+   ],
+   "symptoms": [
+    "blood_path"
+   ],
+   "detail": "pms_mood",
+   "tags": [
+    "mental"
+   ],
+   "femaleOnly": true
+  },
+  {
+   "id": "pms_body",
+   "name": "月経前の体の不調（むくみ・胸の張り・眠気など）",
+   "categories": [
+    "F"
+   ],
+   "findings": [
+    "pms_body"
+   ],
+   "symptoms": [
+    "blood_path"
+   ],
+   "detail": "pms_body",
+   "femaleOnly": true
+  },
+  {
+   "id": "flow_heavy",
+   "name": "経血量が多い",
+   "categories": [
+    "F"
+   ],
+   "findings": [
+    "flow_heavy"
+   ],
+   "symptoms": [
+    "irregular_menses"
+   ],
+   "detail": "flow_heavy",
+   "tags": [
+    "bleeding"
+   ],
+   "femaleOnly": true
+  },
+  {
+   "id": "flow_light",
+   "name": "経血量が少ない",
+   "categories": [
+    "F"
+   ],
+   "findings": [
+    "flow_light"
+   ],
+   "symptoms": [
+    "irregular_menses"
+   ],
+   "detail": "flow_light",
+   "femaleOnly": true
+  },
+  {
+   "id": "menopause",
+   "name": "更年期にともなう不調",
+   "categories": [
+    "F"
+   ],
+   "findings": [
+    "menopause"
+   ],
+   "symptoms": [
+    "menopause"
+   ],
+   "detail": "menopause",
+   "femaleOnly": true
+  },
+  {
+   "id": "postpartum",
+   "name": "産後の不調",
+   "categories": [
+    "F"
+   ],
+   "findings": [
+    "postpartum"
+   ],
+   "symptoms": [
+    "blood_path"
+   ],
+   "detail": "postpartum",
+   "tags": [
+    "mental"
+   ],
+   "femaleOnly": true
+  },
+  {
+   "id": "headache",
+   "name": "頭痛",
+   "categories": [
+    "G"
+   ],
+   "findings": [
+    "headache"
+   ],
+   "symptoms": [
+    "headache"
+   ],
+   "detail": "headache",
+   "tags": [
+    "headache"
+   ]
+  },
+  {
+   "id": "stiff_shoulder",
+   "name": "肩こり・首こり",
+   "categories": [
+    "G"
+   ],
+   "findings": [
+    "stiff_shoulder"
+   ],
+   "symptoms": [
+    "stiff_shoulder"
+   ],
+   "detail": "stiff_shoulder"
+  },
+  {
+   "id": "low_back",
+   "name": "腰痛",
+   "categories": [
+    "G"
+   ],
+   "findings": [
+    "low_back_pain"
+   ],
+   "symptoms": [
+    "low_back"
+   ],
+   "detail": "low_back"
+  },
+  {
+   "id": "joint",
+   "name": "関節痛・筋肉痛",
+   "categories": [
+    "G"
+   ],
+   "findings": [
+    "joint_pain"
+   ],
+   "symptoms": [
+    "joint"
+   ],
+   "detail": "joint"
+  },
+  {
+   "id": "numbness",
+   "name": "手足のしびれ",
+   "categories": [
+    "G"
+   ],
+   "findings": [
+    "numbness"
+   ],
+   "symptoms": [
+    "numbness"
+   ],
+   "detail": "numbness",
+   "tags": [
+    "numbness"
+   ]
+  },
+  {
+   "id": "cramps",
+   "name": "足がつる（こむら返り）",
+   "categories": [
+    "G"
+   ],
+   "findings": [
+    "cramps"
+   ],
+   "symptoms": [
+    "cramps"
+   ],
+   "detail": "cramps"
+  },
+  {
+   "id": "dizziness",
+   "name": "めまい",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "dizzy"
+   ],
+   "symptoms": [
+    "dizziness"
+   ],
+   "detail": "dizziness",
+   "tags": [
+    "dizziness"
+   ]
+  },
+  {
+   "id": "orthostatic",
+   "name": "立ちくらみ",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "orthostatic"
+   ],
+   "symptoms": [
+    "dizziness"
+   ],
+   "detail": "dizziness"
+  },
+  {
+   "id": "tinnitus",
+   "name": "耳鳴り",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "tinnitus"
+   ],
+   "symptoms": [
+    "tinnitus"
+   ],
+   "detail": "tinnitus",
+   "tags": [
+    "hearing"
+   ]
+  },
+  {
+   "id": "runny_nose",
+   "name": "鼻水",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "nasal_discharge"
+   ],
+   "symptoms": [],
+   "detail": "nose"
+  },
+  {
+   "id": "nasal_block",
+   "name": "鼻づまり",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "nasal_block"
+   ],
+   "symptoms": [],
+   "detail": "nose"
+  },
+  {
+   "id": "cough",
+   "name": "咳",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "cough"
+   ],
+   "symptoms": [],
+   "detail": "cough",
+   "tags": [
+    "breath"
+   ]
+  },
+  {
+   "id": "phlegm",
+   "name": "痰",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "phlegm"
+   ],
+   "symptoms": [],
+   "detail": "cough"
+  },
+  {
+   "id": "edema",
+   "name": "むくみ",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "edema"
+   ],
+   "symptoms": [
+    "edema"
+   ],
+   "detail": "puffiness"
+  },
+  {
+   "id": "frequent_urination",
+   "name": "頻尿",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "frequent_urination"
+   ],
+   "symptoms": [
+    "frequent_urination"
+   ],
+   "detail": "urination"
+  },
+  {
+   "id": "nocturia",
+   "name": "夜間尿（夜中にトイレに起きる）",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "nocturia"
+   ],
+   "symptoms": [
+    "frequent_urination"
+   ],
+   "detail": "urination"
+  },
+  {
+   "id": "dysuria",
+   "name": "尿が出にくい",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "dysuria"
+   ],
+   "symptoms": [
+    "dysuria"
+   ],
+   "detail": "urination",
+   "tags": [
+    "urinary"
+   ]
+  },
+  {
+   "id": "palpitation",
+   "name": "動悸",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "palpitation"
+   ],
+   "symptoms": [
+    "palpitation"
+   ],
+   "detail": "palpitation",
+   "tags": [
+    "palpitation"
+   ]
+  },
+  {
+   "id": "eye_dry",
+   "name": "目の乾燥",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "eye_dry"
+   ],
+   "symptoms": [],
+   "detail": "eye"
+  },
+  {
+   "id": "eye_strain",
+   "name": "目の疲れ・かすみ",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "eye_strain"
+   ],
+   "symptoms": [],
+   "detail": "eye"
+  },
+  {
+   "id": "dry_mouth",
+   "name": "口の渇き",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "dry_mouth"
+   ],
+   "symptoms": [],
+   "detail": "thirst"
+  },
+  {
+   "id": "throat",
+   "name": "のどのつかえ",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "throat_lump"
+   ],
+   "symptoms": [
+    "throat_lump"
+   ],
+   "detail": "throat",
+   "tags": [
+    "throat"
+   ]
+  },
+  {
+   "id": "breath",
+   "name": "息苦しさ",
+   "categories": [
+    "H"
+   ],
+   "findings": [
+    "dyspnea"
+   ],
+   "symptoms": [
+    "short_breath"
+   ],
+   "detail": "breath",
+   "tags": [
+    "breath"
+   ]
+  }
+ ]
+}

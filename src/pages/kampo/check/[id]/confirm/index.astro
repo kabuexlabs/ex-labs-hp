@@ -1,0 +1,52 @@
+---
+// 回答の確認：答えた内容を一覧で見直し、「修正する」で各設問に戻れる。「この内容で送信する」で回答を確定する。
+export const prerender = false;
+import KampoLayout from '../../../../../layouts/KampoLayout.astro';
+import { SECTION_LABEL } from '../../../../../lib/kampo/masters';
+import { getSession, saveSession } from '../../../../../lib/kampo/store';
+import { walk, firstUnansweredStep } from '../../../../../lib/kampo/flow';
+import { finalize, isLegacy } from '../../../../../lib/kampo/compute';
+
+const s = await getSession(Astro.params.id ?? '');
+if (!s) return Astro.redirect('/kampo/check/new/?msg=notfound', 303);
+if (s.status !== 'in_progress' || isLegacy(s)) return Astro.redirect(`/kampo/check/${s.id}/done/`, 303);
+const { steps } = walk(s.answers);
+const open = firstUnansweredStep(steps);
+if (open <= steps.length) return Astro.redirect(`/kampo/check/${s.id}/q/${open}/`, 303);
+if (Astro.request.method === 'POST') {
+  finalize(s);
+  await saveSession(s);
+  return Astro.redirect(`/kampo/check/${s.id}/done/`, 303);
+}
+const textOf = (st: (typeof steps)[number]) =>
+  st.ids.map((id) => [...st.q.options, ...(st.q.sub?.options ?? [])].find((o) => o.id === id)?.text ?? '').filter(Boolean).join('、');
+---
+<KampoLayout title="回答の確認" width="normal" progress={{ done: steps.length, total: steps.length }}>
+  <h1 class="kp-h1">回答の<span class="sky">確認</span></h1>
+  <p class="kp-result-lede" style="font-size:16px;line-height:2">内容をご確認ください。直したいところは「修正する」から戻れます。</p>
+  <div class="kp-panel">
+    <div class="kp-panel-b">
+      <ol class="kp-confirm">
+        {steps.map((st, i) => (
+          <li>
+            <p class="kp-confirm-q"><small>{SECTION_LABEL[st.q.section]}</small>{st.q.title}</p>
+            <p class="kp-confirm-a">{textOf(st)}</p>
+            <a class="kp-confirm-edit" href={`/kampo/check/${s.id}/q/${i + 1}/`}>修正する</a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+  <form method="post" style="text-align:center;margin-top:36px">
+    <button class="kp-btn" type="submit" style="min-width:280px">この内容で送信する</button>
+  </form>
+  <style is:global>
+  .kp-confirm{list-style:none;margin:0;padding:0}
+  .kp-confirm li{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:14px 0;border-top:1px solid var(--line)}
+  .kp-confirm li:first-child{border-top:0}
+  .kp-confirm-q{font-size:15px;color:var(--ink-2);grid-column:1}
+  .kp-confirm-q small{display:block;font-size:12px;color:var(--sky-text);letter-spacing:.1em}
+  .kp-confirm-a{font-size:16px;grid-column:1}
+  .kp-confirm-edit{grid-column:2;grid-row:1/3;align-self:center;font-size:14px;white-space:nowrap}
+  </style>
+</KampoLayout>

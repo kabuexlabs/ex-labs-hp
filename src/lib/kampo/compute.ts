@@ -1,20 +1,31 @@
-// セッションの回答からスコアと安全確認フラグをまとめて計算する（保存はしない）。
-import { QUESTIONS } from './masters.ts';
+// セッションの回答から、所見・スコア・安全確認をまとめて計算する（保存はしない）。
+import { FORMULAS, QUESTIONNAIRE } from './masters.ts';
+import { walk, applyStaffAnswers, type WalkResult } from './flow.ts';
 import { score, type ScoreResult } from './scoring.ts';
-import { safetyFlags, type SafetyFlag } from './safety.ts';
-import { sexFromAnswers } from './flow.ts';
+import { safetyFlags, safetyTags, isUrgent, type SafetyFlag, type TagHit } from './safety.ts';
+import { selectFormulas, type Selection } from './recommend.ts';
 import type { KampoSession } from './store.ts';
 
-export function computeSession(s: Pick<KampoSession, 'answers' | 'texts' | 'tongueMode' | 'tongueOverride'>): { scores: ScoreResult; safetyFlags: SafetyFlag[] } {
-  const scores = score(s.answers, QUESTIONS, { sex: sexFromAnswers(s.answers), tongueMode: s.tongueMode, tongueOverride: s.tongueOverride });
-  return { scores, safetyFlags: safetyFlags(s.answers, s.texts, s.tongueOverride ?? []) };
-}
+export interface Computed { w: WalkResult; scores: ScoreResult; safetyFlags: SafetyFlag[]; tags: TagHit[]; urgent: boolean }
 
-/** 回答が終わっていればスコアを確定して completed にする（既に確定済みなら何もしない） */
+/** 旧版（2026-10-24 版・取り消した v2）のセッションは再計算せず、保存時の内容を表示する */
+export const isLegacy = (s: Pick<KampoSession, 'questionnaireVersion'>) => s.questionnaireVersion !== QUESTIONNAIRE.version;
+
+export function computeSession(s: Pick<KampoSession, 'answers' | 'staffAnswers'>): Computed {
+  const w = walk(s.answers);
+  applyStaffAnswers(w.state, s.staffAnswers);
+  return { w, scores: score(w.state), safetyFlags: safetyFlags(s.answers, w), tags: safetyTags(w, s.staffAnswers), urgent: isUrgent(w) };
+}
+export const selectionOf = (s: Pick<KampoSession, 'answers'>, c: Computed): Selection =>
+  selectFormulas(c.scores, s.answers, c.w, c.safetyFlags, c.tags, FORMULAS);
+
+/** 回答が終わっていればスコアを確定して completed にする（既に確定済みなら状態は変えない） */
 export function finalize(s: KampoSession): KampoSession {
-  const { scores, safetyFlags: flags } = computeSession(s);
-  s.scores = scores;
-  s.safetyFlags = flags;
+  const c = computeSession(s);
+  s.scores = c.scores;
+  s.safetyFlags = c.safetyFlags;
+  s.tags = c.tags;
+  s.urgent = c.urgent;
   if (s.status === 'in_progress') {
     s.status = 'completed';
     s.completedAt = new Date().toISOString();

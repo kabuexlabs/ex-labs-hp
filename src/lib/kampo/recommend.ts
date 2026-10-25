@@ -16,17 +16,21 @@
 //          ④服用前の確認事項」の順で作る
 //
 // 候補群の中に体質的に適合する漢方薬がなければ、無理に推薦しない（pick なし）。
-// 主訴が承認された効能・効果に当たらない（毛穴・たるみ・抜け毛など）ときは候補群が空になり、推薦しない。
+// 主訴が承認された効能・効果に当たらない（抜け毛・お腹の張りなど）ときは候補群が空になり、推薦しない。
 // 重み・しきい値は SELECTION の初期値。店頭の実データで薬剤師が調整する。
+// 2026-10-25 フェーズ2：回答は所見（findings.json）に変換して照合する。処方の signs・requires は所見ID。
+// 候補は薬剤師画面にだけ出す（患者向け画面には出さない。改修指示 第1章）。処方選定の作り直しはフェーズ5。
 // ---------------------------------------------------------------------------
 import {
-  TYPE_DEFS, ORGAN_PLAIN, THERMAL_LABEL, HEAT_LABEL, QUESTIONS,
-  optionText, symptomLabel, strengthRangeLabel, questionOfOption,
-  type Formula, type TypeKey, type OrganKey, type Strength, type Question,
+  TYPE_DEFS, ORGAN_PLAIN, THERMAL_LABEL, HEAT_LABEL,
+  findingLabel, symptomLabel, strengthRangeLabel,
+  type Formula, type TypeKey, type OrganKey, type Strength,
 } from './masters.ts';
-import { chosenComplaintIds, mainComplaintId, complaintInfo } from './complaints.ts';
-import { DEF_EXC_LABEL, THERMAL_STATE_LABEL, HEAT_KIND_LABEL, type Answers, type ScoreResult } from './scoring.ts';
-import { hasRefer, safetyContext, assessFormulaSafety, GENERAL_NOTES, type SafetyFlag, type FreeTexts, type FormulaSafety } from './safety.ts';
+import { complaintInfo } from './complaints.ts';
+import { presentIds } from './findings.ts';
+import { DEF_EXC_LABEL, THERMAL_STATE_LABEL, HEAT_KIND_LABEL, type ScoreResult } from './scoring.ts';
+import { safetyContext, assessFormulaSafety, GENERAL_NOTES, type SafetyFlag, type TagHit, type FormulaSafety } from './safety.ts';
+import type { Answers, WalkResult } from './flow.ts';
 
 export const SELECTION = {
   weight: {
@@ -80,7 +84,7 @@ export interface Candidate {
   efficacyIndex: number;
 }
 
-export type GroupOutcome = 'pick' | 'pick_check' | 'no_pool' | 'no_fit' | 'all_excluded' | 'other';
+export type GroupOutcome = 'pick' | 'pick_check' | 'no_pool' | 'no_fit' | 'all_excluded';
 export interface DetailAnswer {
   id: string;
   text: string;
@@ -111,14 +115,12 @@ export interface ComplaintGroup {
 }
 export interface Companion { id: string; label: string; category: string; symptoms: string[] }
 export interface Selection {
-  /** いちばん改善したい主訴（0件か1件。主訴が未選択の旧データは0件） */
+  /** いちばん改善したい主訴（0件か1件） */
   groups: ComplaintGroup[];
   /** ほかに選んだ主訴（随伴症状として扱う） */
   companions: Companion[];
-  /** 受診勧奨があれば来店客向けの推薦は出さない */
-  refer: boolean;
-  /** その他（自由記入）の主訴 */
-  otherComplaint?: string;
+  /** 安全確認タグ（未確認のあいだは提案を確定しない） */
+  tags: TagHit[];
 }
 
 export const OUTCOME_LABEL: Record<GroupOutcome, string> = {
@@ -127,58 +129,50 @@ export const OUTCOME_LABEL: Record<GroupOutcome, string> = {
   no_pool: '効能に当たる候補なし',
   no_fit: '体質に合う候補なし',
   all_excluded: '安全性で全て除外',
-  other: 'その他（自由記入）',
 };
 
 const STRENGTH_ORDER: Record<Strength, number> = { def: 0, mid: 1, exc: 2 };
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-/** 主訴の詳細問診の設問（いちばん改善したい主訴の detail と showIf.mainDetail で対応づけ） */
-export function detailQuestionsFor(complaintId: string, questions: Question[] = QUESTIONS): Question[] {
-  const tpl = complaintInfo(complaintId)?.option.detail;
-  return tpl ? questions.filter((q) => q.role === 'detail' && q.showIf?.mainDetail === tpl) : [];
+/** 照合に使う集合：present の所見と、選ばれている選択肢ID（舌などの薬剤師の観察を含む） */
+export function chosenSet(w: WalkResult): Set<string> {
+  return new Set([...presentIds(w.state), ...w.chosen]);
 }
-
-/** 選ばれている選択肢ID（舌は薬剤師の所見があれば差し替え） */
-export function chosenSet(answers: Answers, tongueOverride?: string[]): Set<string> {
-  const ids = new Set<string>();
-  for (const [qid, arr] of Object.entries(answers)) {
-    if (qid === 'B13' && tongueOverride && tongueOverride.length) continue;
-    for (const id of arr) ids.add(id);
-  }
-  for (const id of tongueOverride ?? []) ids.add(id);
-  return ids;
+/** 主訴そのものと深掘りの回答から得た所見・選択肢（使用目標の一致を「主訴の詳細」として重く見る） */
+export function complaintSignSet(w: WalkResult): Set<string> {
+  const out = new Set<string>();
+  for (const [id, e] of w.state) if (e.status === 'present' && (e.section === 'complaint' || e.section === 'detail')) out.add(id);
+  for (const s of w.steps) if (s.q.section === 'complaint' || s.q.section === 'detail') for (const id of s.ids) out.add(id);
+  return out;
 }
 
 const uniq = <T,>(xs: T[]) => [...new Set(xs)];
 
 /** ほかに選んだ主訴（随伴症状） */
-export function companionComplaints(answers: Answers, texts: FreeTexts = {}): Companion[] {
-  const main = mainComplaintId(answers);
-  return chosenComplaintIds(answers).filter((id) => id !== main).map((id) => {
-    const info = complaintInfo(id, texts)!;
-    return { id, label: info.label, category: info.category, symptoms: info.option.symptoms ?? [] };
+export function companionComplaints(w: WalkResult): Companion[] {
+  return w.complaints.filter((id) => id !== w.primary).map((id) => {
+    const info = complaintInfo(id)!;
+    return { id, label: info.label, category: info.category, symptoms: info.complaint.symptoms };
   });
 }
 
-/** いちばん改善したい主訴と、その詳細問診の回答から症状コードをまとめる */
-export function mainComplaintGroup(answers: Answers, texts: FreeTexts = {}, questions: Question[] = QUESTIONS): Omit<ComplaintGroup, 'candidates' | 'pick' | 'outcome'> | undefined {
-  const main = mainComplaintId(answers);
-  const info = main ? complaintInfo(main, texts) : undefined;
-  if (!main || !info) return undefined;
+/** いちばん改善したい主訴と、その深掘りの回答から症状コードをまとめる */
+export function mainComplaintGroup(w: WalkResult): Omit<ComplaintGroup, 'candidates' | 'pick' | 'outcome'> | undefined {
+  const info = w.primary ? complaintInfo(w.primary) : undefined;
+  if (!w.primary || !info) return undefined;
   const details: DetailAnswer[] = [];
-  for (const dq of detailQuestionsFor(main, questions)) {
-    for (const id of answers[dq.id] ?? []) {
-      const o = dq.options.find((x) => x.id === id);
-      if (!o || o.flags?.includes('none')) continue;
-      const t = (texts[id] ?? '').trim();
-      details.push({ id, text: o.freeText && t ? `${o.text}（${t}）` : o.text, question: dq.id, symptoms: o.symptoms ?? [], also: o.also ?? [] });
+  for (const st of w.steps) {
+    if (st.q.section !== 'detail') continue;
+    for (const id of st.ids) {
+      const o = st.q.options.find((x) => x.id === id);
+      if (!o || o.exclusive) continue;
+      details.push({ id, text: o.text, question: st.q.id, symptoms: o.symptoms ?? [], also: o.also ?? [] });
     }
   }
-  const ownSymptoms = info.option.symptoms ?? [];
+  const ownSymptoms = info.complaint.symptoms;
   const symptoms = uniq([...ownSymptoms, ...details.flatMap((d) => d.symptoms)]);
-  const also = uniq([...details.flatMap((d) => d.also), ...companionComplaints(answers, texts).flatMap((c) => c.symptoms)]).filter((x) => !symptoms.includes(x));
-  return { key: main, label: info.label, category: info.category, details, ownSymptoms, symptoms, also };
+  const also = uniq([...details.flatMap((d) => d.also), ...companionComplaints(w).flatMap((c) => c.symptoms)]).filter((x) => !symptoms.includes(x));
+  return { key: w.primary, label: info.label, category: info.category, details, ownSymptoms, symptoms, also };
 }
 
 /** 効能・効果のうち、症状コードに当たるもの（条件つきの効能は条件を満たすときだけ） */
@@ -196,7 +190,7 @@ export function matchIndications(f: Formula, symptoms: Iterable<string>, chosen:
 const typeName = (t: TypeKey) => (t === 'yin_def' ? '陰虚（水不足）' : TYPE_DEFS[t].name);
 
 /** STEP 2：体質との適合性 */
-export function evaluateFit(f: Formula, result: ScoreResult, chosen: Set<string>, otherSymptoms: Set<string>): Omit<Candidate, 'code' | 'name' | 'reading' | 'formula' | 'matched' | 'safety' | 'efficacyIndex'> {
+export function evaluateFit(f: Formula, result: ScoreResult, chosen: Set<string>, otherSymptoms: Set<string>, complaintSigns: Set<string> = new Set()): Omit<Candidate, 'code' | 'name' | 'reading' | 'formula' | 'matched' | 'safety' | 'efficacyIndex'> {
   const W = SELECTION.weight;
   const matches: FitPoint[] = [];
   const mismatches: FitPoint[] = [];
@@ -264,10 +258,10 @@ export function evaluateFit(f: Formula, result: ScoreResult, chosen: Set<string>
 
   // ⑤ 主訴の詳細・随伴症状（使用目標に当たる回答）
   const signsMatched = f.signs.filter((id) => chosen.has(id));
-  const isComplaintSign = (id: string) => ['complaint', 'detail'].includes(questionOfOption(id)?.role ?? '');
+  const isComplaintSign = (id: string) => complaintSigns.has(id);
   const nDetail = signsMatched.filter(isComplaintSign).length;
   fit += Math.min(W.signCap, W.sign * (signsMatched.length - nDetail)) + Math.min(W.signDetailCap, W.signDetail * nDetail);
-  const signText = (ids: string[]) => `回答「${ids.slice(0, 4).map(optionText).join('」「')}」${ids.length > 4 ? `ほか${ids.length - 4}件` : ''}が、使用目標「${f.useTarget}」に当てはまります`;
+  const signText = (ids: string[]) => `回答「${ids.slice(0, 4).map(findingLabel).join('」「')}」${ids.length > 4 ? `ほか${ids.length - 4}件` : ''}が、使用目標「${f.useTarget}」に当てはまります`;
   const detailSigns = signsMatched.filter(isComplaintSign);
   const otherSigns = signsMatched.filter((id) => !isComplaintSign(id));
   // 主訴とその詳細問診の一致を先に出す（主訴の性質に合うかがいちばん大事）
@@ -294,11 +288,11 @@ export function compareCandidates(a: Candidate, b: Candidate): number {
 }
 
 /** 二段階選定の本体（いちばん改善したい主訴を中心に、候補群 → 体質で選ぶ） */
-export function selectFormulas(result: ScoreResult, answers: Answers, texts: FreeTexts, flags: SafetyFlag[], formulas: Formula[], tongueOverride?: string[]): Selection {
-  const chosen = chosenSet(answers, tongueOverride);
-  const sctx = safetyContext(flags, answers, texts);
-  const g = mainComplaintGroup(answers, texts);
-  const companions = companionComplaints(answers, texts);
+export function selectFormulas(result: ScoreResult, answers: Answers, w: WalkResult, flags: SafetyFlag[], tags: TagHit[], formulas: Formula[]): Selection {
+  const chosen = chosenSet(w);
+  const csigns = complaintSignSet(w);
+  const sctx = safetyContext(flags, answers, w, tags);
+  const g = mainComplaintGroup(w);
   const groups: ComplaintGroup[] = [];
   if (g) {
     const own = new Set(g.symptoms);
@@ -309,7 +303,7 @@ export function selectFormulas(result: ScoreResult, answers: Answers, texts: Fre
       if (!f.active) continue;
       const matched = matchIndications(f, own, chosen);
       if (!matched.length) continue;
-      const ev = evaluateFit(f, result, chosen, others); // STEP 2
+      const ev = evaluateFit(f, result, chosen, others, csigns); // STEP 2
       const safety = assessFormulaSafety(f, sctx); // STEP 4
       candidates.push({
         code: f.code, name: f.name, reading: f.reading, formula: f,
@@ -321,23 +315,10 @@ export function selectFormulas(result: ScoreResult, answers: Answers, texts: Fre
     candidates.sort(compareCandidates); // STEP 3
     const usable = candidates.filter((c) => c.safety.status !== 'excluded');
     const pick = usable.find((c) => c.level === 'good');
-    const isOther = !!complaintInfo(g.key)?.option.freeText;
-    const outcome: GroupOutcome = !candidates.length
-      ? (isOther ? 'other' : 'no_pool')
-      : !usable.length
-        ? 'all_excluded'
-        : !pick
-          ? 'no_fit'
-          : pick.safety.status === 'check'
-            ? 'pick_check'
-            : 'pick';
+    const outcome: GroupOutcome = !candidates.length ? 'no_pool' : !usable.length ? 'all_excluded' : !pick ? 'no_fit' : pick.safety.status === 'check' ? 'pick_check' : 'pick';
     groups.push({ ...g, candidates, pick, outcome });
   }
-  const others = chosenComplaintIds(answers).filter((id) => complaintInfo(id)?.option.freeText);
-  const otherComplaint = others.length
-    ? others.map((id) => { const i = complaintInfo(id)!; return `${i.category}：${(texts[id] ?? '').trim() || '（記入なし）'}`; }).join('／')
-    : undefined;
-  return { groups, companions, refer: hasRefer(flags), otherComplaint };
+  return { groups, companions: companionComplaints(w), tags };
 }
 
 // --- STEP 5：推薦理由 ----------------------------------------------------------
@@ -357,9 +338,9 @@ export interface Reasons {
   cautions: string[];
 }
 
-function comparisonLine(c: Candidate, pick: Candidate, result: ScoreResult, forCustomer: boolean): string {
+function comparisonLine(c: Candidate, pick: Candidate, result: ScoreResult): string {
   const head = `${c.name}（${c.formula.targetLabel}）`;
-  if (c.safety.status === 'excluded') return forCustomer ? `${head}：安全確認の回答から、今回は候補から外しました。` : `${head}：除外（${c.safety.exclude.join('、')}）`;
+  if (c.safety.status === 'excluded') return `${head}：除外（${c.safety.exclude.join('、')}）`;
   if (c.mismatches.length) return `${head}：${c.mismatches[0].text}。`;
   if (c.level === 'good' && c.fit === pick.fit) {
     return `${head}：体質との一致は同程度ですが、${pick.name}は効能・効果の中で「${pick.matched[0]?.term ?? ''}」をより主な対象として挙げているため優先しました。`;
@@ -376,8 +357,7 @@ function comparisonLine(c: Candidate, pick: Candidate, result: ScoreResult, forC
 }
 
 /** STEP 5：推薦理由（実際の回答と体質チェックの結果だけを使う） */
-export function buildReasons(group: ComplaintGroup, c: Candidate, result: ScoreResult, opts: { forCustomer?: boolean; maxCompare?: number } = {}): Reasons {
-  const forCustomer = opts.forCustomer ?? false;
+export function buildReasons(group: ComplaintGroup, c: Candidate, result: ScoreResult, opts: { maxCompare?: number } = {}): Reasons {
   const matchedSy = new Set(c.matched.map((m) => m.symptom));
   const fromMain = group.ownSymptoms.some((x) => matchedSy.has(x));
   const fromDetails = group.details.filter((d) => d.symptoms.some((x) => matchedSy.has(x))).map((d) => d.text);
@@ -387,59 +367,18 @@ export function buildReasons(group: ComplaintGroup, c: Candidate, result: ScoreR
     : `「${group.label}」の詳しい症状「${fromDetails.join('」「')}」`;
   const complaint = `いちばん改善したいお悩み${what}は、${c.name}の効能・効果（承認された内容）にある「${terms.join('」「')}」に当たるため、候補になりました。`;
   const constitution = c.matches.map((m) => `【${m.axis}】${m.text}`);
-  if (!forCustomer) for (const g of c.gaps) constitution.push(`【${g.axis}・ずれ】${g.text}`);
-  const others = group.candidates.filter((x) => x.code !== c.code && (!forCustomer || x.safety.status !== 'excluded'));
+  for (const g of c.gaps) constitution.push(`【${g.axis}・ずれ】${g.text}`);
+  const others = group.candidates.filter((x) => x.code !== c.code);
   const axes = [...new Set(c.matches.map((m) => m.axis))];
   const comparison = [
     others.length
       ? `この主訴の候補${group.candidates.length}種類のうち、${c.name}は${axes.map((a) => `【${a}】`).join('')}が一致し、体質との適合がもっとも高くなりました。`
       : `この主訴の候補は${c.name}だけで、${axes.map((a) => `【${a}】`).join('')}が一致しました。`,
-    ...others.slice(0, opts.maxCompare ?? (forCustomer ? 3 : 10)).map((x) => comparisonLine(x, c, result, forCustomer)),
+    ...others.slice(0, opts.maxCompare ?? 10).map((x) => comparisonLine(x, c, result)),
   ];
-  if (forCustomer && group.candidates.some((x) => x.safety.status === 'excluded')) comparison.push('ほかに、安全確認の回答から今回は候補から外した漢方薬があります。');
   const cautions = [...c.safety.check, ...c.safety.notes, ...GENERAL_NOTES];
   if (c.formula.note) cautions.unshift(c.formula.note);
   return { complaint, constitution, useTarget: `${c.formula.useTarget}方`, action: c.formula.action, comparison, cautions };
-}
-
-/** 来店客向けにまとめる：主訴ごとの推薦を、同じ漢方薬なら1つに束ねる */
-export interface CustomerPick {
-  candidate: Candidate;
-  groups: ComplaintGroup[];
-  reasons: Reasons;
-  status: 'ok' | 'check';
-}
-export function customerPicks(sel: Selection, result: ScoreResult): { picks: CustomerPick[]; messages: { label: string; text: string }[] } {
-  if (sel.refer) return { picks: [], messages: [] };
-  const picks: CustomerPick[] = [];
-  const messages: { label: string; text: string }[] = [];
-  for (const g of sel.groups) {
-    if (g.pick) {
-      const same = picks.find((p) => p.candidate.code === g.pick!.code);
-      if (same) { same.groups.push(g); continue; }
-      picks.push({ candidate: g.pick, groups: [g], reasons: buildReasons(g, g.pick, result, { forCustomer: true }), status: g.pick.safety.status === 'check' ? 'check' : 'ok' });
-      continue;
-    }
-    if (g.outcome === 'other') continue; // 「その他のお悩み」として別に表示する
-    const text: Record<Exclude<GroupOutcome, 'pick' | 'pick_check' | 'other'>, string> = {
-      no_pool: `「${g.label}」を効能・効果に持つ一般用の漢方薬がないため、ここでは漢方薬の候補を挙げていません。体質に合わせた養生とあわせて、薬剤師がお話を伺います。`,
-      no_fit: `候補になる漢方薬（${g.candidates.filter((c) => c.safety.status !== 'excluded').length}種類）の中に、あなたの体質にはっきり合うものが見つかりませんでした。無理におすすめせず、薬剤師が詳しくお話を伺います。`,
-      all_excluded: '安全確認の回答から、候補になる漢方薬をおすすめできませんでした。薬剤師にご相談ください。',
-    };
-    messages.push({ label: g.label, text: text[g.outcome as Exclude<GroupOutcome, 'pick' | 'pick_check' | 'other'>] });
-  }
-  // 同じ注意生薬を含む漢方薬が複数並ぶときは、重複に注意を促す
-  for (const herb of ['甘草', '麻黄', '大黄', '附子']) {
-    const withHerb = picks.filter((p) => p.candidate.formula.cautionHerbs.includes(herb));
-    if (withHerb.length > 1) for (const p of withHerb) p.reasons.cautions.unshift(`ここに挙げた複数の漢方薬（${withHerb.map((x) => x.candidate.name).join('・')}）に${herb}が含まれます。一緒に飲む場合は合計量に注意が必要なため、薬剤師が組み合わせを確認します。`);
-  }
-  // 束ねたものは、主訴の理由を複数まとめる
-  for (const p of picks) {
-    if (p.groups.length > 1) {
-      p.reasons.complaint = p.groups.map((g) => buildReasons(g, p.candidate, result, { forCustomer: true }).complaint).join('\n');
-    }
-  }
-  return { picks, messages };
 }
 
 /** スタッフの提案保存用（監査）：表示した候補の要約 */
