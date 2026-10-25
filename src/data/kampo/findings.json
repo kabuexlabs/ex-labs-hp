@@ -1,0 +1,5420 @@
+{
+ "version": "2026-10-25-v3",
+ "review": {
+  "status": "draft",
+  "source": "2026-10-24 版（3段階版）の設問・重みを、2026-10-25 の改修指示と承認済みの改修計画に沿って組み直した草案。重み・五臓は現行の選択肢の値を引き継いだもので、新しい数値は作っていない（専門家未確認）",
+  "reviewer": null,
+  "reviewedAt": null
+ },
+ "note": "所見（回答から作る1つ1つの症状・状態）。weights・organs は草案で、from に挙げた 2026-10-24 版の選択肢の値の最大を引き継いだもの。group が同じ所見は同じタイプへ1回分しか加点しない。implies は present なら present にする所見。",
+ "findings": [
+  {
+   "id": "fatigue_easy",
+   "label": "疲れやすい（少し動くと疲れる）",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "spleen": 0.5,
+    "lung": 0.5
+   },
+   "from": [
+    "B1-1",
+    "KF-easily",
+    "KF-stamina",
+    "KF-dull",
+    "Scomplexion2-tired",
+    "Saging1-tired",
+    "Sflow_heavy2-tired",
+    "Sflow_light2-tired",
+    "Ssweat2-tired",
+    "Sanxiety2-tired",
+    "Slow_mood3-tired",
+    "Scold2-tired",
+    "Sinsomnia3-tired",
+    "KE-tired",
+    "KD-tired"
+   ]
+  },
+  {
+   "id": "fatigue_unrested",
+   "label": "休んでも疲れが取れない",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "KF-rest",
+    "Sinsomnia1-unrest"
+   ]
+  },
+  {
+   "id": "sob_exertion",
+   "label": "少し動くと息切れする",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "spleen": 0.5,
+    "lung": 0.5,
+    "heart": 0.5
+   },
+   "from": [
+    "B1-1",
+    "B10-1",
+    "Sfatigue1-breath",
+    "Spalpitation2-breath",
+    "Sbreath1-move"
+   ]
+  },
+  {
+   "id": "catch_cold",
+   "label": "風邪をひきやすい",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "lung": 1
+   },
+   "from": [
+    "B1-2",
+    "KF-cold"
+   ]
+  },
+  {
+   "id": "heavy_body",
+   "label": "体が重だるい",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B1-6",
+    "B8-5",
+    "B9-6",
+    "Spuffiness2-heavy",
+    "Spms_edema2-heavy"
+   ]
+  },
+  {
+   "id": "heavy_morning",
+   "label": "朝、体が重くて起きられない",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B8-5"
+   ]
+  },
+  {
+   "id": "heavy_after_meal",
+   "label": "食後に体が重だるくなる",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sfatigue1-heavy"
+   ]
+  },
+  {
+   "id": "weather_sensitive",
+   "label": "雨の日や低気圧で体調が悪くなる",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "group": "trig_weather",
+   "from": [
+    "B7-5"
+   ]
+  },
+  {
+   "id": "lack_energy",
+   "label": "気力が出ない",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "heart": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B9-1",
+    "KF-spirit",
+    "Saging1-tired"
+   ]
+  },
+  {
+   "id": "apathy",
+   "label": "何をするのも億劫",
+   "weights": {
+    "yang_def": 1,
+    "qi_def": 0.25
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "B9-8",
+    "Slow_mood1-lazy"
+   ]
+  },
+  {
+   "id": "evening_heat",
+   "label": "夕方から夜にほてる",
+   "weights": {
+    "yin_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "B1-7",
+    "Shot_flash1-evening",
+    "Sface_flush2-evening"
+   ]
+  },
+  {
+   "id": "knee_back_weak",
+   "label": "腰や膝がだるい",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "B1-8",
+    "B10-8",
+    "B12-7",
+    "Saging1-legs",
+    "Sgray_hair2-back"
+   ]
+  },
+  {
+   "id": "weak_after_illness",
+   "label": "病後・産後の体力低下",
+   "from": [
+    "KF-recovery"
+   ]
+  },
+  {
+   "id": "fatigue_after_illness",
+   "label": "疲れのきっかけ：病気や手術のあと",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "from": [
+    "Sfatigue2-ill"
+   ]
+  },
+  {
+   "id": "fatigue_after_birth",
+   "label": "疲れのきっかけ：出産のあと",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "from": [
+    "Sfatigue2-birth"
+   ]
+  },
+  {
+   "id": "fatigue_after_overwork",
+   "label": "疲れのきっかけ：忙しさ・睡眠不足",
+   "weights": {
+    "qi_def": 0.25,
+    "blood_def": 0.25
+   },
+   "from": [
+    "Sfatigue2-busy"
+   ]
+  },
+  {
+   "id": "fatigue_after_stress",
+   "label": "疲れのきっかけ：強いストレス",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Sfatigue2-stress"
+   ]
+  },
+  {
+   "id": "fatigue_after_heat",
+   "label": "疲れのきっかけ：暑さ・季節の変わり目",
+   "weights": {
+    "qi_def": 0.25,
+    "fluid": 0.25
+   },
+   "from": [
+    "Sfatigue2-heat"
+   ]
+  },
+  {
+   "id": "cold_hands_feet",
+   "label": "手足の先が冷える",
+   "weights": {
+    "blood_def": 0.5,
+    "yang_def": 0.5
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B3-2",
+    "KG-limbs",
+    "KG-feet",
+    "KG-hands",
+    "KE-cold",
+    "Scomplexion2-cold",
+    "Sfatigue1-cold",
+    "Schilblain2-cold",
+    "Scold_pain2-hands"
+   ]
+  },
+  {
+   "id": "cold_belly",
+   "label": "お腹が冷える",
+   "weights": {
+    "yang_def": 1,
+    "qi_def": 0.25
+   },
+   "organs": {
+    "kidney": 1,
+    "spleen": 0.5
+   },
+   "from": [
+    "B3-7",
+    "KG-belly",
+    "Scold_pain2-belly"
+   ]
+  },
+  {
+   "id": "cold_lower",
+   "label": "腰・下半身が冷える",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "B1-8",
+    "B3-7",
+    "KG-waist",
+    "Scold_pain2-legs",
+    "Schilblain2-pain"
+   ]
+  },
+  {
+   "id": "cold_whole",
+   "label": "全身が冷える",
+   "weights": {
+    "yang_def": 0.5
+   },
+   "from": [
+    "KG-whole",
+    "Scold_pain2-whole"
+   ]
+  },
+  {
+   "id": "chilly",
+   "label": "寒がり",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1,
+    "spleen": 0.5
+   },
+   "from": [
+    "B3-8",
+    "B9-8",
+    "B8-7",
+    "Sirregular2-cold",
+    "Sflow_light2-cold",
+    "Saging2-cold"
+   ]
+  },
+  {
+   "id": "cold_summer",
+   "label": "夏でも冷える",
+   "from": [
+    "KG-summer"
+   ]
+  },
+  {
+   "id": "cold_touch_pale",
+   "label": "触ると冷たく、血色が悪い",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Scold1-touch"
+   ]
+  },
+  {
+   "id": "cold_deep",
+   "label": "体の芯から冷える",
+   "weights": {
+    "yang_def": 0.5
+   },
+   "organs": {
+    "kidney": 0.5
+   },
+   "from": [
+    "Scold1-deep"
+   ]
+  },
+  {
+   "id": "cold_pain",
+   "label": "冷えると痛む",
+   "weights": {
+    "blood_stasis": 0.25,
+    "yang_def": 0.25
+   },
+   "from": [
+    "Scold1-pain"
+   ]
+  },
+  {
+   "id": "cold_numb",
+   "label": "冷えるとしびれる",
+   "weights": {
+    "blood_stasis": 0.25,
+    "yang_def": 0.25
+   },
+   "from": [
+    "Scold1-pain"
+   ]
+  },
+  {
+   "id": "cold_diarrhea",
+   "label": "冷えるとお腹を壊す",
+   "weights": {
+    "qi_def": 0.5,
+    "yang_def": 1
+   },
+   "organs": {
+    "spleen": 1,
+    "kidney": 0.5
+   },
+   "from": [
+    "B3-1",
+    "B5-8",
+    "B6-7",
+    "Scold1-diarrhea",
+    "Sstress_gi2-cold",
+    "Scold_pain1-diarrhea"
+   ]
+  },
+  {
+   "id": "cold_edema",
+   "label": "冷えるとむくむ",
+   "weights": {
+    "fluid": 1,
+    "yang_def": 1
+   },
+   "organs": {
+    "spleen": 1,
+    "kidney": 1
+   },
+   "from": [
+    "B3-5",
+    "B7-8",
+    "Scold1-puffy",
+    "Spuffiness2-cold"
+   ]
+  },
+  {
+   "id": "cold_frequent_urination",
+   "label": "冷えるとトイレが近くなる",
+   "weights": {
+    "yang_def": 0.5
+   },
+   "organs": {
+    "kidney": 0.5
+   },
+   "from": [
+    "Scold1-toilet"
+   ]
+  },
+  {
+   "id": "cold_warm_relief",
+   "label": "冷え：温めると楽になる",
+   "weights": {
+    "yang_def": 0.5
+   },
+   "organs": {
+    "kidney": 0.5
+   },
+   "group": "cold_sensitive",
+   "from": [
+    "Scold_pain1-warm"
+   ]
+  },
+  {
+   "id": "chilblain",
+   "label": "しもやけになりやすい",
+   "from": [
+    "KG-chilblain",
+    "Scold2-chilblain"
+   ]
+  },
+  {
+   "id": "heat_intolerant",
+   "label": "暑がり",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "heart": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B3-9"
+   ]
+  },
+  {
+   "id": "temp_fluctuate",
+   "label": "冷えたりほてったり、日や気分で変わる",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B3-3"
+   ]
+  },
+  {
+   "id": "hot_up_cold_down",
+   "label": "上半身はのぼせるのに足は冷える",
+   "weights": {
+    "qi_stag": 0.5,
+    "blood_stasis": 0.5
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B3-4",
+    "KG-flushcold",
+    "Sface_flush1-coldlimb",
+    "Shot_flash1-coldfeet",
+    "Sspots2-flush",
+    "Scold2-flush"
+   ]
+  },
+  {
+   "id": "palms_hot",
+   "label": "手のひら・足の裏がほてる",
+   "weights": {
+    "yin_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "B3-6",
+    "Shot_flash1-palms",
+    "Ssweat2-palms"
+   ]
+  },
+  {
+   "id": "palms_hot_bed",
+   "label": "寝るときに手足がほてる",
+   "weights": {
+    "yin_def": 0.5
+   },
+   "organs": {
+    "kidney": 0.5
+   },
+   "from": [
+    "Shot_flash1-palms"
+   ]
+  },
+  {
+   "id": "hot_upper",
+   "label": "顔や上半身のほてり・熱感",
+   "weights": {
+    "yang_exc": 0.5,
+    "qi_stag": 0.25
+   },
+   "from": [
+    "KA-flush",
+    "KE-flush",
+    "KE-hotflash",
+    "Sredness1-flush",
+    "Sirritability3-flush",
+    "Sdizziness2-flush"
+   ]
+  },
+  {
+   "id": "hot_sudden",
+   "label": "急に顔や上半身がカーッと熱くなる",
+   "weights": {
+    "yang_exc": 0.25,
+    "yin_def": 0.25
+   },
+   "implies": [
+    "hot_upper"
+   ],
+   "from": [
+    "Shot_flash1-sudden"
+   ]
+  },
+  {
+   "id": "hot_face_whole",
+   "label": "顔全体が熱くなる",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "organs": {
+    "heart": 0.5
+   },
+   "implies": [
+    "hot_upper"
+   ],
+   "from": [
+    "Sface_flush1-whole"
+   ]
+  },
+  {
+   "id": "hot_cheek",
+   "label": "頬だけ熱くなる",
+   "weights": {
+    "yin_def": 0.5
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "implies": [
+    "hot_upper"
+   ],
+   "from": [
+    "Sface_flush1-cheek"
+   ]
+  },
+  {
+   "id": "rosacea",
+   "label": "鼻や頬が赤く、赤ら顔になりやすい",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "from": [
+    "Sredness1-nose",
+    "KA-red"
+   ]
+  },
+  {
+   "id": "skin_thin_red",
+   "label": "皮膚が薄く、すぐに赤くなる",
+   "weights": {
+    "yin_def": 0.5
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "from": [
+    "Sredness1-thin"
+   ]
+  },
+  {
+   "id": "hot_upper_worse_warm",
+   "label": "ほてり：入浴後・温まると悪化",
+   "weights": {
+    "yin_def": 0.25,
+    "yang_exc": 0.25
+   },
+   "group": "trig_warm",
+   "from": [
+    "Sface_flush2-bath",
+    "Sredness2-warm"
+   ]
+  },
+  {
+   "id": "hot_upper_worse_exercise",
+   "label": "ほてり：運動後に悪化",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "from": [
+    "Sface_flush2-exercise"
+   ]
+  },
+  {
+   "id": "hot_upper_worse_tension",
+   "label": "ほてり：緊張で悪化",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_stress",
+   "from": [
+    "Sface_flush2-tension",
+    "Sredness2-tension"
+   ]
+  },
+  {
+   "id": "hot_upper_worse_meal",
+   "label": "ほてり：食後に悪化",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sface_flush2-meal"
+   ]
+  },
+  {
+   "id": "hot_upper_worse_alcohol",
+   "label": "ほてり：お酒のあとに悪化",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "group": "trig_alcohol",
+   "from": [
+    "Sredness2-alcohol"
+   ]
+  },
+  {
+   "id": "hot_upper_worse_spicy",
+   "label": "ほてり：辛いもののあとに悪化",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "group": "trig_spicy",
+   "from": [
+    "Sredness2-alcohol"
+   ]
+  },
+  {
+   "id": "hot_upper_worse_season",
+   "label": "ほてり・赤み：季節の変わり目・乾燥する時期に悪化",
+   "weights": {
+    "yin_def": 0.5
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "group": "trig_dry_season",
+   "from": [
+    "Sredness2-season"
+   ]
+  },
+  {
+   "id": "sweat_easy",
+   "label": "汗をかきやすい",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "from": [
+    "KE-sweat",
+    "Sanxiety2-sweat",
+    "Spalpitation2-sweat"
+   ]
+  },
+  {
+   "id": "sweat_exertion",
+   "label": "少し動いただけで汗をかく",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "lung": 1
+   },
+   "implies": [
+    "sweat_easy"
+   ],
+   "from": [
+    "B4-1",
+    "Ssweat1-move",
+    "Sfatigue1-breath"
+   ]
+  },
+  {
+   "id": "chill_after_sweat",
+   "label": "汗のあとに冷える",
+   "weights": {
+    "qi_def": 0.5,
+    "yang_def": 0.5
+   },
+   "organs": {
+    "lung": 0.5,
+    "kidney": 0.5
+   },
+   "from": [
+    "B4-2",
+    "Ssweat2-cold"
+   ]
+  },
+  {
+   "id": "sweat_tension",
+   "label": "緊張すると手や脇に汗をかく",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 0.5,
+    "heart": 0.5
+   },
+   "implies": [
+    "sweat_easy"
+   ],
+   "from": [
+    "B4-3",
+    "Ssweat1-tension"
+   ]
+  },
+  {
+   "id": "sweat_head",
+   "label": "頭や顔だけ汗をかく",
+   "weights": {
+    "qi_stag": 1,
+    "yang_exc": 0.25
+   },
+   "organs": {
+    "liver": 0.5,
+    "heart": 0.5
+   },
+   "implies": [
+    "sweat_easy"
+   ],
+   "from": [
+    "B4-3",
+    "Ssweat1-head",
+    "Shot_flash1-headsweat"
+   ]
+  },
+  {
+   "id": "sweat_with_flush",
+   "label": "急なほてりと一緒に汗が出る",
+   "weights": {
+    "yin_def": 0.25,
+    "yang_exc": 0.25
+   },
+   "implies": [
+    "sweat_easy"
+   ],
+   "from": [
+    "Ssweat1-flush",
+    "Sface_flush1-sweat"
+   ]
+  },
+  {
+   "id": "sweat_little",
+   "label": "汗をかきにくい",
+   "weights": {
+    "yang_def": 0.5,
+    "fluid": 0.5
+   },
+   "organs": {
+    "kidney": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B4-4"
+   ]
+  },
+  {
+   "id": "sweat_sticky",
+   "label": "汗がべたつく",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B4-5"
+   ]
+  },
+  {
+   "id": "sweat_profuse",
+   "label": "汗の量が多い",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "implies": [
+    "sweat_easy"
+   ],
+   "from": [
+    "B4-7"
+   ]
+  },
+  {
+   "id": "night_sweat",
+   "label": "寝汗をかく",
+   "weights": {
+    "yin_def": 1
+   },
+   "organs": {
+    "kidney": 0.5,
+    "heart": 0.5
+   },
+   "from": [
+    "B4-6",
+    "B8-6",
+    "KE-nightsweat",
+    "Ssweat1-night",
+    "Sfatigue1-sweat"
+   ]
+  },
+  {
+   "id": "poor_appetite",
+   "label": "食欲がない",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B5-1",
+    "KF-appetite",
+    "Slow_mood1-appetite",
+    "Sfatigue1-appetite",
+    "Saging2-gi",
+    "Scomplexion2-tired"
+   ]
+  },
+  {
+   "id": "early_satiety",
+   "label": "少量で満腹になる",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B5-1"
+   ]
+  },
+  {
+   "id": "big_appetite",
+   "label": "食欲が旺盛",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B5-9"
+   ]
+  },
+  {
+   "id": "appetite_increase",
+   "label": "食欲が増えた",
+   "from": [
+    "KD-appetite"
+   ]
+  },
+  {
+   "id": "sleepy_after_meal",
+   "label": "食後に眠くなる",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B5-1",
+    "KF-meal",
+    "Sfatigue1-heavy"
+   ]
+  },
+  {
+   "id": "stomach_heavy",
+   "label": "胃がもたれる",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B5-1",
+    "Sfatigue1-heavy",
+    "Sstress_gi1-heavy"
+   ]
+  },
+  {
+   "id": "heavy_worse_meal",
+   "label": "胃もたれ：食後に悪化",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sstress_gi2-after"
+   ]
+  },
+  {
+   "id": "appetite_stress",
+   "label": "ストレスで食欲が変わる",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 0.5,
+    "spleen": 0.5
+   },
+   "group": "trig_stress",
+   "from": [
+    "B5-2",
+    "B1-4",
+    "D1-2"
+   ]
+  },
+  {
+   "id": "appetite_worse_tired",
+   "label": "疲れると食欲が落ちる",
+   "weights": {
+    "qi_def": 0.25,
+    "blood_def": 0.25
+   },
+   "from": [
+    "Sirritability2-tired"
+   ]
+  },
+  {
+   "id": "epigastric_block",
+   "label": "みぞおちがつかえる・痛む",
+   "weights": {
+    "qi_stag": 0.5,
+    "fluid": 0.5
+   },
+   "organs": {
+    "liver": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B5-4",
+    "Sstress_gi1-pit"
+   ]
+  },
+  {
+   "id": "stomach_splash",
+   "label": "水分をとると胃がチャポチャポする",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B5-6"
+   ]
+  },
+  {
+   "id": "stomach_pain",
+   "label": "胃痛",
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "KH-stomach",
+    "Sirritability3-stomach"
+   ]
+  },
+  {
+   "id": "stomach_cramping",
+   "label": "胃：差し込むように痛む",
+   "weights": {
+    "yang_def": 0.25,
+    "qi_stag": 0.25
+   },
+   "from": [
+    "Scold_pain1-cramp"
+   ]
+  },
+  {
+   "id": "stomach_distending",
+   "label": "胃：張るように痛む",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "Sstress_gi1-bloat",
+    "B10-3"
+   ]
+  },
+  {
+   "id": "stomach_worse_empty",
+   "label": "胃：空腹時に悪化",
+   "weights": {
+    "qi_def": 0.25,
+    "yang_exc": 0.25
+   },
+   "from": [
+    "Sstress_gi2-empty"
+   ]
+  },
+  {
+   "id": "stomach_worse_meal",
+   "label": "胃：食後に悪化",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sstress_gi2-after"
+   ]
+  },
+  {
+   "id": "stomach_worse_stress",
+   "label": "胃：緊張・ストレスで悪化",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_stress",
+   "from": [
+    "Sstress_gi2-before"
+   ]
+  },
+  {
+   "id": "stomach_worse_cold",
+   "label": "胃：冷たいもので悪化",
+   "weights": {
+    "yang_def": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "group": "cold_sensitive",
+   "from": [
+    "Sstress_gi2-cold"
+   ]
+  },
+  {
+   "id": "stomach_warm_relief",
+   "label": "胃：温かいもので楽になる",
+   "weights": {
+    "yang_def": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "group": "cold_sensitive",
+   "from": [
+    "Sstress_gi2-cold"
+   ]
+  },
+  {
+   "id": "heartburn",
+   "label": "胸やけ",
+   "weights": {
+    "yang_exc": 0.25,
+    "qi_stag": 0.25
+   },
+   "from": [
+    "Sstress_gi1-burn"
+   ]
+  },
+  {
+   "id": "belching",
+   "label": "げっぷが多い",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B5-3"
+   ]
+  },
+  {
+   "id": "acid_reflux",
+   "label": "酸っぱいものがこみ上げる",
+   "weights": {
+    "yang_exc": 0.25,
+    "qi_stag": 0.25
+   },
+   "from": [
+    "Sstress_gi1-burn"
+   ]
+  },
+  {
+   "id": "nausea",
+   "label": "吐き気",
+   "weights": {
+    "fluid": 0.5,
+    "yang_def": 0.25
+   },
+   "from": [
+    "Scold_pain1-nausea",
+    "Sthroat2-nausea",
+    "Spms_headache1-nausea",
+    "Sheadache2-nausea"
+   ]
+  },
+  {
+   "id": "nausea_empty",
+   "label": "吐き気：空腹時",
+   "weights": {
+    "qi_def": 0.25,
+    "yang_exc": 0.25
+   },
+   "from": [
+    "Sstress_gi2-empty"
+   ]
+  },
+  {
+   "id": "nausea_after_meal",
+   "label": "吐き気：食後",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sstress_gi2-after"
+   ]
+  },
+  {
+   "id": "nausea_stress",
+   "label": "吐き気：ストレス・緊張で",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_stress",
+   "from": [
+    "Sstress_gi2-before"
+   ]
+  },
+  {
+   "id": "motion_sickness",
+   "label": "乗り物酔いしやすい",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B7-6"
+   ]
+  },
+  {
+   "id": "bloating",
+   "label": "お腹が張る",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1,
+    "spleen": 0.5
+   },
+   "from": [
+    "B5-3",
+    "B7-2",
+    "Sstress_gi1-bloat",
+    "Spms_edema1-belly",
+    "Sirritability3-stomach"
+   ]
+  },
+  {
+   "id": "flank_distension",
+   "label": "脇腹が張る",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B5-3"
+   ]
+  },
+  {
+   "id": "relief_gas",
+   "label": "げっぷやガスが出ると楽になる",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B5-3"
+   ]
+  },
+  {
+   "id": "mouth_sticky",
+   "label": "口の中が粘る",
+   "weights": {
+    "fluid": 1,
+    "yang_exc": 0.5,
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "spleen": 1,
+    "liver": 0.5
+   },
+   "from": [
+    "B5-6",
+    "B5-10"
+   ]
+  },
+  {
+   "id": "bitter_mouth",
+   "label": "口が苦い",
+   "weights": {
+    "yang_exc": 0.5,
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B5-10"
+   ]
+  },
+  {
+   "id": "prefer_warm",
+   "label": "温かい飲み物を好む",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B3-8",
+    "D1-5"
+   ]
+  },
+  {
+   "id": "dry_mouth",
+   "label": "口やのどが渇く",
+   "weights": {
+    "yin_def": 0.5,
+    "fluid": 0.5,
+    "yang_exc": 0.5
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "Ssweat2-thirst",
+    "Spuffiness2-thirst",
+    "Spms_edema2-thirst",
+    "B7-7",
+    "Sheadache2-puffy"
+   ]
+  },
+  {
+   "id": "thirst_cold",
+   "label": "渇き：冷たい水を多く飲みたい",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "spleen": 1,
+    "heart": 0.5
+   },
+   "implies": [
+    "dry_mouth"
+   ],
+   "from": [
+    "B5-9",
+    "B3-9"
+   ]
+  },
+  {
+   "id": "thirst_sips",
+   "label": "渇き：少量ずつ飲みたい（口や唇が乾く）",
+   "weights": {
+    "yin_def": 1
+   },
+   "organs": {
+    "spleen": 0.5,
+    "kidney": 0.5
+   },
+   "implies": [
+    "dry_mouth"
+   ],
+   "from": [
+    "B5-7"
+   ]
+  },
+  {
+   "id": "thirst_no_drink",
+   "label": "渇き：口は渇くが、あまり飲みたくない",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "implies": [
+    "dry_mouth"
+   ],
+   "from": [
+    "B5-5"
+   ]
+  },
+  {
+   "id": "loose_stool",
+   "label": "軟便・下痢になりやすい",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B6-1",
+    "Sstress_gi1-diarrhea",
+    "KH-diarrhea"
+   ]
+  },
+  {
+   "id": "watery_stool",
+   "label": "水のような便が出る",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 0.5,
+    "kidney": 0.5
+   },
+   "implies": [
+    "loose_stool"
+   ],
+   "from": [
+    "B6-5"
+   ]
+  },
+  {
+   "id": "morning_diarrhea",
+   "label": "朝起きてすぐ下痢をする",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 0.5,
+    "spleen": 0.5
+   },
+   "implies": [
+    "loose_stool"
+   ],
+   "from": [
+    "B6-7",
+    "Sstress_gi2-morning"
+   ]
+  },
+  {
+   "id": "diarrhea_after_meal",
+   "label": "食後すぐにトイレに行きたくなる",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sstress_gi2-after"
+   ]
+  },
+  {
+   "id": "diarrhea_stress",
+   "label": "緊張やストレスでお腹を壊す",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_stress",
+   "from": [
+    "Sstress_gi2-before",
+    "KH-diarrhea"
+   ]
+  },
+  {
+   "id": "straining_weak",
+   "label": "力まないと出ない（便は硬くない）",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B6-1"
+   ]
+  },
+  {
+   "id": "hard_stool",
+   "label": "便が硬くコロコロしている",
+   "weights": {
+    "blood_def": 0.5,
+    "yin_def": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "kidney": 1
+   },
+   "from": [
+    "B6-2",
+    "B6-6"
+   ]
+  },
+  {
+   "id": "stool_hard_foul",
+   "label": "硬く太い便・においが強い",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B6-9"
+   ]
+  },
+  {
+   "id": "constipation",
+   "label": "便秘がち",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B6-9"
+   ]
+  },
+  {
+   "id": "alternating",
+   "label": "便秘と下痢をくり返す",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B6-3",
+    "Sstress_gi1-alt"
+   ]
+  },
+  {
+   "id": "incomplete_evac",
+   "label": "出てもすっきりしない（残便感）",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B6-3"
+   ]
+  },
+  {
+   "id": "hemorrhoid",
+   "label": "痔がある",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B6-4"
+   ]
+  },
+  {
+   "id": "abd_pain",
+   "label": "お腹が痛む",
+   "weights": {
+    "yang_def": 0.5
+   },
+   "from": [
+    "KG-bellypain",
+    "Schilblain2-pain"
+   ]
+  },
+  {
+   "id": "pain_relief_after_stool",
+   "label": "便が出るとお腹の痛みが楽になる"
+  },
+  {
+   "id": "constipation_worse_stress",
+   "label": "便秘：ストレスで悪化",
+   "group": "trig_stress"
+  },
+  {
+   "id": "frequent_urination",
+   "label": "トイレが近い",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "B6-8"
+   ]
+  },
+  {
+   "id": "nocturia",
+   "label": "夜中にトイレに起きる",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "B6-8",
+    "B8-7",
+    "Sinsomnia2-toilet"
+   ]
+  },
+  {
+   "id": "urine_clear_copious",
+   "label": "尿の色が薄く量が多い",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "B6-8",
+    "B7-8"
+   ]
+  },
+  {
+   "id": "urine_scanty",
+   "label": "尿の量が少ない",
+   "weights": {
+    "fluid": 1,
+    "yin_def": 1,
+    "yang_exc": 0.5
+   },
+   "organs": {
+    "spleen": 0.5,
+    "kidney": 1
+   },
+   "from": [
+    "B6-5",
+    "B6-6",
+    "B7-7",
+    "Spuffiness2-urine",
+    "Spms_edema2-urine"
+   ]
+  },
+  {
+   "id": "urine_dark",
+   "label": "尿の色が濃い",
+   "weights": {
+    "yin_def": 1,
+    "yang_exc": 0.5
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "B6-6",
+    "B7-7"
+   ]
+  },
+  {
+   "id": "dysuria",
+   "label": "尿が出にくい"
+  },
+  {
+   "id": "residual_urine",
+   "label": "残尿感がある"
+  },
+  {
+   "id": "edema",
+   "label": "むくみ",
+   "weights": {
+    "fluid": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "KC-puffy",
+    "KC-eyebag",
+    "Saging1-puffy",
+    "Sheadache2-puffy",
+    "Spms_headache1-puffy"
+   ]
+  },
+  {
+   "id": "edema_morning_face",
+   "label": "朝、顔やまぶたがむくむ",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "spleen": 0.5
+   },
+   "implies": [
+    "edema"
+   ],
+   "from": [
+    "B7-4",
+    "Spuffiness1-morning",
+    "KC-eyebag",
+    "KC-puffy"
+   ]
+  },
+  {
+   "id": "edema_evening_legs",
+   "label": "夕方に足がむくむ",
+   "weights": {
+    "qi_def": 0.5,
+    "fluid": 0.5
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "implies": [
+    "edema"
+   ],
+   "from": [
+    "B7-1",
+    "Spuffiness1-evening",
+    "Spuffiness2-legs"
+   ]
+  },
+  {
+   "id": "edema_premenstrual",
+   "label": "月経前にむくむ",
+   "weights": {
+    "qi_stag": 1,
+    "fluid": 1
+   },
+   "organs": {
+    "liver": 1,
+    "spleen": 1
+   },
+   "implies": [
+    "edema"
+   ],
+   "from": [
+    "B7-2",
+    "B11-5",
+    "Spuffiness1-menses",
+    "KD-edema"
+   ]
+  },
+  {
+   "id": "edema_constant",
+   "label": "いつもむくんでいる",
+   "implies": [
+    "edema"
+   ],
+   "from": [
+    "Spuffiness1-always"
+   ]
+  },
+  {
+   "id": "edema_worse_alcohol",
+   "label": "むくみ：お酒のあとに悪化",
+   "weights": {
+    "fluid": 0.5
+   },
+   "group": "trig_alcohol",
+   "from": [
+    "Spuffiness1-salt"
+   ]
+  },
+  {
+   "id": "edema_worse_salty",
+   "label": "むくみ：塩辛いもののあとに悪化",
+   "weights": {
+    "fluid": 0.5
+   },
+   "from": [
+    "Spuffiness1-salt"
+   ]
+  },
+  {
+   "id": "edema_worse_standing",
+   "label": "むくみ：立ち仕事・座りっぱなしのあとに悪化"
+  },
+  {
+   "id": "sleep_poor",
+   "label": "眠れない",
+   "organs": {
+    "heart": 0.5
+   },
+   "from": [
+    "KE-insomnia",
+    "Shot_flash3-insomnia",
+    "Sirritability3-insomnia"
+   ]
+  },
+  {
+   "id": "sleep_onset",
+   "label": "寝つきが悪い",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 0.5,
+    "heart": 0.5
+   },
+   "implies": [
+    "sleep_poor"
+   ],
+   "from": [
+    "B8-3",
+    "KH-onset",
+    "Sinsomnia1-onset"
+   ]
+  },
+  {
+   "id": "night_waking",
+   "label": "夜中に目が覚める",
+   "weights": {
+    "yin_def": 1,
+    "blood_def": 0.5
+   },
+   "organs": {
+    "kidney": 0.5,
+    "heart": 0.5
+   },
+   "implies": [
+    "sleep_poor"
+   ],
+   "from": [
+    "B8-6",
+    "KH-wake",
+    "Sinsomnia1-wake"
+   ]
+  },
+  {
+   "id": "early_waking",
+   "label": "朝早く目が覚める",
+   "weights": {
+    "yin_def": 1
+   },
+   "organs": {
+    "kidney": 0.5,
+    "heart": 0.5
+   },
+   "implies": [
+    "sleep_poor"
+   ],
+   "from": [
+    "B8-6",
+    "Sinsomnia1-early",
+    "Slow_mood3-insomnia"
+   ]
+  },
+  {
+   "id": "light_sleep",
+   "label": "眠りが浅い",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "heart": 0.5,
+    "liver": 0.5
+   },
+   "implies": [
+    "sleep_poor"
+   ],
+   "from": [
+    "B8-2",
+    "Sinsomnia1-dream",
+    "Sanxiety2-insomnia"
+   ]
+  },
+  {
+   "id": "dreams_many",
+   "label": "夢が多い",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "heart": 0.5,
+    "liver": 0.5
+   },
+   "from": [
+    "B8-2",
+    "Sinsomnia1-dream"
+   ]
+  },
+  {
+   "id": "unrefreshed",
+   "label": "寝ても疲れが取れない",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sinsomnia1-unrest"
+   ]
+  },
+  {
+   "id": "daytime_sleepy",
+   "label": "日中に眠くなる",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B8-1",
+    "Sinsomnia3-sleepy",
+    "KD-sleepy"
+   ]
+  },
+  {
+   "id": "sleep_worry",
+   "label": "考え事・不安で眠れない",
+   "weights": {
+    "qi_stag": 1,
+    "qi_def": 0.25,
+    "blood_def": 0.25
+   },
+   "organs": {
+    "liver": 0.5,
+    "heart": 0.5,
+    "spleen": 0.25
+   },
+   "implies": [
+    "sleep_poor"
+   ],
+   "from": [
+    "B8-3",
+    "Sinsomnia2-worry"
+   ]
+  },
+  {
+   "id": "sleep_agitation",
+   "label": "イライラ・気持ちの高ぶりで眠れない",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "implies": [
+    "sleep_poor"
+   ],
+   "from": [
+    "Sinsomnia2-irritable"
+   ]
+  },
+  {
+   "id": "sleep_hot",
+   "label": "暑さ・ほてりで眠れない",
+   "weights": {
+    "yang_exc": 1,
+    "yin_def": 0.5
+   },
+   "organs": {
+    "heart": 0.5,
+    "liver": 0.5,
+    "kidney": 0.5
+   },
+   "implies": [
+    "sleep_poor"
+   ],
+   "from": [
+    "B8-8",
+    "Sinsomnia2-hot"
+   ]
+  },
+  {
+   "id": "sleep_deprived",
+   "label": "寝不足が続いている",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "organs": {
+    "heart": 0.5
+   },
+   "from": [
+    "Scomplexion2-sleep",
+    "Saging2-sleep"
+   ]
+  },
+  {
+   "id": "anxious",
+   "label": "不安になりやすい",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "heart": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B9-2",
+    "KH-anxious",
+    "KE-anxious",
+    "Sanxiety1-vague"
+   ]
+  },
+  {
+   "id": "anxious_vague",
+   "label": "理由もなく不安になる",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "organs": {
+    "heart": 0.5
+   },
+   "implies": [
+    "anxious"
+   ],
+   "from": [
+    "Sanxiety1-vague"
+   ]
+  },
+  {
+   "id": "tense_social",
+   "label": "人前などで強く緊張する",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Sanxiety1-tense",
+    "KH-tense"
+   ]
+  },
+  {
+   "id": "startle",
+   "label": "驚きやすい",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "heart": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B9-1",
+    "Sanxiety1-startle"
+   ]
+  },
+  {
+   "id": "rumination",
+   "label": "考え事が頭から離れない",
+   "weights": {
+    "qi_def": 0.25,
+    "blood_def": 0.25
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sanxiety1-worry"
+   ]
+  },
+  {
+   "id": "forgetful",
+   "label": "物忘れ・集中力の低下",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "heart": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B9-2",
+    "Sanxiety2-forget"
+   ]
+  },
+  {
+   "id": "irritable",
+   "label": "イライラしやすい",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B9-3",
+    "KH-irritable",
+    "KE-irritable",
+    "Shot_flash3-irritable",
+    "Sstiff_shoulder2-irritable",
+    "Sinsomnia3-irritable",
+    "Spms_body1-angry",
+    "Speriod_pain1-bloat"
+   ]
+  },
+  {
+   "id": "anger",
+   "label": "怒りっぽい",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B9-9",
+    "KH-anger"
+   ]
+  },
+  {
+   "id": "flare_red",
+   "label": "カッとなると顔が赤くなる・頭に血が上る",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B9-9",
+    "Sirritability1-flare"
+   ]
+  },
+  {
+   "id": "nervous_tension",
+   "label": "些細なことが気になり、神経が高ぶる",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Sirritability1-small"
+   ]
+  },
+  {
+   "id": "sighing",
+   "label": "ため息が多い",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B9-3",
+    "Sirritability1-sigh"
+   ]
+  },
+  {
+   "id": "chest_flank_distension",
+   "label": "胸や脇が張る",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Sirritability1-sigh"
+   ]
+  },
+  {
+   "id": "mood_swing",
+   "label": "気分の浮き沈みが大きい",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B9-4",
+    "KH-swing",
+    "Sirritability1-swing",
+    "Sirregular2-mood"
+   ]
+  },
+  {
+   "id": "tension_unwell",
+   "label": "緊張すると具合が悪くなる",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B9-4"
+   ]
+  },
+  {
+   "id": "bruxism",
+   "label": "歯ぎしり・食いしばり",
+   "weights": {
+    "qi_stag": 0.25,
+    "blood_def": 0.25
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Sirritability1-grind"
+   ]
+  },
+  {
+   "id": "low_mood",
+   "label": "気分が沈みがち・落ち込む",
+   "weights": {
+    "blood_stasis": 1,
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B9-5",
+    "KH-low",
+    "KE-low",
+    "Sfatigue1-low"
+   ]
+  },
+  {
+   "id": "mood_heavy",
+   "label": "気分がふさぎ、重い",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "implies": [
+    "low_mood"
+   ],
+   "from": [
+    "Slow_mood1-heavy",
+    "Sthroat2-mood"
+   ]
+  },
+  {
+   "id": "tearful",
+   "label": "涙もろい",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "organs": {
+    "heart": 0.5
+   },
+   "from": [
+    "Slow_mood1-tearful"
+   ]
+  },
+  {
+   "id": "motivation_low",
+   "label": "意欲・集中力が低下している",
+   "from": [
+    "KH-motivation"
+   ]
+  },
+  {
+   "id": "foggy_head",
+   "label": "頭がぼーっとする",
+   "weights": {
+    "fluid": 1,
+    "qi_def": 1
+   },
+   "organs": {
+    "spleen": 1,
+    "lung": 0.5
+   },
+   "from": [
+    "B9-6",
+    "B12-1"
+   ]
+  },
+  {
+   "id": "restless",
+   "label": "焦りやすい",
+   "weights": {
+    "yin_def": 1
+   },
+   "organs": {
+    "heart": 0.5,
+    "kidney": 0.5
+   },
+   "from": [
+    "B9-7"
+   ]
+  },
+  {
+   "id": "night_agitation",
+   "label": "夜に気持ちが高ぶる",
+   "weights": {
+    "yin_def": 1
+   },
+   "organs": {
+    "heart": 0.5,
+    "kidney": 0.5
+   },
+   "from": [
+    "B9-7"
+   ]
+  },
+  {
+   "id": "stress_high",
+   "label": "ストレスが多い",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Saging2-stress",
+    "Sgray_hair2-stress"
+   ]
+  },
+  {
+   "id": "stress_unwell",
+   "label": "ストレスによる体調不良",
+   "from": [
+    "KH-stomach",
+    "KH-diarrhea"
+   ]
+  },
+  {
+   "id": "stress_before_event",
+   "label": "ストレス：緊張する前・大事な予定の前に起こる",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_stress",
+   "from": [
+    "Sstress_gi2-before"
+   ]
+  },
+  {
+   "id": "stress_work",
+   "label": "ストレス：仕事や人間関係",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "group": "trig_stress",
+   "from": [
+    "Sirritability2-work"
+   ]
+  },
+  {
+   "id": "irritable_worse_stress",
+   "label": "イライラ：仕事や人間関係のストレスで強くなる",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "group": "trig_stress",
+   "from": [
+    "Sirritability2-work"
+   ]
+  },
+  {
+   "id": "irritable_worse_premenstrual",
+   "label": "イライラ：月経前に強くなる",
+   "weights": {
+    "qi_stag": 0.25,
+    "blood_stasis": 0.25
+   },
+   "group": "trig_premenstrual",
+   "from": [
+    "Sirritability2-menses"
+   ]
+  },
+  {
+   "id": "irritable_worse_tired",
+   "label": "イライラ：疲れているとき強くなる",
+   "weights": {
+    "qi_def": 0.25,
+    "blood_def": 0.25
+   },
+   "from": [
+    "Sirritability2-tired"
+   ]
+  },
+  {
+   "id": "irritable_worse_hungry",
+   "label": "イライラ：空腹のとき強くなる",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "from": [
+    "Sirritability2-hungry"
+   ]
+  },
+  {
+   "id": "lowmood_after_stress",
+   "label": "落ち込みのきっかけ：仕事や人間関係のストレス"
+  },
+  {
+   "id": "lowmood_after_life_event",
+   "label": "落ち込みのきっかけ：別れや環境の変化"
+  },
+  {
+   "id": "lowmood_after_birth",
+   "label": "落ち込みのきっかけ：出産"
+  },
+  {
+   "id": "lowmood_after_illness",
+   "label": "落ち込みのきっかけ：体調を崩したあと"
+  },
+  {
+   "id": "lowmood_premenstrual",
+   "label": "月経前だけ落ち込む",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "group": "trig_premenstrual",
+   "from": [
+    "Slow_mood2-menses"
+   ]
+  },
+  {
+   "id": "lowmood_no_cycle",
+   "label": "落ち込みは月経周期と関係ない"
+  },
+  {
+   "id": "palpitation",
+   "label": "動悸",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "heart": 0.5,
+    "lung": 0.5
+   },
+   "from": [
+    "B10-1",
+    "KH-palpitation",
+    "KE-palpitation",
+    "Shot_flash3-palpitation",
+    "Sanxiety1-palpitation",
+    "Sinsomnia3-palpitation",
+    "Sdizziness2-palpitation",
+    "Sthroat2-palpitation",
+    "Sbreath2-palpitation"
+   ]
+  },
+  {
+   "id": "palp_tension",
+   "label": "動悸：緊張や不安を感じたとき",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "heart": 0.5
+   },
+   "implies": [
+    "palpitation"
+   ],
+   "from": [
+    "Spalpitation1-stress"
+   ]
+  },
+  {
+   "id": "palp_exertion",
+   "label": "動悸：少し動いただけで",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "organs": {
+    "heart": 0.5
+   },
+   "implies": [
+    "palpitation"
+   ],
+   "from": [
+    "Spalpitation1-move"
+   ]
+  },
+  {
+   "id": "palp_rest",
+   "label": "動悸：安静にしているとき",
+   "weights": {
+    "yin_def": 0.5
+   },
+   "organs": {
+    "heart": 0.5
+   },
+   "implies": [
+    "palpitation"
+   ],
+   "from": [
+    "Spalpitation1-rest"
+   ]
+  },
+  {
+   "id": "numbness",
+   "label": "手足のしびれ",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B10-2"
+   ]
+  },
+  {
+   "id": "numb_extremities",
+   "label": "手足の先がしびれる",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "implies": [
+    "numbness"
+   ],
+   "from": [
+    "B10-2"
+   ]
+  },
+  {
+   "id": "cramps",
+   "label": "こむら返りが起きやすい",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B10-2"
+   ]
+  },
+  {
+   "id": "cramps_night",
+   "label": "こむら返り：夜・寝ているとき",
+   "implies": [
+    "cramps"
+   ]
+  },
+  {
+   "id": "cramps_after_exertion",
+   "label": "こむら返り：運動・立ち仕事のあと",
+   "implies": [
+    "cramps"
+   ]
+  },
+  {
+   "id": "cramps_cold",
+   "label": "こむら返り：冷えたとき",
+   "group": "cold_sensitive",
+   "implies": [
+    "cramps"
+   ]
+  },
+  {
+   "id": "trauma_history",
+   "label": "打撲・むち打ち・手術の経験がある",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "from": [
+    "B10-5"
+   ]
+  },
+  {
+   "id": "varicose",
+   "label": "静脈瘤がある",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "from": [
+    "B10-5"
+   ]
+  },
+  {
+   "id": "anemia_hx",
+   "label": "貧血といわれたことがある",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "from": [
+    "Scomplexion2-anemia",
+    "Scold2-pale"
+   ]
+  },
+  {
+   "id": "weight_loss",
+   "label": "体重が減った",
+   "weights": {
+    "qi_def": 0.25,
+    "blood_def": 0.25,
+    "fluid": 0.25
+   },
+   "from": [
+    "Sflow_light2-weight",
+    "Saging2-weight"
+   ]
+  },
+  {
+   "id": "diet_restrict",
+   "label": "食事を減らしている",
+   "weights": {
+    "qi_def": 0.25,
+    "blood_def": 0.25
+   },
+   "from": [
+    "Sflow_light2-weight"
+   ]
+  },
+  {
+   "id": "skin_dry",
+   "label": "肌が乾燥しやすい",
+   "weights": {
+    "blood_def": 0.5,
+    "yin_def": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "kidney": 0.5
+   },
+   "from": [
+    "B1-3",
+    "B2-8",
+    "KA-dry",
+    "KE-dry",
+    "Sspots2-dry",
+    "Shair_dry2-skin",
+    "Saging1-dry",
+    "Sflow_light2-dry"
+   ]
+  },
+  {
+   "id": "hair_dry",
+   "label": "髪がパサつく",
+   "weights": {
+    "blood_def": 1,
+    "yin_def": 0.5
+   },
+   "organs": {
+    "liver": 0.5,
+    "kidney": 0.5,
+    "lung": 0.5
+   },
+   "from": [
+    "B2-3",
+    "B1-3",
+    "KB-dry",
+    "KB-gloss",
+    "Sflow_light2-dry",
+    "Saging1-dry"
+   ]
+  },
+  {
+   "id": "nail_brittle",
+   "label": "爪が割れやすい",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "liver": 0.5,
+    "kidney": 0.5
+   },
+   "from": [
+    "B2-3",
+    "Shair_dry2-nail"
+   ]
+  },
+  {
+   "id": "lip_dark",
+   "label": "唇の色が暗い・紫っぽい",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "organs": {
+    "heart": 1
+   },
+   "from": [
+    "B2-6",
+    "B5-5"
+   ]
+  },
+  {
+   "id": "skin_weepy",
+   "label": "湿疹がじゅくじゅくしやすい",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 0.5,
+    "lung": 0.5
+   },
+   "from": [
+    "B2-7"
+   ]
+  },
+  {
+   "id": "boils",
+   "label": "できものが化膿しやすい",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "liver": 0.5
+   },
+   "from": [
+    "B2-10",
+    "B10-9"
+   ]
+  },
+  {
+   "id": "eye_red",
+   "label": "目が充血しやすい",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "liver": 1
+   },
+   "from": [
+    "B2-10",
+    "B12-8"
+   ]
+  },
+  {
+   "id": "acne",
+   "label": "ニキビ",
+   "weights": {
+    "fluid": 0.25,
+    "yang_exc": 0.25
+   },
+   "from": [
+    "KA-acne",
+    "KD-acne",
+    "Sskin_texture1-acne"
+   ]
+  },
+  {
+   "id": "acne_red",
+   "label": "ニキビ：赤く腫れる",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "from": [
+    "Sacne1-red"
+   ]
+  },
+  {
+   "id": "acne_pus",
+   "label": "ニキビ：膿を持つ",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "from": [
+    "Sacne1-pus"
+   ]
+  },
+  {
+   "id": "acne_comedo",
+   "label": "ニキビ：白ニキビ・黒ニキビ",
+   "weights": {
+    "fluid": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sacne1-comedo"
+   ]
+  },
+  {
+   "id": "acne_recur",
+   "label": "ニキビ：繰り返しできる",
+   "weights": {
+    "blood_stasis": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Sacne1-recur"
+   ]
+  },
+  {
+   "id": "skin_oily",
+   "label": "皮脂が多く、べたつく",
+   "weights": {
+    "fluid": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sskin_texture1-oily",
+    "KA-oily"
+   ]
+  },
+  {
+   "id": "acne_worse_premenstrual",
+   "label": "ニキビ：月経前に悪化",
+   "weights": {
+    "qi_stag": 0.25,
+    "blood_stasis": 0.25
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_premenstrual",
+   "from": [
+    "Sacne3-menses"
+   ]
+  },
+  {
+   "id": "acne_worse_stress",
+   "label": "ニキビ：ストレスで悪化",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "group": "trig_stress",
+   "from": [
+    "Sacne3-stress",
+    "B2-4"
+   ]
+  },
+  {
+   "id": "acne_worse_sleep",
+   "label": "ニキビ：睡眠不足で悪化",
+   "weights": {
+    "yin_def": 0.5
+   },
+   "organs": {
+    "kidney": 0.5
+   },
+   "group": "trig_sleep",
+   "from": [
+    "Sacne3-sleep"
+   ]
+  },
+  {
+   "id": "acne_worse_greasy",
+   "label": "ニキビ：脂っこいもののあとに悪化",
+   "weights": {
+    "fluid": 0.25,
+    "yang_exc": 0.25
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "group": "trig_greasy",
+   "from": [
+    "Sacne3-food"
+   ]
+  },
+  {
+   "id": "acne_worse_sweet",
+   "label": "ニキビ：甘いもののあとに悪化",
+   "weights": {
+    "fluid": 0.25,
+    "yang_exc": 0.25
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "group": "trig_sweet",
+   "from": [
+    "Sacne3-food"
+   ]
+  },
+  {
+   "id": "rough_hands",
+   "label": "手足があれる",
+   "from": [
+    "Sdry_skin1-hands"
+   ]
+  },
+  {
+   "id": "dry_body",
+   "label": "全身が乾燥する",
+   "weights": {
+    "yin_def": 0.5
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "from": [
+    "Sdry_skin1-body"
+   ]
+  },
+  {
+   "id": "dry_itch",
+   "label": "乾燥：かゆみを伴う",
+   "weights": {
+    "blood_def": 0.25,
+    "yin_def": 0.25
+   },
+   "from": [
+    "Sdry_skin2-itch"
+   ]
+  },
+  {
+   "id": "dry_flake",
+   "label": "乾燥：粉をふく",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "from": [
+    "Sdry_skin2-flake"
+   ]
+  },
+  {
+   "id": "dry_red",
+   "label": "乾燥：赤みを伴う",
+   "weights": {
+    "yin_def": 0.5
+   },
+   "from": [
+    "Sdry_skin2-red"
+   ]
+  },
+  {
+   "id": "dry_crack",
+   "label": "乾燥：ひび割れる",
+   "weights": {
+    "blood_def": 0.25,
+    "yin_def": 0.25
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "from": [
+    "Sdry_skin2-crack"
+   ]
+  },
+  {
+   "id": "dry_skin_worse_season",
+   "label": "乾燥：冬・空気が乾燥する季節に悪化",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "group": "trig_dry_season",
+   "from": [
+    "Sdry_skin3-winter"
+   ]
+  },
+  {
+   "id": "dry_skin_worse_bath",
+   "label": "乾燥：入浴後に悪化",
+   "weights": {
+    "yin_def": 0.5
+   },
+   "from": [
+    "Sdry_skin3-bath"
+   ]
+  },
+  {
+   "id": "dry_skin_always",
+   "label": "一年中乾燥している",
+   "weights": {
+    "blood_def": 0.25,
+    "yin_def": 0.25
+   },
+   "organs": {
+    "kidney": 0.5
+   },
+   "from": [
+    "Sdry_skin3-always"
+   ]
+  },
+  {
+   "id": "itch",
+   "label": "かゆみ",
+   "from": [
+    "KA-itch",
+    "KB-scalp_itch"
+   ]
+  },
+  {
+   "id": "itch_dry",
+   "label": "かゆみ：乾燥してかゆい",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "from": [
+    "Sitch1-dry"
+   ]
+  },
+  {
+   "id": "itch_hot",
+   "label": "かゆみ：赤みや熱感を伴う",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "from": [
+    "Sitch1-red"
+   ]
+  },
+  {
+   "id": "itch_wet",
+   "label": "かゆみ：じゅくじゅくして分泌物がある",
+   "weights": {
+    "fluid": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sitch1-wet"
+   ]
+  },
+  {
+   "id": "hives",
+   "label": "じんましんのように赤く盛り上がる",
+   "weights": {
+    "yang_exc": 0.25,
+    "fluid": 0.25
+   },
+   "from": [
+    "Sitch1-hives"
+   ]
+  },
+  {
+   "id": "itch_night",
+   "label": "かゆみ：夜や温まると強くなる",
+   "weights": {
+    "yin_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "Sitch1-night",
+    "B10-7"
+   ]
+  },
+  {
+   "id": "itch_worse_warm",
+   "label": "かゆみ：温まったとき・入浴後に悪化",
+   "weights": {
+    "yin_def": 0.25,
+    "yang_exc": 0.25
+   },
+   "group": "trig_warm",
+   "from": [
+    "Sitch3-warm"
+   ]
+  },
+  {
+   "id": "itch_worse_sweat",
+   "label": "かゆみ：汗で悪化",
+   "weights": {
+    "fluid": 0.5
+   },
+   "group": "trig_sweat",
+   "from": [
+    "Sitch3-sweat"
+   ]
+  },
+  {
+   "id": "itch_worse_dry",
+   "label": "かゆみ：乾燥する季節に悪化",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "group": "trig_dry_season",
+   "from": [
+    "Sitch3-dry"
+   ]
+  },
+  {
+   "id": "itch_worse_stress",
+   "label": "かゆみ：ストレスで悪化",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_stress",
+   "from": [
+    "Sitch3-stress"
+   ]
+  },
+  {
+   "id": "eczema",
+   "label": "湿疹・肌荒れ",
+   "from": [
+    "KA-eczema",
+    "KD-skin"
+   ]
+  },
+  {
+   "id": "eczema_red",
+   "label": "湿疹：赤みや熱感が強い",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "from": [
+    "Seczema1-red"
+   ]
+  },
+  {
+   "id": "eczema_wet",
+   "label": "湿疹：じゅくじゅくして分泌物が多い",
+   "weights": {
+    "fluid": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Seczema1-wet"
+   ]
+  },
+  {
+   "id": "eczema_dry",
+   "label": "湿疹：乾燥してカサカサ",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "from": [
+    "Seczema1-dry"
+   ]
+  },
+  {
+   "id": "eczema_pus",
+   "label": "湿疹：化膿しやすい",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "from": [
+    "Seczema1-pus"
+   ]
+  },
+  {
+   "id": "eczema_itchy",
+   "label": "湿疹：かゆみが強い",
+   "weights": {
+    "yang_exc": 0.25,
+    "fluid": 0.25
+   },
+   "from": [
+    "Seczema1-itchy"
+   ]
+  },
+  {
+   "id": "eczema_face",
+   "label": "湿疹：顔・頭",
+   "from": [
+    "Seczema2-face"
+   ]
+  },
+  {
+   "id": "eczema_limbs",
+   "label": "湿疹：手足",
+   "from": [
+    "Seczema2-hands"
+   ]
+  },
+  {
+   "id": "eczema_trunk",
+   "label": "湿疹：体（背中・お腹など）",
+   "from": [
+    "Seczema2-body"
+   ]
+  },
+  {
+   "id": "eczema_whole",
+   "label": "湿疹：全身",
+   "from": [
+    "Seczema2-whole"
+   ]
+  },
+  {
+   "id": "eczema_worse_warm",
+   "label": "湿疹：温まると悪化",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "group": "trig_warm",
+   "from": [
+    "Seczema3-warm"
+   ]
+  },
+  {
+   "id": "eczema_worse_sweat",
+   "label": "湿疹：汗で悪化",
+   "weights": {
+    "fluid": 0.5
+   },
+   "group": "trig_sweat",
+   "from": [
+    "Seczema3-sweat"
+   ]
+  },
+  {
+   "id": "eczema_worse_dry",
+   "label": "湿疹：乾燥する季節に悪化",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "group": "trig_dry_season",
+   "from": [
+    "Seczema3-dry"
+   ]
+  },
+  {
+   "id": "eczema_worse_stress",
+   "label": "湿疹：ストレスで悪化",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_stress",
+   "from": [
+    "Seczema3-stress"
+   ]
+  },
+  {
+   "id": "dull_skin",
+   "label": "肌のくすみ",
+   "from": [
+    "KA-dull",
+    "KC-dull"
+   ]
+  },
+  {
+   "id": "circles_blue",
+   "label": "目の下に青っぽいクマ",
+   "weights": {
+    "blood_stasis": 0.25,
+    "blood_def": 0.25
+   },
+   "from": [
+    "Scomplexion1-bluecircle",
+    "KC-circles"
+   ]
+  },
+  {
+   "id": "circles_brown",
+   "label": "目の下に茶色っぽいクマ",
+   "weights": {
+    "blood_stasis": 0.5
+   },
+   "from": [
+    "Scomplexion1-browncircle"
+   ]
+  },
+  {
+   "id": "spots",
+   "label": "シミ・色素沈着",
+   "from": [
+    "KA-spots"
+   ]
+  },
+  {
+   "id": "melasma",
+   "label": "肝斑",
+   "from": [
+    "KA-melasma"
+   ]
+  },
+  {
+   "id": "spots_symmetric",
+   "label": "シミ：頬骨のあたりに左右対称",
+   "weights": {
+    "blood_stasis": 0.25,
+    "qi_stag": 0.25
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Sspots1-sym"
+   ]
+  },
+  {
+   "id": "spots_sun",
+   "label": "シミ：日焼けのあとにできた",
+   "weights": {
+    "blood_stasis": 0.25
+   },
+   "from": [
+    "Sspots1-sun"
+   ]
+  },
+  {
+   "id": "spots_acne_mark",
+   "label": "ニキビ跡が茶色く残っている",
+   "weights": {
+    "blood_stasis": 0.5
+   },
+   "from": [
+    "Sspots1-acne"
+   ]
+  },
+  {
+   "id": "spots_uneven",
+   "label": "全体的に色ムラ・くすみがある",
+   "weights": {
+    "blood_stasis": 0.5
+   },
+   "from": [
+    "Sspots1-spread"
+   ]
+  },
+  {
+   "id": "spots_worse_uv",
+   "label": "シミ：紫外線で濃くなる",
+   "from": [
+    "Sspots3-uv"
+   ]
+  },
+  {
+   "id": "spots_worse_premenstrual",
+   "label": "シミ：月経前に濃くなる",
+   "weights": {
+    "qi_stag": 0.25,
+    "blood_stasis": 0.25
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_premenstrual",
+   "from": [
+    "Sspots3-menses"
+   ]
+  },
+  {
+   "id": "spots_worse_stress",
+   "label": "シミ：ストレスで濃くなる",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_stress",
+   "from": [
+    "Sspots3-stress"
+   ]
+  },
+  {
+   "id": "spots_worse_sleep",
+   "label": "シミ：寝不足で濃くなる",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_sleep",
+   "from": [
+    "Sspots3-stress"
+   ]
+  },
+  {
+   "id": "spots_after_birth",
+   "label": "シミ：妊娠・出産のあとに濃くなった",
+   "weights": {
+    "blood_stasis": 0.25,
+    "blood_def": 0.25
+   },
+   "from": [
+    "Sspots3-preg"
+   ]
+  },
+  {
+   "id": "hair_loss",
+   "label": "抜け毛",
+   "weights": {
+    "blood_def": 0.25,
+    "yin_def": 0.25
+   },
+   "organs": {
+    "kidney": 0.5
+   },
+   "from": [
+    "KB-loss",
+    "KE-hair",
+    "Sgray_hair2-loss",
+    "Saging1-hair"
+   ]
+  },
+  {
+   "id": "thin_hair",
+   "label": "薄毛・髪が細くなった",
+   "weights": {
+    "qi_def": 0.25,
+    "blood_def": 0.25
+   },
+   "organs": {
+    "kidney": 0.5
+   },
+   "from": [
+    "KB-thin",
+    "KB-volume",
+    "KB-fine",
+    "Shair_dry1-thin"
+   ]
+  },
+  {
+   "id": "hairloss_diffuse",
+   "label": "抜け毛：全体的に抜ける",
+   "weights": {
+    "blood_def": 0.25,
+    "qi_def": 0.25
+   },
+   "from": [
+    "Shair_loss1-whole"
+   ]
+  },
+  {
+   "id": "hairloss_part",
+   "label": "抜け毛：分け目が目立つ",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "from": [
+    "Shair_loss1-part"
+   ]
+  },
+  {
+   "id": "hairloss_front",
+   "label": "抜け毛：生え際が薄くなった",
+   "organs": {
+    "kidney": 0.5
+   },
+   "from": [
+    "Shair_loss1-front"
+   ]
+  },
+  {
+   "id": "hairloss_patch",
+   "label": "一部分だけ丸く抜ける",
+   "from": [
+    "Shair_loss1-patch"
+   ]
+  },
+  {
+   "id": "hairloss_after_birth",
+   "label": "抜け毛のきっかけ：出産",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "from": [
+    "Shair_loss3-birth"
+   ]
+  },
+  {
+   "id": "hairloss_after_stress",
+   "label": "抜け毛のきっかけ：強いストレス",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Shair_loss3-stress"
+   ]
+  },
+  {
+   "id": "hairloss_after_weightloss",
+   "label": "抜け毛のきっかけ：急激な体重減少",
+   "weights": {
+    "qi_def": 0.25,
+    "blood_def": 0.25
+   },
+   "from": [
+    "Shair_loss3-weight"
+   ]
+  },
+  {
+   "id": "hairloss_after_illness",
+   "label": "抜け毛のきっかけ：体調不良",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "from": [
+    "Shair_loss3-ill"
+   ]
+  },
+  {
+   "id": "hair_frizzy",
+   "label": "髪：パサついて広がる",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "from": [
+    "Shair_dry1-dry"
+   ]
+  },
+  {
+   "id": "hair_split",
+   "label": "髪：枝毛・切れ毛が多い",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "from": [
+    "Shair_dry1-split"
+   ]
+  },
+  {
+   "id": "hair_dull",
+   "label": "髪：ツヤがない",
+   "weights": {
+    "blood_def": 0.25,
+    "qi_def": 0.25
+   },
+   "from": [
+    "Shair_dry1-dull"
+   ]
+  },
+  {
+   "id": "gray_hair",
+   "label": "白髪",
+   "weights": {
+    "yin_def": 0.25,
+    "blood_def": 0.25
+   },
+   "organs": {
+    "kidney": 0.5
+   },
+   "from": [
+    "KB-gray",
+    "Saging1-hair"
+   ]
+  },
+  {
+   "id": "scalp_dry",
+   "label": "頭皮の乾燥",
+   "weights": {
+    "blood_def": 0.25,
+    "yin_def": 0.25
+   },
+   "from": [
+    "KB-scalp_dry",
+    "Sscalp1-dry"
+   ]
+  },
+  {
+   "id": "scalp_oily",
+   "label": "頭皮の脂っぽさ",
+   "weights": {
+    "fluid": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "KB-scalp_oily",
+    "Sscalp1-oily"
+   ]
+  },
+  {
+   "id": "dandruff",
+   "label": "フケ",
+   "from": [
+    "KB-dandruff"
+   ]
+  },
+  {
+   "id": "dandruff_dry",
+   "label": "乾いた細かいフケ",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "implies": [
+    "dandruff"
+   ],
+   "from": [
+    "Sscalp1-dryflake"
+   ]
+  },
+  {
+   "id": "dandruff_wet",
+   "label": "湿った大きめのフケ",
+   "weights": {
+    "fluid": 0.25,
+    "yang_exc": 0.25
+   },
+   "implies": [
+    "dandruff"
+   ],
+   "from": [
+    "Sscalp1-wetflake"
+   ]
+  },
+  {
+   "id": "scalp_itch",
+   "label": "頭皮のかゆみ",
+   "from": [
+    "KB-scalp_itch",
+    "Sscalp1-itch"
+   ]
+  },
+  {
+   "id": "scalp_eczema",
+   "label": "頭皮の湿疹・赤み",
+   "weights": {
+    "yang_exc": 0.5
+   },
+   "from": [
+    "KB-scalp_eczema",
+    "Sscalp1-red"
+   ]
+  },
+  {
+   "id": "scalp_worse_dry",
+   "label": "頭皮：乾燥する季節に悪化",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "group": "trig_dry_season",
+   "from": [
+    "Sscalp2-winter"
+   ]
+  },
+  {
+   "id": "scalp_worse_sweat",
+   "label": "頭皮：汗のあとに悪化",
+   "weights": {
+    "fluid": 0.5
+   },
+   "group": "trig_sweat",
+   "from": [
+    "Sscalp2-sweat"
+   ]
+  },
+  {
+   "id": "scalp_worse_stress",
+   "label": "頭皮：ストレスで悪化",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_stress",
+   "from": [
+    "Sscalp2-stress"
+   ]
+  },
+  {
+   "id": "scalp_worse_sleep",
+   "label": "頭皮：寝不足で悪化",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "group": "trig_sleep",
+   "from": [
+    "Sscalp2-stress"
+   ]
+  },
+  {
+   "id": "scalp_worse_greasy",
+   "label": "頭皮：脂っこいもののあとに悪化",
+   "weights": {
+    "fluid": 0.25,
+    "yang_exc": 0.25
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "group": "trig_greasy",
+   "from": [
+    "Sscalp2-food"
+   ]
+  },
+  {
+   "id": "scalp_worse_sweet",
+   "label": "頭皮：甘いもののあとに悪化",
+   "weights": {
+    "fluid": 0.25,
+    "yang_exc": 0.25
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "group": "trig_sweet",
+   "from": [
+    "Sscalp2-food"
+   ]
+  },
+  {
+   "id": "scalp_worse_alcohol",
+   "label": "頭皮：お酒のあとに悪化",
+   "weights": {
+    "fluid": 0.25,
+    "yang_exc": 0.25
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "group": "trig_alcohol",
+   "from": [
+    "Sscalp2-food"
+   ]
+  },
+  {
+   "id": "dysmenorrhea",
+   "label": "月経痛",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "KD-pain",
+    "KG-period",
+    "B11-4",
+    "Sirregular2-pain",
+    "Sflow_heavy2-pain",
+    "Scomplexion2-menses",
+    "Sspots2-menses",
+    "Scold2-menses"
+   ]
+  },
+  {
+   "id": "irregular_menses",
+   "label": "月経不順",
+   "weights": {
+    "blood_stasis": 0.5
+   },
+   "from": [
+    "KD-irregular",
+    "Scold2-menses"
+   ]
+  },
+  {
+   "id": "pms_mood",
+   "label": "月経前の心の不調",
+   "from": [
+    "KD-irritable",
+    "KD-low",
+    "KD-anxious"
+   ]
+  },
+  {
+   "id": "pms_body",
+   "label": "月経前の体の不調",
+   "from": [
+    "KD-breast",
+    "KD-sleepy",
+    "KD-tired",
+    "KD-appetite",
+    "KD-edema"
+   ]
+  },
+  {
+   "id": "flow_heavy",
+   "label": "経血量が多い",
+   "from": [
+    "KD-heavy",
+    "Sirregular2-heavy"
+   ]
+  },
+  {
+   "id": "flow_light",
+   "label": "経血量が少ない",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "KD-light",
+    "B11-2",
+    "Sirregular2-light"
+   ]
+  },
+  {
+   "id": "menopause",
+   "label": "更年期にともなう不調",
+   "from": [
+    "KE-hotflash",
+    "KE-flush"
+   ]
+  },
+  {
+   "id": "postpartum",
+   "label": "産後の不調"
+  },
+  {
+   "id": "cycle_short",
+   "label": "周期が早まりがち（24日以内）",
+   "weights": {
+    "qi_def": 1,
+    "yang_exc": 1
+   },
+   "organs": {
+    "spleen": 1,
+    "liver": 1
+   },
+   "from": [
+    "B11-1",
+    "B11-8",
+    "Sirregular1-early"
+   ]
+  },
+  {
+   "id": "cycle_long",
+   "label": "周期が遅れがち（39日以上）",
+   "weights": {
+    "blood_def": 1,
+    "yang_def": 0.25
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B11-2",
+    "Sirregular1-late",
+    "Sflow_light1-late"
+   ]
+  },
+  {
+   "id": "cycle_random",
+   "label": "周期が安定しない・予測できない",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B11-3",
+    "Sirregular1-random"
+   ]
+  },
+  {
+   "id": "cycle_skip",
+   "label": "3か月以上来ないことがある",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "from": [
+    "Sirregular1-skip"
+   ]
+  },
+  {
+   "id": "period_short",
+   "label": "2日ほどで終わる",
+   "weights": {
+    "blood_def": 0.25,
+    "yin_def": 0.25
+   },
+   "from": [
+    "Sflow_light1-short"
+   ]
+  },
+  {
+   "id": "pms_irritable",
+   "label": "月経前にイライラする",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B11-3",
+    "Spms_mood1-angry",
+    "Spms_body1-angry",
+    "KD-irritable"
+   ]
+  },
+  {
+   "id": "pms_low",
+   "label": "月経前に気分が落ち込む",
+   "weights": {
+    "qi_stag": 0.25,
+    "blood_def": 0.25
+   },
+   "organs": {
+    "liver": 0.25,
+    "heart": 0.25
+   },
+   "from": [
+    "Spms_mood1-tearful",
+    "Spms_body1-low",
+    "KD-low"
+   ]
+  },
+  {
+   "id": "pms_tearful",
+   "label": "月経前に涙もろくなる",
+   "weights": {
+    "qi_stag": 0.25,
+    "blood_def": 0.25
+   },
+   "organs": {
+    "liver": 0.25,
+    "heart": 0.25
+   },
+   "from": [
+    "Spms_mood1-tearful"
+   ]
+  },
+  {
+   "id": "pms_anxious",
+   "label": "月経前に不安で落ち着かない",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "organs": {
+    "heart": 0.5
+   },
+   "from": [
+    "Spms_mood1-anxious",
+    "KD-anxious"
+   ]
+  },
+  {
+   "id": "pms_insomnia",
+   "label": "月経前に眠れなくなる",
+   "weights": {
+    "blood_def": 0.25,
+    "qi_stag": 0.25
+   },
+   "organs": {
+    "heart": 0.5
+   },
+   "from": [
+    "Spms_mood1-sleep"
+   ]
+  },
+  {
+   "id": "pms_breast",
+   "label": "月経前に胸や脇が張る",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B11-3",
+    "Spms_mood1-breast",
+    "Spms_body1-breast",
+    "KD-breast"
+   ]
+  },
+  {
+   "id": "pms_sleepy",
+   "label": "月経前に眠くなる",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Spms_body1-sleepy",
+    "KD-sleepy"
+   ]
+  },
+  {
+   "id": "pms_fatigue",
+   "label": "月経前にだるい・疲れる",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Spms_body1-sleepy",
+    "KD-tired"
+   ]
+  },
+  {
+   "id": "pms_bloating",
+   "label": "月経前にお腹が張る",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Spms_edema1-belly"
+   ]
+  },
+  {
+   "id": "pms_headache",
+   "label": "月経前・月経中の頭痛",
+   "from": [
+    "KD-headache",
+    "Spms_headache2-before",
+    "Spms_headache2-during"
+   ]
+  },
+  {
+   "id": "pms_sweet_craving",
+   "label": "月経前に甘いものが欲しくなる",
+   "weights": {
+    "qi_def": 0.25,
+    "fluid": 0.25
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Spms_body1-sweet"
+   ]
+  },
+  {
+   "id": "pms_appetite",
+   "label": "月経前に食欲が増える",
+   "from": [
+    "KD-appetite"
+   ]
+  },
+  {
+   "id": "pms_skin",
+   "label": "月経前のニキビ・肌荒れ",
+   "weights": {
+    "yang_exc": 0.25,
+    "blood_stasis": 0.25,
+    "fluid": 0.25
+   },
+   "from": [
+    "KD-skin",
+    "KD-acne",
+    "Spms_skin1-acne",
+    "Spms_skin1-itch"
+   ]
+  },
+  {
+   "id": "pms_relieved_onset",
+   "label": "月経が始まると楽になる",
+   "from": [
+    "Spms_mood2-late"
+   ]
+  },
+  {
+   "id": "pms_continues",
+   "label": "月経中も続く",
+   "weights": {
+    "blood_stasis": 0.5
+   },
+   "from": [
+    "Spms_mood2-during",
+    "Spms_body2-during"
+   ]
+  },
+  {
+   "id": "clots",
+   "label": "経血に塊が混じる",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B11-4",
+    "Sirregular2-clot",
+    "Sflow_heavy1-clot",
+    "Sflow_light1-dark",
+    "Speriod_pain1-stab",
+    "Scomplexion2-menses",
+    "Sspots2-menses"
+   ]
+  },
+  {
+   "id": "flow_dark",
+   "label": "経血の色が暗い",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B11-4",
+    "Sflow_light1-dark"
+   ]
+  },
+  {
+   "id": "flow_pale",
+   "label": "経血の色が薄い",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B11-2",
+    "Sflow_light1-pale"
+   ]
+  },
+  {
+   "id": "flow_bright_heavy",
+   "label": "鮮やかな赤色の出血が多い",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B11-8",
+    "Sflow_heavy1-bright"
+   ]
+  },
+  {
+   "id": "leukorrhea",
+   "label": "おりものが多い",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B11-5"
+   ]
+  },
+  {
+   "id": "period_cold_pain",
+   "label": "月経痛：下腹部が冷えて痛む",
+   "weights": {
+    "yang_def": 0.5
+   },
+   "organs": {
+    "kidney": 0.5
+   },
+   "from": [
+    "Speriod_pain1-cold"
+   ]
+  },
+  {
+   "id": "period_warm_relief",
+   "label": "月経痛：温めると楽になる",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "group": "cold_sensitive",
+   "from": [
+    "Speriod_pain1-cold",
+    "B11-7"
+   ]
+  },
+  {
+   "id": "period_stabbing",
+   "label": "月経痛：刺すように痛む",
+   "weights": {
+    "blood_stasis": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Speriod_pain1-stab"
+   ]
+  },
+  {
+   "id": "period_distending",
+   "label": "月経痛：張るように痛む",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "Speriod_pain1-bloat",
+    "B10-3"
+   ]
+  },
+  {
+   "id": "period_dull_after",
+   "label": "月経痛：鈍い痛みが月経後も続く",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Speriod_pain1-dull"
+   ]
+  },
+  {
+   "id": "period_back_pain",
+   "label": "月経時に腰の痛みが強い",
+   "weights": {
+    "yang_def": 0.25,
+    "blood_stasis": 0.25
+   },
+   "from": [
+    "Speriod_pain1-back"
+   ]
+  },
+  {
+   "id": "period_back_cold_after",
+   "label": "月経後に腰が冷えてだるい",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "B11-7"
+   ]
+  },
+  {
+   "id": "period_headache",
+   "label": "月経時に頭痛",
+   "from": [
+    "Speriod_pain3-headache"
+   ]
+  },
+  {
+   "id": "period_nausea",
+   "label": "月経時に吐き気",
+   "from": [
+    "Speriod_pain3-nausea"
+   ]
+  },
+  {
+   "id": "period_diarrhea",
+   "label": "月経時に下痢",
+   "from": [
+    "Speriod_pain3-diarrhea"
+   ]
+  },
+  {
+   "id": "period_edema",
+   "label": "月経時にむくみ",
+   "weights": {
+    "fluid": 0.5
+   },
+   "from": [
+    "Speriod_pain3-edema"
+   ]
+  },
+  {
+   "id": "period_constipation",
+   "label": "月経時に便秘",
+   "from": [
+    "Speriod_pain3-constipation"
+   ]
+  },
+  {
+   "id": "irr_after_stress",
+   "label": "月経不順のきっかけ：強いストレス",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Sirregular3-stress"
+   ]
+  },
+  {
+   "id": "irr_after_weight",
+   "label": "月経不順のきっかけ：急な体重の変化",
+   "weights": {
+    "qi_def": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sirregular3-weight"
+   ]
+  },
+  {
+   "id": "irr_after_birth",
+   "label": "月経不順のきっかけ：出産",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "from": [
+    "Sirregular3-birth"
+   ]
+  },
+  {
+   "id": "irr_after_diet",
+   "label": "月経不順のきっかけ：激しい運動・食事制限",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "from": [
+    "Sirregular3-diet"
+   ]
+  },
+  {
+   "id": "lactation_low",
+   "label": "母乳の出が少ない"
+  },
+  {
+   "id": "headache",
+   "label": "頭痛",
+   "weights": {
+    "blood_stasis": 0.5,
+    "fluid": 0.5
+   },
+   "from": [
+    "KE-headache",
+    "KG-headache",
+    "Sheadache2-shoulder",
+    "Sirritability3-headache",
+    "Sstiff_shoulder2-headache",
+    "Slow_mood3-headache",
+    "Speriod_pain3-headache",
+    "Spms_edema2-headache",
+    "Scomplexion2-shoulder",
+    "Sspots2-shoulder",
+    "Scold2-shoulder"
+   ]
+  },
+  {
+   "id": "headache_side",
+   "label": "頭痛：こめかみ・片側",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Spms_headache1-side"
+   ]
+  },
+  {
+   "id": "headache_neck",
+   "label": "頭痛：後頭部から首・肩にかけて"
+  },
+  {
+   "id": "headache_front",
+   "label": "頭痛：額・前頭部"
+  },
+  {
+   "id": "headache_whole",
+   "label": "頭痛：頭全体"
+  },
+  {
+   "id": "headache_band",
+   "label": "頭痛：締めつけられるように痛む",
+   "weights": {
+    "qi_stag": 0.25,
+    "blood_stasis": 0.25
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Sheadache1-band",
+    "Spms_headache1-band"
+   ]
+  },
+  {
+   "id": "headache_throb",
+   "label": "頭痛：ズキズキ脈打つ",
+   "weights": {
+    "qi_stag": 0.25,
+    "yang_exc": 0.25
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Sheadache1-throb",
+    "Spms_headache1-throb"
+   ]
+  },
+  {
+   "id": "headache_distending",
+   "label": "頭痛：張るように痛む",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B12-3",
+    "B10-3"
+   ]
+  },
+  {
+   "id": "headache_stabbing",
+   "label": "頭痛：刺すような痛みが同じ場所に出る",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B12-4"
+   ]
+  },
+  {
+   "id": "head_heavy",
+   "label": "頭が重い",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B12-5",
+    "Sheadache1-heavy",
+    "Sdizziness1-heavy",
+    "Slow_mood3-headache"
+   ]
+  },
+  {
+   "id": "headache_worse_cold",
+   "label": "頭痛：冷えると痛む",
+   "weights": {
+    "yang_def": 0.5
+   },
+   "group": "cold_sensitive",
+   "from": [
+    "Sheadache1-cold",
+    "KG-headache"
+   ]
+  },
+  {
+   "id": "headache_warm_relief",
+   "label": "頭痛：温めると楽になる",
+   "weights": {
+    "yang_def": 0.5
+   },
+   "group": "cold_sensitive",
+   "from": [
+    "Sheadache1-cold"
+   ]
+  },
+  {
+   "id": "headache_worse_weather",
+   "label": "頭痛：雨の日や低気圧で痛む",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "group": "trig_weather",
+   "from": [
+    "Sheadache1-weather",
+    "B10-6"
+   ]
+  },
+  {
+   "id": "headache_worse_stress",
+   "label": "頭痛：緊張・ストレスで痛む",
+   "weights": {
+    "qi_stag": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "group": "trig_stress",
+   "from": [
+    "B12-3"
+   ]
+  },
+  {
+   "id": "headache_after_period",
+   "label": "頭痛：月経後に痛む",
+   "weights": {
+    "blood_def": 0.5
+   },
+   "from": [
+    "Spms_headache2-after"
+   ]
+  },
+  {
+   "id": "headache_worse_sleep",
+   "label": "頭痛：寝不足で痛む",
+   "group": "trig_sleep"
+  },
+  {
+   "id": "stiff_shoulder",
+   "label": "肩こり・首こり",
+   "weights": {
+    "blood_stasis": 0.5,
+    "qi_stag": 0.25
+   },
+   "from": [
+    "KE-shoulder",
+    "Sheadache2-shoulder",
+    "Shot_flash3-shoulder",
+    "Scomplexion2-shoulder",
+    "Sspots2-shoulder",
+    "Scold2-shoulder",
+    "Sirritability3-shoulder"
+   ]
+  },
+  {
+   "id": "shoulder_tight",
+   "label": "肩こり：張るようにこる",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "Sstiff_shoulder1-tight"
+   ]
+  },
+  {
+   "id": "shoulder_stabbing",
+   "label": "肩こり：刺すような痛みが同じ場所にある",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "Sstiff_shoulder1-stab",
+    "B10-4"
+   ]
+  },
+  {
+   "id": "shoulder_heavy",
+   "label": "肩こり：重だるい",
+   "weights": {
+    "fluid": 0.5
+   },
+   "organs": {
+    "spleen": 0.5
+   },
+   "from": [
+    "Sstiff_shoulder1-heavy"
+   ]
+  },
+  {
+   "id": "shoulder_warm_relief",
+   "label": "肩こり：温めると楽になる",
+   "weights": {
+    "yang_def": 0.5
+   },
+   "group": "cold_sensitive",
+   "from": [
+    "Sstiff_shoulder1-cold"
+   ]
+  },
+  {
+   "id": "low_back_pain",
+   "label": "腰痛",
+   "weights": {
+    "yang_def": 0.25,
+    "blood_stasis": 0.25
+   },
+   "from": [
+    "Speriod_pain1-back"
+   ]
+  },
+  {
+   "id": "back_dull",
+   "label": "腰痛：だるく重い痛み",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "B10-8"
+   ]
+  },
+  {
+   "id": "back_worse_cold",
+   "label": "腰痛：冷えると痛む",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "group": "cold_sensitive",
+   "from": [
+    "B10-8"
+   ]
+  },
+  {
+   "id": "back_warm_relief",
+   "label": "腰痛：温めると楽になる",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "group": "cold_sensitive",
+   "from": [
+    "B10-8"
+   ]
+  },
+  {
+   "id": "back_stabbing",
+   "label": "腰痛：刺すように痛む",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B10-4"
+   ]
+  },
+  {
+   "id": "back_menstrual",
+   "label": "腰痛：月経のときに強くなる",
+   "weights": {
+    "yang_def": 0.25,
+    "blood_stasis": 0.25
+   },
+   "from": [
+    "Speriod_pain1-back"
+   ]
+  },
+  {
+   "id": "joint_pain",
+   "label": "関節痛・筋肉痛"
+  },
+  {
+   "id": "joint_hot_swollen",
+   "label": "関節：赤く熱をもって腫れる",
+   "weights": {
+    "yang_exc": 1
+   },
+   "from": [
+    "B10-9"
+   ]
+  },
+  {
+   "id": "joint_worse_cold",
+   "label": "関節：冷えると痛む",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "group": "cold_sensitive",
+   "from": [
+    "B10-8"
+   ]
+  },
+  {
+   "id": "joint_warm_relief",
+   "label": "関節：温めると楽になる",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "group": "cold_sensitive",
+   "from": [
+    "B10-8"
+   ]
+  },
+  {
+   "id": "joint_worse_weather",
+   "label": "関節：雨の日や低気圧で痛む",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "group": "trig_weather",
+   "from": [
+    "B10-6"
+   ]
+  },
+  {
+   "id": "joint_stiff_morning",
+   "label": "関節：朝にこわばる",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B7-6"
+   ]
+  },
+  {
+   "id": "joint_heavy",
+   "label": "関節が重だるい",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B10-6"
+   ]
+  },
+  {
+   "id": "dizzy",
+   "label": "めまい",
+   "weights": {
+    "fluid": 0.5,
+    "blood_def": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "from": [
+    "KE-dizzy",
+    "Shot_flash3-dizzy",
+    "Sheadache2-dizzy",
+    "Spalpitation2-dizzy",
+    "Sthroat2-dizzy",
+    "Sbreath2-dizzy",
+    "Sflow_heavy2-dizzy",
+    "Scomplexion2-dizzy"
+   ]
+  },
+  {
+   "id": "vertigo_spin",
+   "label": "めまい：ぐるぐる回る",
+   "weights": {
+    "fluid": 0.5
+   },
+   "implies": [
+    "dizzy"
+   ],
+   "from": [
+    "Sdizziness1-spin"
+   ]
+  },
+  {
+   "id": "dizzy_float",
+   "label": "めまい：ふわふわ浮く感じ",
+   "weights": {
+    "fluid": 1,
+    "qi_def": 0.25
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "implies": [
+    "dizzy"
+   ],
+   "from": [
+    "Sdizziness1-float",
+    "B7-6"
+   ]
+  },
+  {
+   "id": "orthostatic",
+   "label": "立ちくらみ",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B12-2",
+    "Sdizziness1-stand",
+    "Sfatigue1-pale",
+    "Shair_dry2-dizzy",
+    "Scomplexion2-dizzy",
+    "Sflow_heavy2-dizzy"
+   ]
+  },
+  {
+   "id": "eye_strain",
+   "label": "目が疲れる・かすむ",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B12-2",
+    "Shair_dry2-eye",
+    "Sgray_hair2-eye",
+    "Sstiff_shoulder2-eye"
+   ]
+  },
+  {
+   "id": "eye_dry",
+   "label": "目が乾く",
+   "weights": {
+    "yin_def": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "kidney": 0.5
+   },
+   "from": [
+    "B12-6"
+   ]
+  },
+  {
+   "id": "tinnitus",
+   "label": "耳鳴り",
+   "weights": {
+    "yin_def": 0.5
+   },
+   "organs": {
+    "kidney": 0.5
+   },
+   "from": [
+    "Sdizziness2-ear",
+    "Sgray_hair2-ear"
+   ]
+  },
+  {
+   "id": "tinnitus_low",
+   "label": "耳鳴り：低い音",
+   "weights": {
+    "yin_def": 1,
+    "yang_def": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "kidney": 1
+   },
+   "implies": [
+    "tinnitus"
+   ],
+   "from": [
+    "B12-6",
+    "B12-7"
+   ]
+  },
+  {
+   "id": "tinnitus_high",
+   "label": "耳鳴り：高い音（キーン）",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "implies": [
+    "tinnitus"
+   ],
+   "from": [
+    "B12-8"
+   ]
+  },
+  {
+   "id": "tinnitus_worse_tired",
+   "label": "耳鳴り：疲れると強くなる",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 1
+   },
+   "from": [
+    "B12-7"
+   ]
+  },
+  {
+   "id": "tinnitus_worse_stress",
+   "label": "耳鳴り：ストレスで強くなる",
+   "group": "trig_stress"
+  },
+  {
+   "id": "nasal_discharge",
+   "label": "鼻水が多い",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B12-5"
+   ]
+  },
+  {
+   "id": "nasal_watery",
+   "label": "水のような鼻水",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "spleen": 0.5
+   },
+   "implies": [
+    "nasal_discharge"
+   ],
+   "from": [
+    "B12-5"
+   ]
+  },
+  {
+   "id": "nasal_yellow",
+   "label": "黄色く粘る鼻水",
+   "implies": [
+    "nasal_discharge"
+   ]
+  },
+  {
+   "id": "nasal_block",
+   "label": "鼻づまり",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B12-5"
+   ]
+  },
+  {
+   "id": "sneezing",
+   "label": "くしゃみが多い"
+  },
+  {
+   "id": "nose_worse_cold",
+   "label": "鼻：冷えると悪化",
+   "group": "cold_sensitive"
+  },
+  {
+   "id": "cough",
+   "label": "咳",
+   "weights": {
+    "qi_stag": 0.25,
+    "fluid": 0.25
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "from": [
+    "Sthroat1-cough"
+   ]
+  },
+  {
+   "id": "dry_cough",
+   "label": "乾いた咳（痰が少ない）",
+   "weights": {
+    "yin_def": 1,
+    "fluid": 0.25
+   },
+   "organs": {
+    "lung": 0.5,
+    "kidney": 0.5
+   },
+   "implies": [
+    "cough"
+   ],
+   "from": [
+    "B12-6",
+    "Sbreath2-cough"
+   ]
+  },
+  {
+   "id": "cough_phlegm",
+   "label": "痰がからむ咳",
+   "implies": [
+    "cough"
+   ]
+  },
+  {
+   "id": "phlegm",
+   "label": "痰が多い",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B12-5"
+   ]
+  },
+  {
+   "id": "phlegm_white",
+   "label": "白くうすい痰",
+   "implies": [
+    "phlegm"
+   ]
+  },
+  {
+   "id": "phlegm_yellow",
+   "label": "黄色く粘る痰",
+   "implies": [
+    "phlegm"
+   ]
+  },
+  {
+   "id": "cough_night",
+   "label": "夜に咳が出やすい",
+   "implies": [
+    "cough"
+   ]
+  },
+  {
+   "id": "throat_dry",
+   "label": "のどが乾燥する",
+   "weights": {
+    "yin_def": 0.5
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "from": [
+    "Sthroat1-hoarse"
+   ]
+  },
+  {
+   "id": "hoarse",
+   "label": "声がかすれる",
+   "weights": {
+    "yin_def": 0.5
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "from": [
+    "Sthroat1-hoarse"
+   ]
+  },
+  {
+   "id": "throat_lump",
+   "label": "のどのつかえ",
+   "weights": {
+    "qi_stag": 0.5,
+    "fluid": 0.5
+   },
+   "organs": {
+    "liver": 0.5,
+    "spleen": 0.5,
+    "lung": 0.25
+   },
+   "from": [
+    "B5-4",
+    "KH-throat",
+    "Sthroat1-lump",
+    "Sanxiety2-throat",
+    "Slow_mood1-throat",
+    "Sbreath2-throat"
+   ]
+  },
+  {
+   "id": "throat_clearing",
+   "label": "咳払いが多い",
+   "weights": {
+    "qi_stag": 0.25,
+    "fluid": 0.25
+   },
+   "organs": {
+    "lung": 0.5
+   },
+   "from": [
+    "Sthroat1-cough"
+   ]
+  },
+  {
+   "id": "throat_worse_stress",
+   "label": "のどのつかえ：ストレスで強くなる",
+   "group": "trig_stress"
+  },
+  {
+   "id": "dyspnea",
+   "label": "息苦しさ",
+   "from": [
+    "KH-breath"
+   ]
+  },
+  {
+   "id": "breath_shallow",
+   "label": "深く息が吸えない感じがする",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.25,
+    "lung": 0.25
+   },
+   "implies": [
+    "dyspnea"
+   ],
+   "from": [
+    "Sbreath1-deep"
+   ]
+  },
+  {
+   "id": "breath_tension",
+   "label": "緊張すると息苦しくなる",
+   "weights": {
+    "qi_stag": 0.5
+   },
+   "organs": {
+    "liver": 0.5
+   },
+   "implies": [
+    "dyspnea"
+   ],
+   "from": [
+    "Sbreath1-tense"
+   ]
+  },
+  {
+   "id": "face_pale",
+   "label": "顔色：白っぽい（血色が悪い）",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "heart": 0.5,
+    "liver": 0.5
+   },
+   "from": [
+    "B2-2",
+    "KC-pale",
+    "Scomplexion1-pale",
+    "Sflow_heavy2-pale",
+    "Schilblain2-pale",
+    "Scold2-pale"
+   ]
+  },
+  {
+   "id": "face_dark",
+   "label": "顔色：暗い・くすんでいる",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "organs": {
+    "liver": 0.5,
+    "kidney": 0.5
+   },
+   "from": [
+    "B2-5",
+    "KC-tired",
+    "Scomplexion1-dark",
+    "Saging1-dull"
+   ]
+  },
+  {
+   "id": "face_red",
+   "label": "顔色：赤くなりやすい",
+   "weights": {
+    "yang_exc": 1
+   },
+   "organs": {
+    "lung": 0.5,
+    "liver": 0.5,
+    "heart": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B2-10",
+    "B3-9",
+    "Sface_flush1-red"
+   ]
+  },
+  {
+   "id": "face_bluish",
+   "label": "顔色：青白い",
+   "weights": {
+    "yang_def": 1
+   },
+   "organs": {
+    "kidney": 0.5,
+    "spleen": 0.5
+   },
+   "from": [
+    "B2-9"
+   ]
+  },
+  {
+   "id": "tongue_p1",
+   "label": "舌：白っぽく、歯の跡がある",
+   "weights": {
+    "qi_def": 1
+   },
+   "from": [
+    "B13-1"
+   ]
+  },
+  {
+   "id": "tongue_p2",
+   "label": "舌：淡白で薄く小さい",
+   "weights": {
+    "blood_def": 1
+   },
+   "from": [
+    "B13-2"
+   ]
+  },
+  {
+   "id": "tongue_p3",
+   "label": "舌：両縁が赤い",
+   "weights": {
+    "qi_stag": 1
+   },
+   "from": [
+    "B13-3"
+   ]
+  },
+  {
+   "id": "tongue_p4",
+   "label": "舌：紫色・瘀点・舌下静脈の怒張",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "from": [
+    "B13-4"
+   ]
+  },
+  {
+   "id": "tongue_p5",
+   "label": "舌：大きく、歯痕があり、苔が厚く湿っている",
+   "weights": {
+    "fluid": 1
+   },
+   "from": [
+    "B13-5"
+   ]
+  },
+  {
+   "id": "tongue_p6",
+   "label": "舌：赤く、乾燥し、苔が少ない",
+   "weights": {
+    "yin_def": 1
+   },
+   "from": [
+    "B13-6"
+   ]
+  },
+  {
+   "id": "tongue_p7",
+   "label": "舌：白っぽく大きく、苔が白く湿っている",
+   "weights": {
+    "yang_def": 1
+   },
+   "from": [
+    "B13-7"
+   ]
+  },
+  {
+   "id": "tongue_p8",
+   "label": "舌：鮮紅色で黄色い苔がある",
+   "weights": {
+    "yang_exc": 1
+   },
+   "from": [
+    "B13-8"
+   ]
+  },
+  {
+   "id": "tongue_normal",
+   "label": "舌：特記なし（淡紅・薄白苔）",
+   "from": [
+    "B13-9"
+   ]
+  },
+  {
+   "id": "tongue_severe",
+   "label": "舌：灰黒苔・鏡面舌・偏位や震え",
+   "from": [
+    "B13-10"
+   ]
+  },
+  {
+   "id": "build_thin",
+   "label": "体格：やせ型",
+   "weights": {
+    "blood_def": 0.5,
+    "yin_def": 0.5
+   },
+   "organs": {
+    "lung": 0.5,
+    "kidney": 0.5
+   },
+   "from": [
+    "B1-3"
+   ]
+  },
+  {
+   "id": "build_normal",
+   "label": "体格：普通"
+  },
+  {
+   "id": "build_solid",
+   "label": "体格：がっちり（筋肉質）",
+   "weights": {
+    "yang_exc": 1
+   },
+   "from": [
+    "B1-9"
+   ]
+  },
+  {
+   "id": "build_belly_fat",
+   "label": "体格：太り気味（お腹周り）",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "organs": {
+    "liver": 1
+   },
+   "from": [
+    "B1-5"
+   ]
+  },
+  {
+   "id": "build_watery",
+   "label": "体格：水太り傾向（色白でぽっちゃり）",
+   "weights": {
+    "fluid": 1
+   },
+   "organs": {
+    "spleen": 1
+   },
+   "from": [
+    "B1-6"
+   ]
+  },
+  {
+   "id": "voice_weak",
+   "label": "声：小さく弱い",
+   "weights": {
+    "qi_def": 1
+   },
+   "organs": {
+    "lung": 1,
+    "spleen": 0.5
+   },
+   "from": [
+    "B1-2",
+    "B12-1"
+   ]
+  },
+  {
+   "id": "voice_normal",
+   "label": "声：普通"
+  },
+  {
+   "id": "voice_strong",
+   "label": "声：大きく力強い",
+   "weights": {
+    "yang_exc": 1
+   },
+   "from": [
+    "B1-9"
+   ]
+  }
+ ]
+}

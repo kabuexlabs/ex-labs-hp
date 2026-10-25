@@ -15,8 +15,9 @@
 // ---------------------------------------------------------------------------
 import { randomBytes } from 'node:crypto';
 import { QUESTIONNAIRE, type TypeKey } from './masters.ts';
-import type { Answers, ScoreResult } from './scoring.ts';
-import type { SafetyFlag, FreeTexts } from './safety.ts';
+import type { Answers } from './flow.ts';
+import type { ScoreResult } from './scoring.ts';
+import type { SafetyFlag, TagHit } from './safety.ts';
 
 export function readEnv(name: string): string | undefined {
   const v = (import.meta.env as Record<string, string | undefined>)[name] ?? process.env[name];
@@ -46,6 +47,7 @@ async function redis(...command: (string | number)[]): Promise<unknown> {
 
 // --- 型 -----------------------------------------------------------------------
 
+/** 2026-10-24 版までの「舌チェックの担当」。v3 では舌は薬剤師だけが入力する（旧セッションの表示用に残す） */
 export type TongueMode = 'self' | 'staff';
 export type InputBy = 'customer' | 'staff';
 export type SessionStatus = 'in_progress' | 'completed' | 'proposed';
@@ -85,10 +87,19 @@ export interface KampoSession {
   inputBy: InputBy;
   consentAt: string;
   answers: Answers;
-  texts: FreeTexts;
+  /** 2026-10-24 版までの自由記入（v3 は自由記入なし。旧セッションの表示用） */
+  texts: Record<string, string>;
+  /** 2026-10-24 版までの薬剤師の舌所見（旧セッションの表示用） */
   tongueOverride?: string[];
+  /** 薬剤師の入力（舌・体格・声。設問ID → 選択肢ID） */
+  staffAnswers?: Answers;
+  staffAnsweredAt?: string;
   scores?: ScoreResult;
   safetyFlags?: SafetyFlag[];
+  /** 安全確認タグ（保存時点） */
+  tags?: TagHit[];
+  /** 直ちに対応が必要な回答がある（回答の途中でも立てる） */
+  urgent?: boolean;
   status: SessionStatus;
   startedAt: string;
   completedAt?: string;
@@ -213,7 +224,7 @@ export async function saveSession(s: KampoSession): Promise<void> {
   const exp = Math.floor(new Date(s.expiresAt).getTime() / 1000);
   await redis('SET', sKey(s.id), JSON.stringify(s), 'EXAT', exp);
 }
-export async function createSession(input: { customer: KampoCustomer | null; tongueMode: TongueMode; inputBy: InputBy }): Promise<KampoSession> {
+export async function createSession(input: { customer: KampoCustomer | null; inputBy: InputBy }): Promise<KampoSession> {
   const now = new Date();
   const exp = new Date(now);
   exp.setFullYear(exp.getFullYear() + retentionYears());
@@ -222,7 +233,7 @@ export async function createSession(input: { customer: KampoCustomer | null; ton
     customerId: input.customer?.id,
     customerLabel: customerLabel(input.customer),
     questionnaireVersion: QUESTIONNAIRE.version,
-    tongueMode: input.tongueMode,
+    tongueMode: 'staff',
     inputBy: input.inputBy,
     consentAt: now.toISOString(),
     answers: {},

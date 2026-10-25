@@ -1,71 +1,40 @@
 ---
-// 来店客向け結果：体質チェック結果（8軸レーダー・点数と段階・主体質／副体質）、改善アドバイスへの導線、
-// おすすめの漢方薬（いちばん改善したい主訴を起点にした二段階選定。理由は ①主訴 ②体質 ③他の候補との比較 ④服用前の確認）。
-// 受診勧奨があるときは漢方薬を出さない。安全確認の内容そのものは出さない。
-// 右下の隠しボタン（長押し）からスタッフ画面へ。
+// 体質の説明画面（薬剤師が PIN の後ろで開き、来店客に見せて説明する。2026-10-25 改修計画 §11・Q10）：
+// 主となる体質・併存する体質の傾向・体質の説明・改善アドバイス（養生）への導線。
+// 漢方薬の候補・順位・体質の点数は出さない（改修指示 第13章。点数を診断の確率のように見せない）。
 export const prerender = false;
 import KampoLayout from '../../../../../layouts/KampoLayout.astro';
-import RadarChart from '../../../../../components/kampo/RadarChart.astro';
 import AdviceBlock from '../../../../../components/kampo/AdviceBlock.astro';
 import ResultTabs from '../../../../../components/kampo/ResultTabs.astro';
-import { TYPES, TYPE_DEFS, FORMULAS } from '../../../../../lib/kampo/masters';
-import { LEVEL_LABEL } from '../../../../../lib/kampo/scoring';
+import { TYPE_DEFS, type TypeKey } from '../../../../../lib/kampo/masters';
 import { typeIconSvg } from '../../../../../lib/kampo/icons';
 import { getSession, saveSession, fmtJst } from '../../../../../lib/kampo/store';
-import { visibleQuestions, firstUnansweredStep } from '../../../../../lib/kampo/flow';
-import { finalize, computeSession } from '../../../../../lib/kampo/compute';
-import { selectFormulas, customerPicks } from '../../../../../lib/kampo/recommend';
+import { finalize, isLegacy } from '../../../../../lib/kampo/compute';
 
 const s = await getSession(Astro.params.id ?? '');
-if (!s) return Astro.redirect('/kampo/check/new/?msg=notfound', 303);
-if (s.status === 'in_progress') {
-  const vis = visibleQuestions(s.answers, s.tongueMode);
-  const step = firstUnansweredStep(vis, s.answers, s.texts);
-  if (step <= vis.length) return Astro.redirect(`/kampo/check/${s.id}/q/${step}/`, 303);
-  finalize(s);
-  await saveSession(s);
-}
-// 旧版のスコア（五臓なし）は再計算して保存し直す
-if (!s.scores || !s.scores.organPct) { finalize(s); await saveSession(s); }
-const r = s.scores!;
-const flags = s.safetyFlags ?? computeSession(s).safetyFlags;
-const cards = [...r.mainTypes.map((t) => ({ t, rank: '主体質' })), ...r.subTypes.map((t) => ({ t, rank: '副体質' }))];
-const staffHref = `/kampo/staff/pin/?next=${encodeURIComponent(`/kampo/staff/session/${s.id}/`)}`;
-const sel = selectFormulas(r, s.answers, s.texts, flags, FORMULAS, s.tongueOverride);
-const { picks, messages } = customerPicks(sel, r);
-const name = (t: (typeof TYPES)[number]) => TYPE_DEFS[t].name;
-const summary = r.isBalanced
-  ? '大きな偏りは見られません。今の生活を続けながら、季節の変わり目にもう一度チェックしてみましょう。'
-  : `あなたの体質は、${r.mainTypes.map(name).join('・')}の傾向がもっとも強いようです。${r.subTypes.length ? `${r.subTypes.map(name).join('・')}の傾向も見られます。` : ''}体質の偏りは、生活養生と、体質に合った漢方薬で整えていくことができます。`;
+if (!s) return Astro.redirect('/kampo/staff/?msg=notfound', 303);
+if (s.status === 'in_progress' && !isLegacy(s)) return Astro.redirect(`/kampo/check/${s.id}/`, 303);
+if (!s.scores && !isLegacy(s)) { finalize(s); await saveSession(s); }
+const r = s.scores;
+const cards: { t: TypeKey; rank: string }[] = r ? [...r.mainTypes.map((t) => ({ t, rank: '主となる体質' })), ...r.subTypes.map((t) => ({ t, rank: '併存する体質の傾向' }))] : [];
+const name = (t: TypeKey) => TYPE_DEFS[t].name;
+const summary = !r
+  ? '体質の結果がありません。'
+  : r.isBalanced
+    ? '大きな偏りは見られません。今の生活を続けながら、季節の変わり目にもう一度チェックしてみましょう。'
+    : `あなたの体質は、${r.mainTypes.map(name).join('・')}の傾向がもっとも見られます。${r.subTypes.length ? `${r.subTypes.map(name).join('・')}の傾向もあります。` : ''}体質の偏りは、毎日の養生で整えていくことができます。`;
 ---
 <KampoLayout title="体質チェックの結果" width="normal">
-  <button slot="actions" class="kp-btn pink small no-print" type="button" onclick="window.print()">結果を印刷する</button>
-  <ResultTabs id={s.id} active="result" adviceType={r.mainTypes[0]} />
+  <a slot="actions" class="kp-btn ghost small no-print" href={`/kampo/staff/session/${s.id}/`}>担当者画面へ</a>
+  <button slot="actions" class="kp-btn pink small no-print" type="button" onclick="window.print()">印刷する</button>
+  <ResultTabs id={s.id} active="result" adviceType={r?.mainTypes[0]} />
 
   <section id="result">
     <h1 class="kp-h1">あなたの<span class="sky">体質チェック結果</span></h1>
     <p class="kp-result-lede">{summary}</p>
     <p class="kp-note" style="margin-top:6px">{fmtJst(s.completedAt ?? s.startedAt)}　{s.customerLabel}</p>
 
-    <div class="kp-panel">
-      <h2>あなたの体質バランス</h2>
-      <div class="kp-panel-b kp-result-top">
-        <RadarChart pct={r.pct} />
-        <ul class="kp-scores">
-          {TYPES.map((t) => (
-            <li class:list={[{ main: r.mainTypes.includes(t) }]}>
-              <span class="nm">{TYPE_DEFS[t].name}</span>
-              <span class="bar"><i style={`width:${r.pct[t]}%`}></i></span>
-              <span class="pct">{r.pct[t]}<small>点</small></span>
-              <span class="lv">{LEVEL_LABEL[r.level[t]]}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <p class="kp-note" style="padding:0 32px 22px">点数は「その体質の特徴にどれくらい当てはまったか」の割合です。20点未満＝バランス、20点〜＝傾向あり、40点〜＝注意、60点〜＝強い。</p>
-    </div>
-
-    {r.isBalanced ? (
+    {r?.isBalanced ? (
       <div class="kp-panel"><h2>体質の偏り</h2><div class="kp-panel-b"><p style="font-size:16px">大きな偏りは見られません。今の生活を維持し、季節の変わり目に再度チェックをおすすめします。</p></div></div>
     ) : cards.map(({ t, rank }) => {
       const d = TYPE_DEFS[t];
@@ -74,8 +43,7 @@ const summary = r.isBalanced
           <h2>{rank}：{d.name}（{d.reading}）</h2>
           <div class="kp-panel-b kp-tcard-b">
             <div class="kp-tcard-side">
-              <div class="kp-ring"><small>{rank}</small><b>{r.pct[t]}</b><small>点・{LEVEL_LABEL[r.level[t]]}</small></div>
-              <span class="kp-tcard-icon" style={`color:${d.color}`}><Fragment set:html={typeIconSvg(t, 36)} /></span>
+              <span class="kp-tcard-icon" style={`color:${d.color}`}><Fragment set:html={typeIconSvg(t, 56)} /></span>
             </div>
             <div>
               <h3 class="kp-tcard-h">{d.headline}</h3>
@@ -89,7 +57,7 @@ const summary = r.isBalanced
     })}
   </section>
 
-  {!r.isBalanced && (
+  {cards.length > 0 && (
     <section id="advice" class="kp-panel no-print">
       <h2>改善アドバイス</h2>
       <div class="kp-panel-b kp-advice-links">
@@ -99,65 +67,17 @@ const summary = r.isBalanced
       </div>
     </section>
   )}
+  <div class="kp-panel" style="background:var(--sky-mist)">
+    <h2>漢方薬について</h2>
+    <div class="kp-panel-b"><p style="font-size:15px">気になる症状と体質に合う漢方薬は、服用中のお薬や体調を確かめたうえで、薬剤師がご説明します。</p></div>
+  </div>
 
-  <section id="kampo">
-    <h2 class="kp-h1" style="margin-top:56px">あなたに<span class="sky">おすすめの漢方薬</span></h2>
-    {sel.refer ? (
-      <div class="kp-panel"><h2>薬剤師がお話を伺います</h2><div class="kp-panel-b"><p style="font-size:16px">回答の内容から、まず薬剤師が詳しくお話を伺います。漢方薬のご提案はそのあとで行います。</p></div></div>
-    ) : (
-      <>
-        <p class="kp-result-lede">いちばん改善したいお悩み（主訴）に使われる漢方薬の中から、あなたの体質にもっとも合うものを選びました。体質に合うものがない場合は、無理におすすめしません。</p>
-        {sel.companions.length > 0 && <p class="kp-note" style="margin-top:-6px">あわせて選んだお悩み（{sel.companions.map((c) => c.label).join('・')}）は、体質に合うかを判断する参考にしました。</p>}
-        {sel.groups.length === 0 && !sel.otherComplaint && (
-          <div class="kp-panel"><h2>薬剤師がお話を伺います</h2><div class="kp-panel-b"><p style="font-size:15.5px">お悩みの選択がなかったため、漢方薬の候補を絞り込めませんでした。薬剤師がお話を伺います。</p></div></div>
-        )}
-        {picks.map((p, i) => (
-          <article class="kp-panel kp-fml">
-            <h2>「{p.groups.map((g) => g.label).join('」「')}」のお悩みに</h2>
-            <div class="kp-panel-b">
-              <div class="kp-fml-head">
-                <div class="kp-ring kp-ring-sm"><small>おすすめ</small><b>{i + 1}</b></div>
-                <div>
-                  <p class="kp-fml-name">{p.candidate.name}<small>（{p.candidate.reading}）</small></p>
-                  {p.status === 'check'
-                    ? <p class="kp-chip check" style="margin-top:6px">薬剤師が確認してからのご提案です</p>
-                    : <p class="kp-chip ok" style="margin-top:6px">体質に合うおすすめ</p>}
-                </div>
-              </div>
-              <ol class="kp-reasons">
-                <li><h3>主訴の候補になった理由</h3><p class="pre">{p.reasons.complaint}</p><p class="kp-note">効能・効果（承認された内容）：{p.candidate.formula.efficacy}</p></li>
-                <li><h3>あなたの体質に合う理由</h3>
-                  <ul>{p.reasons.constitution.map((x) => <li>{x}</li>)}</ul>
-                  <p class="kp-fml-sub"><b>使用目標</b>{p.reasons.useTarget}</p>
-                  <p class="kp-fml-sub"><b>漢方の考え方</b>{p.reasons.action}</p>
-                </li>
-                <li><h3>ほかの候補との比較</h3><ul>{p.reasons.comparison.map((x) => <li>{x}</li>)}</ul></li>
-                <li><h3>服用前に確認すること</h3><ul>{p.reasons.cautions.map((x) => <li>{x}</li>)}</ul></li>
-              </ol>
-            </div>
-          </article>
-        ))}
-        {messages.map((m) => (
-          <div class="kp-panel"><h2>「{m.label}」のお悩み</h2><div class="kp-panel-b"><p style="font-size:15.5px">{m.text}</p></div></div>
-        ))}
-        {sel.otherComplaint && (
-          <div class="kp-panel"><h2>その他のお悩み</h2><div class="kp-panel-b"><p style="font-size:15.5px">「{sel.otherComplaint}」については、薬剤師がお話を伺います。</p></div></div>
-        )}
-      </>
-    )}
-    <div class="kp-panel" style="background:var(--sky-mist)">
-      <h2>薬剤師が詳しくご提案します</h2>
-      <div class="kp-panel-b"><p style="font-size:15px">ここに挙げた漢方薬は、回答と体質チェックの結果から選んだものです。服用中のお薬や体調を確かめたうえで、薬剤師が最終的にご提案します。結果画面はそのままスタッフにお渡しください。</p></div>
-    </div>
-  </section>
+  <p class="kp-foot"><span>このチェックは体質の傾向を知るためのもので、病気の診断を行うものではありません。体質の判定方法は検証中の暫定版です。</span><span>ESSENCE薬局</span></p>
 
-  <p class="kp-foot"><span>このチェックは体質の傾向を知るためのもので、病気の診断を行うものではありません。</span><span>ESSENCE薬局</span></p>
-
-  {/* 印刷時の2ページ目：主体質の改善アドバイス */}
-  {!r.isBalanced && r.mainTypes.map((t) => (
-    <div class="print-only page-break"><AdviceBlock type={t} answers={s.answers} pct={r.pct[t]} /></div>
+  {/* 印刷時の2ページ目：主となる体質の改善アドバイス */}
+  {r && !r.isBalanced && r.mainTypes.map((t) => (
+    <div class="print-only page-break"><AdviceBlock type={t} answers={s.answers} /></div>
   ))}
-
   <style is:global>
   .kp-result-lede{font-size:16px;line-height:2.1;margin-bottom:6px}
   .kp-result-top{display:grid;grid-template-columns:minmax(0,440px) 1fr;gap:32px;align-items:center}
@@ -197,13 +117,4 @@ const summary = r.isBalanced
   @media(max-width:760px){.kp-result-top,.kp-tcard-b{grid-template-columns:1fr}.kp-scores li{grid-template-columns:52px 1fr 52px 56px;gap:10px}.kp-fml-head{gap:14px}.kp-fml-name{font-size:21px}.kp-reasons>li{padding-left:44px}}
   @media print{.kp-result-top{grid-template-columns:230px 1fr;gap:14px}.kp-tcard-b{grid-template-columns:120px 1fr;gap:14px}.kp-tcard .kp-ring{width:96px;height:96px}.kp-tcard .kp-ring b{font-size:30px}.kp-tcard-p,.kp-sym{font-size:11px;line-height:1.7}.kp-sym{padding:8px 12px;margin-top:8px}.kp-reasons p,.kp-reasons li li{font-size:10.5px;line-height:1.6}.kp-reasons>li{padding:8px 0 8px 40px}.kp-fml{break-inside:auto}}
   </style>
-
-  <button class="kp-hidden-btn no-print" id="staffBtn" type="button" data-href={staffHref} aria-label="スタッフ用（長押し）" tabindex="-1"></button>
-  <script is:inline>
-  (function(){var b=document.getElementById('staffBtn');if(!b)return;var t=null;var go=function(){location.href=b.dataset.href};
-    b.addEventListener('pointerdown',function(e){e.preventDefault();clearTimeout(t);t=setTimeout(go,1200)});
-    ['pointerup','pointercancel','pointerleave'].forEach(function(ev){b.addEventListener(ev,function(){clearTimeout(t)})});
-    b.addEventListener('contextmenu',function(e){e.preventDefault()});
-  })();
-  </script>
 </KampoLayout>

@@ -1,0 +1,46 @@
+---
+// 送信完了：お礼と「薬剤師がご説明します」。体質の点数・漢方薬は出さない（説明は薬剤師が PIN の後ろの画面で行う）。
+// 直ちに対応が必要な回答があったときだけ「すぐに近くのスタッフにお声がけください」を大きく出す（119番の一律表示はしない）。
+export const prerender = false;
+import KampoLayout from '../../../../../layouts/KampoLayout.astro';
+import { getSession } from '../../../../../lib/kampo/store';
+import { isLegacy } from '../../../../../lib/kampo/compute';
+
+const s = await getSession(Astro.params.id ?? '');
+if (!s) return Astro.redirect('/kampo/check/new/?msg=notfound', 303);
+const legacy = isLegacy(s);
+if (s.status === 'in_progress' && !legacy) return Astro.redirect(`/kampo/check/${s.id}/`, 303);
+const staffHref = `/kampo/staff/pin/?next=${encodeURIComponent(`/kampo/staff/session/${s.id}/`)}`;
+---
+<KampoLayout title="回答ありがとうございました" width="normal">
+  {s.urgent && (
+    <div class="kp-urgent" role="alert">
+      <p class="kp-urgent-h">すぐに近くのスタッフにお声がけください</p>
+      <p>回答の中に、早めに確認したい内容があります。</p>
+    </div>
+  )}
+  {legacy && s.status === 'in_progress' ? (
+    <div class="kp-panel"><h2>以前の版の問診です</h2><div class="kp-panel-b"><p style="font-size:16px">この回答は以前の版の問診のため、続きから答えることができません。お手数ですが、スタッフにお声がけのうえ新しく始めてください。</p></div></div>
+  ) : (
+    <section class="kp-done">
+      <p class="kp-done-en">THANK YOU</p>
+      <h1 class="kp-done-h">回答ありがとうございました</h1>
+      <p style="font-size:17px;line-height:2.1">このあと、薬剤師が舌の状態などを確認し、<br>体質と養生、合いそうな漢方薬についてご説明します。<br>iPad をそのままスタッフにお渡しください。</p>
+    </section>
+  )}
+  <button class="kp-hidden-btn" id="staffBtn" type="button" data-href={staffHref} aria-label="スタッフ用（長押し）" tabindex="-1"></button>
+  <style is:global>
+  .kp-done{text-align:center;padding:40px 0 20px}
+  .kp-done-h{font-size:30px;font-weight:400;letter-spacing:.1em;margin:0 0 22px}
+  .kp-done-en{font-family:var(--en);letter-spacing:.3em;color:var(--sky-text);font-size:15px;margin-bottom:6px}
+  .kp-urgent{background:var(--danger-soft);border:2px solid var(--danger);color:var(--danger-deep);padding:22px 26px;margin-bottom:28px;text-align:center}
+  .kp-urgent-h{font-size:24px;font-weight:700;letter-spacing:.06em;margin-bottom:6px}
+  </style>
+  <script is:inline>
+  (function(){var b=document.getElementById('staffBtn');if(!b)return;var t=null;var go=function(){location.href=b.dataset.href};
+    b.addEventListener('pointerdown',function(e){e.preventDefault();clearTimeout(t);t=setTimeout(go,1200)});
+    ['pointerup','pointercancel','pointerleave'].forEach(function(ev){b.addEventListener(ev,function(){clearTimeout(t)})});
+    b.addEventListener('contextmenu',function(e){e.preventDefault()});
+  })();
+  </script>
+</KampoLayout>

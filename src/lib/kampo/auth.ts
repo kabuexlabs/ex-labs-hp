@@ -75,8 +75,12 @@ export function safeNext(raw: string | null | undefined, fallback: string): stri
 /**
  * middleware から呼ぶルート保護。保護対象なら Response（リダイレクト）、通してよければ undefined。
  *  - /kampo/login/ 以外の /kampo/* は共通パスワードのログイン必須
- *  - /kampo/staff/pin/ 以外の /kampo/staff/* はさらに PIN 必須
+ *  - /kampo/staff/pin/ 以外の /kampo/staff/* と、体質の説明画面（/kampo/check/<id>/result/・advice/）はさらに PIN 必須
+ *    （患者向け画面に結果・点数を出さない。薬剤師が開いて説明する。2026-10-25 改修計画 Q10）
  */
+export const isStaffPath = (pathname: string) =>
+  (pathname.startsWith('/kampo/staff/') && pathname !== PIN_PATH) || /^\/kampo\/check\/[^/]+\/(result|advice)\//.test(pathname);
+
 export function kampoGuard(context: APIContext): Response | undefined {
   const { pathname, search } = context.url;
   if (!pathname.startsWith(KAMPO_BASE)) return undefined;
@@ -86,7 +90,7 @@ export function kampoGuard(context: APIContext): Response | undefined {
     if (pathname.endsWith('.csv') || pathname.endsWith('.json')) return new Response('unauthorized', { status: 401 });
     return context.redirect(`${LOGIN_PATH}?next=${next}`, 303);
   }
-  if (pathname.startsWith('/kampo/staff/') && pathname !== PIN_PATH && !isStaffAuthed(context.cookies)) {
+  if (isStaffPath(pathname) && !isStaffAuthed(context.cookies)) {
     if (pathname.endsWith('.csv') || pathname.endsWith('.json')) return new Response('unauthorized', { status: 401 });
     return context.redirect(`${PIN_PATH}?next=${next}`, 303);
   }
