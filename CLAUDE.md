@@ -102,17 +102,15 @@
 - 販売URL・メインビジュアル・キャスト（CAST：読みのあいうえお順で自動）・所要時間・アクセスは index.astro 冒頭の定数で入れる（空なら非表示）。公演回は本文の開演時刻リストと PERFORMANCES（構造化データ）の両方を直す。
 - case1 /uwasabanashi/ は終了表示中に case2 へ誘導（固定ボタン・チケット欄）。正確な住所・地図・緯度経度は載せない。
 
-## 漢方体質診断 試験サイト /kampo/（2026-10-20 仮実装。2026-10-21〜 main に反映・noindex＋合言葉で非公開運用。2026-10-25〜 v2）
-- ESSENCE薬局 武蔵小杉店の店頭 iPad 用の**開発・試作版**。**仕様の正本は docs/kampo-spec-v2.md（2026-10-25 受領の最終実装用マスタープロンプト）**、設計（現行との比較・①〜⑩）は docs/kampo-v2-design.md、判断の記録は docs/kampo-decisions.md、運用・環境変数は docs/kampo-setup.md。旧仕様 docs/kampo-spec.md（v0.1）は参考。
-- **医学的な重み・カットオフ・主訴と処方の対応・構成生薬・安全規則はすべて草案（review.status: draft）。検証済みとして扱わない・実患者向けに使わない**（仕様書 §0・§22・§25）。草案以外の確認状態にするには source・reviewer・reviewedAt が必須（マスタ検証でエラー）。AI が判定基準・処方マスタを無断で変えない（変更はユーザー・薬剤師の指示があるときだけ、docs/kampo-decisions.md に記録）。
-- **患者画面に漢方薬を出さない**（§25⑪。2026-10-21・10-24 の「来店客にも表示」は v2 で撤回）。患者の導線は 基本情報・安全性 → 主訴カテゴリー → 具体的主訴（§3 の73項目）→ 優先主訴 → 主訴別詳細（1問）→ 共通体質 B1〜B13 → 生活習慣 → 回答確認 → 送信完了。体質の説明・養生（/kampo/check/<id>/result/・advice/）は PIN の後ろで薬剤師が開く。
-- すべて選択式（自由記述なし。医薬品は検索・選択式）。「特にない」「わからない」は排他。回答状態は present／absent／unknown／not_asked／declined で、未質問を「なし」にしない。回答済みの事項は再質問しない（flow.ts の walk）。
-- この Astro サイトに `/kampo/` として組み込み、Upstash Redis（`kampo:` プレフィックス）に保存。ロジックは `src/lib/kampo/` の純粋関数（findings → assess → safety → recommend → staffq、compute でまとめる）、マスタは `src/data/kampo/*.json`（findings・complaints・questions・patterns・formulas①・products②・herbs③・formula_evaluations④・complaint_formulas⑤・safety_rules・types）。
-- **漢方薬の候補は主訴起点**：優先主訴の⑤主訴対応だけから抽出（体質だけで処方を足さない・根拠のない主訴は候補なし）→ 安全性 → 重要鑑別所見 → 体質の適合（補助）→ 追加質問 → 優先検討候補／検討候補／安全性・情報確認待ち／除外・対象外。**製品情報（②）は公式資料で確認できたものだけ登録（現在0件）。未確認の医薬品情報を推測で補完しない**。そのため現在は除外以外すべて「安全性・情報確認待ち」。
-- 副作用歴は生薬単位で除外（1種でも共通なら除外、原因生薬が未特定なら暫定除外、薬剤師の記録でも自動解除しない、構成が未確認で共通なしは確認待ち）。緊急症状があれば通常の候補提示を停止。
-- 認証は2段：共通パスワード `KAMPO_PASSWORD`（未設定なら YOYAKU_ADMIN_KEY）＋スタッフ画面・説明画面の `KAMPO_STAFF_PIN`。ルート保護は `src/middleware.ts` → `kampoGuard`（isStaffPath）。全ページ noindex・no-store。
-- 画面で「診断」「処方」「治る」を使わない（「体質チェック」「ご説明」「漢方薬」）。
-- デザイン（2026-10-24〜）：白地×淡い水色（#86CDE8）、「BODY CHECK KAMPO」の細身英字、枠線の選択肢、Qマーク、丸いSTART、左右一体の戻る｜次へ、水色帯の見出し。参考画像の雰囲気のみで、他社名・ロゴ・文言は使わない。
-- `npm run test:kampo`（`npm run check` に含む）がマスタ検証と仕様書 §23 の全テストを通す。マスタ JSON を変えたら必ず実行。v1（2026-10-24 版まで）のセッションは再計算せず文言だけ表示（legacy-v1.json）。
+## 漢方体質チェック 試験サイト /kampo/（2026-10-20 仮実装。2026-10-21〜 main に反映・noindex＋合言葉で非公開運用）
+- ESSENCE薬局 武蔵小杉店の店頭 iPad 用。仕様の正本は docs/kampo-spec.md（実装指示書 v0.1）、仕様との差分は docs/kampo-decisions.md、運用・環境変数は docs/kampo-setup.md。
+- 仕様書は Next.js+Prisma+PostgreSQL の別リポジトリを想定しているが、仮実装は **この Astro サイトに `/kampo/` として組み込み、Upstash Redis（`kampo:` プレフィックス）に保存**。ロジック（`src/lib/kampo/` の scoring / safety / recommend / flow）は純粋関数、マスタは `src/data/kampo/*.json`（薬剤師が直接編集）。
+- 認証は2段：共通パスワード `KAMPO_PASSWORD`（未設定なら YOYAKU_ADMIN_KEY）＋スタッフ画面の `KAMPO_STAFF_PIN`。ルート保護は `src/middleware.ts` → `kampoGuard`。全ページ noindex・no-store。
+- 画面で「診断」「処方」「治る」を使わない（「体質チェック」「ご提案」「漢方薬」）。
+- **主訴の選択は3段階（2026-10-24 ユーザー指示）**：大カテゴリー（K1。A 肌／B 髪・頭皮／C 年齢による見た目／D 生理前・生理中／E 更年期／F 疲れ／G 冷え／H ストレス の8つ。肌・髪・エイジングを統合しない）→ 具体的な主訴（KA〜KH。ここに詳細を混ぜない）→ 2つ以上なら「いちばん改善したい主訴」（KM）を1つ → その主訴の詳細問診（S*。主訴の `detail` と設問の `showIf.mainDetail`）。ほかの主訴は随伴症状。詳細問診の回答は候補抽出（symptoms）・随伴症状（also）・体質（weights）の全部に使う。推薦は体質チェック完了後だけ。
+- **漢方薬の選定は「主訴を起点とした二段階選定」（2026-10-24 ユーザー指示・最重要）**：いちばん改善したい主訴とその詳細問診の症状 → 承認効能（indications）に持つ漢方薬だけを候補群にし、その中で気血水・寒熱・虚実・五臓・随伴症状が最も合うものを1件推薦する。体質スコアで主訴と無関係な漢方薬を足さない／合うものがなければ推薦しない／禁忌は除外・相談事項や情報不足は「要確認」／理由は①主訴②体質③比較④注意の順。承認効能・使用目標・漢方の考え方は別の欄（混同しない）。`src/lib/kampo/recommend.ts` の `selectFormulas`。効能・効果は全件 verified: false（製品の添付文書で薬剤師が確認する）。
+- デザイン（2026-10-24〜）：白地×淡い水色（#86CDE8）、「BODY CHECK KAMPO」の細身英字、枠線の選択肢、Qマーク、丸いSTART、左右一体の戻る｜次へ、水色帯の見出し、結果のタブ。参考画像の雰囲気のみで、他社名・ロゴ・文言は使わない。
+- `npm run test:kampo`（`npm run check` に含む）がマスタ検証と仕様書の検算例を通す。マスタ JSON を変えたら必ず実行。
 - Vercel Cron は追加していない（Hobby の上限）。保持期限 3年は Redis TTL ＋ スタッフ画面表示時の掃除。
 - 2026-10-21 ユーザー指示で main に反映（https://kabuexlabs.com/kampo/）。検索に出さない運用（noindex・sitemap/llms.txt 非掲載・合言葉）を崩さない。
+- **2026-10-25 ユーザー指示で v2（PDF「最終実装用マスタープロンプト」、PR #134）を取り消し、2026-10-24 の3段階版に戻した**（revert。v2 の実装は commit e918c0e に残る）。v2 期間に保存されたセッションは texts を持たないため store.ts の normalizeSession で補う。同日受領の「問診・証判定・処方選定・薬剤師画面の改修指示」は**フェーズ1（現状調査と改修計画の提示、コード変更なし）→ ユーザー承認 → フェーズ2以降**の順で進める。
