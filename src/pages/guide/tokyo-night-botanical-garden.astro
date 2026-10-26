@@ -1,0 +1,279 @@
+---
+// 「東京 植物園 夜」「夜の植物園 東京」で探す人（施設名をまだ決めていない人）に向けた記事（2026-10-27 新規）。
+// 施設名で探す人の受け皿は /guide/yumenoshima-night/。ここでは都内の植物園・庭園の閉園時刻と「夜に入れる機会」を比べ、
+// 夢の島熱帯植物館の夜間公演は要点だけを書いて、日程・チケットの詳細は既存ページと公式ページ（/gensou/）へ送る。
+// 自社公演の事実は /gensou/ と公演データ（src/data/events/）の記載だけ。他施設の時刻・期間・料金は各公式サイトの記載
+// （2026-10-26 確認。出典は docs/seo-aio-2026-10-27.md）。書いていない施設の夜間公開を推測で足さない。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import StickyReserve from '../../components/StickyReserve.astro';
+import { jsonLd } from '../../lib/microcms';
+import { jstDateString } from '../../lib/thisWeek';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const PATH = '/guide/tokyo-night-botanical-garden/';
+const TICKET = 'https://escape.id/gensou-org/e-ichi/';
+const LP = '/gensou/';
+const VENUE_GUIDE = '/guide/yumenoshima-night/';
+const FROM = '2026-11-05';
+const TO = '2026-11-22';
+const today = jstDateString(new Date());
+const phase = today > TO ? 'ended' : today >= FROM ? 'live' : 'before';
+
+// 通常時の閉園時刻（各施設の公式サイトの記載。2026-10-26 確認）
+const gardens = [
+  { name: '夢の島熱帯植物館', where: '江東区・東京都の施設', hours: '9:30〜17:00（入館は16:00まで）', url: 'https://www.yumenoshima.jp/botanicalhall' },
+  { name: '神代植物公園', where: '調布市・都立公園', hours: '9:30〜17:00（入園は16:00まで）。大温室は16:30閉門', url: 'https://www.tokyo-park.or.jp/park/jindai/index.html' },
+  { name: '小石川植物園', where: '文京区・東京大学の附属植物園', hours: '9:00〜16:30（入園は16:00まで）', url: 'https://koishikawa-bg.jp/overview/guide/' },
+  { name: '新宿御苑', where: '新宿区・環境省', hours: '10月1日〜3月14日は9:00〜16:30（入園は16:00まで）。温室は9:30〜16:00', url: 'https://policies.env.go.jp/national-garden/shinjukugyoen/guide/information/' },
+  { name: '板橋区立熱帯環境植物館', where: '板橋区', hours: '10:00〜18:00（入館は17:30まで）', url: 'https://www.city.itabashi.tokyo.jp/kusei/chosha/1043016/1042967/1043209.html' },
+  { name: '渋谷区ふれあい植物センター', where: '渋谷区', hours: '10:00〜21:00（入園は20:30まで）', url: 'https://www.city.shibuya.tokyo.jp/shisetsu/bunka-shisetsu/bunka-shisetsu/fureai.html' },
+];
+// 2026年11月に夜（17時以降）に入れる機会（公式サイトの記載。2026-10-26 確認）
+const nights = [
+  { name: '夢の島熱帯植物館', kind: '植物館（閉館後の公演）', when: '11月5日〜22日の木〜日曜。17:00〜20:00に12分おきに開始（最終回は20:50終了予定）', entry: '公演チケット（個別3,500円・グループ14,000円。税込・入館料込み）', own: true },
+  { name: '渋谷区ふれあい植物センター', kind: '植物園（通常の開園時間）', when: '毎日21:00まで（入園は20:30まで）。月曜休園（祝日・振替休日の場合は翌平日）', entry: '入園料100円（小学生以上）', own: false },
+  { name: '小石川後楽園「深山“光”葉を楽しむ」', kind: '庭園（夜間特別開園）', when: '11月13日〜24日。18:00〜21:00（最終入園20:00）', entry: '夜間特別観賞券が必要（通常の入園券では入れない）', own: false },
+  { name: '六義園「庭紅葉の六義園 夜間特別観賞」', kind: '庭園（夜間特別観賞）', when: '11月25日〜12月6日。18:00〜20:30（最終入園19:30）', entry: '前売1,000円（11月1日9:00からオンライン販売）・当日1,200円', own: false },
+];
+const toc = [
+  { id: 'enjoy', label: '夜の植物園で楽しめること' },
+  { id: 'gensou', label: '夢の島熱帯植物館の夜間特別公演' },
+  { id: 'diff', label: '通常の植物館見学との違い' },
+  { id: 'info', label: '開催日・料金・所要時間' },
+  { id: 'access', label: 'アクセス・服装・参加条件' },
+  { id: 'ticket', label: 'チケット予約' },
+  { id: 'faq', label: 'よくある質問' },
+];
+const faqs = [
+  { q: '東京で夜まで開いている植物園はありますか？', a: '渋谷区ふれあい植物センターは通常の開園時間が10:00〜21:00（入園は20:30まで）で、夜も入れます（月曜休園）。神代植物公園・小石川植物園・新宿御苑・夢の島熱帯植物館は16:30〜17:00ごろ、板橋区立熱帯環境植物館は18:00に閉まります（各施設の公式サイトの記載）。' },
+  { q: '夢の島熱帯植物館は夜も開いていますか？', a: '通常の開館時間は9:30〜17:00（入館は16:00まで）です。2026年11月5日〜22日の木〜日曜は、閉館後の館内で物語体験「午前零時の幻想集 第一夜『草陰の夢』」を行い、17:00〜20:00に12分おきに回が始まります。参加には公演チケットが必要です。' },
+  { q: '二人で参加する場合、チケットはどう選べばいいですか？', a: '個別チケット（1名3,500円）を2枚買うと合計7,000円で、ほかのお客様と同じ組になる場合があります。二人だけで回りたい場合は、最大4名で貸切になるグループチケット（1組14,000円）を選びます。どちらも税込・入館料込みです。' },
+  { q: '雨の日も開催しますか？', a: '「午前零時の幻想集」は植物館の屋内で行うため、雨の日も開催します。集合は植物館の正面入口で、受付が始まるまでは植物館前（屋外）で待ちます。' },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '東京で夜の植物園を楽しむ｜夢の島熱帯植物館の特別な夜間体験',
+  about: [
+    { '@type': 'Thing', name: '東京の植物園・庭園の夜間開園' },
+    { '@type': 'Place', name: '夢の島熱帯植物館', url: 'https://www.yumenoshima.jp/botanicalhall', address: { '@type': 'PostalAddress', streetAddress: '夢の島2-1-2', addressLocality: '江東区', addressRegion: '東京都', addressCountry: 'JP' } },
+  ],
+  inLanguage: 'ja',
+  image: [new URL('/assets/events/gensou-kv.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-27',
+  dateModified: '2026-10-27',
+  mainEntityOfPage: new URL(PATH, site).toString(),
+};
+---
+<BaseLayout
+  title="東京の夜の植物園｜夜に入れる植物園・庭園と、夢の島熱帯植物館の夜間公演（2026年11月） - 株式会社ex Labs"
+  description="東京の植物園の多くは16時30分〜17時に閉まります。都内の植物園・庭園の閉園時刻と、2026年11月に夜に入れる機会（夢の島熱帯植物館の夜間公演、21時まで開く植物センター、小石川後楽園・六義園の夜間公開）を公式サイトの記載で比べ、夜の植物館で行う物語体験の日程・料金・行き方をまとめました。"
+  ogImage="/assets/events/gensou-kv.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '解説記事一覧', href: '/guide/' },
+  { name: '東京の夜の植物園' },
+]} />
+
+<section class="section yn-hero" style="padding-top:36px"><div class="wrap">
+<div class="yn-top">
+  <a class="yn-kv" href={LP} data-track="show" data-show="gensou" data-place="night-garden-hero"><img src="/assets/events/gensou-kv.webp" alt="午前零時の幻想集 第一夜「草陰の夢」夢の島熱帯植物館" width="880" height="1246" fetchpriority="high" decoding="async" /></a>
+  <div>
+    <p class="yn-eyebrow">2026年11月版</p>
+    <h1 class="yn-h1 serif"><span class="nobr">東京で夜の植物園を楽しむ</span><br><span class="yn-h1s"><span class="nobr">夢の島熱帯植物館の</span><span class="nobr">特別な夜間体験</span></span></h1>
+    <p class="lede">都内の植物園は、多くが16時30分から17時に閉まります。夜に植物のそばで過ごせるのは、夜まで開いている一部の施設か、期間を決めて行われる夜間公開・夜間公演のときです。このページでは、都内の主な植物園・庭園の閉園時刻と、<strong>2026年11月に夜に入れる機会</strong>を並べました。</p>
+    <ul class="yn-keys">
+      <li><span>閉館後</span><span><span class="nobr">夢の島熱帯植物館</span>の物語体験「午前零時の幻想集」。11月5日〜22日の木〜日曜、17:00〜20:00に開始</span></li>
+      <li><span>21時まで</span><span>渋谷区ふれあい植物センター（通常の開園時間）</span></li>
+      <li><span>庭園</span><span>小石川後楽園（11月13日〜24日）、六義園（11月25日〜12月6日）の夜間公開</span></li>
+    </ul>
+    {phase !== 'ended' && <p class="yn-cta"><a class="yn-btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="night-garden-top">夜の植物館の日程・空席を見る（escape.id）↗</a><a class="yn-sub" href={VENUE_GUIDE} data-track="show" data-show="guide-yumenoshima" data-place="night-garden-top">夢の島熱帯植物館の夜の案内 →</a></p>}
+  </div>
+</div>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}</ol></nav>
+</div></section>
+
+<section class="section tinted" id="enjoy"><div class="wrap narrow">
+<p class="eyebrow">AT NIGHT</p><h2 class="h2 serif">夜の植物園で楽しめること</h2>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul>
+<li>この記事でいう「夜の植物園」とは、通常の閉園時刻（都内の多くの植物園は16時30分〜17時）より後に、植物園・温室・庭園に入れる機会のことです。</li>
+<li>この記事で比べた施設のうち、通常の開園時間が夜まであるのは渋谷区ふれあい植物センター（21:00まで、入園は20:30まで）です。</li>
+<li>2026年11月は、<span class="nobr">夢の島熱帯植物館</span>の閉館後に物語体験「午前零時の幻想集」（11月5日〜22日の木〜日曜、17:00〜20:00に開始）があり、小石川後楽園・六義園では夜間公開が行われます。</li>
+</ul></div>
+<p class="lede">東京で夜に植物を見に行く方法は、大きく3つあります。<strong>夜まで開いている施設に行く</strong>、<strong>期間限定の夜間公開・ライトアップに行く</strong>、<strong>閉館後の館内を使った公演に参加する</strong>、の3つです。昼の見学と違い、どれも開いている日と時間が限られるので、まず閉園時刻と開催日を確かめるところから始めます。</p>
+<h3 class="kd-h3">都内の主な植物園・温室の閉園時刻（通常時）</h3>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col">施設</th><th scope="col">場所・運営</th><th scope="col">開園時間</th></tr></thead>
+<tbody>{gardens.map((g) => <tr><th scope="row"><a href={g.url} target="_blank" rel="noopener" style="color:var(--accent)">{g.name} ↗</a></th><td>{g.where}</td><td>{g.hours}</td></tr>)}</tbody>
+</table></div>
+<p class="cmp-src">出典：各施設の公式サイトの記載（2026年10月26日確認）。休園日・臨時の変更は各公式サイトで確認してください。</p>
+<p class="lede" style="margin-top:18px">この表のなかで、平日の仕事終わりに間に合う時間まで開いているのは渋谷区ふれあい植物センターだけです。神代植物公園の大温室のように、花の時期に合わせて夜間公開を行う施設もありますが、日程はその都度発表されます。</p>
+<h3 class="kd-h3">2026年11月に夜に入れる機会</h3>
+<div class="ng-list">
+{nights.map((n) => (
+  <article class="ng-card">
+    <p class="ng-kind">{n.kind}</p>
+    <h4 class="ng-name">{n.own ? <a href={VENUE_GUIDE}>{n.name}</a> : n.name}</h4>
+    <dl class="ng-dl">
+      <div><dt>日時</dt><dd>{n.when}</dd></div>
+      <div><dt>入場</dt><dd>{n.entry}</dd></div>
+    </dl>
+  </article>
+))}
+</div>
+<p class="cmp-src">出典：<span class="nobr">夢の島熱帯植物館</span>は公演の公式サイト、ほかは各施設の公式サイト（2026年10月26日確認）。小石川後楽園と六義園は植物園ではなく都立庭園です（いずれも東京都公園協会の告知）。最新の情報は<a href="https://www.tokyo-park.or.jp/" target="_blank" rel="noopener">公園へ行こう！（東京都公園協会）↗</a>で確認してください。</p>
+</div></section>
+
+<section class="section" id="gensou"><div class="wrap narrow">
+<p class="eyebrow">NIGHT PERFORMANCE</p><h2 class="h2 serif"><span class="nobr">夢の島熱帯植物館の</span><span class="nobr">夜間特別公演</span></h2>
+<p class="lede">「午前零時の幻想集 第一夜『草陰の夢』」は、株式会社ex Labsが企画・主催する物語体験です。会場は江東区の<span class="nobr">夢の島熱帯植物館</span>（東京都の施設）で、通常は17時に閉まる館内を、閉館後の時間帯に使います。</p>
+<p class="lede">公式サイトのあらすじは、<strong>「『夜の植物館』を巡り、失われた記憶を取り戻すイマーシブ体験」</strong>。迷い込んだのは夢の中の植物館で、自分がなぜそこにいるのかを思い出せない——という設定から始まります。参加者は最大4人の組で館内を歩き、キャストと言葉を交わしながら物語の続きを見届けます。</p>
+<ul class="bullets">
+<li><strong>怖さ</strong>：控えめ。暗い場所と、キャストとの会話があります</li>
+<li><strong>所要時間</strong>：約50分</li>
+<li><strong>人数</strong>：1名から参加でき、1組は最大4名</li>
+</ul>
+<p class="vc-line"><a href={`${LP}#story`} style="color:var(--accent)" data-track="show" data-show="gensou" data-place="night-garden-about">あらすじと体験の特徴（公式サイト）→</a></p>
+</div></section>
+
+<section class="section tinted" id="diff"><div class="wrap narrow">
+<p class="eyebrow">DIFFERENCE</p><h2 class="h2 serif">通常の植物館見学との違い</h2>
+<p class="lede">同じ<span class="nobr">夢の島熱帯植物館</span>でも、昼の見学と夜の公演では、入れる時間も料金も回り方も変わります。</p>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col">項目</th><th scope="col">通常の見学</th><th scope="col">夜の公演（午前零時の幻想集）</th></tr></thead>
+<tbody>
+<tr><th scope="row">時間</th><td>9:30〜17:00（入館は16:00まで）</td><td>17:00〜20:00に12分おきに開始。約50分</td></tr>
+<tr><th scope="row">料金</th><td>入館料 大人250円（65歳以上120円、中学生100円、小学生以下無料）</td><td>個別チケット1名3,500円、グループチケット1組14,000円（最大4名）。税込・入館料込み</td></tr>
+<tr><th scope="row">回り方</th><td>館内を自由に見て回る</td><td>最大4人の組で、開始時刻に合わせて館内を巡る</td></tr>
+<tr><th scope="row">予約</th><td>不要</td><td>予約サイト（escape.id）で日時を選んで購入。各回の開始2時間前まで</td></tr>
+<tr><th scope="row">対象</th><td>どなたでも</td><td>中学生以上（18歳未満は保護者同伴）</td></tr>
+<tr><th scope="row">休み</th><td>月曜（祝日の場合は翌日）</td><td>木・金・土・日曜だけ開催</td></tr>
+</tbody>
+</table></div>
+<p class="lede" style="margin-top:18px">公演の物語の詳しい内容は、参加する方のために公式サイトでも伏せています。</p>
+</div></section>
+
+<section class="section" id="info"><div class="wrap narrow">
+<p class="eyebrow">INFO</p><h2 class="h2 serif">開催日・料金・所要時間</h2>
+<ul class="bullets">
+<li><strong>開催日</strong>：2026年11月5日（木）〜22日（日）の木〜日曜、全12日間（5〜8日・12〜15日・19〜22日）</li>
+<li><strong>開始時刻</strong>：各日17:00、17:12、17:24……と12分おき。最終回は20:00開始で、20:50に終わる予定です</li>
+<li><strong>所要時間</strong>：約50分</li>
+<li><strong>料金</strong>：個別チケット1名3,500円（ほかのお客様と同じ組になる場合があります）、グループチケット1組14,000円（最大4名で貸切）。税込・入館料込み</li>
+</ul>
+<div class="cmp-wrap"><table class="cmp cmp-s">
+<thead><tr><th scope="col">人数</th><th scope="col">個別チケットの合計</th><th scope="col">グループチケット</th></tr></thead>
+<tbody>
+<tr><th scope="row">1人</th><td>3,500円</td><td>14,000円</td></tr>
+<tr><th scope="row">2人</th><td>7,000円</td><td>14,000円</td></tr>
+<tr><th scope="row">3人</th><td>10,500円</td><td>14,000円</td></tr>
+<tr><th scope="row">4人</th><td>14,000円</td><td>14,000円</td></tr>
+</tbody>
+</table></div>
+<p class="lede" style="margin-top:18px">人数ごとの選び方は<a href={`${VENUE_GUIDE}#ticket`} style="color:var(--accent)">夢の島熱帯植物館の夜の案内（チケットの選び方）</a>にまとめています。</p>
+</div></section>
+
+<section class="section tinted" id="access"><div class="wrap narrow">
+<p class="eyebrow">ACCESS</p><h2 class="h2 serif">アクセス・服装・参加条件</h2>
+<ul class="bullets">
+<li><strong>場所</strong>：東京都江東区夢の島2-1-2（夢の島公園内）。新木場駅（JR京葉線・東京メトロ有楽町線・りんかい線）から徒歩約15分。東陽町駅から都バス新木場駅行きで「夢の島」下車、徒歩約7分</li>
+<li><strong>集合</strong>：開始時刻の5分前までに植物館の正面入口へ。受付が始まるまでは植物館前（屋外）で待ちます</li>
+<li><strong>帰り</strong>：最終回（20:00開始）でも20:50に終わる予定で、新木場駅まで歩いて21時過ぎに着く計算です</li>
+<li><strong>服装・持ち物</strong>：歩きやすい服装で。通信できるスマートフォンが必要です（アプリの準備は不要）。荷物は預けられないため、大きな荷物は持たずに行きます</li>
+<li><strong>参加できない場合</strong>：階段の上り下りがあるため、車椅子では入場できません。飲酒した状態では参加できません</li>
+<li><strong>天候</strong>：屋内で行うため、雨の日も開催します</li>
+</ul>
+<p class="vc-line"><a href={`${VENUE_GUIDE}#access`} style="color:var(--accent)">行き方と帰りの時間をくわしく見る →</a></p>
+</div></section>
+
+<section class="section" id="ticket"><div class="wrap narrow">
+<p class="eyebrow">TICKET</p><h2 class="h2 serif">チケット予約</h2>
+<p class="lede">チケットは予約サイト（escape.id）で、日時を選んで購入します。各回の開始2時間前まで買えます。お客様の都合によるキャンセル・日時変更はできません。空席は予約サイトの表示が最新です。</p>
+{phase !== 'ended' ? (
+<p class="yn-cta" style="margin-top:22px"><a class="btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="night-garden-body">11/5〜22の日程・空席を見る（escape.id）↗</a><a class="yn-sub2" href={LP} data-track="show" data-show="gensou" data-place="night-garden-body">公式サイトを見る →</a></p>
+) : (
+<p class="lede">2026年11月の公演は終了しました。次回の情報は<a href={LP} style="color:var(--accent)">公式サイト</a>でお知らせします。</p>
+)}
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap narrow">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+{phase !== 'ended' && (
+<div class="cta-mini" style="margin-top:36px">
+<p class="cta-mini-title serif">夜の<span class="nobr">夢の島熱帯植物館</span>で行う物語体験「午前零時の幻想集」</p>
+<a class="btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="night-garden-bottom">日時を選んでチケットを購入（escape.id）↗</a>
+</div>
+)}
+<p class="vc-line" style="margin-top:32px">関連ページ：<a href={VENUE_GUIDE} style="color:var(--accent)">夢の島熱帯植物館の夜イベント（日程・チケット・行き方）</a>／<a href={LP} style="color:var(--accent)">午前零時の幻想集 公式サイト</a>／<a href="/guide/tokyo-night-immersive/" style="color:var(--accent)">東京で夜に楽しめるイマーシブ体験</a>／<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="immersive" />
+
+<StickyReserve href={TICKET} label="夜の植物館の日程・空席を見る" show="gensou" place="night-garden-sticky" until={TO} />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.yn-top{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:32px;align-items:start;max-width:1000px;margin:0 auto}
+.yn-kv img{width:100%;height:auto;display:block;border-radius:10px;box-shadow:0 10px 30px rgba(20,30,60,.35)}
+.yn-eyebrow{margin:0;display:inline-block;padding:4px 12px;background:#EEF6E8;color:#24502A;font-weight:800;font-size:13px;letter-spacing:.08em;border-radius:4px}
+.yn-h1{margin:14px 0 0;font-size:clamp(24px,3.6vw,36px);line-height:1.45;color:#fff;text-wrap:balance}
+.yn-h1s{display:inline-block;margin-top:6px;font-size:.62em;line-height:1.5}
+.yn-keys{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px;font-size:14.5px;line-height:1.75;color:#fff}
+.yn-keys li{display:grid;grid-template-columns:5em minmax(0,1fr);gap:10px}
+.yn-keys li > span:first-child{font-weight:800;color:var(--x-lime,#E1F73E)}
+.yn-cta{margin:22px 0 0;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.yn-btn{display:inline-block;padding:14px 22px;background:#24502A;color:#fff!important;font-weight:800;font-size:15px;border-radius:999px;text-decoration:none!important;border:1px solid #EEF6E8}
+.yn-sub{font-weight:700;font-size:14.5px;color:#fff!important;border-bottom:1px solid currentColor}
+.yn-sub2{font-weight:700;font-size:14.5px;color:var(--accent);border-bottom:1px solid currentColor}
+.toc{max-width:520px;margin:40px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:24px 28px}
+.toc-h{margin:0 0 12px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8)}
+.cmp-wrap{margin:18px 0 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cmp{width:100%;min-width:560px;border-collapse:collapse;background:#fff;font-size:14px;line-height:1.75}
+.cmp.cmp-s{min-width:0;max-width:520px}
+.cmp th,.cmp td{border:1px solid rgba(51,48,43,.12);padding:11px 12px;vertical-align:top;text-align:left}
+.cmp thead th{background:#F4F1EC;font-weight:800;font-size:13px}
+.cmp tbody th{font-weight:800;min-width:9em}
+.cmp-src{margin:10px 0 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.65)}
+.cmp-src a{color:var(--accent)}
+.kd-h3{margin:28px 0 0;font-size:17px;font-weight:800}
+.ng-list{margin:18px 0 0;display:grid;gap:12px}
+.ng-card{background:#fff;border:1px solid rgba(51,48,43,.12);border-radius:12px;padding:16px 18px}
+.ng-kind{margin:0;font-size:12.5px;font-weight:800;color:var(--accent);letter-spacing:.04em}
+.ng-name{margin:4px 0 0;font-size:16px;font-weight:800;line-height:1.55}
+.ng-name a{color:var(--ink,#0B0B14);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.ng-dl{margin:10px 0 0;display:grid;gap:6px;font-size:14px;line-height:1.75}
+.ng-dl div{display:grid;grid-template-columns:3em minmax(0,1fr);gap:10px}
+.ng-dl dt{font-weight:800;color:rgba(51,48,43,.7)}
+.ng-dl dd{margin:0}
+#enjoy,#gensou,#diff,#info,#access,#ticket,#faq{scroll-margin-top:88px}
+@media(max-width:700px){.yn-top{grid-template-columns:120px minmax(0,1fr);gap:16px}.yn-top > div{display:contents}.yn-eyebrow,.yn-h1{grid-column:2}.yn-kv{grid-row:1 / span 2}.yn-top .lede,.yn-keys,.yn-cta{grid-column:1 / -1}}
+</style>

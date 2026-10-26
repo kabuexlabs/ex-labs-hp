@@ -23,6 +23,9 @@
 | `/taikenbizyutu/7th-composition/` | `top`（基本情報の帯） | `ticket`、`info` | — | `float`（既存の右下固定ボタン） |
 | `/guide/kyoto-kyocera-museum-7th/` | `kyoto7-hero` | `kyoto7-body`（料金表の直後） | `kyoto7-bottom` | `kyoto7-sticky` |
 | `/guide/kyoto-november-experience/` | `kyoto-nov-top` | `kyoto-nov-body`（各回の時間の直後） | `kyoto-nov-bottom` | `kyoto-nov-sticky` |
+| `/guide/tokyo-night-botanical-garden/`（2026-10-27） | `night-garden-top` | `night-garden-body`（チケット予約の節） | `night-garden-bottom` | `night-garden-sticky` |
+| `/guide/tokyo-night-immersive/`（2026-10-27） | `night-immersive-top` | `night-immersive-body`・`night-immersive-check`（開催日・予約先の確認の節） | `night-immersive-bottom` | `night-immersive-sticky` |
+| `/guide/kyoto-art-experience-november/`（2026-10-27） | `kyoto-art-top` | `kyoto-art-body`（チケット予約の節） | `kyoto-art-bottom` | `kyoto-art-sticky` |
 | `/guide/botsunyukan/` `/guide/immersive/` | — | `botsunyukan-picks-body` `immersive-picks-body` | — | — |
 | `/` | — | `home-body`（公演欄の「日程・空席を見る」） | — | — |
 | デート・一人参加記事 | `*-pickup`（幻想集の紹介枠） | — | — | — |

@@ -1,0 +1,283 @@
+---
+// 「東京 夜 イマーシブ」「夜 体験型イベント 東京」で探す人に向けた記事（2026-10-27 新規）。
+// 総合ガイド（/guide/immersive-tokyo/）は種類・選び方・開催日全般、夜デート（/guide/tokyo-night-date/）は二人向けの開始時刻比較。
+// ここは「夜に体験できるか」だけに絞り、夜の時間帯に開いている・始まることを公式で確認できたものだけを並べる。
+// 自社公演（午前零時の幻想集）は /gensou/ と公演データ、他は各公式サイトの記載（2026-10-26 確認。docs/seo-aio-2026-10-27.md）。
+// 公式で確かめていない夜の回・料金・怖さを推測で書かない。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import StickyReserve from '../../components/StickyReserve.astro';
+import { jsonLd } from '../../lib/microcms';
+import { jstDateString } from '../../lib/thisWeek';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const PATH = '/guide/tokyo-night-immersive/';
+const TICKET = 'https://escape.id/gensou-org/e-ichi/';
+const LP = '/gensou/';
+const VENUE_GUIDE = '/guide/yumenoshima-night/';
+const FROM = '2026-11-05';
+const TO = '2026-11-22';
+const today = jstDateString(new Date());
+const phase = today > TO ? 'ended' : today >= FROM ? 'live' : 'before';
+
+// 夜の時間帯に体験できることを公式で確認できたもの（2026-10-26 確認）
+const items = [
+  {
+    id: 'gensou',
+    name: '午前零時の幻想集 第一夜「草陰の夢」',
+    own: true,
+    kind: '物語参加型（キャストと会話しながら館内を巡る）',
+    place: '夢の島熱帯植物館（江東区・新木場駅から徒歩約15分）',
+    period: '2026年11月5日〜22日の木〜日曜',
+    night: '17:00〜20:00に12分おきに開始（最終回は20:50終了予定）',
+    price: '個別チケット1名3,500円／グループチケット1組14,000円（最大4名で貸切）。税込・入館料込み',
+    time: '約50分',
+    age: '中学生以上（18歳未満は保護者同伴）',
+    book: '予約サイト（escape.id）で日時を選ぶ。各回の開始2時間前まで',
+    href: VENUE_GUIDE,
+    url: TICKET,
+  },
+  {
+    id: 'zen-night',
+    name: 'ZEN NIGHT TOKYO',
+    own: false,
+    kind: '夜の庭園で、音と光の演出の中を歩く体験型イベント',
+    place: '東京国立博物館の庭園（上野）',
+    period: '2026年10月14日〜12月6日（月曜と11月24日は休み。11月2日・23日・30日の月曜は開催）',
+    night: '17:30〜19:30。金・土曜と11月1日・2日・22日は21:00まで、11月13日は21:30まで（最終入場は終了の30分前）',
+    price: '一般 前売3,600円・当日4,200円（特別展「大徳寺」の観覧料を含む）。中学生以下は無料',
+    time: '開場時間内に入場（最終入場は終了の30分前）',
+    age: '中学生以下は無料（年齢の条件は公式サイトで確認）',
+    book: '公式サイトのチケットページ',
+    href: '',
+    url: 'https://zen.vie.style/tokyo2026/',
+  },
+  {
+    id: 'teamlab-planets',
+    name: 'チームラボプラネッツ TOKYO',
+    own: false,
+    kind: '没入型のデジタルアート・ミュージアム（常設）',
+    place: '豊洲',
+    period: '通年（11月5日・12月3日は休館）',
+    night: '8:00〜22:00（最終入館は閉館の1時間前）',
+    price: '日によって変わるため公式サイトで確認',
+    time: 'チケットは入場時刻の指定',
+    age: '公式サイトで確認',
+    book: '公式サイトのチケットページ',
+    href: '',
+    url: 'https://www.teamlab.art/e/planets/',
+  },
+];
+const toc = [
+  { id: 'what', label: '夜のイマーシブ体験とは' },
+  { id: 'list', label: '東京で体験できる夜間イベント' },
+  { id: 'gensou', label: '夢の島熱帯植物館の夜間公演' },
+  { id: 'who', label: 'デート・友人同士・1人参加の選び方' },
+  { id: 'compare', label: '料金と所要時間の比較' },
+  { id: 'check', label: '開催日・予約先の確認' },
+  { id: 'faq', label: 'よくある質問' },
+];
+const faqs = [
+  { q: '平日の仕事終わりに間に合う夜のイマーシブはありますか？', a: '「午前零時の幻想集」は木・金曜も開催し、17:00〜20:00に12分おきに回が始まります（最終回は20:50終了予定）。ZEN NIGHT TOKYOは17:30〜19:30で、金曜は21:00まで。チームラボプラネッツ TOKYOは22:00まで開いていて、最終入館は21:00です（各公式サイトの記載）。' },
+  { q: '夜のイマーシブは怖いですか？', a: '作品によって違います。「午前零時の幻想集」の怖さは控えめで、暗い場所とキャストとの会話があります。ほかの作品は、公式サイトの注意事項で確認してください。' },
+  { q: '一人でも参加できますか？', a: '「午前零時の幻想集」は1名から参加できます。個別チケットの場合、ほかのお客様と同じ組（最大4名）になることがあります。ZEN NIGHT TOKYOとチームラボプラネッツ TOKYOは、1枚ずつチケットを買って入場する形です。' },
+  { q: '雨の日はどうなりますか？', a: '「午前零時の幻想集」は植物館の屋内で行うため、雨の日も開催します。屋外の庭園で行う催しは、天候による変更を公式サイトで確認してください。' },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '東京で夜に楽しめるイマーシブ体験｜夜の非日常イベントを探す',
+  about: { '@type': 'Thing', name: '東京で夜に体験できるイマーシブ（没入型）イベント' },
+  inLanguage: 'ja',
+  image: [new URL('/assets/events/gensou-kv.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-27',
+  dateModified: '2026-10-27',
+  mainEntityOfPage: new URL(PATH, site).toString(),
+};
+---
+<BaseLayout
+  title="東京で夜に楽しめるイマーシブ体験｜夜の非日常イベントを開始時刻・料金で比較（2026年11月） - 株式会社ex Labs"
+  description="東京で夜に体験できるイマーシブ（没入型）イベントを開始時刻・料金・所要時間で比較。閉館後の夢の島熱帯植物館で行う物語体験「午前零時の幻想集」、夜の庭園の「ZEN NIGHT TOKYO」、22時まで開く「チームラボプラネッツ TOKYO」を公式の記載で整理し、二人・友人・1人での選び方をまとめました。"
+  ogImage="/assets/events/gensou-kv.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '東京のイマーシブ体験', href: '/guide/immersive-tokyo/' },
+  { name: '東京で夜に楽しめるイマーシブ体験' },
+]} />
+
+<section class="section yn-hero" style="padding-top:36px"><div class="wrap">
+<div class="yn-top">
+  <a class="yn-kv" href={LP} data-track="show" data-show="gensou" data-place="night-immersive-hero"><img src="/assets/events/gensou-kv.webp" alt="午前零時の幻想集 第一夜「草陰の夢」夢の島熱帯植物館" width="880" height="1246" fetchpriority="high" decoding="async" /></a>
+  <div>
+    <p class="yn-eyebrow">2026年11月版</p>
+    <h1 class="yn-h1 serif"><span class="nobr">東京で夜に楽しめる</span><span class="nobr">イマーシブ体験</span><br><span class="yn-h1s"><span class="nobr">夜の非日常イベントを探す</span></span></h1>
+    <p class="lede">イマーシブ（没入型）の体験は、昼より夜のほうが選べる時間帯が限られます。このページでは、<strong>夜の時間帯に体験できることを公式の記載で確かめられたもの</strong>だけを並べ、開始時刻・料金・所要時間・人数を比べました。</p>
+    <ul class="yn-keys">
+      <li><span>物語</span><span>午前零時の幻想集（夢の島熱帯植物館、11月5日〜22日の木〜日曜、17:00〜20:00に開始）</span></li>
+      <li><span>庭園</span><span>ZEN NIGHT TOKYO（東京国立博物館の庭園、12月6日まで、17:30から）</span></li>
+      <li><span>アート</span><span>チームラボプラネッツ TOKYO（豊洲、22:00まで）</span></li>
+    </ul>
+    {phase !== 'ended' && <p class="yn-cta"><a class="yn-btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="night-immersive-top">夜の植物館の日程・空席を見る（escape.id）↗</a><a class="yn-sub" href="/guide/immersive-tokyo/" data-track="show" data-show="guide-immersive-tokyo" data-place="night-immersive-top">東京のイマーシブ体験の総合ガイド →</a></p>}
+  </div>
+</div>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}</ol></nav>
+</div></section>
+
+<section class="section tinted" id="what"><div class="wrap narrow">
+<p class="eyebrow">AT NIGHT</p><h2 class="h2 serif">夜のイマーシブ体験とは</h2>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul>
+<li>夜のイマーシブ体験とは、17時以降の時間帯に行われる、作品の空間や物語の中に自分が入り込む形の体験のことです。</li>
+<li>このページでは、夜の時間帯を公式で確認できた「午前零時の幻想集」（17:00〜20:00に開始）、「ZEN NIGHT TOKYO」（17:30から）、「チームラボプラネッツ TOKYO」（22:00まで）の3つを比べています。</li>
+<li>夜に行くときは、受付の時刻・終わる時刻・最寄り駅までの時間を先に確かめておきます。</li>
+</ul></div>
+<p class="lede">イマーシブ体験は、客席から観るのではなく、作品の空間や物語の中に自分が入り込む形の体験です。夜に行われるものには、昼とは違う点がいくつかあります。</p>
+<ul class="bullets">
+<li><strong>普段は閉まっている場所に入れる</strong>：たとえば<span class="nobr">夢の島熱帯植物館</span>の通常の開館時間は17:00まで。「午前零時の幻想集」は、その閉館後の館内で行います</li>
+<li><strong>暗さや照明が演出の一部になる</strong>：夜の庭園や館内では、明るさそのものが体験の雰囲気を左右します</li>
+<li><strong>仕事帰りに行ける</strong>：17時以降に始まる回や、21時・22時まで開いている会場なら、平日の夜にも組み込めます</li>
+<li><strong>帰りの時間を先に決める必要がある</strong>：終わる時刻と最寄り駅までの距離から、乗る電車を逆算しておきます</li>
+</ul>
+<p class="lede" style="margin-top:18px">種類（周遊型・物語参加型・没入型アートなど）や選び方全体は、<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>にまとめています。</p>
+</div></section>
+
+<section class="section" id="list"><div class="wrap narrow">
+<p class="eyebrow">NIGHT EVENTS</p><h2 class="h2 serif">東京で体験できる夜間イベント</h2>
+<p class="lede">2026年11月に、17時以降の時間帯に体験できることを公式サイトで確認できたものです。</p>
+<div class="ni-list">
+{items.map((x) => (
+  <article class="ni-card">
+    <p class="ni-kind">{x.kind}</p>
+    <h3 class="ni-name">{x.own ? <a href={x.href}>{x.name}</a> : <a href={x.url} target="_blank" rel="noopener">{x.name} ↗</a>}</h3>
+    <dl class="ni-dl">
+      <div><dt>場所</dt><dd>{x.place}</dd></div>
+      <div><dt>期間</dt><dd>{x.period}</dd></div>
+      <div><dt>夜の時間</dt><dd>{x.night}</dd></div>
+    </dl>
+    {x.own && <p class="ni-own">株式会社ex Labsの企画・主催</p>}
+  </article>
+))}
+</div>
+<p class="cmp-src">出典：各公式サイトの記載（2026年10月26日確認）。開催日・時間は変わることがあるため、出かける前に公式サイトで確認してください。</p>
+</div></section>
+
+<section class="section tinted" id="gensou"><div class="wrap narrow">
+<p class="eyebrow">YUMENOSHIMA</p><h2 class="h2 serif"><span class="nobr">夢の島熱帯植物館の</span><span class="nobr">夜間公演</span></h2>
+<p class="lede">「午前零時の幻想集 第一夜『草陰の夢』」は、閉館後の<span class="nobr">夢の島熱帯植物館</span>を巡る物語体験です。公式サイトのあらすじは「『夜の植物館』を巡り、失われた記憶を取り戻すイマーシブ体験」。参加者は最大4人の組で館内を歩き、キャストと言葉を交わしながら物語の続きを見届けます。</p>
+<ul class="bullets">
+<li><strong>開催</strong>：2026年11月5日〜22日の木〜日曜（全12日間）。各日17:00〜20:00に12分おきに開始</li>
+<li><strong>所要・人数</strong>：約50分。1名から参加でき、1組は最大4名</li>
+<li><strong>怖さ</strong>：控えめ。暗い場所とキャストとの会話があります</li>
+<li><strong>天候</strong>：屋内で行うため、雨の日も開催します</li>
+</ul>
+<p class="vc-line"><a href={VENUE_GUIDE} style="color:var(--accent)" data-track="show" data-show="guide-yumenoshima" data-place="night-immersive-gensou">日程・チケットの選び方・行き方をくわしく →</a>／<a href="/guide/tokyo-night-botanical-garden/" style="color:var(--accent)">東京の夜の植物園（夜に入れる植物園・庭園）→</a></p>
+</div></section>
+
+<section class="section" id="who"><div class="wrap narrow">
+<p class="eyebrow">WHO</p><h2 class="h2 serif"><span class="nobr">デート・友人同士・</span><span class="nobr">1人参加の選び方</span></h2>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col">誰と</th><th scope="col">午前零時の幻想集</th><th scope="col">ZEN NIGHT TOKYO／チームラボプラネッツ TOKYO</th></tr></thead>
+<tbody>
+<tr><th scope="row">二人</th><td>個別チケット2枚（合計7,000円）だと、ほかのお客様と同じ組になる場合あり。二人だけで回るならグループチケット（1組14,000円）</td><td>1人1枚ずつ購入（チームラボプラネッツは入場時刻を指定）</td></tr>
+<tr><th scope="row">友人3〜4人</th><td>グループチケット1組14,000円で最大4名まで貸切（4人なら1人あたり3,500円）</td><td>人数分を購入</td></tr>
+<tr><th scope="row">1人</th><td>個別チケット1名3,500円。ほかのお客様と同じ組になる場合あり</td><td>1枚から購入できる</td></tr>
+</tbody>
+</table></div>
+<p class="lede" style="margin-top:18px">二人で行く場合の考え方は<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">二人で参加できる東京のイマーシブ</a>、一人での申込条件や相席の扱いは<a href="/guide/immersive-tokyo-solo/" style="color:var(--accent)">東京のイマーシブ体験に一人で参加するには</a>で比べています。</p>
+</div></section>
+
+<section class="section tinted" id="compare"><div class="wrap narrow">
+<p class="eyebrow">COMPARE</p><h2 class="h2 serif">料金と所要時間の比較</h2>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col">名前</th><th scope="col">料金</th><th scope="col">所要時間</th><th scope="col">対象</th></tr></thead>
+<tbody>{items.map((x) => <tr><th scope="row">{x.name}</th><td>{x.price}</td><td>{x.time}</td><td>{x.age}</td></tr>)}</tbody>
+</table></div>
+<p class="cmp-src">料金は税込。出典：午前零時の幻想集は公演の公式サイト、ZEN NIGHT TOKYOとチームラボプラネッツ TOKYOは各公式サイトの記載（2026年10月26日確認）。</p>
+</div></section>
+
+<section class="section" id="check"><div class="wrap narrow">
+<p class="eyebrow">CHECK</p><h2 class="h2 serif">開催日・予約先の確認</h2>
+<ul class="bullets">
+{items.map((x) => <li><strong>{x.name}</strong>：{x.book}。<a href={x.url} target="_blank" rel="noopener" style="color:var(--accent)" {...(x.own ? { 'data-track': 'ticket', 'data-show': 'gensou', 'data-place': 'night-immersive-check' } : {})}>{x.own ? '日程・空席を見る（escape.id）' : '公式サイト'} ↗</a></li>)}
+</ul>
+<p class="lede" style="margin-top:18px">夜に行くときは、<strong>受付の時刻</strong>（開始の何分前か）、<strong>終わる時刻</strong>、<strong>最寄り駅までの時間</strong>の3つを先に確かめておくと、当日あわてません。「午前零時の幻想集」は開始5分前に正面入口で受付、最終回は20:50終了予定で、新木場駅には歩いて21時過ぎに着く計算です。</p>
+{phase !== 'ended' && <p class="yn-cta" style="margin-top:22px"><a class="btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="night-immersive-body">11/5〜22の日程・空席を見る（escape.id）↗</a><a class="yn-sub2" href={LP} data-track="show" data-show="gensou" data-place="night-immersive-body">公式サイトを見る →</a></p>}
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap narrow">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+{phase !== 'ended' && (
+<div class="cta-mini" style="margin-top:36px">
+<p class="cta-mini-title serif">夜の<span class="nobr">夢の島熱帯植物館</span>で行う物語体験「午前零時の幻想集」</p>
+<a class="btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="night-immersive-bottom">日時を選んでチケットを購入（escape.id）↗</a>
+</div>
+)}
+<p class="vc-line" style="margin-top:32px">関連ページ：<a href="/guide/immersive-tokyo/" style="color:var(--accent)">東京で体験できるイマーシブイベント</a>／<a href={LP} style="color:var(--accent)">午前零時の幻想集 公式サイト</a>／<a href={VENUE_GUIDE} style="color:var(--accent)">夢の島熱帯植物館の夜イベント</a>／<a href="/events/" style="color:var(--accent)">開催日程の一覧</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="immersive" />
+
+<StickyReserve href={TICKET} label="夜の植物館の日程・空席を見る" show="gensou" place="night-immersive-sticky" until={TO} />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.yn-top{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:32px;align-items:start;max-width:1000px;margin:0 auto}
+.yn-kv img{width:100%;height:auto;display:block;border-radius:10px;box-shadow:0 10px 30px rgba(20,30,60,.35)}
+.yn-eyebrow{margin:0;display:inline-block;padding:4px 12px;background:#EEF6E8;color:#24502A;font-weight:800;font-size:13px;letter-spacing:.08em;border-radius:4px}
+.yn-h1{margin:14px 0 0;font-size:clamp(24px,3.6vw,36px);line-height:1.45;color:#fff;text-wrap:balance}
+.yn-h1s{display:inline-block;margin-top:6px;font-size:.62em;line-height:1.5}
+.yn-keys{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px;font-size:14.5px;line-height:1.75;color:#fff}
+.yn-keys li{display:grid;grid-template-columns:3.6em minmax(0,1fr);gap:10px}
+.yn-keys li > span:first-child{font-weight:800;color:var(--x-lime,#E1F73E)}
+.yn-cta{margin:22px 0 0;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.yn-btn{display:inline-block;padding:14px 22px;background:#24502A;color:#fff!important;font-weight:800;font-size:15px;border-radius:999px;text-decoration:none!important;border:1px solid #EEF6E8}
+.yn-sub{font-weight:700;font-size:14.5px;color:#fff!important;border-bottom:1px solid currentColor}
+.yn-sub2{font-weight:700;font-size:14.5px;color:var(--accent);border-bottom:1px solid currentColor}
+.toc{max-width:520px;margin:40px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:24px 28px}
+.toc-h{margin:0 0 12px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8)}
+.ni-list{margin:22px 0 0;display:grid;gap:14px}
+.ni-card{background:#fff;border:1px solid rgba(51,48,43,.12);border-radius:12px;padding:18px 20px}
+.ni-kind{margin:0;font-size:12.5px;font-weight:800;color:var(--accent);letter-spacing:.04em}
+.ni-name{margin:6px 0 0;font-size:17px;font-weight:800;line-height:1.5}
+.ni-name a{color:var(--ink,#0B0B14);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.ni-dl{margin:12px 0 0;display:grid;gap:6px;font-size:14px;line-height:1.75}
+.ni-dl div{display:grid;grid-template-columns:5em minmax(0,1fr);gap:10px}
+.ni-dl dt{font-weight:800;color:rgba(51,48,43,.7)}
+.ni-dl dd{margin:0}
+.ni-own{margin:10px 0 0;font-size:12.5px;color:rgba(51,48,43,.65)}
+.cmp-wrap{margin:18px 0 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cmp{width:100%;min-width:600px;border-collapse:collapse;background:#fff;font-size:14px;line-height:1.75}
+.cmp th,.cmp td{border:1px solid rgba(51,48,43,.12);padding:11px 12px;vertical-align:top;text-align:left}
+.cmp thead th{background:#F4F1EC;font-weight:800;font-size:13px}
+.cmp tbody th{font-weight:800;min-width:7em}
+.cmp-src{margin:10px 0 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.65)}
+#what,#list,#gensou,#who,#compare,#check,#faq{scroll-margin-top:88px}
+@media(max-width:700px){.yn-top{grid-template-columns:120px minmax(0,1fr);gap:16px}.yn-top > div{display:contents}.yn-eyebrow,.yn-h1{grid-column:2}.yn-kv{grid-row:1 / span 2}.yn-top .lede,.yn-keys,.yn-cta{grid-column:1 / -1}}
+</style>

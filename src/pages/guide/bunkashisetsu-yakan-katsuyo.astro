@@ -1,0 +1,245 @@
+---
+// 「公共施設 夜間活用」「文化施設 集客」「指定管理者 イベント」で探す、自治体・指定管理者・公共文化施設の担当者向け（2026-10-27 新規）。
+// 商業施設の施設活用（/guide/shisetsu-katsuyo/）、閉店後の活用（/guide/eigyo-jikangai/）、ミュージアム集客（/guide/museum-event/）と重ねず、
+// 公共の文化施設を閉館後に使うときの実施方式・運営設計・費用負担・行政や指定管理者との調整に絞る。
+// 事例は自社公演の公開情報だけ（/gensou/・/taikenbizyutu/7th-composition/・公演データ）。契約の形・分配率・参加者数などの非公開情報は書かない。
+// 夢の島の事例は日付で「開催予定／開催中／開催しました」を切り替える。他施設の夜間公開は各公式の記載（docs/seo-aio-2026-10-27.md）。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import RevShareCallout from '../../components/RevShareCallout.astro';
+import B2BNext from '../../components/guide/B2BNext.astro';
+import { jsonLd } from '../../lib/microcms';
+import { jstDateString } from '../../lib/thisWeek';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const PATH = '/guide/bunkashisetsu-yakan-katsuyo/';
+const CONTACT = '/services/shisetsu-event/#contact';
+const today = jstDateString(new Date());
+const yumePhase = today > '2026-11-22' ? 'ended' : today >= '2026-11-05' ? 'live' : 'before';
+const kyotoPhase = today > '2026-11-23' ? 'ended' : today >= '2026-11-21' ? 'live' : 'before';
+const yumeStatus = { before: '2026年11月5日から開催予定', live: '開催中（11月22日まで）', ended: '2026年11月5日〜22日に開催' }[yumePhase];
+const kyotoStatus = { before: '2026年11月21日から開催予定', live: '開催中（11月23日まで）', ended: '2026年11月21日〜23日に開催' }[kyotoPhase];
+
+const toc = [
+  { id: 'why', label: '公共文化施設で夜間活用が注目される背景' },
+  { id: 'models', label: '夜間イベントの実施方式' },
+  { id: 'design', label: '施設の負担を抑える運営設計' },
+  { id: 'case', label: '夢の島熱帯植物館の事例' },
+  { id: 'money', label: '費用負担・チケット収益・レベニューシェア' },
+  { id: 'coordination', label: '行政・指定管理者との調整事項' },
+  { id: 'contact', label: '施設活用の相談' },
+  { id: 'faq', label: 'よくある質問' },
+];
+const faqs = [
+  { q: '公共の文化施設を夜に使うイベントには、どんな形がありますか？', a: '閉館後の館内を少人数の組で時間をずらして巡る周遊型の物語体験、定員を決めて回ごとに行う公演、期間を決めた夜間開園にライトアップや音の演出を組み合わせる形などがあります。株式会社ex Labsは、東京都の夢の島熱帯植物館で閉館後の館内を巡る周遊型、京都市の京都市京セラ美術館で定員制の回ごとの公演を企画・主催しています。' },
+  { q: '施設側の費用負担はどのくらいですか？', a: '実施方式によります。施設が主催して制作を委託する場合は制作費・運営費を施設が負担します。株式会社ex Labsは、参加者から料金をいただく有料チケット型のイベントでレベニューシェア型（制作費・運営費を当社が負担し、チケット売上から回収する形）に対応しており、条件を満たせば施設側の初期費用0円で開催できます。' },
+  { q: '通常の開館時間や来館者に影響しませんか？', a: '開始時刻を閉館時刻より後に置けば、通常の来館者と時間が重なりません。夢の島熱帯植物館の事例では、通常の開館時間（9:30〜17:00）のあと、17:00から公演の回が始まります。準備・片付けの時間と、職員の立会いの要否は事前に取り決めます。' },
+  { q: '指定管理者が管理している施設でも実施できますか？', a: '実施の形は、施設を所有する自治体と指定管理者の協定・規則によって変わります。自主事業として扱えるか、施設の使用許可が必要か、収入をどう扱うかを、施設の担当者と確認しながら進めます。' },
+  { q: '準備にはどのくらいの期間が必要ですか？', a: '当社の過去案件をもとにした目安では、既存コンテンツの導入で2〜4週間、施設に合わせたオリジナル制作で最短1ヶ月・標準1〜3ヶ月です。公共施設では使用許可や告知の確認に時間がかかることがあるため、季節の企画は3ヶ月前までのご相談をおすすめしています。' },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '公共施設の夜間活用｜美術館・植物館の集客と収益化を進める方法',
+  about: { '@type': 'Thing', name: '公共文化施設（美術館・植物館など）の閉館後の活用' },
+  inLanguage: 'ja',
+  image: [new URL('/assets/events/gensou-kv.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-27',
+  dateModified: '2026-10-27',
+  mainEntityOfPage: new URL(PATH, site).toString(),
+};
+---
+<BaseLayout
+  title="公共施設の夜間活用｜美術館・植物館の集客と収益化を進める方法（事例・費用・調整事項） - 株式会社ex Labs"
+  description="美術館・植物館など公共の文化施設を、閉館後の夜間に体験型イベントの会場として活用する方法。実施方式（自主事業・外部主催・共催）、施設の負担を抑える運営設計、夢の島熱帯植物館での夜間公演の事例、費用負担とレベニューシェア、行政・指定管理者との調整事項を、公演を企画・主催する株式会社ex Labsが解説します。相談無料。"
+  ogImage="/assets/events/gensou-kv.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '施設活用イベントとは', href: '/guide/shisetsu-katsuyo/' },
+  { name: '公共施設の夜間活用' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">PUBLIC FACILITIES AT NIGHT</p>
+<h1 class="h2 serif"><span class="nobr">公共施設の夜間活用</span><br><span class="h1s"><span class="nobr">美術館・植物館の集客と</span><span class="nobr">収益化を進める方法</span></span></h1>
+<p class="lede">美術館や植物館などの公共文化施設は、閉館後の時間には建物も展示もそのまま残っています。この時間を体験型イベントの会場にすると、日中には来られない人に施設を知ってもらう機会と、入館料とは別のチケット収入が生まれます。この記事では、2026年11月に<strong>東京都の<span class="nobr">夢の島熱帯植物館</span>で閉館後の夜間公演</strong>、<strong>京都市の<span class="nobr">京都市京セラ美術館</span>で物語体験の公演</strong>を企画・主催する株式会社ex Labsが、実施方式・運営設計・費用・行政や指定管理者との調整を順に説明します。</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul>
+<li>公共施設の夜間活用とは、閉館後の館内や庭園を、時間を区切った有料の体験型イベントに使う取り組みのことです。</li>
+<li>実施方式は「施設の自主事業（制作を委託）」「外部の主催者が施設を使う」「共催・レベニューシェア」の3つが基本で、費用と収入の扱いが変わります。</li>
+<li>通常の開館時間と重ねない開始時刻、少人数・時間差の入場、使う場所の限定で、施設職員と展示への負担を抑えられます。</li>
+<li>使用許可・指定管理者との役割分担・安全管理・告知のルールは、企画の前に確認します。</li>
+</ul></div>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}</ol></nav>
+</div></section>
+<section class="section" style="padding-top:0;padding-bottom:0"><div class="wrap"><RevShareCallout place="public-night-top" href={CONTACT} /></div></section>
+
+<section class="section tinted" id="why"><div class="wrap narrow">
+<p class="eyebrow">WHY</p><h2 class="h2 serif"><span class="nobr">公共文化施設で</span><span class="nobr">夜間活用が注目される背景</span></h2>
+<p class="lede">東京では2026年の秋にも、公共の施設が期間を決めて夜に門を開ける催しが続いています。</p>
+<ul class="bullets">
+<li><strong>都立庭園の夜間特別開園</strong>：小石川後楽園（11月13日〜24日、18:00〜21:00）、六義園（11月25日〜12月6日、18:00〜20:30）。出典：東京都公園協会の告知</li>
+<li><strong>国立博物館の庭園の夜間公開</strong>：東京国立博物館の庭園で、音と光の演出の中を歩く「ZEN NIGHT TOKYO」（10月14日〜12月6日、17:30から）</li>
+<li><strong>植物園の温室の夜間公開</strong>：神代植物公園では、花の時期に合わせて大温室の夜間公開を行ったことがあります</li>
+</ul>
+<p class="lede" style="margin-top:18px">施設側から見た夜間活用の利点は、主に次の3つです。</p>
+<ul class="bullets">
+<li><strong>日中に来られない人が来られる</strong>：17時前後に閉まる施設は、平日に働く人にとって行きにくい場所です。夜の回があれば、仕事帰りの来館が生まれます</li>
+<li><strong>「普段は入れない時間」そのものが体験の価値になる</strong>：閉館後の館内や暗い庭園は、同じ場所でも昼とは違う体験になります</li>
+<li><strong>入館料とは別の収入になる</strong>：夜の催しは有料チケットにしやすく、制作費・運営費をチケット収入でまかなう設計ができます</li>
+</ul>
+<p class="lede" style="margin-top:18px">一方で、職員の時間外対応、警備、照明・空調、展示物や植物の保護といった、昼にはない負担も生まれます。次の章からは、その負担をどう分け、どう抑えるかを説明します。ミュージアム全般の集客施策は<a href="/guide/museum-event/" style="color:var(--accent)">美術館・博物館・水族館の集客イベント</a>、民間施設の閉店後の活用は<a href="/guide/eigyo-jikangai/" style="color:var(--accent)">営業時間外・閉店後の施設活用</a>にまとめています。</p>
+</div></section>
+
+<section class="section" id="models"><div class="wrap narrow">
+<p class="eyebrow">MODELS</p><h2 class="h2 serif">夜間イベントの実施方式</h2>
+<p class="lede">最初に決めるのは「誰が主催し、誰が費用を出し、チケット収入が誰に入るか」です。一般的には次の3つの形があり、どれを選べるかは施設の規則や指定管理の協定によって変わります。</p>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col">方式</th><th scope="col">主催</th><th scope="col">費用</th><th scope="col">チケット収入</th><th scope="col">向いているケース</th></tr></thead>
+<tbody>
+<tr><th scope="row">施設の自主事業（制作を委託）</th><td>施設（自治体・指定管理者）</td><td>施設が制作費・運営費を支払う</td><td>主催者である施設</td><td>事業計画や予算に組み込める。内容を施設の方針に合わせて決めたい</td></tr>
+<tr><th scope="row">外部の主催者が施設を使う</th><td>制作会社などの外部</td><td>主催者が負担。施設には使用料などが発生する場合がある</td><td>主催者</td><td>施設側に予算がない。まず一度、夜の催しを試したい</td></tr>
+<tr><th scope="row">共催・レベニューシェア</th><td>施設と主催者で分担</td><td>取り決めによる（制作側が先に負担する形もある）</td><td>取り決めた方法で分配</td><td>告知や運営を施設と一緒に進め、成果も分け合いたい</td></tr>
+</tbody>
+</table></div>
+<p class="lede" style="margin-top:18px">体験の形も、施設の広さと使える場所で選びます。</p>
+<ul class="bullets">
+<li><strong>周遊型（少人数・時間差で出発）</strong>：館内を巡る順路をつくり、少人数の組が時間をずらして出発する形。広い館内を使えて、同じ時間に館内にいる人数を抑えられます</li>
+<li><strong>定員制の公演（回ごと）</strong>：講演室や多目的室など決まった部屋で、定員を決めて回ごとに行う形。展示室を使わずに実施できます</li>
+<li><strong>夜間開園＋演出</strong>：期間を決めて夜に開け、ライトアップや音の演出を加える形。来場者が自由に回るため、多くの人数を受け入れやすくなります</li>
+</ul>
+</div></section>
+
+<section class="section tinted" id="design"><div class="wrap narrow">
+<p class="eyebrow">DESIGN</p><h2 class="h2 serif">施設の負担を抑える運営設計</h2>
+<p class="lede">公共施設での夜間イベントは、施設の通常業務と展示を守ることが前提です。当社の2026年11月の公演では、次の点を設計に入れています。</p>
+<ul class="bullets">
+<li><strong>開始を閉館時刻以降に置く</strong>：<span class="nobr">夢の島熱帯植物館</span>の通常の開館時間は9:30〜17:00。公演の回は17:00から始まり、日中の見学者と時間が重なりません</li>
+<li><strong>少人数・時間差で入れる</strong>：1組最大4名が12分おきに出発し、体験は約50分。計算上、同じ時間に館内で体験している組は最大5組（1組4名なら20名）です</li>
+<li><strong>使う場所を絞る</strong>：<span class="nobr">京都市京セラ美術館</span>の公演は、本館地下1階の講演室・多目的室の2部屋だけを使い、体験中に上下の階へ移動しません</li>
+<li><strong>受付と待機の場所を決める</strong>：<span class="nobr">夢の島熱帯植物館</span>では受付を正面入口で開始5分前から行い、それまでは植物館前（屋外）で待ってもらいます</li>
+<li><strong>予約制で人数を事前に確定する</strong>：チケットは各回の開始2時間前（京都は1時間前）まで販売し、当日の人数を前もって把握します</li>
+<li><strong>参加条件を先に示す</strong>：年齢（中学生以上／18歳以上）、階段があるため車椅子では入場できないこと、飲酒した状態では参加できないこと、体験中の撮影禁止などを公式ページで案内しています</li>
+</ul>
+<p class="vc-line"><a href="/services/shisetsu-event/#operation" style="color:var(--accent)" data-track="cta" data-show="services-shisetsu-event" data-place="public-night-design">施設活用イベントの運営体制 →</a></p>
+</div></section>
+
+<section class="section" id="case"><div class="wrap narrow">
+<p class="eyebrow">CASE</p><h2 class="h2 serif"><span class="nobr">夢の島熱帯植物館の</span><span class="nobr">事例</span></h2>
+<p class="lede">東京都の施設である<span class="nobr">夢の島熱帯植物館</span>（江東区）で、閉館後の館内を巡る物語体験「午前零時の幻想集 第一夜『草陰の夢』」を企画・主催しています（{yumeStatus}）。</p>
+<table class="case-table"><tbody>
+<tr><th scope="row">施設</th><td><span class="nobr">夢の島熱帯植物館</span>（東京都江東区夢の島2-1-2、夢の島公園内）。通常の開館時間は9:30〜17:00（入館は16:00まで）</td></tr>
+<tr><th scope="row">実施形式</th><td>閉館後の館内を、最大4人の組がキャストと会話しながら巡る周遊型の物語体験。所要約50分</td></tr>
+<tr><th scope="row">会期・時間</th><td>2026年11月5日〜22日の木〜日曜（全12日間）。各日17:00〜20:00に12分おきに開始し、最終回は20:50終了予定。1日16回</td></tr>
+<tr><th scope="row">料金</th><td>個別チケット1名3,500円／グループチケット1組14,000円（最大4名で貸切）。税込・入館料込みで、参加者が通常の入館料を別に払う必要はありません</td></tr>
+<tr><th scope="row">販売</th><td>予約サイト（escape.id）で日時指定。各回の開始2時間前まで</td></tr>
+<tr><th scope="row">ex Labsの担当</th><td>企画・主催</td></tr>
+<tr><th scope="row">運営上の工夫</th><td>開始を閉館時刻以降に置く／1組最大4名・12分間隔で館内の人数を抑える／屋内で行うため雨天でも開催できる／階段の有無など参加条件を事前に案内</td></tr>
+<tr><th scope="row">現在の状況</th><td>{yumeStatus}。参加者数などの数値は、このページには載せていません</td></tr>
+</tbody></table>
+<p class="vc-line"><a href="/gensou/" style="color:var(--accent)" data-track="show" data-show="gensou" data-place="public-night-case">公演の公式サイト →</a>／<a href="/guide/yumenoshima-night/" style="color:var(--accent)">参加者向けの案内（日程・行き方）→</a></p>
+<h3 class="kd-h3">同じ時期の公共施設での公演：<span class="nobr">京都市京セラ美術館</span></h3>
+<p class="lede">京都市の美術館である<span class="nobr">京都市京セラ美術館</span>では、当社のレーベル「体験する美術館」の公演「7枚目のコンポジション」を行います（{kyotoStatus}）。本館地下1階の講演室・多目的室で、各回最大18名（最少催行12名）・60分の回を各日7回。料金は1名4,500円（税込）で、参加に美術館の入館料は不要です。こちらは夜間ではなく、12:00〜17:30の時間帯に行います。</p>
+<p class="lede">このほか、渋谷サクラステージでの施設一体型イベント（日本経済新聞に掲載）や、閉店後の紀伊國屋書店を舞台にした一夜限りの物語体験（博報堂様との取り組み）など、施設を舞台にした体験型イベントを制作しています。</p>
+<p class="vc-line"><a href="/taikenbizyutu/7th-composition/" style="color:var(--accent)" data-track="show" data-show="7th-composition" data-place="public-night-case">7枚目のコンポジション 公式サイト →</a>／<a href="/works/" style="color:var(--accent)">制作実績の一覧 →</a></p>
+</div></section>
+
+<section class="section tinted" id="money"><div class="wrap narrow">
+<p class="eyebrow">MONEY</p><h2 class="h2 serif"><span class="nobr">費用負担・チケット収益・</span><span class="nobr">レベニューシェア</span></h2>
+<p class="lede">夜間イベントの費用は、制作（物語・演出・美術・小道具）と、会期中の運営（受付・誘導・キャスト）、それに夜間ならではの費用に分かれます。夜間の費用は施設ごとの差が大きいため、見積もりの前に確認します。</p>
+<ul class="bullets">
+<li><strong>夜間ならではの費用</strong>：職員の時間外の立会い、警備、清掃、照明・空調の運転、施設の使用料</li>
+<li><strong>運営の費用</strong>：受付・誘導スタッフ、キャスト、予約サイトの手数料、保険</li>
+<li><strong>制作の費用</strong>：既存コンテンツの導入で数十万円台〜、施設に合わせたオリジナル制作で100万円前後〜、館内全体や複数フロアを使う周遊型で数百万円規模が目安です（株式会社ex Labsにご依頼いただく場合）</li>
+</ul>
+<h3 class="kd-h3">チケット収入の見込み方</h3>
+<p class="lede">収入の上限は「1回の定員 × 1日の回数 × 開催日数 × 単価」で決まります。<span class="nobr">夢の島熱帯植物館</span>の事例なら、1組最大4名 × 1日16回で、1日の受け入れは最大64名です。実際の収入は販売率で変わるため、会期・回数・単価を決める段階で、損益分岐となる販売率を施設と共有しておきます。</p>
+<h3 class="kd-h3">レベニューシェア型</h3>
+<p class="lede">株式会社ex Labsは、参加者から料金をいただく有料チケット型のイベントで<strong>レベニューシェア型</strong>に対応しています。制作費・運営費を当社が負担し、チケット売上から回収したうえで残りを施設と分配する形で、条件を満たせば<strong>施設側の初期費用0円</strong>で開催できます。売上で原価を回収しきれなかった場合も、不足分は当社が負担します。すべての案件に当てはまるわけではないため、適用条件は<a href="/services/shisetsu-event/#revenue" style="color:var(--accent)">初期費用0円の適用条件</a>で確認してください。</p>
+<p class="vc-line"><a href="/guide/event-revenue-share/" style="color:var(--accent)">施設イベントのレベニューシェアとは（計算例）→</a>／<a href="/guide/event-hiyou/" style="color:var(--accent)">体験型イベントの費用相場 →</a></p>
+</div></section>
+
+<section class="section" id="coordination"><div class="wrap narrow">
+<p class="eyebrow">COORDINATION</p><h2 class="h2 serif"><span class="nobr">行政・指定管理者との</span><span class="nobr">調整事項</span></h2>
+<p class="lede">公共施設では、民間の商業施設よりも事前に決めておくことが多くなります。企画を固める前に、施設の担当者と次の項目を確認します。</p>
+<div class="cmp-wrap"><table class="cmp">
+<thead><tr><th scope="col">項目</th><th scope="col">確認すること</th></tr></thead>
+<tbody>
+<tr><th scope="row">実施の形と許可</th><td>自主事業・共催・施設の使用のどれで行うか。自治体の施設では、条例・規則に基づく利用許可や、行政財産の使用許可（地方自治法第238条の4第7項）が必要になる場合があります</td></tr>
+<tr><th scope="row">指定管理者との役割</th><td>指定管理者が管理する施設では、協定で定められた業務の範囲、自主事業として扱えるか、所有者である自治体への報告・承認が必要か</td></tr>
+<tr><th scope="row">料金と収入</th><td>チケットの料金、入館料を含めるかどうか、収入の帰属と分配、販売手数料の負担</td></tr>
+<tr><th scope="row">時間と鍵</th><td>閉館後に使える時間、準備・片付けの時間、職員の立会い、施錠・警備、退館の時刻</td></tr>
+<tr><th scope="row">安全</th><td>避難経路・非常口をふさがない配置、同時に入れる人数、照明を落とす場所での誘導、消防への届出の要否（所轄の消防署に確認）</td></tr>
+<tr><th scope="row">展示・植物の保護</th><td>立ち入ってよい範囲、触れてはいけないもの、照明・温度・湿度への影響、持ち込める機材</td></tr>
+<tr><th scope="row">告知</th><td>施設名・ロゴの表記、施設の公式サイト・SNS・館内掲示での告知、プレスリリースの確認手順</td></tr>
+<tr><th scope="row">参加者対応</th><td>問い合わせの窓口（主催者に一本化するか）、年齢・バリアフリーの案内、雨天時の扱い</td></tr>
+<tr><th scope="row">保険と報告</th><td>主催者が加入する保険、終了後に共有する参加者数・アンケートなどの報告内容</td></tr>
+</tbody>
+</table></div>
+<p class="lede" style="margin-top:18px">商業施設での取り決め（区画・電源・保管場所・設営時間など）は、<a href="/guide/shisetsu-katsuyo/#cost" style="color:var(--accent)">施設活用イベントの「施設側に必要な協力」</a>にもまとめています。</p>
+</div></section>
+
+<section class="section tinted" id="contact"><div class="wrap narrow">
+<p class="eyebrow">CONTACT</p><h2 class="h2 serif">施設活用の相談</h2>
+<p class="lede">「閉館後の時間を使えないか」「指定管理の範囲でできる形を知りたい」といった段階からご相談いただけます。施設の種類、使えそうな場所と時間帯、想定している時期をお知らせください。現地確認と企画の提案までは無料です。</p>
+<div class="cta-mini" style="margin-top:24px">
+<p class="cta-mini-title serif">公共施設の夜間活用を相談する（無料）</p>
+<a class="btn" href={CONTACT} data-track="cta" data-show="services-shisetsu-event" data-place="public-night-bottom">施設活用イベントの相談フォームへ</a>
+</div>
+</div></section>
+
+<section class="section" id="faq"><div class="wrap narrow">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-shisetsu">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<B2BNext place="public-night-next" steps={[
+  { k: '関連する制作実績・導入事例', links: [{ label: '制作事例一覧', href: '/works/' }, { label: '閉店後の紀伊國屋書店の事例', href: '/guide/eigyo-jikangai/' }] },
+  { k: '対応する制作サービス', links: [{ label: '施設活用イベント', href: '/services/shisetsu-event/' }] },
+  { k: '費用・納期・実施条件', links: [{ label: '初期費用0円の適用条件', href: '/services/shisetsu-event/#revenue' }, { label: 'レベニューシェアの仕組み', href: '/guide/event-revenue-share/' }] },
+  { k: '施設タイプ別の解説', links: [{ label: '美術館・博物館・水族館の集客イベント', href: '/guide/museum-event/' }, { label: '施設活用イベントとは', href: '/guide/shisetsu-katsuyo/' }] },
+  { k: '制作相談', links: [{ label: '施設活用イベントを相談する（無料）', href: CONTACT }] },
+]} />
+
+<AuthorBox />
+
+<LatestPosts category="shisetsu" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.h1s{display:inline-block;margin-top:6px;font-size:.6em;line-height:1.5}
+.toc{max-width:520px;margin:44px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8)}
+.cmp-wrap{margin:18px 0 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cmp{width:100%;min-width:640px;border-collapse:collapse;background:#fff;font-size:14px;line-height:1.75}
+.cmp th,.cmp td{border:1px solid rgba(51,48,43,.12);padding:11px 12px;vertical-align:top;text-align:left}
+.cmp thead th{background:#F4F1EC;font-weight:800;font-size:13px;white-space:nowrap}
+.cmp tbody th{font-weight:800;min-width:8em}
+.kd-h3{margin:28px 0 0;font-size:17px;font-weight:800}
+#why,#models,#design,#case,#money,#coordination,#contact,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>

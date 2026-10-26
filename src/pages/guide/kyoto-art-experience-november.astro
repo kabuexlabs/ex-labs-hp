@@ -1,0 +1,273 @@
+---
+// 「京都 体験型アート」「京都 11月 アートイベント」で探す人に向けた記事（2026-10-27 新規）。
+// 京都で11月に選べるアート体験を「鑑賞型・没入型・物語参加型」の3つに分けて比べ、物語参加型の例として
+// 京都市京セラ美術館の「7枚目のコンポジション」へ送る。既存の3本（日程・行き方＝kyoto-kyocera-museum-7th、
+// どんな体験か＝kyoto-november-experience、岡崎の半日＝kyoto-okazaki-november）と同じ説明を繰り返さない。
+// 自社公演の事実は公式ページ（/taikenbizyutu/7th-composition/）と公演データ（src/data/events/）、
+// 「禅とジブリ」京都展は既存ページと同じ事実データ、チームラボは公式サイトの記載（2026-10-26 確認。docs/seo-aio-2026-10-27.md）。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import StickyReserve from '../../components/StickyReserve.astro';
+import { jsonLd } from '../../lib/microcms';
+import { jstDateString } from '../../lib/thisWeek';
+import { eventsData } from '../../data/events/index';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const PATH = '/guide/kyoto-art-experience-november/';
+const w = eventsData.works.find((x) => x.id === '7th-composition');
+const TICKET = w?.ticketUrl ?? 'https://escape.id/kyoukaiart-org/e-7th/';
+const LP = '/taikenbizyutu/7th-composition/';
+const GUIDE = '/guide/kyoto-kyocera-museum-7th/';
+const ABOUT = '/guide/kyoto-november-experience/';
+const OKAZAKI = '/guide/kyoto-okazaki-november/';
+const occ = eventsData.occurrences.filter((o) => o.workId === '7th-composition' && o.published && !o.test && o.eventStatus !== 'cancelled');
+const dates = [...new Set(occ.map((o) => o.date))].sort();
+const FROM = dates[0] ?? '2026-11-21';
+const TO = dates[dates.length - 1] ?? '2026-11-23';
+const today = jstDateString(new Date());
+const phase = today > TO ? 'ended' : today >= FROM ? 'live' : 'before';
+// 各回の開始・終了（公演データ。3日間共通）
+const sessions = [...new Map(occ.map((o) => [o.startTime, o])).values()].sort((a, b) => a.startTime.localeCompare(b.startTime)).map((o, i) => [`第${i + 1}回`, o.startTime, o.endTime ?? ''] as const);
+// 京都で11月に選べるアート体験の3つの形（各公式の記載だけ）
+const kinds = [
+  {
+    k: '鑑賞型（展覧会）',
+    ex: '「禅とジブリ」京都展（京都市京セラ美術館 新館、10月3日〜12月6日）',
+    how: '作品を前に、自分のペースで観る',
+    time: '開館時間内（10:00〜18:00）で自由',
+    book: '一般・大学生1,900円。10月31日から予約優先制',
+  },
+  {
+    k: '没入型（デジタルアート）',
+    ex: 'チームラボ バイオヴォルテックス 京都（JR京都駅から徒歩約7分、常設）',
+    how: 'デジタルアートの作品空間に入り込み、その中を歩く',
+    time: '入館の日時を指定して入る',
+    book: '日時指定のチケット。料金・開館時間は日によって異なるため公式サイトで確認',
+  },
+  {
+    k: '物語参加型（イマーシブ）',
+    ex: '7枚目のコンポジション（京都市京セラ美術館 本館地下1階、11月21日〜23日）',
+    how: '絵画を観ることが、物語に参加するきっかけになる',
+    time: '開始時刻の決まった60分（受付・事前説明・退場を含む）',
+    book: '回を選んで予約。1名4,500円（税込）',
+  },
+];
+const toc = [
+  { id: 'what', label: '京都で楽しめる参加型アートとは' },
+  { id: 'beyond', label: '観るだけで終わらない美術館体験' },
+  { id: 'seventh', label: '京都市京セラ美術館「7枚目のコンポジション」' },
+  { id: 'info', label: '公演日・料金・アクセス' },
+  { id: 'before', label: '参加する前に確認したいこと' },
+  { id: 'ticket', label: 'チケット予約' },
+  { id: 'faq', label: 'よくある質問' },
+];
+const faqs = [
+  { q: '2026年11月の京都で、体験型のアートを楽しめる場所は？', a: '作品空間に入り込む没入型なら、JR京都駅から徒歩約7分の常設ミュージアム「チームラボ バイオヴォルテックス 京都」。物語に参加する形なら、11月21日〜23日に京都市京セラ美術館の本館地下1階で行う「7枚目のコンポジション」（60分・1名4,500円）があります。同じ美術館の新館では、展覧会「禅とジブリ」京都展（12月6日まで）も開催中です。' },
+  { q: 'チームラボと「7枚目のコンポジション」は何が違いますか？', a: 'チームラボ バイオヴォルテックス 京都は、入館の日時を指定して作品空間の中を歩く常設のミュージアムです。「7枚目のコンポジション」は3日間だけの公演で、開始時刻の決まった回に参加し、同じ回の参加者（最大18名）と一緒に、絵画を観ることから始まる物語を60分で体験します。' },
+  { q: '美術館の展覧会も一緒に見られますか？', a: '「7枚目のコンポジション」のチケットに展覧会の入場は含まれません。同じ美術館の新館で開催中の「禅とジブリ」京都展は、別のチケット（一般・大学生1,900円）が必要です。' },
+  { q: '一人でも参加できますか？', a: '1名から参加できます。対象は18歳以上です。' },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: '京都で楽しむ体験型アート｜2026年11月の美術館イベント・参加型体験',
+  about: [
+    { '@type': 'Thing', name: '京都の体験型アート・参加型アート' },
+    { '@type': 'Place', name: '京都市京セラ美術館', address: { '@type': 'PostalAddress', addressLocality: '京都市左京区', addressRegion: '京都府', addressCountry: 'JP' } },
+  ],
+  inLanguage: 'ja',
+  image: [new URL('/assets/events/7th-composition-kv.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-10-27',
+  dateModified: '2026-10-27',
+  mainEntityOfPage: new URL(PATH, site).toString(),
+};
+---
+<BaseLayout
+  title="京都で楽しむ体験型アート｜2026年11月の美術館イベント・参加型体験の選び方 - 株式会社ex Labs"
+  description="2026年11月の京都で楽しめるアート体験を、展覧会を観る「鑑賞型」、作品空間に入り込む「没入型」、物語に参加する「物語参加型」の3つで比較。京都市京セラ美術館で11月21日〜23日に行う60分の物語体験「7枚目のコンポジション」の日程・料金・参加条件とチケット予約まで。"
+  ogImage="/assets/events/7th-composition-kv.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: '解説記事一覧', href: '/guide/' },
+  { name: '京都で楽しむ体験型アート' },
+]} />
+
+<section class="section yn-hero" style="padding-top:36px"><div class="wrap">
+<div class="yn-top">
+  <a class="yn-kv" href={LP} data-track="show" data-show="7th-composition" data-place="kyoto-art-hero"><img src="/assets/events/7th-composition-kv.webp" alt="体験する美術館「7枚目のコンポジション」京都市京セラ美術館" width="880" height="1247" fetchpriority="high" decoding="async" /></a>
+  <div>
+    <p class="yn-eyebrow">2026年11月版</p>
+    <h1 class="yn-h1 serif"><span class="nobr">京都で楽しむ体験型アート</span><br><span class="yn-h1s"><span class="nobr">2026年11月の美術館イベント・</span><span class="nobr">参加型体験</span></span></h1>
+    <p class="lede">「体験型アート」と呼ばれるものには、作品の空間に入り込むものもあれば、物語の登場人物として参加するものもあります。この記事では、2026年11月の京都で選べるアート体験を<strong>観る・入り込む・参加する</strong>の3つに分けて比べ、<span class="nobr">京都市京セラ美術館</span>で3日間だけ行う物語体験「7枚目のコンポジション」を紹介します。</p>
+    <ul class="yn-keys">
+      <li><span>鑑賞型</span><span>「禅とジブリ」京都展（<span class="nobr">京都市京セラ美術館</span> 新館、12月6日まで）</span></li>
+      <li><span>没入型</span><span>チームラボ バイオヴォルテックス 京都（京都駅から徒歩約7分、常設）</span></li>
+      <li><span>参加型</span><span>7枚目のコンポジション（11月21日〜23日、各日7回、60分、1名4,500円）</span></li>
+    </ul>
+    {phase !== 'ended' && <p class="yn-cta"><a class="yn-btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="7th-composition" data-place="kyoto-art-top">11/21〜23の開催回・空席を見る（escape.id）↗</a><a class="yn-sub" href={LP} data-track="show" data-show="7th-composition" data-place="kyoto-art-top">公式サイトを見る →</a></p>}
+  </div>
+</div>
+<nav class="toc" aria-label="目次"><p class="toc-h">目次</p><ol>{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}</ol></nav>
+</div></section>
+
+<section class="section tinted" id="what"><div class="wrap narrow">
+<p class="eyebrow">THREE WAYS</p><h2 class="h2 serif">京都で楽しめる参加型アートとは</h2>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul>
+<li>体験型アートとは、作品を観るだけでなく、作品の空間に入り込んだり、物語に参加したりするアート体験のことです。</li>
+<li>2026年11月の京都では、鑑賞型（「禅とジブリ」京都展）、没入型（チームラボ バイオヴォルテックス 京都）、物語参加型（7枚目のコンポジション）の3つを選べます。</li>
+<li>「7枚目のコンポジション」は11月21日〜23日の3日間、<span class="nobr">京都市京セラ美術館</span>の本館地下1階で行う60分の公演で、1名4,500円（税込）です。</li>
+</ul></div>
+<p class="lede">作品との関わり方で分けると、美術館やアート施設での体験は3つの形に分かれます。作品を前に自分のペースで観る<strong>鑑賞型</strong>、作品の空間そのものに身を置く<strong>没入型</strong>、そして作品を観ることがきっかけで物語が動き出す<strong>物語参加型</strong>です。2026年11月の京都では、3つとも選べます。</p>
+<div class="ka-list">
+{kinds.map((x) => (
+  <article class="ka-card">
+    <h3 class="ka-k">{x.k}</h3>
+    <p class="ka-ex">{x.ex}</p>
+    <dl class="ka-dl">
+      <div><dt>作品との関わり</dt><dd>{x.how}</dd></div>
+      <div><dt>時間</dt><dd>{x.time}</dd></div>
+      <div><dt>料金・予約</dt><dd>{x.book}</dd></div>
+    </dl>
+  </article>
+))}
+</div>
+<p class="cmp-src">出典：「禅とジブリ」京都展・7枚目のコンポジションは各公式の記載、チームラボ バイオヴォルテックス 京都は<a href="https://www.teamlab.art/" target="_blank" rel="noopener">チームラボ公式サイト ↗</a>の記載（2026年10月26日確認）。</p>
+<p class="lede" style="margin-top:18px">選び方の目安は、<strong>使える時間</strong>と<strong>誰かと一緒に体験したいか</strong>です。好きな時間に好きなだけ観たいなら鑑賞型、映像や光の空間に浸りたいなら没入型、決まった時間に、ほかの参加者と一緒に物語の中へ入りたいなら物語参加型が向いています。</p>
+</div></section>
+
+<section class="section" id="beyond"><div class="wrap narrow">
+<p class="eyebrow">BEYOND VIEWING</p><h2 class="h2 serif">観るだけで終わらない美術館体験</h2>
+<p class="lede">「7枚目のコンポジション」を企画したのは、株式会社ex Labsのレーベル「体験する美術館」です。掲げているのは<strong>「『鑑賞するアート』から『体験するアート』へ」</strong>。絵画を観る行為そのものを、物語に参加する入口に変える公演をつくっています。</p>
+<ul class="bullets">
+<li><strong>ヌル・アーデン展</strong>：東京藝術大学出身のアーティストと組んだ、アート×謎解きの没入型展覧会。終了後に作品のオークションも行いました</li>
+<li><strong>ロスト・フレーム</strong>：下北沢の街に散らばった絵画を探し、隠された物語をたどる、街を巡る参加型の絵画鑑賞（2026年7月7日〜8月31日。完売）。参加者の選択によって物語の結末が分かれます</li>
+<li><strong>7枚目のコンポジション</strong>：レーベルの第三弾。会場を<span class="nobr">京都市京セラ美術館</span>に移し、美術館の中で物語が始まります</li>
+</ul>
+<p class="lede" style="margin-top:18px">レーベル全体では、広告費をかけず（告知はXのみ）に累計約2,000人が参加しています。</p>
+<p class="vc-line"><a href="/taikenbizyutu/" style="color:var(--accent)" data-track="show" data-show="taikenbizyutu" data-place="kyoto-art-beyond">体験する美術館（公式サイト）→</a></p>
+</div></section>
+
+<section class="section tinted" id="seventh"><div class="wrap narrow">
+<p class="eyebrow">THE 7TH COMPOSITION</p><h2 class="h2 serif"><span class="nobr">京都市京セラ美術館</span><span class="nobr">「7枚目のコンポジション」</span></h2>
+<p class="lede">物語の入口は、<span class="nobr">京都市京セラ美術館</span>の一角にある「三雲彼方展」と記された展示です。そのパンフレットを開いた瞬間、自分の中に知らない記憶が流れ込んでくる——というところから、60分の体験が始まります。</p>
+<p class="lede">会場は本館地下1階の「講演室」と「多目的室」の2部屋で、体験中に上下の階へ移動することはありません。客席から舞台を観るのではなく、参加者自身が物語の中に入り、絵画を観ることで話が進んでいきます。物語の詳しい内容は、参加する方のために公式サイトでも伏せられています。</p>
+<p class="vc-line"><a href={`${LP}#story`} style="color:var(--accent)" data-track="show" data-show="7th-composition" data-place="kyoto-art-about">ストーリーと制作チーム（公式サイト）→</a>／<a href={ABOUT} style="color:var(--accent)">通常の美術鑑賞との違いをくわしく →</a></p>
+</div></section>
+
+<section class="section" id="info"><div class="wrap narrow">
+<p class="eyebrow">INFO</p><h2 class="h2 serif">公演日・料金・アクセス</h2>
+<ul class="bullets">
+<li><strong>公演日</strong>：2026年11月21日（土）・22日（日）・23日（月・祝）の3日間。各日7回</li>
+<li><strong>料金</strong>：1名4,500円（税込）。この公演への参加に美術館の入館料は不要です</li>
+<li><strong>所要時間</strong>：60分（受付・事前説明・退場を含む）</li>
+<li><strong>会場</strong>：<span class="nobr">京都市京セラ美術館</span> 本館地下1階。地下鉄東西線「東山駅」から徒歩約8分</li>
+</ul>
+<h3 class="kd-h3">各回の開催時間（3日間共通）</h3>
+<div class="cmp-wrap"><table class="cmp cmp-s">
+<thead><tr><th scope="col">回</th><th scope="col">開始</th><th scope="col">終了</th></tr></thead>
+<tbody>{sessions.map(([n, a, b]) => <tr><th scope="row">{n}</th><td>{a}</td><td>{b}</td></tr>)}</tbody>
+</table></div>
+<p class="lede" style="margin-top:18px">京都駅・大阪・神戸からの行き方と館内の経路は<a href={GUIDE} style="color:var(--accent)">日程・チケット・行き方の案内</a>、展覧会や永観堂ライトアップと同じ日に回る組み立ては<a href={OKAZAKI} style="color:var(--accent)">「禅とジブリ」京都展と同じ日に回る岡崎の半日</a>にまとめています。</p>
+</div></section>
+
+<section class="section tinted" id="before"><div class="wrap narrow">
+<p class="eyebrow">BEFORE</p><h2 class="h2 serif">参加する前に確認したいこと</h2>
+<ul class="bullets">
+<li><strong>対象・人数</strong>：18歳以上。1名から参加でき、各回最大18名（最少催行12名）</li>
+<li><strong>受付</strong>：本館地下1階「講演室」の扉前で、各回開始の10分前から。指定時刻に1分でも遅れると参加できません</li>
+<li><strong>体験中</strong>：撮影・録音はできません。途中退出・再入場もできません</li>
+<li><strong>チケット</strong>：各回の開演1時間前まで販売。購入後のお客様都合によるキャンセル・日時変更はできません</li>
+<li><strong>展覧会</strong>：このチケットに展覧会の入場は含まれません。「禅とジブリ」京都展は別のチケットが必要です</li>
+</ul>
+</div></section>
+
+<section class="section" id="ticket"><div class="wrap narrow">
+<p class="eyebrow">TICKET</p><h2 class="h2 serif">チケット予約</h2>
+<p class="lede">チケットは予約サイト（escape.id）で、日付と回を選んで購入します。空席は予約サイトの表示が最新です。開催日と空席は別の情報なので、日付が合っても満席の場合があります。</p>
+{phase !== 'ended' ? (
+<p class="yn-cta" style="margin-top:22px"><a class="btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="7th-composition" data-place="kyoto-art-body">11/21〜23の開催回・空席を見る（escape.id）↗</a><a class="yn-sub2" href={LP} data-track="show" data-show="7th-composition" data-place="kyoto-art-body">公式サイトを見る →</a></p>
+) : (
+<p class="lede">2026年11月の公演は終了しました。次回の情報は<a href="/taikenbizyutu/" style="color:var(--accent)">体験する美術館</a>でお知らせします。</p>
+)}
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap narrow">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+{phase !== 'ended' && (
+<div class="cta-mini" style="margin-top:36px">
+<p class="cta-mini-title serif"><span class="nobr">京都市京セラ美術館</span>の物語体験「7枚目のコンポジション」</p>
+<a class="btn" href={TICKET} target="_blank" rel="noopener" data-track="ticket" data-show="7th-composition" data-place="kyoto-art-bottom">11/21〜23の開催回・空席を見る（escape.id）↗</a>
+</div>
+)}
+<p class="vc-line" style="margin-top:32px">関連ページ：<a href={LP} style="color:var(--accent)">7枚目のコンポジション 公式サイト</a>／<a href={GUIDE} style="color:var(--accent)">日程・チケット・行き方</a>／<a href={ABOUT} style="color:var(--accent)">2026年11月の京都で楽しむ物語体験</a>／<a href="/taikenbizyutu/" style="color:var(--accent)">体験する美術館</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="immersive" />
+
+<StickyReserve href={TICKET} label="11/21〜23の開催回・空席を見る" show="7th-composition" place="kyoto-art-sticky" until={TO} />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.yn-top{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:32px;align-items:start;max-width:1000px;margin:0 auto}
+.yn-kv img{width:100%;height:auto;display:block;border-radius:10px;box-shadow:0 10px 30px rgba(60,20,30,.35)}
+.yn-eyebrow{margin:0;display:inline-block;padding:4px 12px;background:#F6EFE6;color:#7A1F35;font-weight:800;font-size:13px;letter-spacing:.08em;border-radius:4px}
+.yn-h1{margin:14px 0 0;font-size:clamp(24px,3.6vw,36px);line-height:1.45;color:#fff;text-wrap:balance}
+.yn-h1s{display:inline-block;margin-top:6px;font-size:.62em;line-height:1.5}
+.yn-keys{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px;font-size:14.5px;line-height:1.75;color:#fff}
+.yn-keys li{display:grid;grid-template-columns:3.6em minmax(0,1fr);gap:10px}
+.yn-keys li > span:first-child{font-weight:800;color:var(--x-lime,#E1F73E)}
+.yn-cta{margin:22px 0 0;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center}
+.yn-btn{display:inline-block;padding:14px 22px;background:#7A1F35;color:#fff!important;font-weight:800;font-size:15px;border-radius:999px;text-decoration:none!important;border:1px solid #F6EFE6}
+.yn-sub{font-weight:700;font-size:14.5px;color:#fff!important;border-bottom:1px solid currentColor}
+.yn-sub2{font-weight:700;font-size:14.5px;color:var(--accent);border-bottom:1px solid currentColor}
+.toc{max-width:520px;margin:40px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:24px 28px}
+.toc-h{margin:0 0 12px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8)}
+.cmp-wrap{margin:18px 0 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cmp{width:100%;min-width:640px;border-collapse:collapse;background:#fff;font-size:14px;line-height:1.75}
+.cmp.cmp-s{min-width:0;max-width:520px}
+.cmp th,.cmp td{border:1px solid rgba(51,48,43,.12);padding:11px 12px;vertical-align:top;text-align:left}
+.cmp thead th{background:#F4F1EC;font-weight:800;font-size:13px;white-space:nowrap}
+.cmp tbody th{font-weight:800;min-width:7em}
+.cmp-src{margin:10px 0 0;font-size:12.5px;line-height:1.8;color:rgba(51,48,43,.65)}
+.cmp-src a{color:var(--accent)}
+.kd-h3{margin:28px 0 0;font-size:17px;font-weight:800}
+.ka-list{margin:22px 0 0;display:grid;gap:12px}
+.ka-card{background:#fff;border:1px solid rgba(51,48,43,.12);border-radius:12px;padding:16px 18px}
+.ka-k{margin:0;font-size:16px;font-weight:800;color:var(--accent)}
+.ka-ex{margin:4px 0 0;font-size:14.5px;font-weight:700;line-height:1.7}
+.ka-dl{margin:10px 0 0;display:grid;gap:6px;font-size:14px;line-height:1.75}
+.ka-dl div{display:grid;grid-template-columns:7.5em minmax(0,1fr);gap:10px}
+.ka-dl dt{font-weight:800;color:rgba(51,48,43,.7)}
+.ka-dl dd{margin:0}
+@media(max-width:420px){.ka-dl div{grid-template-columns:minmax(0,1fr);gap:0}}
+#what,#beyond,#seventh,#info,#before,#ticket,#faq{scroll-margin-top:88px}
+@media(max-width:700px){.yn-top{grid-template-columns:120px minmax(0,1fr);gap:16px}.yn-top > div{display:contents}.yn-eyebrow,.yn-h1{grid-column:2}.yn-kv{grid-row:1 / span 2}.yn-top .lede,.yn-keys,.yn-cta{grid-column:1 / -1}}
+</style>
