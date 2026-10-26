@@ -6,6 +6,7 @@
 export const prerender = false;
 
 import YoyakuLayout from '../../../layouts/YoyakuLayout.astro';
+import { stripImageMarkers } from '../../../lib/yoyakuImages';
 import {
   isKvConfigured,
   migrateLegacy,
@@ -41,6 +42,8 @@ if (!ev) {
   return new Response('Not Found', { status: 404, headers: { 'Content-Type': 'text/plain' } });
 }
 
+// ご案内文の [画像N]（リマインドメールで画像を入れる位置の指定）は、予約ページと確認メールには出さない
+const notesText = ev.notes ? stripImageMarkers(ev.notes) : '';
 let error = '';
 let prev = { name: '', phone: '', email: '', slotId: '' };
 
@@ -65,7 +68,7 @@ if (Astro.request.method === 'POST') {
       error = '申し訳ありません、この日程はたった今埋まってしまいました。別の日程をお選びください。';
     } else {
       const when = formatSlotJa(slot.date, slot.time);
-      const notesBlock = ev.notes ? `■ ご案内\n${ev.notes}\n\n` : '';
+      const notesBlock = notesText ? `■ ご案内\n${notesText}\n\n` : '';
       await Promise.all([
         sendMail(
           email,
@@ -116,19 +119,19 @@ const hasOpen = visible.some((s) => !bookings.has(s.id) && !s.closed);
     確認メールをお送りしました。前日にもリマインドメールが届きます。<br>
     変更・キャンセルは {adminEmail()} までご連絡ください。
   </div>
-  {ev.notes && (
+  {notesText && (
     <>
     <h2>ご案内</h2>
-    <div class="yk-card yk-notes">{ev.notes}</div>
+    <div class="yk-card yk-notes">{notesText}</div>
     </>
   )}
   </>
 ) : (
   <>
-  {ev.notes && (
+  {notesText && (
     <>
     <h2>ご案内</h2>
-    <div class="yk-card yk-notes">{ev.notes}</div>
+    <div class="yk-card yk-notes">{notesText}</div>
     </>
   )}
   {error && <p class="yk-error">{error}</p>}

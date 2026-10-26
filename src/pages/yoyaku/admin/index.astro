@@ -30,9 +30,17 @@ import {
   cancelBooking,
   formatSlotJa,
   jstToday,
+  jstTomorrow,
+  addEventImage,
+  deleteEventImage,
+  getEventImages,
+  sendMail,
+  adminEmail,
+  lastMailDiag,
   type Booking,
   type EventInfo,
 } from '../../../lib/yoyaku';
+import { MAX_IMAGES, MAX_IMAGE_BYTES, buildReminderMail, type MailImage } from '../../../lib/yoyakuImages';
 import { randomBytes } from 'node:crypto';
 import { loginAllowed, recordLoginFailure } from '../../../lib/contact';
 
@@ -115,6 +123,26 @@ if (Astro.request.method === 'POST') {
         msg = notes
           ? 'ご案内文を保存しました。予約完了画面と確認・リマインドメールに表示されます。'
           : 'ご案内文を削除しました。';
+      } else if (action === 'addimg') {
+        // リマインドメールに入れる画像。ブラウザ側で縮小してから届く（サーバー側でも形式と大きさを確認する）
+        const file = form.get('image');
+        if (!file || typeof file === 'string' || !('arrayBuffer' in file) || file.size === 0) error = '画像ファイルを選んでください。';
+        else {
+          const r = await addEventImage(ev, Buffer.from(await file.arrayBuffer()), String(form.get('alt') ?? ''));
+          if (!r.ok) error = r.error;
+          else msg = `画像を追加しました（[画像${(ev.images?.length ?? 0) + 1}]）。ご案内文にその書き方で位置を指定できます。書かなければご案内文のあとに入ります。`;
+        }
+      } else if (action === 'delimg') {
+        msg = (await deleteEventImage(ev, String(form.get('id') ?? '')))
+          ? '画像を削除しました。残りの画像の番号が繰り上がります（ご案内文の [画像N] もご確認ください）。'
+          : '画像が見つかりません。';
+      } else if (action === 'testremind') {
+        // 管理者宛てに前日リマインドの見本を送る（日付・名前はサンプル。お客様には送らない）
+        const images = await getEventImages(ev);
+        const mail = buildReminderMail({ name: 'テスト', title: ev.title, when: formatSlotJa(jstTomorrow(), '14:00〜16:00'), notes: ev.notes, adminMail: adminEmail(), images });
+        const sent = await sendMail(adminEmail(), '【テスト送信】【ex Labs】明日のご予約のリマインド', mail.text, undefined, mail.html ? { html: mail.html, images: mail.images } : undefined);
+        if (sent) msg = `テストメールを ${adminEmail()} に送信しました（日付・お名前はサンプルです）。`;
+        else error = `テストメールを送信できませんでした。${lastMailDiag().error || 'メールの設定（SMTP_USER／SMTP_PASS）を確認してください。'}`;
       } else if (action === 'add') {
         const date = String(form.get('date') ?? '');
         const time = String(form.get('time') ?? '').trim().slice(0, 40);
@@ -184,12 +212,13 @@ let events: (EventInfo & { stats: { slots: number; bookings: number } })[] = [];
 let ev: EventInfo | null = null;
 let slots: Awaited<ReturnType<typeof getSlots>> = [];
 let bookings = new Map<string, Booking>();
+let images: MailImage[] = [];
 
 if (authed && configured) {
   if (eventId) {
     ev = await getEvent(eventId);
     if (ev) {
-      [slots, bookings] = await Promise.all([getSlots(ev.id), getBookings(ev.id)]);
+      [slots, bookings, images] = await Promise.all([getSlots(ev.id), getBookings(ev.id), getEventImages(ev)]);
     }
   }
   if (!ev) {
@@ -288,12 +317,56 @@ const shareUrl = ev ? new URL(`/yoyaku/${ev.token}/`, Astro.site ?? Astro.url).t
     <input type="hidden" name="action" value="notes">
     <input type="hidden" name="event" value={ev.id}>
     <div class="yk-card" style="padding-top:6px">
-      <label class="yk-field">予約ページ・予約完了画面・確認/リマインドメールに表示されます<small>空にして保存すると非表示になります</small>
+      <label class="yk-field">予約ページ・予約完了画面・確認/リマインドメールに表示されます<small>空にして保存すると非表示になります。リマインドメールに画像を入れたい位置には <b>[画像1]</b> のように書けます（下の「リマインドメールの画像」）</small>
         <textarea name="notes" rows="6" maxlength="2000" placeholder={`【集合場所】\n〇〇ビル 2F 受付前（西新宿駅 徒歩3分）\n\n【注意事項】\n・開始10分前までにお越しください\n・キャンセルは前日までにご連絡ください`}>{ev.notes ?? ''}</textarea>
       </label>
       <button class="yk-btn small ghost" type="submit" style="margin-top:16px">保存する</button>
     </div>
   </form>
+
+  <h2>リマインドメールの画像</h2>
+  <div class="yk-card" style="padding-top:12px">
+    <p class="yk-hint">前日リマインドメールに、地図や集合場所の写真などの画像を入れられます（最大{MAX_IMAGES}枚）。画像はメールの本文に埋め込まれます。予約ページと予約確認メールには入りません。</p>
+    <p class="yk-hint"><strong>入れる位置：</strong>ご案内文に <b>[画像1]</b>（1枚目）、<b>[画像2]</b>（2枚目）… と書いた位置に入ります。書かなかった画像は、ご案内文のあとに順番に入ります。</p>
+    {images.length > 0 && (
+      <ul class="yk-imglist">
+        {images.map((im, i) => (
+          <li>
+            <img src={`data:${im.type};base64,${im.data.toString('base64')}`} alt={im.alt || `画像${i + 1}`} width="120">
+            <div class="yk-imginfo"><strong>[画像{i + 1}]</strong><br>{im.alt ? `キャプション：${im.alt}` : 'キャプションなし'}<br><small>{Math.round(im.data.length / 1024)}KB{im.width && im.height ? `・${im.width}×${im.height}` : ''}</small></div>
+            <form class="yk-inline-form" method="POST" action={Astro.url.pathname} onsubmit="return confirm('この画像を削除しますか？')">
+              <input type="hidden" name="action" value="delimg">
+              <input type="hidden" name="event" value={ev.id}>
+              <input type="hidden" name="id" value={im.id}>
+              <button class="yk-del" type="submit">削除</button>
+            </form>
+          </li>
+        ))}
+      </ul>
+    )}
+    {images.length < MAX_IMAGES ? (
+      <form method="POST" action={Astro.url.pathname} enctype="multipart/form-data">
+        <input type="hidden" name="action" value="addimg">
+        <input type="hidden" name="event" value={ev.id}>
+        <label class="yk-field">画像を追加<small>JPEG・PNG・WebP・GIF。大きい画像はブラウザが自動で縮小します（{Math.round(MAX_IMAGE_BYTES / 1024)}KB以下・長辺1200px）。GIF は縮小できません</small>
+          <input type="file" id="yk-img-file" name="image" accept="image/jpeg,image/png,image/webp,image/gif" required>
+        </label>
+        <p id="yk-img-status" class="yk-hint" aria-live="polite"></p>
+        <label class="yk-field">キャプション（任意）<small>画像の下に表示されます</small>
+          <input type="text" name="alt" maxlength="80" placeholder="例：集合場所までの地図">
+        </label>
+        <button class="yk-btn small ghost" type="submit" style="margin-top:16px">画像を追加する</button>
+      </form>
+    ) : (
+      <p class="yk-hint">画像は{MAX_IMAGES}枚までです。追加するには、どれか1枚を削除してください。</p>
+    )}
+    <form method="POST" action={Astro.url.pathname} style="margin-top:18px;padding-top:14px;border-top:1px solid #f1ece2">
+      <input type="hidden" name="action" value="testremind">
+      <input type="hidden" name="event" value={ev.id}>
+      <button class="yk-btn small ghost" type="submit">自分宛てにテスト送信</button>
+      <p class="yk-hint" style="margin-top:8px">{adminEmail()} に、前日リマインドメールの見本（日付・お名前はサンプル）を送ります。画像の位置や見え方の確認に使えます。</p>
+    </form>
+  </div>
 
   <h2>候補日を追加</h2>
   <form method="POST" action={Astro.url.pathname}>
@@ -410,3 +483,54 @@ const shareUrl = ev ? new URL(`/yoyaku/${ev.token}/`, Astro.site ?? Astro.url).t
   </>
 )}
 </YoyakuLayout>
+
+<style>
+.yk-hint{font-size:13px;line-height:1.8;color:#6b645a;margin:6px 0}
+.yk-imglist{list-style:none;margin:12px 0;padding:0;display:grid;gap:10px}
+.yk-imglist li{display:flex;gap:14px;align-items:center;border:1px solid #f1ece2;border-radius:10px;padding:10px 12px;background:#fffdf8}
+.yk-imglist img{width:120px;height:auto;max-height:120px;object-fit:contain;border-radius:6px;background:#f3efe6;flex:none}
+.yk-imginfo{flex:1;font-size:13.5px;line-height:1.7;min-width:0;word-break:break-all}
+</style>
+<script is:inline>
+// 画像の縮小：スマホで撮った大きな写真でも、長辺1200px・450KB以下のJPEGに縮めてからアップロードする。
+// （縮小できなかった・GIFのときはそのまま送り、サーバー側の上限で案内する）
+(function () {
+  var input = document.getElementById('yk-img-file');
+  if (!input) return;
+  var status = document.getElementById('yk-img-status');
+  var MAX_BYTES = 450 * 1024, MAX_SIDE = 1200;
+  var kb = function (n) { return Math.round(n / 1024) + 'KB'; };
+  input.addEventListener('change', function () {
+    var f = input.files && input.files[0];
+    status.textContent = '';
+    if (!f) return;
+    if (!/^image\/(jpeg|png|webp)$/.test(f.type)) {
+      if (f.size > MAX_BYTES) status.textContent = 'この形式は縮小できません。' + kb(MAX_BYTES) + '以下のファイルを選んでください（現在 ' + kb(f.size) + '）。';
+      return;
+    }
+    var url = URL.createObjectURL(f);
+    var img = new Image();
+    img.onload = function () {
+      var scale = Math.min(1, MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+      if (scale === 1 && f.size <= MAX_BYTES && f.type === 'image/jpeg') { URL.revokeObjectURL(url); status.textContent = 'そのまま使います（' + kb(f.size) + '）。'; return; }
+      var w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale), q = 0.85;
+      var tryEncode = function () {
+        var c = document.createElement('canvas'); c.width = w; c.height = h;
+        var ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
+        c.toBlob(function (b) {
+          if (!b) { URL.revokeObjectURL(url); return; }
+          if (b.size > MAX_BYTES && q > 0.5) { q -= 0.1; return tryEncode(); }
+          if (b.size > MAX_BYTES && w > 400) { w = Math.round(w * 0.8); h = Math.round(h * 0.8); q = 0.8; return tryEncode(); }
+          var nf = new File([b], f.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+          var dt = new DataTransfer(); dt.items.add(nf); input.files = dt.files;
+          status.textContent = '縮小しました：' + kb(f.size) + ' → ' + kb(b.size) + '（' + w + '×' + h + 'px）';
+          URL.revokeObjectURL(url);
+        }, 'image/jpeg', q);
+      };
+      tryEncode();
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); };
+    img.src = url;
+  });
+})();
+</script>

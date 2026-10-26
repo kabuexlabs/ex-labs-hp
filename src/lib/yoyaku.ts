@@ -1,4 +1,5 @@
 import { timingSafeEqual, randomBytes } from 'node:crypto';
+import { MAX_IMAGES, MAX_IMAGE_BYTES, imageExt, cidOf, sniffImage, type ImageMeta, type MailImage } from './yoyakuImages';
 
 // ---------------------------------------------------------------------------
 // 日程調整（/yoyaku）のデータ層とメール送信。
@@ -23,6 +24,9 @@ export interface EventInfo {
   // ご案内文（集合場所・注意事項など）。予約ページ（予約前）・予約完了
   // 画面・確認メール・前日リマインドメールに表示する。
   notes?: string;
+  // リマインドメールに入れる画像のメタ情報（順番どおり。ご案内文の [画像1] が先頭）。
+  // 画像データ本体は別のキー（evImgKey）に base64 で保存する。
+  images?: ImageMeta[];
 }
 
 export interface Slot {
@@ -87,6 +91,7 @@ async function redis(...command: string[]): Promise<unknown> {
 const EVENTS_KEY = 'yoyaku:events';
 const evSlotsKey = (eventId: string) => `yoyaku:ev:${eventId}:slots`;
 const evBookingsKey = (eventId: string) => `yoyaku:ev:${eventId}:bookings`;
+const evImgKey = (eventId: string) => `yoyaku:ev:${eventId}:img`;
 
 // HGETALL は [field, value, field, value, ...] のフラット配列で返る。
 function parseHash<T>(flat: unknown): Map<string, T> {
@@ -139,7 +144,7 @@ export async function createEvent(title: string): Promise<EventInfo> {
 /** イベント削除。枠・予約データも一緒に消す。 */
 export async function deleteEvent(id: string): Promise<void> {
   await redis('HDEL', EVENTS_KEY, id);
-  await redis('DEL', evSlotsKey(id), evBookingsKey(id));
+  await redis('DEL', evSlotsKey(id), evBookingsKey(id), evImgKey(id));
 }
 
 /** 共有URLのトークンから該当イベントを引く（予約ページの認証）。 */
@@ -183,6 +188,53 @@ export async function migrateLegacy(): Promise<void> {
   const legacyBookings = Number(await redis('HLEN', 'yoyaku:bookings')) || 0;
   if (legacyBookings > 0) await redis('RENAME', 'yoyaku:bookings', evBookingsKey(ev.id));
   await redis('DEL', 'yoyaku:title');
+}
+
+// --- リマインドメールの画像 -------------------------------------------------------
+
+export type AddImageResult = { ok: true; image: ImageMeta } | { ok: false; error: string };
+
+/**
+ * 画像を1枚追加する。形式は先頭バイトで判定（JPEG・PNG・GIF・WebP のみ。SVG などは不可）。
+ * 管理ページで縮小してからアップロードされる前提だが、サーバー側でも上限を確認する。
+ */
+export async function addEventImage(ev: EventInfo, data: Buffer, alt: string): Promise<AddImageResult> {
+  const images = ev.images ?? [];
+  if (images.length >= MAX_IMAGES) return { ok: false, error: `画像は1つのイベントに${MAX_IMAGES}枚までです。不要な画像を削除してから追加してください。` };
+  if (data.length === 0) return { ok: false, error: '画像ファイルを選んでください。' };
+  if (data.length > MAX_IMAGE_BYTES) return { ok: false, error: `画像が大きすぎます（${Math.round(data.length / 1024)}KB）。${Math.round(MAX_IMAGE_BYTES / 1024)}KB以下にしてください（JPEG・PNG・WebPはブラウザが自動で縮小します。GIF は事前に小さくしてください）。` };
+  const info = sniffImage(data);
+  if (!info) return { ok: false, error: 'JPEG・PNG・GIF・WebP の画像だけ追加できます。' };
+  const meta: ImageMeta = { id: randHex(6), alt: alt.trim().slice(0, 80), type: info.type, bytes: data.length, ...(info.width && info.height ? { width: info.width, height: info.height } : {}) };
+  await redis('HSET', evImgKey(ev.id), meta.id, JSON.stringify({ type: info.type, data: data.toString('base64') }));
+  await saveEvent({ ...ev, images: [...images, meta] });
+  return { ok: true, image: meta };
+}
+
+export async function deleteEventImage(ev: EventInfo, imageId: string): Promise<boolean> {
+  const images = ev.images ?? [];
+  if (!images.some((i) => i.id === imageId)) return false;
+  await redis('HDEL', evImgKey(ev.id), imageId);
+  const rest = images.filter((i) => i.id !== imageId);
+  await saveEvent({ ...ev, images: rest.length ? rest : undefined });
+  return true;
+}
+
+/** メールに埋め込む画像を、登録順に読み出す（データが欠けているものは飛ばす）。 */
+export async function getEventImages(ev: EventInfo): Promise<MailImage[]> {
+  const metas = (ev.images ?? []).slice(0, MAX_IMAGES);
+  const out: MailImage[] = [];
+  for (const m of metas) {
+    const raw = await redis('HGET', evImgKey(ev.id), m.id);
+    if (typeof raw !== 'string') continue;
+    try {
+      const j = JSON.parse(raw) as { type: MailImage['type']; data: string };
+      out.push({ id: m.id, alt: m.alt, type: j.type, data: Buffer.from(j.data, 'base64'), width: m.width, height: m.height });
+    } catch {
+      // 壊れたデータは飛ばして他を生かす
+    }
+  }
+  return out;
 }
 
 // --- 枠と予約 -----------------------------------------------------------------
@@ -322,11 +374,18 @@ export function smtpFrom(): string {
   return `株式会社ex Labs <${readEnv('SMTP_USER') ?? ''}>`;
 }
 
+/** HTML 本文と、cid で参照するインライン画像（任意）。 */
+export interface MailExtra {
+  html?: string;
+  images?: MailImage[];
+}
+
 async function sendViaSmtp(
   to: string,
   subject: string,
   text: string,
   replyTo?: string,
+  extra?: MailExtra,
 ): Promise<boolean> {
   const user = readEnv('SMTP_USER');
   const pass = readEnv('SMTP_PASS');
@@ -346,6 +405,11 @@ async function sendViaSmtp(
       to,
       subject,
       text,
+      ...(extra?.html ? { html: extra.html } : {}),
+      // 画像は本文に埋め込む（multipart/related）。外部URLを読み込まないので受信側の「画像を表示」確認が要らない
+      ...(extra?.html && extra.images?.length
+        ? { attachments: extra.images.map((im, i) => ({ filename: `image${i + 1}.${imageExt(im.type)}`, content: im.data, contentType: im.type, cid: cidOf(im), contentDisposition: 'inline' as const })) }
+        : {}),
       replyTo: replyTo ?? adminEmail(),
     });
     lastDiag = { via: 'smtp', error: '' };
@@ -358,7 +422,7 @@ async function sendViaSmtp(
 }
 
 /**
- * プレーンテキストメールを送る。優先順位：
+ * メールを送る（既定はプレーンテキスト。extra.html を渡すと HTML メール、extra.images を渡すと本文に画像を埋め込む）。優先順位：
  *   1) 自社SMTP（SMTP_USER/SMTP_PASS 設定時 — 外部サービス不要）
  *   2) Resend（RESEND_API_KEY 設定時のみのフォールバック）
  * どちらも未設定・失敗時は false を返すだけで例外にしない。
@@ -368,11 +432,12 @@ export async function sendMail(
   subject: string,
   text: string,
   replyTo?: string,
+  extra?: MailExtra,
 ): Promise<boolean> {
   lastDiag = { via: 'none', error: 'SMTP・Resend とも未設定' };
   // 1) 自社SMTP（最優先）
   if (smtpConfigured()) {
-    if (await sendViaSmtp(to, subject, text, replyTo)) return true;
+    if (await sendViaSmtp(to, subject, text, replyTo, extra)) return true;
     // SMTP失敗時は下のResendがあればそちらを試す
   }
   const apiKey = readEnv('RESEND_API_KEY');
@@ -389,7 +454,17 @@ export async function sendMail(
     fetch(`${base}/emails`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: fromAddr, to: [to], subject, text, reply_to: replyTo ?? adminEmail() }),
+      body: JSON.stringify({
+        from: fromAddr,
+        to: [to],
+        subject,
+        text,
+        reply_to: replyTo ?? adminEmail(),
+        ...(extra?.html ? { html: extra.html } : {}),
+        ...(extra?.html && extra.images?.length
+          ? { attachments: extra.images.map((im, i) => ({ filename: `image${i + 1}.${imageExt(im.type)}`, content: im.data.toString('base64'), content_type: im.type, content_id: cidOf(im) })) }
+          : {}),
+      }),
     });
   try {
     let res = await post(from);

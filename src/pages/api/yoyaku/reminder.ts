@@ -19,7 +19,9 @@ import {
   adminEmail,
   formatSlotJa,
   jstTomorrow,
+  getEventImages,
 } from '../../../lib/yoyaku';
+import { buildReminderMail } from '../../../lib/yoyakuImages';
 
 export const GET: APIRoute = async ({ request }) => {
   if (!checkCronSecret(request.headers.get('authorization'))) {
@@ -42,18 +44,13 @@ export const GET: APIRoute = async ({ request }) => {
     const due = [...bookings.values()].filter((b) => b.date === tomorrow && !b.remindedAt);
     dueCount += due.length;
 
-    const notesBlock = ev.notes ? `■ ご案内\n${ev.notes}\n\n` : '';
+    // 画像は1イベントにつき1回だけ読み出す（予約者が何人いても Redis への問い合わせは増えない）
+    const images = due.length > 0 && ev.images?.length ? await getEventImages(ev) : [];
     for (const b of due) {
       const when = formatSlotJa(b.date, b.time);
-      const ok = await sendMail(
-        b.email,
-        '【ex Labs】明日のご予約のリマインド',
-        `${b.name} 様\n\n明日のご予約のリマインドです。\n\n` +
-          `■ イベント\n${ev.title}\n\n■ 日程\n${when}\n\n` +
-          notesBlock +
-          `ご不明な点や変更のご希望がありましたら、このメールへの返信、または ${adminEmail()} までご連絡ください。\n\n` +
-          `当日はどうぞよろしくお願いいたします。\n\n株式会社 ex Labs`,
-      );
+      // 画像がなければ従来とまったく同じテキストのみのメール。あれば HTML メールに画像を埋め込む
+      const mail = buildReminderMail({ name: b.name, title: ev.title, when, notes: ev.notes, adminMail: adminEmail(), images });
+      const ok = await sendMail(b.email, '【ex Labs】明日のご予約のリマインド', mail.text, undefined, mail.html ? { html: mail.html, images: mail.images } : undefined);
       if (ok) {
         await saveBooking(ev.id, { ...b, remindedAt: new Date().toISOString() });
         sentCount++;
