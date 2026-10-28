@@ -26,6 +26,16 @@ export interface MediaItem {
 }
 
 export const mediaItems: MediaItem[] = [
+  // 2026-10 掲載。見出しは日経の記事見出し。正確な掲載日は未確認のため年月まで（分かったら日まで直す）
+  {
+    outlet: '日本経済新聞',
+    date: '2026.10',
+    title: '「新興ex Labs、東京都立植物館でエンタメ体験 遊休時間を活用」として紹介されました',
+    desc: '閉館後の夢の島熱帯植物館（東京都江東区）で行う物語体験「午前零時の幻想集 第一夜『草陰の夢』」（2026年11月5日〜22日）の取り組みが、日本経済新聞に掲載されました。施設の遊休時間を体験型エンターテインメントに活用する事例として紹介されています。',
+    url: 'https://www.nikkei.com/article/DGXZQOUC266KX0W6A021C2000000/',
+    img: '/assets/events/gensou-kv.webp',
+    related: [{ label: '公演ページ', href: '/gensou/' }, { label: '公共施設の夜間活用（法人向け）', href: '/guide/bunkashisetsu-yakan-katsuyo/' }],
+  },
   {
     outlet: '日本経済新聞',
     date: '2026.07.31',

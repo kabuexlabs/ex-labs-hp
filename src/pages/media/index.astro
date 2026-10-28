@@ -31,7 +31,7 @@ const mediaLd = {
 const outlets = [...new Set(mediaItems.map((m) => m.outlet))];
 // 改行位置：固有名詞・複合語は途中で折らず、それ以外は文節の切れ目（jpbreak の seg）と句読点の後でだけ折る。
 // word-break:keep-all と組み合わせ、スマホの狭い幅でも「電／ファミニコゲーマー」「会員制／バー」のような折れ方をしない。
-const KEEP = [...new Set([...mediaItems.map((m) => m.outlet), '会員制バー', '体験型イベント', 'マジシャン様', 'コラボレーション', '東急不動産株式会社', '404 Not Found', 'TSUTAYA協力', '渋谷サクラステージ', 'イマーシブ公演', 'エンタメメディア', 'ex Labs', '2026年9月', '取り組み'])].sort((a, b) => b.length - a.length);
+const KEEP = [...new Set([...mediaItems.map((m) => m.outlet), '会員制バー', '体験型イベント', 'マジシャン様', 'コラボレーション', '東急不動産株式会社', '404 Not Found', 'TSUTAYA協力', '渋谷サクラステージ', 'イマーシブ公演', 'エンタメメディア', 'ex Labs', '2026年9月', '取り組み', '夢の島熱帯植物館', '東京都江東区', '午前零時の幻想集', '第一夜『草陰の夢』', '体験型エンターテインメント', '遊休時間', '2026年11月5日〜22日'])].sort((a, b) => b.length - a.length);
 const esc = (t: string) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 const reEsc = (k: string) => k.replace(/[.*+?^$()|[\]\\{}]/g, '\\$&');
 const KEEP_RE = new RegExp('(' + KEEP.map(reEsc).join('|') + ')');
@@ -67,7 +67,7 @@ const brk = (t: string): string => {
 <BaseLayout
   renewal
   title="メディア掲載実績 - 株式会社ex Labs"
-  description="株式会社ex Labsのメディア掲載実績の一覧です。日本経済新聞への掲載、電ファミニコゲーマーでの紹介など、渋谷サクラステージの体験型イベント「ウワサバナシ調査委員会」をはじめとする取り組みが新聞・Webメディアで紹介されています。"
+  description="株式会社ex Labsのメディア掲載実績の一覧です。日本経済新聞には、夢の島熱帯植物館の閉館後に行う物語体験（2026年10月）と、渋谷サクラステージの体験型イベント「ウワサバナシ調査委員会」（2026年7月）の取り組みが掲載されました。電ファミニコゲーマーでの紹介も掲載しています。"
   cutin={[['新聞・メディアで', '紹介されました']]}
   contact={{ title: ['取材・掲載のご相談は', 'こちら'], type: 'media' }}
   footer="short"

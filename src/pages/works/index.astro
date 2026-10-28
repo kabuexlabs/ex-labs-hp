@@ -15,7 +15,7 @@ type W = { img: string; cat: string; client: string; title: string; place: strin
 const W = (img: string, cat: string, client: string, title: string, place: string, desc: string, result: string, link: string, href: string): W => ({ img: '/assets/' + img, cat, client, title, place, desc, result, link, href });
 const genres: { id: string; en: string; ja: string; lead: string; svc?: [string, string][]; items: W[] }[] = [
   { id: 'immersive', en: 'Immersive / Facility', ja: 'イマーシブ・施設一体型', lead: '商業施設・書店・街全体を物語の舞台にした没入型イベント。回遊・滞在時間・話題化を同時に設計します。', svc: [['イマーシブ制作のご依頼', '/services/immersive/'], ['施設活用イベントのご相談', '/services/shisetsu-event/']], items: [
-    W('events/gensou-kv.webp', '企画・主催', '夢の島熱帯植物館（東京都）', '午前零時の幻想集 第一夜「草陰の夢」', '東京・江東区（公共施設）', '東京都の夢の島熱帯植物館で、夜の館内を巡りながら物語を体験するイマーシブ公演を開催（2026年11月5日〜22日）。', '公共施設で開催／夜の植物館を舞台にした周遊型', '公演サイトを見る', '/gensou/'),
+    W('events/gensou-kv.webp', '企画・主催', '夢の島熱帯植物館（東京都）', '午前零時の幻想集 第一夜「草陰の夢」', '東京・江東区（公共施設）', '東京都の夢の島熱帯植物館で、夜の館内を巡りながら物語を体験するイマーシブ公演を開催（2026年11月5日〜22日）。', '公共施設で開催／夜の植物館を舞台にした周遊型／日本経済新聞に掲載', '公演サイトを見る', '/gensou/'),
     W('events/7th-composition-kv.webp', '企画・主催', '京都市京セラ美術館（京都市）', '7枚目のコンポジション', '京都・左京区（公共施設）', '体験する美術館の公演として、京都市京セラ美術館で絵画×イマーシブ体験を開催（2026年11月21日〜23日）。絵画を鑑賞することで物語の中に巻き込まれていく60分の体験です。', '公共施設で開催／美術館での絵画×イマーシブ', '公演サイトを見る', '/taikenbizyutu/7th-composition/'),
     W('events/uwasabanashi-case2-kv.webp', '企画・主催', '自社主催', 'ウワサバナシ調査委員会 case2「言祝ぎの家」', '埼玉県さいたま市（一軒家）', '実際の一軒家を探索し、住人との会話や調査報告を通じて真相に迫るイマーシブホラー・ミステリー（2026年10月23日〜11月3日）。', '全公演完売／一軒家を丸ごと使ったイマーシブ', '公演サイトを見る', '/uwasabanashi/kotohogi/'),
     W('events/uwasabanashi-kv.webp', 'イマーシブ制作', '渋谷サクラステージ', 'ウワサバナシ調査委員会', '東京・渋谷（商業施設）', '東急不動産株式会社様・404 Not Found様・TSUTAYA様のご協力のもと、渋谷サクラステージを周遊する都市伝説イマーシブ体験を企画・制作。施設一体型イベントとして日本経済新聞に掲載されました。', '日本経済新聞掲載／施設全体を周遊する没入体験', '制作事例の詳細を読む', '/guide/case-uwasabanashi/'),
@@ -34,7 +34,7 @@ const genres: { id: string; en: string; ja: string; lead: string; svc?: [string,
 const allWorks = genres.flatMap((g) => g.items);
 // 2026年秋の公演（2026-10-16 追加、10-16 に実績として扱うよう変更）。夢の島熱帯植物館は東京都、京都市京セラ美術館は京都市の施設（国営ではない）。
 const featured = [
-  { id: 'gensou', title: '午前零時の幻想集 第一夜「草陰の夢」', tag: ['公共施設で開催', '東京都の熱帯植物館'], venue: '夢の島熱帯植物館（東京都江東区）', period: '2026年11月5日〜22日', role: '企画・主催：株式会社ex Labs', desc: '夜の熱帯植物館を巡り、物語を体験するイマーシブ公演。', img: '/assets/events/gensou-kv.webp', href: '/gensou/' },
+  { id: 'gensou', title: '午前零時の幻想集 第一夜「草陰の夢」', tag: ['公共施設で開催', '東京都の熱帯植物館', '日本経済新聞に掲載'], venue: '夢の島熱帯植物館（東京都江東区）', period: '2026年11月5日〜22日', role: '企画・主催：株式会社ex Labs', desc: '夜の熱帯植物館を巡り、物語を体験するイマーシブ公演。', img: '/assets/events/gensou-kv.webp', href: '/gensou/' },
   { id: '7th-composition', title: '7枚目のコンポジション', tag: ['公共施設で開催', '京都市の美術館'], venue: '京都市京セラ美術館（京都市左京区）', period: '2026年11月21日〜23日', role: '企画・主催：株式会社ex Labs（体験する美術館）', desc: '絵画を鑑賞することで物語の中に巻き込まれていく、60分の絵画×イマーシブ体験。', img: '/assets/events/7th-composition-kv.webp', href: '/taikenbizyutu/7th-composition/' },
   { id: 'kotohogi', title: 'ウワサバナシ調査委員会 case2「言祝ぎの家」', tag: ['全公演完売', '一軒家を舞台にしたイマーシブ'], venue: '埼玉県さいたま市の一軒家（東京近郊）', period: '2026年10月23日〜11月3日', role: '企画・主催：株式会社ex Labs', desc: '実際の一軒家を探索し、住人との会話や調査報告を通じて真相に迫るイマーシブホラー・ミステリー。', img: '/assets/events/uwasabanashi-case2-kv.webp', href: '/uwasabanashi/kotohogi/' },
 ];

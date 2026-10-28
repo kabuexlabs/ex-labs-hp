@@ -11,6 +11,10 @@ import Cls from '../components/x/Cls.astro';
 import { eventsData } from '../data/events/index';
 import { guideArticles } from '../data/guides';
 import { jstDateString } from '../lib/thisWeek';
+import { mediaItems } from '../data/media';
+
+// メディア掲載の告知（ヒーロー下）と会社欄の掲載一覧。最優先の掲載は src/data/media.ts の先頭
+const topMedia = mediaItems[0];
 
 
 
@@ -205,11 +209,13 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
     </div>
     <p class="xt-hero-visitor">参加したい方は <a href="/events/" class="x-link-lime" data-track="show" data-show="events" data-place="home-hero">開催中の公演を探す →</a></p>
     <EventNotice class="xt-hero-visitor" linkClass="x-link-lime" />
-    <a href="/media/" class="xt-media">
+    {topMedia && (
+    <a href="/media/" class="xt-media" data-track="show" data-show="media" data-place="home-hero">
       <span class="xt-media-k">MEDIA</span>
-      <span class="xt-media-t"><Ph list={['日本経済新聞様に', '掲載されました']} /></span>
-      <span class="xt-media-d"><Cls text="「渋谷サクラステージで周遊型ミステリ体験 新興ex Labs」として紹介されました →" emph={false} /></span>
+      <span class="xt-media-t"><Ph list={[`${topMedia.outlet}様に`, 'ご掲載いただきました。']} /></span>
+      <span class="xt-media-d"><Cls text={`${topMedia.title} →`} emph={false} /></span>
     </a>
+    )}
   </div>
 </section>
 
@@ -470,9 +476,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
       <div class="xt-co-r"><p class="xt-co-k">+ · 所在地</p><p class="xt-co-v" style="line-height:1.7"><span class="x-c">東京都新宿区西新宿3-3-13</span> <span class="x-c">西新宿水間ビル2F</span></p></div>
       <div class="xt-co-r is-last"><p class="xt-co-k">+ · メディア掲載</p>
         <ul class="xt-co-media">
-          <li><a href="https://www.nikkei.com/article/DGXZQOUC222NG0S6A720C2000000/" target="_blank" rel="noopener">日本経済新聞　2026.07.31 ↗</a></li>
-          <li><a href="https://news.denfaminicogamer.jp/news/2608032x" target="_blank" rel="noopener">電ファミニコゲーマー　2026.08.03 ↗</a></li>
-          <li><a href="https://news.denfaminicogamer.jp/news/260807z" target="_blank" rel="noopener">電ファミニコゲーマー　2026.08.07 ↗</a></li>
+          {mediaItems.filter((m) => m.url).map((m) => <li><a href={m.url} target="_blank" rel="noopener">{m.outlet}　{m.date} ↗</a></li>)}
         </ul>
       </div>
     </div>
