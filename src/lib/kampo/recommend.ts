@@ -22,14 +22,14 @@
 // 候補は薬剤師画面にだけ出す（患者向け画面には出さない。改修指示 第1章）。処方選定の作り直しはフェーズ5。
 // ---------------------------------------------------------------------------
 import {
-  TYPE_DEFS, ORGAN_PLAIN, THERMAL_LABEL, HEAT_LABEL,
+  axisName, ORGAN_PLAIN, THERMAL_LABEL, HEAT_LABEL,
   findingLabel, symptomLabel, strengthRangeLabel,
-  type Formula, type TypeKey, type OrganKey, type Strength,
+  type Formula, type AxisKey, type OrganKey, type Strength,
 } from './masters.ts';
 import { complaintInfo } from './complaints.ts';
 import { presentIds } from './findings.ts';
 import { DEF_EXC_LABEL, THERMAL_STATE_LABEL, HEAT_KIND_LABEL, type ScoreResult } from './scoring.ts';
-import { safetyContext, assessFormulaSafety, GENERAL_NOTES, type SafetyFlag, type TagHit, type FormulaSafety } from './safety.ts';
+import { safetyContext, assessFormulaSafety, GENERAL_NOTES, type SafetyFlag, type TagHit, type FormulaSafety, type SafetyInput } from './safety.ts';
 import type { Answers, WalkResult } from './flow.ts';
 
 export const SELECTION = {
@@ -187,7 +187,7 @@ export function matchIndications(f: Formula, symptoms: Iterable<string>, chosen:
   return out;
 }
 
-const typeName = (t: TypeKey) => (t === 'yin_def' ? '陰虚（水不足）' : TYPE_DEFS[t].name);
+const typeName = (t: AxisKey) => axisName(t);
 
 /** STEP 2：体質との適合性 */
 export function evaluateFit(f: Formula, result: ScoreResult, chosen: Set<string>, otherSymptoms: Set<string>, complaintSigns: Set<string> = new Set()): Omit<Candidate, 'code' | 'name' | 'reading' | 'formula' | 'matched' | 'safety' | 'efficacyIndex'> {
@@ -198,14 +198,14 @@ export function evaluateFit(f: Formula, result: ScoreResult, chosen: Set<string>
   let fit = 0;
 
   // ① 気血水
-  const entries = Object.entries(f.types) as [TypeKey, number][];
+  const entries = Object.entries(f.types) as [AxisKey, number][];
   const wsum = entries.reduce((s, [, w]) => s + w, 0) || 1;
   const qbf = entries.reduce((s, [t, w]) => s + w * (result.pct[t] / 100), 0) / wsum;
   fit += W.qbf * qbf;
   const hit = entries.filter(([t]) => result.pct[t] >= SELECTION.tendency).sort((a, b) => result.pct[b[0]] - result.pct[a[0]]);
   const main = [...entries].sort((a, b) => b[1] - a[1])[0]?.[0];
   if (hit.length) {
-    matches.push({ axis: '気血水', text: `${hit.map(([t]) => `${typeName(t)} ${result.pct[t]}点${result.mainTypes.includes(t) ? '（主体質）' : result.subTypes.includes(t) ? '（副体質）' : ''}`).join('・')}の傾向が、この漢方薬が整える対象と重なります` });
+    matches.push({ axis: '気血水', text: `${hit.map(([t]) => `${typeName(t)} ${result.pct[t]}点${(result.mainTypes as AxisKey[]).includes(t) ? '（主体質）' : (result.subTypes as AxisKey[]).includes(t) ? '（副体質）' : ''}`).join('・')}の傾向が、この漢方薬が整える対象と重なります` });
   }
   if (main && result.pct[main] < SELECTION.tendency) {
     gaps.push({ axis: '気血水', text: `主な対象の${typeName(main)}は ${result.pct[main]}点で、傾向がはっきりしません` });
@@ -288,10 +288,10 @@ export function compareCandidates(a: Candidate, b: Candidate): number {
 }
 
 /** 二段階選定の本体（いちばん改善したい主訴を中心に、候補群 → 体質で選ぶ） */
-export function selectFormulas(result: ScoreResult, answers: Answers, w: WalkResult, flags: SafetyFlag[], tags: TagHit[], formulas: Formula[]): Selection {
+export function selectFormulas(result: ScoreResult, answers: Answers, w: WalkResult, flags: SafetyFlag[], tags: TagHit[], formulas: Formula[], input: SafetyInput = {}): Selection {
   const chosen = chosenSet(w);
   const csigns = complaintSignSet(w);
-  const sctx = safetyContext(flags, answers, w, tags);
+  const sctx = safetyContext(flags, answers, w, tags, input);
   const g = mainComplaintGroup(w);
   const groups: ComplaintGroup[] = [];
   if (g) {
@@ -346,7 +346,7 @@ function comparisonLine(c: Candidate, pick: Candidate, result: ScoreResult): str
     return `${head}：体質との一致は同程度ですが、${pick.name}は効能・効果の中で「${pick.matched[0]?.term ?? ''}」をより主な対象として挙げているため優先しました。`;
   }
   if (c.qbf + 0.05 < pick.qbf) {
-    const low = (Object.entries(c.formula.types) as [TypeKey, number][]).filter(([t]) => result.pct[t] < SELECTION.tendency).sort((a, b) => b[1] - a[1]);
+    const low = (Object.entries(c.formula.types) as [AxisKey, number][]).filter(([t]) => result.pct[t] < SELECTION.tendency).sort((a, b) => b[1] - a[1]);
     if (low.length) return `${head}：この漢方薬が対象とする${low.map(([t]) => `${typeName(t)}（${result.pct[t]}点）`).join('・')}の傾向が見られず、体質との一致が少なくなりました。`;
     return `${head}：対象とする体質との重なりが、${pick.name}より少なくなりました。`;
   }

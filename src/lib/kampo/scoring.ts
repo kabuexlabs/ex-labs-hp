@@ -5,14 +5,20 @@
 //  - 同じ group（例：冷えで悪化／温めると楽になる）は、同じタイプへ1回分（group 内の最大）しか加点しない
 //  - 回答済み（あり・なし）の所見だけを理論最大点に入れる。未質問・わからない・回答しないは入れない
 // 主体質・副体質の区切り（20／40／60 点、最高点の0.7倍）は 2026-10-24 版のまま。出典のない暫定値で、検証前に新しく決めない。
+// 2026-10-28（修正依頼 1-1）：体質タイプは6つ（気虚・血虚・気滞・瘀血・水滞・水不足（陰虚））。冷え・熱は寒熱の軸として
+// 別に点数化し（旧・陽虚／陽盛の重みをそのまま付け替えた）、主体質・副体質の候補にしない。
+// 陽虚は「気虚＋冷え」、湿熱は「水滞＋熱」（両方が「傾向あり」＝20点以上）として表示だけする。
 // ---------------------------------------------------------------------------
-import { TYPES, ORGANS, findingById, type TypeKey, type OrganKey } from './masters.ts';
+import { TYPES, AXES, ORGANS, findingById, type TypeKey, type AxisKey, type OrganKey } from './masters.ts';
 import type { FindingState } from './findings.ts';
 
-export const DEFICIENT: TypeKey[] = ['qi_def', 'blood_def', 'yin_def', 'yang_def']; // 虚
-export const EXCESS: TypeKey[] = ['qi_stag', 'blood_stasis', 'fluid', 'yang_exc']; // 実
-export const HOT: TypeKey[] = ['yang_exc', 'yin_def'];
-export const COLD: TypeKey[] = ['yang_def', 'qi_def', 'fluid'];
+export const DEFICIENT: AxisKey[] = ['qi_def', 'blood_def', 'yin_def', 'cold']; // 虚
+export const EXCESS: AxisKey[] = ['qi_stag', 'blood_stasis', 'fluid', 'heat']; // 実
+export const HOT: AxisKey[] = ['heat', 'yin_def'];
+export const COLD: AxisKey[] = ['cold', 'qi_def', 'fluid'];
+/** 組み合わせの表示（独立したタイプにしない） */
+export type Combo = 'yang_def' | 'damp_heat';
+export const COMBO_LABEL: Record<Combo, string> = { yang_def: '気虚＋冷え（陽虚）', damp_heat: '水滞＋熱（湿熱）' };
 
 export type Level = 'balanced' | 'tendency' | 'caution' | 'strong';
 export const LEVEL_LABEL: Record<Level, string> = { balanced: 'バランス', tendency: '傾向あり', caution: '注意', strong: '強い' };
@@ -27,7 +33,8 @@ export const THERMAL_STATE_LABEL: Record<ThermalLabel, string> = { cold: '寒（
 export type { Answers } from './flow.ts';
 
 export interface Classification {
-  level: Record<TypeKey, Level>;
+  /** 6タイプと寒熱（冷え・熱）の段階 */
+  level: Record<AxisKey, Level>;
   mainTypes: TypeKey[];
   subTypes: TypeKey[];
   defExcIndex: number;
@@ -37,26 +44,28 @@ export interface Classification {
   /** 熱寄り（thermalLabel=hot）のときの熱の種類 */
   heatKind?: HeatKindLabel;
   isBalanced: boolean;
+  /** 気虚＋冷え（陽虚）・水滞＋熱（湿熱） */
+  combos: Combo[];
 }
 export interface ScoreResult extends Classification {
-  raw: Record<TypeKey, number>;
-  max: Record<TypeKey, number>;
-  pct: Record<TypeKey, number>;
+  raw: Record<AxisKey, number>;
+  max: Record<AxisKey, number>;
+  pct: Record<AxisKey, number>;
   /** 五臓の傾向（0〜100）。所見の organs の重みで集計 */
   organRaw: Record<OrganKey, number>;
   organMax: Record<OrganKey, number>;
   organPct: Record<OrganKey, number>;
   /** タイプごとに加点した所見（薬剤師画面の根拠表示用） */
-  evidence?: Record<TypeKey, string[]>;
+  evidence?: Record<AxisKey, string[]>;
 }
 
-export const zero = (): Record<TypeKey, number> => Object.fromEntries(TYPES.map((t) => [t, 0])) as Record<TypeKey, number>;
-const mapTypes = <T,>(fn: (t: TypeKey) => T) => Object.fromEntries(TYPES.map((t) => [t, fn(t)])) as Record<TypeKey, T>;
+export const zero = (): Record<AxisKey, number> => Object.fromEntries(AXES.map((t) => [t, 0])) as Record<AxisKey, number>;
+const mapTypes = <T,>(fn: (t: AxisKey) => T) => Object.fromEntries(AXES.map((t) => [t, fn(t)])) as Record<AxisKey, T>;
 export const zeroOrgans = (): Record<OrganKey, number> => Object.fromEntries(ORGANS.map((o) => [o, 0])) as Record<OrganKey, number>;
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
 /** pct から主体質・副体質・指数を決める後半部分（テスト用に分離） */
-export function classify(pct: Record<TypeKey, number>): Classification {
+export function classify(pct: Record<AxisKey, number>): Classification {
   const level = mapTypes<Level>((t) => (pct[t] >= 60 ? 'strong' : pct[t] >= 40 ? 'caution' : pct[t] >= 20 ? 'tendency' : 'balanced'));
   const top = Math.max(...TYPES.map((t) => pct[t]));
   const isBalanced = top < 20;
@@ -66,8 +75,8 @@ export function classify(pct: Record<TypeKey, number>): Classification {
     : TYPES.filter((t) => !mainTypes.includes(t) && (pct[t] >= 0.7 * top || pct[t] >= 60) && pct[t] >= 20)
         .sort((a, b) => pct[b] - pct[a])
         .slice(0, 2);
-  const sum = (ks: TypeKey[]) => ks.reduce((s, k) => s + pct[k], 0);
-  const idx = (pos: TypeKey[], neg: TypeKey[]) => (sum(pos) + sum(neg) === 0 ? 0 : round2((sum(pos) - sum(neg)) / (sum(pos) + sum(neg))));
+  const sum = (ks: AxisKey[]) => ks.reduce((s, k) => s + pct[k], 0);
+  const idx = (pos: AxisKey[], neg: AxisKey[]) => (sum(pos) + sum(neg) === 0 ? 0 : round2((sum(pos) - sum(neg)) / (sum(pos) + sum(neg))));
   const defExcIndex = idx(EXCESS, DEFICIENT);
   const thermalIndex = idx(HOT, COLD);
   const thermalLabel: ThermalLabel = thermalIndex < -0.2 ? 'cold' : thermalIndex > 0.2 ? 'hot' : 'neutral';
@@ -75,16 +84,17 @@ export function classify(pct: Record<TypeKey, number>): Classification {
     level, mainTypes, subTypes, isBalanced,
     defExcIndex, defExcLabel: defExcIndex < -0.2 ? 'def' : defExcIndex > 0.2 ? 'exc' : 'mid',
     thermalIndex, thermalLabel,
-    heatKind: thermalLabel === 'hot' ? (pct.yin_def > pct.yang_exc ? 'deficient' : 'excess') : undefined,
+    heatKind: thermalLabel === 'hot' ? (pct.yin_def > pct.heat ? 'deficient' : 'excess') : undefined,
+    combos: [...(pct.qi_def >= 20 && pct.cold >= 20 ? ['yang_def' as const] : []), ...(pct.fluid >= 20 && pct.heat >= 20 ? ['damp_heat' as const] : [])],
   };
 }
 
 /** 所見の状態からスコアを出す（暫定） */
 export function score(state: FindingState): ScoreResult {
   // group（なければ所見ID）ごとに、タイプ別の最大値を取る
-  const rawG = new Map<string, Partial<Record<TypeKey | OrganKey, number>>>();
-  const maxG = new Map<string, Partial<Record<TypeKey | OrganKey, number>>>();
-  const ev = new Map<string, Partial<Record<TypeKey, string>>>();
+  const rawG = new Map<string, Partial<Record<AxisKey | OrganKey, number>>>();
+  const maxG = new Map<string, Partial<Record<AxisKey | OrganKey, number>>>();
+  const ev = new Map<string, Partial<Record<AxisKey, string>>>();
   for (const [id, e] of state) {
     if (e.status !== 'present' && e.status !== 'absent') continue;
     const f = findingById(id);
@@ -93,11 +103,11 @@ export function score(state: FindingState): ScoreResult {
     const mx = maxG.get(key) ?? {};
     const rw = rawG.get(key) ?? {};
     const evg = ev.get(key) ?? {};
-    for (const [k, w] of [...Object.entries(f.weights ?? {}), ...Object.entries(f.organs ?? {})] as [TypeKey | OrganKey, number][]) {
+    for (const [k, w] of [...Object.entries(f.weights ?? {}), ...Object.entries(f.organs ?? {})] as [AxisKey | OrganKey, number][]) {
       mx[k] = Math.max(mx[k] ?? 0, w);
       if (e.status === 'present' && w > (rw[k] ?? 0)) {
         rw[k] = w;
-        if ((TYPES as string[]).includes(k)) evg[k as TypeKey] = f.id;
+        if ((AXES as string[]).includes(k)) evg[k as AxisKey] = f.id;
       }
     }
     maxG.set(key, mx); rawG.set(key, rw); ev.set(key, evg);
@@ -106,12 +116,31 @@ export function score(state: FindingState): ScoreResult {
   const evidence = mapTypes<string[]>(() => []);
   for (const [key, mx] of maxG) {
     const rw = rawG.get(key) ?? {};
-    for (const t of TYPES) { max[t] += mx[t] ?? 0; raw[t] += rw[t] ?? 0; }
+    for (const t of AXES) { max[t] += mx[t] ?? 0; raw[t] += rw[t] ?? 0; }
     for (const o of ORGANS) { organMax[o] += mx[o] ?? 0; organRaw[o] += rw[o] ?? 0; }
-    for (const [t, fid] of Object.entries(ev.get(key) ?? {}) as [TypeKey, string][]) evidence[t].push(fid);
+    for (const [t, fid] of Object.entries(ev.get(key) ?? {}) as [AxisKey, string][]) evidence[t].push(fid);
   }
   const pct = mapTypes((t) => (max[t] === 0 ? 0 : Math.round((100 * raw[t]) / max[t])));
   const organPct = Object.fromEntries(ORGANS.map((k) => [k, organMax[k] === 0 ? 0 : Math.round((100 * organRaw[k]) / organMax[k])])) as Record<OrganKey, number>;
   return { raw: mapTypes((t) => round2(raw[t])), max: mapTypes((t) => round2(max[t])), pct, organRaw: roundMap(organRaw), organMax: roundMap(organMax), organPct, evidence, ...classify(pct) };
 }
 const roundMap = (m: Record<OrganKey, number>) => Object.fromEntries(ORGANS.map((k) => [k, round2(m[k])])) as Record<OrganKey, number>;
+
+// --- 表示用 -------------------------------------------------------------------
+
+/** 旧版（2026-10-25-v3 まで）の陽虚・陽盛は、冷え・熱として表示する */
+const LEGACY_AXIS: Record<string, AxisKey> = { yang_def: 'cold', yang_exc: 'heat' };
+export const toAxis = (k: string): AxisKey | undefined => ((AXES as string[]).includes(k) ? (k as AxisKey) : LEGACY_AXIS[k]);
+export type CardRank = 'main' | 'sub' | 'thermal';
+export const CARD_RANK_LABEL: Record<CardRank, string> = { main: '主となる体質', sub: '併存する体質の傾向', thermal: '寒熱の傾向' };
+/** 結果・改善アドバイスに出す順：主となる体質 → 併存する体質（6タイプ）→ 寒熱（冷え・熱が「傾向あり」＝20点以上） */
+export function resultCards(r: Pick<ScoreResult, 'mainTypes' | 'subTypes' | 'pct'>): { t: AxisKey; rank: CardRank }[] {
+  const out: { t: AxisKey; rank: CardRank }[] = [];
+  const add = (k: string, rank: CardRank) => { const a = toAxis(k); if (a && !out.some((x) => x.t === a)) out.push({ t: a, rank }); };
+  for (const k of r.mainTypes as string[]) add(k, 'main');
+  for (const k of r.subTypes as string[]) add(k, 'sub');
+  const pct = r.pct as Record<string, number>;
+  for (const t of (['cold', 'heat'] as const).filter((t) => (pct[t] ?? 0) >= 20).sort((a, b) => pct[b] - pct[a])) add(t, 'thermal');
+  return out;
+}
+export const adviceKeys = (r: Pick<ScoreResult, 'mainTypes' | 'subTypes' | 'pct'>): AxisKey[] => resultCards(r).map((x) => x.t);

@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// 漢方体質チェック（/kampo/）のマスタデータ（2026-10-25 v3）。
+// 漢方体質チェック（/kampo/）のマスタデータ（2026-10-25 v3、2026-10-28 v3.1 で6タイプ＋寒熱）。
 // 正本は src/data/kampo/*.json（薬剤師が直接編集する）。読込時に形を検証し、壊れていたら例外でページを落とす。
 //   questions.json   … 設問（section：basic／category／complaint／primary／detail／constitution／safety／lifestyle／staff）
 //   complaints.json  … 主訴カテゴリー A〜H と具体的な主訴（主訴の選択画面はここから作る）
@@ -19,10 +19,17 @@ import typesJson from '../../data/kampo/types.json' with { type: 'json' };
 import formulasJson from '../../data/kampo/formulas.json' with { type: 'json' };
 import legacyJson from '../../data/kampo/legacy.json' with { type: 'json' };
 
-export type TypeKey = 'qi_def' | 'blood_def' | 'qi_stag' | 'blood_stasis' | 'fluid' | 'yin_def' | 'yang_def' | 'yang_exc';
-/** レーダーの軸順（上から時計回り）。気虚・血虚・気滞・瘀血・水滞・陰虚・陽虚・陽盛 */
-export const TYPES: TypeKey[] = ['qi_def', 'blood_def', 'qi_stag', 'blood_stasis', 'fluid', 'yin_def', 'yang_def', 'yang_exc'];
+/** 体質タイプ（6つ。2026-10-28 修正依頼 1-1）：気虚・血虚・気滞・瘀血・水滞・水不足（陰虚）。レーダーの軸順（上から時計回り） */
+export type TypeKey = 'qi_def' | 'blood_def' | 'qi_stag' | 'blood_stasis' | 'fluid' | 'yin_def';
+export const TYPES: TypeKey[] = ['qi_def', 'blood_def', 'qi_stag', 'blood_stasis', 'fluid', 'yin_def'];
 export const isTypeKey = (s: string): s is TypeKey => (TYPES as string[]).includes(s);
+/** 寒熱（独立したタイプにしない）。陽虚は「気虚＋冷え」、湿熱は「水滞＋熱」として扱う */
+export type ThermalKey = 'cold' | 'heat';
+export const THERMALS: ThermalKey[] = ['cold', 'heat'];
+/** 所見の重み・処方の対象に使う軸（6タイプ＋寒熱） */
+export type AxisKey = TypeKey | ThermalKey;
+export const AXES: AxisKey[] = [...TYPES, ...THERMALS];
+export const isAxisKey = (s: string): s is AxisKey => (AXES as string[]).includes(s);
 
 /** 五臓 */
 export type OrganKey = 'liver' | 'heart' | 'spleen' | 'lung' | 'kidney';
@@ -45,6 +52,15 @@ export const SECTION_LABEL: Record<Section, string> = {
 };
 /** 「特にない」「わからない」「回答しない」：ほかの選択肢と同時に選べない */
 export type Exclusive = 'none' | 'unknown' | 'declined';
+/** 進み具合の表示（STEP n / 5。2026-10-28 修正依頼 2-4：設問数の分母が動くので段階で出す） */
+export const STEPS: { label: string; sections: Section[] }[] = [
+  { label: '基本情報', sections: ['basic'] },
+  { label: 'お悩み', sections: ['category', 'complaint', 'primary', 'detail'] },
+  { label: '体質チェック', sections: ['constitution'] },
+  { label: '安全確認', sections: ['safety'] },
+  { label: '生活習慣', sections: ['lifestyle'] },
+];
+export const stepOfSection = (sec: Section) => Math.max(0, STEPS.findIndex((x) => x.sections.includes(sec)));
 
 export interface Option {
   id: string;
@@ -61,13 +77,25 @@ export interface Option {
   urgent?: boolean;
   /** 性別が男性なら出さない */
   femaleOnly?: boolean;
+  /** 月経に関わる選択肢：「閉経」「月経はない」なら出さない（修正依頼 3-1） */
+  mensesOnly?: boolean;
   exclusive?: Exclusive;
+  /** 主訴の深掘りの「その他」（所見なし。修正依頼 2-2） */
+  other?: boolean;
+  /** 選んだら短い記入欄を出す（任意。修正依頼 5-1） */
+  note?: boolean;
+  /** 画面内の小見出し（生活習慣。修正依頼 6-1） */
+  heading?: string;
+  /** 薬剤師の観察で「判断できない」：ご本人の回答を使う（修正依頼 4-10） */
+  defer?: boolean;
+  /** 画面表示用：前の回答で「あり」になった所見の選択肢（チェック済みで変えられない。修正依頼 4-7） */
+  locked?: boolean;
   image?: string;
   /** 基本情報の値（A1 の female など） */
   value?: string;
   /** 安全確認のフラグ（C1〜C4） */
   flags?: string[];
-  /** 漢方薬の選択肢（C1K・C4K）の処方コード */
+  /** 漢方薬の選択肢（薬剤師の入力 X_kampo_current・X_kampo_adverse）の処方コード */
   formula?: string;
   /** 主訴の選択肢の主訴ID・カテゴリー */
   complaint?: string;
@@ -94,8 +122,14 @@ export interface Question {
   type: 'single' | 'multi';
   trigger?: Trigger;
   options: Option[];
-  /** 同じ画面に出す補助の単一選択（D2 就寝・D3 入浴） */
+  /** 同じ画面に出す補助の単一選択（旧版の D2 就寝・D3 入浴） */
   sub?: { title: string; options: Option[] };
+  /** 同じ画面に展開する追加の選択肢（when の選択肢を選んだときだけ。C3 → 漢方で体調を崩したときの症状） */
+  followup?: { when: string; id: string; title: string; type: 'single' | 'multi'; options: Option[] };
+  /** 回答せずに次へ進める（A3P 妊娠・授乳。未回答は薬剤師が口頭で確認） */
+  optional?: boolean;
+  /** 前の回答で「あり」になった所見の選択肢を、隠さずチェック済みで出す（B8 睡眠） */
+  prefill?: boolean;
   help?: string;
   /** 深掘りのテンプレート名 */
   template?: string;
@@ -105,7 +139,7 @@ export interface Question {
 export interface Finding {
   id: string;
   label: string;
-  weights?: Partial<Record<TypeKey, number>>;
+  weights?: Partial<Record<AxisKey, number>>;
   organs?: Partial<Record<OrganKey, number>>;
   /** 意味の近い所見のまとまり。同じ group は同じタイプへ1回分しか加点しない */
   group?: string;
@@ -113,6 +147,8 @@ export interface Finding {
   implies?: string[];
   /** 重みを引き継いだ 2026-10-24 版の選択肢 */
   from?: string[];
+  /** 同時にあり得ない所見（同じ画面では同時に選べず、前の回答で「あり」なら選択肢を出さない。修正依頼 2-3） */
+  conflicts?: string[];
 }
 export interface Category { id: string; name: string; femaleOnly?: boolean }
 export interface Complaint {
@@ -124,6 +160,7 @@ export interface Complaint {
   detail: string;
   tags?: string[];
   femaleOnly?: boolean;
+  mensesOnly?: boolean;
 }
 export interface SafetyTagDef { id: string; label: string; checks: string[]; urgent?: boolean }
 export interface Review { status: string; source?: string; reviewer?: string | null; reviewedAt?: string | null }
@@ -138,8 +175,8 @@ export interface TypeDef {
   advice: { mind: string; food: string; move: string; rest: string };
   tsubo: { name: string; reading: string; position: string; effect: string };
 }
-export interface Tip { when: string; types: TypeKey[]; text: string }
-export interface TypesData { types: Record<TypeKey, TypeDef>; tips: Tip[] }
+export interface Tip { when: string; types: AxisKey[]; text: string }
+export interface TypesData { types: Record<TypeKey, TypeDef>; thermal: Record<ThermalKey, TypeDef>; tips: Tip[] }
 
 export type Strength = 'def' | 'mid' | 'exc';
 export type Thermal = 'warm' | 'neutral' | 'cool';
@@ -161,7 +198,7 @@ export interface Formula {
   strength: Strength[];
   action: string;
   targetLabel: string;
-  types: Partial<Record<TypeKey, number>>;
+  types: Partial<Record<AxisKey, number>>;
   thermal: Thermal;
   heat?: HeatKind;
   organs: OrganKey[];
@@ -173,6 +210,9 @@ export interface Formula {
   verified: boolean;
   note?: string;
   active: boolean;
+  /** ツムラの製品番号（参考値。tsumuraNoVerified: false は未確認） */
+  tsumuraNo?: number;
+  tsumuraNoVerified?: boolean;
 }
 export interface FormulasData { version: string; source?: string; symptoms: Record<string, SymptomDef>; formulas: Formula[] }
 
@@ -198,7 +238,7 @@ export function expandQuestions(rawQuestions: Raw[], cj: { categories: Category[
           ...q, id: `K_${c.id}`, category: c.id, title: String(q.title).replace('{category}', c.name), trigger: { category: c.id },
           options: cj.complaints.filter((x) => x.categories.includes(c.id)).map((x) => ({
             id: `K${c.id}-${x.id}`, text: x.name, complaint: x.id, category: c.id, findings: x.findings, symptoms: x.symptoms,
-            ...(x.tags?.length ? { tags: x.tags } : {}), ...(x.femaleOnly ? { femaleOnly: true } : {}),
+            ...(x.tags?.length ? { tags: x.tags } : {}), ...(x.femaleOnly ? { femaleOnly: true } : {}), ...(x.mensesOnly ? { mensesOnly: true } : {}),
           })),
         });
       }
@@ -225,12 +265,18 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
         if (f[key] === undefined) continue;
         if (!isObj(f[key])) { errs.push(`${f.id}: ${key} がオブジェクトでない`); continue; }
         for (const [k, v] of Object.entries(f[key] as Raw)) {
-          if (key === 'weights' ? !isTypeKey(k) : !isOrganKey(k)) errs.push(`${f.id}: ${key} のキー ${k} が不正`);
+          if (key === 'weights' ? !isAxisKey(k) : !isOrganKey(k)) errs.push(`${f.id}: ${key} のキー ${k} が不正`);
           if (typeof v !== 'number' || v < 0 || v > 1) errs.push(`${f.id}: ${key}.${k} は 0〜1 の数値`);
         }
       }
     }
-    for (const f of fj.findings as Raw[]) for (const i of strArr(f.implies)) if (!findingIds.has(i)) errs.push(`${String(f.id)}: implies の ${i} がない`);
+    for (const f of fj.findings as Raw[]) {
+      for (const i of strArr(f.implies)) if (!findingIds.has(i)) errs.push(`${String(f.id)}: implies の ${i} がない`);
+      for (const i of strArr(f.conflicts)) {
+        if (!findingIds.has(i)) errs.push(`${String(f.id)}: conflicts の ${i} がない`);
+        else if (!strArr((fj.findings as Raw[]).find((x) => x.id === i)?.conflicts).includes(String(f.id))) errs.push(`${String(f.id)}: conflicts は両方向に書く（${i} 側にない）`);
+      }
+    }
   }
   // タグ
   const tagIds = new Set<string>();
@@ -277,8 +323,11 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
       if (q.section === 'detail') { if (!isStr(q.template)) errs.push(`${id}: 深掘りに template がない`); else templates.add(q.template); }
       const opts = Array.isArray(q.options) ? (q.options as unknown[]) : [];
       if (!opts.length && q.generated !== 'primary') errs.push(`${id}: 選択肢がない`);
-      if ((q.section === 'detail' || q.section === 'constitution') && q.type === 'multi' && !opts.some((o) => isObj(o) && o.exclusive)) {
-        errs.push(`${id}: 「特にない」「わからない」（exclusive）がない`);
+      if ((q.section === 'detail' || q.section === 'constitution') && q.type === 'multi' && !opts.some((o) => isObj(o) && (o.exclusive || o.other))) {
+        errs.push(`${id}: 「特にない」（exclusive）か「その他」（other）がない`);
+      }
+      if ((q.section === 'detail' || q.section === 'constitution') && id !== 'Sspots3' && opts.some((o) => isObj(o) && o.exclusive === 'unknown')) {
+        errs.push(`${id}: 体質・深掘りの設問に「わからない」を置かない（修正依頼 2-1。例外はシミが濃くなる条件）`);
       }
       const trig = q.trigger;
       if (trig !== undefined) {
@@ -298,19 +347,30 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
         if (o.exclusive !== undefined && !['none', 'unknown', 'declined'].includes(String(o.exclusive))) errs.push(`${o.id}: exclusive が不正`);
         if (o.exclusive && strArr(o.findings).length) errs.push(`${o.id}: exclusive の選択肢に所見を付けない`);
         if (o.urgent && !strArr(o.tags).length) errs.push(`${o.id}: urgent の選択肢にタグがない`);
+        if ((o.other || o.defer) && (o.exclusive || strArr(o.findings).length)) errs.push(`${o.id}: other／defer の選択肢に所見・exclusive を付けない`);
       };
       for (const o of opts) checkOpt(o);
       if (isObj(q.sub)) for (const o of (q.sub.options as unknown[]) ?? []) checkOpt(o);
+      if (q.followup !== undefined) {
+        const fu = q.followup;
+        if (!isObj(fu) || !isStr(fu.when) || !isStr(fu.id) || !isStr(fu.title) || !Array.isArray(fu.options)) errs.push(`${id}: followup は when/id/title/options`);
+        else {
+          if (!opts.some((o) => isObj(o) && o.id === fu.when)) errs.push(`${id}: followup.when=${fu.when} がこの設問の選択肢にない`);
+          for (const o of fu.options as unknown[]) checkOpt(o);
+        }
+      }
+      if (q.prefill && q.type !== 'multi') errs.push(`${id}: prefill は複数選択の設問だけ`);
     }
     for (const [qid, c] of chosenRefs) if (!optionIds.has(c)) errs.push(`${qid}: trigger.chosen の ${c} は存在しない選択肢ID`);
     for (const t of templatesUsed) if (!templates.has(t)) errs.push(`深掘りテンプレート ${t} の設問がない`);
     for (const t of templates) if (!templatesUsed.has(t)) errs.push(`深掘りテンプレート ${t} を使う主訴がない`);
   }
   // タイプ
-  if (!isObj(ty) || !isObj(ty.types)) errs.push('types.json: types が必要');
+  if (!isObj(ty) || !isObj(ty.types) || !isObj(ty.thermal)) errs.push('types.json: types と thermal が必要');
   else {
-    for (const key of TYPES) {
-      const d = (ty.types as Raw)[key];
+    for (const k of Object.keys(ty.types)) if (!isTypeKey(k)) errs.push(`types.json: types のキー ${k} は6タイプにない（寒熱は thermal に）`);
+    for (const key of AXES) {
+      const d = ((isTypeKey(key) ? ty.types : ty.thermal) as Raw)[key];
       if (!isObj(d)) { errs.push(`types.json: ${key} がない`); continue; }
       for (const k of ['name', 'reading', 'color', 'headline', 'summary']) if (!isStr(d[k])) errs.push(`types.${key}.${k} がない`);
       if (!Array.isArray(d.symptoms) || d.symptoms.length !== 5) errs.push(`types.${key}.symptoms は5つ`);
@@ -320,7 +380,7 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
     for (const [i, tip] of ((Array.isArray(ty.tips) ? ty.tips : []) as unknown[]).entries()) {
       if (!isObj(tip) || !isStr(tip.when) || !Array.isArray(tip.types) || !isStr(tip.text)) { errs.push(`tips[${i}]: when/types/text が必要`); continue; }
       if (!optionIds.has(tip.when)) errs.push(`tips[${i}]: when=${tip.when} は存在しない選択肢ID`);
-      for (const t of tip.types as unknown[]) if (!isTypeKey(String(t))) errs.push(`tips[${i}]: types に不正な値 ${String(t)}`);
+      for (const t of tip.types as unknown[]) if (!isAxisKey(String(t))) errs.push(`tips[${i}]: types に不正な値 ${String(t)}`);
     }
   }
   // 処方
@@ -352,7 +412,7 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
       if (!Array.isArray(raw.strength) || raw.strength.length === 0 || !(raw.strength as unknown[]).every((s) => ['def', 'mid', 'exc'].includes(String(s)))) errs.push(`${c}: strength は def/mid/exc の配列`);
       if (!isObj(raw.types) || Object.keys(raw.types).length === 0) errs.push(`${c}: types が空`);
       else for (const [k, v] of Object.entries(raw.types)) {
-        if (!isTypeKey(k)) errs.push(`${c}: types のキー ${k} が TypeKey でない`);
+        if (!isAxisKey(k)) errs.push(`${c}: types のキー ${k} が6タイプ・寒熱でない`);
         if (typeof v !== 'number' || v < 0 || v > 1) errs.push(`${c}: types.${k} は 0〜1`);
       }
       if (!['warm', 'neutral', 'cool'].includes(String(raw.thermal))) errs.push(`${c}: thermal が warm/neutral/cool でない`);
@@ -364,6 +424,7 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
       if (typeof raw.priority !== 'number') errs.push(`${c}: priority が数値でない`);
       if (typeof raw.verified !== 'boolean') errs.push(`${c}: verified が真偽値でない`);
       if (typeof raw.active !== 'boolean') errs.push(`${c}: active が真偽値でない`);
+      if (raw.tsumuraNo !== undefined && (!Number.isInteger(raw.tsumuraNo) || typeof raw.tsumuraNoVerified !== 'boolean')) errs.push(`${c}: tsumuraNo は整数、tsumuraNoVerified は真偽値`);
     }
   }
   return errs;
@@ -387,6 +448,9 @@ export const COMPLAINTS: Complaint[] = cj.complaints;
 export const FINDINGS: Finding[] = (findingsJson as unknown as { findings: Finding[] }).findings;
 export const SAFETY_TAGS: SafetyTagDef[] = (tagsJson as unknown as { tags: SafetyTagDef[] }).tags;
 export const TYPE_DEFS: Record<TypeKey, TypeDef> = (typesJson as unknown as TypesData).types;
+/** 寒熱（冷え・熱）の説明。体質タイプとは別に出す */
+export const THERMAL_DEFS: Record<ThermalKey, TypeDef> = (typesJson as unknown as TypesData).thermal;
+export const axisDef = (k: AxisKey): TypeDef => (isTypeKey(k) ? TYPE_DEFS[k] : THERMAL_DEFS[k]);
 export const TIPS: Tip[] = (typesJson as unknown as TypesData).tips;
 const formulasData = formulasJson as unknown as FormulasData;
 export const FORMULAS: Formula[] = formulasData.formulas;
@@ -396,7 +460,7 @@ export const LEGACY = legacyJson as unknown as { types: Record<string, string>; 
 
 const QUESTION_BY_ID = new Map(allQuestions.map((q) => [q.id, q]));
 const OPTION_BY_ID = new Map<string, { q: Question; o: Option }>();
-for (const q of allQuestions) for (const o of [...q.options, ...(q.sub?.options ?? [])]) OPTION_BY_ID.set(o.id, { q, o });
+for (const q of allQuestions) for (const o of [...q.options, ...(q.sub?.options ?? []), ...(q.followup?.options ?? [])]) OPTION_BY_ID.set(o.id, { q, o });
 const FINDING_BY_ID = new Map(FINDINGS.map((f) => [f.id, f]));
 const COMPLAINT_BY_ID = new Map(COMPLAINTS.map((c) => [c.id, c]));
 const TAG_BY_ID = new Map(SAFETY_TAGS.map((t) => [t.id, t]));
@@ -411,6 +475,9 @@ export const categoryById = (id: string) => CATEGORIES.find((c) => c.id === id);
 export const tagById = (id: string) => TAG_BY_ID.get(id);
 export const formulaByCode = (code: string) => FORMULAS.find((f) => f.code === code);
 export const symptomLabel = (code: string) => SYMPTOMS[code]?.label ?? code;
+/** タイプ・寒熱の名前（旧版のセッションの陽虚・陽盛なども表示できるように legacy.json の名前で補う） */
+export const axisName = (k: string): string => (isAxisKey(k) ? axisDef(k).name : LEGACY.types[k] ?? k);
+export const axisColor = (k: string): string => (isAxisKey(k) ? axisDef(k).color : '#999');
 /** 旧版のセッションの選択肢ID → 文言（版ごとに探し、なければ全版から） */
 export function legacyOptionText(version: string, id: string): string {
   for (const q of LEGACY.versions[version] ?? []) if (q.options[id]) return q.options[id];

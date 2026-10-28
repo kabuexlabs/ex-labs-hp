@@ -18,10 +18,17 @@ if (Astro.request.method === 'POST') {
   await saveSession(s);
   return Astro.redirect(`/kampo/check/${s.id}/done/`, 303);
 }
-const textOf = (st: (typeof steps)[number]) =>
-  st.ids.map((id) => [...st.q.options, ...(st.q.sub?.options ?? [])].find((o) => o.id === id)?.text ?? '').filter(Boolean).join('、');
+const textOf = (st: (typeof steps)[number]) => {
+  if (st.skipped) return '回答なし（薬剤師が口頭で確認します）';
+  const all = [...st.q.options, ...(st.q.sub?.options ?? []), ...(st.q.followup?.options ?? [])];
+  const main = [...st.q.options.filter((o) => o.locked).map((o) => o.text), ...st.ids.map((id) => {
+    const o = all.find((x) => x.id === id);
+    return o ? o.text + (s.texts[id] ? `（${s.texts[id]}）` : '') : '';
+  })].filter(Boolean);
+  return main.join('、');
+};
 ---
-<KampoLayout title="回答の確認" width="normal" progress={{ done: steps.length, total: steps.length }}>
+<KampoLayout title="回答の確認" width="normal" progress={{ done: 100, total: 100 }}>
   <h1 class="kp-h1">回答の<span class="sky">確認</span></h1>
   <p class="kp-result-lede" style="font-size:16px;line-height:2">内容をご確認ください。直したいところは「修正する」から戻れます。</p>
   <div class="kp-panel">

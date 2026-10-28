@@ -1,9 +1,9 @@
 ---
 // スタッフ画面トップ：本日のチェック一覧（直ちに対応が必要な回答・安全確認タグの印つき）・顧客検索・新規チェック・CSV書き出し。
 // 「来店客モードへ戻る」でスタッフ Cookie を消す（iPad を渡す前に押す）。
+// 体質（AI の暫定判定）は、薬剤師が判定を記録するまで一覧にも出さない（AI に引きずられないように。2026-10-28 修正依頼 第8章）。
 export const prerender = false;
 import KampoLayout from '../../../layouts/KampoLayout.astro';
-import { TYPE_DEFS } from '../../../lib/kampo/masters';
 import { SEX_LABEL, AGE_BAND_LABEL, type Sex } from '../../../lib/kampo/flow';
 import { clearStaffCookie, pinConfigured } from '../../../lib/kampo/auth';
 import { supervisorName } from '../../../lib/kampo/compute';
@@ -43,7 +43,7 @@ const flagSummary = (s: (typeof sessions)[number]) => {
   const f = s.safetyFlags ?? [];
   const refer = f.filter((x) => x.level === 'refer').length;
   const warn = f.filter((x) => x.level === 'warn').length;
-  return { refer, warn, tags: s.tags?.length ?? 0 };
+  return { refer, warn, tags: (s.tags ?? []).filter((t) => !s.tagChecks?.[t.id]).length };
 };
 // 直ちに対応が必要な回答があるチェックを一番上に
 sessions.sort((a, b) => Number(!!b.urgent) - Number(!!a.urgent));
@@ -73,16 +73,17 @@ const urgentCount = sessions.filter((s) => s.urgent).length;
       <p class="kp-note" style="margin-top:12px">この日のチェックはありません。</p>
     ) : (
       <table class="kp-table" style="margin-top:12px">
-        <thead><tr><th>時刻</th><th>お客様</th><th>入力</th><th>主体質</th><th>副体質</th><th>安全確認</th><th>状態</th><th></th></tr></thead>
+        <thead><tr><th>時刻</th><th>お客様</th><th>入力</th><th>主体質（AI）</th><th>副体質（AI）</th><th>安全確認</th><th>状態</th><th></th></tr></thead>
         <tbody>
           {sessions.map((s) => { const f = flagSummary(s); return (
             <tr class:list={[{ 'kp-row-urgent': s.urgent }]}>
               <td>{fmtJst(s.startedAt, false)}</td>
               <td>{s.customerLabel}</td>
               <td>{INPUT_BY_LABEL[s.inputBy]}</td>
-              <td>{s.scores ? (s.scores.isBalanced ? 'バランス良好' : typeNamesOf(s.scores.mainTypes, TYPE_DEFS)) : '—'}</td>
-              <td>{s.scores ? typeNamesOf(s.scores.subTypes, TYPE_DEFS) || '—' : '—'}</td>
-              <td>{s.urgent && <span class="kp-chip refer">直ちに対応</span>} {f.tags > 0 && <span class="kp-chip warn">確認事項 {f.tags}</span>} {f.refer > 0 && <span class="kp-chip refer">受診勧奨 {f.refer}</span>} {f.warn > 0 && <span class="kp-chip check">注意 {f.warn}</span>} {!s.urgent && f.tags + f.refer + f.warn === 0 && <span class="kp-chip ok">なし</span>}</td>
+              {s.scores && !s.judgment ? <td colspan="2"><small style="color:var(--muted)">薬剤師の判定前</small></td> : <>
+              <td>{s.scores ? (s.scores.isBalanced ? 'バランス良好' : typeNamesOf(s.scores.mainTypes)) : '—'}</td>
+              <td>{s.scores ? typeNamesOf(s.scores.subTypes) || '—' : '—'}</td></>}
+              <td>{s.urgent && <span class="kp-chip refer">直ちに対応</span>} {f.tags > 0 && <span class="kp-chip warn">タグ未確認 {f.tags}</span>} {f.refer > 0 && <span class="kp-chip refer">受診勧奨 {f.refer}</span>} {f.warn > 0 && <span class="kp-chip check">注意 {f.warn}</span>} {!s.urgent && f.tags + f.refer + f.warn === 0 && <span class="kp-chip ok">なし</span>}</td>
               <td><span class:list={['kp-chip', { ok: s.status === 'proposed' }]}>{STATUS_LABEL[s.status]}</span></td>
               <td><a class="kp-btn ghost small" href={`/kampo/staff/session/${s.id}/`}>開く</a></td>
             </tr>
@@ -114,7 +115,7 @@ const urgentCount = sessions.filter((s) => s.urgent).length;
     <h2 class="kp-title" style="font-size:18px">設定・データ</h2>
     <dl class="kp-kv">
       <dt>保存件数</dt><dd>{total} 件（保持期間 3年。期限切れは自動で削除）</dd>
-      <dt>監修者表示</dt><dd>{supervisorName() || <span style="color:var(--danger)">未設定（KAMPO_SUPERVISOR_NAME）</span>}</dd>
+      <dt>監修者表示</dt><dd>{supervisorName() || <span style="color:var(--danger)">未設定（KAMPO_SUPERVISOR_NAME）。改善アドバイスの監修欄は表示していません</span>}</dd>
       <dt>スタッフPIN</dt><dd>{pinConfigured() ? '設定済み' : <span style="color:var(--danger)">未設定（KAMPO_STAFF_PIN）。ログインの合言葉で代用中</span>}</dd>
       <dt>CSV書き出し</dt><dd><a href="/kampo/staff/export.csv">全チェックの一覧と回答（CSV）</a></dd>
       <dt>マスタ編集</dt><dd>設問・文面・処方は <code>src/data/kampo/</code> の JSON を直して再デプロイ</dd>

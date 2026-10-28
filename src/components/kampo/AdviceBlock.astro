@@ -1,14 +1,14 @@
 ---
 // 改善アドバイス：特徴（summary）→ 生活養生（心・食・動・休）→ おすすめのツボ → あなたへの一言 → 監修者。
 // 改善アドバイス画面と、結果画面の印刷用2ページ目で共用する。
-import { TYPE_DEFS, type TypeKey } from '../../lib/kampo/masters';
+import { axisDef, type AxisKey } from '../../lib/kampo/masters';
 import { personalTips } from '../../lib/kampo/flow';
 import { typeIconSvg } from '../../lib/kampo/icons';
 import { supervisorName, supervisorBio } from '../../lib/kampo/compute';
 import type { Answers } from '../../lib/kampo/scoring';
-export interface Props { type: TypeKey; answers: Answers; pct?: number; showSupervisor?: boolean }
+export interface Props { type: AxisKey; answers: Answers; pct?: number; showSupervisor?: boolean }
 const { type, answers, pct, showSupervisor = true } = Astro.props;
-const d = TYPE_DEFS[type];
+const d = axisDef(type);
 const tips = personalTips(answers, type);
 const sup = supervisorName();
 const bio = supervisorBio();
@@ -37,7 +37,8 @@ const ADVICE: [keyof typeof d.advice, string][] = [['mind', '心'], ['food', '�
       <p><b>効果</b>　{d.tsubo.effect}</p>
     </div>
     {tips.length > 0 && <div class="kp-tip"><b>あなたへの一言</b>　{tips.join('　')}</div>}
-    {showSupervisor && <p class="kp-supervisor">監修：{sup || '（薬剤師名を設定してください）'}{bio && <span>　{bio}</span>}</p>}
+    {/* 監修者名が未設定（KAMPO_SUPERVISOR_NAME）なら監修欄は出さない（2026-10-28 修正依頼 第8章） */}
+    {showSupervisor && sup && <p class="kp-supervisor">監修：{sup}{bio && <span>　{bio}</span>}</p>}
   </div>
 </section>
 <style is:global>

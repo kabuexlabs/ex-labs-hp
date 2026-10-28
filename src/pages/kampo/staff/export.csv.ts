@@ -2,7 +2,8 @@
 // 旧版（2026-10-24 版・取り消した v2）のセッションは再計算せず、回答を「旧版の回答」列に文言で入れる。
 export const prerender = false;
 import type { APIRoute } from 'astro';
-import { TYPES, TYPE_DEFS, QUESTIONS, STAFF_QUESTIONS, optionText, legacyOptionText } from '../../../lib/kampo/masters';
+import { AXES, axisName, QUESTIONS, STAFF_QUESTIONS, optionText, legacyOptionText } from '../../../lib/kampo/masters';
+import { toAxis } from '../../../lib/kampo/scoring';
 import { isStaffAuthed } from '../../../lib/kampo/auth';
 import { mainComplaintGroup, companionComplaints } from '../../../lib/kampo/recommend';
 import { computeSession, isLegacy } from '../../../lib/kampo/compute';
@@ -22,8 +23,9 @@ export const GET: APIRoute = async ({ cookies }) => {
   const cols = QUESTIONS.filter((q) => q.section !== 'detail' && q.section !== 'complaint' && q.section !== 'primary');
   const header = [
     'セッションID', '開始日時', '完了日時', '状態', 'お客様', '顧客ID', '入力者', '設問版',
-    '主となる体質', '併存する傾向', ...TYPES.map((t) => `${TYPE_DEFS[t].name}（暫定）`), '虚実指数', '寒熱指数',
-    '直ちに対応', '安全確認タグ', '安全フラグ', ...STAFF_QUESTIONS.map((q) => `薬剤師:${q.title}`),
+    '主となる体質', '併存する傾向', ...AXES.map((t) => `${axisName(t)}（暫定）`), '虚実指数', '寒熱指数',
+    '薬剤師の判定:担当', '薬剤師の判定:体質', '薬剤師の判定:寒熱', '薬剤師の判定:虚実', '薬剤師の判定:漢方薬', '薬剤師の判定:メモ', '薬剤師の判定:日時',
+    '直ちに対応', '安全確認タグ', 'タグの確認', '安全フラグ', '記入欄', ...STAFF_QUESTIONS.map((q) => `薬剤師:${q.title}`),
     '担当', '提案', '渡し方', 'メモ', '提案保存日時',
     'いちばん改善したい主訴', '主訴の詳細', 'ほかの主訴（随伴症状）',
     ...cols.map((q) => `${q.id} ${q.title}`), '旧版の回答',
@@ -34,12 +36,16 @@ export const GET: APIRoute = async ({ cookies }) => {
     const r = c?.scores ?? s.scores;
     const g = c ? mainComplaintGroup(c.w) : undefined;
     const ans = (qid: string) => (s.answers[qid] ?? []).map(optionText).join('｜');
+    const j = s.judgment;
     return [
       s.id, fmtJst(s.startedAt), s.completedAt ? fmtJst(s.completedAt) : '', s.status, s.customerLabel, s.customerId ?? '', s.inputBy, s.questionnaireVersion,
-      r ? (r.isBalanced ? 'バランス良好' : r.mainTypes.map((t) => TYPE_DEFS[t].name).join('・')) : '', r ? r.subTypes.map((t) => TYPE_DEFS[t].name).join('・') : '',
-      ...TYPES.map((t) => (r ? r.pct[t] : '')), r?.defExcIndex ?? '', r?.thermalIndex ?? '',
+      r ? (r.isBalanced ? 'バランス良好' : r.mainTypes.map(axisName).join('・')) : '', r ? r.subTypes.map(axisName).join('・') : '',
+      ...AXES.map((t) => (r ? (Object.entries(r.pct).find(([k]) => toAxis(k) === t)?.[1] ?? '') : '')), r?.defExcIndex ?? '', r?.thermalIndex ?? '',
+      j?.staffName ?? '', j ? (j.skipped ? '（記録せずに開いた）' : j.types.map(axisName).join('・')) : '', j?.thermal ?? '', j?.defExc ?? '', j?.formulas ?? '', j?.note ?? '', j ? fmtJst(j.at) : '',
       (c?.urgent ?? s.urgent) ? '1' : '', (c?.tags ?? s.tags ?? []).map((t) => t.label).join('｜'),
+      Object.entries(s.tagChecks ?? {}).map(([k, v]) => `${k}:${v.by}${v.note ? `（${v.note}）` : ''}`).join('｜'),
       (c?.safetyFlags ?? s.safetyFlags ?? []).map((f) => `${f.level}:${f.label}`).join('｜'),
+      legacy ? '' : Object.entries(s.texts).map(([k, v]) => `${optionText(k)}：${v}`).join('｜'),
       ...STAFF_QUESTIONS.map((q) => (s.staffAnswers?.[q.id] ?? []).map(optionText).join('｜')),
       s.proposal?.staffName ?? '', (s.proposal?.selected ?? []).map((x) => x.name).join('・'), s.proposal?.deliveredVia ?? '', s.proposal?.note ?? '', s.proposal ? fmtJst(s.proposal.updatedAt) : '',
       g ? `${g.label}（${g.category}）` : '', g ? g.details.map((d) => d.text).join('｜') : '',

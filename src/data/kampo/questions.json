@@ -1,12 +1,12 @@
 {
- "version": "2026-10-25-v3",
+ "version": "2026-10-28-v3.1",
  "review": {
   "status": "draft",
   "source": "2026-10-24 版（3段階版）の設問・重みを、2026-10-25 の改修指示と承認済みの改修計画に沿って組み直した草案。重み・五臓は現行の選択肢の値を引き継いだもので、新しい数値は作っていない（専門家未確認）",
   "reviewer": null,
   "reviewedAt": null
  },
- "note": "設問（主訴カテゴリー・具体的主訴・いちばん改善したい主訴の選択肢は complaints.json から作る）。section：basic／category／complaint／primary／detail／constitution／safety／lifestyle／staff。選択肢の findings は選んだときに present になる所見。exclusive（none・unknown・declined）はほかの選択肢と同時に選べない。",
+ "note": "設問（主訴カテゴリー・具体的主訴・いちばん改善したい主訴の選択肢は complaints.json から作る）。section：basic／category／complaint／primary／detail／constitution／safety／lifestyle／staff。選択肢の findings は選んだときに present になる所見。exclusive（none・unknown・declined）はほかの選択肢と同時に選べない。 2026-10-28：選択肢の other（その他・所見なし）、mensesOnly（閉経・月経なしでは出さない）、note（短い記入欄）、heading（小見出し）、defer（薬剤師の観察で「判断できない」＝本人の回答を使う）、設問の optional（回答せずに次へ）・prefill（前の回答であった所見をチェック済みで出す）・followup（同じ画面で追加の選択肢）を追加。",
  "questions": [
   {
    "id": "A1",
@@ -101,7 +101,7 @@
     },
     {
      "id": "A3-none",
-     "text": "月経はない（妊娠中・授乳中・その他）",
+     "text": "月経はない",
      "value": "none"
     },
     {
@@ -131,7 +131,7 @@
     },
     {
      "id": "A3P-maybe",
-     "text": "妊娠の可能性がある",
+     "text": "妊娠の可能性がある（はっきりしない場合を含む）",
      "flags": [
       "pregnancy"
      ]
@@ -146,18 +146,10 @@
     {
      "id": "A3P-no",
      "text": "いずれでもない"
-    },
-    {
-     "id": "A3P-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
-    },
-    {
-     "id": "A3P-declined",
-     "text": "回答しない",
-     "exclusive": "declined"
     }
-   ]
+   ],
+   "optional": true,
+   "help": "答えにくい場合は「回答せずに次へ」を押してください。薬剤師が口頭で確認します。"
   },
   {
    "id": "K1",
@@ -303,11 +295,6 @@
      "id": "Sfatigue1-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sfatigue1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -367,11 +354,6 @@
      "id": "Sfatigue2-none",
      "text": "特に思い当たらない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sfatigue2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -410,11 +392,6 @@
      "id": "Sheavy1-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sheavy1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -479,11 +456,6 @@
      "id": "Sheavy2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sheavy2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -536,9 +508,9 @@
      ]
     },
     {
-     "id": "Scold0-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Scold0-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -611,14 +583,9 @@
      ]
     },
     {
-     "id": "Scold1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Scold1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Scold1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -667,11 +634,6 @@
      "id": "Scold2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Scold2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -734,7 +696,8 @@
      "also": [
       "dysmenorrhea"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
      "id": "Scold3-irregular_menses",
@@ -745,7 +708,8 @@
      "also": [
       "irregular_menses"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
      "id": "Scold3-chilblain",
@@ -761,11 +725,6 @@
      "id": "Scold3-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Scold3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -842,14 +801,9 @@
      ]
     },
     {
-     "id": "Shot_upper1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Shot_upper1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Shot_upper1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -916,11 +870,6 @@
      "id": "Shot_upper2-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Shot_upper2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -988,11 +937,6 @@
      "id": "Shot_upper3-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Shot_upper3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -1024,11 +968,6 @@
      "id": "Shot_palms1-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Shot_palms1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -1087,11 +1026,6 @@
      "id": "Shot_palms2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Shot_palms2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -1155,20 +1089,15 @@
     },
     {
      "id": "Ssweat1-sweat_profuse",
-     "text": "汗の量が多い",
+     "text": "暑いときや食事中に大量に汗をかく",
      "findings": [
       "sweat_profuse"
      ]
     },
     {
-     "id": "Ssweat1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Ssweat1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Ssweat1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -1220,11 +1149,6 @@
      "id": "Ssweat2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Ssweat2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -1260,14 +1184,9 @@
      ]
     },
     {
-     "id": "Sstomach1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sstomach1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sstomach1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -1320,11 +1239,6 @@
      "id": "Sstomach2-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sstomach2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -1386,11 +1300,6 @@
      "id": "Sstomach3-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sstomach3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -1436,14 +1345,9 @@
      ]
     },
     {
-     "id": "Sstomach_heavy1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sstomach_heavy1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sstomach_heavy1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -1503,11 +1407,6 @@
      "id": "Sstomach_heavy2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sstomach_heavy2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -1550,14 +1449,9 @@
      ]
     },
     {
-     "id": "Sbloating1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sbloating1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sbloating1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -1625,11 +1519,6 @@
      "id": "Sbloating2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sbloating2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -1682,14 +1571,9 @@
      ]
     },
     {
-     "id": "Sappetite1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sappetite1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sappetite1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -1744,11 +1628,6 @@
      "id": "Sappetite2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sappetite2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -1801,11 +1680,6 @@
      "id": "Snausea1-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Snausea1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -1870,11 +1744,6 @@
      "id": "Snausea2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Snausea2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -1924,14 +1793,9 @@
      ]
     },
     {
-     "id": "Sheartburn1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sheartburn1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sheartburn1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -1967,14 +1831,9 @@
      ]
     },
     {
-     "id": "Sconstipation1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sconstipation1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sconstipation1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -2033,11 +1892,6 @@
      "id": "Sconstipation2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sconstipation2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -2086,11 +1940,6 @@
      "id": "Sconstipation3-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sconstipation3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -2140,14 +1989,9 @@
      ]
     },
     {
-     "id": "Sdiarrhea1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sdiarrhea1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sdiarrhea1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -2209,11 +2053,6 @@
      "id": "Sdiarrhea2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sdiarrhea2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -2266,14 +2105,9 @@
      ]
     },
     {
-     "id": "Salternating1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Salternating1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Salternating1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -2326,14 +2160,9 @@
      ]
     },
     {
-     "id": "Sacne1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sacne1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sacne1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -2353,7 +2182,8 @@
      "findings": [
       "acne_worse_premenstrual"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
      "id": "Sacne3-acne_worse_stress",
@@ -2387,11 +2217,6 @@
      "id": "Sacne3-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sacne3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -2426,11 +2251,6 @@
      "id": "Sdry_skin1-none",
      "text": "顔だけ",
      "exclusive": "none"
-    },
-    {
-     "id": "Sdry_skin1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -2479,11 +2299,6 @@
      "id": "Sdry_skin2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sdry_skin2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -2522,11 +2337,6 @@
      "id": "Sdry_skin3-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sdry_skin3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -2582,6 +2392,11 @@
      ]
     },
     {
+     "id": "Sitch1-other",
+     "text": "その他",
+     "other": true
+    },
+    {
      "id": "Sitch1-urgent_swelling_breath",
      "text": "急に唇やまぶた、のどが腫れてきて息苦しい",
      "tags": [
@@ -2589,16 +2404,6 @@
       "breath"
      ],
      "urgent": true
-    },
-    {
-     "id": "Sitch1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sitch1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -2644,11 +2449,6 @@
      "id": "Sitch3-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sitch3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -2704,14 +2504,9 @@
      ]
     },
     {
-     "id": "Seczema1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Seczema1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Seczema1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -2757,9 +2552,9 @@
      ]
     },
     {
-     "id": "Seczema2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Seczema2-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -2805,11 +2600,6 @@
      "id": "Seczema3-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Seczema3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -2841,11 +2631,6 @@
      "id": "Scomplexion1-none",
      "text": "クマはない",
      "exclusive": "none"
-    },
-    {
-     "id": "Scomplexion1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -2938,7 +2723,8 @@
      "also": [
       "dysmenorrhea"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
      "id": "Scomplexion2-clots",
@@ -2946,7 +2732,8 @@
      "findings": [
       "clots"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
      "id": "Scomplexion2-sleep_deprived",
@@ -2959,11 +2746,6 @@
      "id": "Scomplexion2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Scomplexion2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -3006,14 +2788,9 @@
      ]
     },
     {
-     "id": "Sspots1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sspots1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sspots1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -3036,7 +2813,8 @@
      "also": [
       "dysmenorrhea"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
      "id": "Sspots2-clots",
@@ -3044,7 +2822,8 @@
      "findings": [
       "clots"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
      "id": "Sspots2-hot_up_cold_down",
@@ -3084,11 +2863,6 @@
      "id": "Sspots2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sspots2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -3115,7 +2889,8 @@
      "findings": [
       "spots_worse_premenstrual"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
      "id": "Sspots3-spots_worse_stress",
@@ -3193,14 +2968,9 @@
      ]
     },
     {
-     "id": "Shair_loss1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Shair_loss1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Shair_loss1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -3250,11 +3020,6 @@
      "id": "Shair_loss3-none",
      "text": "特に思い当たらない",
      "exclusive": "none"
-    },
-    {
-     "id": "Shair_loss3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -3297,14 +3062,9 @@
      ]
     },
     {
-     "id": "Shair_dry1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Shair_dry1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Shair_dry1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -3353,11 +3113,6 @@
      "id": "Shair_dry2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Shair_dry2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -3413,11 +3168,6 @@
      "id": "Sgray_hair2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sgray_hair2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -3480,14 +3230,9 @@
      ]
     },
     {
-     "id": "Sscalp1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sscalp1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sscalp1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -3554,75 +3299,6 @@
      "id": "Sscalp2-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sscalp2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
-    }
-   ]
-  },
-  {
-   "id": "Sinsomnia1",
-   "section": "detail",
-   "title": "眠りの状態で、あてはまるものはありますか",
-   "type": "multi",
-   "trigger": {
-    "primaryDetail": "insomnia"
-   },
-   "template": "insomnia",
-   "options": [
-    {
-     "id": "Sinsomnia1-sleep_onset",
-     "text": "寝つきが悪い",
-     "findings": [
-      "sleep_onset"
-     ]
-    },
-    {
-     "id": "Sinsomnia1-night_waking",
-     "text": "夜中に何度も目が覚める",
-     "findings": [
-      "night_waking"
-     ]
-    },
-    {
-     "id": "Sinsomnia1-early_waking",
-     "text": "朝早く目が覚めてしまう",
-     "findings": [
-      "early_waking"
-     ]
-    },
-    {
-     "id": "Sinsomnia1-light_sleep",
-     "text": "眠りが浅い",
-     "findings": [
-      "light_sleep"
-     ]
-    },
-    {
-     "id": "Sinsomnia1-dreams_many",
-     "text": "夢が多い",
-     "findings": [
-      "dreams_many"
-     ]
-    },
-    {
-     "id": "Sinsomnia1-unrefreshed",
-     "text": "寝ても疲れが取れない",
-     "findings": [
-      "unrefreshed"
-     ]
-    },
-    {
-     "id": "Sinsomnia1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sinsomnia1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -3637,24 +3313,10 @@
    "template": "insomnia",
    "options": [
     {
-     "id": "Sinsomnia2-sleep_worry",
-     "text": "考え事・不安",
-     "findings": [
-      "sleep_worry"
-     ]
-    },
-    {
      "id": "Sinsomnia2-sleep_agitation",
      "text": "イライラ・気持ちの高ぶり",
      "findings": [
       "sleep_agitation"
-     ]
-    },
-    {
-     "id": "Sinsomnia2-sleep_hot",
-     "text": "体のほてり・暑さ",
-     "findings": [
-      "sleep_hot"
      ]
     },
     {
@@ -3671,11 +3333,6 @@
      "id": "Sinsomnia2-none",
      "text": "特に思い当たらない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sinsomnia2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -3730,11 +3387,6 @@
      "id": "Sinsomnia3-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sinsomnia3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -3766,11 +3418,6 @@
      "id": "Ssleepy1-none",
      "text": "一日中眠い",
      "exclusive": "none"
-    },
-    {
-     "id": "Ssleepy1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -3829,11 +3476,6 @@
      "id": "Ssleepy2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Ssleepy2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -3886,14 +3528,9 @@
      ]
     },
     {
-     "id": "Sanxiety1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sanxiety1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sanxiety1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -3919,9 +3556,16 @@
     },
     {
      "id": "Sanxiety2-forgetful",
-     "text": "物忘れ・集中力の低下",
+     "text": "物忘れ",
      "findings": [
       "forgetful"
+     ]
+    },
+    {
+     "id": "Sanxiety2-poor_concentration",
+     "text": "集中力が続かない",
+     "findings": [
+      "poor_concentration"
      ]
     },
     {
@@ -3955,11 +3599,6 @@
      "id": "Sanxiety2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sanxiety2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -4016,14 +3655,9 @@
      ]
     },
     {
-     "id": "Sirritability1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sirritability1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sirritability1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -4053,7 +3687,8 @@
      "also": [
       "blood_path"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
      "id": "Sirritability2-irritable_worse_tired",
@@ -4073,11 +3708,6 @@
      "id": "Sirritability2-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sirritability2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -4152,11 +3782,6 @@
      "id": "Sirritability3-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sirritability3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -4209,14 +3834,9 @@
      ]
     },
     {
-     "id": "Slow_mood1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Slow_mood1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Slow_mood1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -4263,11 +3883,6 @@
      "id": "Slow_mood2-none",
      "text": "特に思い当たらない",
      "exclusive": "none"
-    },
-    {
-     "id": "Slow_mood2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -4346,11 +3961,6 @@
      "id": "Slow_mood3-none",
      "text": "特に変わらない",
      "exclusive": "none"
-    },
-    {
-     "id": "Slow_mood3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -4381,11 +3991,6 @@
      "findings": [
       "lowmood_no_cycle"
      ]
-    },
-    {
-     "id": "Slow_mood4-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -4500,9 +4105,9 @@
      ]
     },
     {
-     "id": "Sstress1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sstress1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -4534,11 +4139,6 @@
      "id": "Sstress2-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sstress2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -4612,14 +4212,9 @@
      ]
     },
     {
-     "id": "Speriod_pain1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Speriod_pain1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Speriod_pain1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -4687,11 +4282,6 @@
      "id": "Speriod_pain3-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Speriod_pain3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -4751,9 +4341,9 @@
      ]
     },
     {
-     "id": "Spms_mood1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Spms_mood1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -4780,11 +4370,6 @@
      "findings": [
       "pms_continues"
      ]
-    },
-    {
-     "id": "Spms_mood2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -4871,9 +4456,9 @@
      ]
     },
     {
-     "id": "Spms_body1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Spms_body1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -4900,11 +4485,6 @@
      "findings": [
       "pms_continues"
      ]
-    },
-    {
-     "id": "Spms_body2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -4950,9 +4530,9 @@
      ]
     },
     {
-     "id": "Sirregular1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sirregular1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -5024,11 +4604,6 @@
      "id": "Sirregular2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sirregular2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -5077,11 +4652,6 @@
      "id": "Sirregular3-none",
      "text": "特に思い当たらない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sirregular3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -5117,14 +4687,9 @@
      ]
     },
     {
-     "id": "Sflow_heavy1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sflow_heavy1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sflow_heavy1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -5183,11 +4748,6 @@
      "id": "Sflow_heavy2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sflow_heavy2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -5237,14 +4797,9 @@
      ]
     },
     {
-     "id": "Sflow_light1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sflow_light1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sflow_light1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -5313,11 +4868,6 @@
      "id": "Sflow_light2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sflow_light2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -5455,9 +5005,9 @@
      ]
     },
     {
-     "id": "Smenopause1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Smenopause1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -5540,9 +5090,9 @@
      ]
     },
     {
-     "id": "Spostpartum1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Spostpartum1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -5585,9 +5135,9 @@
      ]
     },
     {
-     "id": "Sheadache0-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sheadache0-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -5637,9 +5187,9 @@
      ]
     },
     {
-     "id": "Sheadache1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sheadache1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -5690,7 +5240,8 @@
      "symptoms": [
       "blood_path"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
      "id": "Sheadache2-headache_after_period",
@@ -5698,7 +5249,8 @@
      "findings": [
       "headache_after_period"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
      "id": "Sheadache2-headache_worse_sleep",
@@ -5711,11 +5263,6 @@
      "id": "Sheadache2-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sheadache2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -5798,11 +5345,6 @@
      "id": "Sheadache3-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sheadache3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -5845,14 +5387,9 @@
      ]
     },
     {
-     "id": "Sstiff_shoulder1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sstiff_shoulder1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sstiff_shoulder1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -5907,11 +5444,6 @@
      "id": "Sstiff_shoulder2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sstiff_shoulder2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -5959,17 +5491,13 @@
      "findings": [
       "back_menstrual"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
-     "id": "Slow_back1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Slow_back1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Slow_back1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -6027,11 +5555,6 @@
      "id": "Slow_back2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Slow_back2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -6088,14 +5611,9 @@
      ]
     },
     {
-     "id": "Sjoint1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sjoint1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sjoint1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -6147,11 +5665,6 @@
      "id": "Sjoint2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sjoint2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -6190,22 +5703,17 @@
      ]
     },
     {
+     "id": "Snumbness1-other",
+     "text": "その他",
+     "other": true
+    },
+    {
      "id": "Snumbness1-urgent_neuro",
      "text": "急に手足が動かしにくい・ろれつが回らない・顔がゆがむ",
      "tags": [
       "neuro"
      ],
      "urgent": true
-    },
-    {
-     "id": "Snumbness1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Snumbness1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -6257,11 +5765,6 @@
      "id": "Snumbness2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Snumbness2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -6300,11 +5803,6 @@
      "id": "Scramps1-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Scramps1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -6359,11 +5857,6 @@
      "id": "Scramps2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Scramps2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -6406,14 +5899,9 @@
      ]
     },
     {
-     "id": "Sdizziness1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sdizziness1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sdizziness1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -6486,11 +5974,6 @@
      "id": "Sdizziness2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sdizziness2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -6519,9 +6002,9 @@
      ]
     },
     {
-     "id": "Stinnitus1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Stinnitus1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -6580,11 +6063,6 @@
      "id": "Stinnitus2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Stinnitus2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -6634,14 +6112,9 @@
      ]
     },
     {
-     "id": "Snose1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Snose1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Snose1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -6680,11 +6153,6 @@
      "id": "Snose2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Snose2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -6737,14 +6205,9 @@
      ]
     },
     {
-     "id": "Scough1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Scough1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Scough1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -6786,11 +6249,6 @@
      "id": "Scough2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Scough2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -6824,7 +6282,8 @@
      "findings": [
       "edema_premenstrual"
      ],
-     "femaleOnly": true
+     "femaleOnly": true,
+     "mensesOnly": true
     },
     {
      "id": "Spuffiness1-edema_constant",
@@ -6834,9 +6293,9 @@
      ]
     },
     {
-     "id": "Spuffiness1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Spuffiness1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -6882,11 +6341,6 @@
      "id": "Spuffiness2-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Spuffiness2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -6934,11 +6388,6 @@
      "id": "Spuffiness3-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Spuffiness3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -6953,10 +6402,17 @@
    "template": "urination",
    "options": [
     {
-     "id": "Surination1-urine_clear_copious",
-     "text": "尿の色が薄く、量が多い",
+     "id": "Surination1-urine_pale",
+     "text": "尿の色が薄い",
      "findings": [
-      "urine_clear_copious"
+      "urine_pale"
+     ]
+    },
+    {
+     "id": "Surination1-urine_copious",
+     "text": "尿の量が多い",
+     "findings": [
+      "urine_copious"
      ]
     },
     {
@@ -7001,14 +6457,9 @@
      ]
     },
     {
-     "id": "Surination1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Surination1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Surination1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -7060,11 +6511,6 @@
      "id": "Surination2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Surination2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -7103,11 +6549,6 @@
      "id": "Spalpitation1-none",
      "text": "特に決まっていない",
      "exclusive": "none"
-    },
-    {
-     "id": "Spalpitation1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -7172,11 +6613,6 @@
      "id": "Spalpitation2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Spalpitation2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -7212,14 +6648,9 @@
      ]
     },
     {
-     "id": "Seye1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Seye1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Seye1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -7271,11 +6702,6 @@
      "id": "Seye2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Seye2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -7298,7 +6724,7 @@
     },
     {
      "id": "Sthirst1-thirst_sips",
-     "text": "少量ずつ飲みたい",
+     "text": "口や喉が乾くが、少しずつしか飲めない",
      "findings": [
       "thirst_sips"
      ]
@@ -7311,9 +6737,9 @@
      ]
     },
     {
-     "id": "Sthirst1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sthirst1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -7372,11 +6798,6 @@
      "id": "Sthirst2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sthirst2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -7412,14 +6833,9 @@
      ]
     },
     {
-     "id": "Sthroat1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sthroat1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "id": "Sthroat1-other",
+     "text": "その他",
+     "other": true
     }
    ]
   },
@@ -7487,11 +6903,6 @@
      "id": "Sthroat2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sthroat2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -7527,6 +6938,11 @@
      ]
     },
     {
+     "id": "Sbreath1-other",
+     "text": "その他",
+     "other": true
+    },
+    {
      "id": "Sbreath1-urgent_swelling_breath",
      "text": "急に唇やまぶた、のどが腫れてきて息苦しい",
      "tags": [
@@ -7534,16 +6950,6 @@
       "breath"
      ],
      "urgent": true
-    },
-    {
-     "id": "Sbreath1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    },
-    {
-     "id": "Sbreath1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -7601,11 +7007,6 @@
      "id": "Sbreath2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "Sbreath2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -7658,6 +7059,27 @@
      ]
     },
     {
+     "id": "B1-daytime_sleepy",
+     "text": "日中に眠くなる",
+     "findings": [
+      "daytime_sleepy"
+     ]
+    },
+    {
+     "id": "B1-forgetful",
+     "text": "物忘れ",
+     "findings": [
+      "forgetful"
+     ]
+    },
+    {
+     "id": "B1-poor_concentration",
+     "text": "集中力が続かない",
+     "findings": [
+      "poor_concentration"
+     ]
+    },
+    {
      "id": "B1-weather_sensitive",
      "text": "雨の日や低気圧で体調が悪くなる",
      "findings": [
@@ -7682,11 +7104,6 @@
      "id": "B1-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -7742,11 +7159,6 @@
      "id": "B2-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -7793,12 +7205,6 @@
       "face_bluish"
      ],
      "image": "/assets/kampo/face/bluish.webp"
-    },
-    {
-     "id": "F1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown",
-     "image": "/assets/kampo/face/unknown.webp"
     }
    ]
   },
@@ -7837,6 +7243,13 @@
      ]
     },
     {
+     "id": "B3-prefer_warm",
+     "text": "温かい飲み物を好む",
+     "findings": [
+      "prefer_warm"
+     ]
+    },
+    {
      "id": "B3-heat_intolerant",
      "text": "暑がり",
      "findings": [
@@ -7865,28 +7278,9 @@
      ]
     },
     {
-     "id": "B3-cold_diarrhea",
-     "text": "冷えるとお腹を壊す",
-     "findings": [
-      "cold_diarrhea"
-     ]
-    },
-    {
-     "id": "B3-cold_edema",
-     "text": "冷えるとむくむ",
-     "findings": [
-      "cold_edema"
-     ]
-    },
-    {
      "id": "B3-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -7947,7 +7341,7 @@
     },
     {
      "id": "B4-sweat_profuse",
-     "text": "汗の量が多い",
+     "text": "暑いときや食事中に大量に汗をかく",
      "findings": [
       "sweat_profuse"
      ]
@@ -7956,11 +7350,6 @@
      "id": "B4-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B4-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -7986,7 +7375,7 @@
     },
     {
      "id": "B5-big_appetite",
-     "text": "食欲が旺盛",
+     "text": "食べてもすぐお腹が空く",
      "findings": [
       "big_appetite"
      ]
@@ -8003,6 +7392,13 @@
      "text": "胃がもたれる",
      "findings": [
       "stomach_heavy"
+     ]
+    },
+    {
+     "id": "B5-heartburn",
+     "text": "胸やけがする",
+     "findings": [
+      "heartburn"
      ]
     },
     {
@@ -8027,14 +7423,16 @@
      ]
     },
     {
+     "id": "B5-cold_diarrhea",
+     "text": "冷たい物や生ものでお腹を壊す",
+     "findings": [
+      "cold_diarrhea"
+     ]
+    },
+    {
      "id": "B5-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B5-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -8080,21 +7478,16 @@
      ]
     },
     {
-     "id": "B5b-prefer_warm",
-     "text": "温かい飲み物を好む",
+     "id": "B5b-mouth_ulcer",
+     "text": "口内炎ができやすい",
      "findings": [
-      "prefer_warm"
+      "mouth_ulcer"
      ]
     },
     {
      "id": "B5b-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B5b-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -8113,7 +7506,7 @@
     },
     {
      "id": "B5T-thirst_sips",
-     "text": "少量ずつ飲みたい",
+     "text": "口や喉が乾くが、少しずつしか飲めない",
      "findings": [
       "thirst_sips"
      ]
@@ -8129,11 +7522,6 @@
      "id": "B5T-none",
      "text": "特に渇かない",
      "exclusive": "none"
-    },
-    {
-     "id": "B5T-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -8203,11 +7591,6 @@
      "id": "B6-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B6-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -8232,17 +7615,10 @@
      ]
     },
     {
-     "id": "B6b-urine_clear_copious",
-     "text": "尿の色が薄く、量が多い",
+     "id": "B6b-urine_pale",
+     "text": "尿の色が薄い",
      "findings": [
-      "urine_clear_copious"
-     ]
-    },
-    {
-     "id": "B6b-urine_scanty",
-     "text": "尿の量が少ない",
-     "findings": [
-      "urine_scanty"
+      "urine_pale"
      ]
     },
     {
@@ -8253,14 +7629,23 @@
      ]
     },
     {
+     "id": "B6b-urine_copious",
+     "text": "尿の量が多い",
+     "findings": [
+      "urine_copious"
+     ]
+    },
+    {
+     "id": "B6b-urine_scanty",
+     "text": "尿の量が少ない",
+     "findings": [
+      "urine_scanty"
+     ]
+    },
+    {
      "id": "B6b-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B6b-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -8269,17 +7654,6 @@
    "section": "constitution",
    "title": "むくみについて、あてはまるものを選んでください",
    "type": "multi",
-   "trigger": {
-    "findingsPresent": [
-     "edema",
-     "heavy_body",
-     "cold_edema",
-     "urine_scanty",
-     "weather_sensitive",
-     "stomach_splash",
-     "edema_premenstrual"
-    ]
-   },
    "options": [
     {
      "id": "B7-edema_evening_legs",
@@ -8296,14 +7670,32 @@
      ]
     },
     {
+     "id": "B7-edema_pitting",
+     "text": "押すと跡が残る",
+     "findings": [
+      "edema_pitting"
+     ]
+    },
+    {
+     "id": "B7-edema_premenstrual",
+     "text": "月経前にむくむ",
+     "findings": [
+      "edema_premenstrual"
+     ],
+     "femaleOnly": true,
+     "mensesOnly": true
+    },
+    {
+     "id": "B7-cold_edema",
+     "text": "冷えるとむくむ",
+     "findings": [
+      "cold_edema"
+     ]
+    },
+    {
      "id": "B7-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B7-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -8322,16 +7714,9 @@
     },
     {
      "id": "B8-night_waking",
-     "text": "夜中に目が覚める",
+     "text": "夜中に何度も目が覚める",
      "findings": [
       "night_waking"
-     ]
-    },
-    {
-     "id": "B8-early_waking",
-     "text": "朝早く目が覚める",
-     "findings": [
-      "early_waking"
      ]
     },
     {
@@ -8349,10 +7734,17 @@
      ]
     },
     {
-     "id": "B8-daytime_sleepy",
-     "text": "日中に眠くなる",
+     "id": "B8-early_waking",
+     "text": "朝早く目が覚める",
      "findings": [
-      "daytime_sleepy"
+      "early_waking"
+     ]
+    },
+    {
+     "id": "B8-unrefreshed",
+     "text": "寝ても疲れが取れない",
+     "findings": [
+      "unrefreshed"
      ]
     },
     {
@@ -8373,13 +7765,9 @@
      "id": "B8-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B8-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
-   ]
+   ],
+   "prefill": true
   },
   {
    "id": "B9",
@@ -8399,13 +7787,6 @@
      "text": "驚きやすい",
      "findings": [
       "startle"
-     ]
-    },
-    {
-     "id": "B9-forgetful",
-     "text": "物忘れ・集中力の低下",
-     "findings": [
-      "forgetful"
      ]
     },
     {
@@ -8478,11 +7859,6 @@
      "id": "B9-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B9-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -8520,13 +7896,6 @@
      ]
     },
     {
-     "id": "B10-trauma_history",
-     "text": "打撲・むち打ち・手術の経験がある",
-     "findings": [
-      "trauma_history"
-     ]
-    },
-    {
      "id": "B10-varicose",
      "text": "静脈瘤がある",
      "findings": [
@@ -8537,11 +7906,6 @@
      "id": "B10-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B10-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -8590,21 +7954,9 @@
      ]
     },
     {
-     "id": "B11-edema_premenstrual",
-     "text": "月経前にむくむ",
-     "findings": [
-      "edema_premenstrual"
-     ]
-    },
-    {
      "id": "B11-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B11-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -8680,11 +8032,6 @@
      "id": "B11b-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B11b-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
@@ -8759,9 +8106,16 @@
     },
     {
      "id": "B12-nasal_discharge",
-     "text": "鼻水・鼻づまりが多い",
+     "text": "鼻水が多い",
      "findings": [
       "nasal_discharge"
+     ]
+    },
+    {
+     "id": "B12-nasal_block",
+     "text": "鼻づまりがある",
+     "findings": [
+      "nasal_block"
      ]
     },
     {
@@ -8789,18 +8143,13 @@
      "id": "B12-none",
      "text": "特にない",
      "exclusive": "none"
-    },
-    {
-     "id": "B12-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ]
   },
   {
    "id": "C1",
    "section": "safety",
-   "title": "いま飲んでいる薬・サプリメントの種類を選んでください",
+   "title": "いま飲んでいる薬・サプリメントの種類を選んでください（漢方薬は次の質問で伺います）",
    "type": "multi",
    "help": "薬の名前は、薬剤師がお薬手帳などで確認します。",
    "options": [
@@ -8856,10 +8205,6 @@
      "text": "ホルモン剤（低用量ピルなど）"
     },
     {
-     "id": "C1-kampo",
-     "text": "漢方薬"
-    },
-    {
      "id": "C1-kanzo",
      "text": "かぜ薬・胃腸薬など（市販薬）"
     },
@@ -8886,358 +8231,20 @@
   {
    "id": "C1K",
    "section": "safety",
-   "title": "飲んでいる漢方薬を選んでください",
-   "type": "multi",
-   "trigger": {
-    "chosen": [
-     "C1-kampo"
-    ]
-   },
-   "help": "名前がわからなければ「わからない」を選んでください。薬剤師が確認します。",
+   "title": "漢方薬を飲んでいますか",
+   "type": "single",
+   "help": "漢方薬の名前は、薬剤師がお薬手帳や口頭で確認します。",
    "options": [
     {
-     "id": "C1K-F48",
-     "text": "安中散",
-     "formula": "F48"
-    },
-    {
-     "id": "C1K-F19",
-     "text": "温経湯",
-     "formula": "F19"
-    },
-    {
-     "id": "C1K-F41",
-     "text": "温清飲",
-     "formula": "F41"
-    },
-    {
-     "id": "C1K-F54",
-     "text": "黄耆建中湯",
-     "formula": "F54"
-    },
-    {
-     "id": "C1K-F35",
-     "text": "黄連解毒湯",
-     "formula": "F35"
-    },
-    {
-     "id": "C1K-F59",
-     "text": "乙字湯",
-     "formula": "F59"
-    },
-    {
-     "id": "C1K-F43",
-     "text": "加味帰脾湯",
-     "formula": "F43"
-    },
-    {
-     "id": "C1K-F11",
-     "text": "加味逍遥散",
-     "formula": "F11"
-    },
-    {
-     "id": "C1K-F08",
-     "text": "帰脾湯",
-     "formula": "F08"
-    },
-    {
-     "id": "C1K-F18",
-     "text": "芎帰調血飲",
-     "formula": "F18"
-    },
-    {
-     "id": "C1K-F37",
-     "text": "荊芥連翹湯",
-     "formula": "F37"
-    },
-    {
-     "id": "C1K-F52",
-     "text": "桂枝加芍薬湯",
-     "formula": "F52"
-    },
-    {
-     "id": "C1K-F64",
-     "text": "桂枝加朮附湯",
-     "formula": "F64"
-    },
-    {
-     "id": "C1K-F46",
-     "text": "桂枝加竜骨牡蛎湯",
-     "formula": "F46"
-    },
-    {
-     "id": "C1K-F16",
-     "text": "桂枝茯苓丸",
-     "formula": "F16"
-    },
-    {
-     "id": "C1K-F38",
-     "text": "桂枝茯苓丸加薏苡仁",
-     "formula": "F38"
-    },
-    {
-     "id": "C1K-F51",
-     "text": "啓脾湯",
-     "formula": "F51"
-    },
-    {
-     "id": "C1K-F12",
-     "text": "香蘇散",
-     "formula": "F12"
-    },
-    {
-     "id": "C1K-F32",
-     "text": "牛車腎気丸",
-     "formula": "F32"
-    },
-    {
-     "id": "C1K-F65",
-     "text": "呉茱萸湯",
-     "formula": "F65"
-    },
-    {
-     "id": "C1K-F21",
-     "text": "五苓散",
-     "formula": "F21"
-    },
-    {
-     "id": "C1K-F14",
-     "text": "柴胡加竜骨牡蛎湯",
-     "formula": "F14"
-    },
-    {
-     "id": "C1K-F47",
-     "text": "柴胡桂枝乾姜湯",
-     "formula": "F47"
-    },
-    {
-     "id": "C1K-F09",
-     "text": "酸棗仁湯",
-     "formula": "F09"
-    },
-    {
-     "id": "C1K-F13",
-     "text": "四逆散",
-     "formula": "F13"
-    },
-    {
-     "id": "C1K-F03",
-     "text": "四君子湯",
-     "formula": "F03"
-    },
-    {
-     "id": "C1K-F06",
-     "text": "四物湯",
-     "formula": "F06"
-    },
-    {
-     "id": "C1K-F55",
-     "text": "芍薬甘草湯",
-     "formula": "F55"
-    },
-    {
-     "id": "C1K-F53",
-     "text": "小建中湯",
-     "formula": "F53"
-    },
-    {
-     "id": "C1K-F40",
-     "text": "消風散",
-     "formula": "F40"
-    },
-    {
-     "id": "C1K-F24",
-     "text": "真武湯",
-     "formula": "F24"
-    },
-    {
-     "id": "C1K-F29",
-     "text": "滋陰降火湯",
-     "formula": "F29"
-    },
-    {
-     "id": "C1K-F04",
-     "text": "十全大補湯",
-     "formula": "F04"
-    },
-    {
-     "id": "C1K-F39",
-     "text": "十味敗毒湯",
-     "formula": "F39"
-    },
-    {
-     "id": "C1K-F57",
-     "text": "潤腸湯",
-     "formula": "F57"
-    },
-    {
-     "id": "C1K-F61",
-     "text": "清心蓮子飲",
-     "formula": "F61"
-    },
-    {
-     "id": "C1K-F36",
-     "text": "清上防風湯",
-     "formula": "F36"
-    },
-    {
-     "id": "C1K-F62",
-     "text": "疎経活血湯",
-     "formula": "F62"
-    },
-    {
-     "id": "C1K-F58",
-     "text": "大黄甘草湯",
-     "formula": "F58"
-    },
-    {
-     "id": "C1K-F15",
-     "text": "大柴胡湯",
-     "formula": "F15"
-    },
-    {
-     "id": "C1K-F30",
-     "text": "知柏地黄丸",
-     "formula": "F30"
-    },
-    {
-     "id": "C1K-F66",
-     "text": "釣藤散",
-     "formula": "F66"
-    },
-    {
-     "id": "C1K-F60",
-     "text": "猪苓湯",
-     "formula": "F60"
-    },
-    {
-     "id": "C1K-F20",
-     "text": "通導散",
-     "formula": "F20"
-    },
-    {
-     "id": "C1K-F17",
-     "text": "桃核承気湯",
-     "formula": "F17"
-    },
-    {
-     "id": "C1K-F42",
-     "text": "当帰飲子",
-     "formula": "F42"
-    },
-    {
-     "id": "C1K-F34",
-     "text": "当帰四逆加呉茱萸生姜湯",
-     "formula": "F34"
-    },
-    {
-     "id": "C1K-F07",
-     "text": "当帰芍薬散",
-     "formula": "F07"
-    },
-    {
-     "id": "C1K-F25",
-     "text": "二陳湯",
-     "formula": "F25"
-    },
-    {
-     "id": "C1K-F68",
-     "text": "女神散",
-     "formula": "F68"
-    },
-    {
-     "id": "C1K-F33",
-     "text": "人参湯",
-     "formula": "F33"
-    },
-    {
-     "id": "C1K-F05",
-     "text": "人参養栄湯",
-     "formula": "F05"
-    },
-    {
-     "id": "C1K-F31",
-     "text": "八味地黄丸",
-     "formula": "F31"
-    },
-    {
-     "id": "C1K-F10",
-     "text": "半夏厚朴湯",
-     "formula": "F10"
-    },
-    {
-     "id": "C1K-F49",
-     "text": "半夏瀉心湯",
-     "formula": "F49"
-    },
-    {
-     "id": "C1K-F67",
-     "text": "半夏白朮天麻湯",
-     "formula": "F67"
-    },
-    {
-     "id": "C1K-F28",
-     "text": "麦門冬湯",
-     "formula": "F28"
-    },
-    {
-     "id": "C1K-F50",
-     "text": "平胃散",
-     "formula": "F50"
-    },
-    {
-     "id": "C1K-F01",
-     "text": "補中益気湯",
-     "formula": "F01"
-    },
-    {
-     "id": "C1K-F23",
-     "text": "防已黄耆湯",
-     "formula": "F23"
-    },
-    {
-     "id": "C1K-F26",
-     "text": "防風通聖散",
-     "formula": "F26"
-    },
-    {
-     "id": "C1K-F56",
-     "text": "麻子仁丸",
-     "formula": "F56"
-    },
-    {
-     "id": "C1K-F63",
-     "text": "薏苡仁湯",
-     "formula": "F63"
-    },
-    {
-     "id": "C1K-F44",
-     "text": "抑肝散",
-     "formula": "F44"
-    },
-    {
-     "id": "C1K-F45",
-     "text": "抑肝散加陳皮半夏",
-     "formula": "F45"
-    },
-    {
-     "id": "C1K-F02",
-     "text": "六君子湯",
-     "formula": "F02"
-    },
-    {
-     "id": "C1K-F22",
-     "text": "苓桂朮甘湯",
-     "formula": "F22"
-    },
-    {
-     "id": "C1K-F27",
-     "text": "六味丸",
-     "formula": "F27"
-    },
-    {
-     "id": "C1K-other",
-     "text": "一覧にない漢方薬"
+     "id": "C1K-yes",
+     "text": "はい",
+     "flags": [
+      "kampo_current"
+     ]
+    },
+    {
+     "id": "C1K-no",
+     "text": "いいえ"
     },
     {
      "id": "C1K-unknown",
@@ -9247,9 +8254,25 @@
    ]
   },
   {
+   "id": "C1NB",
+   "section": "safety",
+   "title": "お薬手帳をお持ちですか",
+   "type": "single",
+   "options": [
+    {
+     "id": "C1NB-yes",
+     "text": "はい"
+    },
+    {
+     "id": "C1NB-no",
+     "text": "いいえ"
+    }
+   ]
+  },
+  {
    "id": "C2",
    "section": "safety",
-   "title": "医師の治療を受けている病気はありますか",
+   "title": "医師の治療を受けている病気や、これまでに受けた手術はありますか",
    "type": "multi",
    "options": [
     {
@@ -9330,6 +8353,13 @@
      ]
     },
     {
+     "id": "C2-surgery",
+     "text": "これまでに手術を受けたことがある",
+     "flags": [
+      "surgery"
+     ]
+    },
+    {
      "id": "C2-0",
      "text": "ない",
      "exclusive": "none"
@@ -9344,22 +8374,33 @@
   {
    "id": "C3",
    "section": "safety",
-   "title": "薬や食品でアレルギーが出たことはありますか",
+   "title": "薬や食品で、アレルギーや体調不良が出たことはありますか",
    "type": "multi",
+   "help": "「ある」を選んだら、何に出たかを短く書いてください（書かなくても進めます）。",
    "options": [
     {
      "id": "C3-drug",
      "text": "薬でアレルギーが出たことがある",
      "flags": [
-      "allergy"
-     ]
+      "allergy_drug"
+     ],
+     "note": true
     },
     {
      "id": "C3-food",
      "text": "食品でアレルギーが出たことがある",
      "flags": [
-      "allergy"
-     ]
+      "allergy_food"
+     ],
+     "note": true
+    },
+    {
+     "id": "C3-kampo",
+     "text": "漢方薬で体調を崩したことがある",
+     "flags": [
+      "adverse_kampo"
+     ],
+     "note": true
     },
     {
      "id": "C3-none",
@@ -9371,663 +8412,406 @@
      "text": "わからない",
      "exclusive": "unknown"
     }
-   ]
-  },
-  {
-   "id": "C4",
-   "section": "safety",
-   "title": "漢方薬を飲んで体調を崩したことはありますか",
-   "type": "single",
-   "options": [
-    {
-     "id": "C4-yes",
-     "text": "ある",
-     "flags": [
-      "adverse_kampo"
-     ]
-    },
-    {
-     "id": "C4-no",
-     "text": "ない"
-    },
-    {
-     "id": "C4-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
-    }
-   ]
-  },
-  {
-   "id": "C4K",
-   "section": "safety",
-   "title": "体調を崩したときの漢方薬を選んでください",
-   "type": "multi",
-   "trigger": {
-    "chosen": [
-     "C4-yes"
-    ]
-   },
-   "help": "名前がわからなければ「わからない」を選んでください。",
-   "options": [
-    {
-     "id": "C4K-F48",
-     "text": "安中散",
-     "formula": "F48"
-    },
-    {
-     "id": "C4K-F19",
-     "text": "温経湯",
-     "formula": "F19"
-    },
-    {
-     "id": "C4K-F41",
-     "text": "温清飲",
-     "formula": "F41"
-    },
-    {
-     "id": "C4K-F54",
-     "text": "黄耆建中湯",
-     "formula": "F54"
-    },
-    {
-     "id": "C4K-F35",
-     "text": "黄連解毒湯",
-     "formula": "F35"
-    },
-    {
-     "id": "C4K-F59",
-     "text": "乙字湯",
-     "formula": "F59"
-    },
-    {
-     "id": "C4K-F43",
-     "text": "加味帰脾湯",
-     "formula": "F43"
-    },
-    {
-     "id": "C4K-F11",
-     "text": "加味逍遥散",
-     "formula": "F11"
-    },
-    {
-     "id": "C4K-F08",
-     "text": "帰脾湯",
-     "formula": "F08"
-    },
-    {
-     "id": "C4K-F18",
-     "text": "芎帰調血飲",
-     "formula": "F18"
-    },
-    {
-     "id": "C4K-F37",
-     "text": "荊芥連翹湯",
-     "formula": "F37"
-    },
-    {
-     "id": "C4K-F52",
-     "text": "桂枝加芍薬湯",
-     "formula": "F52"
-    },
-    {
-     "id": "C4K-F64",
-     "text": "桂枝加朮附湯",
-     "formula": "F64"
-    },
-    {
-     "id": "C4K-F46",
-     "text": "桂枝加竜骨牡蛎湯",
-     "formula": "F46"
-    },
-    {
-     "id": "C4K-F16",
-     "text": "桂枝茯苓丸",
-     "formula": "F16"
-    },
-    {
-     "id": "C4K-F38",
-     "text": "桂枝茯苓丸加薏苡仁",
-     "formula": "F38"
-    },
-    {
-     "id": "C4K-F51",
-     "text": "啓脾湯",
-     "formula": "F51"
-    },
-    {
-     "id": "C4K-F12",
-     "text": "香蘇散",
-     "formula": "F12"
-    },
-    {
-     "id": "C4K-F32",
-     "text": "牛車腎気丸",
-     "formula": "F32"
-    },
-    {
-     "id": "C4K-F65",
-     "text": "呉茱萸湯",
-     "formula": "F65"
-    },
-    {
-     "id": "C4K-F21",
-     "text": "五苓散",
-     "formula": "F21"
-    },
-    {
-     "id": "C4K-F14",
-     "text": "柴胡加竜骨牡蛎湯",
-     "formula": "F14"
-    },
-    {
-     "id": "C4K-F47",
-     "text": "柴胡桂枝乾姜湯",
-     "formula": "F47"
-    },
-    {
-     "id": "C4K-F09",
-     "text": "酸棗仁湯",
-     "formula": "F09"
-    },
-    {
-     "id": "C4K-F13",
-     "text": "四逆散",
-     "formula": "F13"
-    },
-    {
-     "id": "C4K-F03",
-     "text": "四君子湯",
-     "formula": "F03"
-    },
-    {
-     "id": "C4K-F06",
-     "text": "四物湯",
-     "formula": "F06"
-    },
-    {
-     "id": "C4K-F55",
-     "text": "芍薬甘草湯",
-     "formula": "F55"
-    },
-    {
-     "id": "C4K-F53",
-     "text": "小建中湯",
-     "formula": "F53"
-    },
-    {
-     "id": "C4K-F40",
-     "text": "消風散",
-     "formula": "F40"
-    },
-    {
-     "id": "C4K-F24",
-     "text": "真武湯",
-     "formula": "F24"
-    },
-    {
-     "id": "C4K-F29",
-     "text": "滋陰降火湯",
-     "formula": "F29"
-    },
-    {
-     "id": "C4K-F04",
-     "text": "十全大補湯",
-     "formula": "F04"
-    },
-    {
-     "id": "C4K-F39",
-     "text": "十味敗毒湯",
-     "formula": "F39"
-    },
-    {
-     "id": "C4K-F57",
-     "text": "潤腸湯",
-     "formula": "F57"
-    },
-    {
-     "id": "C4K-F61",
-     "text": "清心蓮子飲",
-     "formula": "F61"
-    },
-    {
-     "id": "C4K-F36",
-     "text": "清上防風湯",
-     "formula": "F36"
-    },
-    {
-     "id": "C4K-F62",
-     "text": "疎経活血湯",
-     "formula": "F62"
-    },
-    {
-     "id": "C4K-F58",
-     "text": "大黄甘草湯",
-     "formula": "F58"
-    },
-    {
-     "id": "C4K-F15",
-     "text": "大柴胡湯",
-     "formula": "F15"
-    },
-    {
-     "id": "C4K-F30",
-     "text": "知柏地黄丸",
-     "formula": "F30"
-    },
-    {
-     "id": "C4K-F66",
-     "text": "釣藤散",
-     "formula": "F66"
-    },
-    {
-     "id": "C4K-F60",
-     "text": "猪苓湯",
-     "formula": "F60"
-    },
-    {
-     "id": "C4K-F20",
-     "text": "通導散",
-     "formula": "F20"
-    },
-    {
-     "id": "C4K-F17",
-     "text": "桃核承気湯",
-     "formula": "F17"
-    },
-    {
-     "id": "C4K-F42",
-     "text": "当帰飲子",
-     "formula": "F42"
-    },
-    {
-     "id": "C4K-F34",
-     "text": "当帰四逆加呉茱萸生姜湯",
-     "formula": "F34"
-    },
-    {
-     "id": "C4K-F07",
-     "text": "当帰芍薬散",
-     "formula": "F07"
-    },
-    {
-     "id": "C4K-F25",
-     "text": "二陳湯",
-     "formula": "F25"
-    },
-    {
-     "id": "C4K-F68",
-     "text": "女神散",
-     "formula": "F68"
-    },
-    {
-     "id": "C4K-F33",
-     "text": "人参湯",
-     "formula": "F33"
-    },
-    {
-     "id": "C4K-F05",
-     "text": "人参養栄湯",
-     "formula": "F05"
-    },
-    {
-     "id": "C4K-F31",
-     "text": "八味地黄丸",
-     "formula": "F31"
-    },
-    {
-     "id": "C4K-F10",
-     "text": "半夏厚朴湯",
-     "formula": "F10"
-    },
-    {
-     "id": "C4K-F49",
-     "text": "半夏瀉心湯",
-     "formula": "F49"
-    },
-    {
-     "id": "C4K-F67",
-     "text": "半夏白朮天麻湯",
-     "formula": "F67"
-    },
-    {
-     "id": "C4K-F28",
-     "text": "麦門冬湯",
-     "formula": "F28"
-    },
-    {
-     "id": "C4K-F50",
-     "text": "平胃散",
-     "formula": "F50"
-    },
-    {
-     "id": "C4K-F01",
-     "text": "補中益気湯",
-     "formula": "F01"
-    },
-    {
-     "id": "C4K-F23",
-     "text": "防已黄耆湯",
-     "formula": "F23"
-    },
-    {
-     "id": "C4K-F26",
-     "text": "防風通聖散",
-     "formula": "F26"
-    },
-    {
-     "id": "C4K-F56",
-     "text": "麻子仁丸",
-     "formula": "F56"
-    },
-    {
-     "id": "C4K-F63",
-     "text": "薏苡仁湯",
-     "formula": "F63"
-    },
-    {
-     "id": "C4K-F44",
-     "text": "抑肝散",
-     "formula": "F44"
-    },
-    {
-     "id": "C4K-F45",
-     "text": "抑肝散加陳皮半夏",
-     "formula": "F45"
-    },
-    {
-     "id": "C4K-F02",
-     "text": "六君子湯",
-     "formula": "F02"
-    },
-    {
-     "id": "C4K-F22",
-     "text": "苓桂朮甘湯",
-     "formula": "F22"
-    },
-    {
-     "id": "C4K-F27",
-     "text": "六味丸",
-     "formula": "F27"
-    },
-    {
-     "id": "C4K-other",
-     "text": "一覧にない漢方薬"
-    },
-    {
-     "id": "C4K-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
-    }
-   ]
-  },
-  {
-   "id": "C4S",
-   "section": "safety",
-   "title": "そのとき、どのような症状が出ましたか",
-   "type": "multi",
-   "trigger": {
-    "chosen": [
-     "C4-yes"
-    ]
-   },
-   "options": [
-    {
-     "id": "C4S-rash",
-     "text": "発疹・かゆみ"
-    },
-    {
-     "id": "C4S-gi",
-     "text": "胃の不快感・食欲不振"
-    },
-    {
-     "id": "C4S-diarrhea",
-     "text": "下痢"
-    },
-    {
-     "id": "C4S-edema",
-     "text": "むくみ・血圧が上がった"
-    },
-    {
-     "id": "C4S-palp",
-     "text": "動悸"
-    },
-    {
-     "id": "C4S-liver",
-     "text": "肝機能の異常を指摘された"
-    },
-    {
-     "id": "C4S-fatigue",
-     "text": "強いだるさ"
-    },
-    {
-     "id": "C4S-other",
-     "text": "その他"
-    },
-    {
-     "id": "C4S-unknown",
-     "text": "覚えていない",
-     "exclusive": "unknown"
-    }
-   ]
-  },
-  {
-   "id": "D1",
-   "section": "lifestyle",
-   "title": "食事の傾向",
-   "type": "multi",
-   "options": [
-    {
-     "id": "D1-1",
-     "text": "食事を抜くことが多い"
-    },
-    {
-     "id": "D1-3",
-     "text": "甘いものをよく食べる"
-    },
-    {
-     "id": "D1-8",
-     "text": "脂っこいものをよく食べる"
-    },
-    {
-     "id": "D1-4",
-     "text": "冷たい飲み物をよくとる"
-    },
-    {
-     "id": "D1-6",
-     "text": "辛いものをよく食べる"
-    },
-    {
-     "id": "D1-0",
-     "text": "特にない",
-     "exclusive": "none"
-    }
-   ]
-  },
-  {
-   "id": "D2",
-   "section": "lifestyle",
-   "title": "睡眠時間と就寝時刻",
-   "type": "single",
-   "options": [
-    {
-     "id": "D2-1",
-     "text": "6時間未満"
-    },
-    {
-     "id": "D2-2",
-     "text": "6〜7時間"
-    },
-    {
-     "id": "D2-3",
-     "text": "7時間以上"
-    }
    ],
-   "sub": {
-    "title": "就寝は",
+   "followup": {
+    "when": "C3-kampo",
+    "id": "C3S",
+    "title": "漢方薬で体調を崩したとき、どのような症状が出ましたか",
+    "type": "multi",
     "options": [
      {
-      "id": "D2s-1",
-      "text": "24時前"
+      "id": "C3S-rash",
+      "text": "発疹・かゆみ"
      },
      {
-      "id": "D2s-2",
-      "text": "24時以降"
+      "id": "C3S-gi",
+      "text": "胃の不快感・食欲不振"
+     },
+     {
+      "id": "C3S-diarrhea",
+      "text": "下痢"
+     },
+     {
+      "id": "C3S-edema",
+      "text": "むくみ・血圧が上がった"
+     },
+     {
+      "id": "C3S-palp",
+      "text": "動悸"
+     },
+     {
+      "id": "C3S-cough",
+      "text": "空咳・息苦しさ",
+      "flags": [
+       "serious"
+      ]
+     },
+     {
+      "id": "C3S-liver",
+      "text": "肝機能の異常を指摘された",
+      "flags": [
+       "serious"
+      ]
+     },
+     {
+      "id": "C3S-fatigue",
+      "text": "強いだるさ"
+     },
+     {
+      "id": "C3S-other",
+      "text": "その他"
+     },
+     {
+      "id": "C3S-unknown",
+      "text": "覚えていない",
+      "exclusive": "unknown"
      }
     ]
    }
   },
   {
-   "id": "D3",
+   "id": "L1",
    "section": "lifestyle",
-   "title": "運動と入浴",
-   "type": "single",
-   "options": [
-    {
-     "id": "D3-1",
-     "text": "運動はほぼしない"
-    },
-    {
-     "id": "D3-2",
-     "text": "週1〜2回"
-    },
-    {
-     "id": "D3-3",
-     "text": "週3回以上"
-    }
-   ],
-   "sub": {
-    "title": "入浴は",
-    "options": [
-     {
-      "id": "D3s-1",
-      "text": "シャワーのみ"
-     },
-     {
-      "id": "D3s-2",
-      "text": "湯船につかる"
-     }
-    ]
-   }
-  },
-  {
-   "id": "D4",
-   "section": "lifestyle",
-   "title": "飲酒・喫煙・仕事",
+   "title": "生活習慣について、あてはまるものを選んでください",
    "type": "multi",
    "options": [
     {
-     "id": "D4-1",
-     "text": "お酒を週3回以上飲む"
+     "id": "L1-skip_meal",
+     "text": "食事を抜くことが多い",
+     "heading": "食事"
     },
     {
-     "id": "D4-2",
-     "text": "タバコを吸う"
+     "id": "L1-sweet",
+     "text": "甘いものをよく食べる",
+     "heading": "食事"
     },
     {
-     "id": "D4-3",
-     "text": "デスクワークが多い"
+     "id": "L1-greasy",
+     "text": "脂っこいものをよく食べる",
+     "heading": "食事"
     },
     {
-     "id": "D4-4",
-     "text": "立ち仕事が多い"
+     "id": "L1-spicy",
+     "text": "辛いものをよく食べる",
+     "heading": "食事"
     },
     {
-     "id": "D4-5",
-     "text": "目をよく使う"
+     "id": "L1-cold_drink",
+     "text": "冷たい飲み物をよくとる",
+     "heading": "食事"
     },
     {
-     "id": "D4-0",
+     "id": "L1-short_sleep",
+     "text": "睡眠が6時間未満",
+     "heading": "睡眠"
+    },
+    {
+     "id": "L1-late_bed",
+     "text": "寝るのが23時以降",
+     "heading": "睡眠"
+    },
+    {
+     "id": "L1-irregular",
+     "text": "生活が不規則・夜勤がある",
+     "heading": "睡眠"
+    },
+    {
+     "id": "L1-no_exercise",
+     "text": "運動はほとんどしない",
+     "heading": "運動・お風呂"
+    },
+    {
+     "id": "L1-shower_only",
+     "text": "お風呂はシャワーだけ",
+     "heading": "運動・お風呂"
+    },
+    {
+     "id": "L1-alcohol",
+     "text": "お酒を週3回以上飲む",
+     "heading": "お酒・タバコ・仕事"
+    },
+    {
+     "id": "L1-smoke",
+     "text": "タバコを吸う",
+     "heading": "お酒・タバコ・仕事"
+    },
+    {
+     "id": "L1-desk",
+     "text": "デスクワークが多い",
+     "heading": "お酒・タバコ・仕事"
+    },
+    {
+     "id": "L1-standing",
+     "text": "立ち仕事が多い",
+     "heading": "お酒・タバコ・仕事"
+    },
+    {
+     "id": "L1-eyes",
+     "text": "目をよく使う",
+     "heading": "お酒・タバコ・仕事"
+    },
+    {
+     "id": "L1-none",
      "text": "どれもあてはまらない",
      "exclusive": "none"
     }
    ]
   },
   {
-   "id": "X_tongue",
+   "id": "X_tongue_color",
    "section": "staff",
-   "title": "舌の所見（いちばん近いもの。複数可）",
+   "title": "舌の色",
    "type": "multi",
    "options": [
     {
-     "id": "X_tongue-tongue_p1",
-     "text": "白っぽく、歯の跡がある",
-     "findings": [
-      "tongue_p1"
-     ],
-     "image": "/assets/kampo/tongue/p1.webp"
+     "id": "X_tongue_color-normal",
+     "text": "淡紅色（ふつう）",
+     "exclusive": "none"
     },
     {
-     "id": "X_tongue-tongue_p2",
-     "text": "淡白で薄く小さい",
+     "id": "X_tongue_color-tongue_color_pale",
+     "text": "淡白（白っぽい）",
      "findings": [
-      "tongue_p2"
-     ],
-     "image": "/assets/kampo/tongue/p2.webp"
-    },
-    {
-     "id": "X_tongue-tongue_p3",
-     "text": "舌の両縁が赤い",
-     "findings": [
-      "tongue_p3"
-     ],
-     "image": "/assets/kampo/tongue/p3.webp"
-    },
-    {
-     "id": "X_tongue-tongue_p4",
-     "text": "紫色・瘀点・舌下静脈の怒張",
-     "findings": [
-      "tongue_p4"
-     ],
-     "image": "/assets/kampo/tongue/p4.webp"
-    },
-    {
-     "id": "X_tongue-tongue_p5",
-     "text": "大きく、歯痕があり、苔が厚く湿っている",
-     "findings": [
-      "tongue_p5"
-     ],
-     "image": "/assets/kampo/tongue/p5.webp"
-    },
-    {
-     "id": "X_tongue-tongue_p6",
-     "text": "赤く、乾燥し、苔が少ない",
-     "findings": [
-      "tongue_p6"
-     ],
-     "image": "/assets/kampo/tongue/p6.webp"
-    },
-    {
-     "id": "X_tongue-tongue_p7",
-     "text": "白っぽく大きく、苔が白く湿っている",
-     "findings": [
-      "tongue_p7"
-     ],
-     "image": "/assets/kampo/tongue/p7.webp"
-    },
-    {
-     "id": "X_tongue-tongue_p8",
-     "text": "鮮紅色で黄色い苔がある",
-     "findings": [
-      "tongue_p8"
-     ],
-     "image": "/assets/kampo/tongue/p8.webp"
-    },
-    {
-     "id": "X_tongue-tongue_normal",
-     "text": "特記なし（淡紅舌・薄白苔）",
-     "findings": [
-      "tongue_normal"
+      "tongue_color_pale"
      ]
     },
     {
-     "id": "X_tongue-tongue_severe",
-     "text": "灰黒苔・鏡面舌・舌の偏位や震え",
+     "id": "X_tongue_color-tongue_color_red",
+     "text": "紅（赤い）",
      "findings": [
-      "tongue_severe"
+      "tongue_color_red"
+     ]
+    },
+    {
+     "id": "X_tongue_color-tongue_color_purple",
+     "text": "暗紫・瘀点がある",
+     "findings": [
+      "tongue_color_purple"
+     ]
+    },
+    {
+     "id": "X_tongue_color-tongue_edge_red",
+     "text": "舌の両縁が赤い",
+     "findings": [
+      "tongue_edge_red"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "X_tongue_shape",
+   "section": "staff",
+   "title": "舌の形",
+   "type": "multi",
+   "options": [
+    {
+     "id": "X_tongue_shape-normal",
+     "text": "ふつう",
+     "exclusive": "none"
+    },
+    {
+     "id": "X_tongue_shape-tongue_shape_swollen",
+     "text": "大きい・腫れぼったい（胖大）",
+     "findings": [
+      "tongue_shape_swollen"
+     ]
+    },
+    {
+     "id": "X_tongue_shape-tongue_shape_thin",
+     "text": "小さい・薄い（痩薄）",
+     "findings": [
+      "tongue_shape_thin"
+     ]
+    },
+    {
+     "id": "X_tongue_shape-tongue_teeth_marks",
+     "text": "歯の跡がある（歯痕）",
+     "findings": [
+      "tongue_teeth_marks"
+     ]
+    },
+    {
+     "id": "X_tongue_shape-tongue_fissured",
+     "text": "ひび割れがある（裂紋）",
+     "findings": [
+      "tongue_fissured"
+     ]
+    },
+    {
+     "id": "X_tongue_shape-tongue_deviation",
+     "text": "偏位・震え",
+     "findings": [
+      "tongue_deviation"
      ],
      "tags": [
       "tongue_severe"
      ]
+    }
+   ]
+  },
+  {
+   "id": "X_tongue_coat",
+   "section": "staff",
+   "title": "舌苔",
+   "type": "multi",
+   "options": [
+    {
+     "id": "X_tongue_coat-normal",
+     "text": "薄く白い（ふつう）",
+     "exclusive": "none"
+    },
+    {
+     "id": "X_tongue_coat-tongue_coat_thick",
+     "text": "厚い",
+     "findings": [
+      "tongue_coat_thick"
+     ]
+    },
+    {
+     "id": "X_tongue_coat-tongue_coat_yellow",
+     "text": "黄色い",
+     "findings": [
+      "tongue_coat_yellow"
+     ]
+    },
+    {
+     "id": "X_tongue_coat-tongue_coat_little",
+     "text": "少ない・ない",
+     "findings": [
+      "tongue_coat_little"
+     ]
+    },
+    {
+     "id": "X_tongue_coat-tongue_coat_wet",
+     "text": "湿っている",
+     "findings": [
+      "tongue_coat_wet"
+     ]
+    },
+    {
+     "id": "X_tongue_coat-tongue_coat_dry",
+     "text": "乾いている",
+     "findings": [
+      "tongue_coat_dry"
+     ]
+    },
+    {
+     "id": "X_tongue_coat-tongue_coat_grayblack",
+     "text": "灰黒色",
+     "findings": [
+      "tongue_coat_grayblack"
+     ],
+     "tags": [
+      "tongue_severe"
+     ]
+    },
+    {
+     "id": "X_tongue_coat-tongue_mirror",
+     "text": "苔がなく鏡のように光る",
+     "findings": [
+      "tongue_mirror"
+     ],
+     "tags": [
+      "tongue_severe"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "X_tongue_vein",
+   "section": "staff",
+   "title": "舌下静脈",
+   "type": "single",
+   "options": [
+    {
+     "id": "X_tongue_vein-normal",
+     "text": "ふつう",
+     "exclusive": "none"
+    },
+    {
+     "id": "X_tongue_vein-tongue_sublingual_distended",
+     "text": "太く紫色に浮き出ている（怒張）",
+     "findings": [
+      "tongue_sublingual_distended"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "X_face",
+   "section": "staff",
+   "title": "顔色（観察）",
+   "type": "single",
+   "help": "化粧などで判断できないときは「判断できない」を選ぶと、ご本人の回答を使います。",
+   "options": [
+    {
+     "id": "X_face-normal",
+     "text": "特に気になることはない",
+     "exclusive": "none",
+     "image": "/assets/kampo/face/normal.webp"
+    },
+    {
+     "id": "X_face-face_pale",
+     "text": "血色が悪く、白っぽい",
+     "findings": [
+      "face_pale"
+     ],
+     "image": "/assets/kampo/face/pale.webp"
+    },
+    {
+     "id": "X_face-face_dark",
+     "text": "顔色が暗く、くすんでいる",
+     "findings": [
+      "face_dark"
+     ],
+     "image": "/assets/kampo/face/dark.webp"
+    },
+    {
+     "id": "X_face-face_red",
+     "text": "顔が赤くなりやすい",
+     "findings": [
+      "face_red"
+     ],
+     "image": "/assets/kampo/face/red.webp"
+    },
+    {
+     "id": "X_face-face_bluish",
+     "text": "顔色が青白い",
+     "findings": [
+      "face_bluish"
+     ],
+     "image": "/assets/kampo/face/bluish.webp"
+    },
+    {
+     "id": "X_face-defer",
+     "text": "判断できない（化粧など）",
+     "defer": true
+    }
+   ]
+  },
+  {
+   "id": "X_nail",
+   "section": "staff",
+   "title": "爪（観察）",
+   "type": "single",
+   "help": "ネイルなどで判断できないときは「判断できない」を選ぶと、ご本人の回答を使います。",
+   "options": [
+    {
+     "id": "X_nail-nail_brittle",
+     "text": "薄い・割れやすい",
+     "findings": [
+      "nail_brittle"
+     ]
+    },
+    {
+     "id": "X_nail-normal",
+     "text": "特記なし",
+     "exclusive": "none"
+    },
+    {
+     "id": "X_nail-defer",
+     "text": "判断できない（ネイルなど）",
+     "defer": true
     }
    ]
   },
@@ -10100,6 +8884,735 @@
      "findings": [
       "voice_strong"
      ]
+    }
+   ]
+  },
+  {
+   "id": "X_preg",
+   "section": "staff",
+   "title": "妊娠・授乳（口頭で確認）",
+   "type": "single",
+   "options": [
+    {
+     "id": "X_preg-no",
+     "text": "いずれでもない"
+    },
+    {
+     "id": "X_preg-preg",
+     "text": "妊娠中",
+     "flags": [
+      "pregnancy"
+     ]
+    },
+    {
+     "id": "X_preg-maybe",
+     "text": "妊娠の可能性がある",
+     "flags": [
+      "pregnancy"
+     ]
+    },
+    {
+     "id": "X_preg-lact",
+     "text": "授乳中",
+     "flags": [
+      "lactation"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "X_kampo_current",
+   "section": "staff",
+   "title": "服用中の漢方薬（お薬手帳・口頭で確認）",
+   "type": "multi",
+   "options": [
+    {
+     "id": "X_kampo_current-F48",
+     "text": "安中散",
+     "formula": "F48"
+    },
+    {
+     "id": "X_kampo_current-F19",
+     "text": "温経湯",
+     "formula": "F19"
+    },
+    {
+     "id": "X_kampo_current-F41",
+     "text": "温清飲",
+     "formula": "F41"
+    },
+    {
+     "id": "X_kampo_current-F54",
+     "text": "黄耆建中湯",
+     "formula": "F54"
+    },
+    {
+     "id": "X_kampo_current-F35",
+     "text": "黄連解毒湯",
+     "formula": "F35"
+    },
+    {
+     "id": "X_kampo_current-F59",
+     "text": "乙字湯",
+     "formula": "F59"
+    },
+    {
+     "id": "X_kampo_current-F43",
+     "text": "加味帰脾湯",
+     "formula": "F43"
+    },
+    {
+     "id": "X_kampo_current-F11",
+     "text": "加味逍遥散",
+     "formula": "F11"
+    },
+    {
+     "id": "X_kampo_current-F08",
+     "text": "帰脾湯",
+     "formula": "F08"
+    },
+    {
+     "id": "X_kampo_current-F18",
+     "text": "芎帰調血飲",
+     "formula": "F18"
+    },
+    {
+     "id": "X_kampo_current-F37",
+     "text": "荊芥連翹湯",
+     "formula": "F37"
+    },
+    {
+     "id": "X_kampo_current-F52",
+     "text": "桂枝加芍薬湯",
+     "formula": "F52"
+    },
+    {
+     "id": "X_kampo_current-F64",
+     "text": "桂枝加朮附湯",
+     "formula": "F64"
+    },
+    {
+     "id": "X_kampo_current-F46",
+     "text": "桂枝加竜骨牡蛎湯",
+     "formula": "F46"
+    },
+    {
+     "id": "X_kampo_current-F16",
+     "text": "桂枝茯苓丸",
+     "formula": "F16"
+    },
+    {
+     "id": "X_kampo_current-F38",
+     "text": "桂枝茯苓丸加薏苡仁",
+     "formula": "F38"
+    },
+    {
+     "id": "X_kampo_current-F51",
+     "text": "啓脾湯",
+     "formula": "F51"
+    },
+    {
+     "id": "X_kampo_current-F12",
+     "text": "香蘇散",
+     "formula": "F12"
+    },
+    {
+     "id": "X_kampo_current-F32",
+     "text": "牛車腎気丸",
+     "formula": "F32"
+    },
+    {
+     "id": "X_kampo_current-F65",
+     "text": "呉茱萸湯",
+     "formula": "F65"
+    },
+    {
+     "id": "X_kampo_current-F21",
+     "text": "五苓散",
+     "formula": "F21"
+    },
+    {
+     "id": "X_kampo_current-F14",
+     "text": "柴胡加竜骨牡蛎湯",
+     "formula": "F14"
+    },
+    {
+     "id": "X_kampo_current-F47",
+     "text": "柴胡桂枝乾姜湯",
+     "formula": "F47"
+    },
+    {
+     "id": "X_kampo_current-F09",
+     "text": "酸棗仁湯",
+     "formula": "F09"
+    },
+    {
+     "id": "X_kampo_current-F13",
+     "text": "四逆散",
+     "formula": "F13"
+    },
+    {
+     "id": "X_kampo_current-F03",
+     "text": "四君子湯",
+     "formula": "F03"
+    },
+    {
+     "id": "X_kampo_current-F06",
+     "text": "四物湯",
+     "formula": "F06"
+    },
+    {
+     "id": "X_kampo_current-F55",
+     "text": "芍薬甘草湯",
+     "formula": "F55"
+    },
+    {
+     "id": "X_kampo_current-F53",
+     "text": "小建中湯",
+     "formula": "F53"
+    },
+    {
+     "id": "X_kampo_current-F40",
+     "text": "消風散",
+     "formula": "F40"
+    },
+    {
+     "id": "X_kampo_current-F24",
+     "text": "真武湯",
+     "formula": "F24"
+    },
+    {
+     "id": "X_kampo_current-F29",
+     "text": "滋陰降火湯",
+     "formula": "F29"
+    },
+    {
+     "id": "X_kampo_current-F04",
+     "text": "十全大補湯",
+     "formula": "F04"
+    },
+    {
+     "id": "X_kampo_current-F39",
+     "text": "十味敗毒湯",
+     "formula": "F39"
+    },
+    {
+     "id": "X_kampo_current-F57",
+     "text": "潤腸湯",
+     "formula": "F57"
+    },
+    {
+     "id": "X_kampo_current-F61",
+     "text": "清心蓮子飲",
+     "formula": "F61"
+    },
+    {
+     "id": "X_kampo_current-F36",
+     "text": "清上防風湯",
+     "formula": "F36"
+    },
+    {
+     "id": "X_kampo_current-F62",
+     "text": "疎経活血湯",
+     "formula": "F62"
+    },
+    {
+     "id": "X_kampo_current-F58",
+     "text": "大黄甘草湯",
+     "formula": "F58"
+    },
+    {
+     "id": "X_kampo_current-F15",
+     "text": "大柴胡湯",
+     "formula": "F15"
+    },
+    {
+     "id": "X_kampo_current-F30",
+     "text": "知柏地黄丸",
+     "formula": "F30"
+    },
+    {
+     "id": "X_kampo_current-F66",
+     "text": "釣藤散",
+     "formula": "F66"
+    },
+    {
+     "id": "X_kampo_current-F60",
+     "text": "猪苓湯",
+     "formula": "F60"
+    },
+    {
+     "id": "X_kampo_current-F20",
+     "text": "通導散",
+     "formula": "F20"
+    },
+    {
+     "id": "X_kampo_current-F17",
+     "text": "桃核承気湯",
+     "formula": "F17"
+    },
+    {
+     "id": "X_kampo_current-F42",
+     "text": "当帰飲子",
+     "formula": "F42"
+    },
+    {
+     "id": "X_kampo_current-F34",
+     "text": "当帰四逆加呉茱萸生姜湯",
+     "formula": "F34"
+    },
+    {
+     "id": "X_kampo_current-F07",
+     "text": "当帰芍薬散",
+     "formula": "F07"
+    },
+    {
+     "id": "X_kampo_current-F25",
+     "text": "二陳湯",
+     "formula": "F25"
+    },
+    {
+     "id": "X_kampo_current-F68",
+     "text": "女神散",
+     "formula": "F68"
+    },
+    {
+     "id": "X_kampo_current-F33",
+     "text": "人参湯",
+     "formula": "F33"
+    },
+    {
+     "id": "X_kampo_current-F05",
+     "text": "人参養栄湯",
+     "formula": "F05"
+    },
+    {
+     "id": "X_kampo_current-F31",
+     "text": "八味地黄丸",
+     "formula": "F31"
+    },
+    {
+     "id": "X_kampo_current-F10",
+     "text": "半夏厚朴湯",
+     "formula": "F10"
+    },
+    {
+     "id": "X_kampo_current-F49",
+     "text": "半夏瀉心湯",
+     "formula": "F49"
+    },
+    {
+     "id": "X_kampo_current-F67",
+     "text": "半夏白朮天麻湯",
+     "formula": "F67"
+    },
+    {
+     "id": "X_kampo_current-F28",
+     "text": "麦門冬湯",
+     "formula": "F28"
+    },
+    {
+     "id": "X_kampo_current-F50",
+     "text": "平胃散",
+     "formula": "F50"
+    },
+    {
+     "id": "X_kampo_current-F01",
+     "text": "補中益気湯",
+     "formula": "F01"
+    },
+    {
+     "id": "X_kampo_current-F23",
+     "text": "防已黄耆湯",
+     "formula": "F23"
+    },
+    {
+     "id": "X_kampo_current-F26",
+     "text": "防風通聖散",
+     "formula": "F26"
+    },
+    {
+     "id": "X_kampo_current-F56",
+     "text": "麻子仁丸",
+     "formula": "F56"
+    },
+    {
+     "id": "X_kampo_current-F63",
+     "text": "薏苡仁湯",
+     "formula": "F63"
+    },
+    {
+     "id": "X_kampo_current-F44",
+     "text": "抑肝散",
+     "formula": "F44"
+    },
+    {
+     "id": "X_kampo_current-F45",
+     "text": "抑肝散加陳皮半夏",
+     "formula": "F45"
+    },
+    {
+     "id": "X_kampo_current-F02",
+     "text": "六君子湯",
+     "formula": "F02"
+    },
+    {
+     "id": "X_kampo_current-F22",
+     "text": "苓桂朮甘湯",
+     "formula": "F22"
+    },
+    {
+     "id": "X_kampo_current-F27",
+     "text": "六味丸",
+     "formula": "F27"
+    }
+   ]
+  },
+  {
+   "id": "X_kampo_adverse",
+   "section": "staff",
+   "title": "体調を崩したときの漢方薬（口頭で確認）",
+   "type": "multi",
+   "options": [
+    {
+     "id": "X_kampo_adverse-F48",
+     "text": "安中散",
+     "formula": "F48"
+    },
+    {
+     "id": "X_kampo_adverse-F19",
+     "text": "温経湯",
+     "formula": "F19"
+    },
+    {
+     "id": "X_kampo_adverse-F41",
+     "text": "温清飲",
+     "formula": "F41"
+    },
+    {
+     "id": "X_kampo_adverse-F54",
+     "text": "黄耆建中湯",
+     "formula": "F54"
+    },
+    {
+     "id": "X_kampo_adverse-F35",
+     "text": "黄連解毒湯",
+     "formula": "F35"
+    },
+    {
+     "id": "X_kampo_adverse-F59",
+     "text": "乙字湯",
+     "formula": "F59"
+    },
+    {
+     "id": "X_kampo_adverse-F43",
+     "text": "加味帰脾湯",
+     "formula": "F43"
+    },
+    {
+     "id": "X_kampo_adverse-F11",
+     "text": "加味逍遥散",
+     "formula": "F11"
+    },
+    {
+     "id": "X_kampo_adverse-F08",
+     "text": "帰脾湯",
+     "formula": "F08"
+    },
+    {
+     "id": "X_kampo_adverse-F18",
+     "text": "芎帰調血飲",
+     "formula": "F18"
+    },
+    {
+     "id": "X_kampo_adverse-F37",
+     "text": "荊芥連翹湯",
+     "formula": "F37"
+    },
+    {
+     "id": "X_kampo_adverse-F52",
+     "text": "桂枝加芍薬湯",
+     "formula": "F52"
+    },
+    {
+     "id": "X_kampo_adverse-F64",
+     "text": "桂枝加朮附湯",
+     "formula": "F64"
+    },
+    {
+     "id": "X_kampo_adverse-F46",
+     "text": "桂枝加竜骨牡蛎湯",
+     "formula": "F46"
+    },
+    {
+     "id": "X_kampo_adverse-F16",
+     "text": "桂枝茯苓丸",
+     "formula": "F16"
+    },
+    {
+     "id": "X_kampo_adverse-F38",
+     "text": "桂枝茯苓丸加薏苡仁",
+     "formula": "F38"
+    },
+    {
+     "id": "X_kampo_adverse-F51",
+     "text": "啓脾湯",
+     "formula": "F51"
+    },
+    {
+     "id": "X_kampo_adverse-F12",
+     "text": "香蘇散",
+     "formula": "F12"
+    },
+    {
+     "id": "X_kampo_adverse-F32",
+     "text": "牛車腎気丸",
+     "formula": "F32"
+    },
+    {
+     "id": "X_kampo_adverse-F65",
+     "text": "呉茱萸湯",
+     "formula": "F65"
+    },
+    {
+     "id": "X_kampo_adverse-F21",
+     "text": "五苓散",
+     "formula": "F21"
+    },
+    {
+     "id": "X_kampo_adverse-F14",
+     "text": "柴胡加竜骨牡蛎湯",
+     "formula": "F14"
+    },
+    {
+     "id": "X_kampo_adverse-F47",
+     "text": "柴胡桂枝乾姜湯",
+     "formula": "F47"
+    },
+    {
+     "id": "X_kampo_adverse-F09",
+     "text": "酸棗仁湯",
+     "formula": "F09"
+    },
+    {
+     "id": "X_kampo_adverse-F13",
+     "text": "四逆散",
+     "formula": "F13"
+    },
+    {
+     "id": "X_kampo_adverse-F03",
+     "text": "四君子湯",
+     "formula": "F03"
+    },
+    {
+     "id": "X_kampo_adverse-F06",
+     "text": "四物湯",
+     "formula": "F06"
+    },
+    {
+     "id": "X_kampo_adverse-F55",
+     "text": "芍薬甘草湯",
+     "formula": "F55"
+    },
+    {
+     "id": "X_kampo_adverse-F53",
+     "text": "小建中湯",
+     "formula": "F53"
+    },
+    {
+     "id": "X_kampo_adverse-F40",
+     "text": "消風散",
+     "formula": "F40"
+    },
+    {
+     "id": "X_kampo_adverse-F24",
+     "text": "真武湯",
+     "formula": "F24"
+    },
+    {
+     "id": "X_kampo_adverse-F29",
+     "text": "滋陰降火湯",
+     "formula": "F29"
+    },
+    {
+     "id": "X_kampo_adverse-F04",
+     "text": "十全大補湯",
+     "formula": "F04"
+    },
+    {
+     "id": "X_kampo_adverse-F39",
+     "text": "十味敗毒湯",
+     "formula": "F39"
+    },
+    {
+     "id": "X_kampo_adverse-F57",
+     "text": "潤腸湯",
+     "formula": "F57"
+    },
+    {
+     "id": "X_kampo_adverse-F61",
+     "text": "清心蓮子飲",
+     "formula": "F61"
+    },
+    {
+     "id": "X_kampo_adverse-F36",
+     "text": "清上防風湯",
+     "formula": "F36"
+    },
+    {
+     "id": "X_kampo_adverse-F62",
+     "text": "疎経活血湯",
+     "formula": "F62"
+    },
+    {
+     "id": "X_kampo_adverse-F58",
+     "text": "大黄甘草湯",
+     "formula": "F58"
+    },
+    {
+     "id": "X_kampo_adverse-F15",
+     "text": "大柴胡湯",
+     "formula": "F15"
+    },
+    {
+     "id": "X_kampo_adverse-F30",
+     "text": "知柏地黄丸",
+     "formula": "F30"
+    },
+    {
+     "id": "X_kampo_adverse-F66",
+     "text": "釣藤散",
+     "formula": "F66"
+    },
+    {
+     "id": "X_kampo_adverse-F60",
+     "text": "猪苓湯",
+     "formula": "F60"
+    },
+    {
+     "id": "X_kampo_adverse-F20",
+     "text": "通導散",
+     "formula": "F20"
+    },
+    {
+     "id": "X_kampo_adverse-F17",
+     "text": "桃核承気湯",
+     "formula": "F17"
+    },
+    {
+     "id": "X_kampo_adverse-F42",
+     "text": "当帰飲子",
+     "formula": "F42"
+    },
+    {
+     "id": "X_kampo_adverse-F34",
+     "text": "当帰四逆加呉茱萸生姜湯",
+     "formula": "F34"
+    },
+    {
+     "id": "X_kampo_adverse-F07",
+     "text": "当帰芍薬散",
+     "formula": "F07"
+    },
+    {
+     "id": "X_kampo_adverse-F25",
+     "text": "二陳湯",
+     "formula": "F25"
+    },
+    {
+     "id": "X_kampo_adverse-F68",
+     "text": "女神散",
+     "formula": "F68"
+    },
+    {
+     "id": "X_kampo_adverse-F33",
+     "text": "人参湯",
+     "formula": "F33"
+    },
+    {
+     "id": "X_kampo_adverse-F05",
+     "text": "人参養栄湯",
+     "formula": "F05"
+    },
+    {
+     "id": "X_kampo_adverse-F31",
+     "text": "八味地黄丸",
+     "formula": "F31"
+    },
+    {
+     "id": "X_kampo_adverse-F10",
+     "text": "半夏厚朴湯",
+     "formula": "F10"
+    },
+    {
+     "id": "X_kampo_adverse-F49",
+     "text": "半夏瀉心湯",
+     "formula": "F49"
+    },
+    {
+     "id": "X_kampo_adverse-F67",
+     "text": "半夏白朮天麻湯",
+     "formula": "F67"
+    },
+    {
+     "id": "X_kampo_adverse-F28",
+     "text": "麦門冬湯",
+     "formula": "F28"
+    },
+    {
+     "id": "X_kampo_adverse-F50",
+     "text": "平胃散",
+     "formula": "F50"
+    },
+    {
+     "id": "X_kampo_adverse-F01",
+     "text": "補中益気湯",
+     "formula": "F01"
+    },
+    {
+     "id": "X_kampo_adverse-F23",
+     "text": "防已黄耆湯",
+     "formula": "F23"
+    },
+    {
+     "id": "X_kampo_adverse-F26",
+     "text": "防風通聖散",
+     "formula": "F26"
+    },
+    {
+     "id": "X_kampo_adverse-F56",
+     "text": "麻子仁丸",
+     "formula": "F56"
+    },
+    {
+     "id": "X_kampo_adverse-F63",
+     "text": "薏苡仁湯",
+     "formula": "F63"
+    },
+    {
+     "id": "X_kampo_adverse-F44",
+     "text": "抑肝散",
+     "formula": "F44"
+    },
+    {
+     "id": "X_kampo_adverse-F45",
+     "text": "抑肝散加陳皮半夏",
+     "formula": "F45"
+    },
+    {
+     "id": "X_kampo_adverse-F02",
+     "text": "六君子湯",
+     "formula": "F02"
+    },
+    {
+     "id": "X_kampo_adverse-F22",
+     "text": "苓桂朮甘湯",
+     "formula": "F22"
+    },
+    {
+     "id": "X_kampo_adverse-F27",
+     "text": "六味丸",
+     "formula": "F27"
     }
    ]
   }

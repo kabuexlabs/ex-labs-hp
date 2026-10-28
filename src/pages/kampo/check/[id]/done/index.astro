@@ -1,5 +1,6 @@
 ---
 // 送信完了：お礼と「薬剤師がご説明します」。体質の点数・漢方薬は出さない（説明は薬剤師が PIN の後ろの画面で行う）。
+// 画面の右下（ボタンの見た目なし）を長押しすると、スタッフ PIN を経て担当者画面が開く。
 // 直ちに対応が必要な回答があったときだけ「すぐに近くのスタッフにお声がけください」を大きく出す（119番の一律表示はしない）。
 export const prerender = false;
 import KampoLayout from '../../../../../layouts/KampoLayout.astro';
@@ -25,7 +26,7 @@ const staffHref = `/kampo/staff/pin/?next=${encodeURIComponent(`/kampo/staff/ses
     <section class="kp-done">
       <p class="kp-done-en">THANK YOU</p>
       <h1 class="kp-done-h">回答ありがとうございました</h1>
-      <p style="font-size:17px;line-height:2.1">このあと、薬剤師が舌の状態などを確認し、<br>体質と養生、合いそうな漢方薬についてご説明します。<br>iPad をそのままスタッフにお渡しください。</p>
+      <p style="font-size:17px;line-height:2.1">このあと、薬剤師が舌の状態などを確認し、<br>体質と養生についてご説明します。<br>iPad をそのままスタッフにお渡しください。</p>
     </section>
   )}
   <button class="kp-hidden-btn" id="staffBtn" type="button" data-href={staffHref} aria-label="スタッフ用（長押し）" tabindex="-1"></button>

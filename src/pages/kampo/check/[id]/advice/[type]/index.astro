@@ -5,16 +5,17 @@ export const prerender = false;
 import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
 import AdviceBlock from '../../../../../../components/kampo/AdviceBlock.astro';
 import ResultTabs from '../../../../../../components/kampo/ResultTabs.astro';
-import { isTypeKey, TYPE_DEFS } from '../../../../../../lib/kampo/masters';
+import { isAxisKey, axisDef, axisName } from '../../../../../../lib/kampo/masters';
+import { adviceKeys } from '../../../../../../lib/kampo/scoring';
 import { getSession } from '../../../../../../lib/kampo/store';
 
 const s = await getSession(Astro.params.id ?? '');
 if (!s) return Astro.redirect('/kampo/staff/?msg=notfound', 303);
 const type = Astro.params.type ?? '';
-if (!isTypeKey(type)) return Astro.redirect(`/kampo/check/${s.id}/result/`, 303);
+if (!isAxisKey(type)) return Astro.redirect(`/kampo/check/${s.id}/result/`, 303);
 if (s.status === 'in_progress') return Astro.redirect(`/kampo/check/${s.id}/`, 303);
-const d = TYPE_DEFS[type];
-const others = [...(s.scores?.mainTypes ?? []), ...(s.scores?.subTypes ?? [])].filter((t) => t !== type);
+const d = axisDef(type);
+const others = (s.scores ? adviceKeys(s.scores) : []).filter((t) => t !== type);
 ---
 <KampoLayout title={`${d.name}の改善アドバイス`} width="normal">
   <button slot="actions" class="kp-btn pink small no-print" type="button" onclick="window.print()">印刷する</button>
@@ -23,7 +24,7 @@ const others = [...(s.scores?.mainTypes ?? []), ...(s.scores?.subTypes ?? [])].f
   <AdviceBlock type={type} answers={s.answers} />
   {others.length > 0 && (
     <div class="kp-panel no-print"><h2>ほかの体質の改善アドバイス</h2>
-      <div class="kp-panel-b" style="display:flex;gap:12px;flex-wrap:wrap">{others.map((t) => <a class="kp-btn ghost" href={`/kampo/check/${s.id}/advice/${t}/`}>{TYPE_DEFS[t].name}のアドバイスを見る</a>)}</div>
+      <div class="kp-panel-b" style="display:flex;gap:12px;flex-wrap:wrap">{others.map((t) => <a class="kp-btn ghost" href={`/kampo/check/${s.id}/advice/${t}/`}>{axisName(t)}のアドバイスを見る</a>)}</div>
     </div>
   )}
   <div class="kp-nav no-print" style="margin-top:36px"><div class="kp-nav-pill"><a class="tri-l" href={`/kampo/check/${s.id}/result/`}>結果に戻る</a><a class="tri-r" href={`/kampo/staff/session/${s.id}/`}>担当者画面へ</a></div></div>

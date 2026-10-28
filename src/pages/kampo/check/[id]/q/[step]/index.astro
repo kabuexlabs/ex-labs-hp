@@ -1,14 +1,17 @@
 ---
 // 設問（1画面1問）。回答は1問ごとに保存し、途中離脱しても同じ URL で再開できる。
-// 表示する設問と選択肢は flow.ts の walk() が決める（回答済みの所見は出さない・月経やむくみの設問は条件つき）。
+// 表示する設問と選択肢は flow.ts の walk() が決める（回答済みの所見は出さない・月経の設問は条件つき）。
 // 全部答えたら「回答の確認」へ。患者向け画面には体質の点数・漢方薬を出さない。
 // 直ちに対応が必要な選択肢を選ぶと、その場で「すぐに近くのスタッフにお声がけください」を出す（119番の一律表示はしない）。
+// 2026-10-28 修正依頼：進み具合は STEP n / 5 で出す（設問数の分母が動くため。2-4）。同時にあり得ない選択肢は同時に選べない（2-3）。
+// 主訴で選んだ睡眠の項目はチェック済みで出す（4-7）。妊娠・授乳は「回答せずに次へ」で進める（3-2）。
+// アレルギー・体調を崩した経験は、選んだら短い記入欄と症状の選択肢を同じ画面に出す（5-1）。生活習慣は小見出しで区切る（6-1）。
 export const prerender = false;
 import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
 import QMark from '../../../../../../components/kampo/QMark.astro';
-import { SECTION_LABEL } from '../../../../../../lib/kampo/masters';
+import { STEPS, stepOfSection, findingById, type Option } from '../../../../../../lib/kampo/masters';
 import { getSession, saveSession, getCustomer, saveCustomer } from '../../../../../../lib/kampo/store';
-import { walk, firstUnansweredStep, normalizeAnswer, isAnswered, sexFromAnswers, ageBandFromAnswers } from '../../../../../../lib/kampo/flow';
+import { walk, firstUnansweredStep, normalizeAnswer, isAnswered, conflictIn, sexFromAnswers, ageBandFromAnswers } from '../../../../../../lib/kampo/flow';
 import { isUrgent } from '../../../../../../lib/kampo/safety';
 import { isLegacy } from '../../../../../../lib/kampo/compute';
 
@@ -28,12 +31,23 @@ let error = '';
 
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
-  const rawIds = [...form.getAll('opt').map(String), ...(form.get('sub') ? [String(form.get('sub'))] : [])];
-  const ids = normalizeAnswer(q, rawIds);
-  if (!isAnswered(q, ids)) {
+  const skip = q.optional && form.get('skip') === '1';
+  const rawIds = [...form.getAll('opt').map(String), ...(form.get('sub') ? [String(form.get('sub'))] : []), ...form.getAll('fu').map(String)];
+  const ids = skip ? [] : normalizeAnswer(q, rawIds);
+  const conflict = skip ? null : conflictIn(q, ids);
+  if (!skip && !isAnswered(q, ids)) {
     error = q.sub ? '上下それぞれ1つずつ選んでください。' : '1つ以上選んでください。';
+  } else if (conflict) {
+    error = `「${conflict[0]}」と「${conflict[1]}」は同時に選べません。`;
   } else {
     s.answers[q.id] = ids;
+    // 短い記入欄（選んだ選択肢のものだけ残す）
+    for (const o of q.options) {
+      if (!o.note) continue;
+      const v = String(form.get(`note-${o.id}`) ?? '').replace(/\s+/g, ' ').trim().slice(0, 60);
+      if (ids.includes(o.id) && v) s.texts[o.id] = v;
+      else delete s.texts[o.id];
+    }
     // 前の回答が変わって表示されなくなった設問の回答は捨てる（判定・安全確認に混ざらないように）
     const w = walk(s.answers);
     const shown = new Set(w.steps.map((x) => x.q.id));
@@ -56,31 +70,74 @@ const selected = new Set(s.answers[q.id] ?? []);
 const multi = q.type === 'multi';
 const hint = multi ? '※あてはまるものをすべて選んでください' : '';
 const withImages = q.options.some((o) => o.image);
-const meta = SECTION_LABEL[q.section];
-// 短い選択肢は4列・3列で並べる（参考：横並びの枠）
-const maxLen = Math.max(...q.options.map((o) => o.text.length), 0);
-const cols = withImages ? 'imgs' : maxLen <= 8 && q.options.length >= 3 ? 'cols4' : maxLen <= 14 && q.options.length >= 3 ? 'cols3' : '';
+// STEP 表示：段階の中での位置を進み具合に使う（分母が動いても段階は変わらない）
+const stepIdx = stepOfSection(q.section);
+const inGroup = steps.filter((x) => stepOfSection(x.q.section) === stepIdx);
+const pos = Math.max(0, inGroup.findIndex((x) => x.q.id === q.id));
+const progressPct = Math.round((100 * (stepIdx + pos / Math.max(1, inGroup.length))) / STEPS.length);
+// 同時に選べない選択肢（所見の conflicts）
+const conflictsOf = (o: Option) => q.options.filter((b) => b !== o && (o.findings ?? []).some((f) => (findingById(f)?.conflicts ?? []).some((x) => (b.findings ?? []).includes(x)))).map((b) => b.id);
+// 小見出しごとに分ける（小見出しのない選択肢は最後のまとまり）
+const groups: { heading?: string; options: Option[] }[] = [];
+for (const o of q.options) {
+  const last = groups[groups.length - 1];
+  if (last && last.heading === o.heading) last.options.push(o);
+  else groups.push({ heading: o.heading, options: [o] });
+}
+const colsOf = (opts: Option[]) => {
+  const maxLen = Math.max(...opts.map((o) => o.text.length), 0);
+  return withImages ? 'imgs' : maxLen <= 8 && opts.length >= 3 ? 'cols4' : maxLen <= 14 && opts.length >= 3 ? 'cols3' : '';
+};
+const noteOpts = q.options.filter((o) => o.note);
+const NOTE_PH: Record<string, string> = { 'C3-drug': '例：薬の名前', 'C3-food': '例：食品の名前', 'C3-kampo': '例：漢方薬の名前' };
+const fu = q.followup;
 ---
-<KampoLayout title={`Q${stepNum} ${q.title}`} width="normal" progress={{ done: stepNum - 1, total: steps.length }}>
+<KampoLayout title={`${STEPS[stepIdx].label} ${q.title}`} width="normal" progress={{ done: progressPct, total: 100 }}>
   <form method="post" id="qform" data-qid={q.id} data-type={q.type} data-sub={q.sub ? '1' : '0'}>
-    <p class="kp-qmeta">{meta}　Q{stepNum} / {steps.length}</p>
-    {q.section === 'safety' && <p class="kp-eyebrow" style="letter-spacing:.14em;margin-bottom:4px">安心してご提案するための確認です</p>}
+    <p class="kp-qmeta">STEP {stepIdx + 1} / {STEPS.length}　{STEPS[stepIdx].label}</p>
+    {q.section === 'safety' && <p class="kp-eyebrow" style="letter-spacing:.14em;margin-bottom:4px">安心してご相談いただくための確認です</p>}
     <div class="kp-q"><QMark /><h1 class="kp-qtitle">{q.title}</h1></div>
     {hint && <p class="kp-qhint">{hint}</p>}
     {q.help && <p class="kp-qhelp">{q.help}</p>}
     {error && <p class="kp-error" style="margin:0 0 16px">{error}</p>}
-    <div class:list={['kp-opts', cols]}>
-      {q.options.map((o) => {
-        const on = selected.has(o.id);
-        return (
-          <label class:list={['kp-opt', { check: multi, none: !!o.exclusive, 'is-on': on, 'has-img': !!o.image }]}>
-            <input type={multi ? 'checkbox' : 'radio'} name="opt" value={o.id} checked={on} data-ex={o.exclusive ? '1' : '0'} data-urgent={o.urgent ? '1' : '0'}>
-            {o.image && <img class="kp-opt-img" src={o.image} alt="" width="160" height="236" loading="lazy">}
-            <span class="kp-opt-text">{o.text}</span>
-          </label>
-        );
-      })}
-    </div>
+    {groups.map((g) => (
+      <>
+        {g.heading && <p class="kp-opt-h">{g.heading}</p>}
+        <div class:list={['kp-opts', colsOf(g.options)]}>
+          {g.options.map((o) => {
+            const on = o.locked || selected.has(o.id);
+            return (
+              <label class:list={['kp-opt', { check: multi, none: !!o.exclusive, 'is-on': on, 'has-img': !!o.image, locked: !!o.locked }]}>
+                <input type={multi ? 'checkbox' : 'radio'} name={o.locked ? undefined : 'opt'} value={o.id} checked={on} disabled={o.locked}
+                  data-ex={o.exclusive ? '1' : '0'} data-urgent={o.urgent ? '1' : '0'} data-locked={o.locked ? '1' : '0'} data-conf={conflictsOf(o).join(' ')}>
+                {o.image && <img class="kp-opt-img" src={o.image} alt="" width="160" height="236" loading="lazy">}
+                <span class="kp-opt-text">{o.text}{o.locked && <small class="kp-opt-lock">お悩みで選んだ項目</small>}</span>
+              </label>
+            );
+          })}
+        </div>
+      </>
+    ))}
+    {noteOpts.map((o) => (
+      <label class="kp-notefield" data-for={o.id} hidden={!selected.has(o.id)}>
+        <span>「{o.text}」：何に出ましたか（任意）</span>
+        <input class="kp-input" type="text" name={`note-${o.id}`} maxlength="60" value={s.texts[o.id] ?? ''} placeholder={NOTE_PH[o.id] ?? '例：名前など'} autocomplete="off">
+      </label>
+    ))}
+    {fu && (
+      <div class="kp-sub" id="followup" data-when={fu.when} data-type={fu.type} hidden={!selected.has(fu.when)}>
+        <div class="kp-q" style="margin-bottom:22px"><QMark /><h2 class="kp-qtitle" style="font-size:24px">{fu.title}</h2></div>
+        {fu.type === 'multi' && <p class="kp-qhint">※あてはまるものをすべて選んでください</p>}
+        <div class:list={['kp-opts', colsOf(fu.options)]}>
+          {fu.options.map((o) => (
+            <label class:list={['kp-opt', { check: fu.type === 'multi', none: !!o.exclusive, 'is-on': selected.has(o.id) }]}>
+              <input type={fu.type === 'multi' ? 'checkbox' : 'radio'} name="fu" value={o.id} checked={selected.has(o.id)} data-ex={o.exclusive ? '1' : '0'}>
+              <span class="kp-opt-text">{o.text}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    )}
     <p class="kp-alert refer" id="alert-urgent" hidden>すぐに近くのスタッフにお声がけください。回答はこのまま続けられます。</p>
     {q.sub && (
       <div class="kp-sub">
@@ -102,11 +159,19 @@ const cols = withImages ? 'imgs' : maxLen <= 8 && q.options.length >= 3 ? 'cols4
         <button class="tri-r" type="submit" id="nextBtn" disabled>次へ</button>
       </div>
     </div>
+    {q.optional && <p style="text-align:center;margin-top:22px"><button class="kp-btn ghost small" type="submit" name="skip" value="1" id="skipBtn">回答せずに次へ</button></p>}
   </form>
   <style is:global>
   .kp-opts.imgs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
   .kp-opts.imgs .kp-opt-img{width:100%;max-width:160px;height:auto;mix-blend-mode:multiply}
   @media(max-width:640px){.kp-opts.imgs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .kp-opt-h{font-size:15px;letter-spacing:.14em;color:var(--sky-text);margin:28px 0 4px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  .kp-opt-h:first-of-type{margin-top:8px}
+  .kp-opt.locked{cursor:default}
+  .kp-opt-lock{display:block;font-size:12px;color:var(--sky-text);letter-spacing:.08em}
+  .kp-notefield{display:block;margin-top:20px;font-size:15px;color:var(--ink-2)}
+  .kp-notefield[hidden],.kp-sub[hidden]{display:none}
+  .kp-notefield .kp-input{margin-top:6px}
   </style>
   <script is:inline>
   (function(){
@@ -115,21 +180,30 @@ const cols = withImages ? 'imgs' : maxLen <= 8 && q.options.length >= 3 ? 'cols4
     var next=document.getElementById('nextBtn');
     var opts=Array.prototype.slice.call(form.querySelectorAll('input[name=opt]'));
     var subs=Array.prototype.slice.call(form.querySelectorAll('input[name=sub]'));
+    var fus=Array.prototype.slice.call(form.querySelectorAll('input[name=fu]'));
+    var fuBox=document.getElementById('followup');
     var isEx=function(i){return i.dataset.ex==='1'};
     function sync(){
       var checked=opts.filter(function(i){return i.checked});
       opts.forEach(function(i){i.closest('.kp-opt').classList.toggle('is-on',i.checked)});
-      subs.forEach(function(i){i.closest('.kp-opt').classList.toggle('is-on',i.checked)});
+      subs.concat(fus).forEach(function(i){i.closest('.kp-opt').classList.toggle('is-on',i.checked)});
       var el=document.getElementById('alert-urgent');if(el)el.hidden=!checked.some(function(i){return i.dataset.urgent==='1'});
+      Array.prototype.forEach.call(form.querySelectorAll('.kp-notefield'),function(n){var o=opts.filter(function(i){return i.value===n.dataset.for})[0];n.hidden=!(o&&o.checked)});
+      if(fuBox){var w=opts.filter(function(i){return i.value===fuBox.dataset.when})[0];fuBox.hidden=!(w&&w.checked);if(fuBox.hidden)fus.forEach(function(i){i.checked=false})}
       next.disabled=!(checked.length>0&&(!hasSub||subs.some(function(i){return i.checked})));
     }
+    function exclusive(list,i,isMulti){
+      if(!isMulti)return;
+      if(i.checked&&isEx(i)){list.forEach(function(o){if(o!==i)o.checked=false})}
+      else if(i.checked){list.forEach(function(o){if(isEx(o))o.checked=false})}
+    }
     opts.forEach(function(i){i.addEventListener('change',function(){
-      if(type==='multi'){
-        if(i.checked&&isEx(i)){opts.forEach(function(o){if(o!==i)o.checked=false})}
-        else if(i.checked){opts.forEach(function(o){if(isEx(o))o.checked=false})}
-      }
+      exclusive(opts,i,type==='multi');
+      // 同時にあり得ない選択肢は外す（例：汗をかきにくい ⇔ 寝汗をかく）
+      if(i.checked&&i.dataset.conf){i.dataset.conf.split(' ').forEach(function(id){opts.forEach(function(o){if(o.value===id)o.checked=false})})}
       sync();
     })});
+    fus.forEach(function(i){i.addEventListener('change',function(){exclusive(fus,i,fuBox&&fuBox.dataset.type==='multi');sync()})});
     subs.forEach(function(i){i.addEventListener('change',sync)});
     sync();
   })();
