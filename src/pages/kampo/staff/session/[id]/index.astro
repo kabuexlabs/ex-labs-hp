@@ -1,22 +1,26 @@
 ---
-// 担当者画面（2026-10-25 v3）：直ちに対応 → 安全確認タグと確認事項 → 安全フラグ → お客様・主訴 → 薬剤師の観察（舌・体格・声）
-// → 体質（暫定スコアと根拠の所見）→ 所見・回答の一覧 → 漢方薬の選定（主訴 → 候補群 → 体質で選ぶ → 安全性）→ 提案の保存。
-// 旧版（2026-10-24 版・取り消した v2）のセッションは再計算せず、保存時の内容を文言だけで表示する。
+// 担当者画面（2026-10-25 v3、2026-10-28 修正依頼を反映）：
+//   直ちに対応 → 未確認アラート → 安全確認タグ（薬剤師が「確認した」を記録）→ 服用中の薬・持病・アレルギーなど
+//   → お客様・主訴／薬剤師の判定（AI の判定より先に記録する）→ 薬剤師の観察（舌は色・形・苔・舌下静脈の4軸、顔色・爪、体格・声、妊娠授乳、漢方薬）
+//   → AI の判定（体質の暫定スコアと薬剤師の判定の比較）→ 所見・回答の一覧 → 漢方薬の選定 → 提案。
+// AI の判定（体質・漢方薬の候補）は、薬剤師が判定を記録するまで出さない（AI に引きずられないように。修正依頼 第8章）。
+// 旧版（2026-10-24 版・取り消した v2・2026-10-25-v3）のセッションは再計算せず、保存時の内容を文言だけで表示する。
 export const prerender = false;
 import KampoLayout from '../../../../../layouts/KampoLayout.astro';
 import RadarChart from '../../../../../components/kampo/RadarChart.astro';
+import StaffNameField from '../../../../../components/kampo/StaffNameField.astro';
 import {
-  TYPES, TYPE_DEFS, STAFF_QUESTIONS, SECTION_LABEL, LEGACY, formulaByCode, findingLabel, legacyOptionText,
-  strengthRangeLabel, THERMAL_LABEL, HEAT_LABEL, ORGAN_LABEL, symptomLabel,
+  TYPES, AXES, STAFF_QUESTIONS, SECTION_LABEL, LEGACY, FORMULAS, formulaByCode, findingLabel, legacyOptionText, optionText, axisName, axisColor,
+  strengthRangeLabel, THERMAL_LABEL, HEAT_LABEL, ORGAN_LABEL, symptomLabel, isTypeKey, type TypeKey, type Option, type Question,
 } from '../../../../../lib/kampo/masters';
-import { LEVEL_LABEL, DEF_EXC_LABEL, THERMAL_STATE_LABEL } from '../../../../../lib/kampo/scoring';
-import { SAFETY_LEVEL_LABEL } from '../../../../../lib/kampo/safety';
+import { LEVEL_LABEL, DEF_EXC_LABEL, THERMAL_STATE_LABEL, COMBO_LABEL, toAxis } from '../../../../../lib/kampo/scoring';
+import { SAFETY_LEVEL_LABEL, FOOD_HERBS, uncheckedTags } from '../../../../../lib/kampo/safety';
 import { FINDING_STATUS_LABEL } from '../../../../../lib/kampo/findings';
 import { buildReasons, selectionSnapshot, FIT_LEVEL_LABEL, OUTCOME_LABEL, type Candidate } from '../../../../../lib/kampo/recommend';
-import { SEX_LABEL, AGE_BAND_LABEL, MENSES_LABEL, kampoCodes } from '../../../../../lib/kampo/flow';
+import { SEX_LABEL, AGE_BAND_LABEL, MENSES_LABEL } from '../../../../../lib/kampo/flow';
 import { computeSession, selectionOf, finalize, isLegacy, staffNames } from '../../../../../lib/kampo/compute';
 import { clearStaffCookie } from '../../../../../lib/kampo/auth';
-import { getSession, saveSession, getCustomer, audit, fmtJst, STATUS_LABEL, INPUT_BY_LABEL, type KampoProposal } from '../../../../../lib/kampo/store';
+import { getSession, saveSession, getCustomer, audit, fmtJst, STATUS_LABEL, INPUT_BY_LABEL, type KampoProposal, type PharmacistJudgment } from '../../../../../lib/kampo/store';
 
 const id = Astro.params.id ?? '';
 const s = await getSession(id);
@@ -29,6 +33,7 @@ let error = '';
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   const get = (k: string) => String(form.get(k) ?? '').trim();
+  const staffOf = (k: string) => (get(k) === '__other' ? get(`${k}Other`) : get(k)).slice(0, 40);
   const action = get('action');
   if (action === 'leave') {
     clearStaffCookie(Astro.cookies);
@@ -37,22 +42,61 @@ if (Astro.request.method === 'POST') {
   if (action === 'observe' && !legacy) {
     const sa: Record<string, string[]> = {};
     for (const q of STAFF_QUESTIONS) {
-      const valid = new Set(q.options.map((o) => o.id));
-      const ids = form.getAll(q.id).map(String).filter((x) => valid.has(x));
+      const valid = new Map(q.options.map((o) => [o.id, o]));
+      let ids = form.getAll(q.id).map(String).filter((x) => valid.has(x));
+      const nonEx = ids.filter((x) => !valid.get(x)!.exclusive);
+      if (nonEx.length) ids = nonEx;
       if (ids.length) sa[q.id] = q.type === 'single' ? ids.slice(0, 1) : ids;
     }
     s.staffAnswers = Object.keys(sa).length ? sa : undefined;
     s.staffAnsweredAt = new Date().toISOString();
+    s.staffAnsweredBy = staffOf('obsStaff') || s.staffAnsweredBy;
+    for (const k of ['X_kampo_current-other', 'X_kampo_adverse-other']) { const v = get(k).slice(0, 80); if (v) s.texts[k] = v; else delete s.texts[k]; }
     if (s.status !== 'in_progress') finalize(s);
     await saveSession(s);
-    await audit('observe', s.id, get('staff') || undefined);
-    return Astro.redirect(`${self}?msg=observe`, 303);
+    await audit('observe', s.id, s.staffAnsweredBy);
+    return Astro.redirect(`${self}?msg=observe#observe`, 303);
+  }
+  if ((action === 'tagcheck' || action === 'tagundo') && !legacy) {
+    const tag = get('tag');
+    const by = staffOf('tagStaff');
+    if (action === 'tagundo') delete s.tagChecks?.[tag];
+    else if (!by) error = '確認した担当者を選んでください。';
+    else s.tagChecks = { ...(s.tagChecks ?? {}), [tag]: { by, at: new Date().toISOString(), note: get('tagNote').slice(0, 200) || undefined } };
+    if (!error) {
+      if (s.status !== 'in_progress') finalize(s);
+      await saveSession(s);
+      await audit(action, `${s.id}:${tag}`, by || undefined);
+      return Astro.redirect(`${self}?msg=${action}#tags`, 303);
+    }
+  }
+  if ((action === 'judgment' || action === 'judgment_skip') && !legacy) {
+    const staffName = staffOf('judgeStaff');
+    const types = form.getAll('jtype').map(String).filter(isTypeKey) as TypeKey[];
+    const thermal = get('jthermal');
+    const defExc = get('jdefexc');
+    if (!staffName) error = '判定した担当者を選んでください。';
+    else if (action === 'judgment' && !types.length) error = '主となる体質を1つ以上選んでください（記録しない場合は「記録せずに AI の判定を開く」）。';
+    else {
+      const j: PharmacistJudgment = {
+        staffName, types: action === 'judgment' ? types : [],
+        thermal: (['cold', 'heat', 'neutral'].includes(thermal) ? thermal : 'pending') as PharmacistJudgment['thermal'],
+        defExc: (['def', 'mid', 'exc'].includes(defExc) ? defExc : 'pending') as PharmacistJudgment['defExc'],
+        formulas: get('jformulas').slice(0, 120) || undefined, note: get('jnote').slice(0, 500) || undefined,
+        ...(action === 'judgment_skip' ? { skipped: true } : {}), at: new Date().toISOString(),
+      };
+      s.judgment = j;
+      await saveSession(s);
+      await audit(action, s.id, staffName);
+      return Astro.redirect(`${self}?msg=${action}#ai`, 303);
+    }
   }
   if (action === 'proposal' && !legacy) {
-    const staffName = (get('staffName') === '__other' ? get('staffOther') : get('staffName')).slice(0, 40);
+    const staffName = staffOf('staffName');
     const selCodes = [...new Set(form.getAll('sel').map(String))].filter((c) => formulaByCode(c));
     const other = get('selOther').slice(0, 120);
     if (!staffName) error = '担当者名を選んでください。';
+    else if (!s.judgment) error = '先に薬剤師の判定を記録してください。';
     else if (selCodes.length === 0 && !other && !get('note')) error = '提案する漢方薬を選ぶか、メモを入力してください。';
     else if (s.status === 'in_progress') error = '回答がまだ終わっていません。';
     else {
@@ -82,27 +126,78 @@ const customer = s.customerId ? await getCustomer(s.customerId) : null;
 const inProgress = s.status === 'in_progress';
 const c = legacy ? null : computeSession(s);
 const r = c ? c.scores : s.scores;
-const sel = c ? selectionOf(s, c) : null;
 const w = c?.w;
+// AI の判定を出すのは、薬剤師の判定を記録したあと（旧版のセッションは判定なしで表示）
+const revealed = legacy || !!s.judgment;
+const sel = c && revealed ? selectionOf(s, c) : null;
 const names = staffNames();
-const currentStaff = s.proposal?.staffName ?? '';
+const flags = c?.safetyFlags ?? s.safetyFlags ?? [];
+const tags = c?.tags ?? s.tags ?? [];
+const openTags = uncheckedTags(tags.map((t) => ({ ...t, checked: t.checked ?? s.tagChecks?.[t.id] })));
+const pregUnconfirmed = flags.some((f) => f.code === 'preg_unconfirmed');
 const selectedSet = new Set((s.proposal?.selected ?? []).map((x) => x.formulaCode));
 const thermalCell = (cd: Candidate) => `${THERMAL_LABEL[cd.formula.thermal]}${cd.formula.heat ? `（${HEAT_LABEL[cd.formula.heat]}）` : ''}／${strengthRangeLabel(cd.formula.strength)}`;
-const stepText = (st: { q: { options: { id: string; text: string }[]; sub?: { options: { id: string; text: string }[] } }; ids: string[] }) =>
-  st.ids.map((x) => [...st.q.options, ...(st.q.sub?.options ?? [])].find((o) => o.id === x)?.text ?? x).join('、');
-const answerOf = (qid: string) => (w ? stepText(w.steps.find((x) => x.q.id === qid) ?? { q: { options: [] }, ids: [] }) : '');
+type StepLike = { q: { options: Option[]; sub?: { options: Option[] }; followup?: { options: Option[] } }; ids: string[]; skipped?: boolean };
+const stepText = (st: StepLike) => {
+  if (st.skipped) return '回答なし（口頭で確認）';
+  const all = [...st.q.options, ...(st.q.sub?.options ?? []), ...(st.q.followup?.options ?? [])];
+  return [...st.q.options.filter((o) => o.locked).map((o) => `${o.text}（お悩みで選択）`), ...st.ids.map((x) => (all.find((o) => o.id === x)?.text ?? x) + (s.texts[x] ? `（${s.texts[x]}）` : ''))].join('、');
+};
+const answerOf = (qid: string) => { const st = w?.steps.find((x) => x.q.id === qid); return st ? stepText(st) : ''; };
+const primaryName = w?.primary ? w.steps.flatMap((x) => (x.q.section === 'complaint' ? x.q.options : [])).find((o) => o.complaint === w.primary)?.text ?? w.primary : '';
 // 所見の一覧（あり／なし・わからない）
 const findingRows = w ? [...w.state].map(([fid, e]) => ({ fid, label: findingLabel(fid), ...e })) : [];
 const present = findingRows.filter((x) => x.status === 'present');
 const notPresent = findingRows.filter((x) => x.status !== 'present');
 const staffSel = new Set(Object.values(s.staffAnswers ?? {}).flat());
 const legacyQs = legacy ? LEGACY.versions[s.questionnaireVersion] ?? [] : [];
-const MSG: Record<string, string> = { saved: '提案を保存しました。', observe: '薬剤師の観察を保存し、再計算しました。' };
+const MSG: Record<string, string> = {
+  saved: '提案を保存しました。', observe: '薬剤師の観察を保存し、再計算しました。', tagcheck: '安全確認タグの確認を記録しました。', tagundo: '確認の記録を取り消しました。',
+  judgment: '薬剤師の判定を記録しました。AI の判定を表示しています。', judgment_skip: '判定を記録せずに AI の判定を開きました（検証には使えません）。',
+};
+// 旧版のスコア（陽虚・陽盛）も冷え・熱として読む
+const pctOf = (k: string) => { if (!r) return 0; const e = Object.entries(r.pct).find(([key]) => toAxis(key) === k); return e ? e[1] : 0; };
+const levelOf = (k: string) => { if (!r) return ''; const e = Object.entries(r.level ?? {}).find(([key]) => toAxis(key) === k); return e ? LEVEL_LABEL[e[1]] : ''; };
+const evOf = (k: string) => { if (!r?.evidence) return []; const e = Object.entries(r.evidence).find(([key]) => toAxis(key) === k); return e ? e[1] : []; };
+const radarPct = Object.fromEntries(TYPES.map((t) => [t, pctOf(t)])) as Record<TypeKey, number>;
+const mainSet = new Set(((r?.mainTypes ?? []) as string[]).map((k) => toAxis(k) ?? k));
+const subSet = new Set(((r?.subTypes ?? []) as string[]).map((k) => toAxis(k) ?? k));
+// 薬剤師の判定と AI（暫定スコア）の比較
+const j = s.judgment;
+const cmp = j && !j.skipped && r ? (() => {
+  const ai = new Set([...mainSet, ...subSet]);
+  const ph = new Set(j.types as string[]);
+  const aiThermal = r.thermalLabel === 'cold' ? 'cold' : r.thermalLabel === 'hot' ? 'heat' : 'neutral';
+  return {
+    both: [...ph].filter((x) => ai.has(x)), onlyPh: [...ph].filter((x) => !ai.has(x)), onlyAi: [...ai].filter((x) => !ph.has(x)),
+    thermal: j.thermal === 'pending' ? '判断保留' : j.thermal === aiThermal ? '一致' : 'ずれ', defExc: j.defExc === 'pending' ? '判断保留' : j.defExc === r.defExcLabel ? '一致' : 'ずれ',
+  };
+})() : null;
+const J_THERMAL: Record<string, string> = { cold: '冷え', heat: '熱', neutral: 'どちらでもない', pending: '判断保留' };
+const J_DEFEXC: Record<string, string> = { def: '虚証寄り', mid: '虚実間', exc: '実証寄り', pending: '判断保留' };
+// 観察の設問
+const sq = (qid: string) => STAFF_QUESTIONS.find((x) => x.id === qid);
+const TONGUE_AXES = ['X_tongue_color', 'X_tongue_shape', 'X_tongue_coat', 'X_tongue_vein'].map(sq).filter((x): x is Question => !!x);
+const OTHER_OBS = ['X_face', 'X_nail', 'X_build', 'X_voice', ...(w?.sex === 'male' ? [] : ['X_preg'])].map(sq).filter((x): x is Question => !!x);
+const KAMPO_OBS = ['X_kampo_current', 'X_kampo_adverse'].map(sq).filter((x): x is Question => !!x);
+// 舌のイラスト（いただいた8種）から4軸の選択肢をまとめて入れる（入れたあとで薬剤師が直す）
+const TONGUE_PRESETS: { img: string; label: string; ids: string[] }[] = [
+  { img: 'p1', label: '白っぽく、歯の跡がある', ids: ['X_tongue_color-tongue_color_pale', 'X_tongue_shape-tongue_teeth_marks'] },
+  { img: 'p2', label: '淡白で薄く小さい', ids: ['X_tongue_color-tongue_color_pale', 'X_tongue_shape-tongue_shape_thin'] },
+  { img: 'p3', label: '舌の両縁が赤い', ids: ['X_tongue_color-tongue_edge_red'] },
+  { img: 'p4', label: '紫色・瘀点・舌下静脈の怒張', ids: ['X_tongue_color-tongue_color_purple', 'X_tongue_vein-tongue_sublingual_distended'] },
+  { img: 'p5', label: '大きく、歯痕、苔が厚く湿る', ids: ['X_tongue_shape-tongue_shape_swollen', 'X_tongue_shape-tongue_teeth_marks', 'X_tongue_coat-tongue_coat_thick', 'X_tongue_coat-tongue_coat_wet'] },
+  { img: 'p6', label: '赤く、乾燥し、苔が少ない', ids: ['X_tongue_color-tongue_color_red', 'X_tongue_coat-tongue_coat_little', 'X_tongue_coat-tongue_coat_dry'] },
+  { img: 'p7', label: '白っぽく大きく、苔が白く湿る', ids: ['X_tongue_color-tongue_color_pale', 'X_tongue_shape-tongue_shape_swollen', 'X_tongue_coat-tongue_coat_wet'] },
+  { img: 'p8', label: '鮮紅色で黄色い苔', ids: ['X_tongue_color-tongue_color_red', 'X_tongue_coat-tongue_coat_yellow'] },
+];
+const formulaOf = (o: Option) => (o.formula ? formulaByCode(o.formula) : undefined);
+const hasFoodAllergy = flags.some((f) => f.code === 'allergy_food');
 ---
 <KampoLayout title={`担当者画面 ${s.customerLabel}`} mode="staff" width="wide">
   <a slot="actions" class="kp-btn ghost small" href="/kampo/staff/">一覧へ</a>
   {customer && <a slot="actions" class="kp-btn ghost small" href={`/kampo/staff/customer/${customer.id}/`}>顧客履歴</a>}
-  {!inProgress && <a slot="actions" class="kp-btn ghost small" href={`/kampo/check/${s.id}/result/`}>体質の説明画面</a>}
+  {!inProgress && revealed && <a slot="actions" class="kp-btn ghost small" href={`/kampo/check/${s.id}/result/`}>体質の説明画面</a>}
   <form slot="actions" method="post"><button class="kp-btn small" type="submit" name="action" value="leave">来店客モードへ戻る</button></form>
 
   {msg && MSG[msg] && <p class="kp-ok" style="margin:0 0 12px">{MSG[msg]}</p>}
@@ -110,20 +205,40 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', o
   {legacy && <p class="kp-notice" style="margin:0 0 12px">旧版の問診（設問版 {s.questionnaireVersion}）のチェックです。いまの判定では再計算せず、保存時の内容を表示します。提案の保存・観察の入力はできません。</p>}
   {inProgress && !legacy && <p class="kp-notice" style="margin:0 0 12px">このチェックはまだ回答の途中です（表示は現時点の回答で仮計算）。<a href={`/kampo/check/${s.id}/`}>続きから回答する</a></p>}
 
-  {/* 1. 直ちに対応 */}
+  {/* 1. 直ちに対応・未確認アラート（修正依頼 5-3・3-2） */}
   {(c?.urgent ?? s.urgent) && <div class="kp-band">直ちに対応が必要な回答があります。お客様に声をかけ、状況を確認してください（救急要請などの判断は薬剤師が行います）。</div>}
+  {!legacy && (openTags.length > 0 || pregUnconfirmed) && (
+    <div class="kp-band warn">
+      {openTags.length > 0 && <p>未確認の安全確認タグが {openTags.length} 件あります（{openTags.map((t) => t.label).join('・')}）。確認したら下の欄で「確認した」を記録してください。記録するまで漢方薬の提案は「要確認」のままです。</p>}
+      {pregUnconfirmed && <p>妊娠・授乳：未確認（口頭で確認）。確認したら「薬剤師の観察」の「妊娠・授乳」に入力してください。</p>}
+    </div>
+  )}
 
   {/* 2. 安全確認タグ */}
   {c && (
-    <div class="kp-card">
-      <h2 class="kp-h2" style="margin-top:0">安全確認タグと確認事項 <span class="kp-chip" style="margin-left:6px">{c.tags.length}件</span></h2>
-      <p class="kp-note">タグが付いた回答について、下の事項を確認してください。受診をすすめるかは薬剤師が判断します（確認結果・判断の入力欄はフェーズ4で追加）。確認が済むまで、漢方薬の候補はすべて「要確認」になります。</p>
+    <div class="kp-card" id="tags">
+      <h2 class="kp-h2" style="margin-top:0">安全確認タグと確認事項 <span class="kp-chip" style="margin-left:6px">{c.tags.length}件</span>{openTags.length > 0 && <span class="kp-chip refer" style="margin-left:6px">未確認 {openTags.length}</span>}</h2>
+      <p class="kp-note">タグが付いた回答について、下の事項を確認してください。受診をすすめるかは薬剤師が判断します。確認したら「確認した」を記録します（記録するまで、漢方薬の候補はすべて「要確認」）。</p>
       {c.tags.length === 0 ? <p class="kp-note">安全確認タグの付いた回答はありません。</p> : (
         <div class="kp-tags">
           {c.tags.map((t) => (
-            <div class:list={['kp-tag', { urgent: t.urgent }]}>
-              <p class="kp-tag-h"><b>{t.label}</b>{t.urgent && <span class="kp-chip refer" style="margin-left:8px">直ちに対応</span>}<small>{t.sources.join('／')}</small></p>
+            <div class:list={['kp-tag', { urgent: t.urgent, done: !!t.checked }]}>
+              <p class="kp-tag-h"><b>{t.label}</b>{t.urgent && <span class="kp-chip refer" style="margin-left:8px">直ちに対応</span>}{t.checked ? <span class="kp-chip ok" style="margin-left:8px">確認済み</span> : <span class="kp-chip warn" style="margin-left:8px">未確認</span>}<small>{t.sources.join('／')}</small></p>
               <ul>{t.checks.map((x) => <li>{x}</li>)}</ul>
+              {t.checked ? (
+                <form method="post" class="kp-tag-form">
+                  <input type="hidden" name="action" value="tagundo"><input type="hidden" name="tag" value={t.id}>
+                  <small>確認：{t.checked.by}　{fmtJst(t.checked.at)}{t.checked.note && `　メモ：${t.checked.note}`}</small>
+                  <button class="kp-btn ghost small" type="submit">取り消す</button>
+                </form>
+              ) : (
+                <form method="post" class="kp-tag-form">
+                  <input type="hidden" name="action" value="tagcheck"><input type="hidden" name="tag" value={t.id}>
+                  <StaffNameField name="tagStaff" names={names} label="確認した担当者" />
+                  <input class="kp-input" type="text" name="tagNote" placeholder="確認結果のメモ（任意）" style="min-height:40px;font-size:13.5px">
+                  <button class="kp-btn small" type="submit">確認した</button>
+                </form>
+              )}
             </div>
           ))}
         </div>
@@ -131,12 +246,18 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', o
     </div>
   )}
 
-  {/* 3. 安全フラグ */}
+  {/* 3. 安全フラグ（アレルギーと副作用歴は分けて表示。修正依頼 5-1） */}
   <div class="kp-card">
-    <h2 class="kp-h2" style="margin-top:0">服用中の薬・持病などの確認 <span class="kp-chip" style="margin-left:6px">{(c?.safetyFlags ?? s.safetyFlags ?? []).length}件</span></h2>
-    {(c?.safetyFlags ?? s.safetyFlags ?? []).length === 0 ? <p class="kp-note">該当するものはありません。</p> : (c?.safetyFlags ?? s.safetyFlags ?? []).map((f) => (
+    <h2 class="kp-h2" style="margin-top:0">服用中の薬・持病・アレルギーなどの確認 <span class="kp-chip" style="margin-left:6px">{flags.length}件</span></h2>
+    {flags.length === 0 ? <p class="kp-note">該当するものはありません。</p> : flags.map((f) => (
       <div class:list={['kp-flag', f.level]}><b>[{SAFETY_LEVEL_LABEL[f.level]}] {f.label}</b><span>{f.detail}<small style="opacity:.75">　（{f.source}）</small></span></div>
     ))}
+    <details class="kp-fold" open={hasFoodAllergy}>
+      <summary>食品と生薬の対応（食品アレルギーの確認用・参考）</summary>
+      <p class="kp-note">食品アレルギーには生薬と重なるものがあります。どの漢方薬に含まれるかは、製品の添付文書の構成生薬で確認してください（構成生薬のマスタは未登録）。</p>
+      <table class="kp-table compact"><thead><tr><th>食品</th><th>重なる生薬</th></tr></thead>
+        <tbody>{FOOD_HERBS.map((x) => <tr><td>{x.food}</td><td>{x.herb}</td></tr>)}</tbody></table>
+    </details>
   </div>
 
   <div class="kp-grid2" style="margin-top:16px">
@@ -147,70 +268,153 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', o
         <dt>お客様</dt><dd>{s.customerLabel}{customer && <> <a href={`/kampo/staff/customer/${customer.id}/`}>履歴</a></>}</dd>
         {w && <><dt>性別・年代</dt><dd>{w.sex ? SEX_LABEL[w.sex] : '—'}／{w.ageBand ? AGE_BAND_LABEL[w.ageBand] : '—'}{w.menses ? `／${MENSES_LABEL[w.menses]}` : ''}</dd></>}
         <dt>入力・状態</dt><dd>{INPUT_BY_LABEL[s.inputBy]}　{fmtJst(s.startedAt)}　<span class:list={['kp-chip', { ok: s.status === 'proposed' }]}>{STATUS_LABEL[s.status]}</span></dd>
-        {sel && <>
-          <dt>いちばん改善したい主訴</dt><dd><b>{sel.groups[0] ? `${sel.groups[0].label}（${sel.groups[0].category}）` : '—'}</b>{sel.groups[0]?.details.length ? <><br><small>{sel.groups[0].details.map((d) => d.text).join('／')}</small></> : null}</dd>
-          <dt>ほかの主訴（随伴症状）</dt><dd>{sel.companions.map((x) => `${x.label}（${x.category}）`).join('、') || '—'}</dd>
-          <dt>服用中の薬</dt><dd>{answerOf('C1') || '—'}{answerOf('C1K') && <><br><small>漢方薬：{answerOf('C1K')}</small></>}</dd>
-          <dt>漢方で体調を崩した経験</dt><dd>{answerOf('C4') || '—'}{answerOf('C4K') && <><br><small>漢方薬：{answerOf('C4K')}／症状：{answerOf('C4S') || '—'}</small></>}</dd>
+        {w && <>
+          <dt>いちばん改善したい主訴</dt><dd><b>{primaryName || '—'}</b></dd>
+          <dt>ほかのお悩み</dt><dd>{w.complaints.filter((x) => x !== w.primary).map((cid) => w.steps.flatMap((x) => (x.q.section === 'complaint' ? x.q.options : [])).find((o) => o.complaint === cid)?.text ?? cid).join('、') || '—'}</dd>
+          {w.sex !== 'male' && <><dt>妊娠・授乳</dt><dd>{pregUnconfirmed ? <span style="color:var(--danger)">未確認（口頭で確認）</span> : (s.staffAnswers?.X_preg?.length ? `${optionText(s.staffAnswers.X_preg[0])}（薬剤師が確認）` : answerOf('A3P') || '—')}</dd></>}
+          <dt>服用中の薬</dt><dd>{answerOf('C1') || '—'}</dd>
+          <dt>漢方薬を飲んでいるか</dt><dd>{answerOf('C1K') || '—'}　／　お薬手帳：{answerOf('C1NB') || '—'}</dd>
+          <dt>アレルギー・体調を崩した経験</dt><dd>{answerOf('C3') || '—'}</dd>
         </>}
         <dt>設問版</dt><dd>{s.questionnaireVersion}</dd>
       </dl>
     </div>
-    {/* 5. 体質（暫定） */}
-    <div class="kp-card">
-      <h2 class="kp-h2" style="margin-top:0">体質（暫定スコア）</h2>
-      {!r ? <p class="kp-note">スコアはまだありません。</p> : (
-        <>
-          <p class="kp-note" style="margin-bottom:8px">所見ごとの草案の重み（2026-10-24 版の値を引き継いだもの）で集計した暫定値です。同じ所見・意味の近い所見は1回分だけ数えます。区切り（20／40／60点）も暫定で、フェーズ3で証の判定条件に置き換えます。</p>
-          <div class="kp-score-grid">
-            <RadarChart pct={r.pct} size={260} />
-            <div style="overflow-x:auto;min-width:0">
-            <table class="kp-table compact">
-              <thead><tr><th>タイプ</th><th class="num">点</th><th>段階</th><th>主な根拠の所見</th></tr></thead>
-              <tbody>{TYPES.map((k) => (
-                <tr style={r.mainTypes.includes(k) ? 'font-weight:700' : ''}>
-                  <td><span style={`display:inline-block;width:10px;height:10px;border-radius:3px;background:${TYPE_DEFS[k].color};margin-right:6px`}></span>{TYPE_DEFS[k].name}{r.mainTypes.includes(k) && '（主）'}{r.subTypes.includes(k) && '（併存）'}</td>
-                  <td class="num">{r.pct[k]}</td><td>{LEVEL_LABEL[r.level[k]]}</td>
-                  <td class="kp-ev"><small>{(r.evidence?.[k] ?? []).slice(0, 4).map(findingLabel).join('、') || '—'}</small></td>
-                </tr>
-              ))}</tbody>
-            </table>
-            </div>
+    {/* 5. 薬剤師の判定（AI の判定より先に記録） */}
+    <div class="kp-card" id="judge">
+      <h2 class="kp-h2" style="margin-top:0">薬剤師の判定 <small style="font-weight:400;color:var(--muted);font-size:13px">{j ? `${j.skipped ? '記録せずに開いた' : '記録済み'}　${j.staffName}　${fmtJst(j.at)}` : 'AI の判定を開く前に記録します'}</small></h2>
+      {legacy ? <p class="kp-note">旧版のチェックでは記録しません。</p> : j && !j.skipped ? (
+        <dl class="kp-kv">
+          <dt>主となる体質</dt><dd>{j.types.map(axisName).join('・')}</dd>
+          <dt>寒熱</dt><dd>{J_THERMAL[j.thermal]}</dd>
+          <dt>虚実</dt><dd>{J_DEFEXC[j.defExc]}</dd>
+          <dt>検討する漢方薬</dt><dd>{j.formulas ?? '—'}</dd>
+          <dt>メモ</dt><dd style="white-space:pre-wrap">{j.note ?? '—'}</dd>
+        </dl>
+      ) : j?.skipped ? (
+        <p class="kp-note">判定を記録せずに AI の判定を開きました（このチェックは判定の検証には使えません）。</p>
+      ) : (
+        <form method="post">
+          <p class="kp-note">回答の一覧と観察をもとに、先に判定を記録してください。記録すると AI の判定（体質の暫定スコア・漢方薬の候補）が表示されます（AI に引きずられないように）。</p>
+          <fieldset class="kp-obs"><legend>主となる体質（複数可）</legend>
+            <div class="kp-obs-opts">{TYPES.map((t) => <label class="kp-check small"><input type="checkbox" name="jtype" value={t}><span>{axisName(t)}</span></label>)}</div>
+          </fieldset>
+          <fieldset class="kp-obs"><legend>寒熱</legend>
+            <div class="kp-obs-opts">{Object.entries(J_THERMAL).map(([k, v]) => <label class="kp-check small"><input type="radio" name="jthermal" value={k} checked={k === 'pending'}><span>{v}</span></label>)}</div>
+          </fieldset>
+          <fieldset class="kp-obs"><legend>虚実</legend>
+            <div class="kp-obs-opts">{Object.entries(J_DEFEXC).map(([k, v]) => <label class="kp-check small"><input type="radio" name="jdefexc" value={k} checked={k === 'pending'}><span>{v}</span></label>)}</div>
+          </fieldset>
+          <div class="kp-grid2" style="margin-top:12px">
+            <StaffNameField name="judgeStaff" names={names} label="判定した薬剤師" />
+            <label class="kp-field" style="margin-top:0">検討する漢方薬（任意）<input class="kp-input" type="text" name="jformulas" list="kp-formula-names" placeholder="例：補中益気湯"></label>
           </div>
-          <dl class="kp-kv" style="margin-top:10px">
-            <dt>主となる体質</dt><dd>{r.isBalanced ? 'バランス良好（全タイプ20点未満）' : r.mainTypes.map((k) => TYPE_DEFS[k].name).join('・')}</dd>
-            <dt>併存する傾向</dt><dd>{r.subTypes.map((k) => TYPE_DEFS[k].name).join('・') || '—'}</dd>
-            <dt>虚実指数</dt><dd>{r.defExcIndex > 0 ? '+' : ''}{r.defExcIndex}　{DEF_EXC_LABEL[r.defExcLabel]}</dd>
-            <dt>寒熱指数</dt><dd>{r.thermalIndex > 0 ? '+' : ''}{r.thermalIndex}　{THERMAL_STATE_LABEL[r.thermalLabel]}</dd>
-          </dl>
-        </>
+          <label class="kp-field">メモ（任意）<textarea class="kp-input" name="jnote" rows="2"></textarea></label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+            <button class="kp-btn small" type="submit" name="action" value="judgment">判定を記録して AI の判定を開く</button>
+            <button class="kp-btn ghost small" type="submit" name="action" value="judgment_skip">記録せずに AI の判定を開く</button>
+          </div>
+          <datalist id="kp-formula-names">{FORMULAS.map((f) => <option value={f.name} />)}</datalist>
+        </form>
       )}
     </div>
   </div>
 
   {/* 6. 薬剤師の観察 */}
   {!legacy && (
-    <div class="kp-card" style="margin-top:16px">
-      <h2 class="kp-h2" style="margin-top:0">薬剤師の観察（舌・体格・声） <small style="font-weight:400;color:var(--muted);font-size:13px">{s.staffAnsweredAt ? `保存 ${fmtJst(s.staffAnsweredAt)}` : '未入力'}</small></h2>
-      <p class="kp-note">舌は薬剤師が観察して入力します（患者には聞いていません）。保存すると体質と候補を再計算します。舌質・舌苔などの項目ごとの入力はフェーズ4で追加します。</p>
-      <form method="post">
+    <div class="kp-card" id="observe" style="margin-top:16px">
+      <h2 class="kp-h2" style="margin-top:0">薬剤師の観察 <small style="font-weight:400;color:var(--muted);font-size:13px">{s.staffAnsweredAt ? `保存 ${fmtJst(s.staffAnsweredAt)}　スタッフ入力${s.staffAnsweredBy ? `（${s.staffAnsweredBy}）` : ''}` : '未入力'}</small></h2>
+      <p class="kp-note">舌は薬剤師が観察して入力します（患者の自己入力はありません）。顔色・爪は観察を優先し、化粧・ネイルなどで「判断できない」ときだけご本人の回答を使います（両方は足しません）。保存すると体質と候補を再計算します。</p>
+      <form method="post" id="obsForm">
         <input type="hidden" name="action" value="observe">
-        {STAFF_QUESTIONS.map((q) => (
-          <fieldset class="kp-obs">
+        <h3 class="kp-obs-h">舌（色・形・苔・舌下静脈）</h3>
+        <p class="kp-note">近いイラストを押すと、下の4つの項目にまとめて入ります（入ったあとで直してください）。</p>
+        <div class="kp-tongue-presets">
+          {TONGUE_PRESETS.map((p) => <button type="button" class="kp-tongue-preset" data-ids={p.ids.join(' ')}><img src={`/assets/kampo/tongue/${p.img}.webp`} alt="" width="64" height="68"><span>{p.label}</span></button>)}
+        </div>
+        {TONGUE_AXES.map((q) => (
+          <fieldset class="kp-obs" data-qid={q.id} data-type={q.type}>
             <legend>{q.title}</legend>
-            <div class:list={['kp-obs-opts', { imgs: q.options.some((o) => o.image) }]}>
-              {q.options.map((o) => (
-                <label class="kp-check small"><input type={q.type === 'multi' ? 'checkbox' : 'radio'} name={q.id} value={o.id} checked={staffSel.has(o.id)}>{o.image && <img src={o.image} alt="" width="64" height="68">}<span>{o.text}</span></label>
-              ))}
+            <div class="kp-obs-opts">
+              {q.options.map((o) => <label class="kp-check small"><input type={q.type === 'multi' ? 'checkbox' : 'radio'} name={q.id} value={o.id} checked={staffSel.has(o.id)} data-ex={o.exclusive ? '1' : '0'}><span>{o.text}</span></label>)}
             </div>
           </fieldset>
         ))}
+        <h3 class="kp-obs-h">顔色・爪・体格・声{w?.sex !== 'male' && '・妊娠授乳'}</h3>
+        {OTHER_OBS.map((q) => (
+          <fieldset class="kp-obs" data-qid={q.id} data-type={q.type}>
+            <legend>{q.title}{q.help && <small>　{q.help}</small>}</legend>
+            <div class:list={['kp-obs-opts', { imgs: q.options.some((o) => o.image) }]}>
+              {q.options.map((o) => <label class="kp-check small"><input type={q.type === 'multi' ? 'checkbox' : 'radio'} name={q.id} value={o.id} checked={staffSel.has(o.id)} data-ex={o.exclusive ? '1' : '0'}>{o.image && <img src={o.image} alt="" width="48" height="70">}<span>{o.text}</span></label>)}
+            </div>
+            {q.id === 'X_face' && <p class="kp-note">ご本人の回答：{answerOf('F1') || '—'}</p>}
+            {q.id === 'X_nail' && <p class="kp-note">ご本人の回答（肌・髪・爪・唇）：{answerOf('B2') || '—'}</p>}
+            {q.id === 'X_preg' && <p class="kp-note">ご本人の回答：{answerOf('A3P') || '—'}</p>}
+          </fieldset>
+        ))}
+        <h3 class="kp-obs-h">漢方薬（お薬手帳・口頭で確認して入力）</h3>
+        <p class="kp-note">名前（ひらがな可）またはツムラの製品番号で探せます。番号はメーカーごとに違うため、番号で探せるのはツムラ番号だけです（市販薬は商品名が処方名と違うことがあるので、名前で探してください）。ツムラ番号は参考値で、No.125・128 以外は未確認です。入力すると、候補の漢方薬との重複（同じ漢方薬・甘草などの注意生薬）を警告します。</p>
+        {KAMPO_OBS.map((q) => (
+          <fieldset class="kp-obs kp-kampo" data-qid={q.id}>
+            <legend>{q.title}</legend>
+            <div class="kp-kampo-picked"></div>
+            <input class="kp-input kp-kampo-q" type="search" placeholder="例：ほちゅう／補中／41" autocomplete="off" style="min-height:40px;font-size:14px">
+            <div class="kp-obs-opts kp-kampo-list">
+              {q.options.map((o) => {
+                const f = formulaOf(o);
+                return <label class="kp-check small" data-key={f ? `${f.name} ${f.reading}` : o.text} data-no={f?.tsumuraNo ?? ''} hidden={!staffSel.has(o.id)}><input type="checkbox" name={q.id} value={o.id} checked={staffSel.has(o.id)}><span><span class="kp-kampo-name">{o.text}</span><small>{f?.tsumuraNo ? `　ツムラ No.${f.tsumuraNo}${f.tsumuraNoVerified ? '' : '（未確認）'}` : '　ツムラ番号なし'}</small></span></label>;
+              })}
+            </div>
+            <input class="kp-input" type="text" name={`${q.id}-other`} value={s.texts[`${q.id}-other`] ?? ''} placeholder="一覧にない漢方薬・市販薬の商品名（任意）" style="min-height:40px;font-size:13.5px;margin-top:8px">
+          </fieldset>
+        ))}
+        <div class="kp-grid2" style="margin-top:12px"><StaffNameField name="obsStaff" current={s.staffAnsweredBy} names={names} label="入力した担当者" /></div>
         <button class="kp-btn small" type="submit" style="margin-top:12px">観察を保存して再計算</button>
       </form>
     </div>
   )}
 
-  {/* 7. 所見・回答の一覧 */}
+  {/* 7. AI の判定：体質（暫定スコア）と薬剤師の判定の比較。薬剤師の判定のあとに出す */}
+  <div class="kp-card" id="ai" style="margin-top:16px">
+    <h2 class="kp-h2" style="margin-top:0">AI の判定：体質（暫定スコア）</h2>
+    {!revealed ? <p class="kp-note">薬剤師の判定を記録すると表示されます。</p> : !r ? <p class="kp-note">スコアはまだありません。</p> : (
+      <>
+        <p class="kp-note" style="margin-bottom:8px">体質は6タイプ（気虚・血虚・気滞・瘀血・水滞・水不足（陰虚））。冷え・熱は寒熱として別に数え、陽虚は「気虚＋冷え」、湿熱は「水滞＋熱」として表示します。所見ごとの草案の重み（2026-10-24 版の値を引き継いだもの）で集計した暫定値で、同じ所見・意味の近い所見は1回分だけ数えます。区切り（20／40／60点）も暫定です。</p>
+        {cmp && (
+          <div class="kp-cmp">
+            <b>薬剤師の判定との比較</b>
+            <span>体質：一致 {cmp.both.map(axisName).join('・') || '—'}／薬剤師のみ {cmp.onlyPh.map(axisName).join('・') || '—'}／AI のみ {cmp.onlyAi.map(axisName).join('・') || '—'}</span>
+            <span>寒熱：{cmp.thermal}（薬剤師 {J_THERMAL[j!.thermal]}／AI {THERMAL_STATE_LABEL[r.thermalLabel]}）　虚実：{cmp.defExc}（薬剤師 {J_DEFEXC[j!.defExc]}／AI {DEF_EXC_LABEL[r.defExcLabel]}）</span>
+          </div>
+        )}
+        <div class="kp-score-grid">
+          <RadarChart pct={radarPct} size={260} />
+          <div style="overflow-x:auto;min-width:0">
+          <table class="kp-table compact">
+            <thead><tr><th>タイプ</th><th class="num">点</th><th>段階</th><th>主な根拠の所見</th></tr></thead>
+            <tbody>
+              {AXES.map((k) => (
+                <tr class:list={[{ 'kp-thermal-first': k === 'cold' }]} style={mainSet.has(k) ? 'font-weight:700' : ''}>
+                  <td><span style={`display:inline-block;width:10px;height:10px;border-radius:3px;background:${axisColor(k)};margin-right:6px`}></span>{isTypeKey(k) ? '' : '寒熱：'}{axisName(k)}{mainSet.has(k) && '（主）'}{subSet.has(k) && '（併存）'}</td>
+                  <td class="num">{pctOf(k)}</td><td>{levelOf(k)}</td>
+                  <td class="kp-ev"><small>{evOf(k).slice(0, 4).map(findingLabel).join('、') || '—'}</small></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          </div>
+        </div>
+        <dl class="kp-kv" style="margin-top:10px">
+          <dt>主となる体質</dt><dd>{r.isBalanced ? 'バランス良好（全タイプ20点未満）' : [...mainSet].map(axisName).join('・')}</dd>
+          <dt>併存する傾向</dt><dd>{[...subSet].map(axisName).join('・') || '—'}</dd>
+          <dt>組み合わせ</dt><dd>{(r.combos ?? []).map((x) => COMBO_LABEL[x]).join('・') || '—'}</dd>
+          <dt>虚実指数</dt><dd>{r.defExcIndex > 0 ? '+' : ''}{r.defExcIndex}　{DEF_EXC_LABEL[r.defExcLabel]}</dd>
+          <dt>寒熱指数</dt><dd>{r.thermalIndex > 0 ? '+' : ''}{r.thermalIndex}　{THERMAL_STATE_LABEL[r.thermalLabel]}</dd>
+        </dl>
+      </>
+    )}
+  </div>
+
+  {/* 8. 所見・回答の一覧 */}
   {w && (
     <details class="kp-fold">
       <summary>所見の一覧（あり {present.length}／なし・わからない {notPresent.length}）</summary>
@@ -240,7 +444,7 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', o
     </div>
   </details>
 
-  {/* 8. 漢方薬の選定と 9. 提案 */}
+  {/* 9. 漢方薬の選定と 10. 提案 */}
   {legacy ? (
     <div class="kp-card" style="margin-top:16px">
       <h2 class="kp-h2" style="margin-top:0">保存済みの提案</h2>
@@ -253,10 +457,15 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', o
         </dl>
       ) : <p class="kp-note">提案は保存されていません。</p>}
     </div>
+  ) : !revealed ? (
+    <div class="kp-card" style="margin-top:16px">
+      <h2 class="kp-h2" style="margin-top:0">漢方薬の選定</h2>
+      <p class="kp-note">漢方薬の候補は、薬剤師の判定を記録すると表示されます。</p>
+    </div>
   ) : sel && (
     <div class="kp-card" style="margin-top:16px">
       <h2 class="kp-h2" style="margin-top:0">漢方薬の選定（主訴 → 候補群 → 体質で選ぶ）</h2>
-      <p class="kp-note">STEP 1：いちばん改善したい主訴と、その深掘りで特定した症状に当たる効能・効果（承認内容。一般用漢方製剤の承認基準による初期値で、添付文書では未確認）を持つ漢方薬だけを候補にします。STEP 2〜3：候補の中で気血水・寒熱・虚実・五臓・主訴の詳細と随伴症状を照合します（体質は暫定スコア）。STEP 4：除外フラグに当たるものは除外、相談事項・情報不足・安全確認タグの未確認は「要確認」。候補は来店客には表示していません。最終判断は薬剤師が行います。</p>
+      <p class="kp-note">STEP 1：いちばん改善したい主訴と、その深掘りで特定した症状に当たる効能・効果（承認内容。一般用漢方製剤の承認基準による初期値で、添付文書では未確認）を持つ漢方薬だけを候補にします。STEP 2〜3：候補の中で気血水・寒熱・虚実・五臓・主訴の詳細と随伴症状を照合します（体質は暫定スコア）。STEP 4：除外フラグに当たるものは除外、相談事項・情報不足・安全確認タグの未確認・服用中の漢方薬との重複は「要確認」。候補は来店客には表示していません。最終判断は薬剤師が行います。</p>
       <form method="post" id="propForm">
         <input type="hidden" name="action" value="proposal">
         {sel.groups.length === 0 && <p class="kp-notice">いちばん改善したい主訴が決まっていません（回答の途中の可能性があります）。</p>}
@@ -284,6 +493,7 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', o
                         <td class="num"><b>{cd.fit.toFixed(2)}</b></td>
                         <td>{cd.safety.status === 'excluded' ? <span class="kp-chip refer">除外</span> : cd.safety.status === 'check' ? <span class="kp-chip check">要確認</span> : <span class="kp-chip ok">問題なし</span>}
                           {cd.safety.exclude.map((x) => <div class="kp-sel-bad">{x}</div>)}
+                          {cd.safety.check.filter((x) => /^(服用中の|体調を崩した|この漢方薬で)/.test(x)).map((x) => <div class="kp-sel-bad">{x}</div>)}
                           {cd.safety.status === 'check' && <details><summary>確認事項 {cd.safety.check.length}件</summary><ul class="kp-sel-ul">{cd.safety.check.map((x) => <li>{x}</li>)}</ul></details>}</td>
                       </tr>
                     ))}
@@ -307,7 +517,6 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', o
             })()}
           </div>
         ))}
-        {w && kampoCodes(s.answers, 'C1K').length > 0 && <p class="kp-note" style="margin-top:12px">服用中の漢方薬：{kampoCodes(s.answers, 'C1K').map((x) => formulaByCode(x)?.name ?? x).join('・')}（構成生薬の重複は添付文書の登録後に表示）</p>}
         <label class="kp-field">選定理由<small>選んだ漢方薬に共通のメモ（任意）</small>
           <input class="kp-input" type="text" name="selReason" value={s.proposal?.selected.find((x) => x.formulaCode !== 'other')?.reason ?? ''} placeholder="例：随伴症状ののぼせ・月経不順も考慮" style="min-height:44px;font-size:14px">
         </label>
@@ -318,18 +527,7 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', o
 
         <h2 class="kp-h2">選定とメモ</h2>
         <div class="kp-grid2">
-          <label class="kp-field" style="margin-top:0">担当薬剤師
-            {names.length ? (
-              <select class="kp-input" name="staffName" id="staffName">
-                <option value="">選択してください</option>
-                {names.map((n) => <option value={n} selected={n === currentStaff}>{n}</option>)}
-                <option value="__other" selected={!!currentStaff && !names.includes(currentStaff)}>その他（入力）</option>
-              </select>
-            ) : (
-              <input class="kp-input" type="text" name="staffName" value={currentStaff} placeholder="氏名（KAMPO_STAFF_NAMES に登録すると選択式になります）">
-            )}
-            {names.length > 0 && <input class="kp-input" type="text" name="staffOther" id="staffOther" value={!names.includes(currentStaff) ? currentStaff : ''} placeholder="担当者名" style="margin-top:8px" hidden={!currentStaff || names.includes(currentStaff)}>}
-          </label>
+          <StaffNameField name="staffName" current={s.proposal?.staffName ?? ''} names={names} />
           <div>
             <span class="kp-field" style="display:block;margin-top:0">結果の渡し方</span>
             <div class="kp-radios cols" style="margin-top:8px">
@@ -347,23 +545,89 @@ const MSG: Record<string, string> = { saved: '提案を保存しました。', o
     </div>
   )}
   <script is:inline>
-  (function(){var sel=document.getElementById('staffName'),oth=document.getElementById('staffOther');if(!sel||!oth)return;var u=function(){oth.hidden=sel.value!=='__other'};sel.addEventListener('change',u);u();})();
+  (function(){
+    // 担当者名：「その他」で入力欄
+    Array.prototype.forEach.call(document.querySelectorAll('.kp-staffsel'),function(sel){
+      var oth=sel.form&&sel.form.querySelector('input[name="'+sel.dataset.other+'"]');if(!oth)return;
+      var u=function(){oth.hidden=sel.value!=='__other'};sel.addEventListener('change',u);u();
+    });
+    var form=document.getElementById('obsForm');if(!form)return;
+    // 観察：「ふつう」などは他と同時に選べない
+    Array.prototype.forEach.call(form.querySelectorAll('fieldset[data-type=multi]'),function(fs){
+      var ins=Array.prototype.slice.call(fs.querySelectorAll('input'));
+      ins.forEach(function(i){i.addEventListener('change',function(){
+        if(!i.checked)return;
+        ins.forEach(function(o){if(o!==i&&(i.dataset.ex==='1'||o.dataset.ex==='1'))o.checked=false});
+      })});
+    });
+    // 舌のイラストから4軸へ
+    Array.prototype.forEach.call(form.querySelectorAll('.kp-tongue-preset'),function(b){
+      b.addEventListener('click',function(){
+        b.dataset.ids.split(' ').forEach(function(id){
+          var i=form.querySelector('input[value="'+id+'"]');if(!i)return;
+          var fs=i.closest('fieldset');Array.prototype.forEach.call(fs.querySelectorAll('input[data-ex="1"]'),function(o){o.checked=false});
+          i.checked=true;
+        });
+        b.classList.add('on');setTimeout(function(){b.classList.remove('on')},600);
+      });
+    });
+    // 漢方薬の検索（名前・ひらがな・カタカナ・ツムラ番号）
+    var hira=function(s){return s.replace(/[ァ-ヶ]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0x60)})};
+    var half=function(s){return s.replace(/[０-９]/g,function(c){return String.fromCharCode(c.charCodeAt(0)-0xfee0)})};
+    Array.prototype.forEach.call(form.querySelectorAll('.kp-kampo'),function(fs){
+      var q=fs.querySelector('.kp-kampo-q'),picked=fs.querySelector('.kp-kampo-picked');
+      var items=Array.prototype.slice.call(fs.querySelectorAll('.kp-kampo-list label'));
+      function render(){
+        var v=hira(half((q.value||'').trim()).replace(/^(ツムラ|つむら)?\s*no\.?\s*/i,''));
+        items.forEach(function(l){
+          var on=l.querySelector('input').checked;
+          var hit=!!v&&(/^\d+$/.test(v)?l.dataset.no===v:hira(l.dataset.key).indexOf(v)>=0);
+          l.hidden=!(on||hit);
+        });
+        var names=items.filter(function(l){return l.querySelector('input').checked}).map(function(l){return l.querySelector('.kp-kampo-name').textContent});
+        picked.textContent='入力済み：'+(names.join('・')||'なし');
+      }
+      q.addEventListener('input',render);
+      q.addEventListener('keydown',function(e){if(e.key==='Enter')e.preventDefault()});
+      items.forEach(function(l){l.querySelector('input').addEventListener('change',render)});
+      render();
+    });
+  })();
   </script>
   <style is:global>
+  .kp-band.warn{background:#FFF6E0;border-color:#EAD59A;color:#7A5A00}
+  .kp-band.warn p+p{margin-top:6px}
   .kp-score-grid{display:grid;grid-template-columns:minmax(140px,180px) minmax(0,1fr);gap:12px;align-items:start}
   .kp-ev{white-space:normal;min-width:12em;line-height:1.5}
+  .kp-thermal-first td{border-top:2px solid var(--line)}
+  .kp-cmp{display:grid;gap:2px;padding:10px 14px;margin-bottom:12px;background:var(--sky-soft);font-size:13.5px}
   @media(max-width:1100px){.kp-score-grid{grid-template-columns:1fr}}
   .kp-tags{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px;margin-top:10px}
   .kp-tag{border:1px solid #F2B8B8;background:var(--danger-soft);padding:12px 14px}
   .kp-tag.urgent{border-color:var(--danger);border-width:2px}
+  .kp-tag.done{background:var(--paper);border-color:var(--line)}
   .kp-tag-h{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline;color:var(--danger-deep)}
+  .kp-tag.done .kp-tag-h{color:var(--ink-2)}
   .kp-tag-h small{flex-basis:100%;font-size:12px;color:var(--ink-2)}
   .kp-tag ul{margin:6px 0 0;padding-left:1.2em;font-size:13.5px}
+  .kp-tag-form{display:grid;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed #E7C4C4}
+  .kp-tag-form small{font-size:12px;color:var(--ink-2)}
+  .kp-tag-form .kp-field{font-size:13px}
+  .kp-obs-h{font-size:15px;font-weight:500;margin:22px 0 4px;padding-bottom:4px;border-bottom:1px solid var(--line)}
   .kp-obs{border:0;padding:0;margin:14px 0 0}
   .kp-obs legend{font-weight:500;font-size:14px;margin-bottom:6px}
+  .kp-obs legend small{font-weight:400;color:var(--muted);font-size:12px}
   .kp-obs-opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
-  .kp-obs-opts.imgs{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+  .kp-obs-opts.imgs{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
   .kp-obs-opts img{flex:none;object-fit:contain;mix-blend-mode:multiply}
+  .kp-obs-opts label[hidden]{display:none}
+  .kp-check small{color:var(--muted);font-size:11.5px}
+  .kp-tongue-presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:8px 0 4px}
+  .kp-tongue-preset{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);background:var(--paper);font-size:12.5px;text-align:left;cursor:pointer;line-height:1.4;color:var(--ink)}
+  .kp-tongue-preset img{mix-blend-mode:multiply;flex:none}
+  .kp-tongue-preset.on{background:var(--sky-soft);border-color:var(--sky)}
+  .kp-kampo-picked{font-size:13.5px;margin-bottom:6px;color:var(--ink-2)}
+  .kp-kampo-list{margin-top:8px}
   .kp-sel-group{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
   .kp-sel-h{font-size:16px;font-weight:500;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:10px}
   .kp-sel-h small{font-size:13px;color:var(--ink-2)}

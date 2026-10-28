@@ -14,7 +14,7 @@
 // purgeExpired() が期限切れ分を掃除し、セッションが0になった顧客も削除する。
 // ---------------------------------------------------------------------------
 import { randomBytes } from 'node:crypto';
-import { QUESTIONNAIRE, type TypeKey } from './masters.ts';
+import { QUESTIONNAIRE, axisName, type TypeKey } from './masters.ts';
 import type { Answers } from './flow.ts';
 import type { ScoreResult } from './scoring.ts';
 import type { SafetyFlag, TagHit } from './safety.ts';
@@ -77,6 +77,22 @@ export interface KampoProposal {
   updatedAt: string;
 }
 
+/** 薬剤師の判定（AI の判定を開く前に記録する。2026-10-28 修正依頼 第8章） */
+export interface PharmacistJudgment {
+  staffName: string;
+  /** 主となる体質（6タイプ） */
+  types: TypeKey[];
+  /** 寒熱：冷え／熱／どちらでもない／判断保留 */
+  thermal: 'cold' | 'heat' | 'neutral' | 'pending';
+  /** 虚実：虚証寄り／虚実間／実証寄り／判断保留 */
+  defExc: 'def' | 'mid' | 'exc' | 'pending';
+  /** 検討する漢方薬（任意） */
+  formulas?: string;
+  note?: string;
+  /** 記録せずに AI の判定を開いた */
+  skipped?: boolean;
+  at: string;
+}
 export interface KampoSession {
   id: string;
   customerId?: string;
@@ -87,13 +103,19 @@ export interface KampoSession {
   inputBy: InputBy;
   consentAt: string;
   answers: Answers;
-  /** 2026-10-24 版までの自由記入（v3 は自由記入なし。旧セッションの表示用） */
+  /** 短い記入欄（2026-10-28〜 C3 の「何に出たか」。選択肢ID → 記入内容）。2026-10-24 版までの自由記入もここ */
   texts: Record<string, string>;
   /** 2026-10-24 版までの薬剤師の舌所見（旧セッションの表示用） */
   tongueOverride?: string[];
-  /** 薬剤師の入力（舌・体格・声。設問ID → 選択肢ID） */
+  /** 薬剤師の入力（舌・顔色・爪・体格・声・妊娠授乳・漢方薬。設問ID → 選択肢ID） */
   staffAnswers?: Answers;
   staffAnsweredAt?: string;
+  /** 観察を入力した担当者 */
+  staffAnsweredBy?: string;
+  /** 安全確認タグの確認（タグID → 確認した担当者・日時・メモ） */
+  tagChecks?: Record<string, { by: string; at: string; note?: string }>;
+  /** 薬剤師の判定（AI の判定より先に記録） */
+  judgment?: PharmacistJudgment;
   scores?: ScoreResult;
   safetyFlags?: SafetyFlag[];
   /** 安全確認タグ（保存時点） */
@@ -339,4 +361,5 @@ export async function recentAudit(limit = 50): Promise<AuditEntry[]> {
 
 // --- 表示用 -------------------------------------------------------------------
 
-export const typeNamesOf = (keys: TypeKey[] | undefined, defs: Record<TypeKey, { name: string }>) => (keys ?? []).map((k) => defs[k].name).join('・');
+/** タイプの名前（旧版のセッションの陽虚・陽盛なども表示する） */
+export const typeNamesOf = (keys: string[] | undefined) => (keys ?? []).map(axisName).join('・');

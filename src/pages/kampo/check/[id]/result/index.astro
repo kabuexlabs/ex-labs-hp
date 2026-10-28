@@ -6,7 +6,8 @@ export const prerender = false;
 import KampoLayout from '../../../../../layouts/KampoLayout.astro';
 import AdviceBlock from '../../../../../components/kampo/AdviceBlock.astro';
 import ResultTabs from '../../../../../components/kampo/ResultTabs.astro';
-import { TYPE_DEFS, type TypeKey } from '../../../../../lib/kampo/masters';
+import { axisDef, axisName } from '../../../../../lib/kampo/masters';
+import { resultCards, CARD_RANK_LABEL, COMBO_LABEL } from '../../../../../lib/kampo/scoring';
 import { typeIconSvg } from '../../../../../lib/kampo/icons';
 import { getSession, saveSession, fmtJst } from '../../../../../lib/kampo/store';
 import { finalize, isLegacy } from '../../../../../lib/kampo/compute';
@@ -16,28 +17,34 @@ if (!s) return Astro.redirect('/kampo/staff/?msg=notfound', 303);
 if (s.status === 'in_progress' && !isLegacy(s)) return Astro.redirect(`/kampo/check/${s.id}/`, 303);
 if (!s.scores && !isLegacy(s)) { finalize(s); await saveSession(s); }
 const r = s.scores;
-const cards: { t: TypeKey; rank: string }[] = r ? [...r.mainTypes.map((t) => ({ t, rank: '主となる体質' })), ...r.subTypes.map((t) => ({ t, rank: '併存する体質の傾向' }))] : [];
-const name = (t: TypeKey) => TYPE_DEFS[t].name;
+const cards = r ? resultCards(r).map((x) => ({ t: x.t, rank: CARD_RANK_LABEL[x.rank], kind: x.rank })) : [];
+const name = (t: string) => axisName(t);
+const thermalCards = cards.filter((x) => x.kind === 'thermal');
+const typeCards = cards.filter((x) => x.kind !== 'thermal');
+const combos = (r?.combos ?? []).map((c) => COMBO_LABEL[c]);
+const thermalText = thermalCards.length ? `寒熱では、${thermalCards.map((x) => name(x.t)).join('・')}の傾向があります。` : '';
+const comboText = combos.length ? `${combos.join('・')}の組み合わせが見られます。` : '';
 const summary = !r
   ? '体質の結果がありません。'
   : r.isBalanced
-    ? '大きな偏りは見られません。今の生活を続けながら、季節の変わり目にもう一度チェックしてみましょう。'
-    : `あなたの体質は、${r.mainTypes.map(name).join('・')}の傾向がもっとも見られます。${r.subTypes.length ? `${r.subTypes.map(name).join('・')}の傾向もあります。` : ''}体質の偏りは、毎日の養生で整えていくことができます。`;
+    ? `大きな偏りは見られません。${thermalText}今の生活を続けながら、季節の変わり目にもう一度チェックしてみましょう。`
+    : `あなたの体質は、${typeCards.filter((x) => x.kind === 'main').map((x) => name(x.t)).join('・')}の傾向がもっとも見られます。${r.subTypes.length ? `${typeCards.filter((x) => x.kind === 'sub').map((x) => name(x.t)).join('・')}の傾向もあります。` : ''}${thermalText}${comboText}体質の偏りは、毎日の養生で整えていくことができます。`;
 ---
 <KampoLayout title="体質チェックの結果" width="normal">
   <a slot="actions" class="kp-btn ghost small no-print" href={`/kampo/staff/session/${s.id}/`}>担当者画面へ</a>
   <button slot="actions" class="kp-btn pink small no-print" type="button" onclick="window.print()">印刷する</button>
-  <ResultTabs id={s.id} active="result" adviceType={r?.mainTypes[0]} />
+  <ResultTabs id={s.id} active="result" adviceType={cards[0]?.t} />
 
   <section id="result">
     <h1 class="kp-h1">あなたの<span class="sky">体質チェック結果</span></h1>
     <p class="kp-result-lede">{summary}</p>
     <p class="kp-note" style="margin-top:6px">{fmtJst(s.completedAt ?? s.startedAt)}　{s.customerLabel}</p>
 
-    {r?.isBalanced ? (
+    {r?.isBalanced && (
       <div class="kp-panel"><h2>体質の偏り</h2><div class="kp-panel-b"><p style="font-size:16px">大きな偏りは見られません。今の生活を維持し、季節の変わり目に再度チェックをおすすめします。</p></div></div>
-    ) : cards.map(({ t, rank }) => {
-      const d = TYPE_DEFS[t];
+    )}
+    {cards.map(({ t, rank }) => {
+      const d = axisDef(t);
       return (
         <article class="kp-panel kp-tcard">
           <h2>{rank}：{d.name}（{d.reading}）</h2>
@@ -62,20 +69,20 @@ const summary = !r
       <h2>改善アドバイス</h2>
       <div class="kp-panel-b kp-advice-links">
         {cards.map(({ t, rank }) => (
-          <a href={`/kampo/check/${s.id}/advice/${t}/`}><small>{rank}</small>{TYPE_DEFS[t].name}の生活養生・ツボ</a>
+          <a href={`/kampo/check/${s.id}/advice/${t}/`}><small>{rank}</small>{name(t)}の生活養生・ツボ</a>
         ))}
       </div>
     </section>
   )}
   <div class="kp-panel" style="background:var(--sky-mist)">
-    <h2>漢方薬について</h2>
-    <div class="kp-panel-b"><p style="font-size:15px">気になる症状と体質に合う漢方薬は、服用中のお薬や体調を確かめたうえで、薬剤師がご説明します。</p></div>
+    <h2>ご相談について</h2>
+    <div class="kp-panel-b"><p style="font-size:15px">気になる症状については、服用中のお薬や体調を確かめたうえで、薬剤師がご相談をお受けします。</p></div>
   </div>
 
   <p class="kp-foot"><span>このチェックは体質の傾向を知るためのもので、病気の診断を行うものではありません。体質の判定方法は検証中の暫定版です。</span><span>ESSENCE薬局</span></p>
 
   {/* 印刷時の2ページ目：主となる体質の改善アドバイス */}
-  {r && !r.isBalanced && r.mainTypes.map((t) => (
+  {cards.filter((x) => x.kind === 'main').map(({ t }) => (
     <div class="print-only page-break"><AdviceBlock type={t} answers={s.answers} /></div>
   ))}
   <style is:global>

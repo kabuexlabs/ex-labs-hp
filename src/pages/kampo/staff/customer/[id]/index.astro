@@ -2,7 +2,7 @@
 // 顧客履歴：同一識別子の過去セッションを新しい順に。スコアの推移と提案の履歴。
 export const prerender = false;
 import KampoLayout from '../../../../../layouts/KampoLayout.astro';
-import { TYPES, TYPE_DEFS } from '../../../../../lib/kampo/masters';
+import { AXES, axisName, axisColor } from '../../../../../lib/kampo/masters';
 import { SEX_LABEL, AGE_BAND_LABEL, type Sex } from '../../../../../lib/kampo/flow';
 import { getCustomer, listCustomerSessions, audit, fmtJst, customerLabel, STATUS_LABEL, typeNamesOf } from '../../../../../lib/kampo/store';
 
@@ -37,8 +37,8 @@ const scored = sessions.filter((s) => s.scores);
           <tr>
             <td>{fmtJst(s.startedAt)}</td>
             <td><span class:list={['kp-chip', { ok: s.status === 'proposed' }]}>{STATUS_LABEL[s.status]}</span></td>
-            <td>{s.scores ? (s.scores.isBalanced ? 'バランス良好' : typeNamesOf(s.scores.mainTypes, TYPE_DEFS)) : '—'}</td>
-            <td>{s.scores ? typeNamesOf(s.scores.subTypes, TYPE_DEFS) || '—' : '—'}</td>
+            <td>{s.scores ? (s.scores.isBalanced ? 'バランス良好' : typeNamesOf(s.scores.mainTypes)) : '—'}</td>
+            <td>{s.scores ? typeNamesOf(s.scores.subTypes) || '—' : '—'}</td>
             <td>{s.proposal?.selected.map((x) => x.name).join('・') || '—'}</td>
             <td>{s.proposal?.staffName ?? '—'}</td>
             <td style="max-width:260px;white-space:pre-wrap">{s.proposal?.note ?? ''}</td>
@@ -54,8 +54,8 @@ const scored = sessions.filter((s) => s.scores);
       <h2 class="kp-h2" style="margin-top:0">スコアの推移（暫定。設問版が違う回は単純に比べられません）</h2>
       <table class="kp-table">
         <thead><tr><th>タイプ</th>{scored.map((s) => <th class="num">{fmtJst(s.startedAt).slice(0, 10)}</th>)}</tr></thead>
-        <tbody>{TYPES.map((k) => (
-          <tr><td><span style={`display:inline-block;width:10px;height:10px;border-radius:3px;background:${TYPE_DEFS[k].color};margin-right:6px`}></span>{TYPE_DEFS[k].name}</td>{scored.map((s) => <td class="num" style={s.scores!.mainTypes.includes(k) ? 'font-weight:700' : ''}>{s.scores!.pct[k]}</td>)}</tr>
+        <tbody>{AXES.map((k) => (
+          <tr><td><span style={`display:inline-block;width:10px;height:10px;border-radius:3px;background:${axisColor(k)};margin-right:6px`}></span>{axisName(k)}</td>{scored.map((s) => <td class="num" style={(s.scores!.mainTypes as string[]).includes(k) ? 'font-weight:700' : ''}>{s.scores!.pct[k] ?? (k === 'cold' ? (s.scores!.pct as Record<string, number>).yang_def : k === 'heat' ? (s.scores!.pct as Record<string, number>).yang_exc : undefined) ?? '—'}</td>)}</tr>
         ))}
           <tr><td>虚実指数</td>{scored.map((s) => <td class="num">{s.scores!.defExcIndex}</td>)}</tr>
           <tr><td>寒熱指数</td>{scored.map((s) => <td class="num">{s.scores!.thermalIndex}</td>)}</tr>

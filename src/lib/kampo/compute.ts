@@ -11,13 +11,15 @@ export interface Computed { w: WalkResult; scores: ScoreResult; safetyFlags: Saf
 /** 旧版（2026-10-24 版・取り消した v2）のセッションは再計算せず、保存時の内容を表示する */
 export const isLegacy = (s: Pick<KampoSession, 'questionnaireVersion'>) => s.questionnaireVersion !== QUESTIONNAIRE.version;
 
-export function computeSession(s: Pick<KampoSession, 'answers' | 'staffAnswers'>): Computed {
+type Inputs = Pick<KampoSession, 'answers' | 'staffAnswers' | 'texts' | 'tagChecks'>;
+const inputOf = (s: Partial<Inputs>) => ({ staffAnswers: s.staffAnswers, texts: s.texts, tagChecks: s.tagChecks });
+export function computeSession(s: Pick<KampoSession, 'answers' | 'staffAnswers'> & Partial<Inputs>): Computed {
   const w = walk(s.answers);
   applyStaffAnswers(w.state, s.staffAnswers);
-  return { w, scores: score(w.state), safetyFlags: safetyFlags(s.answers, w), tags: safetyTags(w, s.staffAnswers), urgent: isUrgent(w) };
+  return { w, scores: score(w.state), safetyFlags: safetyFlags(s.answers, w, inputOf(s)), tags: safetyTags(w, s.staffAnswers, s.tagChecks), urgent: isUrgent(w) };
 }
-export const selectionOf = (s: Pick<KampoSession, 'answers'>, c: Computed): Selection =>
-  selectFormulas(c.scores, s.answers, c.w, c.safetyFlags, c.tags, FORMULAS);
+export const selectionOf = (s: Pick<KampoSession, 'answers'> & Partial<Inputs>, c: Computed): Selection =>
+  selectFormulas(c.scores, s.answers, c.w, c.safetyFlags, c.tags, FORMULAS, inputOf(s));
 
 /** 回答が終わっていればスコアを確定して completed にする（既に確定済みなら状態は変えない） */
 export function finalize(s: KampoSession): KampoSession {

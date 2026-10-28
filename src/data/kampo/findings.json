@@ -1,12 +1,12 @@
 {
- "version": "2026-10-25-v3",
+ "version": "2026-10-28-v3.1",
  "review": {
   "status": "draft",
   "source": "2026-10-24 版（3段階版）の設問・重みを、2026-10-25 の改修指示と承認済みの改修計画に沿って組み直した草案。重み・五臓は現行の選択肢の値を引き継いだもので、新しい数値は作っていない（専門家未確認）",
   "reviewer": null,
   "reviewedAt": null
  },
- "note": "所見（回答から作る1つ1つの症状・状態）。weights・organs は草案で、from に挙げた 2026-10-24 版の選択肢の値の最大を引き継いだもの。group が同じ所見は同じタイプへ1回分しか加点しない。implies は present なら present にする所見。",
+ "note": "所見（回答から作る1つ1つの症状・状態）。weights・organs は草案で、from に挙げた 2026-10-24 版の選択肢の値の最大を引き継いだもの。group が同じ所見は同じタイプへ1回分しか加点しない。implies は present なら present にする所見。 2026-10-28：陽虚（yang_def）の重みを冷え（cold）、陽盛（yang_exc）の重みを熱（heat）に付け替えた（6タイプ＋寒熱）。conflicts は同時にあり得ない所見。舌は4軸（group tongue）。",
  "findings": [
   {
    "id": "fatigue_easy",
@@ -160,7 +160,7 @@
    "id": "apathy",
    "label": "何をするのも億劫",
    "weights": {
-    "yang_def": 1,
+    "cold": 1,
     "qi_def": 0.25
    },
    "organs": {
@@ -190,7 +190,7 @@
    "id": "knee_back_weak",
    "label": "腰や膝がだるい",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1
@@ -270,7 +270,7 @@
    "label": "手足の先が冷える",
    "weights": {
     "blood_def": 0.5,
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "organs": {
     "liver": 1
@@ -291,7 +291,7 @@
    "id": "cold_belly",
    "label": "お腹が冷える",
    "weights": {
-    "yang_def": 1,
+    "cold": 1,
     "qi_def": 0.25
    },
    "organs": {
@@ -308,7 +308,7 @@
    "id": "cold_lower",
    "label": "腰・下半身が冷える",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1
@@ -325,7 +325,7 @@
    "id": "cold_whole",
    "label": "全身が冷える",
    "weights": {
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "from": [
     "KG-whole",
@@ -336,7 +336,7 @@
    "id": "chilly",
    "label": "寒がり",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1,
@@ -375,7 +375,7 @@
    "id": "cold_deep",
    "label": "体の芯から冷える",
    "weights": {
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "organs": {
     "kidney": 0.5
@@ -389,7 +389,7 @@
    "label": "冷えると痛む",
    "weights": {
     "blood_stasis": 0.25,
-    "yang_def": 0.25
+    "cold": 0.25
    },
    "from": [
     "Scold1-pain"
@@ -400,7 +400,7 @@
    "label": "冷えるとしびれる",
    "weights": {
     "blood_stasis": 0.25,
-    "yang_def": 0.25
+    "cold": 0.25
    },
    "from": [
     "Scold1-pain"
@@ -408,10 +408,10 @@
   },
   {
    "id": "cold_diarrhea",
-   "label": "冷えるとお腹を壊す",
+   "label": "冷たい物や生ものでお腹を壊す",
    "weights": {
     "qi_def": 0.5,
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "spleen": 1,
@@ -431,7 +431,7 @@
    "label": "冷えるとむくむ",
    "weights": {
     "fluid": 1,
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "spleen": 1,
@@ -448,7 +448,7 @@
    "id": "cold_frequent_urination",
    "label": "冷えるとトイレが近くなる",
    "weights": {
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "organs": {
     "kidney": 0.5
@@ -461,7 +461,7 @@
    "id": "cold_warm_relief",
    "label": "冷え：温めると楽になる",
    "weights": {
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "organs": {
     "kidney": 0.5
@@ -483,7 +483,7 @@
    "id": "heat_intolerant",
    "label": "暑がり",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "heart": 0.5,
@@ -557,7 +557,7 @@
    "id": "hot_upper",
    "label": "顔や上半身のほてり・熱感",
    "weights": {
-    "yang_exc": 0.5,
+    "heat": 0.5,
     "qi_stag": 0.25
    },
    "from": [
@@ -573,7 +573,7 @@
    "id": "hot_sudden",
    "label": "急に顔や上半身がカーッと熱くなる",
    "weights": {
-    "yang_exc": 0.25,
+    "heat": 0.25,
     "yin_def": 0.25
    },
    "implies": [
@@ -587,7 +587,7 @@
    "id": "hot_face_whole",
    "label": "顔全体が熱くなる",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "organs": {
     "heart": 0.5
@@ -619,7 +619,7 @@
    "id": "rosacea",
    "label": "鼻や頬が赤く、赤ら顔になりやすい",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "organs": {
     "lung": 0.5
@@ -647,7 +647,7 @@
    "label": "ほてり：入浴後・温まると悪化",
    "weights": {
     "yin_def": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "group": "trig_warm",
    "from": [
@@ -659,7 +659,7 @@
    "id": "hot_upper_worse_exercise",
    "label": "ほてり：運動後に悪化",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "from": [
     "Sface_flush2-exercise"
@@ -684,7 +684,7 @@
    "id": "hot_upper_worse_meal",
    "label": "ほてり：食後に悪化",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "organs": {
     "spleen": 0.5
@@ -697,7 +697,7 @@
    "id": "hot_upper_worse_alcohol",
    "label": "ほてり：お酒のあとに悪化",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "organs": {
     "spleen": 0.5
@@ -711,7 +711,7 @@
    "id": "hot_upper_worse_spicy",
    "label": "ほてり：辛いもののあとに悪化",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "organs": {
     "spleen": 0.5
@@ -763,6 +763,9 @@
     "B4-1",
     "Ssweat1-move",
     "Sfatigue1-breath"
+   ],
+   "conflicts": [
+    "sweat_little"
    ]
   },
   {
@@ -770,7 +773,7 @@
    "label": "汗のあとに冷える",
    "weights": {
     "qi_def": 0.5,
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "organs": {
     "lung": 0.5,
@@ -804,7 +807,7 @@
    "label": "頭や顔だけ汗をかく",
    "weights": {
     "qi_stag": 1,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "organs": {
     "liver": 0.5,
@@ -824,7 +827,7 @@
    "label": "急なほてりと一緒に汗が出る",
    "weights": {
     "yin_def": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "implies": [
     "sweat_easy"
@@ -838,7 +841,7 @@
    "id": "sweat_little",
    "label": "汗をかきにくい",
    "weights": {
-    "yang_def": 0.5,
+    "cold": 0.5,
     "fluid": 0.5
    },
    "organs": {
@@ -847,6 +850,11 @@
    },
    "from": [
     "B4-4"
+   ],
+   "conflicts": [
+    "sweat_exertion",
+    "sweat_profuse",
+    "night_sweat"
    ]
   },
   {
@@ -864,9 +872,9 @@
   },
   {
    "id": "sweat_profuse",
-   "label": "汗の量が多い",
+   "label": "暑いときや食事中に大量に汗をかく",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "spleen": 1
@@ -876,6 +884,9 @@
    ],
    "from": [
     "B4-7"
+   ],
+   "conflicts": [
+    "sweat_little"
    ]
   },
   {
@@ -894,6 +905,9 @@
     "KE-nightsweat",
     "Ssweat1-night",
     "Sfatigue1-sweat"
+   ],
+   "conflicts": [
+    "sweat_little"
    ]
   },
   {
@@ -912,6 +926,9 @@
     "Sfatigue1-appetite",
     "Saging2-gi",
     "Scomplexion2-tired"
+   ],
+   "conflicts": [
+    "big_appetite"
    ]
   },
   {
@@ -929,15 +946,18 @@
   },
   {
    "id": "big_appetite",
-   "label": "食欲が旺盛",
+   "label": "食べてもすぐお腹が空く",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "spleen": 1
    },
    "from": [
     "B5-9"
+   ],
+   "conflicts": [
+    "poor_appetite"
    ]
   },
   {
@@ -1062,7 +1082,7 @@
    "id": "stomach_cramping",
    "label": "胃：差し込むように痛む",
    "weights": {
-    "yang_def": 0.25,
+    "cold": 0.25,
     "qi_stag": 0.25
    },
    "from": [
@@ -1088,7 +1108,7 @@
    "label": "胃：空腹時に悪化",
    "weights": {
     "qi_def": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "from": [
     "Sstress_gi2-empty"
@@ -1125,7 +1145,7 @@
    "id": "stomach_worse_cold",
    "label": "胃：冷たいもので悪化",
    "weights": {
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "organs": {
     "spleen": 0.5
@@ -1139,7 +1159,7 @@
    "id": "stomach_warm_relief",
    "label": "胃：温かいもので楽になる",
    "weights": {
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "organs": {
     "spleen": 0.5
@@ -1153,7 +1173,7 @@
    "id": "heartburn",
    "label": "胸やけ",
    "weights": {
-    "yang_exc": 0.25,
+    "heat": 0.25,
     "qi_stag": 0.25
    },
    "from": [
@@ -1177,7 +1197,7 @@
    "id": "acid_reflux",
    "label": "酸っぱいものがこみ上げる",
    "weights": {
-    "yang_exc": 0.25,
+    "heat": 0.25,
     "qi_stag": 0.25
    },
    "from": [
@@ -1189,7 +1209,7 @@
    "label": "吐き気",
    "weights": {
     "fluid": 0.5,
-    "yang_def": 0.25
+    "cold": 0.25
    },
    "from": [
     "Scold_pain1-nausea",
@@ -1203,7 +1223,7 @@
    "label": "吐き気：空腹時",
    "weights": {
     "qi_def": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "from": [
     "Sstress_gi2-empty"
@@ -1298,7 +1318,7 @@
    "label": "口の中が粘る",
    "weights": {
     "fluid": 1,
-    "yang_exc": 0.5,
+    "heat": 0.5,
     "qi_stag": 0.5
    },
    "organs": {
@@ -1314,7 +1334,7 @@
    "id": "bitter_mouth",
    "label": "口が苦い",
    "weights": {
-    "yang_exc": 0.5,
+    "heat": 0.5,
     "qi_stag": 0.5
    },
    "organs": {
@@ -1329,7 +1349,7 @@
    "id": "prefer_warm",
    "label": "温かい飲み物を好む",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 0.5,
@@ -1346,7 +1366,7 @@
    "weights": {
     "yin_def": 0.5,
     "fluid": 0.5,
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "organs": {
     "kidney": 1
@@ -1363,7 +1383,7 @@
    "id": "thirst_cold",
    "label": "渇き：冷たい水を多く飲みたい",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "spleen": 1,
@@ -1379,7 +1399,7 @@
   },
   {
    "id": "thirst_sips",
-   "label": "渇き：少量ずつ飲みたい（口や唇が乾く）",
+   "label": "渇き：口や喉が乾くが、少しずつしか飲めない",
    "weights": {
     "yin_def": 1
    },
@@ -1420,6 +1440,9 @@
     "B6-1",
     "Sstress_gi1-diarrhea",
     "KH-diarrhea"
+   ],
+   "conflicts": [
+    "hard_stool"
    ]
   },
   {
@@ -1443,7 +1466,7 @@
    "id": "morning_diarrhea",
    "label": "朝起きてすぐ下痢をする",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 0.5,
@@ -1512,13 +1535,16 @@
    "from": [
     "B6-2",
     "B6-6"
+   ],
+   "conflicts": [
+    "loose_stool"
    ]
   },
   {
    "id": "stool_hard_foul",
    "label": "硬く太い便・においが強い",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "spleen": 1
@@ -1531,7 +1557,7 @@
    "id": "constipation",
    "label": "便秘がち",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "spleen": 1
@@ -1586,7 +1612,7 @@
    "id": "abd_pain",
    "label": "お腹が痛む",
    "weights": {
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "from": [
     "KG-bellypain",
@@ -1606,7 +1632,7 @@
    "id": "frequent_urination",
    "label": "トイレが近い",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1
@@ -1619,7 +1645,7 @@
    "id": "nocturia",
    "label": "夜中にトイレに起きる",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1
@@ -1631,26 +1657,12 @@
    ]
   },
   {
-   "id": "urine_clear_copious",
-   "label": "尿の色が薄く量が多い",
-   "weights": {
-    "yang_def": 1
-   },
-   "organs": {
-    "kidney": 1
-   },
-   "from": [
-    "B6-8",
-    "B7-8"
-   ]
-  },
-  {
    "id": "urine_scanty",
    "label": "尿の量が少ない",
    "weights": {
     "fluid": 1,
     "yin_def": 1,
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "organs": {
     "spleen": 0.5,
@@ -1662,6 +1674,9 @@
     "B7-7",
     "Spuffiness2-urine",
     "Spms_edema2-urine"
+   ],
+   "conflicts": [
+    "urine_copious"
    ]
   },
   {
@@ -1669,7 +1684,7 @@
    "label": "尿の色が濃い",
    "weights": {
     "yin_def": 1,
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "organs": {
     "kidney": 1
@@ -1677,6 +1692,9 @@
    "from": [
     "B6-6",
     "B7-7"
+   ],
+   "conflicts": [
+    "urine_pale"
    ]
   },
   {
@@ -1972,7 +1990,7 @@
    "id": "sleep_hot",
    "label": "暑さ・ほてりで眠れない",
    "weights": {
-    "yang_exc": 1,
+    "heat": 1,
     "yin_def": 0.5
    },
    "organs": {
@@ -2080,7 +2098,7 @@
   },
   {
    "id": "forgetful",
-   "label": "物忘れ・集中力の低下",
+   "label": "物忘れ",
    "weights": {
     "blood_def": 1
    },
@@ -2117,7 +2135,7 @@
    "id": "anger",
    "label": "怒りっぽい",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "liver": 1
@@ -2131,7 +2149,7 @@
    "id": "flare_red",
    "label": "カッとなると顔が赤くなる・頭に血が上る",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "liver": 1
@@ -2579,16 +2597,6 @@
    ]
   },
   {
-   "id": "trauma_history",
-   "label": "打撲・むち打ち・手術の経験がある",
-   "weights": {
-    "blood_stasis": 1
-   },
-   "from": [
-    "B10-5"
-   ]
-  },
-  {
    "id": "varicose",
    "label": "静脈瘤がある",
    "weights": {
@@ -2723,7 +2731,7 @@
    "id": "boils",
    "label": "できものが化膿しやすい",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "lung": 0.5,
@@ -2738,7 +2746,7 @@
    "id": "eye_red",
    "label": "目が充血しやすい",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "lung": 0.5,
@@ -2754,7 +2762,7 @@
    "label": "ニキビ",
    "weights": {
     "fluid": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "from": [
     "KA-acne",
@@ -2766,7 +2774,7 @@
    "id": "acne_red",
    "label": "ニキビ：赤く腫れる",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "organs": {
     "lung": 0.5
@@ -2779,7 +2787,7 @@
    "id": "acne_pus",
    "label": "ニキビ：膿を持つ",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "organs": {
     "lung": 0.5
@@ -2877,7 +2885,7 @@
    "label": "ニキビ：脂っこいもののあとに悪化",
    "weights": {
     "fluid": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "organs": {
     "spleen": 0.5
@@ -2892,7 +2900,7 @@
    "label": "ニキビ：甘いもののあとに悪化",
    "weights": {
     "fluid": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "organs": {
     "spleen": 0.5
@@ -3027,7 +3035,7 @@
    "id": "itch_hot",
    "label": "かゆみ：赤みや熱感を伴う",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "from": [
     "Sitch1-red"
@@ -3050,7 +3058,7 @@
    "id": "hives",
    "label": "じんましんのように赤く盛り上がる",
    "weights": {
-    "yang_exc": 0.25,
+    "heat": 0.25,
     "fluid": 0.25
    },
    "from": [
@@ -3076,7 +3084,7 @@
    "label": "かゆみ：温まったとき・入浴後に悪化",
    "weights": {
     "yin_def": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "group": "trig_warm",
    "from": [
@@ -3131,7 +3139,7 @@
    "id": "eczema_red",
    "label": "湿疹：赤みや熱感が強い",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "from": [
     "Seczema1-red"
@@ -3167,7 +3175,7 @@
    "id": "eczema_pus",
    "label": "湿疹：化膿しやすい",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "from": [
     "Seczema1-pus"
@@ -3177,7 +3185,7 @@
    "id": "eczema_itchy",
    "label": "湿疹：かゆみが強い",
    "weights": {
-    "yang_exc": 0.25,
+    "heat": 0.25,
     "fluid": 0.25
    },
    "from": [
@@ -3216,7 +3224,7 @@
    "id": "eczema_worse_warm",
    "label": "湿疹：温まると悪化",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "group": "trig_warm",
    "from": [
@@ -3621,7 +3629,7 @@
    "label": "湿った大きめのフケ",
    "weights": {
     "fluid": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "implies": [
     "dandruff"
@@ -3642,7 +3650,7 @@
    "id": "scalp_eczema",
    "label": "頭皮の湿疹・赤み",
    "weights": {
-    "yang_exc": 0.5
+    "heat": 0.5
    },
    "from": [
     "KB-scalp_eczema",
@@ -3704,7 +3712,7 @@
    "label": "頭皮：脂っこいもののあとに悪化",
    "weights": {
     "fluid": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "organs": {
     "spleen": 0.5
@@ -3719,7 +3727,7 @@
    "label": "頭皮：甘いもののあとに悪化",
    "weights": {
     "fluid": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "organs": {
     "spleen": 0.5
@@ -3734,7 +3742,7 @@
    "label": "頭皮：お酒のあとに悪化",
    "weights": {
     "fluid": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "organs": {
     "spleen": 0.5
@@ -3835,7 +3843,7 @@
    "label": "周期が早まりがち（24日以内）",
    "weights": {
     "qi_def": 1,
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "spleen": 1,
@@ -3852,7 +3860,7 @@
    "label": "周期が遅れがち（39日以上）",
    "weights": {
     "blood_def": 1,
-    "yang_def": 0.25
+    "cold": 0.25
    },
    "organs": {
     "liver": 1
@@ -4065,7 +4073,7 @@
    "id": "pms_skin",
    "label": "月経前のニキビ・肌荒れ",
    "weights": {
-    "yang_exc": 0.25,
+    "heat": 0.25,
     "blood_stasis": 0.25,
     "fluid": 0.25
    },
@@ -4145,7 +4153,7 @@
    "id": "flow_bright_heavy",
    "label": "鮮やかな赤色の出血が多い",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "liver": 1
@@ -4172,7 +4180,7 @@
    "id": "period_cold_pain",
    "label": "月経痛：下腹部が冷えて痛む",
    "weights": {
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "organs": {
     "kidney": 0.5
@@ -4185,7 +4193,7 @@
    "id": "period_warm_relief",
    "label": "月経痛：温めると楽になる",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1
@@ -4240,7 +4248,7 @@
    "id": "period_back_pain",
    "label": "月経時に腰の痛みが強い",
    "weights": {
-    "yang_def": 0.25,
+    "cold": 0.25,
     "blood_stasis": 0.25
    },
    "from": [
@@ -4251,7 +4259,7 @@
    "id": "period_back_cold_after",
    "label": "月経後に腰が冷えてだるい",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1
@@ -4414,7 +4422,7 @@
    "label": "頭痛：ズキズキ脈打つ",
    "weights": {
     "qi_stag": 0.25,
-    "yang_exc": 0.25
+    "heat": 0.25
    },
    "organs": {
     "liver": 0.5
@@ -4472,7 +4480,7 @@
    "id": "headache_worse_cold",
    "label": "頭痛：冷えると痛む",
    "weights": {
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "group": "cold_sensitive",
    "from": [
@@ -4484,7 +4492,7 @@
    "id": "headache_warm_relief",
    "label": "頭痛：温めると楽になる",
    "weights": {
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "group": "cold_sensitive",
    "from": [
@@ -4596,7 +4604,7 @@
    "id": "shoulder_warm_relief",
    "label": "肩こり：温めると楽になる",
    "weights": {
-    "yang_def": 0.5
+    "cold": 0.5
    },
    "group": "cold_sensitive",
    "from": [
@@ -4607,7 +4615,7 @@
    "id": "low_back_pain",
    "label": "腰痛",
    "weights": {
-    "yang_def": 0.25,
+    "cold": 0.25,
     "blood_stasis": 0.25
    },
    "from": [
@@ -4618,7 +4626,7 @@
    "id": "back_dull",
    "label": "腰痛：だるく重い痛み",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1
@@ -4631,7 +4639,7 @@
    "id": "back_worse_cold",
    "label": "腰痛：冷えると痛む",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1
@@ -4645,7 +4653,7 @@
    "id": "back_warm_relief",
    "label": "腰痛：温めると楽になる",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1
@@ -4672,7 +4680,7 @@
    "id": "back_menstrual",
    "label": "腰痛：月経のときに強くなる",
    "weights": {
-    "yang_def": 0.25,
+    "cold": 0.25,
     "blood_stasis": 0.25
    },
    "from": [
@@ -4687,7 +4695,7 @@
    "id": "joint_hot_swollen",
    "label": "関節：赤く熱をもって腫れる",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "from": [
     "B10-9"
@@ -4697,7 +4705,7 @@
    "id": "joint_worse_cold",
    "label": "関節：冷えると痛む",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1
@@ -4711,7 +4719,7 @@
    "id": "joint_warm_relief",
    "label": "関節：温めると楽になる",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1
@@ -4880,7 +4888,7 @@
    "label": "耳鳴り：低い音",
    "weights": {
     "yin_def": 1,
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "lung": 0.5,
@@ -4898,7 +4906,7 @@
    "id": "tinnitus_high",
    "label": "耳鳴り：高い音（キーン）",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "liver": 1
@@ -4914,7 +4922,7 @@
    "id": "tinnitus_worse_tired",
    "label": "耳鳴り：疲れると強くなる",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 1
@@ -5210,7 +5218,7 @@
    "id": "face_red",
    "label": "顔色：赤くなりやすい",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "organs": {
     "lung": 0.5,
@@ -5228,7 +5236,7 @@
    "id": "face_bluish",
    "label": "顔色：青白い",
    "weights": {
-    "yang_def": 1
+    "cold": 1
    },
    "organs": {
     "kidney": 0.5,
@@ -5236,100 +5244,6 @@
    },
    "from": [
     "B2-9"
-   ]
-  },
-  {
-   "id": "tongue_p1",
-   "label": "舌：白っぽく、歯の跡がある",
-   "weights": {
-    "qi_def": 1
-   },
-   "from": [
-    "B13-1"
-   ]
-  },
-  {
-   "id": "tongue_p2",
-   "label": "舌：淡白で薄く小さい",
-   "weights": {
-    "blood_def": 1
-   },
-   "from": [
-    "B13-2"
-   ]
-  },
-  {
-   "id": "tongue_p3",
-   "label": "舌：両縁が赤い",
-   "weights": {
-    "qi_stag": 1
-   },
-   "from": [
-    "B13-3"
-   ]
-  },
-  {
-   "id": "tongue_p4",
-   "label": "舌：紫色・瘀点・舌下静脈の怒張",
-   "weights": {
-    "blood_stasis": 1
-   },
-   "from": [
-    "B13-4"
-   ]
-  },
-  {
-   "id": "tongue_p5",
-   "label": "舌：大きく、歯痕があり、苔が厚く湿っている",
-   "weights": {
-    "fluid": 1
-   },
-   "from": [
-    "B13-5"
-   ]
-  },
-  {
-   "id": "tongue_p6",
-   "label": "舌：赤く、乾燥し、苔が少ない",
-   "weights": {
-    "yin_def": 1
-   },
-   "from": [
-    "B13-6"
-   ]
-  },
-  {
-   "id": "tongue_p7",
-   "label": "舌：白っぽく大きく、苔が白く湿っている",
-   "weights": {
-    "yang_def": 1
-   },
-   "from": [
-    "B13-7"
-   ]
-  },
-  {
-   "id": "tongue_p8",
-   "label": "舌：鮮紅色で黄色い苔がある",
-   "weights": {
-    "yang_exc": 1
-   },
-   "from": [
-    "B13-8"
-   ]
-  },
-  {
-   "id": "tongue_normal",
-   "label": "舌：特記なし（淡紅・薄白苔）",
-   "from": [
-    "B13-9"
-   ]
-  },
-  {
-   "id": "tongue_severe",
-   "label": "舌：灰黒苔・鏡面舌・偏位や震え",
-   "from": [
-    "B13-10"
    ]
   },
   {
@@ -5355,7 +5269,7 @@
    "id": "build_solid",
    "label": "体格：がっちり（筋肉質）",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "from": [
     "B1-9"
@@ -5410,10 +5324,252 @@
    "id": "voice_strong",
    "label": "声：大きく力強い",
    "weights": {
-    "yang_exc": 1
+    "heat": 1
    },
    "from": [
     "B1-9"
+   ]
+  },
+  {
+   "id": "urine_pale",
+   "label": "尿の色が薄い",
+   "weights": {
+    "cold": 1
+   },
+   "from": [
+    "B6-8",
+    "B7-8"
+   ],
+   "conflicts": [
+    "urine_dark"
+   ]
+  },
+  {
+   "id": "urine_copious",
+   "label": "尿の量が多い",
+   "weights": {
+    "cold": 1
+   },
+   "from": [
+    "B6-8",
+    "B7-8"
+   ],
+   "conflicts": [
+    "urine_scanty"
+   ]
+  },
+  {
+   "id": "poor_concentration",
+   "label": "集中力が続かない",
+   "weights": {
+    "blood_def": 1
+   },
+   "from": [
+    "B9-2",
+    "Sanxiety2-forget"
+   ]
+  },
+  {
+   "id": "mouth_ulcer",
+   "label": "口内炎ができやすい",
+   "weights": {
+    "heat": 1
+   },
+   "from": [
+    "B13-8"
+   ]
+  },
+  {
+   "id": "edema_pitting",
+   "label": "むくみ：押すと跡が残る",
+   "weights": {
+    "qi_def": 0.5,
+    "fluid": 0.5
+   },
+   "implies": [
+    "edema"
+   ],
+   "from": [
+    "B7-1"
+   ]
+  },
+  {
+   "id": "tongue_color_pale",
+   "label": "舌の色：淡白（白っぽい）",
+   "weights": {
+    "blood_def": 1,
+    "cold": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-2",
+    "B13-7"
+   ]
+  },
+  {
+   "id": "tongue_color_red",
+   "label": "舌の色：紅（赤い）",
+   "weights": {
+    "yin_def": 1,
+    "heat": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-6",
+    "B13-8"
+   ]
+  },
+  {
+   "id": "tongue_color_purple",
+   "label": "舌の色：暗紫・瘀点",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-4"
+   ]
+  },
+  {
+   "id": "tongue_edge_red",
+   "label": "舌の両縁が赤い",
+   "weights": {
+    "qi_stag": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-3"
+   ]
+  },
+  {
+   "id": "tongue_shape_swollen",
+   "label": "舌の形：大きい（胖大）",
+   "weights": {
+    "fluid": 1,
+    "cold": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-5",
+    "B13-7"
+   ]
+  },
+  {
+   "id": "tongue_shape_thin",
+   "label": "舌の形：小さい・薄い",
+   "weights": {
+    "blood_def": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-2"
+   ]
+  },
+  {
+   "id": "tongue_teeth_marks",
+   "label": "舌の形：歯痕",
+   "weights": {
+    "qi_def": 1,
+    "fluid": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-1",
+    "B13-5"
+   ]
+  },
+  {
+   "id": "tongue_fissured",
+   "label": "舌の形：裂紋（ひび割れ）",
+   "weights": {
+    "yin_def": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-6"
+   ]
+  },
+  {
+   "id": "tongue_deviation",
+   "label": "舌の偏位・震え（安全確認）",
+   "group": "tongue"
+  },
+  {
+   "id": "tongue_coat_thick",
+   "label": "舌苔：厚い",
+   "weights": {
+    "fluid": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-5"
+   ]
+  },
+  {
+   "id": "tongue_coat_yellow",
+   "label": "舌苔：黄色い",
+   "weights": {
+    "heat": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-8"
+   ]
+  },
+  {
+   "id": "tongue_coat_little",
+   "label": "舌苔：少ない・ない",
+   "weights": {
+    "yin_def": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-6"
+   ]
+  },
+  {
+   "id": "tongue_coat_wet",
+   "label": "舌苔：湿っている",
+   "weights": {
+    "fluid": 1,
+    "cold": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-5",
+    "B13-7"
+   ]
+  },
+  {
+   "id": "tongue_coat_dry",
+   "label": "舌苔：乾いている",
+   "weights": {
+    "yin_def": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-6"
+   ]
+  },
+  {
+   "id": "tongue_coat_grayblack",
+   "label": "舌苔：灰黒色（安全確認）",
+   "group": "tongue"
+  },
+  {
+   "id": "tongue_mirror",
+   "label": "舌苔がなく鏡のように光る（安全確認）",
+   "group": "tongue"
+  },
+  {
+   "id": "tongue_sublingual_distended",
+   "label": "舌下静脈：太く紫色に浮き出ている（怒張）",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "group": "tongue",
+   "from": [
+    "B13-4"
    ]
   }
  ]
