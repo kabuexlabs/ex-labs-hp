@@ -1,12 +1,12 @@
 {
- "version": "2026-10-29-v3.2",
+ "version": "2026-10-29-v3.3",
  "review": {
   "status": "draft",
   "source": "2026-10-24 版（3段階版）の設問・重みを、2026-10-25 の改修指示と承認済みの改修計画に沿って組み直した草案。重み・五臓は現行の選択肢の値を引き継いだもので、新しい数値は作っていない（専門家未確認）",
   "reviewer": null,
   "reviewedAt": null
  },
- "note": "設問（主訴カテゴリー・具体的主訴・いちばん改善したい主訴の選択肢は complaints.json から作る）。section：basic／category／complaint／primary／detail／constitution／safety／lifestyle／staff。選択肢の findings は選んだときに present になる所見。exclusive（none・unknown・declined）はほかの選択肢と同時に選べない。 2026-10-28：選択肢の other（その他・所見なし）、mensesOnly（閉経・月経なしでは出さない）、note（短い記入欄）、heading（小見出し）、defer（薬剤師の観察で「判断できない」＝本人の回答を使う）、設問の optional（回答せずに次へ）・prefill（前の回答であった所見をチェック済みで出す）・followup（同じ画面で追加の選択肢）を追加。 2026-10-29：followup を followups（配列。picker: formulas は漢方薬の候補から選ぶ）に、設問の note（選択肢を選んだら出す任意の記入欄。except の選択肢は除く）、選択肢の noteLabel／notePlaceholder・staffNote（薬剤師画面の確認メモ）を追加。",
+ "note": "設問（主訴カテゴリー・具体的主訴・いちばん改善したい主訴の選択肢は complaints.json から作る）。section：basic／category／complaint／primary／detail／constitution／safety／lifestyle／staff。選択肢の findings は選んだときに present になる所見。exclusive（none・unknown・declined）はほかの選択肢と同時に選べない。 2026-10-28：選択肢の other（その他・所見なし）、mensesOnly（閉経・月経なしでは出さない）、note（短い記入欄）、heading（小見出し）、defer（薬剤師の観察で「判断できない」＝本人の回答を使う）、設問の optional（回答せずに次へ）・prefill（前の回答であった所見をチェック済みで出す）・followup（同じ画面で追加の選択肢）を追加。 2026-10-29：followup を followups（配列。picker: formulas は漢方薬の候補から選ぶ）に、設問の note（選択肢を選んだら出す任意の記入欄。except の選択肢は除く）、選択肢の noteLabel／notePlaceholder・staffNote（薬剤師画面の確認メモ）を追加。 2026-10-29（第3弾）：section tongue（舌の確認方法 T1 とご本人の自己確認 TS_*）、選択肢の refer（選ぶと患者画面・薬剤師画面に受診のおすすめ）・oneOf（同じ名前の選択肢はどれか1つ）を追加。記入欄は選んだ選択肢のすぐ下に出す。",
  "questions": [
   {
    "id": "A1",
@@ -7825,7 +7825,7 @@
   {
    "id": "B11b",
    "section": "constitution",
-   "title": "経血や月経痛について、あてはまるものを選んでください",
+   "title": "経血・月経痛・おりものについて、あてはまるものを選んでください",
    "type": "multi",
    "trigger": {
     "menses": true
@@ -7860,6 +7860,13 @@
      ]
     },
     {
+     "id": "B11b-flow_bright_heavy",
+     "text": "経血の色が鮮やかな赤",
+     "findings": [
+      "flow_bright_heavy"
+     ]
+    },
+    {
      "id": "B11b-flow_light",
      "text": "経血量が少ない",
      "findings": [
@@ -7877,11 +7884,12 @@
      ]
     },
     {
-     "id": "B11b-flow_bright_heavy",
-     "text": "鮮やかな赤色の出血が多い",
+     "id": "B11b-irregular_bleeding",
+     "text": "月経以外の時期に出血がある",
      "findings": [
-      "flow_bright_heavy"
-     ]
+      "irregular_bleeding"
+     ],
+     "refer": "月経以外の時期の出血は、婦人科の病気が隠れていることがあります。婦人科の受診をおすすめします。"
     },
     {
      "id": "B11b-leukorrhea",
@@ -8005,60 +8013,109 @@
   {
    "id": "C1",
    "section": "safety",
-   "title": "いま飲んでいる薬・サプリメントの種類を選んでください",
+   "title": "いま飲んでいる薬・サプリメントはありますか",
    "type": "multi",
-   "help": "薬の名前がわかれば書いてください（書かなくても進めます）。薬剤師がお薬手帳などで確認します。",
+   "help": "あてはまるものを選ぶと、そのすぐ下に薬の名前の欄が出ます（わかれば。書かなくても進めます）。ここにない薬は「その他の薬・サプリメント」に書いてください。",
    "options": [
     {
-     "id": "C1-bp",
-     "text": "血圧の薬"
-    },
-    {
      "id": "C1-diuretic",
-     "text": "利尿薬（むくみ・血圧）"
-    },
-    {
-     "id": "C1-anticoag",
-     "text": "血液をサラサラにする薬"
-    },
-    {
-     "id": "C1-diabetes",
-     "text": "糖尿病の薬"
-    },
-    {
-     "id": "C1-thyroid",
-     "text": "甲状腺の薬"
+     "text": "利尿薬（むくみや血圧の薬）",
+     "flags": [
+      "med_diuretic"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書かれている名前"
     },
     {
      "id": "C1-steroid",
-     "text": "ステロイド"
+     "text": "ステロイドの飲み薬",
+     "flags": [
+      "med_steroid"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書かれている名前"
     },
     {
-     "id": "C1-sleep",
-     "text": "睡眠薬・抗不安薬"
+     "id": "C1-bp",
+     "text": "血圧の薬",
+     "flags": [
+      "med_bp"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書かれている名前"
+    },
+    {
+     "id": "C1-thyroid",
+     "text": "甲状腺の薬",
+     "flags": [
+      "med_thyroid"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書かれている名前"
+    },
+    {
+     "id": "C1-asthma",
+     "text": "ぜんそく・気管支の薬",
+     "flags": [
+      "med_asthma"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書かれている名前"
     },
     {
      "id": "C1-antidep",
-     "text": "抗うつ薬"
+     "text": "抗うつ薬",
+     "flags": [
+      "med_antidep"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書かれている名前"
     },
     {
      "id": "C1-interferon",
-     "text": "インターフェロン製剤",
+     "text": "インターフェロン",
      "flags": [
       "interferon"
-     ]
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書かれている名前"
     },
     {
      "id": "C1-laxative",
-     "text": "便秘薬"
+     "text": "便秘薬",
+     "flags": [
+      "med_laxative"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書かれている名前"
     },
     {
-     "id": "C1-pain",
-     "text": "痛み止め"
+     "id": "C1-kanzo",
+     "text": "市販のかぜ薬・胃腸薬",
+     "flags": [
+      "med_otc"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書かれている名前"
     },
     {
-     "id": "C1-hormone",
-     "text": "ホルモン剤（低用量ピルなど）"
+     "id": "C1-anticoag",
+     "text": "血液をサラサラにする薬",
+     "flags": [
+      "med_anticoag"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書かれている名前"
     },
     {
      "id": "C1-kampo",
@@ -8068,16 +8125,14 @@
      ]
     },
     {
-     "id": "C1-kanzo",
-     "text": "かぜ薬・胃腸薬など（市販薬）"
-    },
-    {
-     "id": "C1-supp",
-     "text": "サプリメント・健康食品"
-    },
-    {
      "id": "C1-other",
-     "text": "その他の薬"
+     "text": "その他の薬・サプリメント",
+     "flags": [
+      "other_meds"
+     ],
+     "note": true,
+     "noteLabel": "薬・サプリメントの名前（わかれば・任意）",
+     "notePlaceholder": "例：痛み止め（ロキソニン）、ビタミン剤"
     },
     {
      "id": "C1-none",
@@ -8090,13 +8145,6 @@
      "exclusive": "unknown"
     }
    ],
-   "note": {
-    "label": "薬の名前（わかれば・任意）",
-    "placeholder": "例：お薬手帳に書かれている名前",
-    "except": [
-     "C1-kampo"
-    ]
-   },
    "followups": [
     {
      "when": "C1-kampo",
@@ -8119,77 +8167,90 @@
      "text": "高血圧",
      "flags": [
       "hypertension"
-     ]
+     ],
+     "note": true,
+     "noteLabel": "病名・時期（わかれば・任意）",
+     "notePlaceholder": "例：不整脈（5年前から通院）"
     },
     {
      "id": "C2-2",
      "text": "心臓の病気",
      "flags": [
       "heart"
-     ]
+     ],
+     "note": true,
+     "noteLabel": "病名・時期（わかれば・任意）",
+     "notePlaceholder": "例：不整脈（5年前から通院）"
     },
     {
      "id": "C2-3",
      "text": "腎臓の病気",
      "flags": [
       "kidney"
-     ]
+     ],
+     "note": true,
+     "noteLabel": "病名・時期（わかれば・任意）",
+     "notePlaceholder": "例：不整脈（5年前から通院）"
     },
     {
-     "id": "C2-4",
-     "text": "肝臓の病気",
+     "id": "C2-hypok",
+     "text": "低カリウムと言われたことがある",
      "flags": [
-      "liver"
-     ]
+      "hypokalemia"
+     ],
+     "note": true,
+     "noteLabel": "病名・時期（わかれば・任意）",
+     "notePlaceholder": "例：不整脈（5年前から通院）"
     },
     {
      "id": "C2-5",
      "text": "甲状腺の病気",
      "flags": [
       "thyroid"
-     ]
-    },
-    {
-     "id": "C2-6",
-     "text": "緑内障",
-     "flags": [
-      "glaucoma_bph"
-     ]
+     ],
+     "note": true,
+     "noteLabel": "病名・時期（わかれば・任意）",
+     "notePlaceholder": "例：不整脈（5年前から通院）"
     },
     {
      "id": "C2-11",
-     "text": "前立腺肥大（排尿しにくい）",
+     "text": "前立腺肥大など、尿が出にくい",
      "flags": [
       "glaucoma_bph"
-     ]
+     ],
+     "note": true,
+     "noteLabel": "病名・時期（わかれば・任意）",
+     "notePlaceholder": "例：不整脈（5年前から通院）"
     },
     {
-     "id": "C2-7",
-     "text": "糖尿病",
+     "id": "C2-4",
+     "text": "肝臓の病気",
      "flags": [
-      "diabetes"
-     ]
+      "liver"
+     ],
+     "note": true,
+     "noteLabel": "病名・時期（わかれば・任意）",
+     "notePlaceholder": "例：不整脈（5年前から通院）"
     },
     {
      "id": "C2-8",
-     "text": "胃腸の病気",
+     "text": "胃腸が弱い・胃腸の病気",
      "flags": [
       "gi_weak"
-     ]
+     ],
+     "note": true,
+     "noteLabel": "病名・時期（わかれば・任意）",
+     "notePlaceholder": "例：不整脈（5年前から通院）"
     },
     {
      "id": "C2-9",
      "text": "がんの治療中",
      "flags": [
       "cancer"
-     ]
-    },
-    {
-     "id": "C2-10",
-     "text": "その他の病気",
-     "flags": [
-      "other_disease"
-     ]
+     ],
+     "note": true,
+     "noteLabel": "病名・時期（わかれば・任意）",
+     "notePlaceholder": "例：不整脈（5年前から通院）"
     },
     {
      "id": "C2-surgery",
@@ -8202,6 +8263,16 @@
      "notePlaceholder": "例：盲腸の手術（10年前）"
     },
     {
+     "id": "C2-10",
+     "text": "その他の病気",
+     "flags": [
+      "other_disease"
+     ],
+     "note": true,
+     "noteLabel": "病名・時期（わかれば・任意）",
+     "notePlaceholder": "例：不整脈（5年前から通院）"
+    },
+    {
      "id": "C2-0",
      "text": "ない",
      "exclusive": "none"
@@ -8212,13 +8283,7 @@
      "exclusive": "unknown"
     }
    ],
-   "note": {
-    "label": "病名・時期（わかれば・任意）",
-    "placeholder": "例：不整脈（5年前から通院）",
-    "except": [
-     "C2-surgery"
-    ]
-   }
+   "help": "あてはまるものを選ぶと、そのすぐ下に病名・時期の欄が出ます（わかれば。書かなくても進めます）。ここにない病気は「その他の病気」に書いてください。"
   },
   {
    "id": "C3",
@@ -8420,6 +8485,232 @@
    ]
   },
   {
+   "id": "T1",
+   "section": "tongue",
+   "title": "舌の状態を確認します。どの方法がよいですか",
+   "type": "single",
+   "help": "舌を人に見せたくない場合は、ご自分で鏡を見て選ぶか、確認しないを選べます。",
+   "options": [
+    {
+     "id": "T1-staff",
+     "text": "薬剤師に見てもらう",
+     "value": "staff"
+    },
+    {
+     "id": "T1-self",
+     "text": "自分で鏡を見て、イラストから選ぶ",
+     "value": "self"
+    },
+    {
+     "id": "T1-none",
+     "text": "舌の確認はしない",
+     "value": "none"
+    }
+   ]
+  },
+  {
+   "id": "TS_color",
+   "section": "tongue",
+   "title": "鏡で舌を見て、色について近いものを選んでください",
+   "type": "multi",
+   "options": [
+    {
+     "id": "TS_color-normal",
+     "text": "淡いピンク色（ふつう）",
+     "oneOf": "base"
+    },
+    {
+     "id": "TS_color-tongue_color_pale",
+     "text": "白っぽい",
+     "findings": [
+      "tongue_color_pale"
+     ],
+     "oneOf": "base"
+    },
+    {
+     "id": "TS_color-tongue_color_red",
+     "text": "赤い",
+     "findings": [
+      "tongue_color_red"
+     ],
+     "oneOf": "base"
+    },
+    {
+     "id": "TS_color-tongue_color_purple",
+     "text": "紫っぽい・黒っぽい点がある",
+     "findings": [
+      "tongue_color_purple"
+     ]
+    },
+    {
+     "id": "TS_color-tongue_edge_red",
+     "text": "ふちが赤い",
+     "findings": [
+      "tongue_edge_red"
+     ]
+    }
+   ],
+   "trigger": {
+    "chosen": [
+     "T1-self"
+    ]
+   }
+  },
+  {
+   "id": "TS_shape",
+   "section": "tongue",
+   "title": "舌の形について、近いものを選んでください",
+   "type": "multi",
+   "options": [
+    {
+     "id": "TS_shape-normal",
+     "text": "ふつう",
+     "exclusive": "none"
+    },
+    {
+     "id": "TS_shape-tongue_shape_swollen",
+     "text": "大きく、ぼってりしている",
+     "findings": [
+      "tongue_shape_swollen"
+     ]
+    },
+    {
+     "id": "TS_shape-tongue_shape_thin",
+     "text": "小さく、薄い",
+     "findings": [
+      "tongue_shape_thin"
+     ]
+    },
+    {
+     "id": "TS_shape-tongue_teeth_marks",
+     "text": "ふちに歯の跡がある",
+     "findings": [
+      "tongue_teeth_marks"
+     ]
+    },
+    {
+     "id": "TS_shape-tongue_fissured",
+     "text": "表面にひび割れがある",
+     "findings": [
+      "tongue_fissured"
+     ]
+    },
+    {
+     "id": "TS_shape-tongue_deviation",
+     "text": "まっすぐ出せない・震える",
+     "findings": [
+      "tongue_deviation"
+     ],
+     "tags": [
+      "tongue_severe"
+     ]
+    }
+   ],
+   "trigger": {
+    "chosen": [
+     "T1-self"
+    ]
+   }
+  },
+  {
+   "id": "TS_coat",
+   "section": "tongue",
+   "title": "舌の表面の苔（こけ）について、近いものを選んでください",
+   "type": "multi",
+   "options": [
+    {
+     "id": "TS_coat-normal",
+     "text": "薄く白い（ふつう）",
+     "exclusive": "none"
+    },
+    {
+     "id": "TS_coat-tongue_coat_thick",
+     "text": "厚い",
+     "findings": [
+      "tongue_coat_thick"
+     ]
+    },
+    {
+     "id": "TS_coat-tongue_coat_yellow",
+     "text": "黄色い",
+     "findings": [
+      "tongue_coat_yellow"
+     ]
+    },
+    {
+     "id": "TS_coat-tongue_coat_little",
+     "text": "少ない・ない",
+     "findings": [
+      "tongue_coat_little"
+     ]
+    },
+    {
+     "id": "TS_coat-tongue_coat_wet",
+     "text": "湿っている",
+     "findings": [
+      "tongue_coat_wet"
+     ]
+    },
+    {
+     "id": "TS_coat-tongue_coat_dry",
+     "text": "乾いている",
+     "findings": [
+      "tongue_coat_dry"
+     ]
+    },
+    {
+     "id": "TS_coat-tongue_coat_grayblack",
+     "text": "灰色・黒っぽい",
+     "findings": [
+      "tongue_coat_grayblack"
+     ],
+     "tags": [
+      "tongue_severe"
+     ]
+    },
+    {
+     "id": "TS_coat-tongue_mirror",
+     "text": "苔がなく、つるつる光る",
+     "findings": [
+      "tongue_mirror"
+     ],
+     "tags": [
+      "tongue_severe"
+     ]
+    }
+   ],
+   "trigger": {
+    "chosen": [
+     "T1-self"
+    ]
+   }
+  },
+  {
+   "id": "TS_vein",
+   "section": "tongue",
+   "title": "舌の裏側の静脈について、近いものを選んでください",
+   "type": "single",
+   "options": [
+    {
+     "id": "TS_vein-normal",
+     "text": "ふつう",
+     "exclusive": "none"
+    },
+    {
+     "id": "TS_vein-tongue_sublingual_distended",
+     "text": "太く紫色に浮き出ている",
+     "findings": [
+      "tongue_sublingual_distended"
+     ]
+    }
+   ],
+   "trigger": {
+    "chosen": [
+     "T1-self"
+    ]
+   }
+  },
+  {
    "id": "X_tongue_color",
    "section": "staff",
    "title": "舌の色",
@@ -8428,21 +8719,23 @@
     {
      "id": "X_tongue_color-normal",
      "text": "淡紅色（ふつう）",
-     "exclusive": "none"
+     "oneOf": "base"
     },
     {
      "id": "X_tongue_color-tongue_color_pale",
      "text": "淡白（白っぽい）",
      "findings": [
       "tongue_color_pale"
-     ]
+     ],
+     "oneOf": "base"
     },
     {
      "id": "X_tongue_color-tongue_color_red",
      "text": "紅（赤い）",
      "findings": [
       "tongue_color_red"
-     ]
+     ],
+     "oneOf": "base"
     },
     {
      "id": "X_tongue_color-tongue_color_purple",
@@ -8652,26 +8945,73 @@
    ]
   },
   {
-   "id": "X_nail",
+   "id": "X_nail_color",
    "section": "staff",
-   "title": "爪（観察）",
+   "title": "爪の色（観察）",
    "type": "single",
    "help": "ネイルなどで判断できないときは「判断できない」を選ぶと、ご本人の回答を使います。",
    "options": [
     {
-     "id": "X_nail-nail_brittle",
+     "id": "X_nail_color-normal",
+     "text": "ふつう",
+     "exclusive": "none"
+    },
+    {
+     "id": "X_nail_color-nail_pale",
+     "text": "白っぽい",
+     "findings": [
+      "nail_pale"
+     ]
+    },
+    {
+     "id": "X_nail_color-nail_dark",
+     "text": "紫っぽい・暗い",
+     "findings": [
+      "nail_dark"
+     ]
+    },
+    {
+     "id": "X_nail_color-defer",
+     "text": "判断できない（ネイルなど）",
+     "defer": true
+    }
+   ]
+  },
+  {
+   "id": "X_nail_shape",
+   "section": "staff",
+   "title": "爪の形（観察・複数可）",
+   "type": "multi",
+   "options": [
+    {
+     "id": "X_nail_shape-nail_brittle",
      "text": "薄い・割れやすい",
      "findings": [
       "nail_brittle"
      ]
     },
     {
-     "id": "X_nail-normal",
+     "id": "X_nail_shape-nail_ridges",
+     "text": "縦すじが目立つ",
+     "findings": [
+      "nail_ridges"
+     ]
+    },
+    {
+     "id": "X_nail_shape-nail_spoon",
+     "text": "反り返っている・スプーン状",
+     "findings": [
+      "nail_spoon"
+     ],
+     "refer": "爪の反り返り（スプーン状）は鉄不足の可能性があります。受診をおすすめしてください。"
+    },
+    {
+     "id": "X_nail_shape-normal",
      "text": "特記なし",
      "exclusive": "none"
     },
     {
-     "id": "X_nail-defer",
+     "id": "X_nail_shape-defer",
      "text": "判断できない（ネイルなど）",
      "defer": true
     }

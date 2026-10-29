@@ -8,6 +8,8 @@
 // 2026-10-28（修正依頼 1-1）：体質タイプは6つ（気虚・血虚・気滞・瘀血・水滞・水不足（陰虚））。冷え・熱は寒熱の軸として
 // 別に点数化し（旧・陽虚／陽盛の重みをそのまま付け替えた）、主体質・副体質の候補にしない。
 // 陽虚は「気虚＋冷え」、湿熱は「水滞＋熱」（両方が「傾向あり」＝20点以上）として表示だけする。
+// 2026-10-29 第3弾 11-1：舌（group tongue）をご本人が鏡で見て入力した所見は、重み・理論最大点とも 0.5 倍（暫定）。
+// 舌を確認しない方は舌の所見がないので、分子・分母の両方から外れる。
 // ---------------------------------------------------------------------------
 import { TYPES, AXES, ORGANS, findingById, type TypeKey, type AxisKey, type OrganKey } from './masters.ts';
 import type { FindingState } from './findings.ts';
@@ -19,6 +21,9 @@ export const COLD: AxisKey[] = ['cold', 'qi_def', 'fluid'];
 /** 組み合わせの表示（独立したタイプにしない） */
 export type Combo = 'yang_def' | 'damp_heat';
 export const COMBO_LABEL: Record<Combo, string> = { yang_def: '気虚＋冷え（陽虚）', damp_heat: '水滞＋熱（湿熱）' };
+
+/** ご本人が鏡で見て入力した舌の所見の重み（暫定） */
+export const SELF_TONGUE_FACTOR = 0.5;
 
 export type Level = 'balanced' | 'tendency' | 'caution' | 'strong';
 export const LEVEL_LABEL: Record<Level, string> = { balanced: 'バランス', tendency: '傾向あり', caution: '注意', strong: '強い' };
@@ -103,7 +108,9 @@ export function score(state: FindingState): ScoreResult {
     const mx = maxG.get(key) ?? {};
     const rw = rawG.get(key) ?? {};
     const evg = ev.get(key) ?? {};
-    for (const [k, w] of [...Object.entries(f.weights ?? {}), ...Object.entries(f.organs ?? {})] as [AxisKey | OrganKey, number][]) {
+    const factor = f.group === 'tongue' && e.source !== 'staff' ? SELF_TONGUE_FACTOR : 1;
+    for (const [k, w0] of [...Object.entries(f.weights ?? {}), ...Object.entries(f.organs ?? {})] as [AxisKey | OrganKey, number][]) {
+      const w = w0 * factor;
       mx[k] = Math.max(mx[k] ?? 0, w);
       if (e.status === 'present' && w > (rw[k] ?? 0)) {
         rw[k] = w;

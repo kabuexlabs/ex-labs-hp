@@ -10,6 +10,8 @@
 //  - 体質チェックの設問は全員に同じ選択肢を出し、お悩み（主訴・深掘り）で「あり」になった項目はチェック済み（変えられない）で出して
 //    1回だけ数える。前の回答と同時にあり得ない選択肢はグレーで押せない（修正依頼 4-7、第2弾 2-3・5-3）。深掘りでは従来どおり答えた所見を出さない。
 //  - 妊娠・授乳（A3P）は回答せずに次へ進める（optional。未回答は薬剤師画面に「未確認（口頭で確認）」。修正依頼 3-2）。
+//    「妊娠中」なら月経の設問・選択肢・主訴を出さない（第3弾 1。可能性あり・授乳中は月経の状況に従う）。
+//  - 舌（第3弾 11-1）：最後に確認の方法（薬剤師／ご自分で鏡を見て／確認しない）を聞き、ご自分で見る方だけ TS_* の4項目を出す。
 //  - 舌・顔色・爪は薬剤師が観察して入力する（顔色・爪は観察が優先、「判断できない」ならご本人の回答。修正依頼 4-10）。
 // ---------------------------------------------------------------------------
 import {
@@ -63,11 +65,13 @@ export function primaryOf(a: Answers): string | undefined {
 export interface FlowContext {
   sex?: Sex; menses?: Menses; categories: string[]; complaints: string[]; primary?: string;
   state: FindingState; chosen: Set<string>;
+  /** 妊娠・授乳で「妊娠中」を選んだ */
+  pregnant?: boolean;
 }
 export function triggerOk(t: Trigger | undefined, c: FlowContext): boolean {
   if (!t) return true;
   if (t.sexNot && c.sex === t.sexNot) return false;
-  if (t.menses && !(c.menses === 'regular' || c.menses === 'irregular')) return false;
+  if (t.menses && (!(c.menses === 'regular' || c.menses === 'irregular') || c.pregnant)) return false;
   if (t.mensesNot && c.menses === t.mensesNot) return false;
   if (t.category && !c.categories.includes(t.category)) return false;
   if (t.minComplaints && c.complaints.length < t.minComplaints) return false;
@@ -80,7 +84,7 @@ export function triggerOk(t: Trigger | undefined, c: FlowContext): boolean {
 /** 回答済みの所見だけの選択肢を隠す設問 */
 const CARRY: Section[] = ['detail', 'constitution'];
 /** 月経に関わる選択肢を出すか（「閉経」「月経はない」なら出さない） */
-const mensesShown = (c: FlowContext) => c.menses !== 'post' && c.menses !== 'none';
+const mensesShown = (c: FlowContext) => c.menses !== 'post' && c.menses !== 'none' && !c.pregnant;
 /** この所見と同時にあり得ない所見が、すでに「あり」か */
 const conflictsPresent = (state: FindingState, fid: string) => (findingById(fid)?.conflicts ?? []).some((x) => isPresent(state, x));
 /**
@@ -146,10 +150,11 @@ export function walk(answers: Answers): WalkResult {
     const skipped = !!rq.optional && Array.isArray(answers[q.id]) && answers[q.id].length === 0;
     steps.push({ q: rq, ids, ...(skipped ? { skipped } : {}) });
     if (!ids.length) continue;
-    applyAnswer(ctx.state, rq, rq.options.filter(selectable), ids, { inferAbsent: CARRY.includes(q.section) });
+    applyAnswer(ctx.state, rq, rq.options.filter(selectable), ids, { inferAbsent: CARRY.includes(q.section) || q.section === 'tongue' });
     for (const id of ids) ctx.chosen.add(id);
     // 月経の状況は A3 を表示したときだけ使う（性別を男性に変えたあとに残った回答を拾わない）
     if (q.id === 'A3') ctx.menses = mensesValue(answers);
+    if (q.id === 'A3P') ctx.pregnant = ids.includes('A3P-preg');
   }
   return { steps, state: ctx.state, sex: ctx.sex, ageBand: ageBandFromAnswers(answers), menses: ctx.menses, categories: ctx.categories, complaints: ctx.complaints, primary: ctx.primary, chosen: ctx.chosen };
 }
@@ -158,12 +163,15 @@ export function walk(answers: Answers): WalkResult {
  * 薬剤師の入力（舌・顔色・爪・体格・声）を所見に統合する。薬剤師の観察が患者の回答より優先し、
  * 選ばなかった選択肢の所見は「なし」にする（顔色・爪は観察と自己申告を両方足さない。修正依頼 4-10）。
  * 「判断できない」（defer）を選んだ設問は、ご本人の回答をそのまま使う。
+ * 舌は、ご本人が「薬剤師に見てもらう」を選んだときだけ薬剤師の入力を使う（ご本人入力・確認しないのときは使わない。第3弾 11-1）。
  */
-export function applyStaffAnswers(state: FindingState, staffAnswers: Answers | undefined): void {
+export function applyStaffAnswers(state: FindingState, staffAnswers: Answers | undefined, answers?: Answers): void {
   if (!staffAnswers) return;
+  const tm = answers ? tongueMode(answers) : undefined;
   for (const q of STAFF_QUESTIONS) {
     const ids = staffAnswers[q.id];
     if (!ids?.length || ids.some((id) => optionById(id)?.defer)) continue;
+    if (q.id.startsWith('X_tongue_') && (tm === 'self' || tm === 'none')) continue;
     applyAnswer(state, q, q.options, ids, { source: 'staff', inferAbsent: true });
   }
 }
@@ -179,6 +187,9 @@ export function normalizeAnswer(q: Question, rawIds: string[]): string[] {
     let m = uniq.filter((id) => by.has(id));
     const nonEx = m.filter((id) => !by.get(id)!.exclusive);
     m = nonEx.length ? nonEx : m.slice(0, 1);
+    // oneOf：同じ名前の選択肢は最初の1つだけ
+    const seen = new Set<string>();
+    m = m.filter((id) => { const g = by.get(id)!.oneOf; if (!g) return true; if (seen.has(g)) return false; seen.add(g); return true; });
     return single ? m.slice(0, 1) : m;
   };
   const uniq = [...new Set(rawIds)];
@@ -188,6 +199,11 @@ export function normalizeAnswer(q: Question, rawIds: string[]): string[] {
   const f = (q.followups ?? []).filter((fu) => m.includes(fu.when)).flatMap((fu) => pick(fu.options, fu.type === 'single'));
   return [...m, ...s, ...f];
 }
+/** 舌の確認の方法（T1）：staff 薬剤師に見てもらう／self ご自分で鏡を見て／none 確認しない／undefined 未回答 */
+export const tongueMode = (a: Answers): 'staff' | 'self' | 'none' | undefined => {
+  const v = valueOf(a, 'T1');
+  return v === 'staff' || v === 'self' || v === 'none' ? v : undefined;
+};
 /** 同時に選べない組み合わせ（所見の conflicts）を選んでいれば、その2つの選択肢の文言を返す */
 export function conflictIn(q: Question, ids: string[]): [string, string] | null {
   const picked = q.options.filter((o) => ids.includes(o.id) || o.locked);

@@ -15,7 +15,7 @@ type Inputs = Pick<KampoSession, 'answers' | 'staffAnswers' | 'texts' | 'tagChec
 const inputOf = (s: Partial<Inputs>) => ({ staffAnswers: s.staffAnswers, texts: s.texts, tagChecks: s.tagChecks });
 export function computeSession(s: Pick<KampoSession, 'answers' | 'staffAnswers'> & Partial<Inputs>): Computed {
   const w = walk(s.answers);
-  applyStaffAnswers(w.state, s.staffAnswers);
+  applyStaffAnswers(w.state, s.staffAnswers, s.answers);
   return { w, scores: score(w.state), safetyFlags: safetyFlags(s.answers, w, inputOf(s)), tags: safetyTags(w, s.staffAnswers, s.tagChecks), urgent: isUrgent(w) };
 }
 export const selectionOf = (s: Pick<KampoSession, 'answers'> & Partial<Inputs>, c: Computed): Selection =>
@@ -48,8 +48,4 @@ export function supervisorName(): string {
 export function supervisorBio(): string {
   const v = (import.meta.env as Record<string, string | undefined>).KAMPO_SUPERVISOR_BIO ?? process.env.KAMPO_SUPERVISOR_BIO;
   return v?.trim() || '';
-}
-export function staffNames(): string[] {
-  const v = (import.meta.env as Record<string, string | undefined>).KAMPO_STAFF_NAMES ?? process.env.KAMPO_STAFF_NAMES;
-  return (v ?? '').split(/[,、，]/).map((s) => s.trim()).filter(Boolean);
 }
