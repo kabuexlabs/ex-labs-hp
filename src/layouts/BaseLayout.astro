@@ -9,6 +9,7 @@ import '../styles/x.css';
 import '../styles/xguide.css';
 import '../styles/xtone.css';
 import { jsonLd } from '../lib/microcms';
+import { ORG_NAME, ORG_ALT_NAMES, ORG_DESCRIPTION, ORG_KNOWS_ABOUT, ORG_OFFERS } from '../data/org';
 
 export interface Props {
   title?: string;
@@ -54,7 +55,7 @@ const ogImageAbs = new URL(ogImage, site);
 const websiteLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: '株式会社 ex Labs',
+  name: ORG_NAME,
   alternateName: 'ex Labs公式サイト',
   url: site.toString(),
   description:
@@ -66,15 +67,14 @@ const orgLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   '@id': new URL('/#organization', site).toString(),
-  name: '株式会社ex Labs',
-  legalName: '株式会社ex Labs',
-  alternateName: 'ex Labs（イーエックスラボ）',
+  name: ORG_NAME,
+  legalName: ORG_NAME,
+  alternateName: ORG_ALT_NAMES,
   url: site.toString(),
   logo: new URL('/assets/logo.png', site).toString(),
   image: new URL('/assets/share-card.png', site).toString(),
   email: 'info@kabuexlabs.com',
-  description:
-    '謎解き・マーダーミステリー（マダミス）・頭脳戦・イマーシブなど、体験型エンターテインメントの企画・制作・集客・運営を一貫して手掛けるクリエイティブカンパニー。',
+  description: ORG_DESCRIPTION,
   slogan: 'AI時代に、人間が作る面白さを追求する',
   foundingDate: '2025-11',
   founder: { '@type': 'Person', '@id': new URL('/company/iida-yuki/#person', site).toString(), name: '飯田 雄貴', alternateName: ['飯田雄貴', '飯田ゆうき', 'いいだ ゆうき', 'Yuki Iida'], jobTitle: '代表取締役', url: new URL('/company/iida-yuki/', site).toString(), sameAs: [
@@ -85,33 +85,16 @@ const orgLd = {
   address: { '@type': 'PostalAddress', streetAddress: '西新宿3-3-13 西新宿水間ビル2F', addressLocality: '新宿区', addressRegion: '東京都', postalCode: '160-0023', addressCountry: 'JP' },
   // AI検索（AIO）向けの専門領域宣言。「マーダーミステリーの制作会社は？」
   // のような質問に対し、この会社が該当領域の事業者だと判定させるための情報。
-  knowsAbout: [
-    '謎解きイベントの企画・制作',
-    'マーダーミステリー（マダミス）の制作',
-    'イマーシブ（没入型）体験・イマーシブシアターの企画・制作',
-    '頭脳戦・交渉ゲームコンテンツの制作',
-    '商業施設・観光施設・文化施設の集客イベント',
-    '謎解きを活用した企業研修・チームビルディング',
-    '心理戦ゲーム・対人頭脳戦イベントの企画・運営',
-    '体験型イベント・参加型イベントの企画・制作',
-    '周遊型イベント・回遊施策の設計',
-    '催事・ポップアップ・遊休区画の体験型活用',
-  ],
+  knowsAbout: ORG_KNOWS_ABOUT,
   // 提供サービスを実体として列挙し、各サービスページに紐づける。
-  makesOffer: [
-    { n: '謎解き研修', p: '/services/nazotoki-kenshu/' },
-    { n: 'マーダーミステリー（マダミス）制作', p: '/services/murder-mystery/' },
-    { n: '施設活用イベントの企画・制作', p: '/services/shisetsu-event/' },
-    { n: 'イマーシブコンテンツ制作', p: '/services/immersive/' },
-    { n: '頭脳戦制作', p: '/services/zunousen/' },
-  ].map((s) => ({
+  makesOffer: ORG_OFFERS.map((o) => ({ n: o.name, p: o.path })).map((s) => ({
     '@type': 'Offer',
     itemOffered: {
       '@type': 'Service',
       name: s.n,
       serviceType: s.n,
       url: new URL(s.p, site).toString(),
-      provider: { '@type': 'Organization', name: '株式会社ex Labs' },
+      provider: { '@type': 'Organization', name: ORG_NAME },
       areaServed: { '@type': 'Country', name: '日本' },
     },
   })),
@@ -163,7 +146,7 @@ const orgLd = {
   <meta property="og:image:height" content="630">
   </>
 )}
-<meta property="og:site_name" content="株式会社 ex Labs">
+<meta property="og:site_name" content={ORG_NAME}>
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="google-site-verification" content="70Rfozvga_yw5B2FeapOdwuZiC8fwS_oCnVyWKijlRE">

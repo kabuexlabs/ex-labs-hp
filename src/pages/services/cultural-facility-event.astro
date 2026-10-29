@@ -1,0 +1,20 @@
+---
+// 公共施設・文化施設向けの体験型イベント（2026-10-29 追加）。本文は src/data/serviceCultural.ts、描画は components/x/ServicePage.astro。
+// 商業施設中心の /services/shisetsu-event/、夜間活用の解説 /guide/bunkashisetsu-yakan-katsuyo/、ミュージアム集客の解説 /guide/museum-event/ とは役割を分ける。
+export const prerender = false;
+import ServicePage from '../../components/x/ServicePage.astro';
+
+const serviceLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  serviceType: '公共施設・文化施設の体験型イベント企画・制作',
+  name: '公共施設・文化施設（美術館・博物館・植物園など）の体験型イベント企画・制作',
+  alternateName: ['文化施設のイベント企画', '美術館のイベント企画', '植物園のイベント企画', '公共施設の活用イベント'],
+  description: '美術館・博物館・植物園など公共の文化施設を舞台に、展示物や空間を物語に組み込んだ体験型イベントを企画・制作・運営。閉館後や未活用時間の活用、新しい来館者層の獲得、有料チケットによる収益化、安全管理と施設運営との調整に対応する。',
+  provider: { '@type': 'Organization', '@id': new URL('/#organization', Astro.site).toString(), name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
+  audience: { '@type': 'BusinessAudience', name: '自治体、指定管理者、美術館・博物館・植物園・水族館などの運営者' },
+  areaServed: 'JP',
+  url: new URL('/services/cultural-facility-event/', Astro.site).toString(),
+};
+---
+<ServicePage slug="cultural" title="公共施設・文化施設の体験型イベント企画｜美術館・植物園の新規来館と閉館後活用 - 株式会社ex Labs" description="美術館・博物館・植物園など公共の文化施設で、展示物や空間を物語に組み込んだ体験型イベントを企画・制作・運営。夢の島熱帯植物館（東京都）・京都市京セラ美術館（京都市）での公演を企画・主催。閉館後や未活用時間の活用、有料チケットによる収益化、安全管理と施設運営との調整まで対応します。" serviceLd={serviceLd} />

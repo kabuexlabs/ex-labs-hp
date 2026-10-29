@@ -28,8 +28,9 @@ const facts = (raw.intro.facts ?? []) as any[];
 const def: string = raw.intro.definition ?? '';
 const dm = def.match(/^\**([^、。*]+?)\**とは/);
 const defTitle = dm ? dm[1] + 'とは' : '';
-const CONTACT: Record<ServiceSlug, ContactType> = { nazotoki: 'kenshu', murder: 'madamis', shisetsu: 'shisetsu', immersive: 'immersive', zunousen: 'zunousen', ip: 'immersive' };
-const related = SERVICE_LINKS.filter((l) => l.slug !== slug);
+const CONTACT: Record<ServiceSlug, ContactType> = { nazotoki: 'kenshu', murder: 'madamis', shisetsu: 'shisetsu', immersive: 'immersive', zunousen: 'zunousen', ip: 'immersive', experience: 'taikengata', cultural: 'shisetsu' };
+// 関連サービス：共通の一覧（SERVICE_LINKS）＋ページごとの追加（raw.related。施設活用・イマーシブ → 公共施設・文化施設）
+const related = [...SERVICE_LINKS, ...((raw.related ?? []) as typeof SERVICE_LINKS)].filter((l) => l.slug !== slug);
 const faqSec = sections.find((s) => s.type === 'faq');
 // 費用（金額）を載せている節（「ご依頼の条件」優先、なければ最初の節、FAQ だけなら FAQ）に「原価＋実績に対するレベニューシェア」の訴求を置く（FAQ は除く）
 const hasCost = (s: any) => /万円/.test(JSON.stringify(s));

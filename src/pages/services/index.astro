@@ -49,16 +49,22 @@ const chooser = [
   { want: '登場人物として推理するコンテンツを作りたい', to: 'マーダーミステリー制作', href: '/services/murder-mystery/', ex: 'オリジナルのシナリオ制作、既存作品の貸切導入、宿泊プラン・配信向け', proof: '日本テレビ『金曜ミステリークラブ!!!』にミステリー企画で参画、宿泊施設向け作品で新規宿泊予約20件以上' },
   { want: '交渉・読み合いの対戦企画を作りたい', to: '頭脳戦制作', href: '/services/zunousen/', ex: 'ルール設計・バランス調整・制作物・進行審判・大会運営', proof: '東京都頭脳王決定戦 2026（全公演完売）' },
   { want: '作品・キャラクターの世界を体験にしたい', to: 'IPイベント企画・制作', href: '/services/ip-event/', ex: '版元・ゲーム会社・ブランド・施設向け。物語参加型・周遊型・展示連動型、複数施設での展開', proof: '日本テレビ『金曜ミステリークラブ!!!』（ミステリー企画で参画）、自社レーベルの運営、博報堂×紀伊國屋書店の体験型イベント' },
+  { want: '美術館・植物園など公共の文化施設で実施したい', to: '公共施設・文化施設の体験型イベント', href: '/services/cultural-facility-event/', ex: '閉館後・未活用時間の活用、新しい来館者層、有料チケットでの実施、安全管理と施設運営との調整', proof: '夢の島熱帯植物館（東京都）・京都市京セラ美術館（京都市）で公演を企画・主催（2026年11月）' },
   { want: '社内のチームビルディングをしたい', to: '謎解き研修', href: '/services/nazotoki-kenshu/', ex: '謎解きを使った体験型研修・社内イベント', proof: '法人向け研修プログラム、日本テレビ『金曜ミステリークラブ!!!』へのミステリー企画での参画' },
 ];
 
+// 一覧の構造化データには、ジャンル横断の入口と公共施設・文化施設のページも含める（カードは6サービスのまま）
+const itemListExtra = [
+  { title: '体験型イベントの企画・制作（ジャンル横断）', href: '/services/experience-event-production/' },
+  { title: '公共施設・文化施設の体験型イベント', href: '/services/cultural-facility-event/' },
+];
 // サービス一覧の ItemList 構造化データ（検索エンジンの一覧理解を補助）
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const itemListLd = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
   name: '株式会社ex Labs 法人向けサービス一覧',
-  itemListElement: services.map((s, i) => ({
+  itemListElement: [...services, ...itemListExtra].map((s, i) => ({
     '@type': 'ListItem',
     position: i + 1,
     name: s.title,
@@ -85,7 +91,7 @@ const itemListLd = {
   <tr><th scope="row">{c.want}</th><td><a href={c.href} style="color:var(--accent);font-weight:800">{c.to} →</a></td><td>{c.ex}</td><td>{c.proof}</td></tr>
 ))}
 </tbody></table></div>
-<p class="cmp-note">ジャンルが決まっていない場合は、<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミス・謎解き・イマーシブ・頭脳戦の違い</a>や<a href="/guide/event-original-or-existing/" style="color:var(--accent)">オリジナル制作か既存導入かの比較</a>で選び方を確認するか、そのまま<a href="/?c=taikengata#contact" style="color:var(--accent)">「体験型イベント全般」として相談</a>してください。目的と場所を伺ったうえで形式をご提案します。</p>
+<p class="cmp-note">ジャンルが決まっていない場合は、<a href="/services/experience-event-production/" style="color:var(--accent);font-weight:700" data-track="cta" data-show="services-experience" data-place="services-chooser">体験型イベントの企画・制作（ジャンル横断の相談）</a>のほか、<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミス・謎解き・イマーシブ・頭脳戦の違い</a>や<a href="/guide/event-original-or-existing/" style="color:var(--accent)">オリジナル制作か既存導入かの比較</a>で選び方を確認するか、そのまま<a href="/?c=taikengata#contact" style="color:var(--accent)">「体験型イベント全般」として相談</a>してください。目的と場所を伺ったうえで形式をご提案します。</p>
 <div class="svc-grid" style="margin-top:48px">
 {services.map((s) => (
   <div class={`svc-card tag-${s.tag}`}>

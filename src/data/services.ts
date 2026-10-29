@@ -5,8 +5,11 @@
 // view: "matrix" の表は、行×列の比較表（table 要素）としてそのまま見せる（受託とレベニューシェアの比較など、列どうしを見比べる表）。
 // 実績カード（cards）の img は小さなサムネイルとして見出しの横に出す。
 import { IP_SERVICE } from './serviceIp';
+import { EXPERIENCE_SERVICE } from './serviceExperience';
+import { CULTURAL_SERVICE } from './serviceCultural';
 // ip（IPイベント企画・制作）は 2026-10 追加。既存サービスの「関連サービス」欄（SERVICE_LINKS）には加えない（既存ページを変えないため）
-export type ServiceSlug = 'nazotoki' | 'murder' | 'shisetsu' | 'immersive' | 'zunousen' | 'ip';
+// experience（体験型イベントの企画・制作、ジャンル横断）・cultural（公共施設・文化施設）は 2026-10-29 追加。SERVICE_LINKS には加えず、関係するページから個別にリンクする
+export type ServiceSlug = 'nazotoki' | 'murder' | 'shisetsu' | 'immersive' | 'zunousen' | 'ip' | 'experience' | 'cultural';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const SERVICES: Record<ServiceSlug, any> = {
  "nazotoki": {
@@ -1199,6 +1202,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
    "label": "施設に合う体験企画を相談する",
    "note": "目的・開催時期・会場など、分かる範囲でお知らせください。使える区画や時間帯、受託かレベニューシェアかが決まっていなくても構いません。"
   },
+  "related": [{ "slug": "cultural", "label": "公共施設・文化施設の体験型イベント", "href": "/services/cultural-facility-event/" }],
   "guides": [
   {
    "href": "/guide/shuyu-event-uketsuke/",
@@ -2110,6 +2114,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
    "label": "イマーシブ体験の制作を相談する",
    "note": "目的・開催時期・会場など、分かる範囲でお知らせください。使える場所や期間、脚本のみか運営込みかが決まっていなくても構いません。"
   },
+  "related": [{ "slug": "cultural", "label": "公共施設・文化施設の体験型イベント", "href": "/services/cultural-facility-event/" }],
   "guides": [
    {
     "href": "/guide/immersive/",
@@ -2145,7 +2150,9 @@ export const SERVICES: Record<ServiceSlug, any> = {
    }
   ]
  },
- "ip": IP_SERVICE
+ "ip": IP_SERVICE,
+ "experience": EXPERIENCE_SERVICE,
+ "cultural": CULTURAL_SERVICE
 };
 export const SERVICE_LINKS: { slug: ServiceSlug; label: string; href: string }[] = [
  {
@@ -2172,5 +2179,10 @@ export const SERVICE_LINKS: { slug: ServiceSlug; label: string; href: string }[]
   "slug": "zunousen",
   "label": "頭脳戦制作",
   "href": "/services/zunousen/"
+ },
+ {
+  "slug": "experience",
+  "label": "体験型イベントの企画・制作（ジャンルが決まる前の相談）",
+  "href": "/services/experience-event-production/"
  }
 ];

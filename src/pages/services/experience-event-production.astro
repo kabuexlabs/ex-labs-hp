@@ -1,0 +1,20 @@
+---
+// 体験型イベントの企画・制作（ジャンル横断の入口。2026-10-29 追加）。本文は src/data/serviceExperience.ts、描画は components/x/ServicePage.astro。
+// /services/ はサービスの一覧、/guide/taikengata-company/ は制作会社の選び方の解説。ここは「ジャンルが決まる前に何を相談できるか」を判断するページ。
+export const prerender = false;
+import ServicePage from '../../components/x/ServicePage.astro';
+
+const serviceLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  serviceType: '体験型イベントの企画・制作',
+  name: '体験型イベントの企画・制作（謎解き・イマーシブ・マーダーミステリー・心理戦／頭脳戦）',
+  alternateName: ['体験型イベント制作', '参加型イベント制作', 'イベントコンテンツ制作'],
+  description: '謎解き・イマーシブ（没入型体験）・マーダーミステリー・心理戦／頭脳戦などの体験型イベントを、目的・会場・参加人数から形式を選んで企画・制作。企画から制作物・キャスト・告知・当日運営まで一貫して対応し、一部の工程だけの依頼にも対応する。',
+  provider: { '@type': 'Organization', '@id': new URL('/#organization', Astro.site).toString(), name: '株式会社ex Labs', url: new URL('/', Astro.site).toString() },
+  audience: { '@type': 'BusinessAudience', name: '企業のマーケティング・販促担当、広告代理店・イベント会社、商業施設・文化施設・観光施設の運営者、IP・ブランドを持つ企業' },
+  areaServed: 'JP',
+  url: new URL('/services/experience-event-production/', Astro.site).toString(),
+};
+---
+<ServicePage slug="experience" title="体験型イベントの企画・制作｜謎解き・イマーシブ・マダミス・心理戦をジャンル横断で相談 - 株式会社ex Labs" description="体験型イベント・参加型イベントの企画・制作を、ジャンルが決まる前から相談できます。謎解き・イマーシブ・マーダーミステリー・心理戦／頭脳戦の違い、目的からの選び方、夢の島熱帯植物館・京都市京セラ美術館・渋谷サクラステージなどの実績（場所・形式・担当範囲・時期）、費用と期間の目安を掲載。" serviceLd={serviceLd} />
