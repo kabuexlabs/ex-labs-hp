@@ -16,6 +16,8 @@ import LinkPreviewScript from '../components/LinkPreviewScript.astro';
 
 // メディア掲載の告知（ヒーロー下）と会社欄の掲載一覧。最優先の掲載は src/data/media.ts の先頭
 const topMedia = mediaItems[0];
+// トップの「メディア掲載」欄：記事URLのある掲載（新聞・Webメディアの記事）だけを、掲載の新しい順に
+const pressMedia = mediaItems.filter((m) => m.url).sort((a, b) => b.date.localeCompare(a.date));
 
 
 
@@ -275,10 +277,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
     </div>
     {upcomingEvents.length > 0 && (
       <div class="xt-soon">
-        <p class="xt-soon-h"><span>Coming Soon</span>{upcomingEvents.some((e) => (e.from ?? '').startsWith('2026-11')) ? `2026年11月の公演（${[...new Set(upcomingEvents.filter((e) => (e.from ?? '').startsWith('2026-11')).map((e) => e.region).filter(Boolean))].join('・')}）` : '開催予定・近日公開'}</p>
-        {upcomingEvents.some((e) => e.venueTag) && <p class="xt-soon-pub"><Cls text={`この秋は、${upcomingEvents.filter((e) => e.venueTag).map((e) => `${(e.venueTag ?? '').split('の')[0]}の${e.place}`).join('、')}と、公共の文化施設を舞台にした公演を開催します。`} emph={false} /></p>}
-        {upcomingEvents.some((e) => e.url.endsWith('/gensou/')) && <p class="xt-soon-more"><a href="/guide/yumenoshima-night/" data-track="show" data-show="guide-yumenoshima" data-place="home-soon">夜の夢の島熱帯植物館で行われる物語体験：日程・チケットの選び方・行き方 →</a></p>}
-        {upcomingEvents.some((e) => e.url.includes('/7th-composition/')) && <p class="xt-soon-more"><a href="/guide/kyoto-kyocera-museum-7th/" data-track="show" data-show="guide-kyoto7" data-place="home-soon">京都市京セラ美術館で行われる、絵画の物語体験：日程・チケット・行き方 →</a></p>}
+        <p class="xt-soon-h"><span>Coming Soon</span></p>
         <div class="x-hscroll" style="margin-top:20px;gap:20px">
           {upcomingEvents.map((e) => {
             const id = e.url.split('/').filter(Boolean).pop();
@@ -352,6 +351,21 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
       </div>
       <p class="xt-style-note"><span class="x-c">企画・制作に加え、</span><span class="x-c">集客・運営・</span><span class="x-c">コンテンツ改善までを</span><span class="x-c">一貫してご支援する</span><span class="x-c"><strong style="color:#fff">「伴走型」の制作体制</strong>。</span><span class="x-c">案件によっては</span><span class="x-c">初期費用を抑えたご提案や</span><span class="x-c"><strong style="color:#fff">レベニューシェア型</strong>での</span><span class="x-c">実施にも対応しております。</span></p>
     </div>
+  </div>
+</section>
+
+<section id="media" class="xt-pad16">
+  <div style="max-width:880px;margin:0 auto">
+    <SecHead en="Media" size="top" ja="メディア掲載" />
+    <div class="xt-guides xt-press">
+      {pressMedia.map((m) => (
+        <a href={m.url} target="_blank" rel="noopener" data-track="show" data-show="media-article" data-place="home-media">
+          <span class="xt-g-date">{m.date}</span>
+          <span class="xt-g-t"><span class="xt-press-o">{m.outlet}</span><Cls text={m.title} emph={false} /> ↗</span>
+        </a>
+      ))}
+    </div>
+    <div class="xt-works-more" style="margin-top:36px"><a href="/media/" class="x-btn is-line xt-more">メディア掲載実績を見る&nbsp;→</a></div>
   </div>
 </section>
 

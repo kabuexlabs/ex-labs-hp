@@ -34,13 +34,37 @@ const faqSec = sections.find((s) => s.type === 'faq');
 // 費用（金額）を載せている節（「ご依頼の条件」優先、なければ最初の節、FAQ だけなら FAQ）に「原価＋実績に対するレベニューシェア」の訴求を置く（FAQ は除く）
 const hasCost = (s: any) => /万円/.test(JSON.stringify(s));
 const costSecId = (sections.find((s) => s.id === 'terms' && hasCost(s)) ?? sections.find((s) => s.type !== 'faq' && hasCost(s)) ?? sections.find(hasCost))?.id;
+// ---- 文字の多い並びを図・表にするための整形（文章そのものは変えない） ----
+const plain = (t: string) => t.replace(/\*\*/g, '');
+// 短い項目だけの並び（ご依頼いただける内容・おすすめの業種など）はタグ（チップ）で見せる
+const isChipList = (items: string[]) => items.length > 1 && items.every((t) => plain(t).length <= 16);
+// 「実施：…」「成果：…」のような見出しつきの箇条書きは、見出しと中身の表にする
+const LABELED = /^([^：:（(、。]{1,8})：(.+)$/s;
+const splitBullets = (bs: string[] = []) => ({
+  rows: bs.map((b) => b.match(LABELED)).filter((m): m is RegExpMatchArray => !!m).map((m) => [m[1], m[2]] as [string, string]),
+  rest: bs.filter((b) => !LABELED.test(b)),
+});
+// 実績カードの目印（本文に書かれている事実だけをバッジにする）
+const badgesOf = (c: any) => {
+  const t = [c.title, c.sub, ...(c.bullets ?? [])].join(' ');
+  const out: string[] = [];
+  if (/全公演が?完売/.test(t)) out.push('全公演完売');
+  if (/日本経済新聞/.test(t)) out.push('日本経済新聞に掲載');
+  if (/電ファミニコゲーマー/.test(t)) out.push('電ファミニコゲーマーに掲載');
+  return out;
+};
+// 表：最初から見せる列（data の keyCols。省略時は値の列が3つ以下なら全部、4つ以上なら先頭2列）。残りは「詳しく見る」に畳む
+const keyColsOf = (sec: any): number[] => sec.keyCols ?? ((sec.cols as string[]).length - 1 <= 3 ? (sec.cols as string[]).slice(1).map((_, j) => j + 1) : [1, 2]);
+// 長い一覧・条件は先頭だけ見せて、残りは「ほか n件を見る」に畳む
+const KV_OPEN = 3;
+const FACT_OPEN = 3;
 const faqLd = faqSec ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqSec.items.map((f: any) => ({ '@type': 'Question', name: flat(f.q), acceptedAnswer: { '@type': 'Answer', text: flat(f.a) } })) } : null;
 const crumbLd = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
   { '@type': 'ListItem', position: 1, name: 'ホーム', item: new URL('/', site).toString() },
   { '@type': 'ListItem', position: 2, name: 'サービス', item: new URL('/services/', site).toString() },
   { '@type': 'ListItem', position: 3, name: raw.crumb, item: new URL(Astro.url.pathname, site).toString() },
 ] };
-// モバイルで横スクロールにする並び（デザインの rail 設定と同じ列幅）
+// 並びの列幅（パソコン）。スマホでは縦に積む。実績（works）が4件以上のときだけ横送り＋「‹ 1 / N ›」のボタン（carousel）
 const RAIL: Record<string, { gtc: string; gap: string; col: string; bleed: boolean; bg?: boolean }> = {
   list: { gtc: 'repeat(auto-fit,minmax(min(100%,420px),1fr))', gap: '12px', col: '76%', bleed: true },
   numbered: { gtc: 'repeat(auto-fit,minmax(min(100%,230px),1fr))', gap: '1px', col: '62%', bleed: false, bg: true },
@@ -48,7 +72,7 @@ const RAIL: Record<string, { gtc: string; gap: string; col: string; bleed: boole
   table: { gtc: 'minmax(0,1fr)', gap: '16px', col: 'calc(100% - 52px)', bleed: true },
   flow: { gtc: 'repeat(auto-fit,minmax(200px,1fr))', gap: '28px', col: '62%', bleed: true },
 };
-const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-rail${r.bleed ? ' is-bleed' : ''}${r.bg ? ' is-bg1' : ''}`, style: `--gtc:${r.gtc};--gap:${r.gap};--col:${r.col};margin-top:44px` }; };
+const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; return { class: `x-rail${r.bleed ? ' is-bleed' : ''}${r.bg ? ' is-bg1' : ''}${carousel ? ' is-carousel' : ''}`, style: `--gtc:${r.gtc};--gap:${r.gap};--col:${r.col};margin-top:44px` }; };
 ---
 <BaseLayout renewal title={title} description={description} cutin={raw.hero.lines} contact={{ title: raw.cta.title, note: raw.cta.note || undefined, type: CONTACT[slug] }} footer="short">
 <script type="application/ld+json" set:html={jsonLd(crumbLd)} />
@@ -98,7 +122,16 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
           {facts.map((f) => (
             <div class="xs-fact">
               <p class="xs-fact-k">{f.k}</p>
-              {f.items && <ul class="xs-fact-ul">{(f.items as string[]).map((it) => <li><span class="xs-dot" aria-hidden="true"></span><span><Cls text={it} emph={false} /></span></li>)}</ul>}
+              {f.items && (isChipList(f.items)
+                ? <ul class="xs-chips">{(f.items as string[]).map((it) => <li><Cls text={it} emph={false} /></li>)}</ul>
+                : <>
+                    <ul class="xs-fact-ul">{(f.items as string[]).slice(0, f.items.length > FACT_OPEN + 1 ? FACT_OPEN : undefined).map((it) => <li><span class="xs-dot" aria-hidden="true"></span><span><Cls text={it} emph={false} /></span></li>)}</ul>
+                    {f.items.length > FACT_OPEN + 1 && (
+                      <details class="xs-more"><summary>ほか{f.items.length - FACT_OPEN}件を見る</summary>
+                        <ul class="xs-fact-ul">{(f.items as string[]).slice(FACT_OPEN).map((it) => <li><span class="xs-dot" aria-hidden="true"></span><span><Cls text={it} emph={false} /></span></li>)}</ul>
+                      </details>
+                    )}
+                  </>)}
               {f.venues && <div class="xs-venues"><p class="xs-small">会場</p><div>{(f.venues as string[]).map((v) => <span>{v}</span>)}</div></div>}
               {f.steps && (
                 <div class="xs-steps"><p class="xs-small">人数・規模</p>
@@ -145,35 +178,61 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
       )}
       {s.type === 'cards' && (
         <>
-          <div {...railAttrs('cards')}>
-            {(s.items as any[]).map((c) => (
+          <div {...railAttrs('cards', s.id === 'works' && s.items.length >= 4)}>
+            {(s.items as any[]).map((c) => {
+              const bl = splitBullets(c.bullets);
+              const badges = badgesOf(c);
+              return (
               <div class="xs-cardc">
                 {c.preview && findLinkPreviewTarget(c.preview) && <a class="xs-cardc-pv" href={c.preview} target="_blank" rel="noopener" data-track="show" data-show="ntv" data-place={`svc-${slug}-works`} aria-label={`${c.title}（公式サイト）`}><span class="xs-cardc-img" data-link-preview={c.preview}><span class="xs-pv-k">TV</span><span class="xs-pv-t">{c.title}</span></span></a>}
-                <div class="xs-cardc-h"><span class="xs-cardc-no">{c.no}</span><h3><Cls text={c.title} emph={false} /></h3></div>
+                <div class:list={['xs-cardc-h', { 'has-th': c.img }]}>{c.img && <img class="xs-cardc-th" src={c.img} alt="" loading="lazy" decoding="async">}<span class="xs-cardc-no">{c.no}</span><h3><Cls text={c.title} emph={false} /></h3></div>
+                {badges.length > 0 && <p class="xs-badges">{badges.map((b) => <span>{b}</span>)}</p>}
                 <div class="xs-cardc-sub"><Rich text={c.sub} /></div>
-                <ul class="xs-cardc-ul">{(c.bullets as string[]).map((b) => <li><span class="xs-plus">+</span><span><Cls text={b} emph={false} /></span></li>)}</ul>
+                {bl.rows.length > 0 && <dl class="xs-cardc-dl">{bl.rows.map(([k, v]) => <div><dt>{k}</dt><dd><Cls text={v} emph={false} /></dd></div>)}</dl>}
+                {bl.rest.length > 0 && <ul class="xs-cardc-ul">{bl.rest.map((b) => <li><span class="xs-plus">+</span><span><Cls text={b} emph={false} /></span></li>)}</ul>}
                 {c.href && <a href={c.href} class="xs-cardc-a" data-track="cta" data-show="case" data-place={`svc-${slug}-works`}>{c.hrefLabel ?? '事例の詳細を読む'} →</a>}
               </div>
-            ))}
+              );
+            })}
           </div>
           {s.photo && <figure class="xs-photo"><img src={s.photo.img} alt={s.photo.cap} loading="lazy" decoding="async"><figcaption><Cls text={s.photo.cap} emph={false} /></figcaption></figure>}
         </>
       )}
-      {s.type === 'table' && (
+      {s.type === 'table' && s.view === 'matrix' && (
+        <div class="xs-mx-wrap">
+          <table class="xs-mx">
+            <thead><tr>{(s.cols as string[]).map((c) => <th scope="col">{c}</th>)}</tr></thead>
+            <tbody>{(s.rows as string[][]).map((r) => <tr><th scope="row"><Cls text={r[0]} emph={false} /></th>{r.slice(1).map((v) => <td><Rich text={v} /></td>)}</tr>)}</tbody>
+          </table>
+        </div>
+      )}
+      {s.type === 'table' && s.view !== 'matrix' && (
         <div {...railAttrs('table')}>
           {(s.rows as string[][]).map((r, i) => (
             <div class="xs-tr">
               <div class="xs-tr-h"><span class="xs-tr-no">{pad(i + 1)}</span><p><Cls text={r[0]} emph={false} /></p></div>
               <div class="xs-tr-b">
-                {r.slice(1).map((v, j) => <div><p class="xs-tr-k">{s.cols[j + 1]}</p><div class="xs-tr-v"><Rich text={v} /></div></div>)}
+                {keyColsOf(s).map((j) => <div><p class="xs-tr-k">{s.cols[j]}</p><div class="xs-tr-v"><Rich text={r[j]} /></div></div>)}
               </div>
+              {r.length - 1 > keyColsOf(s).length && (
+                <details class="xs-more xs-tr-more"><summary>詳しく見る（{s.cols.slice(1).filter((_: string, j: number) => !keyColsOf(s).includes(j + 1)).join('・')}）</summary>
+                  <div class="xs-tr-b">
+                    {r.slice(1).map((v, j) => keyColsOf(s).includes(j + 1) ? null : <div><p class="xs-tr-k">{s.cols[j + 1]}</p><div class="xs-tr-v"><Rich text={v} /></div></div>)}
+                  </div>
+                </details>
+              )}
             </div>
           ))}
         </div>
       )}
       {s.type === 'kv' && (
         <div class="x-wcard is-s xs-kv">
-          {(s.items as any[]).map((kv) => <div class="xs-kv-r"><p class="xs-kv-k"><Cls text={kv.k} emph={false} /></p><div class="xs-kv-v"><Rich text={kv.v} /></div></div>)}
+          {(s.items as any[]).slice(0, s.items.length > KV_OPEN + 1 ? KV_OPEN : undefined).map((kv) => <div class="xs-kv-r"><p class="xs-kv-k"><Cls text={kv.k} emph={false} /></p><div class="xs-kv-v"><Rich text={kv.v} /></div></div>)}
+          {s.items.length > KV_OPEN + 1 && (
+            <details class="xs-more xs-kv-more"><summary>ほかの条件を見る（{(s.items as any[]).slice(KV_OPEN).map((kv) => plain(kv.k)).join('・')}）</summary>
+              {(s.items as any[]).slice(KV_OPEN).map((kv) => <div class="xs-kv-r"><p class="xs-kv-k"><Cls text={kv.k} emph={false} /></p><div class="xs-kv-v"><Rich text={kv.v} /></div></div>)}
+            </details>
+          )}
         </div>
       )}
       {s.type === 'titles' && (

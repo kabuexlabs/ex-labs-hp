@@ -240,12 +240,12 @@ const orgLd = {
   window.addEventListener('pageshow', function (e) { if (e.persisted) ensureHeroVisible(); });
   window.addEventListener('load', function () { setTimeout(ensureHeroVisible, 1800); });
 })();
-/* 横に並ぶカード（.x-hscroll・.x-rail.is-carousel）の下に「‹ 1 / 11 ›」のボタンを付け、横に送れることを分かるようにする。
+/* 横に並ぶカード（.x-hscroll・.x-rail.is-carousel・旧デザインの .blog-strip・.works-grid）の下に「‹ 1 / 11 ›」のボタンを付け、横に送れることを分かるようにする。
    はみ出していないとき（パソコンの幅で全部見えている等）はボタンを隠す。 */
 (function () {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var arrow = function (d) { return '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="' + (d < 0 ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7') + '" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'; };
-  document.querySelectorAll('.x-hscroll, .x-rail.is-carousel').forEach(function (t) {
+  document.querySelectorAll('.x-hscroll, .x-rail.is-carousel, .blog-strip, .works-grid').forEach(function (t) {
     var items = Array.prototype.slice.call(t.children);
     if (items.length < 2) return;
     var nav = document.createElement('div');
@@ -304,7 +304,8 @@ const orgLd = {
    したらフェードアウトする。対象クラスはCSSの横スクロール
    ストリップ群と揃えること。 */
 (function () {
-  var strips = document.querySelectorAll('.str-grid,.style-grid,.genre-grid,.flow-row,.biz-flow,.event-row,.blog-strip,.works-grid');
+  // .blog-strip・.works-grid は「‹ 1 / N ›」のボタンを付けるので、ここでは対象外
+  var strips = document.querySelectorAll('.str-grid,.style-grid,.genre-grid,.flow-row,.biz-flow,.event-row');
   function attach() {
     strips.forEach(function (el) {
       if (el.dataset.swipeHint || el.scrollWidth <= el.clientWidth + 8) return;

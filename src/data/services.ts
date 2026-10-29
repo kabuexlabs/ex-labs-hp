@@ -1,6 +1,9 @@
 // 2026-09 リニューアルのサービスページ本文データ（デザイン元 service-data.js を移植。immersive は既存ページの内容を同じ形式に整理）。
 // 本文の「**」は強調、「／」は箇条書き、「A：B／C：D」は項目表として自動整形される（src/lib/jpbreak.ts の rich）。
 // FAQ はページ内の表示と FAQPage 構造化データの両方に使う。
+// 表（type: table）の keyCols は最初から見せる列の番号（それ以外は「詳しく見る」に畳む）。省略時は値の列が3つ以下なら全部、4つ以上なら先頭2列。
+// view: "matrix" の表は、行×列の比較表（table 要素）としてそのまま見せる（受託とレベニューシェアの比較など、列どうしを見比べる表）。
+// 実績カード（cards）の img は小さなサムネイルとして見出しの横に出す。
 import { IP_SERVICE } from './serviceIp';
 // ip（IPイベント企画・制作）は 2026-10 追加。既存サービスの「関連サービス」欄（SERVICE_LINKS）には加えない（既存ページを変えないため）
 export type ServiceSlug = 'nazotoki' | 'murder' | 'shisetsu' | 'immersive' | 'zunousen' | 'ip';
@@ -747,6 +750,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ],
     "lead": "施設の目的ごとに、おすすめの形式・これまでの実績・費用の考え方をまとめました。",
     "type": "table",
+    "keyCols": [1, 3],
     "cols": [
      "目的",
      "おすすめの形式",
@@ -900,6 +904,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
       "href": "/guide/bunkashisetsu-yakan-katsuyo/",
      "hrefLabel": "公共施設の夜間活用（事例の詳細）",
      "title": "夢の島熱帯植物館（東京都の施設）",
+     "img": "/assets/events/gensou-kv.webp",
       "sub": "閉館後の館内を巡る物語体験「午前零時の幻想集 第一夜『草陰の夢』」を企画・主催。",
       "bullets": [
        "通常の開館時間（9:30〜17:00）のあと、17:00〜20:00に12分おきに開始。最大4人の組・約50分で、日中の見学と時間を分ける",
@@ -911,6 +916,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
       "href": "/taikenbizyutu/7th-composition/",
      "hrefLabel": "公演ページ",
      "title": "京都市京セラ美術館（京都市の美術館）",
+     "img": "/assets/events/7th-composition-kv.webp",
       "sub": "体験する美術館「7枚目のコンポジション」を企画・主催。",
       "bullets": [
        "本館地下1階の講演室・多目的室の2部屋で、各回最大18名・60分の回を各日7回（2026年11月21日〜23日）",
@@ -922,6 +928,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
       "href": "/guide/case-uwasabanashi/",
      "hrefLabel": "制作事例の詳細（施設の課題・担当範囲）",
      "title": "Shibuya Sakura Stage（東急不動産様）",
+     "img": "/assets/events/uwasabanashi-kv.webp",
       "sub": "施設全体を周遊する体験型イベント「ウワサバナシ調査委員会」を開催。",
       "bullets": [
        "共有区画・館内導線を「体験の目的地」に転換し、回遊・滞在・館内店舗への送客を促進",
@@ -931,6 +938,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "04",
       "title": "博報堂 × 紀伊國屋書店様",
+      "img": "/assets/work-1.webp",
       "sub": "「月明かりの書店と呪われた原稿」の制作を担当。",
       "bullets": [
        "閉店後の紀伊國屋書店を舞台にした一夜限りの体験型イベント",
@@ -942,6 +950,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
       "href": "/guide/case-lostframe/",
      "hrefLabel": "制作事例の詳細（街の使い方・担当範囲）",
      "title": "下北沢エリア（街全体）",
+     "img": "/assets/events/lost-frame.webp",
       "sub": "アート体験型イベント「ロスト・フレーム」などを制作。",
       "bullets": [
        "下北沢の街全体を舞台にした実績あり（2026年7月〜8月31日、全公演完売）",
@@ -951,6 +960,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "06",
       "title": "カラオケ館様",
+      "img": "/assets/work-5.webp",
       "sub": "周遊型頭脳戦コンテンツ「恣験」を制作。",
       "bullets": [
        "参加者が様々な試験へ挑戦する内容",
@@ -1098,6 +1108,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ],
     "lead": "「誰が何を負担し、売上をどう分けるか」を一つの表にまとめました。併用（C）は、一部を施設様のご負担、残りをチケット売上から回収する形です。",
     "type": "table",
+    "view": "matrix",
     "cols": [
      "費目",
      "A：受託",
@@ -1335,6 +1346,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ],
     "lead": "対人ゲームは、ルールを書くだけでは成立しません。工程ごとの内容と、ご依頼いただける範囲をまとめました。",
     "type": "table",
+    "keyCols": [2, 3],
     "cols": [
      "工程",
      "内容",
@@ -1776,6 +1788,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ],
     "lead": "当社が制作するのは、実在の場所で行うリアルなイマーシブ体験です。目的と使える空間に合わせて、3つの形式から選びます。",
     "type": "table",
+    "keyCols": [1, 3, 4],
     "cols": [
      "形式",
      "向いている目的",
@@ -1861,6 +1874,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
       "href": "/gensou/",
      "hrefLabel": "公演ページ",
      "title": "午前零時の幻想集 第一夜「草陰の夢」（夢の島熱帯植物館）",
+     "img": "/assets/events/gensou-kv.webp",
       "sub": "東京都の夢の島熱帯植物館で、閉館後の館内を巡る物語体験を企画・主催。",
       "bullets": [
        "実施：2026年11月5日〜22日の木〜日曜（全12日間）。17:00〜20:00に12分おきに開始し、最大4人の組が約50分かけてキャストと会話しながら館内を巡る",
@@ -1872,6 +1886,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
       "href": "/taikenbizyutu/7th-composition/",
      "hrefLabel": "公演ページ",
      "title": "7枚目のコンポジション（京都市京セラ美術館）",
+     "img": "/assets/events/7th-composition-kv.webp",
       "sub": "京都市京セラ美術館で、絵画を鑑賞することが物語に参加するきっかけになる絵画×イマーシブを企画・主催（体験する美術館 第三弾）。",
       "bullets": [
        "実施：2026年11月21日〜23日の3日間、各日7回。1回60分（受付・事前説明・退場を含む）・各回最大18名",
@@ -1883,6 +1898,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
       "href": "/uwasabanashi/kotohogi/",
      "hrefLabel": "公演ページ",
      "title": "ウワサバナシ調査委員会 case2「言祝ぎの家」（さいたま市の一軒家）",
+     "img": "/assets/events/uwasabanashi-case2-kv.webp",
       "sub": "実際の一軒家を探索し、住人との会話や調査報告を通じて真相に迫るイマーシブ・ホラーミステリーを企画・主催。",
       "bullets": [
        "実施：2026年10月23日〜11月3日の指定日。各回定員8名",
@@ -1894,6 +1910,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
       "href": "/guide/case-uwasabanashi/",
      "hrefLabel": "制作事例の詳細（施設の課題・担当範囲）",
      "title": "ウワサバナシ調査委員会（渋谷サクラステージ）",
+     "img": "/assets/events/uwasabanashi-kv.webp",
       "sub": "東急不動産様・404 Not Found様・TSUTAYA様と連携した、施設全体を周遊する都市伝説×イマーシブ×謎解き。",
       "bullets": [
       "目的：目的がないと立ち寄られにくい共有区画・上層フロアへの回遊と、協力テナントへの来店のきっかけづくり",
@@ -1905,6 +1922,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "05",
       "title": "怪盗と秘密の試験（IMMERSIVE ILLUSION）",
+      "img": "/assets/events/kaitou-kv.webp",
       "sub": "日本一になった実績のあるマジシャン様とのコラボによる、六本木の会員制バーを舞台にしたマジック×イマーシブ公演。",
       "bullets": [
        "実在するバー空間そのものを物語の舞台に変える少人数制の没入体験",
@@ -1916,6 +1934,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
       "href": "/guide/case-lostframe/",
      "hrefLabel": "制作事例の詳細（街の使い方・担当範囲）",
      "title": "ロスト・フレーム（体験する美術館）",
+     "img": "/assets/events/lost-frame.webp",
       "sub": "下北沢の街全体を舞台にしたアート×イマーシブ体験を制作。",
       "bullets": [
        "街に散らばった絵画を探し、隠された物語を辿る周遊型アートイマーシブ",
@@ -1925,6 +1944,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "07",
       "title": "ヌル・アーデン展（自社主催）",
+      "img": "/assets/work-2.webp",
       "sub": "東京藝術大学出身アーティストとのコラボレーションによる、アート×謎解きを融合した没入型の展覧会イベントを企画・制作。",
       "bullets": [
        "アート作品の世界に入り込む、体験としての美術展",

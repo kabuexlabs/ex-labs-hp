@@ -133,7 +133,6 @@ html body.x-body .xt-soon-pub{border-left:0;padding:14px 18px;border-radius:var(
 html body.x-body .xt-str-no{font-family:var(--x-en);font-weight:800;font-size:clamp(56px,10vw,88px);line-height:1;color:var(--x-lime);-webkit-text-stroke:1.5px var(--x-ink);paint-order:stroke fill;text-shadow:3px 4px 0 var(--x-ink)}
 html body.x-body .xt-str-h{font-family:var(--x-sans);font-weight:700;letter-spacing:.04em;text-shadow:none}
 html body.x-body .xt-str-body,html body.x-body .xt-str-p{font-family:var(--x-sans);font-weight:500}
-html body.x-body .xt-str-ul{border-top:0;padding:18px 20px;border-radius:var(--x-r-s);background:rgba(255,255,255,.08)}
 html body.x-body .xt-model{border-radius:var(--x-r);border:var(--x-bd)}
 html body.x-body .xt-model-h{font-family:var(--x-sans);font-weight:700;letter-spacing:.14em}
 html body.x-body .x-rail.is-bg1{border-radius:var(--x-r-m);overflow:hidden}
@@ -275,7 +274,6 @@ html body.x-body .xs-def-h span{font-family:var(--x-sans);text-transform:none;le
 html body.x-body .xs-num-no{font-family:var(--x-en);font-weight:800;font-size:36px}
 html body.x-body .xs-cardc{border-radius:var(--x-r);overflow:hidden}
 html body.x-body .xs-cardc-no{font-family:var(--x-en);font-weight:800;font-size:clamp(36px,5vw,52px)}
-html body.x-body .xs-cardc-ul{border-top:0;padding:16px 18px;border-radius:var(--x-r-s);background:rgba(255,255,255,.07)}
 html body.x-body .xs-pv-k{font-family:var(--x-en);font-weight:800}
 html body.x-body .xs-tr{border-radius:var(--x-r-m);overflow:hidden}
 html body.x-body .xs-title img,html body.x-body .xs-gal img,html body.x-body .xs-photo img{border-radius:var(--x-r-m)}
@@ -367,7 +365,6 @@ html .x-hscroll::-webkit-scrollbar,html .x-rail.is-carousel::-webkit-scrollbar{d
 }
 /* ---- トップ：強み（ボックス） ---- */
 html body.x-body .xt-str{background:var(--x-panel);border:var(--x-bd);border-radius:var(--x-r);padding:clamp(26px,4vw,40px) clamp(20px,4vw,36px);box-shadow:var(--x-shadow)}
-html body.x-body .xt-str-ul{background:rgba(255,255,255,.07)}
 /* ---- トップ：成果報酬型のビジネスモデル（3者をボックスに） ---- */
 @media(max-width:699px){
   html body.x-body .xt-model-c{border:1.5px solid rgba(255,255,255,.3);border-radius:var(--x-r-m);padding:22px 20px}
@@ -395,4 +392,75 @@ html body.x-body .xs-toc-a{border:1.5px solid rgba(255,255,255,.18)}
 @media(max-width:699px){
   html body.x-body .xs-li,html body.x-body .xs-num,html body.x-body .xs-cardc,html body.x-body .xs-tr,html body.x-body .xs-flow{border:var(--x-bd)}
   html body.x-body .xs-toc-a{padding:12px 16px}
+}
+
+/* ---- トップ：メディア掲載（Strength と Works の間。解説記事の一覧と同じ白いリスト） ---- */
+html body.x-body .xt-press .xt-g-t{display:block}
+html body.x-body .xt-press-o{display:inline-block;margin:0 8px 4px 0;padding:3px 12px;border-radius:999px;background:var(--x-blue);color:#fff;font-size:12px;line-height:1.5;letter-spacing:.06em;vertical-align:1px}
+
+/* ---- 入れ子の箱を減らす：箱の中の箇条書きは背景の箱にせず、上の区切り線だけにする ---- */
+html body.x-body .xt-str-ul,html body.x-body .xs-cardc-ul{background:none;border-radius:0;padding:16px 0 0;border-top:1px solid rgba(255,255,255,.25)}
+
+/* ---- 箱の高さを中身に合わせる（横に並んだ箱が一番長い箱に引き伸ばされ、下に空きができていた） ---- */
+html .x-rail:not(.is-bg1),html .x-hscroll{align-items:start}
+html body.x-guide .genre-grid,html body.x-guide .blog-grid,html body.x-guide .pick-grid,html body.x-guide .cal-grid,html body.x-legacy .svc-grid,html body.x-legacy .blog-grid,html body.x-legacy .works-grid{align-items:start}
+
+/* ---- 解説記事：スマホで横に流していた並び（種類のタイル・流れ・比較）も、ボックスの縦積みに ---- */
+@media(max-width:640px){
+  html body.x-guide .genre-grid,html body.x-guide .flow-row,html body.x-guide .str-grid,html body.x-guide .style-grid{display:grid;grid-template-columns:minmax(0,1fr);overflow:visible;margin:28px 0 0;padding:0;gap:14px;scroll-snap-type:none}
+  html body.x-guide .genre-cell,html body.x-guide .flow-step,html body.x-guide .str-card,html body.x-guide .style-col{flex:none}
+  html body.x-guide .flow-step{position:relative}
+  html body.x-guide .flow-step:not(:last-child)::after{display:block;content:'';position:absolute;left:50%;right:auto;top:auto;bottom:-12px;width:14px;height:10px;transform:translateX(-50%);border:0;background:var(--x-blue);clip-path:polygon(0 0,100% 0,50% 100%);z-index:1}
+  html body.x-guide .blog-strip,html body.x-legacy .works-grid{align-items:flex-start}
+}
+
+/* =====================================================================
+   サービス各ページ：文字の多い箇所を図・表に（ServicePage の整形と対）
+   ===================================================================== */
+/* 短い項目はタグ（チップ） */
+html body.x-body .xs-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+html body.x-body .xs-chips li{padding:7px 14px;border-radius:999px;background:var(--x-card);color:var(--x-blue);font-weight:700;font-size:14px;line-height:1.45;letter-spacing:.04em}
+/* 「ほか n件を見る」「詳しく見る」（畳んだ中身） */
+html body.x-body .xs-more{margin-top:4px}
+html body.x-body .xs-more>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:10px;min-height:44px;font-weight:700;font-size:14px;line-height:1.5;color:var(--x-lime)}
+html body.x-body .xs-more>summary::-webkit-details-marker{display:none}
+html body.x-body .xs-more>summary::before{content:'+';flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--x-lime);color:var(--x-ink);font-family:var(--x-en);font-weight:800;font-size:16px;line-height:1}
+html body.x-body .xs-more[open]>summary::before{content:'−'}
+html body.x-body .xs-more[open]>summary{margin-bottom:10px}
+html body.x-body .xs-kv-more>summary{color:var(--x-blue);padding:18px 0 4px}
+html body.x-body .xs-kv-more>summary::before{background:var(--x-blue);color:#fff}
+html body.x-body .xs-tr-more{padding:0 clamp(20px,4vw,36px) 18px}
+html body.x-body .xs-tr-more .xs-tr-b{padding:0 0 8px}
+/* 実績カード：サムネイル＋番号＋題名、事実のバッジ、見出しつきの表 */
+html body.x-body .xs-cardc-h.has-th{display:grid;grid-template-columns:72px minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:16px;row-gap:6px;align-items:start}
+html body.x-body .xs-cardc-th{grid-row:1 / span 2;width:72px;height:96px;object-fit:cover;border-radius:10px;border:2px solid var(--x-ink);background:var(--x-blue)}
+html body.x-body .xs-cardc-h.has-th .xs-cardc-no{font-size:28px;line-height:1}
+html body.x-body .xs-badges{margin:0;display:flex;flex-wrap:wrap;gap:6px}
+html body.x-body .xs-badges span{padding:4px 12px;border-radius:999px;background:var(--x-lime);color:var(--x-ink);font-weight:700;font-size:12.5px;line-height:1.5;letter-spacing:.04em}
+html body.x-body .xs-cardc-dl{margin:0;display:grid;gap:10px;padding-top:14px;border-top:1px solid rgba(255,255,255,.25)}
+html body.x-body .xs-cardc-dl>div{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:baseline}
+html body.x-body .xs-cardc-dl dt{padding:2px 10px;border-radius:999px;border:1.5px solid var(--x-lime);color:var(--x-lime);font-size:12px;font-weight:700;white-space:nowrap;line-height:1.5}
+html body.x-body .xs-cardc-dl dd{margin:0;font-size:14px;line-height:1.8;color:var(--x-pale)}
+html body.x-body .xs-cardc-dl+.xs-cardc-ul{border-top:0;padding-top:0}
+/* 公演詳細の「所要時間・料金…」と、お出かけページの「初めてなら…」：横に並んだ項目が一番長い項目に引き伸ばされていた */
+html .ev-dl,html .ev-facts,html body.x-body .og-help{align-items:start}
+/* 比較表（view: matrix）：受託とレベニューシェアなど、列どうしを見比べる表 */
+html body.x-body .xs-mx-wrap{margin-top:40px;overflow-x:auto;border:var(--x-bd);border-radius:var(--x-r-m);background:var(--x-card);box-shadow:var(--x-shadow)}
+html body.x-body .xs-mx{width:100%;min-width:520px;border-collapse:collapse;color:var(--x-ink);font-size:14px;line-height:1.75}
+html body.x-body .xs-mx th,html body.x-body .xs-mx td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid #D6DFFB}
+html body.x-body .xs-mx tr:last-child>*{border-bottom:0}
+html body.x-body .xs-mx thead th{background:var(--x-blue);color:#fff;font-weight:700;font-size:13.5px;letter-spacing:.06em;white-space:nowrap}
+html body.x-body .xs-mx thead th:last-child{background:var(--x-lime);color:var(--x-ink)}
+html body.x-body .xs-mx tbody th{width:7.5em;background:#EEF2FE;color:var(--x-blue);font-weight:700;font-size:13.5px}
+html body.x-body .xs-mx td+td{background:rgba(225,247,62,.12)}
+/* スマホ：費目を行の見出しとして上に、A・B を左右に並べる */
+@media(max-width:560px){
+  html body.x-body .xs-mx{min-width:0;font-size:13.5px}
+  html body.x-body .xs-mx,html body.x-body .xs-mx thead,html body.x-body .xs-mx tbody{display:block}
+  html body.x-body .xs-mx tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  html body.x-body .xs-mx thead th:first-child{display:none}
+  html body.x-body .xs-mx tbody th{grid-column:1 / -1;width:auto;padding:10px 14px;border-bottom:0}
+  html body.x-body .xs-mx th,html body.x-body .xs-mx td{padding:12px 12px}
+  html body.x-body .xs-mx tr:last-child>td{border-bottom:0}
+  html body.x-body .xs-mx tbody tr:not(:last-child)>td{border-bottom:2px solid #C4D1FB}
 }
