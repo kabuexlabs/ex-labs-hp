@@ -100,7 +100,7 @@ const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity
       <p class="x-sh-ja is-b"><Cls text={g.ja} emph={false} /></p>
       <p class="xw-lead"><Cls text={g.lead} emph={false} /></p>
       {g.svc && <p class="xw-svc">{g.svc.map(([t, h]) => <a href={h} class="xw-link" data-track="cta" data-show={h.split('/')[2]} data-place="works-genre">{t} →</a>)}</p>}
-      <div class="x-rail is-bleed" style="--gtc:repeat(auto-fill,minmax(min(100%,320px),1fr));--gap:24px;--col:calc(100% - 52px);margin-top:44px">
+      <div class="x-rail is-bleed is-carousel" style="--gtc:repeat(auto-fill,minmax(min(100%,320px),1fr));--gap:24px;--col:calc(100% - 52px);margin-top:44px">
         {g.items.map((w) => (
           <article class="xw-card">
             <div style="position:relative">

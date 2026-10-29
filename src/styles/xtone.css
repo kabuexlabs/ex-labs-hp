@@ -159,7 +159,8 @@ html body.x-body .xt-perf-h{font-family:var(--x-sans);font-weight:700;letter-spa
 html body.x-body .xt-perf-l,html body.x-body .xt-perf-u{font-family:var(--x-sans);font-weight:700}
 html body.x-body .xt-perf-n{font-family:var(--x-en);font-weight:800;font-size:clamp(34px,9vw,96px);letter-spacing:0}
 html body.x-body .xt-perf-pre{font-family:var(--x-sans)}
-html body.x-body .xt-perf-pills span{border:var(--x-bd);font-weight:700}
+html body.x-body .xt-perf-pills>span{border:var(--x-bd);font-weight:700}
+html body.x-body .xt-perf-pills span span{border:0;padding:0;background:none;border-radius:0}
 html body.x-body .xt-svc{border-radius:var(--x-r);border:var(--x-bd)}
 html body.x-body .xt-svc-no{font-family:var(--x-en);font-weight:800;font-size:15px;letter-spacing:.06em;justify-self:start;padding:4px 12px;border-radius:999px;background:var(--x-lime);color:var(--x-ink)}
 html body.x-body .xt-svc-t{font-family:var(--x-sans);font-weight:700;letter-spacing:.06em}
@@ -333,3 +334,65 @@ html body.x-body .xgd-t{display:block}
 html body.x-body .xgd-t small{display:block;margin-top:4px}
 /* スマホでもヒーローの2つのボタンを横に並べる */
 @media(max-width:420px){html body.x-body .xt-hero-ctas{gap:10px}html body.x-body .xt-cta{padding:14px 20px;font-size:15px;letter-spacing:.04em}html body.x-body .xt-hero-en{letter-spacing:.06em}}
+
+/* =====================================================================
+   横スクロールの見直し（2026-10）：
+   ・文章が中心の並び（強み・ビジネスモデル・他社との違い・サービス・制作フロー・事業内容など）は、
+     スマホでも横に流さず、ボックスを縦に積む
+   ・画像のカードが多い並び（実績・公演など＝.x-hscroll／.x-rail.is-carousel）は横送りのまま、
+     下に「‹ 1 / 11 ›」のボタンを付ける（BaseLayout のスクリプト）
+   ===================================================================== */
+@media(max-width:699px){
+  html .x-rail:not(.is-carousel){grid-auto-flow:row;grid-template-columns:minmax(0,1fr);grid-auto-columns:auto;overflow:visible;padding-bottom:0;gap:14px}
+  html .x-rail.is-bleed:not(.is-carousel){margin-left:0;margin-right:0;padding-left:0;padding-right:0}
+  html .x-rail.is-bg1:not(.is-carousel){background:none}
+}
+html .x-car{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:20px}
+html .x-car[hidden]{display:none}
+html .x-car-b{width:48px;height:48px;padding:0;border-radius:50%;border:var(--x-bd);background:var(--x-lime);color:var(--x-ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 3px 0 var(--x-ink);transition:transform .15s,box-shadow .15s}
+html .x-car-b:active{transform:translateY(2px);box-shadow:0 1px 0 var(--x-ink)}
+html .x-car-b:disabled{opacity:.35;cursor:default;box-shadow:none;transform:none}
+html .x-car-b:focus-visible{outline:2px solid #fff;outline-offset:3px}
+html .x-car-n{min-width:4.6em;text-align:center;font-family:var(--x-en);font-weight:800;font-size:15px;letter-spacing:.12em;font-variant-numeric:tabular-nums}
+/* 横送りの間はスクロールバーを出さない（ボタンと指で送る） */
+html .x-hscroll,html .x-rail.is-carousel{scrollbar-width:none}
+html .x-hscroll::-webkit-scrollbar,html .x-rail.is-carousel::-webkit-scrollbar{display:none}
+@media(max-width:699px){html .x-rail.is-carousel{padding-bottom:4px;scroll-snap-type:x mandatory}html .x-rail.is-carousel>*{scroll-snap-align:start}}
+
+/* ---- トップ：事業内容（スマホは「番号｜文」の横長ボックス） ---- */
+@media(max-width:699px){
+  html body.x-body .xt-biz-c{grid-template-columns:auto minmax(0,1fr);align-items:center;gap:16px;padding:18px 20px}
+  html body.x-body .xt-biz-no{font-size:28px}
+  html body.x-body .xt-biz-c p{font-size:16px}
+}
+/* ---- トップ：強み（ボックス） ---- */
+html body.x-body .xt-str{background:var(--x-panel);border:var(--x-bd);border-radius:var(--x-r);padding:clamp(26px,4vw,40px) clamp(20px,4vw,36px);box-shadow:var(--x-shadow)}
+html body.x-body .xt-str-ul{background:rgba(255,255,255,.07)}
+/* ---- トップ：成果報酬型のビジネスモデル（3者をボックスに） ---- */
+@media(max-width:699px){
+  html body.x-body .xt-model-c{border:1.5px solid rgba(255,255,255,.3);border-radius:var(--x-r-m);padding:22px 20px}
+  html body.x-body .xt-model-h{margin-bottom:22px}
+}
+/* ---- トップ：主な実績（カードをボックスに） ---- */
+html body.x-body .xt-work{background:var(--x-panel);border:var(--x-bd);border-radius:var(--x-r);padding:12px 12px 22px;box-shadow:var(--x-shadow)}
+html body.x-body .xt-work>div:last-child{padding:0 8px}
+html body.x-body .xt-work img,html body.x-body .xt-work-panel{border-width:0;border-radius:var(--x-r-m)}
+/* ---- トップ：法人向けサービス（白いボックスを縦に） ---- */
+html body.x-body .xt-svc-list{display:grid;gap:12px}
+html body.x-body .xt-svc-row{background:var(--x-card);color:var(--x-ink);border:var(--x-bd);border-bottom:var(--x-bd);border-radius:var(--x-r-m);padding:20px 22px}
+html body.x-body .xt-svc-row:hover{opacity:1;transform:translateY(-2px)}
+html body.x-body .xt-svc-t{color:var(--x-blue)}
+html body.x-body .xt-svc-d{color:rgba(11,11,20,.78);margin-top:8px}
+/* ---- 制作フロー（トップ・サービス各ページ）：順番が分かるよう、ボックスの間に▼ ---- */
+@media(max-width:699px){
+  html body.x-body .xt-flow,html body.x-body .xs-flow{position:relative}
+  html body.x-body .xt-flow:not(:last-child)::after,html body.x-body .xs-flow:not(:last-child)::after{content:'';position:absolute;left:50%;bottom:-12px;width:14px;height:10px;transform:translateX(-50%);background:var(--x-lime);clip-path:polygon(0 0,100% 0,50% 100%);z-index:1}
+}
+/* ---- 公演・作品のカード（横送りの中）もボックスとして輪郭を付ける ---- */
+html body.x-body .xt-ev,html body.x-body .xs-title,html body.x-body .xw-card,html body.x-body .xb-post{border:var(--x-bd)}
+/* ---- サービス各ページ：目次・一覧・番号つきの並びもボックスに ---- */
+html body.x-body .xs-toc-a{border:1.5px solid rgba(255,255,255,.18)}
+@media(max-width:699px){
+  html body.x-body .xs-li,html body.x-body .xs-num,html body.x-body .xs-cardc,html body.x-body .xs-tr,html body.x-body .xs-flow{border:var(--x-bd)}
+  html body.x-body .xs-toc-a{padding:12px 16px}
+}

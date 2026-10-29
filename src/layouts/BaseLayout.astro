@@ -240,6 +240,43 @@ const orgLd = {
   window.addEventListener('pageshow', function (e) { if (e.persisted) ensureHeroVisible(); });
   window.addEventListener('load', function () { setTimeout(ensureHeroVisible, 1800); });
 })();
+/* 横に並ぶカード（.x-hscroll・.x-rail.is-carousel）の下に「‹ 1 / 11 ›」のボタンを付け、横に送れることを分かるようにする。
+   はみ出していないとき（パソコンの幅で全部見えている等）はボタンを隠す。 */
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var arrow = function (d) { return '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="' + (d < 0 ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7') + '" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'; };
+  document.querySelectorAll('.x-hscroll, .x-rail.is-carousel').forEach(function (t) {
+    var items = Array.prototype.slice.call(t.children);
+    if (items.length < 2) return;
+    var nav = document.createElement('div');
+    nav.className = 'x-car';
+    nav.innerHTML = '<button type="button" class="x-car-b" aria-label="前へ">' + arrow(-1) + '</button><span class="x-car-n"></span><button type="button" class="x-car-b" aria-label="次へ">' + arrow(1) + '</button>';
+    t.insertAdjacentElement('afterend', nav);
+    var prev = nav.children[0], cnt = nav.children[1], next = nav.children[2];
+    var left0 = function () { return t.getBoundingClientRect().left + (parseFloat(getComputedStyle(t).paddingLeft) || 0); };
+    var cur = function () { var L = left0(), best = 0, d = Infinity; items.forEach(function (c, j) { var x = Math.abs(c.getBoundingClientRect().left - L); if (x < d) { d = x; best = j; } }); return best; };
+    var atEnd = function () { return t.scrollLeft + t.clientWidth >= t.scrollWidth - 4; };
+    var upd = function () {
+      var over = t.scrollWidth > t.clientWidth + 4;
+      nav.hidden = !over;
+      if (!over) return;
+      cnt.textContent = (atEnd() ? items.length : cur() + 1) + ' / ' + items.length;
+      prev.disabled = t.scrollLeft <= 2;
+      next.disabled = atEnd();
+    };
+    var go = function (dir) {
+      var i = Math.max(0, Math.min(items.length - 1, cur() + dir));
+      t.scrollBy({ left: items[i].getBoundingClientRect().left - left0(), behavior: reduce ? 'auto' : 'smooth' });
+    };
+    prev.addEventListener('click', function () { go(-1); });
+    next.addEventListener('click', function () { go(1); });
+    var raf = 0;
+    t.addEventListener('scroll', function () { cancelAnimationFrame(raf); raf = requestAnimationFrame(upd); }, { passive: true });
+    window.addEventListener('resize', upd);
+    window.addEventListener('load', upd);
+    upd();
+  });
+})();
 /* マーキーのスクロール速度を全トラックで統一する。CSSの固定
    duration だとトラック幅（ロゴ枚数）によって px/秒 が変わるため、
    幅に比例した duration を計算して速度を一定にする。遅延読み込みの

@@ -312,7 +312,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
     <SecHead en="Strength" size="top" />
     <p class="x-sh-ja is-b"><Ph list={['ex Labsが選ばれる、', '2つの理由']} /></p>
     <div class="x-rail is-bleed" style={railStyle('repeat(auto-fit,minmax(min(100%,420px),1fr))', '56px', 'calc(100% - 52px)', '64px')}>
-      <div>
+      <div class="xt-str">
         <div class="xt-str-no">01</div>
         <h3 class="xt-str-h"><Ph list={['受注制作の形式ではなく、', 'レベニューシェア形式で', 'イベント実施が可能。']} /></h3>
         <div class="xt-str-body">
@@ -323,7 +323,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
         <a href="/services/shisetsu-event/#revenue" class="xt-str-link" data-track="cta" data-show="services-shisetsu" data-place="home-strength">適用条件を見る →</a>
         <ul class="xt-str-ul"><li><Cls text="企画の中身だけでなく、集客成果まで責任を持ちます。" emph={false} /></li><li><Cls text="「制作して終わり」ではなく「成功するところまで伴走する」そんな会社を目指しております。" emph={false} /></li></ul>
       </div>
-      <div>
+      <div class="xt-str">
         <div class="xt-str-no">02</div>
         <h3 class="xt-str-h"><Ph list={['どんなコンテンツでも', '制作可能！']} /></h3>
         <p class="xt-str-p"><Cls text="謎解き・マーダーミステリー・頭脳戦・イマーシブコンテンツなど、多岐に渡るジャンルを企画・制作可能です。" emph={false} /></p>
@@ -358,7 +358,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 <section id="works" class="xt-pad24">
   <div style="max-width:1200px;margin:0 auto">
     <SecHead en="Works" size="top" ja="主な実績" />
-    <div class="x-rail is-bleed" style={railStyle('repeat(auto-fill,minmax(min(100%,300px),1fr))', '48px 28px', 'calc(100% - 52px)', '56px')}>
+    <div class="x-rail is-bleed is-carousel" style={railStyle('repeat(auto-fill,minmax(min(100%,300px),1fr))', '48px 28px', 'calc(100% - 52px)', '56px')}>
       {works.map((w) => (
         <article class="xt-work">
           <div style="position:relative">
