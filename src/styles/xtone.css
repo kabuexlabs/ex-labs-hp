@@ -484,3 +484,6 @@
 @media(prefers-reduced-motion:reduce){:root body.x-body .xs-rel-list a,:root body.x-body .xs-rel-list a>span[aria-hidden]{transition:none}}
 /* サービスページ冒頭の図：中段の項目は折り返してよい（長い項目が途中で切れていた） */
 :root body.x-body .xs-dg-mids div{white-space:normal;line-height:1.45;display:grid;place-items:center}
+/* 横送りの枠：高さを表示中のカードに合わせる（BaseLayout のスクリプトが is-fit と高さを付ける）。カードは上揃え、はみ出た分は隠す */
+:root .is-fit{align-items:flex-start;overflow-y:hidden;transition:height .3s ease}
+@media(prefers-reduced-motion:reduce){:root .is-fit{transition:none}}
