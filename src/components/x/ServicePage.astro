@@ -58,8 +58,8 @@ const badgesOf = (c: any) => {
 const keyColsOf = (sec: any): number[] => sec.keyCols ?? ((sec.cols as string[]).length - 1 <= 3 ? (sec.cols as string[]).slice(1).map((_, j) => j + 1) : [1, 2]);
 // 長い一覧・条件は先頭だけ見せて、残りは「ほか n件を見る」に畳む
 const KV_OPEN = 3;
-// ヒーローに並べる実績の写真（このページの実績カード・作品・ギャラリーの画像から、重複を除いて最大4枚）
-const heroImgs = [...new Set(sections.flatMap((s) => (s.type === 'cards' && s.id === 'works') || s.type === 'titles' || s.type === 'gallery' ? (s.items as any[]).map((it) => it.img).filter(Boolean) : []))].slice(0, 4) as string[];
+// ヒーローに並べる実績の写真（このページの実績・事例カード・作品・ギャラリーの画像から、重複を除いて最大4枚）
+const heroImgs = [...new Set(sections.flatMap((s) => (s.type === 'cards' && (s.id === 'works' || s.id === 'cases')) || s.type === 'titles' || s.type === 'gallery' ? (s.items as any[]).map((it) => it.img).filter(Boolean) : []))].slice(0, 4) as string[];
 // 条件（kv）のうち、図（参考価格の階段・納期の帯）で見せた項目は「ほかの条件」に回す
 const kvShown = (sec: any) => (sec.items as any[]).filter((kv) => !((sec.priceSteps && /参考価格/.test(kv.k)) || (sec.leadTimes && /^納期/.test(kv.k))));
 const kvMoved = (sec: any) => (sec.items as any[]).filter((kv) => !kvShown(sec).includes(kv));
