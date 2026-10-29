@@ -244,11 +244,20 @@ const orgLd = {
     var left0 = function () { return t.getBoundingClientRect().left + (parseFloat(getComputedStyle(t).paddingLeft) || 0); };
     var cur = function () { var L = left0(), best = 0, d = Infinity; items.forEach(function (c, j) { var x = Math.abs(c.getBoundingClientRect().left - L); if (x < d) { d = x; best = j; } }); return best; };
     var atEnd = function () { return t.scrollLeft + t.clientWidth >= t.scrollWidth - 4; };
+    // 枠の高さを、いま表示しているカードに合わせる（一番背の高いカードに合わせると、短いカードの下とボタンの間が空く）
+    var fitH = function (i) {
+      var cs = getComputedStyle(t);
+      var pad = cs.boxSizing === 'border-box' ? (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0) : 0;
+      t.style.height = Math.ceil(items[i].getBoundingClientRect().height + pad) + 'px';
+    };
     var upd = function () {
       var over = t.scrollWidth > t.clientWidth + 4;
       nav.hidden = !over;
-      if (!over) return;
-      cnt.textContent = (atEnd() ? items.length : cur() + 1) + ' / ' + items.length;
+      t.classList.toggle('is-fit', over);
+      if (!over) { t.style.height = ''; return; }
+      var i = atEnd() ? items.length - 1 : cur();
+      fitH(i);
+      cnt.textContent = (i + 1) + ' / ' + items.length;
       prev.disabled = t.scrollLeft <= 2;
       next.disabled = atEnd();
     };
@@ -262,6 +271,8 @@ const orgLd = {
     t.addEventListener('scroll', function () { cancelAnimationFrame(raf); raf = requestAnimationFrame(upd); }, { passive: true });
     window.addEventListener('resize', upd);
     window.addEventListener('load', upd);
+    // 画像の読み込みなどでカードの高さが変わったら合わせ直す
+    if ('ResizeObserver' in window) { var ro = new ResizeObserver(function () { cancelAnimationFrame(raf); raf = requestAnimationFrame(upd); }); items.forEach(function (c) { ro.observe(c); }); }
     upd();
   });
 })();
