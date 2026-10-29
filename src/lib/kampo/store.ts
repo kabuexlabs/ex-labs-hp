@@ -116,6 +116,8 @@ export interface KampoSession {
   tagChecks?: Record<string, { by: string; at: string; note?: string }>;
   /** 薬剤師の判定（AI の判定より先に記録） */
   judgment?: PharmacistJudgment;
+  /** 漢方薬で体調を崩した経験がある方に、薬剤師が確認したうえで漢方候補を表示に切り替えた記録（第2弾 6-4） */
+  kampoUnlocked?: { by: string; at: string };
   scores?: ScoreResult;
   safetyFlags?: SafetyFlag[];
   /** 安全確認タグ（保存時点） */
@@ -290,6 +292,12 @@ export async function listSessionsByDay(date: string): Promise<KampoSession[]> {
 }
 export async function listAllSessions(): Promise<KampoSession[]> {
   const ids = await redis('ZRANGE', SESSIONS, 0, -1);
+  if (!Array.isArray(ids) || ids.length === 0) return [];
+  return (await mgetSessions(ids.map(String))).sort((a, b) => b.startedAt.localeCompare(a.startedAt));
+}
+/** 日付をまたいだ直近のセッション（新しい順） */
+export async function listRecentSessions(n = 20): Promise<KampoSession[]> {
+  const ids = await redis('ZRANGE', SESSIONS, -n, -1);
   if (!Array.isArray(ids) || ids.length === 0) return [];
   return (await mgetSessions(ids.map(String))).sort((a, b) => b.startedAt.localeCompare(a.startedAt));
 }

@@ -21,6 +21,12 @@ export function computeSession(s: Pick<KampoSession, 'answers' | 'staffAnswers'>
 export const selectionOf = (s: Pick<KampoSession, 'answers'> & Partial<Inputs>, c: Computed): Selection =>
   selectFormulas(c.scores, s.answers, c.w, c.safetyFlags, c.tags, FORMULAS, inputOf(s));
 
+/**
+ * 漢方薬で体調を崩したことがあるとご本人が答えた方は、初期表示では漢方候補を出さない（美容商品のおすすめを出す）。
+ * 薬剤師が確認して「漢方候補も表示する」に切り替えたら出す（2026-10-29 第2弾 6-4）。
+ */
+export const kampoHidden = (s: Pick<KampoSession, 'answers' | 'kampoUnlocked'>) => (s.answers['C3'] ?? []).includes('C3-kampo') && !s.kampoUnlocked;
+
 /** 回答が終わっていればスコアを確定して completed にする（既に確定済みなら状態は変えない） */
 export function finalize(s: KampoSession): KampoSession {
   const c = computeSession(s);

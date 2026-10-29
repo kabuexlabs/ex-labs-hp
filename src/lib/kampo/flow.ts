@@ -7,7 +7,8 @@
 //    出す選択肢がなくなった設問は出さない（同じ症状を2回聞かない。改修指示 3-1）。
 //  - 月経の設問は「月経の状況」で出し分ける。「閉経」「月経はない」なら月経に関わる選択肢・主訴も出さない（2026-10-28 修正依頼 3-1）。
 //  - 同時にあり得ない所見（findings.json の conflicts）：前の回答で一方が「あり」なら、もう一方の選択肢は出さない（修正依頼 2-3）。
-//  - 睡眠（B8）は全員に聞き、主訴で選んだ項目はチェック済み（変えられない）で出して1回だけ数える（prefill。修正依頼 4-7）。
+//  - 体質チェックの設問は全員に同じ選択肢を出し、お悩み（主訴・深掘り）で「あり」になった項目はチェック済み（変えられない）で出して
+//    1回だけ数える。前の回答と同時にあり得ない選択肢はグレーで押せない（修正依頼 4-7、第2弾 2-3・5-3）。深掘りでは従来どおり答えた所見を出さない。
 //  - 妊娠・授乳（A3P）は回答せずに次へ進める（optional。未回答は薬剤師画面に「未確認（口頭で確認）」。修正依頼 3-2）。
 //  - 舌・顔色・爪は薬剤師が観察して入力する（顔色・爪は観察が優先、「判断できない」ならご本人の回答。修正依頼 4-10）。
 // ---------------------------------------------------------------------------
@@ -91,25 +92,30 @@ export function resolveQuestion(q: Question, c: FlowContext): Question {
   if (q.section === 'primary') options = c.complaints.map((cid) => ({ id: primaryOptionId(cid), text: complaintById(cid)!.name, complaint: cid }));
   if (c.sex === 'male') options = options.filter((o) => !o.femaleOnly);
   if (!mensesShown(c)) options = options.filter((o) => !o.mensesOnly);
-  if (CARRY.includes(q.section)) {
-    const out: Option[] = [];
-    for (const o of options) {
+  if (q.section === 'constitution') {
+    options = options.map((o) => {
       const fs = o.findings ?? [];
-      if (o.exclusive || !fs.length) { out.push(o); continue; }
-      if (q.prefill && fs.every((f) => isPresent(c.state, f))) { out.push({ ...o, locked: true }); continue; }
-      if (fs.every((f) => isDetermined(c.state, f))) continue;
-      if (fs.some((f) => conflictsPresent(c.state, f))) continue;
-      out.push(o);
-    }
-    options = out;
+      if (o.exclusive || !fs.length) return o;
+      if (fs.every((f) => isPresent(c.state, f))) return { ...o, locked: true };
+      if (fs.some((f) => conflictsPresent(c.state, f))) return { ...o, blocked: true };
+      return o;
+    });
     if (options.some((o) => o.locked)) options = options.map((o) => (o.exclusive === 'none' ? { ...o, text: 'ほかには特にない' } : o));
+  } else if (q.section === 'detail') {
+    options = options.filter((o) => {
+      const fs = o.findings ?? [];
+      if (o.exclusive || !fs.length) return true;
+      return !fs.every((f) => isDetermined(c.state, f)) && !fs.some((f) => conflictsPresent(c.state, f));
+    });
   }
   const main = c.primary ? complaintById(c.primary)?.name : undefined;
   const title = q.title.replace(/\{main\}/g, main ?? 'その症状');
   return { ...q, title, options };
 }
-/** 答える選択肢（「特にない」「その他」、チェック済みで出す選択肢を除く）が残っているか */
-const hasAskable = (q: Question) => q.options.some((o) => !o.exclusive && !o.other && !o.locked);
+/** 選べる選択肢（チェック済み・グレーを除く） */
+export const selectable = (o: Option) => !o.locked && !o.blocked;
+/** 答える選択肢（「特にない」「その他」、チェック済み・グレーの選択肢を除く）が残っているか */
+const hasAskable = (q: Question) => q.options.some((o) => !o.exclusive && !o.other && selectable(o));
 
 export interface Step {
   q: Question;
@@ -135,12 +141,12 @@ export function walk(answers: Answers): WalkResult {
     if (!triggerOk(q.trigger, ctx)) continue;
     const rq = resolveQuestion(q, ctx);
     if (!hasAskable(rq)) continue;
-    const valid = new Set([...rq.options.filter((o) => !o.locked), ...(rq.sub?.options ?? []), ...(rq.followup?.options ?? [])].map((o) => o.id));
+    const valid = new Set([...rq.options.filter(selectable), ...(rq.sub?.options ?? []), ...(rq.followups ?? []).flatMap((f) => f.options)].map((o) => o.id));
     const ids = (answers[q.id] ?? []).filter((id) => valid.has(id));
     const skipped = !!rq.optional && Array.isArray(answers[q.id]) && answers[q.id].length === 0;
     steps.push({ q: rq, ids, ...(skipped ? { skipped } : {}) });
     if (!ids.length) continue;
-    applyAnswer(ctx.state, rq, rq.options.filter((o) => !o.locked), ids, { inferAbsent: CARRY.includes(q.section) });
+    applyAnswer(ctx.state, rq, rq.options.filter(selectable), ids, { inferAbsent: CARRY.includes(q.section) });
     for (const id of ids) ctx.chosen.add(id);
     // 月経の状況は A3 を表示したときだけ使う（性別を男性に変えたあとに残った回答を拾わない）
     if (q.id === 'A3') ctx.menses = mensesValue(answers);
@@ -169,7 +175,7 @@ export function applyStaffAnswers(state: FindingState, staffAnswers: Answers | u
  */
 export function normalizeAnswer(q: Question, rawIds: string[]): string[] {
   const pick = (opts: Option[], single: boolean) => {
-    const by = new Map(opts.filter((o) => !o.locked).map((o) => [o.id, o]));
+    const by = new Map(opts.filter(selectable).map((o) => [o.id, o]));
     let m = uniq.filter((id) => by.has(id));
     const nonEx = m.filter((id) => !by.get(id)!.exclusive);
     m = nonEx.length ? nonEx : m.slice(0, 1);
@@ -179,7 +185,7 @@ export function normalizeAnswer(q: Question, rawIds: string[]): string[] {
   const m = pick(q.options, q.type === 'single');
   const subIds = new Set(q.sub?.options.map((o) => o.id) ?? []);
   const s = uniq.filter((id) => subIds.has(id)).slice(0, 1);
-  const f = q.followup && m.includes(q.followup.when) ? pick(q.followup.options, q.followup.type === 'single') : [];
+  const f = (q.followups ?? []).filter((fu) => m.includes(fu.when)).flatMap((fu) => pick(fu.options, fu.type === 'single'));
   return [...m, ...s, ...f];
 }
 /** 同時に選べない組み合わせ（所見の conflicts）を選んでいれば、その2つの選択肢の文言を返す */
@@ -207,6 +213,19 @@ export function firstUnansweredStep(steps: Step[]): number {
 /** 薬剤師が入力した漢方薬（服用中 X_kampo_current・体調を崩した X_kampo_adverse）の処方コード */
 export const kampoCodes = (staffAnswers: Answers | undefined, qid: 'X_kampo_current' | 'X_kampo_adverse'): string[] =>
   (staffAnswers?.[qid] ?? []).map((id) => optionById(id)?.formula).filter((x): x is string => !!x);
+const PICKER = { X_kampo_current: { q: 'C1', fu: 'C1KP' }, X_kampo_adverse: { q: 'C3', fu: 'C3KP' } } as const;
+/**
+ * 漢方薬（服用中・体調を崩した）：薬剤師が入力・修正していればそれ、なければご本人が候補から選んだもの（第2弾 6-3）。
+ * notfound はご本人が「見つからない（薬剤師に伝える）」を選んだか。
+ */
+export function kampoOf(answers: Answers, staffAnswers: Answers | undefined, qid: 'X_kampo_current' | 'X_kampo_adverse'): { codes: string[]; source: 'staff' | 'patient' | 'none'; notfound: boolean } {
+  const p = PICKER[qid];
+  const ids = (answers[p.q] ?? []).filter((id) => id.startsWith(`${p.fu}-`));
+  const notfound = ids.some((id) => optionById(id)?.notfound);
+  if (staffAnswers?.[qid] !== undefined) return { codes: kampoCodes(staffAnswers, qid), source: 'staff', notfound };
+  const codes = ids.map((id) => optionById(id)?.formula).filter((x): x is string => !!x);
+  return { codes, source: codes.length ? 'patient' : 'none', notfound };
+}
 
 /** 生活習慣の回答に応じた「あなたへの一言」（生活習慣は体質の加点に使わず、養生の助言にだけ使う。修正依頼 6-2） */
 export function personalTips(answers: Answers, type: AxisKey): string[] {

@@ -1,6 +1,7 @@
 ---
 // 送信完了：お礼と「薬剤師がご説明します」。体質の点数・漢方薬は出さない（説明は薬剤師が PIN の後ろの画面で行う）。
-// 画面の右下（ボタンの見た目なし）を長押しすると、スタッフ PIN を経て担当者画面が開く。
+// 画面の下の「スタッフの方はこちら」→ スタッフ PIN → いま回答した方の担当者画面（薬剤師の入力画面）へ進む（2026-10-29 第2弾 1）。
+// スタッフが聞き取りで入力した場合は、同じボタンを目立つ形で出す。
 // 直ちに対応が必要な回答があったときだけ「すぐに近くのスタッフにお声がけください」を大きく出す（119番の一律表示はしない）。
 export const prerender = false;
 import KampoLayout from '../../../../../layouts/KampoLayout.astro';
@@ -29,19 +30,18 @@ const staffHref = `/kampo/staff/pin/?next=${encodeURIComponent(`/kampo/staff/ses
       <p style="font-size:17px;line-height:2.1">このあと、薬剤師が舌の状態などを確認し、<br>体質と養生についてご説明します。<br>iPad をそのままスタッフにお渡しください。</p>
     </section>
   )}
-  <button class="kp-hidden-btn" id="staffBtn" type="button" data-href={staffHref} aria-label="スタッフ用（長押し）" tabindex="-1"></button>
+  {!(legacy && s.status === 'in_progress') && (
+    s.inputBy === 'staff'
+      ? <p style="text-align:center;margin-top:28px"><a class="kp-btn" href={staffHref}>薬剤師の入力画面へ進む（スタッフPIN）</a></p>
+      : <p class="kp-staff-link"><a href={staffHref}>スタッフの方はこちら</a></p>
+  )}
   <style is:global>
   .kp-done{text-align:center;padding:40px 0 20px}
   .kp-done-h{font-size:30px;font-weight:400;letter-spacing:.1em;margin:0 0 22px}
   .kp-done-en{font-family:var(--en);letter-spacing:.3em;color:var(--sky-text);font-size:15px;margin-bottom:6px}
   .kp-urgent{background:var(--danger-soft);border:2px solid var(--danger);color:var(--danger-deep);padding:22px 26px;margin-bottom:28px;text-align:center}
   .kp-urgent-h{font-size:24px;font-weight:700;letter-spacing:.06em;margin-bottom:6px}
+  .kp-staff-link{text-align:right;margin-top:64px;font-size:13px}
+  .kp-staff-link a{color:var(--muted);text-decoration:none;border:1px solid var(--line);padding:8px 14px;display:inline-block}
   </style>
-  <script is:inline>
-  (function(){var b=document.getElementById('staffBtn');if(!b)return;var t=null;var go=function(){location.href=b.dataset.href};
-    b.addEventListener('pointerdown',function(e){e.preventDefault();clearTimeout(t);t=setTimeout(go,1200)});
-    ['pointerup','pointercancel','pointerleave'].forEach(function(ev){b.addEventListener(ev,function(){clearTimeout(t)})});
-    b.addEventListener('contextmenu',function(e){e.preventDefault()});
-  })();
-  </script>
 </KampoLayout>

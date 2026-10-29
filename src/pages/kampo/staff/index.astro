@@ -8,7 +8,7 @@ import { SEX_LABEL, AGE_BAND_LABEL, type Sex } from '../../../lib/kampo/flow';
 import { clearStaffCookie, pinConfigured } from '../../../lib/kampo/auth';
 import { supervisorName } from '../../../lib/kampo/compute';
 import {
-  isKvConfigured, listSessionsByDay, searchCustomers, countSessions, purgeExpired, jstDate, fmtJst, customerLabel,
+  isKvConfigured, listSessionsByDay, listRecentSessions, searchCustomers, countSessions, purgeExpired, jstDate, fmtJst, customerLabel,
   STATUS_LABEL, INPUT_BY_LABEL, typeNamesOf,
 } from '../../../lib/kampo/store';
 
@@ -27,13 +27,14 @@ const qstr = (Astro.url.searchParams.get('q') ?? '').trim();
 const msg = Astro.url.searchParams.get('msg') ?? '';
 const shift = (d: string, n: number) => { const t = new Date(`${d}T00:00:00+09:00`); t.setUTCDate(t.getUTCDate() + n); return jstDate(new Date(t.getTime() - 9 * 3600 * 1000 + 12 * 3600 * 1000)); };
 let sessions: Awaited<ReturnType<typeof listSessionsByDay>> = [];
+let recent: Awaited<ReturnType<typeof listRecentSessions>> = [];
 let customers: Awaited<ReturnType<typeof searchCustomers>> = [];
 let total = 0;
 let loadError = '';
 if (kv) {
   try {
     if (date === today) await purgeExpired().catch((e) => console.error('[kampo] purge', e));
-    [sessions, total] = await Promise.all([listSessionsByDay(date), countSessions()]);
+    [sessions, total, recent] = await Promise.all([listSessionsByDay(date), countSessions(), listRecentSessions(20)]);
     if (qstr) customers = await searchCustomers(qstr);
   } catch (e) {
     loadError = String((e as Error).message ?? e);
@@ -89,6 +90,19 @@ const urgentCount = sessions.filter((s) => s.urgent).length;
             </tr>
           ); })}
         </tbody>
+      </table>
+    )}
+  </div>
+
+  <div class="kp-card">
+    <h2 class="kp-title" style="font-size:18px">直近のチェック（日付をまたいで新しい順に20件）</h2>
+    <p class="kp-note">過去のチェックは、ここ・上の日付の切り替え・下の顧客検索（→ 履歴）から「開く」で薬剤師の入力画面を開けます。各チェックの URL は <code>/kampo/staff/session/（チェックID）/</code> です（スタッフPINが必要）。</p>
+    {recent.length === 0 ? <p class="kp-note" style="margin-top:8px">まだチェックはありません。</p> : (
+      <table class="kp-table" style="margin-top:8px">
+        <thead><tr><th>日時</th><th>お客様</th><th>入力</th><th>状態</th><th>チェックID</th><th></th></tr></thead>
+        <tbody>{recent.map((x) => (
+          <tr class:list={[{ 'kp-row-urgent': x.urgent }]}><td>{fmtJst(x.startedAt)}</td><td>{x.customerLabel}</td><td>{INPUT_BY_LABEL[x.inputBy]}</td><td><span class:list={['kp-chip', { ok: x.status === 'proposed' }]}>{STATUS_LABEL[x.status]}</span></td><td><small>{x.id}</small></td><td><a class="kp-btn ghost small" href={`/kampo/staff/session/${x.id}/`}>開く</a></td></tr>
+        ))}</tbody>
       </table>
     )}
   </div>

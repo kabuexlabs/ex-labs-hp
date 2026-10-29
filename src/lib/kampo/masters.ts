@@ -82,14 +82,22 @@ export interface Option {
   exclusive?: Exclusive;
   /** 主訴の深掘りの「その他」（所見なし。修正依頼 2-2） */
   other?: boolean;
-  /** 選んだら短い記入欄を出す（任意。修正依頼 5-1） */
+  /** 選んだら短い記入欄を出す（任意。修正依頼 5-1・7-1） */
   note?: boolean;
+  noteLabel?: string;
+  notePlaceholder?: string;
+  /** 選ばれたら薬剤師画面の「口頭で確認する項目」に出すメモ（例：耳鳴りの音の高さ） */
+  staffNote?: string;
+  /** 漢方薬の候補（picker）の「見つからない（薬剤師に伝える）」 */
+  notfound?: boolean;
   /** 画面内の小見出し（生活習慣。修正依頼 6-1） */
   heading?: string;
   /** 薬剤師の観察で「判断できない」：ご本人の回答を使う（修正依頼 4-10） */
   defer?: boolean;
-  /** 画面表示用：前の回答で「あり」になった所見の選択肢（チェック済みで変えられない。修正依頼 4-7） */
+  /** 画面表示用：前の回答で「あり」になった所見の選択肢（チェック済みで変えられない。修正依頼 4-7・第2弾 2-3） */
   locked?: boolean;
+  /** 画面表示用：前の回答の所見と同時にあり得ない選択肢（グレーで押せない。第2弾 5-3） */
+  blocked?: boolean;
   image?: string;
   /** 基本情報の値（A1 の female など） */
   value?: string;
@@ -124,17 +132,27 @@ export interface Question {
   options: Option[];
   /** 同じ画面に出す補助の単一選択（旧版の D2 就寝・D3 入浴） */
   sub?: { title: string; options: Option[] };
-  /** 同じ画面に展開する追加の選択肢（when の選択肢を選んだときだけ。C3 → 漢方で体調を崩したときの症状） */
-  followup?: { when: string; id: string; title: string; type: 'single' | 'multi'; options: Option[] };
+  /** 同じ画面に展開する追加の選択肢（when の選択肢を選んだときだけ。C1・C3 の漢方薬の候補、C3 の症状） */
+  followups?: Followup[];
+  /** 選択肢を選んだら出す任意の記入欄（設問全体で1つ。except の選択肢だけのときは出さない。C1 薬の名前・C2 病名と時期） */
+  note?: { label: string; placeholder?: string; except?: string[] };
   /** 回答せずに次へ進める（A3P 妊娠・授乳。未回答は薬剤師が口頭で確認） */
   optional?: boolean;
-  /** 前の回答で「あり」になった所見の選択肢を、隠さずチェック済みで出す（B8 睡眠） */
-  prefill?: boolean;
   help?: string;
   /** 深掘りのテンプレート名 */
   template?: string;
   /** 主訴の設問のカテゴリー */
   category?: string;
+}
+export interface Followup {
+  when: string;
+  id: string;
+  title: string;
+  type: 'single' | 'multi';
+  options: Option[];
+  help?: string;
+  /** formulas：漢方薬の候補から選ぶ（名前・読み・ツムラ番号・商品名で検索。選択肢は formulas.json から作る） */
+  picker?: 'formulas';
 }
 export interface Finding {
   id: string;
@@ -212,6 +230,8 @@ export interface Formula {
   active: boolean;
   /** ツムラの製品番号（参考値。tsumuraNoVerified: false は未確認） */
   tsumuraNo?: number;
+  /** 市販品の商品名など、検索に使う別名（未登録。いただいたら追加する） */
+  aliases?: string[];
   tsumuraNoVerified?: boolean;
 }
 export interface FormulasData { version: string; source?: string; symptoms: Record<string, SymptomDef>; formulas: Formula[] }
@@ -227,9 +247,16 @@ const strArr = (v: unknown): string[] => (Array.isArray(v) ? v.map(String) : [])
 // --- 主訴の設問を complaints.json から作る ------------------------------------
 
 /** questions.json の generated（categories／complaints／primary）を実際の設問に展開する */
-export function expandQuestions(rawQuestions: Raw[], cj: { categories: Category[]; complaints: Complaint[] }): Raw[] {
+export function expandQuestions(rawQuestions: Raw[], cj: { categories: Category[]; complaints: Complaint[] }, formulas: { code: string; name: string }[] = []): Raw[] {
   const out: Raw[] = [];
-  for (const q of rawQuestions) {
+  const sorted = [...formulas].sort((a, b) => ((a as { reading?: string }).reading ?? a.name).localeCompare((b as { reading?: string }).reading ?? b.name, 'ja'));
+  const withPickers = (q: Raw): Raw => (Array.isArray(q.followups)
+    ? { ...q, followups: (q.followups as Raw[]).map((fu) => (fu.picker === 'formulas'
+      ? { ...fu, options: [...sorted.map((f) => ({ id: `${String(fu.id)}-${f.code}`, text: f.name, formula: f.code })), { id: `${String(fu.id)}-notfound`, text: '見つからない（薬剤師に伝える）', notfound: true }] }
+      : fu)) }
+    : q);
+  for (const q0 of rawQuestions) {
+    const q = withPickers(q0);
     if (q.generated === 'categories') {
       out.push({ ...q, options: cj.categories.map((c) => ({ id: `K1-${c.id}`, text: c.name, category: c.id, ...(c.femaleOnly ? { femaleOnly: true } : {}) })) });
     } else if (q.generated === 'complaints') {
@@ -311,7 +338,7 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
   const chosenRefs: [string, string][] = [];
   if (!isObj(qj) || !isStr(qj.version) || !Array.isArray(qj.questions)) errs.push('questions.json: version と questions が必要');
   else {
-    const expanded = isObj(cj) && Array.isArray(cj.complaints) ? expandQuestions(qj.questions as Raw[], cj as { categories: Category[]; complaints: Complaint[] }) : [];
+    const expanded = isObj(cj) && Array.isArray(cj.complaints) ? expandQuestions(qj.questions as Raw[], cj as { categories: Category[]; complaints: Complaint[] }, isObj(fo) && Array.isArray(fo.formulas) ? (fo.formulas as { code: string; name: string }[]) : []) : [];
     const qIds = new Set<string>();
     for (const q of expanded) {
       const id = String(q.id);
@@ -351,15 +378,17 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
       };
       for (const o of opts) checkOpt(o);
       if (isObj(q.sub)) for (const o of (q.sub.options as unknown[]) ?? []) checkOpt(o);
-      if (q.followup !== undefined) {
-        const fu = q.followup;
-        if (!isObj(fu) || !isStr(fu.when) || !isStr(fu.id) || !isStr(fu.title) || !Array.isArray(fu.options)) errs.push(`${id}: followup は when/id/title/options`);
-        else {
-          if (!opts.some((o) => isObj(o) && o.id === fu.when)) errs.push(`${id}: followup.when=${fu.when} がこの設問の選択肢にない`);
+      if (q.followup !== undefined) errs.push(`${id}: followup は followups（配列）に`);
+      if (q.followups !== undefined) {
+        for (const fu of Array.isArray(q.followups) ? (q.followups as unknown[]) : [null]) {
+          if (!isObj(fu) || !isStr(fu.when) || !isStr(fu.id) || !isStr(fu.title) || !Array.isArray(fu.options)) { errs.push(`${id}: followups は when/id/title/options`); continue; }
+          if (!opts.some((o) => isObj(o) && o.id === fu.when)) errs.push(`${id}: followups.when=${fu.when} がこの設問の選択肢にない`);
+          if (fu.picker !== undefined && fu.picker !== 'formulas') errs.push(`${id}: followups.picker は formulas だけ`);
           for (const o of fu.options as unknown[]) checkOpt(o);
         }
       }
-      if (q.prefill && q.type !== 'multi') errs.push(`${id}: prefill は複数選択の設問だけ`);
+      if (q.note !== undefined && (!isObj(q.note) || !isStr(q.note.label))) errs.push(`${id}: note は label を持つ`);
+      if (q.prefill !== undefined) errs.push(`${id}: prefill は廃止（体質チェックは全設問でお悩みの所見をチェック済みで出す）`);
     }
     for (const [qid, c] of chosenRefs) if (!optionIds.has(c)) errs.push(`${qid}: trigger.chosen の ${c} は存在しない選択肢ID`);
     for (const t of templatesUsed) if (!templates.has(t)) errs.push(`深掘りテンプレート ${t} の設問がない`);
@@ -425,6 +454,7 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
       if (typeof raw.verified !== 'boolean') errs.push(`${c}: verified が真偽値でない`);
       if (typeof raw.active !== 'boolean') errs.push(`${c}: active が真偽値でない`);
       if (raw.tsumuraNo !== undefined && (!Number.isInteger(raw.tsumuraNo) || typeof raw.tsumuraNoVerified !== 'boolean')) errs.push(`${c}: tsumuraNo は整数、tsumuraNoVerified は真偽値`);
+      if (raw.aliases !== undefined && (!Array.isArray(raw.aliases) || !(raw.aliases as unknown[]).every(isStr))) errs.push(`${c}: aliases は文字列の配列`);
     }
   }
   return errs;
@@ -437,7 +467,7 @@ if (problems.length) {
 
 const cj = complaintsJson as unknown as { categories: Category[]; complaints: Complaint[] };
 const qj = questionsJson as unknown as { version: string; review: Review; questions: Raw[] };
-const allQuestions = expandQuestions(qj.questions, cj) as unknown as Question[];
+const allQuestions = expandQuestions(qj.questions, cj, (formulasJson as unknown as FormulasData).formulas) as unknown as Question[];
 /** 患者の問診に出す設問（表示順） */
 export const QUESTIONS: Question[] = allQuestions.filter((q) => q.section !== 'staff');
 /** 薬剤師が入力する設問（舌・体格・声） */
@@ -460,7 +490,7 @@ export const LEGACY = legacyJson as unknown as { types: Record<string, string>; 
 
 const QUESTION_BY_ID = new Map(allQuestions.map((q) => [q.id, q]));
 const OPTION_BY_ID = new Map<string, { q: Question; o: Option }>();
-for (const q of allQuestions) for (const o of [...q.options, ...(q.sub?.options ?? []), ...(q.followup?.options ?? [])]) OPTION_BY_ID.set(o.id, { q, o });
+for (const q of allQuestions) for (const o of [...q.options, ...(q.sub?.options ?? []), ...(q.followups ?? []).flatMap((f) => f.options)]) OPTION_BY_ID.set(o.id, { q, o });
 const FINDING_BY_ID = new Map(FINDINGS.map((f) => [f.id, f]));
 const COMPLAINT_BY_ID = new Map(COMPLAINTS.map((c) => [c.id, c]));
 const TAG_BY_ID = new Map(SAFETY_TAGS.map((t) => [t.id, t]));

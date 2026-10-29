@@ -1,12 +1,12 @@
 {
- "version": "2026-10-28-v3.1",
+ "version": "2026-10-29-v3.2",
  "review": {
   "status": "draft",
   "source": "2026-10-24 版（3段階版）の設問・重みを、2026-10-25 の改修指示と承認済みの改修計画に沿って組み直した草案。重み・五臓は現行の選択肢の値を引き継いだもので、新しい数値は作っていない（専門家未確認）",
   "reviewer": null,
   "reviewedAt": null
  },
- "note": "設問（主訴カテゴリー・具体的主訴・いちばん改善したい主訴の選択肢は complaints.json から作る）。section：basic／category／complaint／primary／detail／constitution／safety／lifestyle／staff。選択肢の findings は選んだときに present になる所見。exclusive（none・unknown・declined）はほかの選択肢と同時に選べない。 2026-10-28：選択肢の other（その他・所見なし）、mensesOnly（閉経・月経なしでは出さない）、note（短い記入欄）、heading（小見出し）、defer（薬剤師の観察で「判断できない」＝本人の回答を使う）、設問の optional（回答せずに次へ）・prefill（前の回答であった所見をチェック済みで出す）・followup（同じ画面で追加の選択肢）を追加。",
+ "note": "設問（主訴カテゴリー・具体的主訴・いちばん改善したい主訴の選択肢は complaints.json から作る）。section：basic／category／complaint／primary／detail／constitution／safety／lifestyle／staff。選択肢の findings は選んだときに present になる所見。exclusive（none・unknown・declined）はほかの選択肢と同時に選べない。 2026-10-28：選択肢の other（その他・所見なし）、mensesOnly（閉経・月経なしでは出さない）、note（短い記入欄）、heading（小見出し）、defer（薬剤師の観察で「判断できない」＝本人の回答を使う）、設問の optional（回答せずに次へ）・prefill（前の回答であった所見をチェック済みで出す）・followup（同じ画面で追加の選択肢）を追加。 2026-10-29：followup を followups（配列。picker: formulas は漢方薬の候補から選ぶ）に、設問の note（選択肢を選んだら出す任意の記入欄。except の選択肢は除く）、選択肢の noteLabel／notePlaceholder・staffNote（薬剤師画面の確認メモ）を追加。",
  "questions": [
   {
    "id": "A1",
@@ -1024,129 +1024,6 @@
     },
     {
      "id": "Shot_palms2-none",
-     "text": "特にない",
-     "exclusive": "none"
-    }
-   ]
-  },
-  {
-   "id": "Ssweat1",
-   "section": "detail",
-   "title": "「{main}」は、どのような汗ですか",
-   "type": "multi",
-   "trigger": {
-    "primaryDetail": "sweat"
-   },
-   "template": "sweat",
-   "options": [
-    {
-     "id": "Ssweat1-sweat_with_flush",
-     "text": "急なほてりと一緒に汗が出る",
-     "findings": [
-      "sweat_with_flush"
-     ],
-     "also": [
-      "flush"
-     ]
-    },
-    {
-     "id": "Ssweat1-sweat_exertion",
-     "text": "少し動くだけで汗が出る",
-     "findings": [
-      "sweat_exertion"
-     ]
-    },
-    {
-     "id": "Ssweat1-night_sweat",
-     "text": "寝ている間に汗をかく",
-     "findings": [
-      "night_sweat"
-     ],
-     "symptoms": [
-      "night_sweat"
-     ]
-    },
-    {
-     "id": "Ssweat1-sweat_tension",
-     "text": "緊張すると手や脇に汗をかく",
-     "findings": [
-      "sweat_tension"
-     ]
-    },
-    {
-     "id": "Ssweat1-sweat_head",
-     "text": "頭や顔だけ汗をかく",
-     "findings": [
-      "sweat_head"
-     ]
-    },
-    {
-     "id": "Ssweat1-sweat_sticky",
-     "text": "汗がべたつく",
-     "findings": [
-      "sweat_sticky"
-     ]
-    },
-    {
-     "id": "Ssweat1-sweat_profuse",
-     "text": "暑いときや食事中に大量に汗をかく",
-     "findings": [
-      "sweat_profuse"
-     ]
-    },
-    {
-     "id": "Ssweat1-other",
-     "text": "その他",
-     "other": true
-    }
-   ]
-  },
-  {
-   "id": "Ssweat2",
-   "section": "detail",
-   "title": "あわせて、あてはまるものはありますか",
-   "type": "multi",
-   "trigger": {
-    "primaryDetail": "sweat"
-   },
-   "template": "sweat",
-   "options": [
-    {
-     "id": "Ssweat2-fatigue_easy",
-     "text": "疲れやすい",
-     "findings": [
-      "fatigue_easy"
-     ],
-     "also": [
-      "fatigue"
-     ]
-    },
-    {
-     "id": "Ssweat2-dry_mouth",
-     "text": "口やのどが渇く",
-     "findings": [
-      "dry_mouth"
-     ]
-    },
-    {
-     "id": "Ssweat2-palms_hot",
-     "text": "手足がほてる",
-     "findings": [
-      "palms_hot"
-     ],
-     "also": [
-      "flush"
-     ]
-    },
-    {
-     "id": "Ssweat2-chill_after_sweat",
-     "text": "汗のあとに冷える",
-     "findings": [
-      "chill_after_sweat"
-     ]
-    },
-    {
-     "id": "Ssweat2-none",
      "text": "特にない",
      "exclusive": "none"
     }
@@ -7045,20 +6922,6 @@
      ]
     },
     {
-     "id": "B1-apathy",
-     "text": "何をするのも億劫",
-     "findings": [
-      "apathy"
-     ]
-    },
-    {
-     "id": "B1-heavy_body",
-     "text": "体が重だるい",
-     "findings": [
-      "heavy_body"
-     ]
-    },
-    {
      "id": "B1-daytime_sleepy",
      "text": "日中に眠くなる",
      "findings": [
@@ -7080,17 +6943,17 @@
      ]
     },
     {
+     "id": "B1-heavy_body",
+     "text": "体が重だるい",
+     "findings": [
+      "heavy_body"
+     ]
+    },
+    {
      "id": "B1-weather_sensitive",
      "text": "雨の日や低気圧で体調が悪くなる",
      "findings": [
       "weather_sensitive"
-     ]
-    },
-    {
-     "id": "B1-evening_heat",
-     "text": "夕方から夜にほてる",
-     "findings": [
-      "evening_heat"
      ]
     },
     {
@@ -7278,6 +7141,13 @@
      ]
     },
     {
+     "id": "B3-evening_heat",
+     "text": "夕方から夜にほてる",
+     "findings": [
+      "evening_heat"
+     ]
+    },
+    {
      "id": "B3-none",
      "text": "特にない",
      "exclusive": "none"
@@ -7356,7 +7226,7 @@
   {
    "id": "B5",
    "section": "constitution",
-   "title": "食欲・胃について、あてはまるものを選んでください",
+   "title": "ふだんの食欲や、食べたあとの様子について、あてはまるものを選んでください",
    "type": "multi",
    "options": [
     {
@@ -7748,13 +7618,6 @@
      ]
     },
     {
-     "id": "B8-sleep_hot",
-     "text": "暑くて眠れない",
-     "findings": [
-      "sleep_hot"
-     ]
-    },
-    {
      "id": "B8-sleep_worry",
      "text": "考え事で眠れない",
      "findings": [
@@ -7766,8 +7629,7 @@
      "text": "特にない",
      "exclusive": "none"
     }
-   ],
-   "prefill": true
+   ]
   },
   {
    "id": "B9",
@@ -8091,18 +7953,12 @@
      ]
     },
     {
-     "id": "B12-tinnitus_low",
-     "text": "低い音の耳鳴りがする",
+     "id": "B12-tinnitus",
+     "text": "耳鳴りがする",
      "findings": [
-      "tinnitus_low"
-     ]
-    },
-    {
-     "id": "B12-tinnitus_high",
-     "text": "高い音（キーン）の耳鳴りがする",
-     "findings": [
-      "tinnitus_high"
-     ]
+      "tinnitus"
+     ],
+     "staffNote": "耳鳴りの音の高さ（低い音／高い音・キーン）を口頭で確認してください"
     },
     {
      "id": "B12-nasal_discharge",
@@ -8149,9 +8005,9 @@
   {
    "id": "C1",
    "section": "safety",
-   "title": "いま飲んでいる薬・サプリメントの種類を選んでください（漢方薬は次の質問で伺います）",
+   "title": "いま飲んでいる薬・サプリメントの種類を選んでください",
    "type": "multi",
-   "help": "薬の名前は、薬剤師がお薬手帳などで確認します。",
+   "help": "薬の名前がわかれば書いてください（書かなくても進めます）。薬剤師がお薬手帳などで確認します。",
    "options": [
     {
      "id": "C1-bp",
@@ -8205,6 +8061,13 @@
      "text": "ホルモン剤（低用量ピルなど）"
     },
     {
+     "id": "C1-kampo",
+     "text": "漢方薬",
+     "flags": [
+      "kampo_current"
+     ]
+    },
+    {
      "id": "C1-kanzo",
      "text": "かぜ薬・胃腸薬など（市販薬）"
     },
@@ -8226,46 +8089,22 @@
      "text": "わからない",
      "exclusive": "unknown"
     }
-   ]
-  },
-  {
-   "id": "C1K",
-   "section": "safety",
-   "title": "漢方薬を飲んでいますか",
-   "type": "single",
-   "help": "漢方薬の名前は、薬剤師がお薬手帳や口頭で確認します。",
-   "options": [
+   ],
+   "note": {
+    "label": "薬の名前（わかれば・任意）",
+    "placeholder": "例：お薬手帳に書かれている名前",
+    "except": [
+     "C1-kampo"
+    ]
+   },
+   "followups": [
     {
-     "id": "C1K-yes",
-     "text": "はい",
-     "flags": [
-      "kampo_current"
-     ]
-    },
-    {
-     "id": "C1K-no",
-     "text": "いいえ"
-    },
-    {
-     "id": "C1K-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
-    }
-   ]
-  },
-  {
-   "id": "C1NB",
-   "section": "safety",
-   "title": "お薬手帳をお持ちですか",
-   "type": "single",
-   "options": [
-    {
-     "id": "C1NB-yes",
-     "text": "はい"
-    },
-    {
-     "id": "C1NB-no",
-     "text": "いいえ"
+     "when": "C1-kampo",
+     "id": "C1KP",
+     "title": "飲んでいる漢方薬はどれですか",
+     "type": "multi",
+     "picker": "formulas",
+     "help": "名前の一部（ひらがな・漢字）か、ツムラの番号を入れると候補が出ます。見つからないときは「見つからない（薬剤師に伝える）」を選んでください。"
     }
    ]
   },
@@ -8347,7 +8186,7 @@
     },
     {
      "id": "C2-10",
-     "text": "その他の病気（内容は薬剤師にお伝えください）",
+     "text": "その他の病気",
      "flags": [
       "other_disease"
      ]
@@ -8357,7 +8196,10 @@
      "text": "これまでに手術を受けたことがある",
      "flags": [
       "surgery"
-     ]
+     ],
+     "note": true,
+     "noteLabel": "何の手術か・いつ頃か（任意）",
+     "notePlaceholder": "例：盲腸の手術（10年前）"
     },
     {
      "id": "C2-0",
@@ -8369,7 +8211,14 @@
      "text": "わからない",
      "exclusive": "unknown"
     }
-   ]
+   ],
+   "note": {
+    "label": "病名・時期（わかれば・任意）",
+    "placeholder": "例：不整脈（5年前から通院）",
+    "except": [
+     "C2-surgery"
+    ]
+   }
   },
   {
    "id": "C3",
@@ -8384,7 +8233,9 @@
      "flags": [
       "allergy_drug"
      ],
-     "note": true
+     "note": true,
+     "noteLabel": "何の薬で出ましたか（任意）",
+     "notePlaceholder": "例：薬の名前"
     },
     {
      "id": "C3-food",
@@ -8392,15 +8243,16 @@
      "flags": [
       "allergy_food"
      ],
-     "note": true
+     "note": true,
+     "noteLabel": "何の食品で出ましたか（任意）",
+     "notePlaceholder": "例：食品の名前"
     },
     {
      "id": "C3-kampo",
      "text": "漢方薬で体調を崩したことがある",
      "flags": [
       "adverse_kampo"
-     ],
-     "note": true
+     ]
     },
     {
      "id": "C3-none",
@@ -8413,61 +8265,71 @@
      "exclusive": "unknown"
     }
    ],
-   "followup": {
-    "when": "C3-kampo",
-    "id": "C3S",
-    "title": "漢方薬で体調を崩したとき、どのような症状が出ましたか",
-    "type": "multi",
-    "options": [
-     {
-      "id": "C3S-rash",
-      "text": "発疹・かゆみ"
-     },
-     {
-      "id": "C3S-gi",
-      "text": "胃の不快感・食欲不振"
-     },
-     {
-      "id": "C3S-diarrhea",
-      "text": "下痢"
-     },
-     {
-      "id": "C3S-edema",
-      "text": "むくみ・血圧が上がった"
-     },
-     {
-      "id": "C3S-palp",
-      "text": "動悸"
-     },
-     {
-      "id": "C3S-cough",
-      "text": "空咳・息苦しさ",
-      "flags": [
-       "serious"
-      ]
-     },
-     {
-      "id": "C3S-liver",
-      "text": "肝機能の異常を指摘された",
-      "flags": [
-       "serious"
-      ]
-     },
-     {
-      "id": "C3S-fatigue",
-      "text": "強いだるさ"
-     },
-     {
-      "id": "C3S-other",
-      "text": "その他"
-     },
-     {
-      "id": "C3S-unknown",
-      "text": "覚えていない",
-      "exclusive": "unknown"
-     }
-    ]
-   }
+   "followups": [
+    {
+     "when": "C3-kampo",
+     "id": "C3KP",
+     "title": "どの漢方薬でしたか",
+     "type": "multi",
+     "picker": "formulas",
+     "help": "名前の一部（ひらがな・漢字）か、ツムラの番号を入れると候補が出ます。わからないときは「見つからない（薬剤師に伝える）」を選んでください。"
+    },
+    {
+     "when": "C3-kampo",
+     "id": "C3S",
+     "title": "漢方薬で体調を崩したとき、どのような症状が出ましたか",
+     "type": "multi",
+     "options": [
+      {
+       "id": "C3S-rash",
+       "text": "発疹・かゆみ"
+      },
+      {
+       "id": "C3S-gi",
+       "text": "胃の不快感・食欲不振"
+      },
+      {
+       "id": "C3S-diarrhea",
+       "text": "下痢"
+      },
+      {
+       "id": "C3S-edema",
+       "text": "むくみ・血圧が上がった"
+      },
+      {
+       "id": "C3S-palp",
+       "text": "動悸"
+      },
+      {
+       "id": "C3S-cough",
+       "text": "空咳・息苦しさ",
+       "flags": [
+        "serious"
+       ]
+      },
+      {
+       "id": "C3S-liver",
+       "text": "肝機能の異常を指摘された",
+       "flags": [
+        "serious"
+       ]
+      },
+      {
+       "id": "C3S-fatigue",
+       "text": "強いだるさ"
+      },
+      {
+       "id": "C3S-other",
+       "text": "その他"
+      },
+      {
+       "id": "C3S-unknown",
+       "text": "覚えていない",
+       "exclusive": "unknown"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "L1",
