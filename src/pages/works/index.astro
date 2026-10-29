@@ -7,6 +7,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import ListHero from '../../components/x/ListHero.astro';
 import SecHead from '../../components/x/SecHead.astro';
 import Cls from '../../components/x/Cls.astro';
+import { findLinkPreviewTarget } from '../../lib/linkPreview';
+import LinkPreviewScript from '../../components/LinkPreviewScript.astro';
 import Ph from '../../components/x/Ph.astro';
 import { jsonLd } from '../../lib/microcms';
 
@@ -102,7 +104,7 @@ const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity
         {g.items.map((w) => (
           <article class="xw-card">
             <div style="position:relative">
-              {w.img ? <img src={w.img} alt={w.title} loading="lazy" decoding="async"> : <div class="xw-panel" aria-hidden="true"><span class="xw-panel-k">TV</span><span class="xw-panel-t">{w.title}</span><span class="xw-panel-c">{w.client}</span></div>}
+              {w.img ? <img src={w.img} alt={w.title} loading="lazy" decoding="async"> : <div class="xw-panel" aria-hidden="true" data-link-preview={findLinkPreviewTarget(w.href) ? w.href : undefined}><span class="xw-panel-k">TV</span><span class="xw-panel-t">{w.title}</span><span class="xw-panel-c">{w.client}</span></div>}
               <span class="xw-cat">{w.cat}</span>
             </div>
             <div class="xw-body">
@@ -122,6 +124,8 @@ const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity
     </div>
   </section>
 ))}
+
+<LinkPreviewScript />
 
 <section class="xw-zero">
   <div class="x-wcard is-s xw-zero-card">
