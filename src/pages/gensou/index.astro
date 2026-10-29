@@ -9,6 +9,7 @@ import SiteGuard from '../../components/SiteGuard.astro';
 import StickyReserve from '../../components/StickyReserve.astro';
 import SecHead from '../../components/gensou/SecHead.astro';
 import J from '../../components/gensou/J.astro';
+import { mediaItems } from '../../data/media';
 
 // ---- 未定の項目（決まったらここを埋める。null の間は非表示／仮表示） ----
 // escape.id の販売ページURL。null の間は予約ボタンを「近日販売開始」表示にし、#ticket へ飛ばす
@@ -45,6 +46,9 @@ const staff: { role: string; name: string; profile?: string }[] = [
   { role: 'ディレクター（演出・デザイン）', name: '荒巻まりの' },
   { role: 'プロデューサー', name: 'かるら' },
 ];
+
+// この公演が紹介されたメディア掲載（src/data/media.ts で related に /gensou/ を持つもの）。見出しは「」の中だけを出す
+const MEDIA = mediaItems.filter((m) => m.url && m.related?.some((r) => r.href === '/gensou/')).map((m) => ({ ...m, head: m.title.match(/^「(.*)」/)?.[1] ?? m.title }));
 
 const reserveHref = RESERVE_URL ?? '#ticket';
 const reserveAttrs = RESERVE_URL
@@ -294,6 +298,12 @@ img{max-width:100%}
 .lead{margin:0;font-size:clamp(18px,2.6vw,22px);line-height:2;font-weight:500;text-wrap:pretty}
 .rows{display:flex;flex-direction:column}
 .row{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:22px 0;border-top:1px solid rgba(217,174,44,.78);font-size:15px;line-height:1.9}
+.mb{display:grid;gap:6px;margin:0 0 -8px;padding:16px 20px;border-left:2px solid #e2c43c;background:rgba(226,196,60,.07);color:#f3f2f8 !important;text-decoration:none}
+.mb-k{font-size:12px;letter-spacing:.24em;color:#e2c43c}
+.mb-t{font-size:16px;font-weight:600;letter-spacing:.08em;line-height:1.6}
+.mb-h{font-size:13.5px;line-height:1.85;color:#d9d5c8}
+.mb-x{font-size:12px;color:#e2c43c;text-decoration:underline;text-underline-offset:3px}
+.mb:focus-visible{outline:2px solid #e2c43c;outline-offset:3px}
 .qi{margin:36px 0 12px;border:1px solid rgba(217,174,44,.78);padding:20px 22px}
 .qi-l{margin:0;display:grid;gap:8px;font-size:14px;line-height:1.8}
 .qi-l div{display:grid;grid-template-columns:56px 1fr;gap:12px}
@@ -526,6 +536,14 @@ img{max-width:100%}
       {/* タイトルロゴ・サブタイトルは直前の全面KVで見せるので、ここでは表示しない（見出しとしては残す） */}
       <h1 class="sr">午前零時の幻想集 {SUB_NO}「{SUB_TITLE}」× 夢の島熱帯植物館</h1>
       <p class="ov-lead"><J t={"普段は入れない\n夜の夢の島熱帯植物館を巡る\n物語体験。"} /></p>
+      {MEDIA.map((m) => (
+        <a class="mb" href={m.url} target="_blank" rel="noopener" data-track="show" data-show="media-nikkei" data-place="gensou-media">
+          <span class="mb-k hv">MEDIA</span>
+          <span class="mb-t">{m.outlet}で紹介されました</span>
+          <span class="mb-h">「<J t={m.head} />」</span>
+          <span class="mb-x">記事を読む（{m.outlet}・外部サイト）↗</span>
+        </a>
+      ))}
       {/* 2026-10-22 予約促進：最初の画面で開催日・会場・料金・所要時間・対象と予約ボタンを確認できるようにする（値は公式記載のみ） */}
       <div class="qi" aria-label="公演の基本情報">
         <dl class="qi-l">
