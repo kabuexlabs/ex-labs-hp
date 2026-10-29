@@ -1,15 +1,32 @@
 ---
-// 全ページ共通ヘッダー（2026-09 リニューアル）：sticky・青地・白ロゴ・ライムの「お問い合わせ」、2段目は横スクロールのナビ。
-// ナビの並びは社名検索から来た人の行き先の優先順（制作依頼 → 実績 → 施設活用 → 公演 → サービス → 会社概要）。
+// 全ページ共通ヘッダー（2026-10 トンマナ改訂）：白いピルを浮かせる。ロゴ・お問い合わせ・メニュー（全ページへのリンク）。
+// 幅1100px以上では主要ページへのリンクも横に並べる。メニューの並びは社名検索から来た人の行き先の優先順
+// （制作依頼 → 実績 → 施設活用 → 公演 → サービス → 会社概要）。
 interface Props { ctaHref?: string }
 const { ctaHref = '/#contact' } = Astro.props;
 ---
 <header class="x-hd" id="top">
   <div class="x-hd-row">
-    <a href="/" class="x-hd-logo"><img src="/assets/exlabs-logo-w.png" alt="ex Labs" width="2048" height="520"></a>
+    <a href="/" class="x-hd-logo"><img src="/assets/logo.png" alt="ex Labs" width="2048" height="520"></a>
+    <nav class="x-hd-quick" aria-label="主なページ">
+      <a href="/services/immersive/">イマーシブ制作</a><a href="/works/">制作事例</a><a href="/services/shisetsu-event/">施設活用</a><a href="/events/">公演を探す</a><a href="/services/">サービス</a>
+    </nav>
     <a href={ctaHref} class="x-hd-cta">お問い合わせ</a>
+    <details class="x-hd-menu">
+      <summary aria-label="メニュー"><span class="x-hd-bars" aria-hidden="true"><i></i><i></i><i></i></span></summary>
+      <nav class="x-hd-nav" aria-label="サイト内のページ">
+        <a href="/services/immersive/">イマーシブ制作</a><a href="/works/">制作事例</a><a href="/services/shisetsu-event/">施設活用</a><a href="/events/">公演を探す</a><a href="/guide/#date">デート・お出かけ</a><a href="/#service">サービス</a><a href="/#about">会社概要</a><a href="/#works">実績</a><a href="/#strength">強み</a><a href="/#message">メッセージ</a><a href="/press/">プレスリリース</a><a href="/blog/">ブログ</a><a href="/game/">過去コンテンツのネタバレ</a>
+      </nav>
+    </details>
   </div>
-  <nav class="x-hd-nav" aria-label="サイト内のページ">
-    <a href="/services/immersive/">イマーシブ制作</a><a href="/works/">制作事例</a><a href="/services/shisetsu-event/">施設活用</a><a href="/events/">公演を探す</a><a href="/guide/#date">デート・お出かけ</a><a href="/#service">サービス</a><a href="/#about">会社概要</a><a href="/#works">実績</a><a href="/#strength">強み</a><a href="/#message">メッセージ</a><a href="/press/">プレスリリース</a><a href="/blog/">ブログ</a><a href="/game/">過去コンテンツのネタバレ</a>
-  </nav>
 </header>
+<script is:inline>
+// メニューは、リンクを押したとき・メニューの外を押したとき・Esc で閉じる
+(function () {
+  var m = document.querySelector('.x-hd-menu'); if (!m) return;
+  var close = function () { m.removeAttribute('open'); };
+  m.querySelectorAll('.x-hd-nav a').forEach(function (a) { a.addEventListener('click', close); });
+  document.addEventListener('click', function (e) { if (m.open && !m.contains(e.target)) close(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && m.open) { close(); var s = m.querySelector('summary'); if (s) s.focus(); } });
+})();
+</script>

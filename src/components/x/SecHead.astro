@@ -1,13 +1,13 @@
 ---
-// セクション見出し：Italiana の英字（両側に「+ ―」の装飾）＋明朝の日本語サブ見出し。
+// セクション見出し：縁取りの英字＋線つきの和文サブ見出し（2026-10 トンマナ改訂）。jaWeight="b" の長いサブ見出しは線なし。
 import Cls from './Cls.astro';
-interface Props { en: string; ja?: string; tag?: 'h1' | 'h2'; size?: 'l' | 'm' | 's'; jaTag?: 'p' | 'h1' | 'h2'; jaWeight?: 'n' | 'b' }
+interface Props { en: string; ja?: string; tag?: 'h1' | 'h2'; size?: 'l' | 'm' | 's' | 'top'; jaTag?: 'p' | 'h1' | 'h2'; jaWeight?: 'n' | 'b' }
 const { en, ja, tag = 'h2', size = 'l', jaTag = 'p', jaWeight = 'n' } = Astro.props;
 const Tag = tag; const JaTag = jaTag;
 ---
 <div class="x-sh">
-  <span class="x-sh-deco" aria-hidden="true">+<span class="x-sh-line"></span></span>
   <Tag class={`x-sh-en is-${size}`}>{en}</Tag>
-  <span class="x-sh-deco" aria-hidden="true"><span class="x-sh-line"></span>+</span>
 </div>
-{ja && <JaTag class={`x-sh-ja${jaWeight === 'b' ? ' is-b' : ''}`}><Cls text={ja} emph={false} /></JaTag>}
+{ja && (jaWeight === 'b'
+  ? <JaTag class="x-sh-ja is-b"><Cls text={ja} emph={false} /></JaTag>
+  : <JaTag class="x-sh-ja"><span class="x-sh-ln" aria-hidden="true"></span><span class="x-sh-jt"><Cls text={ja} emph={false} /></span><span class="x-sh-ln" aria-hidden="true"></span></JaTag>)}

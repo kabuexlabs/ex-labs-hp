@@ -59,7 +59,7 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
 
 <section class="xs-hero">
   <div class="xs-hero-in">
-    <div class="xs-hero-kick"><span class="x-sh-deco" aria-hidden="true">+<span class="x-sh-line"></span></span><p>{raw.hero.en}</p></div>
+    <div class="xs-hero-kick"><p>{raw.hero.en}</p></div>
     <h1 class="xs-h1">{(raw.hero.lines as string[][]).map((ln) => <span class="x-bl"><Ph list={ln} /></span>)}</h1>
     <div class="xs-ctas">
       {(raw.hero.ctas as any[]).map((c) => <a href={c.href} class={`x-btn xs-cta ${c.primary ? 'is-lime' : 'is-line'}`} data-track={c.href === '#contact' ? 'cta' : undefined} data-show={c.href === '#contact' ? 'contact' : undefined} data-place={c.href === '#contact' ? `svc-${slug}-hero` : undefined}>{c.label}</a>)}
@@ -93,7 +93,7 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
     <div class="xs-intro-body"><Rich text={(raw.intro.body as string[]).join('')} /></div>
     {facts.length > 0 && (
       <>
-        <p class="xs-ov">Overview<span>+ · サービス概要</span></p>
+        <p class="xs-ov">Overview<span>サービス概要</span></p>
         <div class="x-rail" style="--gtc:repeat(auto-fit,minmax(min(100%,340px),1fr));--gap:12px;--col:calc(100% - 52px);margin-top:20px">
           {facts.map((f) => (
             <div class="xs-fact">
@@ -234,7 +234,7 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
     <p class="xs-rel-en">Other Services</p>
     <p class="xs-rel-ja">関連サービス</p>
     <div class="xs-rel-list">
-      {related.map((r) => <a href={r.href} data-track="cta" data-show={`services-${r.slug}`} data-place={`svc-${slug}-related`}><span>+ · {r.label}</span><span aria-hidden="true">→</span></a>)}
+      {related.map((r) => <a href={r.href} data-track="cta" data-show={`services-${r.slug}`} data-place={`svc-${slug}-related`}><span>{r.label}</span><span aria-hidden="true">→</span></a>)}
     </div>
   </div>
 </section>

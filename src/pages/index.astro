@@ -190,13 +190,11 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 <section class="xt-hero">
   <div class="xt-hero-top">
     <div class="xt-hero-logo">
-      <span class="x-sh-deco" aria-hidden="true">+<span class="x-sh-line"></span></span>
       <img src="/assets/exlabs-logo-w.png" alt="株式会社 ex Labs" width="2048" height="520" fetchpriority="high">
-      <span class="x-sh-deco" aria-hidden="true"><span class="x-sh-line"></span>+</span>
     </div>
     <div class="xt-stat">
       <div>
-        <div class="xt-stat-l">+ · 累計コンテンツ体験者数</div>
+        <div class="xt-stat-l">累計コンテンツ体験者数</div>
         <div class="xt-stat-n">15,000</div>
       </div>
       <div class="xt-stat-u">人超</div>
@@ -228,7 +226,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
     <p class="xt-about-pre">株式会社ex Labs（イーエックスラボ）は、</p>
     <p class="xt-about-lead"><span class="x-c"><span class="xt-mk">体験型</span></span><span class="x-c"><span class="xt-mk">エンターテインメント</span></span><span class="x-c"><span class="xt-mk">領域</span>を</span><span class="x-c">主軸とする</span><span class="x-c">クリエイティブ</span><span class="x-c">カンパニーです。</span></p>
 
-    <div class="xt-biz-h"><span class="xt-biz-en">Business</span><span class="xt-biz-ja">+ · 事業内容</span></div>
+    <div class="xt-biz-h"><span class="xt-biz-en">Business</span><span class="xt-biz-ja">事業内容</span></div>
     <div class="x-rail xt-biz" style={railStyle('repeat(auto-fit,minmax(min(100%,300px),1fr))', '12px', '76%', '22px')}>
       {[['01', ['自社主催による', '体験型イベントの', '企画・運営']], ['02', ['法人向け', '体験型コンテンツの', '企画・制作']], ['03', ['体験型', 'エンターテインメント', '領域における', '企画・知見提供']], ['04', ['体験型コンテンツを', '活用した', '社内研修プログラムの', '企画・提供']]].map(([no, t]) => (
         <div class="xt-biz-c"><span class="xt-biz-no">{no}</span><p><Cls text={(t as string[]).join('')} emph={false} /></p></div>
@@ -242,11 +240,11 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
     </div>
     <p class="xt-about-note"><Cls text="設立からの期間はまだ長くありませんが、複数の上場企業様とのお取引実績を有しており、Skyland Ventures様をはじめとするベンチャーキャピタル様からのご支援もいただいております。" emph={false} /></p>
 
-    <p class="xt-mq-label" style="margin-top:56px"><Ph list={['+ · お取引先、', 'ご協力企業様']} /></p>
+    <p class="xt-mq-label" style="margin-top:56px"><Ph list={['お取引先、', 'ご協力企業様']} /></p>
     <div class="xt-mq-wrap"><div class="x-mq" style="--dur:40s;gap:28px">
       {partnerRow1Items.map((p, i) => <div class="xt-mq-cell"><img src={p.logo} alt={i < partnersRow1.length ? p.name : ''} decoding="async"></div>)}
     </div></div>
-    <p class="xt-mq-label" style="margin-top:36px">+ · 展開団体</p>
+    <p class="xt-mq-label" style="margin-top:36px">展開団体</p>
     <div class="xt-mq-wrap"><div class="x-mq is-rev" style="--dur:60s;gap:28px">
       {marqueeItems.map((g, i) => <div class="xt-mq-cell is-round"><img src={g.logo} alt={i < groups.length ? g.name : ''} decoding="async"></div>)}
     </div></div>
@@ -312,7 +310,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 <section id="strength" class="xt-pad24">
   <div style="max-width:1040px;margin:0 auto">
     <SecHead en="Strength" size="top" />
-    <p class="x-sh-ja"><Ph list={['ex Labsが選ばれる、', '2つの理由']} /></p>
+    <p class="x-sh-ja is-b"><Ph list={['ex Labsが選ばれる、', '2つの理由']} /></p>
     <div class="x-rail is-bleed" style={railStyle('repeat(auto-fit,minmax(min(100%,420px),1fr))', '56px', 'calc(100% - 52px)', '64px')}>
       <div>
         <div class="xt-str-no">01</div>
@@ -323,13 +321,13 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
           <p><Ph list={['条件に応じて', '受託・併用でご提案します。']} /></p>
         </div>
         <a href="/services/shisetsu-event/#revenue" class="xt-str-link" data-track="cta" data-show="services-shisetsu" data-place="home-strength">適用条件を見る →</a>
-        <ul class="xt-str-ul"><li><Cls text="+ · 企画の中身だけでなく、集客成果まで責任を持ちます。" emph={false} /></li><li><Cls text="+ · 「制作して終わり」ではなく「成功するところまで伴走する」そんな会社を目指しております。" emph={false} /></li></ul>
+        <ul class="xt-str-ul"><li><Cls text="企画の中身だけでなく、集客成果まで責任を持ちます。" emph={false} /></li><li><Cls text="「制作して終わり」ではなく「成功するところまで伴走する」そんな会社を目指しております。" emph={false} /></li></ul>
       </div>
       <div>
         <div class="xt-str-no">02</div>
         <h3 class="xt-str-h"><Ph list={['どんなコンテンツでも', '制作可能！']} /></h3>
         <p class="xt-str-p"><Cls text="謎解き・マーダーミステリー・頭脳戦・イマーシブコンテンツなど、多岐に渡るジャンルを企画・制作可能です。" emph={false} /></p>
-        <ul class="xt-str-ul"><li><Cls text="+ · 自社団体を複数運営し、それぞれにコミュニティ・ファン層を形成しております。" emph={false} /></li><li><Cls text="+ · そのため、新規プロジェクトでも既存の集客基盤を活かした展開が可能です。" emph={false} /></li></ul>
+        <ul class="xt-str-ul"><li><Cls text="自社団体を複数運営し、それぞれにコミュニティ・ファン層を形成しております。" emph={false} /></li><li><Cls text="そのため、新規プロジェクトでも既存の集客基盤を活かした展開が可能です。" emph={false} /></li></ul>
       </div>
     </div>
 
@@ -369,7 +367,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
           </div>
           <div>
             {w.tag && <p class="xt-work-tag">{w.tag}</p>}
-            <p class="xt-work-client">+ · {w.client}</p>
+            <p class="xt-work-client">{w.client}</p>
             <h3 class="xt-work-t"><Cls text={w.title} emph={false} /></h3>
             <p class="xt-work-d"><Cls text={w.desc} emph={false} /></p>
             {w.href && (w.href.startsWith('http')
@@ -475,10 +473,10 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
   <div style="max-width:880px;margin:0 auto">
     <SecHead en="Company" size="top" />
     <div class="xt-co">
-      <div class="xt-co-r"><p class="xt-co-k">+ · 法人名</p><p class="xt-co-v">株式会社ex Labs</p></div>
-      <div class="xt-co-r"><p class="xt-co-k">+ · 代表者</p><p class="xt-co-v"><a href="/company/iida-yuki/" style="border-bottom:1px solid">飯田 雄貴</a></p></div>
-      <div class="xt-co-r"><p class="xt-co-k">+ · 所在地</p><p class="xt-co-v" style="line-height:1.7"><span class="x-c">東京都新宿区西新宿3-3-13</span> <span class="x-c">西新宿水間ビル2F</span></p></div>
-      <div class="xt-co-r is-last"><p class="xt-co-k">+ · メディア掲載</p>
+      <div class="xt-co-r"><p class="xt-co-k">法人名</p><p class="xt-co-v">株式会社ex Labs</p></div>
+      <div class="xt-co-r"><p class="xt-co-k">代表者</p><p class="xt-co-v"><a href="/company/iida-yuki/" style="border-bottom:1px solid">飯田 雄貴</a></p></div>
+      <div class="xt-co-r"><p class="xt-co-k">所在地</p><p class="xt-co-v" style="line-height:1.7"><span class="x-c">東京都新宿区西新宿3-3-13</span> <span class="x-c">西新宿水間ビル2F</span></p></div>
+      <div class="xt-co-r is-last"><p class="xt-co-k">メディア掲載</p>
         <ul class="xt-co-media">
           {mediaItems.filter((m) => m.url).map((m) => <li><a href={m.url} target="_blank" rel="noopener">{m.outlet}　{m.date} ↗</a></li>)}
         </ul>

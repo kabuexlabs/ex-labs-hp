@@ -4,7 +4,7 @@ interface Props { footer?: 'full' | 'short' }
 const { footer = 'full' } = Astro.props;
 ---
 <footer class="x-foot">
-  <p class="x-foot-name">+ · 株式会社 ex Labs · +</p>
+  <p class="x-foot-name">株式会社 ex Labs</p>
   {footer === 'full' && <p class="x-foot-tag"><span class="x-c">AI時代に、人間が作る面白さを追求する</span> <span class="x-c">— 体験型エンターテインメントの</span><span class="x-c">企画・制作</span></p>}
   <p class="x-foot-addr"><span class="x-c">東京都新宿区西新宿3-3-13</span> <span class="x-c">西新宿水間ビル2F</span></p>
   {footer === 'full' && (
