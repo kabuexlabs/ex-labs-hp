@@ -1,0 +1,39 @@
+---
+// テレビ番組などの外部実績を、リンクカード（左に番組公式サイトのリンクプレビュー画像、右に説明）で見せる。
+// 画像は番組公式サイトの og:image を相手のサイトから表示する（LinkPreviewScript）。取れないときは文字のパネル。
+import LinkPreviewScript from './LinkPreviewScript.astro';
+import { findLinkPreviewTarget } from '../lib/linkPreview';
+import { FRIDAY_MYSTERY, type TvWork } from '../data/tvWorks';
+interface Props { work?: TvWork; place: string; theme?: 'light' | 'dark' }
+const { work = FRIDAY_MYSTERY, place, theme = 'light' } = Astro.props;
+const preview = findLinkPreviewTarget(work.url) ? work.url : undefined;
+---
+<aside class:list={['lpc', { 'is-dark': theme === 'dark' }]} aria-label={`${work.broadcaster}『${work.title}』`}>
+  <a class="lpc-in" href={work.url} target="_blank" rel="noopener" data-track="show" data-show="ntv" data-place={place}>
+    <div class="lpc-img" data-link-preview={preview} aria-hidden="true"><span class="lpc-k">TV</span><span class="lpc-t">{work.title}</span><span class="lpc-c">{work.broadcaster}</span></div>
+    <div class="lpc-body">
+      <p class="lpc-eb">テレビ番組・{work.role}</p>
+      <p class="lpc-title">{work.broadcaster}『{work.title}』</p>
+      <p class="lpc-desc">{work.broadcaster}の番組（{work.slot}）に、{work.role}しました。</p>
+      <p class="lpc-link">番組公式サイト ↗</p>
+    </div>
+  </a>
+</aside>
+<LinkPreviewScript />
+<style>
+.lpc{margin:24px 0 0}
+.lpc-in{display:grid;grid-template-columns:minmax(0,240px) minmax(0,1fr);gap:0;background:#fff;border:1px solid rgba(11,11,20,.14);text-decoration:none!important;color:inherit}
+.lpc-img{aspect-ratio:1.91/1;background:#0B0B14;display:grid;place-content:center;justify-items:center;gap:6px;padding:14px;text-align:center}
+.lpc-k{font-family:var(--x-en,serif);font-size:30px;line-height:1;letter-spacing:.2em;color:var(--x-lime,#E1F73E)}
+.lpc-t{font-family:var(--x-min,serif);font-weight:700;font-size:16px;line-height:1.4;color:#fff;white-space:nowrap}
+.lpc-c{font-size:12px;color:rgba(255,255,255,.7)}
+.lpc-body{padding:14px 18px;display:grid;gap:4px;align-content:center}
+.lpc-eb{margin:0;font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--x-blue,#0B35C8)}
+.lpc-title{margin:0;font-family:var(--x-min,serif);font-weight:700;font-size:16.5px;line-height:1.5;color:var(--x-ink,#0B0B14)}
+.lpc-desc{margin:0;font-size:13.5px;line-height:1.75;color:rgba(11,11,20,.75)}
+.lpc-link{margin:4px 0 0;font-size:13px;font-weight:700;color:var(--x-blue,#0B35C8)}
+.lpc-in:hover .lpc-link,.lpc-in:focus-visible .lpc-link{text-decoration:underline}
+.is-dark .lpc-in{background:var(--x-panel,#0A2BA8);border-color:rgba(255,255,255,.3)}
+.is-dark .lpc-title{color:#fff}.is-dark .lpc-desc{color:rgba(255,255,255,.8)}.is-dark .lpc-eb,.is-dark .lpc-link{color:var(--x-lime,#E1F73E)}
+@media(max-width:560px){.lpc-in{grid-template-columns:minmax(0,1fr)}}
+</style>

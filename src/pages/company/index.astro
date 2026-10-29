@@ -7,6 +7,7 @@
 // Organization 構造化データ（@id 付き）と FAQ で「引用しやすい形」にする。
 export const prerender = false;
 
+import LinkPreviewCard from '../../components/LinkPreviewCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import { jsonLd } from '../../lib/microcms';
@@ -165,6 +166,7 @@ const history = [
 <li><strong>宿泊施設向けマーダーミステリー</strong>：Thermal Climb Studio Fuji様向けの体験付きプランで<strong>新規宿泊予約20件以上</strong>を獲得。</li>
 <li><strong>お取引先・ご協力企業</strong>：東急不動産、博報堂、紀伊國屋書店、Skyland Ventures、SHINKUKAN、Sally、COEN、MAISON MARC、Party、Thermal Climb Studio Fuji ほか。複数の上場企業様との取引実績があります。</li>
 </ul>
+<LinkPreviewCard place="company-results" />
 </div></section>
 
 <section class="section tinted" id="history"><div class="wrap narrow">

@@ -445,6 +445,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "01",
      "title": "日本テレビ『金曜ミステリークラブ!!!』",
+      "preview": "https://www.ntv.co.jp/friday-mystery/",
       "sub": "日本テレビの番組（毎週金曜19時）に、ミステリー企画で参画。",
       "bullets": [
        "日本テレビ系で毎週金曜19時に放送されている番組（2026年4月スタート）"

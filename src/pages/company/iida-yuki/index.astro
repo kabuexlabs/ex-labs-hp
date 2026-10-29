@@ -6,6 +6,7 @@
 // 記載する事実はサイト内で既に公開している内容のみ。
 export const prerender = false;
 
+import LinkPreviewCard from '../../../components/LinkPreviewCard.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Breadcrumb from '../../../components/Breadcrumb.astro';
 import { jsonLd } from '../../../lib/microcms';
@@ -130,6 +131,7 @@ const profilePageLd = {
 <li><strong>宿泊施設向けマーダーミステリー</strong>：体験付き宿泊プランで新規宿泊予約20件以上を獲得。</li>
 <li><strong>レーベル運営</strong>：UNLIMITED MYSTERY（東大マダミス）、HACKTALE（頭脳戦）、体験する美術館、IMMERSIVE ILLUSION、ANATOR、myagare。<a href="/company/#labels" style="color:var(--accent)">展開レーベル一覧 →</a></li>
 </ul>
+<LinkPreviewCard place="ceo-works" />
 </div></section>
 
 <section class="section tinted" id="message"><div class="wrap narrow">

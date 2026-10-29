@@ -11,6 +11,8 @@ import { SERVICES, SERVICE_LINKS, type ServiceSlug } from '../../data/services';
 import RevShareCallout from '../RevShareCallout.astro';
 import { flat } from '../../lib/jpbreak';
 import { jsonLd } from '../../lib/microcms';
+import { findLinkPreviewTarget } from '../../lib/linkPreview';
+import LinkPreviewScript from '../LinkPreviewScript.astro';
 import type { ContactType } from './ContactBlock.astro';
 
 interface Props { slug: ServiceSlug; title: string; description: string; serviceLd?: Record<string, unknown> }
@@ -19,6 +21,8 @@ const raw = SERVICES[slug];
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const pad = (n: number) => String(n).padStart(2, '0');
 const sections = raw.sections as any[];
+// 実績カードに外部サイトのリンクプレビュー画像（preview）を出すものがあるか
+const hasPreview = sections.some((s) => s.type === 'cards' && (s.items as any[]).some((c) => c.preview && findLinkPreviewTarget(c.preview)));
 const toc = sections.map((s, i) => ({ no: pad(i + 1), href: '#' + s.id, label: (s.ja as string[]).join('') }));
 const facts = (raw.intro.facts ?? []) as any[];
 const def: string = raw.intro.definition ?? '';
@@ -144,6 +148,7 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
           <div {...railAttrs('cards')}>
             {(s.items as any[]).map((c) => (
               <div class="xs-cardc">
+                {c.preview && findLinkPreviewTarget(c.preview) && <a class="xs-cardc-pv" href={c.preview} target="_blank" rel="noopener" data-track="show" data-show="ntv" data-place={`svc-${slug}-works`} aria-label={`${c.title}（公式サイト）`}><span class="xs-cardc-img" data-link-preview={c.preview}><span class="xs-pv-k">TV</span><span class="xs-pv-t">{c.title}</span></span></a>}
                 <div class="xs-cardc-h"><span class="xs-cardc-no">{c.no}</span><h3><Cls text={c.title} emph={false} /></h3></div>
                 <div class="xs-cardc-sub"><Rich text={c.sub} /></div>
                 <ul class="xs-cardc-ul">{(c.bullets as string[]).map((b) => <li><span class="xs-plus">+</span><span><Cls text={b} emph={false} /></span></li>)}</ul>
@@ -233,6 +238,7 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
     </div>
   </div>
 </section>
+{hasPreview && <LinkPreviewScript />}
 </BaseLayout>
 
 <style>
@@ -295,6 +301,10 @@ const railAttrs = (type: string) => { const r = RAIL[type]; return { class: `x-r
 .xs-num-no{white-space:nowrap;font-family:var(--x-en);font-size:44px;line-height:1;color:var(--x-lime)}
 .xs-num p{margin:0;font-family:var(--x-min);font-weight:600;font-size:16px;line-height:1.8}
 .xs-cardc{background:var(--x-panel);padding:clamp(24px,4vw,40px);display:grid;gap:16px;align-content:start}
+.xs-cardc-pv{display:block;margin:calc(-1 * clamp(24px,4vw,40px)) calc(-1 * clamp(24px,4vw,40px)) 4px}
+.xs-cardc-img{aspect-ratio:1.91/1;background:#0B0B14;display:grid;place-content:center;justify-items:center;gap:8px;padding:16px;text-align:center}
+.xs-pv-k{font-family:var(--x-en);font-size:36px;line-height:1;letter-spacing:.2em;color:var(--x-lime)}
+.xs-pv-t{font-family:var(--x-min);font-weight:700;font-size:15px;line-height:1.5;color:#fff}
 .xs-cardc-h{display:flex;align-items:baseline;gap:16px}
 .xs-cardc-no{white-space:nowrap;font-family:var(--x-en);font-size:clamp(44px,6vw,64px);line-height:.8;color:var(--x-lime)}
 .xs-cardc-h h3{margin:0;font-family:var(--x-min);font-weight:600;font-size:clamp(18px,2.4vw,23px);line-height:1.55}
