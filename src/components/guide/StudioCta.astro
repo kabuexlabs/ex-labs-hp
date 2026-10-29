@@ -19,6 +19,7 @@ const {
   id = 'studio',
 } = Astro.props;
 const works = [
+  { t: '金曜ミステリークラブ!!!（日本テレビ）', d: '日本テレビの番組（毎週金曜19時）にミステリー企画で参画', href: 'https://www.ntv.co.jp/friday-mystery/' },
   { t: '午前零時の幻想集', d: '東京都の夢の島熱帯植物館で、閉館後の館内を巡る夜のイマーシブ公演（2026年11月）。日本経済新聞に掲載', href: '/gensou/' },
   { t: '7枚目のコンポジション', d: '京都市京セラ美術館で開催する絵画×イマーシブ（2026年11月、体験する美術館）', href: '/taikenbizyutu/7th-composition/' },
   { t: 'ウワサバナシ調査委員会 case2「言祝ぎの家」', d: 'さいたま市の一軒家を舞台にしたイマーシブ・ホラーミステリー（2026年10〜11月）。全公演完売', href: '/uwasabanashi/kotohogi/' },
@@ -32,7 +33,7 @@ const works = [
 <h2 class="h2 serif">{title}</h2>
 <p class="lede">{lead}</p>
 <ul class="sc-works">
-  {works.map((w) => <li><a href={w.href} data-track="cta" data-show="works" data-place={place}><strong>{w.t}</strong><span>{w.d}</span></a></li>)}
+  {works.map((w) => <li><a href={w.href} {...(w.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})} data-track="cta" data-show="works" data-place={place}><strong>{w.t}</strong><span>{w.d}</span></a></li>)}
 </ul>
 <div class="sc-actions">
   <a class="sc-btn" href={`${service}#contact`} data-track="cta" data-show={service.split('/')[2]} data-place={place}>{serviceLabel}を相談する（無料）</a>

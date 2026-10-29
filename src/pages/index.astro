@@ -152,10 +152,12 @@ const liveCards = liveEvents.map((e) => ({ ...e, desc: e.desc.replace(/​/g, ''
 // 主な実績（トップはデザイン確定版の7件）
 // 2026年秋の公演（幻想集・7枚目のコンポジション・ウワサバナシcase2）を先頭に置き、実績として強めに出す。
 // tag：公共施設での開催・完売など、ひと目で伝えたい事実（夢の島熱帯植物館は東京都、京都市京セラ美術館は京都市の施設）
-const works: { img: string; cat: string; client: string; title: string; desc: string; tag?: string; href?: string }[] = [
+// img が空の実績（テレビ番組など、使える画像がないもの）は文字だけのパネルで出す。外部サイトへのリンクは linkLabel を付けて別タブで開く
+const works: { img: string; cat: string; client: string; title: string; desc: string; tag?: string; href?: string; linkLabel?: string }[] = [
   { img: '/assets/events/gensou-kv.webp', cat: '企画・主催', client: '夢の島熱帯植物館（東京都）', title: '午前零時の幻想集 第一夜「草陰の夢」', desc: '東京都の夢の島熱帯植物館で、夜の館内を巡りながら物語を体験するイマーシブ公演を開催。2026年11月5日〜22日。', tag: '公共施設で開催｜東京都の熱帯植物館', href: '/gensou/' },
   { img: '/assets/events/7th-composition-kv.webp', cat: '企画・主催', client: '京都市京セラ美術館（京都市）', title: '7枚目のコンポジション', desc: '京都市京セラ美術館で、絵画を鑑賞しながら物語に巻き込まれていく60分の絵画×イマーシブ体験を開催。2026年11月21日〜23日。', tag: '公共施設で開催｜京都市の美術館', href: '/taikenbizyutu/7th-composition/' },
   { img: '/assets/events/uwasabanashi-case2-kv.webp', cat: '企画・主催', client: '埼玉県さいたま市の一軒家', title: 'ウワサバナシ調査委員会 case2「言祝ぎの家」', desc: '実際の一軒家を探索し、住人との会話や調査報告を通じて真相に迫るイマーシブホラー・ミステリー。2026年10月23日〜11月3日の公演。', tag: '全公演完売', href: '/uwasabanashi/kotohogi/' },
+  { img: '', cat: 'ミステリー企画', client: '日本テレビ', title: '金曜ミステリークラブ!!!', desc: '日本テレビの番組『金曜ミステリークラブ!!!』（毎週金曜19時）に、ミステリー企画で参画しました。', tag: 'テレビ番組', href: 'https://www.ntv.co.jp/friday-mystery/', linkLabel: '番組公式サイト' },
   { img: '/assets/work-1.webp', cat: 'ミステリー原案', client: '博報堂 × 紀伊國屋書店', title: '月明かりの書店と呪われた原稿', desc: '閉店後の紀伊國屋書店を舞台に開催された、一夜限りの体験型イベントの制作を担当しました。' },
   { img: '/assets/work-2.webp', cat: '企画・制作', client: '自社主催', title: 'ヌル・アーデン展', desc: '東京藝術大学出身アーティストとのコラボレーション企画。アートと謎解きを融合した体験型イベントを実施し、公演終了後には作品オークションも開催しました。' },
   { img: '/assets/work-3.webp', cat: '企画・制作', client: '下北沢', title: 'ロスト・フレーム', desc: '下北沢の街全体を舞台としたアート体験型イベントを制作しました。全公演完売（2026年7月〜8月31日）。' },
@@ -363,7 +365,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
       {works.map((w) => (
         <article class="xt-work">
           <div style="position:relative">
-            <img src={w.img} alt={w.title} loading="lazy" decoding="async">
+            {w.img ? <img src={w.img} alt={w.title} loading="lazy" decoding="async"> : <div class="xt-work-panel" aria-hidden="true"><span class="xt-work-panel-k">TV</span><span class="xt-work-panel-t">{w.title}</span><span class="xt-work-panel-c">{w.client}</span></div>}
             <span class="xt-work-cat">{w.cat}</span>
           </div>
           <div>
@@ -371,7 +373,9 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
             <p class="xt-work-client">+ · {w.client}</p>
             <h3 class="xt-work-t"><Cls text={w.title} emph={false} /></h3>
             <p class="xt-work-d"><Cls text={w.desc} emph={false} /></p>
-            {w.href && <p class="xt-work-link"><a href={w.href} data-track="show" data-show={w.href.split('/').filter(Boolean).pop()} data-place="home-works">公演サイトを見る →</a></p>}
+            {w.href && (w.href.startsWith('http')
+              ? <p class="xt-work-link"><a href={w.href} target="_blank" rel="noopener" data-track="show" data-show="ntv" data-place="home-works">{w.linkLabel ?? '公式サイト'} ↗</a></p>
+              : <p class="xt-work-link"><a href={w.href} data-track="show" data-show={w.href.split('/').filter(Boolean).pop()} data-place="home-works">{w.linkLabel ?? '公演サイトを見る'} →</a></p>)}
           </div>
         </article>
       ))}
@@ -592,6 +596,10 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-style-note{margin:24px 0 0;max-width:760px;font-size:14px;line-height:1.9;color:var(--x-pale)}
 .xt-work{display:grid;gap:16px;align-content:start}
 .xt-work img{width:100%;height:auto;aspect-ratio:4/3;object-fit:contain;background:var(--x-panel);display:block}
+.xt-work-panel{aspect-ratio:4/3;background:var(--x-panel);display:grid;place-content:center;justify-items:center;gap:10px;padding:24px;text-align:center}
+.xt-work-panel-k{font-family:var(--x-en);font-size:44px;line-height:1;letter-spacing:.2em;color:var(--x-lime)}
+.xt-work-panel-t{font-family:var(--x-min);font-weight:700;font-size:clamp(17px,5vw,22px);line-height:1.4;color:#fff;white-space:nowrap}
+.xt-work-panel-c{font-size:13px;color:var(--x-pale2)}
 .xt-work-cat{position:absolute;left:0;bottom:0;background:var(--x-lime);color:var(--x-ink);font-family:var(--x-min);font-weight:600;font-size:12px;padding:6px 12px}
 .xt-work-tag{margin:0 0 10px;display:inline-block;padding:4px 12px;border:1.5px solid var(--x-lime);color:var(--x-lime);font-weight:800;font-size:13.5px;letter-spacing:.06em}
 .xt-work-link{margin:10px 0 0;font-size:14px;font-weight:700}.xt-work-link a{color:var(--x-lime);border-bottom:1px solid currentColor}
