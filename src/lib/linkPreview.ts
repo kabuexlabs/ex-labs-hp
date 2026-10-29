@@ -29,16 +29,54 @@ export interface OgInfo {
   siteName?: string;
 }
 
-/** HTML の <meta property="og:*"> / <meta name="twitter:*"> から、画像・タイトル・サイト名を取り出す（画像URLは絶対URLにする） */
+/** タグの属性を取り出す（"…"・'…'・引用符なしのどれでも） */
+function tagAttrs(tag: string): Record<string, string> {
+  const attrs: Record<string, string> = {};
+  for (const m of tag.matchAll(/([a-zA-Z_:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/g)) {
+    let v = m[2] ?? m[3] ?? m[4] ?? '';
+    // 引用符なしの値の直後が「/>」のとき、末尾の「/」は値ではない
+    if (m[4] !== undefined && v.endsWith('/') && tag.slice((m.index ?? 0) + m[0].length).startsWith('>')) v = v.slice(0, -1);
+    attrs[m[1].toLowerCase()] = v;
+  }
+  return attrs;
+}
+
+/** HTML に書かれた meta の property／name の一覧（原因の確認用） */
+export function metaKeys(html: string): string[] {
+  return (html.match(/<meta\s[^>]*>/gi) ?? []).map((t) => { const a = tagAttrs(t); return (a.property || a.name || a.itemprop || a['http-equiv'] || a.charset || '').toLowerCase(); }).filter(Boolean);
+}
+
+/**
+ * 共有用に指定された画像・タイトル・サイト名を取り出す（画像URLは絶対URLにする）。
+ * 画像は og:image → twitter:image → <link rel="image_src"> → 構造化データ（JSON-LD）の image の順。ページ内の普通の画像は使わない。
+ */
 export function extractOg(html: string, pageUrl: string): OgInfo {
   const meta: Record<string, string> = {};
   for (const tag of html.match(/<meta\s[^>]*>/gi) ?? []) {
-    const attrs: Record<string, string> = {};
-    for (const m of tag.matchAll(/([a-zA-Z_:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)) attrs[m[1].toLowerCase()] = m[2] ?? m[3] ?? '';
-    const key = (attrs.property || attrs.name || '').toLowerCase();
+    const attrs = tagAttrs(tag);
+    const key = (attrs.property || attrs.name || attrs.itemprop || '').toLowerCase();
     if (key && attrs.content !== undefined && !(key in meta)) meta[key] = decode(attrs.content.trim());
   }
-  const raw = meta['og:image:secure_url'] || meta['og:image'] || meta['og:image:url'] || meta['twitter:image'] || meta['twitter:image:src'];
+  let linkImage: string | undefined;
+  for (const tag of html.match(/<link\s[^>]*>/gi) ?? []) {
+    const a = tagAttrs(tag);
+    if ((a.rel || '').toLowerCase().split(/\s+/).includes('image_src') && a.href) { linkImage = decode(a.href.trim()); break; }
+  }
+  let ldImage: string | undefined;
+  for (const m of html.matchAll(/<script[^>]*type\s*=\s*["']?application\/ld\+json["']?[^>]*>([\s\S]*?)<\/script>/gi)) {
+    try {
+      const pick = (v: unknown): string | undefined => (typeof v === 'string' ? v : Array.isArray(v) ? pick(v[0]) : v && typeof v === 'object' ? pick((v as { url?: unknown }).url) : undefined);
+      const walk = (o: unknown): string | undefined => {
+        if (!o || typeof o !== 'object') return undefined;
+        if (Array.isArray(o)) { for (const x of o) { const r = walk(x); if (r) return r; } return undefined; }
+        const rec = o as Record<string, unknown>;
+        return pick(rec.image) ?? pick(rec.thumbnailUrl) ?? walk(rec['@graph']);
+      };
+      ldImage = walk(JSON.parse(m[1]));
+      if (ldImage) break;
+    } catch { /* 壊れた JSON-LD は無視 */ }
+  }
+  const raw = meta['og:image:secure_url'] || meta['og:image'] || meta['og:image:url'] || meta['twitter:image'] || meta['twitter:image:src'] || meta['image'] || linkImage || ldImage;
   let image: string | undefined;
   if (raw) {
     try { image = new URL(raw, pageUrl).toString(); } catch { image = undefined; }

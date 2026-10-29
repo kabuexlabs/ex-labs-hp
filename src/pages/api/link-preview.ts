@@ -5,7 +5,7 @@ export const prerender = false;
 // 画像が出ないときの原因を確かめられるよう、status（ok／http-error／fetch-error／no-image／image-host-not-allowed）と detail を返す。
 
 import type { APIRoute } from 'astro';
-import { findLinkPreviewTarget, extractOg, isAllowedImage } from '../../lib/linkPreview';
+import { findLinkPreviewTarget, extractOg, isAllowedImage, metaKeys } from '../../lib/linkPreview';
 
 const json = (body: unknown, status: number, cache: string) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': cache } });
@@ -33,7 +33,10 @@ export const GET: APIRoute = async ({ url }) => {
   const html = (await r.text()).slice(0, 512 * 1024);
   const og = extractOg(html, r.url || target.url);
   const base = { title: og.title ?? null, siteName: og.siteName ?? null };
-  if (!og.image) return json({ image: null, ...base, status: 'no-image', detail: `og:image なし（${html.length}文字のHTMLを確認）` }, 200, SHORT);
+  if (!og.image) {
+    // 原因の確認用：HTML に og:image の文字列があるか（あれば読み取りの問題、なければページ側に設定がない）と、見つかった meta の一覧
+    return json({ image: null, ...base, status: 'no-image', detail: `共有用の画像の指定なし（${html.length}文字のHTMLを確認）`, hasOgImageText: /og:image/i.test(html), hasTwitterImageText: /twitter:image/i.test(html), meta: metaKeys(html).slice(0, 40) }, 200, SHORT);
+  }
   if (!isAllowedImage(og.image, target.imageHosts)) {
     let host = '';
     try { host = new URL(og.image).hostname; } catch { host = og.image.slice(0, 80); }

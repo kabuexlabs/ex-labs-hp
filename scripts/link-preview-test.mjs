@@ -1,5 +1,5 @@
 // リンクプレビュー（src/lib/linkPreview.ts）のテスト：og:image の取り出し・許可ドメインの判定・登録先の照合
-import { extractOg, isAllowedImage, findLinkPreviewTarget } from '../src/lib/linkPreview.ts';
+import { extractOg, isAllowedImage, findLinkPreviewTarget, metaKeys } from '../src/lib/linkPreview.ts';
 
 let fail = 0;
 const eq = (name, got, want) => {
@@ -16,6 +16,14 @@ eq('secure_url を優先', extractOg('<meta property="og:image" content="http://
 eq('twitter:image の代替', extractOg('<meta name="twitter:image" content="https://www.ntv.co.jp/t.jpg">', page).image, 'https://www.ntv.co.jp/t.jpg');
 eq('&amp; を戻す', extractOg('<meta property="og:image" content="https://www.ntv.co.jp/i.jpg?a=1&amp;b=2">', page).image, 'https://www.ntv.co.jp/i.jpg?a=1&b=2');
 eq('og が無ければ title タグ・画像なし', extractOg('<title>番組名</title>', page), { image: undefined, title: '番組名', siteName: undefined });
+
+eq('引用符なしの属性', extractOg('<meta property=og:image content=https://www.ntv.co.jp/fm/ogp.jpg>', page).image, 'https://www.ntv.co.jp/fm/ogp.jpg');
+eq('引用符なし＋/>', extractOg('<meta property=og:image content=https://www.ntv.co.jp/fm/ogp.jpg/>', page).image, 'https://www.ntv.co.jp/fm/ogp.jpg');
+eq('link rel=image_src', extractOg('<link rel="image_src" href="/fm/share.png">', page).image, 'https://www.ntv.co.jp/fm/share.png');
+eq('JSON-LD の image', extractOg('<script type="application/ld+json">{"@context":"https://schema.org","@type":"TVSeries","image":{"@type":"ImageObject","url":"https://www.ntv.co.jp/fm/ld.jpg"}}</script>', page).image, 'https://www.ntv.co.jp/fm/ld.jpg');
+eq('JSON-LD の @graph', extractOg('<script type="application/ld+json">{"@graph":[{"@type":"WebPage"},{"@type":"TVSeries","image":["https://www.ntv.co.jp/fm/g.jpg"]}]}</script>', page).image, 'https://www.ntv.co.jp/fm/g.jpg');
+eq('og:image が最優先', extractOg('<link rel="image_src" href="/a.png"><meta property="og:image" content="/b.png">', page).image, 'https://www.ntv.co.jp/b.png');
+eq('meta 一覧', metaKeys('<meta charset="utf-8"><meta name=viewport content="w"><meta property="og:title" content="t">'), ['utf-8', 'viewport', 'og:title']);
 
 eq('許可：同じドメイン', isAllowedImage('https://ntv.co.jp/a.jpg', ['ntv.co.jp']), true);
 eq('許可：サブドメイン', isAllowedImage('https://www.ntv.co.jp/a.jpg', ['ntv.co.jp']), true);
