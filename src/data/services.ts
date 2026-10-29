@@ -153,6 +153,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "01",
       "title": "商業イベントで培ったシナリオ制作力",
+      "img": "/assets/work-1.webp",
       "sub": "博報堂×紀伊國屋書店様など、商業施設・大手企業との体験型イベント制作実績。",
       "bullets": [
        "「参加者を夢中にさせる」プロのコンテンツ設計力",
@@ -326,6 +327,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
    "note": ""
   },
   "intro": {
+   "diagram": {"lead": "物語への没入と推理の面白さを両立させた、目的に合わせたオリジナル作品をお届けします。", "from": "目的（動画企画・店舗集客・イベントなど）", "mids": ["物語への没入", "推理の面白さ"], "to": "目的に合わせたオリジナル作品"},
    "title": [
     "マーダーミステリー",
     "（マダミス）",
@@ -537,6 +539,8 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ],
     "lead": "「何を、いくらで、どこまで頼めるか」を先にお伝えします。当社にご依頼いただく場合の目安です。",
     "type": "kv",
+    "priceSteps": {"title": "参考価格の目安", "steps": [{"t": "1作品の制作", "d": "6〜8人・2〜3時間", "p": "数十万円台〜"}, {"t": "1作品＋制作物", "d": "", "p": "100万円前後まで"}, {"t": "施設・宿泊施設向けオリジナル＋当日運営", "d": "公演回数・キャスト有無で変動", "p": "100万円前後〜"}], "note": "集客型（有料チケット）はレベニューシェア（初期費用0円）も選択可"},
+    "leadTimes": [{"t": "既存作品の貸切実施", "v": "2〜4週間", "from": 0.5, "to": 1}, {"t": "オリジナル制作", "v": "最短1ヶ月、標準1〜3ヶ月", "from": 1, "to": 3}],
     "items": [
      {
       "k": "対応範囲",
@@ -675,6 +679,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
    "note": "※初期費用0円は有料チケット型のイベントで成立する形式です。受託・併用のプランもあります。"
   },
   "intro": {
+   "diagram": {"lead": "施設の空間を舞台にした体験型イベントで、来館のきっかけと館内を巡る理由をつくります。", "from": "商業施設・文化施設・観光施設・宿泊施設の空間", "mids": ["回遊導線の設計", "店舗送客の仕組み", "施設に合わせた物語"], "to": "施設の魅力を引き出す集客コンテンツ"},
    "title": [
     "施設活用イベントの",
     "企画・制作"
@@ -753,6 +758,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ],
     "lead": "施設の目的ごとに、おすすめの形式・これまでの実績・費用の考え方をまとめました。",
     "type": "table",
+    "rowImgs": ["/assets/events/lost-frame.webp", "/assets/events/uwasabanashi-kv.webp", "/assets/work-1.webp", "", ""],
     "keyCols": [1, 3],
     "cols": [
      "目的",
@@ -1036,6 +1042,8 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ],
     "lead": "ご検討いただく際に必要な「対応範囲・費用・ご準備いただくもの」をまとめました。",
     "type": "kv",
+    "priceSteps": {"title": "参考価格の目安（受託の場合）", "steps": [{"t": "小規模企画", "d": "空き区画・催事枠を使う", "p": "数十万円台〜"}, {"t": "フロア横断の周遊型", "d": "2〜4週間", "p": "100万円前後〜"}, {"t": "施設全体・複数施設", "d": "", "p": "数百万円規模"}], "note": "有料チケット型はレベニューシェア（初期費用0円）も選択可"},
+    "leadTimes": [{"t": "既存コンテンツの導入", "v": "2〜4週間", "from": 0.5, "to": 1}, {"t": "施設に合わせたオリジナル", "v": "最短1ヶ月、標準1〜3ヶ月", "from": 1, "to": 3}],
     "items": [
      {
       "k": "対応範囲",
@@ -1275,6 +1283,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
    "note": ""
   },
   "intro": {
+   "diagram": {"lead": "謎解きが「協力して解く」形式なのに対し、頭脳戦は参加者同士の対戦です。", "from": "ルール設計とバランス調整", "mids": ["交渉", "心理戦", "閃き"], "to": "参加者同士が対戦する頭脳戦コンテンツ"},
    "title": [
     "頭脳戦制作・",
     "交渉戦制作"
@@ -1453,6 +1462,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "01",
       "title": "頭脳戦に特化したレーベルを自社運営",
+      "img": "/assets/zunousen/present-poker.webp",
       "sub": "交渉・心理戦・閃きを軸にした頭脳戦コンテンツに特化したレーベル「HACKTALE（ハックテイル）」を運営し、一般公演で作品を磨いています。",
       "bullets": [
        "対人ゲーム特有のルール設計・バランス調整を専門に担当",
@@ -1462,6 +1472,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "02",
       "title": "大型イベントでの実施実績",
+      "img": "/assets/work-8.webp",
       "sub": "自社主催「東京都頭脳王決定戦」を企画・運営し、ご好評をいただきました。",
       "bullets": [
        "東京都内4会場を同時に活用した大型イベント",
@@ -1567,6 +1578,8 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ],
     "lead": "「何を、いくらで、どこまでご依頼いただけるか」の目安をまとめました。",
     "type": "kv",
+    "priceSteps": {"title": "参考価格の目安", "steps": [{"t": "既存作品（HACKTALE）の貸切・出張", "d": "", "p": "数十万円台〜"}, {"t": "オリジナル制作", "d": "テストプレイ込み", "p": "100万円前後〜"}, {"t": "複数会場の大会形式", "d": "会場数・回数による", "p": "別途お見積り"}]},
+    "leadTimes": [{"t": "既存作品の貸切", "v": "2〜4週間", "from": 0.5, "to": 1}, {"t": "オリジナル制作", "v": "最短1ヶ月、標準1〜3ヶ月", "from": 1, "to": 3}],
     "items": [
      {
       "k": "対応範囲",
@@ -1701,6 +1714,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
    "note": ""
   },
   "intro": {
+   "diagram": {"lead": "参加者が物語を「観る」のではなく、自分自身が物語の当事者として体験するのが、イマーシブ（没入型）コンテンツです。", "from": "実在する場所や作品", "mids": ["街", "空間", "香り・アート作品"], "to": "その場所だからこそ体験できる物語"},
    "title": [
     "イマーシブ",
     "コンテンツ制作｜",
@@ -1792,6 +1806,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ],
     "lead": "当社が制作するのは、実在の場所で行うリアルなイマーシブ体験です。目的と使える空間に合わせて、3つの形式から選びます。",
     "type": "table",
+    "rowImgs": ["/assets/events/uwasabanashi-kv.webp", "/assets/events/lost-frame.webp", "/assets/events/kaitou-kv.webp"],
     "keyCols": [1, 3, 4],
     "cols": [
      "形式",
@@ -1846,6 +1861,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "01",
       "title": "複数のイマーシブレーベルを自社運営",
+      "img": "/assets/events/7th-composition-kv.webp",
       "sub": "アート×体験の「体験する美術館」、マジック×イマーシブの「IMMERSIVE ILLUSION」など、複数の没入型レーベルを自社で運営しています。",
       "bullets": [
        "ジャンルごとの体験設計ノウハウを蓄積",
@@ -1855,6 +1871,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "02",
       "title": "街・ブランドと連携した制作実績",
+      "img": "/assets/events/uwasabanashi-kv.webp",
       "sub": "渋谷サクラステージや下北沢の街全体を舞台にしたイマーシブ作品を制作してきました。",
       "bullets": [
        "実在の街・商店街を舞台にした周遊型の設計力",
@@ -2027,6 +2044,8 @@ export const SERVICES: Record<ServiceSlug, any> = {
     ],
     "lead": "「何を、いくらで、どこまで頼めるか」を先にお伝えします。当社にご依頼いただく場合の目安です。",
     "type": "kv",
+    "priceSteps": {"title": "参考価格の目安（規模別）", "steps": [{"t": "1空間完結型", "d": "バー・店舗・1フロア、60〜90分", "p": "数十万円台〜"}, {"t": "施設一体型", "d": "商業施設の複数フロア、期間限定", "p": "100万円前後〜"}, {"t": "街全体・複数会場の周遊型", "d": "", "p": "数百万円規模"}], "note": "集客型（有料チケット）はレベニューシェア（初期費用0円）も選択可"},
+    "leadTimes": [{"t": "既存公演の貸切・出張実施", "v": "2〜4週間", "from": 0.5, "to": 1}, {"t": "オリジナル制作", "v": "最短1ヶ月、標準1〜3ヶ月", "from": 1, "to": 3}],
     "items": [
      {
       "k": "対応範囲",
