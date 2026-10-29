@@ -7,11 +7,15 @@ export const prerender = false;
 import KampoLayout from '../../../../../layouts/KampoLayout.astro';
 import { getSession } from '../../../../../lib/kampo/store';
 import { isLegacy } from '../../../../../lib/kampo/compute';
+import { walk } from '../../../../../lib/kampo/flow';
+import { referrals } from '../../../../../lib/kampo/safety';
 
 const s = await getSession(Astro.params.id ?? '');
 if (!s) return Astro.redirect('/kampo/check/new/?msg=notfound', 303);
 const legacy = isLegacy(s);
 if (s.status === 'in_progress' && !legacy) return Astro.redirect(`/kampo/check/${s.id}/`, 303);
+// 受診のおすすめ（月経以外の時期の出血など。第3弾 3-1）
+const refers = legacy ? [] : referrals(walk(s.answers));
 const staffHref = `/kampo/staff/pin/?next=${encodeURIComponent(`/kampo/staff/session/${s.id}/`)}`;
 ---
 <KampoLayout title="回答ありがとうございました" width="normal">
@@ -19,6 +23,13 @@ const staffHref = `/kampo/staff/pin/?next=${encodeURIComponent(`/kampo/staff/ses
     <div class="kp-urgent" role="alert">
       <p class="kp-urgent-h">すぐに近くのスタッフにお声がけください</p>
       <p>回答の中に、早めに確認したい内容があります。</p>
+    </div>
+  )}
+  {refers.length > 0 && (
+    <div class="kp-refer" role="note">
+      <p class="kp-refer-h">受診のおすすめ</p>
+      {refers.map((r) => <p>{r.message}</p>)}
+      <p style="font-size:14px">詳しくは薬剤師にご相談ください。</p>
     </div>
   )}
   {legacy && s.status === 'in_progress' ? (
@@ -41,6 +52,8 @@ const staffHref = `/kampo/staff/pin/?next=${encodeURIComponent(`/kampo/staff/ses
   .kp-done-en{font-family:var(--en);letter-spacing:.3em;color:var(--sky-text);font-size:15px;margin-bottom:6px}
   .kp-urgent{background:var(--danger-soft);border:2px solid var(--danger);color:var(--danger-deep);padding:22px 26px;margin-bottom:28px;text-align:center}
   .kp-urgent-h{font-size:24px;font-weight:700;letter-spacing:.06em;margin-bottom:6px}
+  .kp-refer{border:2px solid var(--danger);background:var(--danger-soft);color:var(--danger-deep);padding:18px 22px;margin-bottom:24px;font-size:16px;line-height:1.9}
+  .kp-refer-h{font-size:19px;font-weight:700;letter-spacing:.06em;margin-bottom:4px}
   .kp-staff-link{text-align:right;margin-top:64px;font-size:13px}
   .kp-staff-link a{color:var(--muted);text-decoration:none;border:1px solid var(--line);padding:8px 14px;display:inline-block}
   </style>

@@ -1,5 +1,5 @@
 {
- "version": "2026-10-29-v3.2",
+ "version": "2026-10-29-v3.3",
  "review": {
   "status": "draft",
   "source": "2026-10-24 版（3段階版）の設問・重みを、2026-10-25 の改修指示と承認済みの改修計画に沿って組み直した草案。重み・五臓は現行の選択肢の値を引き継いだもので、新しい数値は作っていない（専門家未確認）",
@@ -2707,7 +2707,8 @@
    "from": [
     "B2-3",
     "Shair_dry2-nail"
-   ]
+   ],
+   "group": "nail"
   },
   {
    "id": "lip_dark",
@@ -3819,6 +3820,9 @@
    "from": [
     "KD-heavy",
     "Sirregular2-heavy"
+   ],
+   "conflicts": [
+    "flow_light"
    ]
   },
   {
@@ -3834,6 +3838,9 @@
     "KD-light",
     "B11-2",
     "Sirregular2-light"
+   ],
+   "conflicts": [
+    "flow_heavy"
    ]
   },
   {
@@ -3863,6 +3870,10 @@
     "B11-1",
     "B11-8",
     "Sirregular1-early"
+   ],
+   "conflicts": [
+    "cycle_long",
+    "cycle_random"
    ]
   },
   {
@@ -3879,6 +3890,10 @@
     "B11-2",
     "Sirregular1-late",
     "Sflow_light1-late"
+   ],
+   "conflicts": [
+    "cycle_short",
+    "cycle_random"
    ]
   },
   {
@@ -3893,6 +3908,10 @@
    "from": [
     "B11-3",
     "Sirregular1-random"
+   ],
+   "conflicts": [
+    "cycle_short",
+    "cycle_long"
    ]
   },
   {
@@ -4143,6 +4162,10 @@
    "from": [
     "B11-4",
     "Sflow_light1-dark"
+   ],
+   "conflicts": [
+    "flow_pale",
+    "flow_bright_heavy"
    ]
   },
   {
@@ -4157,11 +4180,15 @@
    "from": [
     "B11-2",
     "Sflow_light1-pale"
+   ],
+   "conflicts": [
+    "flow_dark",
+    "flow_bright_heavy"
    ]
   },
   {
    "id": "flow_bright_heavy",
-   "label": "鮮やかな赤色の出血が多い",
+   "label": "経血の色が鮮やかな赤",
    "weights": {
     "heat": 1
    },
@@ -4171,6 +4198,10 @@
    "from": [
     "B11-8",
     "Sflow_heavy1-bright"
+   ],
+   "conflicts": [
+    "flow_dark",
+    "flow_pale"
    ]
   },
   {
@@ -5581,6 +5612,44 @@
    "from": [
     "B13-4"
    ]
+  },
+  {
+   "id": "irregular_bleeding",
+   "label": "月経以外の時期に出血がある"
+  },
+  {
+   "id": "nail_pale",
+   "label": "爪の色：白っぽい",
+   "weights": {
+    "blood_def": 1
+   },
+   "group": "nail",
+   "conflicts": [
+    "nail_dark"
+   ]
+  },
+  {
+   "id": "nail_dark",
+   "label": "爪の色：紫っぽい・暗い",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "group": "nail",
+   "conflicts": [
+    "nail_pale"
+   ]
+  },
+  {
+   "id": "nail_ridges",
+   "label": "爪：縦すじが目立つ",
+   "weights": {
+    "blood_def": 1
+   },
+   "group": "nail"
+  },
+  {
+   "id": "nail_spoon",
+   "label": "爪：反り返っている・スプーン状"
   }
  ]
 }

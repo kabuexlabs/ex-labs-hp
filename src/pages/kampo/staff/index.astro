@@ -9,14 +9,21 @@ import { clearStaffCookie, pinConfigured } from '../../../lib/kampo/auth';
 import { supervisorName } from '../../../lib/kampo/compute';
 import {
   isKvConfigured, listSessionsByDay, listRecentSessions, searchCustomers, countSessions, purgeExpired, jstDate, fmtJst, customerLabel,
-  STATUS_LABEL, INPUT_BY_LABEL, typeNamesOf,
+  STATUS_LABEL, INPUT_BY_LABEL, typeNamesOf, getStaffRoster, saveStaffRoster, audit,
 } from '../../../lib/kampo/store';
 
 if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
-  if (String(form.get('action') ?? '') === 'leave') {
+  const action = String(form.get('action') ?? '');
+  if (action === 'leave') {
     clearStaffCookie(Astro.cookies);
     return Astro.redirect('/kampo/check/new/', 303);
+  }
+  // 担当者の名簿（薬剤師の入力画面の「担当者」はここから選ぶ。第3弾 10-3）
+  if (action === 'roster' && isKvConfigured()) {
+    await saveStaffRoster(String(form.get('names') ?? '').split(/[\n,、，]/));
+    await audit('roster', 'staffnames');
+    return Astro.redirect('/kampo/staff/?msg=roster#roster', 303);
   }
 }
 const kv = isKvConfigured();
@@ -30,11 +37,12 @@ let sessions: Awaited<ReturnType<typeof listSessionsByDay>> = [];
 let recent: Awaited<ReturnType<typeof listRecentSessions>> = [];
 let customers: Awaited<ReturnType<typeof searchCustomers>> = [];
 let total = 0;
+let roster: string[] = [];
 let loadError = '';
 if (kv) {
   try {
     if (date === today) await purgeExpired().catch((e) => console.error('[kampo] purge', e));
-    [sessions, total, recent] = await Promise.all([listSessionsByDay(date), countSessions(), listRecentSessions(20)]);
+    [sessions, total, recent, roster] = await Promise.all([listSessionsByDay(date), countSessions(), listRecentSessions(20), getStaffRoster()]);
     if (qstr) customers = await searchCustomers(qstr);
   } catch (e) {
     loadError = String((e as Error).message ?? e);
@@ -134,6 +142,14 @@ const urgentCount = sessions.filter((s) => s.urgent).length;
       <dt>CSV書き出し</dt><dd><a href="/kampo/staff/export.csv">全チェックの一覧と回答（CSV）</a></dd>
       <dt>マスタ編集</dt><dd>設問・文面・処方は <code>src/data/kampo/</code> の JSON を直して再デプロイ</dd>
     </dl>
+    <form method="post" id="roster" class="kp-roster">
+      <input type="hidden" name="action" value="roster">
+      <label class="kp-field" style="margin-top:14px">担当者の名簿<small>1行に1人。薬剤師の入力画面の「担当者」はここから選びます（選んだ担当者は以降の記録に自動で入ります）</small>
+        <textarea class="kp-input" name="names" rows="4" placeholder="例：山田（薬剤師）">{roster.join('\n')}</textarea>
+      </label>
+      {msg === 'roster' && <p class="kp-ok" style="margin:8px 0 0">担当者の名簿を保存しました（{roster.length}人）。</p>}
+      <button class="kp-btn ghost small" type="submit" style="margin-top:10px" disabled={!kv}>名簿を保存</button>
+    </form>
   </div>
   <style is:global>.kp-row-urgent td{background:var(--danger-soft)}</style>
 </KampoLayout>

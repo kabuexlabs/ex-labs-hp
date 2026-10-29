@@ -9,6 +9,8 @@ import { mainComplaintGroup, companionComplaints } from '../../../lib/kampo/reco
 import { computeSession, isLegacy } from '../../../lib/kampo/compute';
 import { isKvConfigured, listAllSessions, audit, fmtJst, jstDate } from '../../../lib/kampo/store';
 
+// 薬剤師が ② で入力する妊娠・授乳の補足（texts の「<キー>#staff」）
+const TEXT_LABEL: Record<string, string> = { preg_weeks: '妊娠週数', preg_due: '出産予定日', lact_months: '産後の月数' };
 const esc = (v: unknown) => {
   const s = v === undefined || v === null ? '' : String(v);
   return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
@@ -24,7 +26,7 @@ export const GET: APIRoute = async ({ cookies }) => {
   const header = [
     'セッションID', '開始日時', '完了日時', '状態', 'お客様', '顧客ID', '入力者', '設問版',
     '主となる体質', '併存する傾向', ...AXES.map((t) => `${axisName(t)}（暫定）`), '虚実指数', '寒熱指数',
-    '薬剤師の判定:担当', '薬剤師の判定:体質', '薬剤師の判定:寒熱', '薬剤師の判定:虚実', '薬剤師の判定:漢方薬', '薬剤師の判定:メモ', '薬剤師の判定:日時',
+    '薬剤師の判定:担当', '薬剤師の判定:体質', '薬剤師の判定:寒熱', '薬剤師の判定:虚実', '薬剤師の判定:漢方薬', '薬剤師の判定:メモ', '薬剤師の判定:日時', '判定記録時のAIの判定',
     '直ちに対応', '安全確認タグ', 'タグの確認', '安全フラグ', '記入欄', '漢方候補の表示（体調を崩した経験あり）', ...STAFF_QUESTIONS.map((q) => `薬剤師:${q.title}`),
     '担当', '提案', '渡し方', 'メモ', '提案保存日時',
     'いちばん改善したい主訴', '主訴の詳細', 'ほかの主訴（随伴症状）',
@@ -42,10 +44,11 @@ export const GET: APIRoute = async ({ cookies }) => {
       r ? (r.isBalanced ? 'バランス良好' : r.mainTypes.map(axisName).join('・')) : '', r ? r.subTypes.map(axisName).join('・') : '',
       ...AXES.map((t) => (r ? (Object.entries(r.pct).find(([k]) => toAxis(k) === t)?.[1] ?? '') : '')), r?.defExcIndex ?? '', r?.thermalIndex ?? '',
       j?.staffName ?? '', j ? (j.skipped ? '（記録せずに開いた）' : j.types.map(axisName).join('・')) : '', j?.thermal ?? '', j?.defExc ?? '', j?.formulas ?? '', j?.note ?? '', j ? fmtJst(j.at) : '',
+      j?.ai ? `主:${j.ai.mainTypes.map(axisName).join('・') || '—'}／併存:${j.ai.subTypes.map(axisName).join('・') || '—'}／寒熱:${j.ai.thermalLabel}／虚実:${j.ai.defExcLabel}` : '',
       (c?.urgent ?? s.urgent) ? '1' : '', (c?.tags ?? s.tags ?? []).map((t) => t.label).join('｜'),
       Object.entries(s.tagChecks ?? {}).map(([k, v]) => `${k}:${v.by}${v.note ? `（${v.note}）` : ''}`).join('｜'),
       (c?.safetyFlags ?? s.safetyFlags ?? []).map((f) => `${f.level}:${f.label}`).join('｜'),
-      legacy ? '' : Object.entries(s.texts).map(([k, v]) => { const base = k.replace(/#staff$/, ''); return `${questionById(base)?.id ?? optionText(base)}${k.endsWith('#staff') ? '（薬剤師が確認）' : ''}：${v}`; }).join('｜'),
+      legacy ? '' : Object.entries(s.texts).map(([k, v]) => { const base = k.replace(/#staff$/, ''); return `${TEXT_LABEL[base] ?? questionById(base)?.id ?? optionText(base)}${k.endsWith('#staff') ? '（薬剤師が確認）' : ''}：${v}`; }).join('｜'),
       s.kampoUnlocked ? `${s.kampoUnlocked.by} ${fmtJst(s.kampoUnlocked.at)}` : '',
       ...STAFF_QUESTIONS.map((q) => (s.staffAnswers?.[q.id] ?? []).map(optionText).join('｜')),
       s.proposal?.staffName ?? '', (s.proposal?.selected ?? []).map((x) => x.name).join('・'), s.proposal?.deliveredVia ?? '', s.proposal?.note ?? '', s.proposal ? fmtJst(s.proposal.updatedAt) : '',

@@ -92,6 +92,8 @@ export interface PharmacistJudgment {
   /** 記録せずに AI の判定を開いた */
   skipped?: boolean;
   at: string;
+  /** 判定を記録した時点の AI の判定（精度の検証用に並べて保存。第3弾 9） */
+  ai?: { mainTypes: string[]; subTypes: string[]; thermalLabel: string; defExcLabel: string; pct: Record<string, number> };
 }
 export interface KampoSession {
   id: string;
@@ -351,6 +353,19 @@ export async function purgeExpired(now = new Date()): Promise<{ sessions: number
 }
 
 // --- 監査記録 -----------------------------------------------------------------
+
+/** 担当者の名簿（スタッフ画面で登録。KAMPO_STAFF_NAMES と合わせて使う。第3弾 10-3） */
+const ROSTER = 'kampo:staffnames';
+export async function getStaffRoster(): Promise<string[]> {
+  const raw = await redis('GET', ROSTER).catch(() => null);
+  const kv = typeof raw === 'string' ? (parse<string[]>(raw) ?? []) : [];
+  const env = (readEnv('KAMPO_STAFF_NAMES') ?? '').split(/[,、，]/).map((x) => x.trim()).filter(Boolean);
+  return [...new Set([...env, ...kv])];
+}
+export async function saveStaffRoster(names: string[]): Promise<void> {
+  const clean = [...new Set(names.map((x) => x.trim().slice(0, 30)).filter(Boolean))].slice(0, 50);
+  await redis('SET', ROSTER, JSON.stringify(clean));
+}
 
 export async function audit(action: string, target: string, staffName?: string): Promise<void> {
   try {

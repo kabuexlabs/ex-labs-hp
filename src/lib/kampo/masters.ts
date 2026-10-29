@@ -45,10 +45,10 @@ export const ORGAN_PLAIN: Record<OrganKey, string> = {
   kidney: '腎（成長・老化・水分代謝・足腰の働き）',
 };
 
-export type Section = 'basic' | 'category' | 'complaint' | 'primary' | 'detail' | 'constitution' | 'safety' | 'lifestyle' | 'staff';
+export type Section = 'basic' | 'category' | 'complaint' | 'primary' | 'detail' | 'constitution' | 'safety' | 'lifestyle' | 'tongue' | 'staff';
 export const SECTION_LABEL: Record<Section, string> = {
   basic: '基本情報', category: 'お悩みのカテゴリー', complaint: '具体的なお悩み', primary: 'いちばん改善したいお悩み', detail: 'お悩みの詳細',
-  constitution: '体質チェック', safety: '安全確認', lifestyle: '生活習慣', staff: '薬剤師の観察',
+  constitution: '体質チェック', safety: '安全確認', lifestyle: '生活習慣', tongue: '舌の確認', staff: '薬剤師の観察',
 };
 /** 「特にない」「わからない」「回答しない」：ほかの選択肢と同時に選べない */
 export type Exclusive = 'none' | 'unknown' | 'declined';
@@ -58,7 +58,7 @@ export const STEPS: { label: string; sections: Section[] }[] = [
   { label: 'お悩み', sections: ['category', 'complaint', 'primary', 'detail'] },
   { label: '体質チェック', sections: ['constitution'] },
   { label: '安全確認', sections: ['safety'] },
-  { label: '生活習慣', sections: ['lifestyle'] },
+  { label: '生活習慣・舌の確認', sections: ['lifestyle', 'tongue'] },
 ];
 export const stepOfSection = (sec: Section) => Math.max(0, STEPS.findIndex((x) => x.sections.includes(sec)));
 
@@ -90,6 +90,10 @@ export interface Option {
   staffNote?: string;
   /** 漢方薬の候補（picker）の「見つからない（薬剤師に伝える）」 */
   notfound?: boolean;
+  /** 選ばれたら患者画面・薬剤師画面に出す受診のおすすめ（2026-10-29 第3弾 3-1・11-2） */
+  refer?: string;
+  /** 同じ名前の選択肢はどれか1つ（舌の色の「ふつう・淡白・紅」など。所見の conflicts を持たない選択肢どうし。第3弾 10-4） */
+  oneOf?: string;
   /** 画面内の小見出し（生活習慣。修正依頼 6-1） */
   heading?: string;
   /** 薬剤師の観察で「判断できない」：ご本人の回答を使う（修正依頼 4-10） */
@@ -237,7 +241,7 @@ export interface Formula {
 export interface FormulasData { version: string; source?: string; symptoms: Record<string, SymptomDef>; formulas: Formula[] }
 
 export const CONTRA_CODES = ['pregnancy', 'lactation', 'interferon', 'hypertension', 'heart', 'kidney', 'thyroid', 'glaucoma_bph', 'gi_weak'] as const;
-const SECTIONS: Section[] = ['basic', 'category', 'complaint', 'primary', 'detail', 'constitution', 'safety', 'lifestyle', 'staff'];
+const SECTIONS: Section[] = ['basic', 'category', 'complaint', 'primary', 'detail', 'constitution', 'safety', 'lifestyle', 'tongue', 'staff'];
 
 type Raw = Record<string, unknown>;
 const isObj = (v: unknown): v is Raw => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -375,6 +379,8 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
         if (o.exclusive && strArr(o.findings).length) errs.push(`${o.id}: exclusive の選択肢に所見を付けない`);
         if (o.urgent && !strArr(o.tags).length) errs.push(`${o.id}: urgent の選択肢にタグがない`);
         if ((o.other || o.defer) && (o.exclusive || strArr(o.findings).length)) errs.push(`${o.id}: other／defer の選択肢に所見・exclusive を付けない`);
+        if (o.refer !== undefined && !isStr(o.refer)) errs.push(`${o.id}: refer は受診のおすすめの文言`);
+        if (o.oneOf !== undefined && (!isStr(o.oneOf) || o.exclusive)) errs.push(`${o.id}: oneOf は名前（exclusive と併用しない）`);
       };
       for (const o of opts) checkOpt(o);
       if (isObj(q.sub)) for (const o of (q.sub.options as unknown[]) ?? []) checkOpt(o);

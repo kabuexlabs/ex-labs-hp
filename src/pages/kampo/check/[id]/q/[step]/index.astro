@@ -9,6 +9,8 @@
 //    同じ画面で選んだ選択肢と矛盾する選択肢はグレーで押せない（5-3）。STEP 3 の最初に「お悩みと似た質問もありますが…」（5-2）。
 //  - 薬の名前・病名と時期・手術の内容は、選んだら任意の記入欄を出す（6-1・7-1）。漢方薬は候補から選ぶ（ひらがな・漢字・ツムラ番号。6-3）。
 //  - 「どれもあてはまらない」は小見出しの外に区切って置く（6.5-1）。確認画面の「修正する」から来たら、直したあと確認画面に戻る（8-2）。
+// 2026-10-29 第3弾：記入欄・漢方薬の候補・症状の選択肢は、選んだ選択肢のすぐ下に出す（4・5・6）。最後の設問で進み具合 100%（7）。
+//  同じ oneOf の選択肢はどれか1つ（10-4）。受診のおすすめ（refer）の選択肢を選ぶとその場で表示（3-1）。舌のご本人確認ではイラストを出す（11-1）。
 export const prerender = false;
 import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
 import QMark from '../../../../../../components/kampo/QMark.astro';
@@ -91,7 +93,7 @@ const withImages = q.options.some((o) => o.image);
 const stepIdx = stepOfSection(q.section);
 const inGroup = steps.filter((x) => stepOfSection(x.q.section) === stepIdx);
 const pos = Math.max(0, inGroup.findIndex((x) => x.q.id === q.id));
-const progressPct = Math.round((100 * (stepIdx + pos / Math.max(1, inGroup.length))) / STEPS.length);
+const progressPct = Math.round((100 * (stepIdx + (pos + 1) / Math.max(1, inGroup.length))) / STEPS.length);
 // 同時に選べない選択肢（所見の conflicts）
 const conflictsOf = (o: Option) => q.options.filter((b) => b !== o && selectable(b) && (o.findings ?? []).some((f) => (findingById(f)?.conflicts ?? []).some((x) => (b.findings ?? []).includes(x)))).map((b) => b.id);
 // 小見出しごとに分ける（小見出しのない選択肢は最後のまとまり。小見出しのある設問では区切り線の下に置く）
@@ -102,12 +104,19 @@ for (const o of q.options) {
   else groups.push({ heading: o.heading, options: [o] });
 }
 const hasHeadings = groups.some((g) => g.heading);
+const followups: Followup[] = q.followups ?? [];
+// 記入欄・追加の選択肢を選択肢のすぐ下に出す設問は1列
+const inline = q.options.some((o) => o.note) || followups.length > 0;
 const colsOf = (opts: Option[]) => {
+  if (inline) return 'one';
   const maxLen = Math.max(...opts.map((o) => o.text.length), 0);
   return withImages ? 'imgs' : maxLen <= 8 && opts.length >= 3 ? 'cols4' : maxLen <= 14 && opts.length >= 3 ? 'cols3' : '';
 };
-const noteOpts = q.options.filter((o) => o.note);
-const followups: Followup[] = q.followups ?? [];
+const fuOf = (o: Option) => followups.filter((f) => f.when === o.id);
+const referred = q.options.filter((o) => o.refer && selected.has(o.id));
+// 舌のご本人確認（鏡を見てイラストから選ぶ）：いただいた8種のイラストを見本として出す
+const TONGUE_SAMPLES = [['p1', '白っぽく、歯の跡'], ['p2', '淡白で薄く小さい'], ['p3', '両縁が赤い'], ['p4', '紫色・裏の静脈が太い'], ['p5', '大きく、苔が厚く湿る'], ['p6', '赤く、乾燥し苔が少ない'], ['p7', '白っぽく大きく湿る'], ['p8', '鮮やかな赤で黄色い苔']];
+const showTongue = q.section === 'tongue' && q.id.startsWith('TS_');
 // 漢方薬の候補：名前・読み・商品名・ツムラ番号で探す
 const pickKey = (o: Option) => { const f = o.formula ? formulaByCode(o.formula) : undefined; return f ? [f.name, f.reading, ...(f.aliases ?? [])].join(' ') : o.text; };
 const pickNo = (o: Option) => (o.formula ? formulaByCode(o.formula)?.tsumuraNo ?? '' : '');
@@ -122,6 +131,11 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
     {hint && <p class="kp-qhint">{hint}</p>}
     {q.help && <p class="kp-qhelp">{q.help}</p>}
     {error && <p class="kp-error" style="margin:0 0 16px">{error}</p>}
+    {showTongue && (
+      <div class="kp-tongue-samples" aria-label="舌の見本">
+        {TONGUE_SAMPLES.map(([img, label]) => <figure><img src={`/assets/kampo/tongue/${img}.webp`} alt="" width="72" height="77" loading="lazy"><figcaption>{label}</figcaption></figure>)}
+      </div>
+    )}
     {groups.map((g) => (
       <>
         {g.heading && <p class="kp-opt-h">{g.heading}</p>}
@@ -129,12 +143,58 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
           {g.options.map((o) => {
             const on = o.locked || selected.has(o.id);
             return (
-              <label class:list={['kp-opt', { check: multi, none: !!o.exclusive, 'is-on': on, 'has-img': !!o.image, locked: !!o.locked, 'is-off': !!o.blocked }]}>
-                <input type={multi ? 'checkbox' : 'radio'} name={selectable(o) ? 'opt' : undefined} value={o.id} checked={on} disabled={!selectable(o)}
-                  data-ex={o.exclusive ? '1' : '0'} data-urgent={o.urgent ? '1' : '0'} data-locked={o.locked ? '1' : '0'} data-conf={conflictsOf(o).join(' ')}>
-                {o.image && <img class="kp-opt-img" src={o.image} alt="" width="160" height="236" loading="lazy">}
-                <span class="kp-opt-text">{o.text}{o.locked && <small class="kp-opt-lock">お悩みで選んだ項目</small>}{o.blocked && <small class="kp-opt-lock off">ほかの回答と同時には選べません</small>}</span>
-              </label>
+              <>
+                <label class:list={['kp-opt', { check: multi, none: !!o.exclusive, 'is-on': on, 'has-img': !!o.image, locked: !!o.locked, 'is-off': !!o.blocked }]}>
+                  <input type={multi ? 'checkbox' : 'radio'} name={selectable(o) ? 'opt' : undefined} value={o.id} checked={on} disabled={!selectable(o)}
+                    data-ex={o.exclusive ? '1' : '0'} data-urgent={o.urgent ? '1' : '0'} data-refer={o.refer ? '1' : '0'} data-locked={o.locked ? '1' : '0'} data-conf={conflictsOf(o).join(' ')} data-one={o.oneOf ?? ''}>
+                  {o.image && <img class="kp-opt-img" src={o.image} alt="" width="160" height="236" loading="lazy">}
+                  <span class="kp-opt-text">{o.text}{o.locked && <small class="kp-opt-lock">お悩みで選んだ項目</small>}{o.blocked && <small class="kp-opt-lock off">ほかの回答と同時には選べません</small>}</span>
+                </label>
+                {o.note && (
+                  <label class="kp-notefield" data-for={o.id} hidden={!selected.has(o.id)}>
+                    <span>{o.noteLabel ?? `「${o.text}」：何に出ましたか（任意）`}</span>
+                    <input class="kp-input" type="text" name={`note-${o.id}`} maxlength="60" value={s.texts[o.id] ?? ''} placeholder={o.notePlaceholder ?? ''} autocomplete="off">
+                  </label>
+                )}
+                {fuOf(o).map((fu) => (
+                  <div class:list={['kp-sub', 'kp-fu', 'inline', { picker: fu.picker === 'formulas' }]} data-when={fu.when} data-type={fu.type} hidden={!selected.has(fu.when)}>
+                    <p class="kp-fu-title">{fu.title}</p>
+                    {fu.help && <p class="kp-qhelp" style="margin:0 0 12px">{fu.help}</p>}
+                    {fu.picker === 'formulas' ? (
+                      <>
+                        <p class="kp-picked" data-empty="まだ選んでいません"></p>
+                        <input class="kp-input kp-picker-q" type="search" placeholder="例：ほちゅう／補中益気湯／41" autocomplete="off" enterkeyhint="search">
+                        <div class="kp-opts one kp-picker-list">
+                          {fu.options.filter((x) => !x.notfound).map((x) => (
+                            <label class:list={['kp-opt', 'check', { 'is-on': selected.has(x.id) }]} data-key={pickKey(x)} data-no={pickNo(x)} hidden={!selected.has(x.id)}>
+                              <input type="checkbox" name="fu" value={x.id} checked={selected.has(x.id)} data-ex="0">
+                              <span class="kp-opt-text">{x.text}{pickNo(x) && <small class="kp-opt-lock" style="color:var(--muted)">ツムラ {pickNo(x)}</small>}</span>
+                            </label>
+                          ))}
+                        </div>
+                        <p class="kp-picker-none" hidden>候補が見つかりません。下の「見つからない（薬剤師に伝える）」を選んでください。</p>
+                        <div class="kp-opts one" style="margin-top:12px">
+                          {fu.options.filter((x) => x.notfound).map((x) => (
+                            <label class:list={['kp-opt', 'check', 'none', { 'is-on': selected.has(x.id) }]}>
+                              <input type="checkbox" name="fu" value={x.id} checked={selected.has(x.id)} data-ex="0">
+                              <span class="kp-opt-text">{x.text}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <div class="kp-opts cols3">
+                        {fu.options.map((x) => (
+                          <label class:list={['kp-opt', { check: fu.type === 'multi', none: !!x.exclusive, 'is-on': selected.has(x.id) }]}>
+                            <input type={fu.type === 'multi' ? 'checkbox' : 'radio'} name="fu" value={x.id} checked={selected.has(x.id)} data-ex={x.exclusive ? '1' : '0'}>
+                            <span class="kp-opt-text">{x.text}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </>
             );
           })}
         </div>
@@ -146,54 +206,8 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
         <input class="kp-input" type="text" name="note-q" maxlength="120" value={s.texts[q.id] ?? ''} placeholder={q.note.placeholder ?? ''} autocomplete="off">
       </label>
     )}
-    {noteOpts.map((o) => (
-      <label class="kp-notefield" data-for={o.id} hidden={!selected.has(o.id)}>
-        <span>{o.noteLabel ?? `「${o.text}」：何に出ましたか（任意）`}</span>
-        <input class="kp-input" type="text" name={`note-${o.id}`} maxlength="60" value={s.texts[o.id] ?? ''} placeholder={o.notePlaceholder ?? ''} autocomplete="off">
-      </label>
-    ))}
-    {followups.map((fu) => (
-      <div class:list={['kp-sub', 'kp-fu', { picker: fu.picker === 'formulas' }]} data-when={fu.when} data-type={fu.type} hidden={!selected.has(fu.when)}>
-        <div class="kp-q" style="margin-bottom:18px"><QMark /><h2 class="kp-qtitle" style="font-size:24px">{fu.title}</h2></div>
-        {fu.help && <p class="kp-qhelp">{fu.help}</p>}
-        {fu.picker === 'formulas' ? (
-          <>
-            <p class="kp-picked" data-empty="まだ選んでいません"></p>
-            <input class="kp-input kp-picker-q" type="search" placeholder="例：ほちゅう／補中益気湯／41" autocomplete="off" enterkeyhint="search">
-            <div class="kp-opts one kp-picker-list">
-              {fu.options.filter((o) => !o.notfound).map((o) => (
-                <label class:list={['kp-opt', 'check', { 'is-on': selected.has(o.id) }]} data-key={pickKey(o)} data-no={pickNo(o)} hidden={!selected.has(o.id)}>
-                  <input type="checkbox" name="fu" value={o.id} checked={selected.has(o.id)} data-ex="0">
-                  <span class="kp-opt-text">{o.text}{pickNo(o) && <small class="kp-opt-lock" style="color:var(--muted)">ツムラ {pickNo(o)}</small>}</span>
-                </label>
-              ))}
-            </div>
-            <p class="kp-picker-none" hidden>候補が見つかりません。下の「見つからない（薬剤師に伝える）」を選んでください。</p>
-            <div class="kp-opts one" style="margin-top:14px">
-              {fu.options.filter((o) => o.notfound).map((o) => (
-                <label class:list={['kp-opt', 'check', 'none', { 'is-on': selected.has(o.id) }]}>
-                  <input type="checkbox" name="fu" value={o.id} checked={selected.has(o.id)} data-ex="0">
-                  <span class="kp-opt-text">{o.text}</span>
-                </label>
-              ))}
-            </div>
-          </>
-        ) : (
-          <>
-            {fu.type === 'multi' && <p class="kp-qhint">※あてはまるものをすべて選んでください</p>}
-            <div class:list={['kp-opts', colsOf(fu.options)]}>
-              {fu.options.map((o) => (
-                <label class:list={['kp-opt', { check: fu.type === 'multi', none: !!o.exclusive, 'is-on': selected.has(o.id) }]}>
-                  <input type={fu.type === 'multi' ? 'checkbox' : 'radio'} name="fu" value={o.id} checked={selected.has(o.id)} data-ex={o.exclusive ? '1' : '0'}>
-                  <span class="kp-opt-text">{o.text}</span>
-                </label>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    ))}
     <p class="kp-alert refer" id="alert-urgent" hidden>すぐに近くのスタッフにお声がけください。回答はこのまま続けられます。</p>
+    <div class="kp-alert refer" id="alert-refer" hidden>{q.options.filter((o) => o.refer).map((o) => <p data-for={o.id} hidden={!referred.includes(o)}>{o.refer}</p>)}</div>
     {q.sub && (
       <div class="kp-sub">
         <div class="kp-q" style="margin-bottom:22px"><QMark /><h2 class="kp-qtitle" style="font-size:26px">{q.sub.title}</h2></div>
@@ -236,6 +250,13 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
   .kp-picker-list{margin-top:10px;gap:10px}
   .kp-picker-list .kp-opt{min-height:64px}
   .kp-picker-none{margin-top:10px;font-size:14px;color:var(--muted)}
+  .kp-fu.inline{margin:6px 0 10px;padding:16px 18px;border:1px solid #BFE3F2;background:var(--sky-mist)}
+  .kp-fu-title{font-size:17px;font-weight:500;letter-spacing:.06em;margin:0 0 8px}
+  .kp-opts.one>.kp-notefield{margin-top:2px;margin-bottom:8px}
+  .kp-tongue-samples{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 22px}
+  .kp-tongue-samples figure{margin:0;text-align:center;font-size:12px;color:var(--ink-2)}
+  .kp-tongue-samples img{width:100%;max-width:90px;height:auto;mix-blend-mode:multiply}
+  #alert-refer p[hidden]{display:none}
   </style>
   <script is:inline>
   (function(){
@@ -251,6 +272,8 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
     function blockConflicts(){
       var off={};
       opts.forEach(function(i){if(i.checked&&i.dataset.conf)i.dataset.conf.split(' ').forEach(function(x){off[x]=1})});
+      // oneOf：同じ名前の選択肢は、1つ選んだらほかはグレー
+      opts.forEach(function(i){if(i.checked&&i.dataset.one)opts.forEach(function(o){if(o!==i&&o.dataset.one===i.dataset.one)off[o.value]=1})});
       opts.forEach(function(i){var b=!!off[i.value]&&!i.checked;i.disabled=b;i.closest('.kp-opt').classList.toggle('is-off',b)});
     }
     function sync(){
@@ -258,6 +281,7 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
       blockConflicts();
       A('.kp-opt input').forEach(function(i){if(i.dataset.locked!=='1')i.closest('.kp-opt').classList.toggle('is-on',i.checked)});
       var el=document.getElementById('alert-urgent');if(el)el.hidden=!checked.some(function(i){return i.dataset.urgent==='1'});
+      var rf=document.getElementById('alert-refer');if(rf){var any=false;A('p[data-for]',rf).forEach(function(p){var o=opts.filter(function(i){return i.value===p.dataset.for})[0];p.hidden=!(o&&o.checked);any=any||!p.hidden});rf.hidden=!any}
       A('.kp-notefield[data-for]').forEach(function(n){var o=opts.filter(function(i){return i.value===n.dataset.for})[0];n.hidden=!(o&&o.checked)});
       A('.kp-notefield[data-qnote]').forEach(function(n){var ex=(n.dataset.except||'').split(' ');n.hidden=!checked.some(function(i){return !isEx(i)&&ex.indexOf(i.value)<0})});
       fuBoxes.forEach(function(b){var w=opts.filter(function(i){return i.value===b.dataset.when})[0];b.hidden=!(w&&w.checked);if(b.hidden)A('input[name=fu]',b).forEach(function(i){i.checked=false});renderPicker(b)});
