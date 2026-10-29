@@ -15,6 +15,8 @@ export const IP_SERVICE = {
   },
   intro: {
     title: ['IP・キャラクターを', '活用した', 'イベント企画・制作'],
+    // 本文（body）の内容を図にしたもの
+    diagram: { lead: '原作の世界観を「見せる」だけでなく、来場者が物語の中で役割を持つ体験に組み立てます。', from: '作品・キャラクターの設定・登場人物', mids: ['行動', '会話', '選択'], to: '来場者が物語の中で役割を持つ体験' },
     body: [
       '株式会社ex Labsは、作品やキャラクターの設定・登場人物を、来場者の**行動・会話・選択**につなげる体験型イベントを企画・制作しています。原作の世界観を展示やパネルで「見せる」だけでなく、来場者が物語の中で役割を持ち、登場人物と言葉を交わし、手がかりを調べて判断する体験に組み立てます。',
     ],
@@ -53,6 +55,7 @@ export const IP_SERVICE = {
     },
     {
       id: 'formats', en: 'Formats', ja: ['体験の形式と', '向いている目的'], type: 'table', keyCols: [1, 2],
+      rowImgs: ['/assets/events/kaitou-kv.webp', '/assets/events/uwasabanashi-kv.webp', '/assets/work-2.webp', '/assets/zunousen/present-poker.webp', ''],
       lead: '目的・会場・想定人数に合わせて、4つの形式から組み立てます。形式を組み合わせることもできます。',
       cols: ['形式', '来場者がすること', '向いている目的', '参考になる当社の制作'],
       rows: [

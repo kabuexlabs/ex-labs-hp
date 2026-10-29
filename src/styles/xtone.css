@@ -482,3 +482,50 @@
 :root body.x-body .xs-rel-list a>span[aria-hidden]{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--x-lime);color:var(--x-ink);border:2px solid var(--x-ink);font-weight:800;line-height:1;transition:transform .2s}
 :root body.x-body .xs-rel-list a:hover>span[aria-hidden]{transform:translateX(3px)}
 @media(prefers-reduced-motion:reduce){:root body.x-body .xs-rel-list a,:root body.x-body .xs-rel-list a>span[aria-hidden]{transition:none}}
+
+/* =====================================================================
+   サービス各ページの視覚化（実績の写真・図）
+   ===================================================================== */
+/* ヒーロー：このページの実績の写真を重ねて並べる */
+:root body.x-body .xs-hero-ph{margin-top:36px;display:flex;align-items:flex-end;padding-left:8px}
+:root body.x-body .xs-hero-ph-i{flex:0 0 auto;width:clamp(96px,24vw,170px);aspect-ratio:3/4;margin-left:-8px;border-radius:14px;border:2px solid var(--x-ink);overflow:hidden;background:var(--x-panel);box-shadow:var(--x-shadow);transform:rotate(calc((var(--i) - 1.5) * 3deg)) translateY(calc(var(--i) * -4px))}
+:root body.x-body .xs-hero-ph-i img{width:100%;height:100%;object-fit:cover;display:block}
+/* 本文の図（from → 中段 → to）：中段は折り返してよい */
+:root body.x-body .xs-dg{max-width:640px}
+:root body.x-body .xs-dg-from,:root body.x-body .xs-dg-to{border-radius:var(--x-r-s);line-height:1.6}
+:root body.x-body .xs-dg-mids div{white-space:normal;line-height:1.45;display:grid;place-items:center;border-radius:var(--x-r-s)}
+:root body.x-body .xs-dg-arrow{color:var(--x-blue);font-weight:800}
+/* チェックつきの一覧 */
+:root body.x-body .xs-chk{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--x-lime);color:var(--x-ink);border:2px solid var(--x-ink);align-self:start;margin-top:2px}
+:root body.x-body .xs-li{align-items:start}
+/* 画像（ぼかした背景の上にポスター全体） */
+:root body.x-body .xs-cover{position:relative;aspect-ratio:16/10;overflow:hidden;border-radius:var(--x-r-s);background:var(--x-ink)}
+:root body.x-body .xs-cover::before{content:'';position:absolute;inset:-20px;background:var(--bg) center/cover no-repeat;filter:blur(16px) brightness(.55);transform:scale(1.1)}
+:root body.x-body .xs-cover img{position:relative;display:block;height:100%;width:100%;object-fit:contain}
+:root body.x-body .xs-cardc>.xs-cover{margin:calc(-1 * clamp(24px,4vw,40px)) calc(-1 * clamp(24px,4vw,40px)) 4px;border-radius:0}
+:root body.x-body .xs-tr>.xs-cover{aspect-ratio:16/7;border-radius:0}
+/* 参考価格の階段・納期の帯 */
+:root body.x-body .xs-figs{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px;align-items:start}
+:root body.x-body .xs-fig{margin:0;padding:24px clamp(18px,3vw,28px);background:var(--x-panel);border:var(--x-bd);border-radius:var(--x-r-m)}
+:root body.x-body .xs-fig-h{margin:0 0 20px;font-weight:700;font-size:16px;letter-spacing:.08em;color:var(--x-lime)}
+:root body.x-body .xs-fig-note{margin:16px 0 0;font-size:13px;line-height:1.8;color:var(--x-pale)}
+:root body.x-body .xs-price{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));grid-template-rows:auto auto;column-gap:10px;row-gap:10px}
+:root body.x-body .xs-price li{display:contents}
+:root body.x-body .xs-price-v{grid-column:var(--c);grid-row:1;align-self:end;display:grid;gap:8px;text-align:center}
+:root body.x-body .xs-price-p{font-weight:700;font-size:clamp(13px,3.6vw,16px);line-height:1.35;color:#fff}
+:root body.x-body .xs-price-bar{display:block;height:calc(28px + var(--h) * 92px);border-radius:12px 12px 4px 4px;background:var(--x-lime);border:2px solid var(--x-ink)}
+:root body.x-body .xs-price-l{grid-column:var(--c);grid-row:2;display:grid;gap:4px;text-align:center}
+:root body.x-body .xs-price-t{font-weight:700;font-size:13px;line-height:1.5;color:#fff}
+:root body.x-body .xs-price-d{font-size:11.5px;line-height:1.5;color:var(--x-pale2)}
+:root body.x-body .xs-ltm{position:relative;display:grid;gap:16px;padding-bottom:26px}
+:root body.x-body .xs-ltm-t{margin:0 0 8px;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;font-weight:700;font-size:14px;line-height:1.5}
+:root body.x-body .xs-ltm-t span{color:var(--x-lime);font-size:13.5px}
+:root body.x-body .xs-ltm-track{position:relative;height:16px;border-radius:999px;background:rgba(255,255,255,.14)}
+:root body.x-body .xs-ltm-track span{position:absolute;top:-1px;bottom:-1px;border-radius:999px;background:var(--x-lime);border:2px solid var(--x-ink)}
+:root body.x-body .xs-ltm-axis{position:absolute;left:0;right:0;bottom:0;height:18px;font-family:var(--x-en);font-weight:700;font-size:11px;color:var(--x-pale2)}
+:root body.x-body .xs-ltm-axis span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+:root body.x-body .xs-ltm-axis span:first-child{transform:none}
+:root body.x-body .xs-ltm-axis span:last-child{transform:translateX(-100%)}
+:root body.x-body .xs-price-l{align-content:start}
+:root body.x-body .xs-price-p{letter-spacing:0}
+@media(max-width:420px){:root body.x-body .xs-price-p{font-size:12.5px}:root body.x-body .xs-price{column-gap:8px}:root body.x-body .xs-fig{padding:22px 16px}}

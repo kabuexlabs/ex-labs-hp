@@ -57,6 +57,16 @@ const badgesOf = (c: any) => {
 const keyColsOf = (sec: any): number[] => sec.keyCols ?? ((sec.cols as string[]).length - 1 <= 3 ? (sec.cols as string[]).slice(1).map((_, j) => j + 1) : [1, 2]);
 // 長い一覧・条件は先頭だけ見せて、残りは「ほか n件を見る」に畳む
 const KV_OPEN = 3;
+// ヒーローに並べる実績の写真（このページの実績カード・作品・ギャラリーの画像から、重複を除いて最大4枚）
+const heroImgs = [...new Set(sections.flatMap((s) => (s.type === 'cards' && s.id === 'works') || s.type === 'titles' || s.type === 'gallery' ? (s.items as any[]).map((it) => it.img).filter(Boolean) : []))].slice(0, 4) as string[];
+// 条件（kv）のうち、図（参考価格の階段・納期の帯）で見せた項目は「ほかの条件」に回す
+const kvShown = (sec: any) => (sec.items as any[]).filter((kv) => !((sec.priceSteps && /参考価格/.test(kv.k)) || (sec.leadTimes && /^納期/.test(kv.k))));
+const kvMoved = (sec: any) => (sec.items as any[]).filter((kv) => !kvShown(sec).includes(kv));
+// 最初から見せる条件（先頭3項目。4項目だけなら全部）と、「ほかの条件を見る」に畳む条件
+const kvTop = (sec: any) => { const sh = kvShown(sec); return sh.length > KV_OPEN + 1 ? sh.slice(0, KV_OPEN) : sh; };
+const kvRest = (sec: any) => [...kvShown(sec).slice(kvTop(sec).length), ...kvMoved(sec)];
+// 納期の帯：横軸は 0〜3ヶ月
+const LEAD_MAX = 3;
 const FACT_OPEN = 3;
 const faqLd = faqSec ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqSec.items.map((f: any) => ({ '@type': 'Question', name: flat(f.q), acceptedAnswer: { '@type': 'Answer', text: flat(f.a) } })) } : null;
 const crumbLd = { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
@@ -89,6 +99,11 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
       {(raw.hero.ctas as any[]).map((c) => <a href={c.href} class={`x-btn xs-cta ${c.primary ? 'is-lime' : 'is-line'}`} data-track={c.href === '#contact' ? 'cta' : undefined} data-show={c.href === '#contact' ? 'contact' : undefined} data-place={c.href === '#contact' ? `svc-${slug}-hero` : undefined}>{c.label}</a>)}
     </div>
     {raw.hero.note && <p class="xs-note"><Cls text={raw.hero.note} emph={false} /></p>}
+    {heroImgs.length >= 2 && (
+      <div class="xs-hero-ph" aria-hidden="true">
+        {heroImgs.map((src, i) => <span class="xs-hero-ph-i" style={`--i:${i}`}><img src={src} alt="" loading={i < 2 ? 'eager' : 'lazy'} decoding="async"></span>)}
+      </div>
+    )}
     <nav class="xs-toc" aria-label="このページの内容">
       <p class="xs-toc-h">Contents<span>このページの内容</span></p>
       <div class="x-rail is-bleed" style="--gtc:repeat(auto-fill,minmax(min(100%,230px),1fr));--gap:8px;--col:70%;margin-top:16px">
@@ -108,7 +123,7 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
         <div class="xs-dg">
           <div class="xs-dg-from">{raw.intro.diagram.from}</div>
           <div class="xs-dg-arrow" aria-hidden="true">↓</div>
-          <div class="xs-dg-mids">{(raw.intro.diagram.mids as string[]).map((m) => <div>{m}</div>)}</div>
+          <div class="xs-dg-mids" style={`grid-template-columns:repeat(${raw.intro.diagram.mids.length},minmax(0,1fr))`}>{(raw.intro.diagram.mids as string[]).map((m) => <div>{m}</div>)}</div>
           <div class="xs-dg-arrow" aria-hidden="true">↓</div>
           <div class="xs-dg-to"><Cls text={raw.intro.diagram.to} emph={false} /></div>
         </div>
@@ -168,7 +183,7 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
 
       {s.type === 'list' && (
         <div {...railAttrs('list')}>
-          {(s.items as string[]).map((it, i) => <div class="xs-li"><span class="xs-no">{pad(i + 1)}</span><span class="xs-li-t"><Cls text={it} emph={false} /></span></div>)}
+          {(s.items as string[]).map((it) => <div class="xs-li"><span class="xs-chk" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="xs-li-t"><Cls text={it} emph={false} /></span></div>)}
         </div>
       )}
       {s.type === 'numbered' && (
@@ -185,7 +200,8 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
               return (
               <div class="xs-cardc">
                 {c.preview && findLinkPreviewTarget(c.preview) && <a class="xs-cardc-pv" href={c.preview} target="_blank" rel="noopener" data-track="show" data-show="ntv" data-place={`svc-${slug}-works`} aria-label={`${c.title}（公式サイト）`}><span class="xs-cardc-img" data-link-preview={c.preview}><span class="xs-pv-k">TV</span><span class="xs-pv-t">{c.title}</span></span></a>}
-                <div class:list={['xs-cardc-h', { 'has-th': c.img }]}>{c.img && <img class="xs-cardc-th" src={c.img} alt="" loading="lazy" decoding="async">}<span class="xs-cardc-no">{c.no}</span><h3><Cls text={c.title} emph={false} /></h3></div>
+                {c.img && <div class="xs-cover" style={`--bg:url(${c.img})`}><img src={c.img} alt="" loading="lazy" decoding="async"></div>}
+                <div class="xs-cardc-h"><span class="xs-cardc-no">{c.no}</span><h3><Cls text={c.title} emph={false} /></h3></div>
                 {badges.length > 0 && <p class="xs-badges">{badges.map((b) => <span>{b}</span>)}</p>}
                 <div class="xs-cardc-sub"><Rich text={c.sub} /></div>
                 {bl.rows.length > 0 && <dl class="xs-cardc-dl">{bl.rows.map(([k, v]) => <div><dt>{k}</dt><dd><Cls text={v} emph={false} /></dd></div>)}</dl>}
@@ -210,6 +226,7 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
         <div {...railAttrs('table')}>
           {(s.rows as string[][]).map((r, i) => (
             <div class="xs-tr">
+              {s.rowImgs?.[i] && <div class="xs-cover is-wide" style={`--bg:url(${s.rowImgs[i]})`}><img src={s.rowImgs[i]} alt="" loading="lazy" decoding="async"></div>}
               <div class="xs-tr-h"><span class="xs-tr-no">{pad(i + 1)}</span><p><Cls text={r[0]} emph={false} /></p></div>
               <div class="xs-tr-b">
                 {keyColsOf(s).map((j) => <div><p class="xs-tr-k">{s.cols[j]}</p><div class="xs-tr-v"><Rich text={r[j]} /></div></div>)}
@@ -225,12 +242,44 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
           ))}
         </div>
       )}
+      {s.type === 'kv' && (s.priceSteps || s.leadTimes) && (
+        <div class="xs-figs">
+          {s.priceSteps && (
+            <figure class="xs-fig">
+              <figcaption class="xs-fig-h">{s.priceSteps.title}</figcaption>
+              <ol class="xs-price" style={`--n:${s.priceSteps.steps.length}`}>
+                {(s.priceSteps.steps as any[]).map((st, i) => (
+                  <li style={`--c:${i + 1};--h:${(i + 1) / s.priceSteps.steps.length}`}>
+                    <span class="xs-price-v"><span class="xs-price-p">{st.p}</span><span class="xs-price-bar" aria-hidden="true"></span></span>
+                    <span class="xs-price-l"><span class="xs-price-t">{st.t}</span>{st.d && <span class="xs-price-d">{st.d}</span>}</span>
+                  </li>
+                ))}
+              </ol>
+              {s.priceSteps.note && <p class="xs-fig-note">{s.priceSteps.note}</p>}
+            </figure>
+          )}
+          {s.leadTimes && (
+            <figure class="xs-fig">
+              <figcaption class="xs-fig-h">納期の目安</figcaption>
+              <div class="xs-ltm">
+                {(s.leadTimes as any[]).map((lt) => (
+                  <div class="xs-ltm-r">
+                    <p class="xs-ltm-t">{lt.t}<span>{lt.v}</span></p>
+                    <div class="xs-ltm-track" aria-hidden="true"><span style={`left:${(lt.from / LEAD_MAX) * 100}%;width:${((lt.to - lt.from) / LEAD_MAX) * 100}%`}></span></div>
+                  </div>
+                ))}
+                <div class="xs-ltm-axis" aria-hidden="true">{Array.from({ length: LEAD_MAX + 1 }).map((_, m) => <span style={`left:${(m / LEAD_MAX) * 100}%`}>{m === 0 ? '0' : `${m}ヶ月`}</span>)}</div>
+              </div>
+            </figure>
+          )}
+        </div>
+      )}
       {s.type === 'kv' && (
         <div class="x-wcard is-s xs-kv">
-          {(s.items as any[]).slice(0, s.items.length > KV_OPEN + 1 ? KV_OPEN : undefined).map((kv) => <div class="xs-kv-r"><p class="xs-kv-k"><Cls text={kv.k} emph={false} /></p><div class="xs-kv-v"><Rich text={kv.v} /></div></div>)}
-          {s.items.length > KV_OPEN + 1 && (
-            <details class="xs-more xs-kv-more"><summary>ほかの条件を見る（{(s.items as any[]).slice(KV_OPEN).map((kv) => plain(kv.k)).join('・')}）</summary>
-              {(s.items as any[]).slice(KV_OPEN).map((kv) => <div class="xs-kv-r"><p class="xs-kv-k"><Cls text={kv.k} emph={false} /></p><div class="xs-kv-v"><Rich text={kv.v} /></div></div>)}
+          {kvTop(s).map((kv) => <div class="xs-kv-r"><p class="xs-kv-k"><Cls text={kv.k} emph={false} /></p><div class="xs-kv-v"><Rich text={kv.v} /></div></div>)}
+          {kvRest(s).length > 0 && (
+            <details class="xs-more xs-kv-more"><summary>ほかの条件を見る（{kvRest(s).map((kv) => plain(kv.k)).join('・')}）</summary>
+              {kvRest(s).map((kv) => <div class="xs-kv-r"><p class="xs-kv-k"><Cls text={kv.k} emph={false} /></p><div class="xs-kv-v"><Rich text={kv.v} /></div></div>)}
             </details>
           )}
         </div>
