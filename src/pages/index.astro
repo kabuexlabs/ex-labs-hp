@@ -12,6 +12,8 @@ import { eventsData } from '../data/events/index';
 import { guideArticles } from '../data/guides';
 import { jstDateString } from '../lib/thisWeek';
 import { mediaItems } from '../data/media';
+import { findLinkPreviewTarget } from '../lib/linkPreview';
+import LinkPreviewScript from '../components/LinkPreviewScript.astro';
 
 // メディア掲載の告知（ヒーロー下）と会社欄の掲載一覧。最優先の掲載は src/data/media.ts の先頭
 const topMedia = mediaItems[0];
@@ -365,7 +367,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
       {works.map((w) => (
         <article class="xt-work">
           <div style="position:relative">
-            {w.img ? <img src={w.img} alt={w.title} loading="lazy" decoding="async"> : <div class="xt-work-panel" aria-hidden="true"><span class="xt-work-panel-k">TV</span><span class="xt-work-panel-t">{w.title}</span><span class="xt-work-panel-c">{w.client}</span></div>}
+            {w.img ? <img src={w.img} alt={w.title} loading="lazy" decoding="async"> : <div class="xt-work-panel" aria-hidden="true" data-link-preview={w.href && findLinkPreviewTarget(w.href) ? w.href : undefined}><span class="xt-work-panel-k">TV</span><span class="xt-work-panel-t">{w.title}</span><span class="xt-work-panel-c">{w.client}</span></div>}
             <span class="xt-work-cat">{w.cat}</span>
           </div>
           <div>
@@ -386,6 +388,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
     </div>
   </div>
 </section>
+<LinkPreviewScript />
 
 <section class="xt-pad16">
   <div class="x-wcard xt-card is-perf">
