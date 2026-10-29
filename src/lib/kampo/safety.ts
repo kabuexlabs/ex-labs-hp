@@ -8,12 +8,14 @@
 //     「すぐに近くのスタッフにお声がけください」、スタッフ一覧に印。119番の一律表示はしない（改修指示 5-5）。
 // 全員共通のレッドフラッグ質問・「日常生活への影響」×期間による機械的な受診勧奨はやめた（改修指示 5-1・4-7）。
 // 2026-10-28 修正依頼 第5章：アレルギーと副作用歴は1問（C3）にまとめ、記入内容は「口頭で確認」の印つきで分けて出す。
-// 服用中・体調を崩した漢方薬の名前は患者に選ばせず、薬剤師が入力する（X_kampo_current・X_kampo_adverse）。
+// 服用中・体調を崩した漢方薬は、ご本人が候補から選び（C1KP・C3KP。見つからなければ「見つからない」）、薬剤師が確認・修正する
+// （X_kampo_current・X_kampo_adverse。2026-10-29 第2弾 6-3）。体調を崩した漢方薬と同じ漢方薬は候補から除外する（6-4）。
+// 薬の名前・病名・手術・アレルギーの記入内容は、薬剤師が確認・修正した内容（texts の「<ID>#staff」）を優先して出す。
 // 安全確認タグは薬剤師が「確認した」を記録するまで未確認として残す。妊娠・授乳が未回答なら口頭で確認するまで提案を確定しない。
 // ---------------------------------------------------------------------------
 import { optionById, optionText, complaintById, tagById, formulaByCode, type SafetyTagDef } from './masters.ts';
 import { isPresent } from './findings.ts';
-import { kampoCodes, type Answers, type WalkResult } from './flow.ts';
+import { kampoOf, type Answers, type WalkResult } from './flow.ts';
 
 export type SafetyLevel = 'refer' | 'warn' | 'info';
 export interface SafetyFlag {
@@ -32,7 +34,7 @@ export const FLAG_LABEL: Record<string, string> = {
   glaucoma_bph: '緑内障・前立腺肥大', kidney: '腎臓の病気', liver: '肝臓の病気', diabetes: '糖尿病', cancer: 'がん治療中', other_disease: 'その他の病気',
   gi_weak: '胃腸が弱い', pregnancy: '妊娠中・可能性あり', lactation: '授乳中', allergy: 'アレルギー歴', adverse_kampo: '漢方で体調を崩した経験',
   allergy_drug: '薬のアレルギー歴', allergy_food: '食品のアレルギー歴', surgery: '手術歴', preg_unconfirmed: '妊娠・授乳が未確認', minor: '10代',
-  notebook: 'お薬手帳',
+  disease_note: '治療中の病気（病名・時期）',
 };
 /** 安全確認の入力（患者の回答のほか、薬剤師の入力・記入欄・タグの確認） */
 export interface SafetyInput {
@@ -56,7 +58,17 @@ const chosenIn = (answers: Answers, qid: string) => answers[qid] ?? [];
 const nonExclusive = (ids: string[]) => ids.filter((id) => !optionById(id)?.exclusive);
 
 const names = (codes: string[]) => codes.map((c) => formulaByCode(c)?.name ?? c).join('・');
-const noteOf = (input: SafetyInput, id: string) => (input.texts?.[id] ?? '').trim();
+/** 記入内容：薬剤師が確認・修正した内容があればそれ、なければご本人の記入 */
+export function noteText(texts: Record<string, string> | undefined, id: string): { text: string; by: 'staff' | 'patient' | 'none' } {
+  const st = (texts?.[`${id}#staff`] ?? '').trim();
+  if (st) return { text: st, by: 'staff' };
+  const p = (texts?.[id] ?? '').trim();
+  return p ? { text: p, by: 'patient' } : { text: '', by: 'none' };
+}
+const noteLine = (input: SafetyInput, id: string) => {
+  const n = noteText(input.texts, id);
+  return n.by === 'staff' ? `「${n.text}」（薬剤師が確認）` : n.by === 'patient' ? `記入：「${n.text}」（口頭で確認）` : '記入なし（口頭で確認）';
+};
 /** 妊娠・授乳の回答：薬剤師が口頭で確認した入力（X_preg）が患者の回答（A3P）より優先 */
 export function pregnancyAnswer(answers: Answers, w: WalkResult, input: SafetyInput = {}): { ids: string[]; source: 'A3P' | 'X_preg'; unconfirmed: boolean } {
   const staff = input.staffAnswers?.['X_preg'] ?? [];
@@ -71,21 +83,30 @@ export function safetyFlags(answers: Answers, w: WalkResult, input: SafetyInput 
   const flags: SafetyFlag[] = [];
   const push = (f: SafetyFlag) => { if (!flags.some((x) => x.code === f.code)) flags.push(f); };
   const meds = nonExclusive(chosenIn(answers, 'C1'));
-  if (meds.length) {
-    push({ code: 'meds', level: 'warn', label: '服用中の薬', detail: `${meds.map(optionText).join('・')}（薬の名前は薬剤師が確認）`, source: 'C1' });
+  const otherMeds = meds.filter((id) => id !== 'C1-kampo' && !id.startsWith('C1KP-'));
+  if (otherMeds.length) {
+    push({ code: 'meds', level: 'warn', label: '服用中の薬', detail: `${otherMeds.map(optionText).join('・')}／薬の名前：${noteLine(input, 'C1')}`, source: 'C1' });
     if (meds.includes('C1-interferon')) push({ code: 'interferon', level: 'warn', label: 'インターフェロン製剤を使用', detail: '小柴胡湯との併用禁忌。柴胡を含む漢方薬は確認が必要', source: 'C1' });
   }
-  const current = kampoCodes(input.staffAnswers, 'X_kampo_current');
-  const takesKampo = chosenIn(answers, 'C1K').includes('C1K-yes');
-  if (takesKampo || current.length) {
-    push({ code: 'kampo_current', level: 'warn', label: '服用中の漢方薬', detail: current.length ? `${names(current)}（薬剤師が入力）` : '名前は未入力（お薬手帳・口頭で確認して、観察の欄に入力してください）', source: current.length ? '薬剤師の入力' : 'C1K' });
+  const cur = kampoOf(answers, input.staffAnswers, 'X_kampo_current');
+  if (meds.includes('C1-kampo') || cur.codes.length) {
+    const who = cur.source === 'staff' ? '（薬剤師が確認）' : cur.source === 'patient' ? '（ご本人が選択。薬剤師が確認・修正）' : '';
+    push({
+      code: 'kampo_current', level: 'warn', label: '服用中の漢方薬',
+      detail: `${cur.codes.length ? `${names(cur.codes)}${who}` : '名前は未確認'}${cur.notfound ? '／ご本人が「見つからない」を選択（口頭で確認）' : ''}`,
+      source: cur.source === 'staff' ? '薬剤師の入力' : 'C1',
+    });
   }
-  const nb = chosenIn(answers, 'C1NB')[0];
-  if (nb && (takesKampo || meds.length)) push({ code: 'notebook', level: 'info', label: 'お薬手帳', detail: nb === 'C1NB-yes' ? 'お持ち（薬の名前を確認できます）' : 'お持ちでない（薬の名前を口頭で確認）', source: 'C1NB' });
   for (const id of chosenIn(answers, 'C2')) {
     for (const code of optionById(id)?.flags ?? []) {
       push({ code, level: LEVEL_OF[code] ?? 'warn', label: FLAG_LABEL[code] ?? optionText(id), detail: DISEASE_DETAIL[code] ?? DISEASE_NOTE[code], source: 'C2' });
     }
+  }
+  const diseases = nonExclusive(chosenIn(answers, 'C2')).filter((id) => id !== 'C2-surgery');
+  if (diseases.length) push({ code: 'disease_note', level: 'info', label: '治療中の病気（病名・時期）', detail: `${diseases.map(optionText).join('・')}／${noteLine(input, 'C2')}`, source: 'C2' });
+  if (chosenIn(answers, 'C2').includes('C2-surgery')) {
+    const f = flags.find((x) => x.code === 'surgery');
+    if (f) f.detail = `何の手術か・いつ頃か：${noteLine(input, 'C2-surgery')}`;
   }
   if (chosenIn(answers, 'C2').includes('C2-8') || (isPresent(w.state, 'loose_stool') && isPresent(w.state, 'poor_appetite'))) {
     push({ code: 'gi_weak', level: 'warn', label: chosenIn(answers, 'C2').includes('C2-8') ? '胃腸の病気' : '胃腸が弱い傾向（軟便＋食欲がない）', detail: '大黄・石膏・地黄を含む漢方薬は胃腸障害に注意', source: chosenIn(answers, 'C2').includes('C2-8') ? 'C2' : '体質の回答' });
@@ -99,16 +120,16 @@ export function safetyFlags(answers: Answers, w: WalkResult, input: SafetyInput 
   if (preg.includes('A3P-lact')) push({ code: 'lactation', level: 'info', label: '授乳中', detail: '大黄を含む漢方薬は乳児の下痢に注意', source: pSrc });
   if (pg.unconfirmed) push({ code: 'preg_unconfirmed', level: 'warn', label: '妊娠・授乳：未確認（口頭で確認）', detail: 'ご本人が回答せずに進めました。口頭で確認して観察の欄に入力するまで、提案を確定しません', source: 'A3P' });
   const c3 = chosenIn(answers, 'C3');
-  const oral = (id: string) => { const n = noteOf(input, id); return `${n ? `記入：「${n}」` : '記入なし'}（口頭で確認）`; };
-  if (c3.includes('C3-drug')) push({ code: 'allergy_drug', level: 'warn', label: '薬のアレルギー歴', detail: oral('C3-drug'), source: 'C3' });
-  if (c3.includes('C3-food')) push({ code: 'allergy_food', level: 'warn', label: '食品のアレルギー歴', detail: `${oral('C3-food')}。生薬と重なる食品がないか、下の「食品と生薬の対応」で確認`, source: 'C3' });
-  if (c3.includes('C3-kampo') || kampoCodes(input.staffAnswers, 'X_kampo_adverse').length) {
-    const adv = kampoCodes(input.staffAnswers, 'X_kampo_adverse');
+  if (c3.includes('C3-drug')) push({ code: 'allergy_drug', level: 'warn', label: '薬のアレルギー歴', detail: noteLine(input, 'C3-drug'), source: 'C3' });
+  if (c3.includes('C3-food')) push({ code: 'allergy_food', level: 'warn', label: '食品のアレルギー歴', detail: `${noteLine(input, 'C3-food')}。生薬と重なる食品がないか、「食品と生薬の対応」で確認`, source: 'C3' });
+  const adv = kampoOf(answers, input.staffAnswers, 'X_kampo_adverse');
+  if (c3.includes('C3-kampo') || adv.codes.length) {
     const sym = c3.filter((id) => id.startsWith('C3S-'));
     const serious = sym.some((id) => optionById(id)?.flags?.includes('serious'));
+    const who = adv.source === 'staff' ? '（薬剤師が確認）' : adv.source === 'patient' ? '（ご本人が選択。薬剤師が確認・修正）' : '';
     push({
       code: 'adverse_kampo', level: 'warn', label: '漢方薬で体調を崩した経験',
-      detail: `${c3.includes('C3-kampo') ? oral('C3-kampo') : ''}／漢方薬：${adv.length ? `${names(adv)}（薬剤師が入力）` : '未入力（口頭で確認して入力）'}／症状：${sym.map(optionText).join('・') || '未回答'}（原因の生薬は未特定）${serious ? '。空咳・息苦しさ（間質性肺炎）や肝機能の異常は重い副作用のサインのことがあるため、原因の漢方薬・生薬を必ず確認' : ''}`,
+      detail: `漢方薬：${adv.codes.length ? `${names(adv.codes)}${who}` : '未確認（口頭で確認して入力）'}${adv.notfound ? '（ご本人が「見つからない」を選択）' : ''}／症状：${sym.map(optionText).join('・') || '未回答'}（原因の生薬は未特定）${serious ? '。空咳・息苦しさ（間質性肺炎）や肝機能の異常は重い副作用のサインのことがあるため、原因の漢方薬・生薬を必ず確認' : ''}`,
       source: c3.includes('C3-kampo') ? 'C3' : '薬剤師の入力',
     });
   }
@@ -157,6 +178,18 @@ export function safetyTags(w: WalkResult, staffAnswers?: Answers, tagChecks?: Re
   return [...hits.values()].sort((a, b) => Number(b.urgent) - Number(a.urgent) || Number(!!a.checked) - Number(!!b.checked));
 }
 export const uncheckedTags = (tags: TagHit[]) => tags.filter((t) => !t.checked);
+/** 薬剤師が口頭で確認するメモ（選択肢の staffNote、シミの状態からの肝斑の可能性。安全確認タグとは別で、提案の確定は止めない） */
+export interface StaffCheck { label: string; detail: string }
+export function staffChecks(w: WalkResult): StaffCheck[] {
+  const out: StaffCheck[] = [];
+  const add = (c: StaffCheck) => { if (!out.some((x) => x.label === c.label)) out.push(c); };
+  for (const st of w.steps) for (const o of st.q.options) if (o.staffNote && (o.locked || st.ids.includes(o.id))) add({ label: o.text, detail: o.staffNote });
+  // 第2弾 3-2：「シミ・色素沈着」で頬骨のあたりに左右対称 → 肝斑の典型的な見え方と重なる（患者画面には出さない）
+  if (w.complaints.includes('spots') && !w.complaints.includes('melasma') && isPresent(w.state, 'spots_symmetric')) {
+    add({ label: '肝斑の可能性あり（確認）', detail: '「シミ・色素沈着」で「頬骨のあたりに左右対称に広がる」を選んでいます。肝斑の典型的な見え方と重なるため確認してください（患者画面には表示していません）' });
+  }
+  return out;
+}
 /** 直ちに対応が必要な回答があるか（回答の途中でも判定する） */
 export const isUrgent = (w: WalkResult) => w.steps.some((s) => s.ids.some((id) => s.q.options.find((o) => o.id === id)?.urgent));
 
@@ -229,9 +262,9 @@ export function safetyContext(flags: SafetyFlag[], answers: Answers, w: WalkResu
   // 安全確認の回答が足りない・「わからない」→ 推薦を確定しない（情報不足）。妊娠・授乳の未回答は preg_unconfirmed で扱う
   const missing: string[] = [];
   const unknown: string[] = [];
-  const LABEL: Record<string, string> = { C1: '服用中の薬', C1K: '漢方薬を飲んでいるか', C2: '治療中の病気', C3: 'アレルギー・体調を崩した経験', A3P: '妊娠・授乳' };
+  const LABEL: Record<string, string> = { C1: '服用中の薬', C2: '治療中の病気', C3: 'アレルギー・体調を崩した経験', A3P: '妊娠・授乳' };
   const pg = pregnancyAnswer(answers, w, input);
-  for (const qid of ['C1', 'C1K', 'C2', 'C3', 'A3P']) {
+  for (const qid of ['C1', 'C2', 'C3', 'A3P']) {
     if (qid === 'A3P' && (pg.unconfirmed || pg.source === 'X_preg' || !w.steps.some((x) => x.q.id === 'A3P'))) continue;
     const ids = answers[qid] ?? [];
     if (!ids.length) missing.push(LABEL[qid]);
@@ -244,13 +277,15 @@ export function safetyContext(flags: SafetyFlag[], answers: Answers, w: WalkResu
   if (disease.length) general.push(`治療中の病気（${disease.map((c) => FLAG_LABEL[c] ?? c).join('・')}）があるため、主治医の指示とあわせて確認が必要です`);
   if (codes.has('allergy_drug') || codes.has('allergy_food')) general.push('アレルギー歴があるため、何に出たかを口頭で確認し、含まれる生薬・添加物との照合が必要です');
   if (codes.has('adverse_kampo')) general.push('漢方薬で体調を崩した経験があるため、その漢方薬の構成生薬と照合し、副作用の内容・原因として疑われる生薬・再投与の危険性を確認する必要があります（原因の生薬は未特定）');
-  if (codes.has('kampo_current') && !kampoCodes(input.staffAnswers, 'X_kampo_current').length) general.push('漢方薬を飲んでいると回答されています。名前を確認して入力するまで、重複の照合ができません');
+  const cur = kampoOf(answers, input.staffAnswers, 'X_kampo_current');
+  const adv = kampoOf(answers, input.staffAnswers, 'X_kampo_adverse');
+  if (codes.has('kampo_current') && (!cur.codes.length || cur.notfound)) general.push('服用中の漢方薬の名前が確認できていません。確認して入力するまで、重複の照合ができません');
   if (codes.has('pregnancy')) general.push('妊娠中・妊娠の可能性があるため、服用前に確認が必要です');
   if (codes.has('preg_unconfirmed')) general.push('妊娠・授乳が未確認です。口頭で確認して入力するまで、提案を確定しません');
   if (codes.has('minor')) general.push('10代のため、保護者の同意と漢方薬を提案してよいかを確認するまで、提案を確定しません');
   const open = uncheckedTags(tags);
   if (open.length) general.push(`安全確認タグ（${open.map((t) => t.label).join('・')}）の確認が済むまで、提案を確定しません`);
-  return { codes, general, adverse: new Set(kampoCodes(input.staffAnswers, 'X_kampo_adverse')), current: new Set(kampoCodes(input.staffAnswers, 'X_kampo_current')) };
+  return { codes, general, adverse: new Set(adv.codes), current: new Set(cur.codes) };
 }
 
 /** 服用中・体調を崩した漢方薬と候補の重複（同じ漢方薬・注意生薬の重複）。注意生薬（cautionHerbs）の範囲で照合する */
@@ -267,15 +302,15 @@ export function overlapChecks(f: FormulaSafetyInput, ctx: Pick<SafetyCtx, 'curre
     const af = formulaByCode(code);
     if (!af || code === f.code) continue;
     const shared = f.cautionHerbs.filter((h) => af.cautionHerbs.includes(h));
-    if (shared.length) out.push(`体調を崩した${af.name}と共通の注意生薬（${shared.join('・')}）を含みます（原因の生薬は未特定）`);
+    if (shared.length) out.push(`${shared.join('・')}が共通（体調を崩した${af.name}と。原因の生薬は未特定）`);
   }
   return out;
 }
 
 export function assessFormulaSafety(f: FormulaSafetyInput, ctx: SafetyCtx): FormulaSafety {
   const exclude = f.contraindications.filter((c) => ctx.codes.has(c)).map((c) => `${FLAG_LABEL[c] ?? c}に当たるため除外`);
+  if (f.code && ctx.adverse.has(f.code)) exclude.unshift('この漢方薬で体調を崩したことがあるため除外');
   const check: string[] = [...ctx.general];
-  if (f.code && ctx.adverse.has(f.code)) check.unshift('この漢方薬で体調を崩したことがあると入力されています。再び使うかは薬剤師が判断します');
   for (const x of overlapChecks(f, ctx)) if (!check.includes(x)) check.push(x);
   for (const r of HERB_CHECKS) {
     if (f.cautionHerbs.includes(r.herb) && r.flags.some((c) => ctx.codes.has(c)) && !check.includes(r.text)) check.push(r.text);

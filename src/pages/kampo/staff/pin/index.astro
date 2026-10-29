@@ -24,9 +24,12 @@ if (Astro.request.method === 'POST') {
   return Astro.redirect(next, 303);
 }
 const numeric = pinConfigured();
+// 送信完了画面の「スタッフの方はこちら」から来たときは、戻るで送信完了画面へ
+const sid = next.match(/^\/kampo\/staff\/session\/([a-f0-9]{16})\//)?.[1];
+const back = sid ? `/kampo/check/${sid}/done/` : '/kampo/check/new/';
 ---
 <KampoLayout title="スタッフ確認" mode="staff" width="narrow">
-  <a slot="actions" class="kp-btn ghost small" href="/kampo/check/new/">来店客モードへ戻る</a>
+  <a slot="actions" class="kp-btn ghost small" href={back}>{back === '/kampo/check/new/' ? '来店客モードへ戻る' : '戻る'}</a>
   <div class="kp-card" style="max-width:460px;margin:40px auto 0">
     <p class="kp-eyebrow">スタッフ確認</p>
     <h1 class="kp-title">{numeric ? 'PINを入力' : '合言葉を入力'}</h1>
