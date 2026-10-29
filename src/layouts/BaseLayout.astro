@@ -240,6 +240,11 @@ const orgLd = {
   window.addEventListener('pageshow', function (e) { if (e.persisted) ensureHeroVisible(); });
   window.addEventListener('load', function () { setTimeout(ensureHeroVisible, 1800); });
 })();
+/* 外部サイトへのリンクに付けている「↗」が、iPhone では絵文字（色つきの四角）で表示されるため、文字として表示する指定（U+FE0E）を付ける */
+(function () {
+  var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: function (n) { return n.nodeValue.indexOf('\u2197') >= 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP; } });
+  var n; while ((n = w.nextNode())) n.nodeValue = n.nodeValue.replace(/\u2197(?!\uFE0E)/g, '\u2197\uFE0E');
+})();
 /* 横に並ぶカード（.x-hscroll・.x-rail.is-carousel・旧デザインの .blog-strip・.works-grid）の下に「‹ 1 / 11 ›」のボタンを付け、横に送れることを分かるようにする。
    はみ出していないとき（パソコンの幅で全部見えている等）はボタンを隠す。 */
 (function () {

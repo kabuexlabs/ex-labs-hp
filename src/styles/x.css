@@ -92,7 +92,7 @@ body.x-legacy .breadcrumb{padding-top:28px}
 .x-hscroll>*{scroll-snap-align:start}
 
 /* ---- マーキー ---- */
-.x-mq{display:flex;width:max-content;animation:exMarquee var(--dur,40s) linear infinite}
+.x-mq{display:flex;width:max-content;animation:exMarquee var(--dur,40s) linear infinite;will-change:transform;backface-visibility:hidden}
 .x-mq.is-rev{animation-direction:reverse}
 @media(hover:hover){.x-mq:hover{animation-play-state:paused}}
 @media(prefers-reduced-motion:reduce){.x-mq{animation:none}}

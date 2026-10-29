@@ -125,9 +125,9 @@ const partnersRow1: { name: string; logo: string; h?: number }[] = [
   { name: 'Thermal Climb Studio Fuji', logo: '/assets/partners/thermalclimb.webp', h: 60 },
   { name: 'SHINKUKAN', logo: '/assets/partners/shinkukan.webp', h: 70 },
 ];
-// 少ない枚数でも -50% ループが常に画面幅（4Kワイド含む）を超えるよう
-// 十分に複製する。
-const partnerRow1Items = Array(4).fill(partnersRow1).flat();
+// -50% で1周するよう2つ並べる。マーキーは白いカードの中（表示幅は最大でも約800px）で、1組の幅がそれより広いため2つで足りる。
+// 4つ並べていた頃は帯の幅が5,000px超になり、iPhone の Safari で帯ごと描画されないことがあった。
+const partnerRow1Items = Array(2).fill(partnersRow1).flat();
 
 // 展開団体 — self-run labels/communities shown in the About marquee.
 // Add `logo: '/assets/groups/xxx.png'` to an entry to show an image
@@ -145,9 +145,8 @@ const groups: { name: string; logo?: string; h?: number }[] = [
   { name: 'ANATOR', logo: '/assets/groups/anator.webp', h: 40 },
   { name: '体験型取調室 FACTROOM', logo: '/assets/groups/factroom.webp', h: 74 },
 ];
-// Repeat the list so the marquee loop has no visible gap on wide
-// screens.
-const marqueeItems = Array(4).fill(groups).flat();
+// お取引先と同じく2つ並べる（1組の幅が表示幅より広いので、つなぎ目は見えない）
+const marqueeItems = Array(2).fill(groups).flat();
 
 // ---- 2026-09 リニューアル：表示用の整形 ----
 const liveCards = liveEvents.map((e) => ({ ...e, desc: e.desc.replace(/​/g, ''), id: e.url.split('/').filter(Boolean).pop() ?? 'event' }));
@@ -243,12 +242,12 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
     <p class="xt-about-note"><Cls text="設立からの期間はまだ長くありませんが、複数の上場企業様とのお取引実績を有しており、Skyland Ventures様をはじめとするベンチャーキャピタル様からのご支援もいただいております。" emph={false} /></p>
 
     <p class="xt-mq-label" style="margin-top:56px"><Ph list={['お取引先、', 'ご協力企業様']} /></p>
-    <div class="xt-mq-wrap"><div class="x-mq" style="--dur:40s;gap:28px">
-      {partnerRow1Items.map((p, i) => <div class="xt-mq-cell"><img src={p.logo} alt={i < partnersRow1.length ? p.name : ''} decoding="async"></div>)}
+    <div class="xt-mq-wrap"><div class="x-mq" style="--dur:20s">
+      {partnerRow1Items.map((p, i) => <div class="xt-mq-cell"><img src={p.logo} alt={i < partnersRow1.length ? p.name : ''} loading="eager"></div>)}
     </div></div>
     <p class="xt-mq-label" style="margin-top:36px">展開団体</p>
-    <div class="xt-mq-wrap"><div class="x-mq is-rev" style="--dur:60s;gap:28px">
-      {marqueeItems.map((g, i) => <div class="xt-mq-cell is-round"><img src={g.logo} alt={i < groups.length ? g.name : ''} decoding="async"></div>)}
+    <div class="xt-mq-wrap"><div class="x-mq is-rev" style="--dur:30s">
+      {marqueeItems.map((g, i) => <div class="xt-mq-cell is-round"><img src={g.logo} alt={i < groups.length ? g.name : ''} loading="eager"></div>)}
     </div></div>
   </div>
 </section>
@@ -421,9 +420,10 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
           <a href={s.href} class="xt-svc-row" data-track="cta" data-show={s.href.split('/')[2]} data-place="home-service">
             <span class="xt-svc-no">{s.no}</span>
             <div>
-              <p class="xt-svc-t">{s.title} ↗</p>
+              <p class="xt-svc-t">{s.title}</p>
               <p class="xt-svc-d"><Cls text={s.desc} emph={false} /></p>
             </div>
+            <span class="xt-svc-go">詳しく見る<span class="xt-svc-arr" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M5 12h13M12 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
           </a>
         ))}
       </div>
@@ -543,8 +543,12 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-concept-d{margin:20px auto 0;max-width:620px;font-size:15px;line-height:2;font-weight:500}
 .xt-about-note{margin:32px 0 0;font-size:14px;line-height:2;color:#4A68D6}
 .xt-mq-label{margin:0;font-family:var(--x-min);font-weight:700;font-size:15px}
-.xt-mq-wrap{margin-top:14px;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
-.xt-mq-cell{flex:0 0 170px;height:72px;padding:10px 14px;display:flex;align-items:center;justify-content:center}
+.xt-mq-wrap{position:relative;margin-top:14px;overflow:hidden}
+/* 両端のぼかし。マスク（mask）と動く帯の組み合わせは iPhone の Safari で帯が消えることがあるため、カードと同じ色を重ねる */
+.xt-mq-wrap::before,.xt-mq-wrap::after{content:'';position:absolute;top:0;bottom:0;width:6%;z-index:1;pointer-events:none}
+.xt-mq-wrap::before{left:0;background:linear-gradient(90deg,var(--x-card),rgba(251,252,255,0))}
+.xt-mq-wrap::after{right:0;background:linear-gradient(270deg,var(--x-card),rgba(251,252,255,0))}
+.xt-mq-cell{flex:0 0 170px;height:72px;margin-right:28px;padding:10px 14px;display:flex;align-items:center;justify-content:center}
 .xt-mq-cell.is-round{flex:0 0 150px;height:96px;padding:10px}
 .xt-mq-cell img{max-width:100%;max-height:100%;object-fit:contain;display:block}
 .xt-sub{margin:14px auto 0;text-align:center;font-size:14px;line-height:1.9;color:var(--x-pale)}

@@ -377,7 +377,7 @@ html body.x-body .xt-work img,html body.x-body .xt-work-panel{border-width:0;bor
 /* ---- トップ：法人向けサービス（白いボックスを縦に） ---- */
 html body.x-body .xt-svc-list{display:grid;gap:12px}
 html body.x-body .xt-svc-row{background:var(--x-card);color:var(--x-ink);border:var(--x-bd);border-bottom:var(--x-bd);border-radius:var(--x-r-m);padding:20px 22px}
-html body.x-body .xt-svc-row:hover{opacity:1;transform:translateY(-2px)}
+html body.x-body .xt-svc-row:hover{opacity:1}
 html body.x-body .xt-svc-t{color:var(--x-blue)}
 html body.x-body .xt-svc-d{color:rgba(11,11,20,.78);margin-top:8px}
 /* ---- 制作フロー（トップ・サービス各ページ）：順番が分かるよう、ボックスの間に▼ ---- */
@@ -464,3 +464,14 @@ html body.x-body .xs-mx td+td{background:rgba(225,247,62,.12)}
   html body.x-body .xs-mx tr:last-child>td{border-bottom:0}
   html body.x-body .xs-mx tbody tr:not(:last-child)>td{border-bottom:2px solid #C4D1FB}
 }
+
+/* ---- トップ：法人向けサービス。各カードがサービスのページへ進めることを、下の「詳しく見る →」ボタンで示す ---- */
+html body.x-body .xt-svc-go{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px;padding:8px 8px 8px 20px;border-radius:999px;background:var(--x-blue);color:#fff;font-weight:700;font-size:14px;letter-spacing:.08em;line-height:1.4}
+html body.x-body .xt-svc-arr{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--x-lime);color:var(--x-ink);border:2px solid var(--x-ink);transition:transform .2s}
+html body.x-body .xt-svc-row{transition:transform .2s,box-shadow .2s}
+html body.x-body .xt-svc-row:hover,html body.x-body .xt-svc-row:focus-visible{transform:translateY(-2px);box-shadow:0 6px 0 var(--x-ink)}
+html body.x-body .xt-svc-row:hover .xt-svc-arr,html body.x-body .xt-svc-row:focus-visible .xt-svc-arr{transform:translateX(4px)}
+@media(prefers-reduced-motion:reduce){html body.x-body .xt-svc-row,html body.x-body .xt-svc-arr{transition:none}}
+/* サービス各ページの「関連サービス」「関連する解説記事」：右端の → を丸いボタンに */
+html body.x-body .xs-rel-list a{align-items:center}
+html body.x-body .xs-rel-list a>span[aria-hidden]{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--x-lime);color:var(--x-ink);border:2px solid var(--x-ink);font-weight:800;line-height:1}
