@@ -4,7 +4,6 @@
 export const prerender = false;
 
 import BaseLayout from '../layouts/BaseLayout.astro';
-import EventNotice from '../components/EventNotice.astro';
 import SecHead from '../components/x/SecHead.astro';
 import Ph from '../components/x/Ph.astro';
 import Cls from '../components/x/Cls.astro';
@@ -211,8 +210,6 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
       <a href="#contact" class="x-btn is-lime xt-cta" data-track="cta" data-show="contact" data-place="home-hero">相談してみる</a>
       <a href="#works" class="x-btn is-line xt-cta">実績を見る</a>
     </div>
-    <p class="xt-hero-visitor">参加したい方は <a href="/events/" class="x-link-lime" data-track="show" data-show="events" data-place="home-hero">開催中の公演を探す →</a></p>
-    <EventNotice class="xt-hero-visitor" linkClass="x-link-lime" />
     {topMedia && (
     <a href="/media/" class="xt-media" data-track="show" data-show="media" data-place="home-hero">
       <span class="xt-media-k">MEDIA</span>
@@ -510,7 +507,6 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-hero-en{margin:24px 0 0;font-family:var(--x-en);font-size:clamp(15px,1.8vw,18px);letter-spacing:.14em;color:#AFC0FA}
 .xt-hero-ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:40px}
 .xt-cta{font-size:16px;padding:16px 36px}
-.xt-hero-visitor{margin:24px 0 0;font-size:14px;color:var(--x-pale3)}
 .xt-media{margin-top:48px;display:grid;gap:8px;padding:18px 22px;border:1px solid rgba(255,255,255,.35)}
 .xt-media-k{font-family:var(--x-en);font-size:14px;letter-spacing:.2em;color:var(--x-lime)}
 .xt-media-t{font-family:var(--x-min);font-weight:600;font-size:16px}

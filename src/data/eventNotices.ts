@@ -44,7 +44,7 @@ export const NOTICES = {
 
 /** 告知を出すページ（パス → 告知キー）。最初の画面に公演へのリンクが既にあるページ（/events/ /works/ /taikenbizyutu/ とデート系7本）は入れない */
 export const NOTICE_PAGES: Record<string, keyof typeof NOTICES> = {
-  '/': 'home',
+  // トップ（/）は2026-10-30に「こまごまして見にくい」との指示で告知を外した（home の文言は残す）
   '/events/factroom/': 'gensou-next',
   '/uwasabanashi/': 'gensou-next',
   '/uwasabanashi/kotohogi/': 'gensou-next',
