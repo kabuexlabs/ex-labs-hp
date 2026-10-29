@@ -23,7 +23,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 const sections = raw.sections as any[];
 // 実績カードに外部サイトのリンクプレビュー画像（preview）を出すものがあるか
 const hasPreview = sections.some((s) => s.type === 'cards' && (s.items as any[]).some((c) => c.preview && findLinkPreviewTarget(c.preview)));
-const toc = sections.map((s, i) => ({ no: pad(i + 1), href: '#' + s.id, label: (s.ja as string[]).join('') }));
+const toc = sections.map((s, i) => ({ no: pad(i + 1), href: '#' + s.id, label: s.ja as string[] }));
 const facts = (raw.intro.facts ?? []) as any[];
 const def: string = raw.intro.definition ?? '';
 const dm = def.match(/^\**([^、。*]+?)\**とは/);
@@ -93,7 +93,7 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
     <nav class="xs-toc" aria-label="このページの内容">
       <p class="xs-toc-h">Contents<span>このページの内容</span></p>
       <div class="x-rail is-bleed" style="--gtc:repeat(auto-fill,minmax(min(100%,230px),1fr));--gap:8px;--col:70%;margin-top:16px">
-        {toc.map((t) => <a href={t.href} class="xs-toc-a"><span class="xs-toc-no">{t.no}</span><span>{t.label}</span></a>)}
+        {toc.map((t) => <a href={t.href} class="xs-toc-a"><span class="xs-toc-no">{t.no}</span><span><Ph list={t.label} /></span></a>)}
       </div>
     </nav>
   </div>
@@ -287,7 +287,7 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
         <p class="xs-rel-en">Guide</p>
         <p class="xs-rel-ja">関連する解説記事</p>
         <div class="xs-rel-list">
-          {(raw.guides as { href: string; label: string }[]).map((g) => <a href={g.href}><span><span class="x-c">+ ·</span> <Cls text={g.label} emph={false} /></span><span aria-hidden="true">→</span></a>)}
+          {(raw.guides as { href: string; label: string }[]).map((g) => <a href={g.href}><span><Cls text={g.label} emph={false} /></span><span aria-hidden="true">→</span></a>)}
         </div>
       </div>
     )}
