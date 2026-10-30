@@ -10,6 +10,7 @@ import StickyReserve from '../../components/StickyReserve.astro';
 import SecHead from '../../components/gensou/SecHead.astro';
 import J from '../../components/gensou/J.astro';
 import { mediaItems } from '../../data/media';
+import { pressItems } from '../../data/press';
 
 // ---- 未定の項目（決まったらここを埋める。null の間は非表示／仮表示） ----
 // escape.id の販売ページURL。null の間は予約ボタンを「近日販売開始」表示にし、#ticket へ飛ばす
@@ -48,6 +49,8 @@ const staff: { role: string; name: string; profile?: string }[] = [
 ];
 
 // この公演が紹介されたメディア掲載（src/data/media.ts で related に /gensou/ を持つもの）。見出しは「」の中だけを出す
+// この公演を発表したプレスリリース（src/data/press.ts のうち、公共文化施設のエンタメ事業の発表＝第一弾が本公演）
+const PRESS = pressItems.filter((p) => p.url.includes('000000008.000185770'));
 const MEDIA = mediaItems.filter((m) => m.url && m.related?.some((r) => r.href === '/gensou/')).map((m) => ({ ...m, head: m.title.match(/^「(.*)」/)?.[1] ?? m.title }));
 
 const reserveHref = RESERVE_URL ?? '#ticket';
@@ -542,6 +545,14 @@ img{max-width:100%}
           <span class="mb-t">{m.outlet}で紹介されました</span>
           <span class="mb-h">「<J t={m.head} />」</span>
           <span class="mb-x">記事を読む（{m.outlet}・外部サイト）↗</span>
+        </a>
+      ))}
+      {PRESS.map((p) => (
+        <a class="mb" href={p.url} target="_blank" rel="noopener" data-track="show" data-show="press" data-place="gensou-press">
+          <span class="mb-k hv">PRESS</span>
+          <span class="mb-t">公共文化施設でのエンターテインメント事業の第一弾として発表しました</span>
+          <span class="mb-h">「<J t={p.title} />」</span>
+          <span class="mb-x">プレスリリースを読む（{p.source ?? 'PR TIMES'}・外部サイト）↗</span>
         </a>
       ))}
       {/* 2026-10-22 予約促進：最初の画面で開催日・会場・料金・所要時間・対象と予約ボタンを確認できるようにする（値は公式記載のみ） */}

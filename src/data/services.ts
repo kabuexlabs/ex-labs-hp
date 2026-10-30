@@ -911,6 +911,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "01",
       "href": "/guide/bunkashisetsu-yakan-katsuyo/",
+      "press": "https://prtimes.jp/main/html/rd/p/000000008.000185770.html",
      "hrefLabel": "公共施設の夜間活用（事例の詳細）",
      "title": "夢の島熱帯植物館（東京都の施設）",
      "img": "/assets/events/gensou-kv.webp",
@@ -1893,6 +1894,7 @@ export const SERVICES: Record<ServiceSlug, any> = {
      {
       "no": "01",
       "href": "/gensou/",
+      "press": "https://prtimes.jp/main/html/rd/p/000000008.000185770.html",
      "hrefLabel": "公演ページ",
      "title": "午前零時の幻想集 第一夜「草陰の夢」（夢の島熱帯植物館）",
      "img": "/assets/events/gensou-kv.webp",

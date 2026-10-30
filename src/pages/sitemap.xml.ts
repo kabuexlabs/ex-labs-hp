@@ -265,7 +265,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/services/': '2026-10-29',
     '/': '2026-10-29',
     '/services/nazotoki-kenshu/': '2026-10-29',
-    '/press/': '2026-09-28',
+    '/press/': '2026-10-30',
     '/blog/': '2026-09-28',
     '/game/': '2026-09-28',
     '/services/murder-mystery/': '2026-10-29',

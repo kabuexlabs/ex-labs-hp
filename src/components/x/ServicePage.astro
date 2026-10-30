@@ -208,6 +208,7 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
                 {bl.rows.length > 0 && <dl class="xs-cardc-dl">{bl.rows.map(([k, v]) => <div><dt>{k}</dt><dd><Cls text={v} emph={false} /></dd></div>)}</dl>}
                 {bl.rest.length > 0 && <ul class="xs-cardc-ul">{bl.rest.map((b) => <li><span class="xs-plus">+</span><span><Cls text={b} emph={false} /></span></li>)}</ul>}
                 {c.href && <a href={c.href} class="xs-cardc-a" data-track="cta" data-show="case" data-place={`svc-${slug}-works`}>{c.hrefLabel ?? '事例の詳細を読む'} →</a>}
+                {c.press && <a href={c.press} class="xs-cardc-a" target="_blank" rel="noopener" data-track="show" data-show="press" data-place={`svc-${slug}-works`}>プレスリリース（PR TIMES）↗</a>}
               </div>
               );
             })}
