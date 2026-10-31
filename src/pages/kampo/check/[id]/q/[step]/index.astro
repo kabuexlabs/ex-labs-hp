@@ -13,6 +13,9 @@
 //  同じ oneOf の選択肢はどれか1つ（10-4）。受診のおすすめ（refer）の選択肢を選ぶとその場で表示（3-1）。舌のご本人確認ではイラストを出す（11-1）。
 // 2026-10-31 第4弾：お悩みで自動チェックされた項目だけでも「次へ」を押せる（0-1。サーバーは「ほかには特にない」を記録）。受診のおすすめは患者画面に出さない（0-2。薬剤師画面のみ）。
 //  舌は1ページの中に小見出し（色・形・苔・静脈）と項目別イラストで出す（2-8）。食品アレルギーは選択肢（2-9）、耳鳴りの音の高さは選択肢のすぐ下（2-10）。
+// 2026-10-31 第5弾：薬・病気・アレルギー（Question.gate）は「ある／ない」を先に聞き、「ある」のときだけ種類を出す（1-1f）。
+//  種類は小さめのボタンを2〜3列、名前の欄はその行のすぐ下に全幅（1-1e）。「その他」「種類がわからない」は区切り線の下（sepBefore）。
+//  食品・症状などの追加の選択肢は4〜6列の小さいボタン。短い選択肢の設問も小さめのボタンで横に並べる。
 export const prerender = false;
 import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
 import QMark from '../../../../../../components/kampo/QMark.astro';
@@ -54,7 +57,8 @@ if (Astro.request.method === 'POST') {
     const missGroup = (q.groups ?? []).filter((g) => g.required && !ids.some((x) => q.options.find((o) => o.id === x)?.group === g.id)).map((g) => g.title);
     error = missGroup.length ? `「${missGroup.join('」「')}」を選んでください。`
       : (q.followups ?? []).some((fu) => fu.required && (ids.includes(fu.when) || q.options.find((o) => o.id === fu.when)?.locked)) && ids.length ? 'すぐ下に出ている追加の項目（音の種類など）も選んでください。'
-      : q.sub ? '上下それぞれ1つずつ選んでください。' : '1つ以上選んでください。';
+      : q.sub ? '上下それぞれ1つずつ選んでください。'
+      : q.gate && ids.includes(q.gate.yes) ? 'あてはまる種類を1つ以上選んでください。' : '1つ以上選んでください。';
   } else if (conflict) {
     error = `「${conflict[0]}」と「${conflict[1]}」は同時に選べません。`;
   } else {
@@ -97,7 +101,7 @@ if (Astro.request.method === 'POST') {
 
 const selected = new Set(s.answers[q.id] ?? []);
 const multi = q.type === 'multi';
-const hint = multi && !q.groups?.length ? '※あてはまるものをすべて選んでください' : '';
+const hint = multi && !q.groups?.length && !q.gate ? '※あてはまるものをすべて選んでください' : '';
 const withImages = q.options.some((o) => o.image);
 // STEP 表示：段階の中での位置を進み具合に使う（分母が動いても段階は変わらない）
 const stepIdx = stepOfSection(q.section);
@@ -107,8 +111,13 @@ const progressPct = Math.round((100 * (stepIdx + (pos + 1) / Math.max(1, inGroup
 // 同時に選べない選択肢（所見の conflicts）
 const conflictsOf = (o: Option) => q.options.filter((b) => b !== o && selectable(b) && (o.findings ?? []).some((f) => (findingById(f)?.conflicts ?? []).some((x) => (b.findings ?? []).includes(x)))).map((b) => b.id);
 // 小見出しごとに分ける（小見出しのない選択肢は最後のまとまり。小見出しのある設問では区切り線の下に置く）
-const groups: { heading?: string; hint?: string; required?: boolean; gid?: string; options: Option[] }[] = [];
-if (q.groups?.length) {
+const groups: { heading?: string; hint?: string; required?: boolean; gid?: string; kind?: 'gate' | 'gated'; options: Option[] }[] = [];
+const gate = q.gate;
+if (gate) {
+  // 「ある／ない」を先に。「ある」のときだけ種類を出す（第5弾 1-1f）
+  groups.push({ kind: 'gate', options: q.options.filter((o) => o.id === gate.yes || o.id === gate.no) });
+  groups.push({ kind: 'gated', heading: 'あてはまるものをすべて選んでください', options: q.options.filter((o) => o.id !== gate.yes && o.id !== gate.no) });
+} else if (q.groups?.length) {
   // 1ページの中の小見出し（舌：色・色の追加・形・苔・苔の追加・静脈。第4弾 2-8）
   for (const g of q.groups) groups.push({ heading: g.title, hint: g.hint, required: g.required, gid: g.id, options: q.options.filter((o) => o.group === g.id) });
 } else {
@@ -125,11 +134,13 @@ const followups: Followup[] = q.followups ?? [];
 const inline = q.options.some((o) => o.note) || (followups.length > 0 && q.section !== 'complaint');
 // 同時に選べない選択肢（所見の conflicts と、設問の excludes）
 const exclOf = (o: Option) => q.options.filter((b) => b !== o && (o.excludes?.includes(b.id) || b.excludes?.includes(o.id))).map((b) => b.id);
-const colsOf = (opts: Option[]) => {
+const colsOf = (opts: Option[], kind?: 'gate' | 'gated') => {
+  if (kind === 'gate') return 'cols2 gate';
+  if (kind === 'gated') return 'compact cols3 dense';
   if (hasIcons) return 'icons';
   if (inline) return 'one';
   const maxLen = Math.max(...opts.map((o) => o.text.length), 0);
-  return withImages ? 'imgs' : maxLen <= 8 && opts.length >= 3 ? 'cols4' : maxLen <= 14 && opts.length >= 3 ? 'cols3' : '';
+  return withImages ? 'imgs' : maxLen <= 8 && opts.length >= 3 ? 'compact cols4' : maxLen <= 14 && opts.length >= 3 ? 'compact cols3' : '';
 };
 const fuOf = (o: Option) => followups.filter((f) => f.when === o.id);
 // 漢方薬の候補：名前・読み・商品名・ツムラ番号で探す
@@ -138,7 +149,7 @@ const pickNo = (o: Option) => (o.formula ? formulaByCode(o.formula)?.tsumuraNo ?
 const firstConstitution = q.section === 'constitution' && pos === 0;
 ---
 <KampoLayout title={`${STEPS[stepIdx].label} ${q.title}`} width="normal" progress={{ done: progressPct, total: 100 }}>
-  <form method="post" id="qform" data-qid={q.id} data-type={q.type} data-sub={q.sub ? '1' : '0'}>
+  <form method="post" id="qform" data-qid={q.id} data-type={q.type} data-sub={q.sub ? '1' : '0'} data-gate-yes={gate?.yes} data-gate-no={gate?.no}>
     <p class="kp-qmeta">STEP {stepIdx + 1} / {STEPS.length}　{STEPS[stepIdx].label}</p>
     {firstConstitution && <p class="kp-qintro">お悩みと似た質問もありますが、体質を見るために皆さまにお聞きしています。お悩みで選んだ項目は、チェックした状態で表示しています。</p>}
     {q.section === 'safety' && <p class="kp-eyebrow" style="letter-spacing:.14em;margin-bottom:4px">安心してご相談いただくための確認です</p>}
@@ -148,12 +159,13 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
     {error && <p class="kp-error" style="margin:0 0 16px">{error}</p>}
     {groups.map((g) => (
       <>
-        {g.heading && <p class="kp-opt-h" data-group-required={g.required ? g.gid : undefined}>{g.heading}{g.hint && <small class="kp-opt-hint">{g.hint}</small>}</p>}
-        <div class:list={['kp-opts', colsOf(g.options), { 'kp-opts-sep': hasHeadings && !g.heading }]}>
+        {g.heading && <p class="kp-opt-h" data-group-required={g.required ? g.gid : undefined} data-gated={g.kind === 'gated' ? '1' : undefined} hidden={g.kind === 'gated' && !selected.has(gate!.yes)}>{g.heading}{g.hint && <small class="kp-opt-hint">{g.hint}</small>}</p>}
+        <div class:list={['kp-opts', colsOf(g.options, g.kind), { 'kp-opts-sep': hasHeadings && !g.heading }]} data-gated={g.kind === 'gated' ? '1' : undefined} hidden={g.kind === 'gated' && !selected.has(gate!.yes)}>
           {g.options.map((o) => {
             const on = o.locked || selected.has(o.id);
             return (
               <>
+                {o.sepBefore && <hr class="kp-opt-sep">}
                 <label class:list={['kp-opt', { check: multi, none: !!o.exclusive, 'is-on': on, 'has-img': !!o.image, 'has-icon': !!o.icon, locked: !!o.locked, 'is-off': !!o.blocked }]}>
                   <input type={multi ? 'checkbox' : 'radio'} name={selectable(o) ? 'opt' : undefined} value={o.id} checked={on} disabled={!selectable(o)}
                     data-ex={o.exclusive || (o.defer && !o.group) ? '1' : '0'} data-urgent={o.urgent ? '1' : '0'} data-locked={o.locked ? '1' : '0'} data-conf={[...conflictsOf(o), ...exclOf(o)].join(' ')} data-one={o.oneOf ?? ''} data-group={o.group ?? ''} data-gex={o.groupExclusive ? '1' : '0'}>
@@ -194,7 +206,7 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
                         </div>
                       </>
                     ) : (
-                      <div class="kp-opts cols3">
+                      <div class:list={['kp-opts', fu.options.length >= 8 && Math.max(...fu.options.map((x) => x.text.length)) <= 12 ? 'mini' : 'compact cols3']}>
                         {fu.options.map((x) => (
                           <>
                             <label class:list={['kp-opt', { check: fu.type === 'multi', none: !!x.exclusive, 'is-on': selected.has(x.id) }]}>
@@ -278,6 +290,25 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
   .kp-opts.icons .kp-opt.has-icon:not(.is-on) .kp-opt-icon{opacity:.92}
   @media(max-width:640px){.kp-opts.icons{grid-template-columns:repeat(2,minmax(0,1fr))}}
   .kp-opts>.kp-fu.inline,.kp-opts>.kp-notefield{grid-column:1/-1}
+  /* 第5弾 1-1e：小さめのボタン（44px 以上）を横に並べる。名前の欄は選んだ行のすぐ下に全幅（dense で行を詰める） */
+  .kp-opts[hidden],.kp-opt-h[hidden]{display:none}
+  .kp-opts.gate{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px;max-width:560px}
+  .kp-opts.compact{gap:10px 12px}
+  .kp-opts.compact .kp-opt{min-height:56px;padding:10px 12px 10px 48px;font-size:16px;letter-spacing:.03em;gap:10px}
+  .kp-opts.compact .kp-opt::before{left:14px;width:22px;height:22px;margin-top:-11px}
+  .kp-opts.compact .kp-opt::after{left:20px}
+  .kp-opts.compact .kp-opt.check::after{left:21px;width:6px;height:12px;margin-top:-8px}
+  .kp-opts.dense{grid-auto-flow:row dense}
+  .kp-opts.dense>.kp-notefield{margin:0 0 4px;padding:10px 14px;background:var(--sky-mist);border:1px solid var(--sky-border)}
+  .kp-opt-sep{grid-column:1/-1;border:0;border-top:1px solid var(--line);margin:10px 0 2px;width:100%}
+  .kp-opts.mini{grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+  .kp-opts.mini .kp-opt{min-height:44px;padding:6px 8px 6px 36px;font-size:15px;letter-spacing:.02em;gap:6px;line-height:1.35}
+  .kp-opts.mini .kp-opt::before{left:10px;width:18px;height:18px;margin-top:-9px}
+  .kp-opts.mini .kp-opt::after{left:15px;width:8px;height:8px;margin-top:-4px}
+  .kp-opts.mini .kp-opt.check::after{left:16px;width:5px;height:10px;margin-top:-7px}
+  .kp-fu.inline .kp-opts.compact .kp-opt{min-height:48px}
+  @media(max-width:900px){.kp-opts.compact.cols4{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media(max-width:640px){.kp-opts.compact.cols3,.kp-opts.compact.cols4{grid-template-columns:repeat(2,minmax(0,1fr))}.kp-opts.gate{grid-template-columns:repeat(2,minmax(0,1fr))}.kp-opts.mini{grid-template-columns:repeat(3,minmax(0,1fr))}.kp-opts.compact .kp-opt{font-size:15px}}
   </style>
   <script is:inline>
   (function(){
@@ -291,6 +322,7 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
     var subs=A('input[name=sub]');
     var fuBoxes=A('.kp-fu');
     var isEx=function(i){return i.dataset.ex==='1'};
+    var gateYes=form.dataset.gateYes||'';
     var byVal=function(v){return allIn.filter(function(i){return i.value===v})[0]};
     // 同じ画面で選んだ選択肢と矛盾する選択肢はグレーで押せない（第2弾 5-3）
     function blockConflicts(){
@@ -302,6 +334,8 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
     function ready(){
       var checked=opts.filter(function(i){return i.checked});
       if(!(checked.length>0||lockedAny))return false;
+      // 「ある」を選んだら種類も1つ以上（第5弾 1-1f）
+      if(gateYes&&checked.length===1&&checked[0].value===gateYes)return false;
       if(hasSub&&!subs.some(function(i){return i.checked}))return false;
       var ok=true;
       A('[data-group-required]').forEach(function(h){var g=h.dataset.groupRequired;if(!opts.some(function(i){return i.checked&&i.dataset.group===g}))ok=false});
@@ -309,6 +343,11 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
       return ok;
     }
     function sync(){
+      if(gateYes){
+        var y=byVal(gateYes),on=!!(y&&y.checked);
+        A('[data-gated]').forEach(function(el){el.hidden=!on});
+        if(!on)A('[data-gated] input').forEach(function(i){if(i.type==='checkbox'||i.type==='radio')i.checked=false});
+      }
       var checked=opts.filter(function(i){return i.checked});
       blockConflicts();
       A('.kp-opt input').forEach(function(i){if(i.dataset.locked!=='1')i.closest('.kp-opt').classList.toggle('is-on',i.checked)});

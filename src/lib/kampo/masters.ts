@@ -18,6 +18,7 @@ import tagsJson from '../../data/kampo/safety_tags.json' with { type: 'json' };
 import typesJson from '../../data/kampo/types.json' with { type: 'json' };
 import formulasJson from '../../data/kampo/formulas.json' with { type: 'json' };
 import legacyJson from '../../data/kampo/legacy.json' with { type: 'json' };
+import scoringJson from '../../data/kampo/scoring.json' with { type: 'json' };
 
 /** 体質タイプ（6つ。2026-10-28 修正依頼 1-1）：気虚・血虚・気滞・瘀血・水滞・水不足（陰虚）。レーダーの軸順（上から時計回り） */
 export type TypeKey = 'qi_def' | 'blood_def' | 'qi_stag' | 'blood_stasis' | 'fluid' | 'yin_def';
@@ -108,6 +109,12 @@ export interface Option {
   herbs?: string[];
   /** 画面で選択肢のイラストを表示する（舌の項目別イラストなど。image と同じ。小さめ） */
   icon?: string;
+  /** 患者画面には出さない（薬剤師が「記入漏れの薬の追加」で種類を付け直すときだけ使う。第5弾 1-1d） */
+  staffOnly?: boolean;
+  /** この選択肢の前に区切り線を入れる（「その他」「わからない」を下にまとめる。第5弾 1-1e） */
+  sepBefore?: boolean;
+  /** 記録用（「本人に聞いて選んだ」など）。所見を持たず、ほかの選択肢と同時に選べる */
+  meta?: boolean;
   /** 画面内の小見出し（生活習慣。修正依頼 6-1） */
   heading?: string;
   /** 薬剤師の観察で「判断できない」：ご本人の回答を使う（修正依頼 4-10） */
@@ -158,6 +165,8 @@ export interface Question {
   optional?: boolean;
   /** 1ページの中の小見出し（舌：色・形・苔・舌下静脈。第4弾 2-8）。選択肢の group と対応 */
   groups?: OptionGroup[];
+  /** 先に「ある／ない」を聞き、「ある」のときだけほかの選択肢を出す（薬・病気・アレルギー。第5弾 1-1f） */
+  gate?: { yes: string; no: string };
   help?: string;
   /** 深掘りのテンプレート名 */
   template?: string;
@@ -213,6 +222,19 @@ export interface Complaint {
   refer?: string;
   /** 選んだらすぐ下に出す追加の選択（耳鳴りの音の高さ。第4弾 2-10） */
   followups?: Omit<Followup, 'when'>[];
+}
+/** 配点表の1行（2026-10-31 第5弾。scoring.json） */
+export interface ScoreRow {
+  no: number;
+  label: string;
+  source: 'patient' | 'staff';
+  /** このうちどれかが「あり」ならこの行を1回数える。空は問診にない（判定外） */
+  findings: string[];
+  pts?: Partial<Record<TypeKey, number>>;
+  defExc?: { side: 'def' | 'exc'; pts: number };
+  thermal?: { kind: 'cold' | 'heat_def' | 'heat_exc' | 'heat_unknown' | 'cold_heat'; pts: number; site?: 'whole' | 'upper' | 'lower' | 'limbs' | 'upper_lower' };
+  organs?: OrganKey[];
+  note?: string;
 }
 export interface SafetyTagDef { id: string; label: string; checks: string[]; urgent?: boolean }
 export interface Review { status: string; source?: string; reviewer?: string | null; reviewedAt?: string | null }
@@ -442,6 +464,7 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
         }
       }
       if (q.note !== undefined && (!isObj(q.note) || !isStr(q.note.label))) errs.push(`${id}: note は label を持つ`);
+      if (q.gate !== undefined && !(isObj(q.gate) && opts.some((o) => isObj(o) && o.id === (q.gate as Raw).yes) && opts.some((o) => isObj(o) && o.id === (q.gate as Raw).no && o.exclusive === 'none'))) errs.push(`${id}: gate は yes（ある）と no（ない。exclusive none）の選択肢ID`);
       if (q.groups !== undefined && !(Array.isArray(q.groups) && (q.groups as unknown[]).every((g) => isObj(g) && isStr(g.id) && isStr(g.title) && isStr(g.hint)))) errs.push(`${id}: groups は id/title/hint の配列`);
       if (q.prefill !== undefined) errs.push(`${id}: prefill は廃止（体質チェックは全設問でお悩みの所見をチェック済みで出す）`);
     }
@@ -525,6 +548,25 @@ if (problems.length) {
   throw new Error(`[kampo] マスタデータの検証に失敗:\n  - ${problems.join('\n  - ')}`);
 }
 
+// 配点表（scoring.json）：所見の存在・同じ所見を2つの行で数えないことを確かめる
+const scoringData = scoringJson as unknown as { version: string; cutoffRatio: number; rows: ScoreRow[] };
+{
+  const fids = new Set((findingsJson as unknown as { findings: { id: string }[] }).findings.map((f) => f.id));
+  const errs: string[] = [];
+  const seen = new Map<string, number>();
+  if (!(scoringData.cutoffRatio > 0 && scoringData.cutoffRatio < 1)) errs.push('scoring.json: cutoffRatio は 0〜1');
+  for (const r of scoringData.rows) {
+    for (const f of r.findings) { if (!fids.has(f)) errs.push(`scoring.json 行${r.no}: 所見 ${f} がない`); if (seen.has(f)) errs.push(`scoring.json: 所見 ${f} が行${seen.get(f)}と行${r.no}の両方にある`); seen.set(f, r.no); }
+    for (const [k, v] of Object.entries(r.pts ?? {})) if (!isTypeKey(k) || ![1, 2, 3].includes(v as number)) errs.push(`scoring.json 行${r.no}: pts ${k}=${String(v)}`);
+    for (const o of r.organs ?? []) if (!isOrganKey(o)) errs.push(`scoring.json 行${r.no}: 五臓タグ ${o}`);
+  }
+  if (errs.length) throw new Error(`[kampo] 配点表の検証に失敗:\n  - ${errs.join('\n  - ')}`);
+}
+/** 配点表の行（第5弾。判定はこの表どおり） */
+export const SCORE_ROWS: ScoreRow[] = scoringData.rows;
+/** カットオフ（満点に対する割合。初期値 0.4） */
+export const CUTOFF_RATIO: number = scoringData.cutoffRatio;
+export const SCORING_VERSION: string = scoringData.version;
 const cj = complaintsJson as unknown as { categories: Category[]; complaints: Complaint[] };
 const qj = questionsJson as unknown as { version: string; review: Review; questions: Raw[] };
 const allQuestions = expandQuestions(qj.questions, cj, (formulasJson as unknown as FormulasData).formulas) as unknown as Question[];

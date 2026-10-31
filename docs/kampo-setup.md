@@ -66,6 +66,7 @@ ESSENCE薬局 武蔵小杉店の店頭 iPad で使う「体質チェック＋薬
 | `src/data/kampo/legacy.json` | 旧版（2026-10-24 版・取り消した v2）のセッションを表示するための文言（判定には使わない） |
 | `src/data/kampo/types.json` | 8タイプの文面（状態の一言・説明・代表症状5・心食動休・ツボ）と `tips`（生活習慣の回答に応じた「あなたへの一言」） |
 | `src/data/kampo/formulas.json` | 処方 68件。扱わないものは `active: false`、商品が決まったら `code` を商品コードに。`priority` は同点時の並び順 |
+| `src/data/kampo/scoring.json` | 配点表（2026-10-31 第5弾。いただいた xlsx から変換）。行ごとの所見（`findings`）・6タイプの配点（強3・中2・弱1）・虚実・寒熱・五臓タグ。`cutoffRatio`（0.4）が主な体質・ほかの体質のカットオフ。判定はこの表だけで行い、findings.json の `weights` は使わない |
 | `src/data/kampo/consent.md` | 受付画面の同意文 |
 
 編集後は `npm run test:kampo`（`npm run check` に含む）でマスタ検証と回帰テストが走る。選択肢IDの重複・存在しない所見／signs／requires／タグ・未定義の症状コード・深掘りのない主訴・「特にない」「わからない」の欠落はエラー。全主訴×性別×答え方で同じ所見を2回聞かないこと、改修指示 4-1〜4-8 の修正も確認する。

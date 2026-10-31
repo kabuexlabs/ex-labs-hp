@@ -1,0 +1,1848 @@
+{
+ "version": "2026-10-31",
+ "source": "体質チェック 配点表（2026-10-31 版。薬剤師が仕分けを確認済み）。強3・中2・弱1。行の findings のどれかが「あり」ならその行を1回だけ数える。findings が空の行は問診にない（判定外）。",
+ "cutoffRatio": 0.4,
+ "rows": [
+  {
+   "no": 1,
+   "label": "少し動くと息切れする",
+   "source": "patient",
+   "findings": [
+    "sob_exertion"
+   ],
+   "pts": {
+    "qi_def": 3
+   },
+   "defExc": {
+    "side": "def",
+    "pts": 3
+   },
+   "organs": [
+    "lung"
+   ]
+  },
+  {
+   "no": 2,
+   "label": "少し動いただけで汗をかく",
+   "source": "patient",
+   "findings": [
+    "sweat_exertion"
+   ],
+   "pts": {
+    "qi_def": 3
+   },
+   "defExc": {
+    "side": "def",
+    "pts": 3
+   },
+   "organs": [
+    "lung"
+   ]
+  },
+  {
+   "no": 3,
+   "label": "風邪をひきやすい",
+   "source": "patient",
+   "findings": [
+    "catch_cold"
+   ],
+   "pts": {
+    "qi_def": 3
+   },
+   "defExc": {
+    "side": "def",
+    "pts": 2
+   },
+   "organs": [
+    "lung"
+   ]
+  },
+  {
+   "no": 4,
+   "label": "声が小さく弱い",
+   "source": "staff",
+   "findings": [
+    "voice_weak"
+   ],
+   "pts": {
+    "qi_def": 3
+   },
+   "defExc": {
+    "side": "def",
+    "pts": 3
+   },
+   "organs": [
+    "lung"
+   ]
+  },
+  {
+   "no": 5,
+   "label": "疲れやすい",
+   "source": "patient",
+   "findings": [
+    "fatigue_easy"
+   ],
+   "pts": {
+    "qi_def": 2
+   },
+   "defExc": {
+    "side": "def",
+    "pts": 2
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 6,
+   "label": "気力が出ない",
+   "source": "patient",
+   "findings": [
+    "lack_energy"
+   ],
+   "pts": {
+    "qi_def": 2
+   },
+   "defExc": {
+    "side": "def",
+    "pts": 2
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 7,
+   "label": "日中に眠くなる",
+   "source": "patient",
+   "findings": [
+    "daytime_sleepy"
+   ],
+   "pts": {
+    "qi_def": 2
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 8,
+   "label": "食欲がない",
+   "source": "patient",
+   "findings": [
+    "poor_appetite"
+   ],
+   "pts": {
+    "qi_def": 2
+   },
+   "defExc": {
+    "side": "def",
+    "pts": 2
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 9,
+   "label": "少量で満腹になる",
+   "source": "patient",
+   "findings": [
+    "early_satiety"
+   ],
+   "pts": {
+    "qi_def": 2
+   },
+   "defExc": {
+    "side": "def",
+    "pts": 2
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 10,
+   "label": "軟便・下痢になりやすい",
+   "source": "patient",
+   "findings": [
+    "loose_stool"
+   ],
+   "pts": {
+    "qi_def": 2,
+    "fluid": 2
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 11,
+   "label": "舌が大きくぼってりしている",
+   "source": "staff",
+   "findings": [
+    "tongue_shape_swollen"
+   ],
+   "pts": {
+    "qi_def": 2,
+    "fluid": 2
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 12,
+   "label": "舌のふちに歯の跡がある",
+   "source": "staff",
+   "findings": [
+    "tongue_teeth_marks"
+   ],
+   "pts": {
+    "qi_def": 2,
+    "fluid": 2
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 13,
+   "label": "顔色：血色が悪く白っぽい",
+   "source": "staff",
+   "findings": [
+    "face_pale"
+   ],
+   "pts": {
+    "qi_def": 2,
+    "blood_def": 2
+   },
+   "note": "顔色は薬剤師が観察（見えないときは本人に聞く）"
+  },
+  {
+   "no": 14,
+   "label": "寝汗をかく",
+   "source": "patient",
+   "findings": [
+    "night_sweat"
+   ],
+   "pts": {
+    "qi_def": 2,
+    "yin_def": 2
+   },
+   "thermal": {
+    "kind": "heat_def",
+    "pts": 2,
+    "site": "whole"
+   }
+  },
+  {
+   "no": 15,
+   "label": "動悸がする",
+   "source": "patient",
+   "findings": [
+    "palpitation"
+   ],
+   "pts": {
+    "qi_def": 2,
+    "blood_def": 1
+   },
+   "organs": [
+    "heart"
+   ]
+  },
+  {
+   "no": 16,
+   "label": "胃痛：空腹のとき痛む",
+   "source": "patient",
+   "findings": [
+    "stomach_worse_empty"
+   ],
+   "pts": {
+    "qi_def": 2
+   },
+   "defExc": {
+    "side": "def",
+    "pts": 2
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 17,
+   "label": "寝ても疲れが取れない",
+   "source": "patient",
+   "findings": [
+    "unrefreshed",
+    "fatigue_unrested"
+   ],
+   "pts": {
+    "qi_def": 1,
+    "fluid": 1
+   }
+  },
+  {
+   "no": 18,
+   "label": "集中力が続かない",
+   "source": "patient",
+   "findings": [
+    "poor_concentration"
+   ],
+   "pts": {
+    "qi_def": 1,
+    "blood_def": 1
+   },
+   "organs": [
+    "heart"
+   ]
+  },
+  {
+   "no": 19,
+   "label": "物忘れ",
+   "source": "patient",
+   "findings": [
+    "forgetful"
+   ],
+   "pts": {
+    "qi_def": 1,
+    "blood_def": 2
+   },
+   "organs": [
+    "heart",
+    "kidney"
+   ]
+  },
+  {
+   "no": 20,
+   "label": "不安になりやすい",
+   "source": "patient",
+   "findings": [
+    "anxious"
+   ],
+   "pts": {
+    "qi_def": 1,
+    "blood_def": 1,
+    "qi_stag": 1
+   },
+   "organs": [
+    "heart"
+   ]
+  },
+  {
+   "no": 21,
+   "label": "驚きやすい",
+   "source": "patient",
+   "findings": [
+    "startle"
+   ],
+   "pts": {
+    "qi_def": 1,
+    "blood_def": 1
+   },
+   "organs": [
+    "heart"
+   ]
+  },
+  {
+   "no": 22,
+   "label": "体が重だるい",
+   "source": "patient",
+   "findings": [
+    "heavy_body"
+   ],
+   "pts": {
+    "qi_def": 1,
+    "fluid": 2
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 23,
+   "label": "手足が冷える",
+   "source": "patient",
+   "findings": [
+    "cold_hands_feet"
+   ],
+   "pts": {
+    "qi_def": 1,
+    "blood_def": 1,
+    "blood_stasis": 1
+   },
+   "thermal": {
+    "kind": "cold",
+    "pts": 2,
+    "site": "limbs"
+   },
+   "note": "瘀血の「手足の先が冷える」と統合"
+  },
+  {
+   "no": 24,
+   "label": "腰や膝がだるい",
+   "source": "patient",
+   "findings": [
+    "knee_back_weak"
+   ],
+   "pts": {
+    "qi_def": 1
+   },
+   "organs": [
+    "kidney"
+   ]
+  },
+  {
+   "no": 25,
+   "label": "静脈瘤がある",
+   "source": "patient",
+   "findings": [
+    "varicose"
+   ],
+   "pts": {
+    "qi_def": 1,
+    "blood_stasis": 2
+   }
+  },
+  {
+   "no": 26,
+   "label": "乗り物酔いしやすい",
+   "source": "patient",
+   "findings": [
+    "motion_sickness"
+   ],
+   "pts": {
+    "qi_def": 1,
+    "fluid": 1
+   }
+  },
+  {
+   "no": 27,
+   "label": "舌の色：白っぽい（淡白）",
+   "source": "staff",
+   "findings": [
+    "tongue_color_pale"
+   ],
+   "pts": {
+    "blood_def": 3
+   },
+   "defExc": {
+    "side": "def",
+    "pts": 2
+   },
+   "thermal": {
+    "kind": "cold",
+    "pts": 1
+   }
+  },
+  {
+   "no": 28,
+   "label": "舌の形：薄く小さい",
+   "source": "staff",
+   "findings": [
+    "tongue_shape_thin"
+   ],
+   "pts": {
+    "blood_def": 3
+   },
+   "defExc": {
+    "side": "def",
+    "pts": 2
+   }
+  },
+  {
+   "no": 29,
+   "label": "爪の色：白っぽい",
+   "source": "staff",
+   "findings": [
+    "nail_pale"
+   ],
+   "pts": {
+    "blood_def": 3
+   }
+  },
+  {
+   "no": 30,
+   "label": "経血量が少ない",
+   "source": "patient",
+   "findings": [
+    "flow_light"
+   ],
+   "pts": {
+    "blood_def": 3
+   }
+  },
+  {
+   "no": 31,
+   "label": "経血の色が薄い",
+   "source": "patient",
+   "findings": [
+    "flow_pale"
+   ],
+   "pts": {
+    "blood_def": 3
+   }
+  },
+  {
+   "no": 32,
+   "label": "月経周期が遅れがち",
+   "source": "patient",
+   "findings": [
+    "cycle_long"
+   ],
+   "pts": {
+    "blood_def": 3
+   }
+  },
+  {
+   "no": 33,
+   "label": "顔色：黄色っぽい・つやがない",
+   "source": "staff",
+   "findings": [
+    "face_sallow"
+   ],
+   "pts": {
+    "blood_def": 2
+   },
+   "organs": [
+    "spleen"
+   ],
+   "note": "イラスト追加依頼中"
+  },
+  {
+   "no": 34,
+   "label": "爪が割れやすい",
+   "source": "staff",
+   "findings": [
+    "nail_brittle"
+   ],
+   "pts": {
+    "blood_def": 2
+   },
+   "organs": [
+    "liver",
+    "kidney"
+   ]
+  },
+  {
+   "no": 35,
+   "label": "爪：縦すじが目立つ",
+   "source": "staff",
+   "findings": [
+    "nail_ridges"
+   ],
+   "pts": {
+    "blood_def": 2
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 36,
+   "label": "髪がパサつく・抜けやすい",
+   "source": "patient",
+   "findings": [
+    "hair_dry"
+   ],
+   "pts": {
+    "blood_def": 2
+   },
+   "organs": [
+    "kidney"
+   ]
+  },
+  {
+   "no": 37,
+   "label": "肌が乾燥しやすい",
+   "source": "patient",
+   "findings": [
+    "skin_dry"
+   ],
+   "pts": {
+    "blood_def": 2,
+    "yin_def": 1
+   },
+   "organs": [
+    "lung"
+   ]
+  },
+  {
+   "no": 38,
+   "label": "めまい・立ちくらみ",
+   "source": "patient",
+   "findings": [
+    "dizzy",
+    "orthostatic"
+   ],
+   "pts": {
+    "blood_def": 2,
+    "fluid": 2
+   }
+  },
+  {
+   "no": 39,
+   "label": "目が疲れる・かすむ",
+   "source": "patient",
+   "findings": [
+    "eye_strain"
+   ],
+   "pts": {
+    "blood_def": 2
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 40,
+   "label": "手足がしびれる",
+   "source": "patient",
+   "findings": [
+    "numbness"
+   ],
+   "pts": {
+    "blood_def": 2,
+    "blood_stasis": 1
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 41,
+   "label": "こむら返りが起きやすい",
+   "source": "patient",
+   "findings": [
+    "cramps"
+   ],
+   "pts": {
+    "blood_def": 2
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 42,
+   "label": "夢が多い",
+   "source": "patient",
+   "findings": [
+    "dreams_many"
+   ],
+   "pts": {
+    "blood_def": 2
+   },
+   "organs": [
+    "heart"
+   ]
+  },
+  {
+   "no": 43,
+   "label": "寝つきが悪い",
+   "source": "patient",
+   "findings": [
+    "sleep_onset"
+   ],
+   "pts": {
+    "blood_def": 1,
+    "qi_stag": 1
+   },
+   "organs": [
+    "heart"
+   ]
+  },
+  {
+   "no": 44,
+   "label": "夜中に何度も目が覚める",
+   "source": "patient",
+   "findings": [
+    "night_waking"
+   ],
+   "pts": {
+    "blood_def": 1,
+    "yin_def": 2
+   },
+   "organs": [
+    "heart"
+   ]
+  },
+  {
+   "no": 45,
+   "label": "眠りが浅い",
+   "source": "patient",
+   "findings": [
+    "light_sleep"
+   ],
+   "pts": {
+    "blood_def": 1
+   },
+   "organs": [
+    "heart"
+   ]
+  },
+  {
+   "no": 46,
+   "label": "目が乾く",
+   "source": "patient",
+   "findings": [
+    "eye_dry"
+   ],
+   "pts": {
+    "blood_def": 1,
+    "yin_def": 2
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 47,
+   "label": "ため息が多い",
+   "source": "patient",
+   "findings": [
+    "sighing"
+   ],
+   "pts": {
+    "qi_stag": 3
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 48,
+   "label": "月経前に胸が張る",
+   "source": "patient",
+   "findings": [
+    "pms_breast"
+   ],
+   "pts": {
+    "qi_stag": 3
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 49,
+   "label": "緊張すると具合が悪くなる",
+   "source": "patient",
+   "findings": [
+    "tension_unwell"
+   ],
+   "pts": {
+    "qi_stag": 3
+   }
+  },
+  {
+   "no": 50,
+   "label": "胃痛：緊張したとき・ストレスが強いとき",
+   "source": "patient",
+   "findings": [
+    "stomach_worse_stress"
+   ],
+   "pts": {
+    "qi_stag": 3
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 51,
+   "label": "げっぷやガスが出ると楽になる",
+   "source": "patient",
+   "findings": [
+    "relief_gas"
+   ],
+   "pts": {
+    "qi_stag": 3
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 52,
+   "label": "喉に何かつかえる感じがある",
+   "source": "patient",
+   "findings": [
+    "throat_lump"
+   ],
+   "pts": {
+    "qi_stag": 3
+   },
+   "organs": [
+    "lung"
+   ]
+  },
+  {
+   "no": 53,
+   "label": "脇腹やみぞおちが張る・苦しい",
+   "source": "patient",
+   "findings": [
+    "flank_distension",
+    "chest_flank_distension"
+   ],
+   "pts": {
+    "qi_stag": 3
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 54,
+   "label": "イライラしやすい",
+   "source": "patient",
+   "findings": [
+    "irritable"
+   ],
+   "pts": {
+    "qi_stag": 2
+   },
+   "organs": [
+    "liver"
+   ],
+   "note": "イライラ単独では熱にしない"
+  },
+  {
+   "no": 55,
+   "label": "気分の浮き沈みが大きい",
+   "source": "patient",
+   "findings": [
+    "mood_swing"
+   ],
+   "pts": {
+    "qi_stag": 2
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 56,
+   "label": "気分が沈みがち",
+   "source": "patient",
+   "findings": [
+    "low_mood"
+   ],
+   "pts": {
+    "qi_stag": 2
+   }
+  },
+  {
+   "no": 57,
+   "label": "月経前にイライラする",
+   "source": "patient",
+   "findings": [
+    "pms_irritable"
+   ],
+   "pts": {
+    "qi_stag": 2
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 58,
+   "label": "月経の周期が安定しない",
+   "source": "patient",
+   "findings": [
+    "cycle_random"
+   ],
+   "pts": {
+    "qi_stag": 2
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 59,
+   "label": "お腹が張る",
+   "source": "patient",
+   "findings": [
+    "bloating"
+   ],
+   "pts": {
+    "qi_stag": 2
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 60,
+   "label": "冷えたりほてったり、日や気分で変わる",
+   "source": "patient",
+   "findings": [
+    "temp_fluctuate"
+   ],
+   "pts": {
+    "qi_stag": 2
+   }
+  },
+  {
+   "no": 61,
+   "label": "舌のふちが赤い",
+   "source": "staff",
+   "findings": [
+    "tongue_edge_red"
+   ],
+   "pts": {
+    "qi_stag": 2
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 62,
+   "label": "考え事で眠れない",
+   "source": "patient",
+   "findings": [
+    "sleep_worry"
+   ],
+   "pts": {
+    "qi_stag": 2
+   }
+  },
+  {
+   "no": 63,
+   "label": "肩こり・首のこり",
+   "source": "patient",
+   "findings": [
+    "stiff_shoulder"
+   ],
+   "pts": {
+    "qi_stag": 1,
+    "blood_stasis": 1
+   }
+  },
+  {
+   "no": 64,
+   "label": "頭痛",
+   "source": "patient",
+   "findings": [
+    "headache"
+   ],
+   "pts": {
+    "qi_stag": 1,
+    "blood_stasis": 1,
+    "fluid": 1
+   }
+  },
+  {
+   "no": 65,
+   "label": "便秘と下痢をくり返す",
+   "source": "patient",
+   "findings": [
+    "alternating"
+   ],
+   "pts": {
+    "qi_stag": 1
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 66,
+   "label": "月経痛",
+   "source": "patient",
+   "findings": [
+    "dysmenorrhea"
+   ],
+   "pts": {
+    "qi_stag": 1,
+    "blood_stasis": 2
+   },
+   "organs": [
+    "liver"
+   ],
+   "note": "月経がある方のみ"
+  },
+  {
+   "no": 67,
+   "label": "胸やけがする",
+   "source": "patient",
+   "findings": [
+    "heartburn"
+   ],
+   "pts": {
+    "qi_stag": 1
+   },
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 1,
+    "site": "lower"
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 68,
+   "label": "舌が紫っぽい・黒っぽい点（瘀点）がある",
+   "source": "staff",
+   "findings": [
+    "tongue_color_purple",
+    "tongue_petechiae"
+   ],
+   "pts": {
+    "blood_stasis": 3
+   }
+  },
+  {
+   "no": 69,
+   "label": "舌の裏の静脈が太く浮き出ている",
+   "source": "staff",
+   "findings": [
+    "tongue_sublingual_distended"
+   ],
+   "pts": {
+    "blood_stasis": 3
+   }
+  },
+  {
+   "no": 70,
+   "label": "経血に塊が混じる",
+   "source": "patient",
+   "findings": [
+    "clots"
+   ],
+   "pts": {
+    "blood_stasis": 3
+   }
+  },
+  {
+   "no": 71,
+   "label": "下腹部を押すと痛いところがある",
+   "source": "patient",
+   "findings": [
+    "lower_abd_tender"
+   ],
+   "pts": {
+    "blood_stasis": 3
+   }
+  },
+  {
+   "no": 72,
+   "label": "唇の色が暗い・紫っぽい",
+   "source": "patient",
+   "findings": [
+    "lip_dark"
+   ],
+   "pts": {
+    "blood_stasis": 3
+   }
+  },
+  {
+   "no": 73,
+   "label": "爪の色：紫っぽい・暗い",
+   "source": "staff",
+   "findings": [
+    "nail_dark"
+   ],
+   "pts": {
+    "blood_stasis": 3
+   }
+  },
+  {
+   "no": 74,
+   "label": "決まった場所が刺すように痛む・夜に強くなる",
+   "source": "patient",
+   "findings": [
+    "pain_fixed_stabbing",
+    "headache_stabbing",
+    "shoulder_stabbing",
+    "back_stabbing",
+    "period_stabbing"
+   ],
+   "pts": {
+    "blood_stasis": 3
+   }
+  },
+  {
+   "no": 75,
+   "label": "顔色：暗い・くすんでいる",
+   "source": "staff",
+   "findings": [
+    "face_dark"
+   ],
+   "pts": {
+    "blood_stasis": 2
+   },
+   "organs": [
+    "kidney"
+   ]
+  },
+  {
+   "no": 76,
+   "label": "経血の色が暗い",
+   "source": "patient",
+   "findings": [
+    "flow_dark"
+   ],
+   "pts": {
+    "blood_stasis": 2
+   }
+  },
+  {
+   "no": 77,
+   "label": "シミ・色素沈着（お悩み）",
+   "source": "patient",
+   "findings": [
+    "spots"
+   ],
+   "pts": {
+    "blood_stasis": 2
+   },
+   "note": "単独では瘀血と決めない"
+  },
+  {
+   "no": 78,
+   "label": "目の下にクマができやすい",
+   "source": "patient",
+   "findings": [
+    "circles_blue",
+    "circles_brown"
+   ],
+   "pts": {
+    "blood_stasis": 1
+   },
+   "note": "問診にあれば"
+  },
+  {
+   "no": 79,
+   "label": "肌がくすむ・ごわつく",
+   "source": "patient",
+   "findings": [
+    "dull_skin"
+   ],
+   "pts": {
+    "blood_stasis": 1
+   },
+   "note": "問診にあれば"
+  },
+  {
+   "no": 80,
+   "label": "むくみ：押すと跡が残る",
+   "source": "patient",
+   "findings": [
+    "edema_pitting"
+   ],
+   "pts": {
+    "fluid": 3
+   }
+  },
+  {
+   "no": 81,
+   "label": "雨の日や低気圧で体調が悪くなる",
+   "source": "patient",
+   "findings": [
+    "weather_sensitive"
+   ],
+   "pts": {
+    "fluid": 3
+   }
+  },
+  {
+   "no": 82,
+   "label": "苔が厚く、べたっと湿っている",
+   "source": "staff",
+   "findings": [
+    "tongue_coat_thick",
+    "tongue_coat_wet"
+   ],
+   "pts": {
+    "fluid": 3
+   },
+   "defExc": {
+    "side": "exc",
+    "pts": 2
+   }
+  },
+  {
+   "no": 83,
+   "label": "口は渇くが、あまり飲みたくない",
+   "source": "patient",
+   "findings": [
+    "thirst_no_drink"
+   ],
+   "pts": {
+    "fluid": 3
+   }
+  },
+  {
+   "no": 84,
+   "label": "胃でチャポチャポ音がする",
+   "source": "patient",
+   "findings": [
+    "stomach_splash"
+   ],
+   "pts": {
+    "fluid": 3
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 85,
+   "label": "むくみやすい",
+   "source": "patient",
+   "findings": [
+    "edema"
+   ],
+   "pts": {
+    "fluid": 2
+   }
+  },
+  {
+   "no": 86,
+   "label": "冷えるとむくむ",
+   "source": "patient",
+   "findings": [
+    "cold_edema"
+   ],
+   "pts": {
+    "fluid": 2
+   },
+   "thermal": {
+    "kind": "cold",
+    "pts": 2,
+    "site": "lower"
+   },
+   "organs": [
+    "kidney"
+   ]
+  },
+  {
+   "no": 87,
+   "label": "月経前にむくむ",
+   "source": "patient",
+   "findings": [
+    "edema_premenstrual"
+   ],
+   "pts": {
+    "fluid": 2
+   }
+  },
+  {
+   "no": 88,
+   "label": "口の中が粘る",
+   "source": "patient",
+   "findings": [
+    "mouth_sticky"
+   ],
+   "pts": {
+    "fluid": 2
+   },
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 1
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 89,
+   "label": "痰が多い",
+   "source": "patient",
+   "findings": [
+    "phlegm"
+   ],
+   "pts": {
+    "fluid": 2
+   },
+   "organs": [
+    "lung"
+   ]
+  },
+  {
+   "no": 90,
+   "label": "頭が重い",
+   "source": "patient",
+   "findings": [
+    "head_heavy"
+   ],
+   "pts": {
+    "fluid": 1
+   }
+  },
+  {
+   "no": 91,
+   "label": "吐き気",
+   "source": "patient",
+   "findings": [
+    "nausea"
+   ],
+   "pts": {
+    "fluid": 1
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 92,
+   "label": "鼻水が多い（透明）",
+   "source": "patient",
+   "findings": [
+    "nasal_discharge",
+    "nasal_watery"
+   ],
+   "pts": {
+    "fluid": 1
+   },
+   "thermal": {
+    "kind": "cold",
+    "pts": 1,
+    "site": "upper"
+   },
+   "organs": [
+    "lung"
+   ]
+  },
+  {
+   "no": 93,
+   "label": "尿の量が少ない",
+   "source": "patient",
+   "findings": [
+    "urine_scanty"
+   ],
+   "pts": {
+    "fluid": 1,
+    "yin_def": 1
+   }
+  },
+  {
+   "no": 94,
+   "label": "湿疹がじゅくじゅくしやすい",
+   "source": "patient",
+   "findings": [
+    "skin_weepy"
+   ],
+   "pts": {
+    "fluid": 1
+   },
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 1
+   }
+  },
+  {
+   "no": 95,
+   "label": "苔が少ない・ない、鏡のように光る",
+   "source": "staff",
+   "findings": [
+    "tongue_coat_little",
+    "tongue_mirror"
+   ],
+   "pts": {
+    "yin_def": 3
+   },
+   "thermal": {
+    "kind": "heat_def",
+    "pts": 2
+   }
+  },
+  {
+   "no": 96,
+   "label": "手のひら・足の裏がほてる",
+   "source": "patient",
+   "findings": [
+    "palms_hot"
+   ],
+   "pts": {
+    "yin_def": 3
+   },
+   "thermal": {
+    "kind": "heat_def",
+    "pts": 3,
+    "site": "limbs"
+   }
+  },
+  {
+   "no": 97,
+   "label": "夕方から夜にほてる",
+   "source": "patient",
+   "findings": [
+    "evening_heat"
+   ],
+   "pts": {
+    "yin_def": 3
+   },
+   "thermal": {
+    "kind": "heat_def",
+    "pts": 3,
+    "site": "whole"
+   }
+  },
+  {
+   "no": 98,
+   "label": "口や喉が乾くが、少しずつしか飲めない",
+   "source": "patient",
+   "findings": [
+    "thirst_sips"
+   ],
+   "pts": {
+    "yin_def": 3
+   },
+   "thermal": {
+    "kind": "heat_def",
+    "pts": 2,
+    "site": "upper"
+   }
+  },
+  {
+   "no": 99,
+   "label": "舌が赤い",
+   "source": "staff",
+   "findings": [
+    "tongue_color_red"
+   ],
+   "pts": {
+    "yin_def": 2
+   },
+   "thermal": {
+    "kind": "heat_unknown",
+    "pts": 2
+   },
+   "note": "苔が黄色い→実熱、苔が少ない→虚熱として数える"
+  },
+  {
+   "no": 100,
+   "label": "舌にひび割れがある",
+   "source": "staff",
+   "findings": [
+    "tongue_fissured"
+   ],
+   "pts": {
+    "yin_def": 2
+   },
+   "thermal": {
+    "kind": "heat_def",
+    "pts": 1
+   }
+  },
+  {
+   "no": 101,
+   "label": "便が硬くコロコロしている",
+   "source": "patient",
+   "findings": [
+    "hard_stool"
+   ],
+   "pts": {
+    "yin_def": 2
+   },
+   "defExc": {
+    "side": "exc",
+    "pts": 1
+   },
+   "thermal": {
+    "kind": "heat_def",
+    "pts": 1,
+    "site": "lower"
+   }
+  },
+  {
+   "no": 102,
+   "label": "乾いた咳が出る",
+   "source": "patient",
+   "findings": [
+    "dry_cough"
+   ],
+   "pts": {
+    "yin_def": 2
+   },
+   "organs": [
+    "lung"
+   ]
+  },
+  {
+   "no": 103,
+   "label": "尿の色が濃い",
+   "source": "patient",
+   "findings": [
+    "urine_dark"
+   ],
+   "pts": {
+    "yin_def": 1
+   },
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 2,
+    "site": "lower"
+   }
+  },
+  {
+   "no": 104,
+   "label": "朝早く目が覚める",
+   "source": "patient",
+   "findings": [
+    "early_waking"
+   ],
+   "pts": {
+    "yin_def": 1
+   }
+  },
+  {
+   "no": 105,
+   "label": "耳鳴り：キーンと高い音",
+   "source": "patient",
+   "findings": [
+    "tinnitus_high"
+   ],
+   "pts": {
+    "yin_def": 1
+   },
+   "organs": [
+    "kidney"
+   ],
+   "note": "耳鳴りの高さは本人チェック"
+  },
+  {
+   "no": 106,
+   "label": "体格：やせ型",
+   "source": "staff",
+   "findings": [
+    "build_thin"
+   ],
+   "defExc": {
+    "side": "def",
+    "pts": 2
+   }
+  },
+  {
+   "no": 107,
+   "label": "がっちりした体型で暑がり、声が大きく体力がある",
+   "source": "patient",
+   "findings": [],
+   "defExc": {
+    "side": "exc",
+    "pts": 3
+   }
+  },
+  {
+   "no": 108,
+   "label": "声が大きく力強い",
+   "source": "staff",
+   "findings": [
+    "voice_strong"
+   ],
+   "defExc": {
+    "side": "exc",
+    "pts": 3
+   }
+  },
+  {
+   "no": 109,
+   "label": "体格：がっちり（筋肉質）",
+   "source": "staff",
+   "findings": [
+    "build_solid"
+   ],
+   "defExc": {
+    "side": "exc",
+    "pts": 3
+   }
+  },
+  {
+   "no": 110,
+   "label": "体格：太り気味（お腹周り）",
+   "source": "staff",
+   "findings": [
+    "build_belly_fat"
+   ],
+   "defExc": {
+    "side": "exc",
+    "pts": 2
+   },
+   "note": "ため込む実も水太りの虚もいる"
+  },
+  {
+   "no": 111,
+   "label": "食べてもすぐお腹が空く",
+   "source": "patient",
+   "findings": [
+    "big_appetite"
+   ],
+   "defExc": {
+    "side": "exc",
+    "pts": 2
+   },
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 1,
+    "site": "lower"
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 112,
+   "label": "胃痛：食後に痛む",
+   "source": "patient",
+   "findings": [
+    "stomach_worse_meal"
+   ],
+   "defExc": {
+    "side": "exc",
+    "pts": 2
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 113,
+   "label": "寒がり",
+   "source": "patient",
+   "findings": [
+    "chilly"
+   ],
+   "thermal": {
+    "kind": "cold",
+    "pts": 3,
+    "site": "whole"
+   }
+  },
+  {
+   "no": 114,
+   "label": "胃痛：温かいものをとると楽になる",
+   "source": "patient",
+   "findings": [
+    "stomach_warm_relief"
+   ],
+   "thermal": {
+    "kind": "cold",
+    "pts": 3,
+    "site": "lower"
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 115,
+   "label": "冷たい物や生ものでお腹を壊す",
+   "source": "patient",
+   "findings": [
+    "cold_diarrhea"
+   ],
+   "thermal": {
+    "kind": "cold",
+    "pts": 3,
+    "site": "lower"
+   },
+   "organs": [
+    "spleen"
+   ]
+  },
+  {
+   "no": 116,
+   "label": "温かい飲み物を好む",
+   "source": "patient",
+   "findings": [
+    "prefer_warm"
+   ],
+   "thermal": {
+    "kind": "cold",
+    "pts": 2,
+    "site": "whole"
+   }
+  },
+  {
+   "no": 117,
+   "label": "お腹・腰が冷える",
+   "source": "patient",
+   "findings": [
+    "cold_belly",
+    "cold_lower"
+   ],
+   "thermal": {
+    "kind": "cold",
+    "pts": 2,
+    "site": "lower"
+   }
+  },
+  {
+   "no": 118,
+   "label": "尿の色が薄い",
+   "source": "patient",
+   "findings": [
+    "urine_pale"
+   ],
+   "thermal": {
+    "kind": "cold",
+    "pts": 2,
+    "site": "lower"
+   }
+  },
+  {
+   "no": 119,
+   "label": "尿の量が多い・夜中にトイレに起きる",
+   "source": "patient",
+   "findings": [
+    "urine_copious",
+    "nocturia"
+   ],
+   "thermal": {
+    "kind": "cold",
+    "pts": 1,
+    "site": "lower"
+   },
+   "organs": [
+    "kidney"
+   ]
+  },
+  {
+   "no": 120,
+   "label": "冷たい水を多く飲みたい",
+   "source": "patient",
+   "findings": [
+    "thirst_cold"
+   ],
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 3,
+    "site": "whole"
+   }
+  },
+  {
+   "no": 121,
+   "label": "暑がり",
+   "source": "patient",
+   "findings": [
+    "heat_intolerant"
+   ],
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 3,
+    "site": "whole"
+   }
+  },
+  {
+   "no": 122,
+   "label": "苔が黄色い",
+   "source": "staff",
+   "findings": [
+    "tongue_coat_yellow"
+   ],
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 3
+   }
+  },
+  {
+   "no": 123,
+   "label": "暑いときや食事中に大量に汗をかく",
+   "source": "patient",
+   "findings": [
+    "sweat_profuse"
+   ],
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 2,
+    "site": "whole"
+   }
+  },
+  {
+   "no": 124,
+   "label": "口が苦い",
+   "source": "patient",
+   "findings": [
+    "bitter_mouth"
+   ],
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 2,
+    "site": "upper"
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 125,
+   "label": "目が充血しやすい",
+   "source": "patient",
+   "findings": [
+    "eye_red"
+   ],
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 2,
+    "site": "upper"
+   },
+   "organs": [
+    "liver"
+   ]
+  },
+  {
+   "no": 126,
+   "label": "カッとなると顔が赤くなる・頭に血が上る",
+   "source": "patient",
+   "findings": [
+    "flare_red"
+   ],
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 2,
+    "site": "upper"
+   }
+  },
+  {
+   "no": 127,
+   "label": "口内炎ができやすい",
+   "source": "patient",
+   "findings": [
+    "mouth_ulcer"
+   ],
+   "thermal": {
+    "kind": "heat_exc",
+    "pts": 2,
+    "site": "upper"
+   },
+   "organs": [
+    "heart"
+   ]
+  },
+  {
+   "no": 128,
+   "label": "顔が赤くなりやすい／顔や上半身のほてり",
+   "source": "patient",
+   "findings": [
+    "face_red",
+    "hot_upper"
+   ],
+   "thermal": {
+    "kind": "heat_unknown",
+    "pts": 2,
+    "site": "upper"
+   },
+   "note": "夕方〜夜なら虚熱、汗が多いなら実熱として数える"
+  },
+  {
+   "no": 129,
+   "label": "上半身はのぼせるのに足は冷える",
+   "source": "patient",
+   "findings": [
+    "hot_up_cold_down"
+   ],
+   "thermal": {
+    "kind": "cold_heat",
+    "pts": 2,
+    "site": "upper_lower"
+   },
+   "note": "上部の熱1つ＋下部の冷え1つを両方数える（強さは中＝2点ずつ）"
+  }
+ ]
+}
