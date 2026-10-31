@@ -95,6 +95,8 @@ export function resolveQuestion(q: Question, c: FlowContext): Question {
   let options: Option[] = q.options;
   if (q.section === 'primary') options = c.complaints.map((cid) => ({ id: primaryOptionId(cid), text: complaintById(cid)!.name, complaint: cid }));
   if (c.sex === 'male') options = options.filter((o) => !o.femaleOnly);
+  // 薬剤師が「記入漏れの薬の追加」でだけ使う種類は患者画面に出さない（第5弾 1-1d）
+  options = options.filter((o) => !o.staffOnly);
   if (!mensesShown(c)) options = options.filter((o) => !o.mensesOnly);
   if (q.section === 'constitution') {
     options = options.map((o) => {
@@ -206,7 +208,12 @@ export function normalizeAnswer(q: Question, rawIds: string[]): string[] {
     return single ? m.slice(0, 1) : m;
   };
   const uniq = [...new Set(rawIds)];
-  const m = pick(q.options, q.type === 'single');
+  let m = pick(q.options, q.type === 'single');
+  // 「ある／ない」を先に聞く設問：「ない」なら「ない」だけ。種類を選んでいれば「ある」を付ける（第5弾 1-1f）
+  if (q.gate) {
+    if (m.includes(q.gate.no)) m = [q.gate.no];
+    else if (m.some((id) => id !== q.gate!.yes)) m = [q.gate.yes, ...m.filter((id) => id !== q.gate!.yes)];
+  }
   const subIds = new Set(q.sub?.options.map((o) => o.id) ?? []);
   const s = uniq.filter((id) => subIds.has(id)).slice(0, 1);
   const f = (q.followups ?? []).filter((fu) => m.includes(fu.when) || q.options.find((o) => o.id === fu.when)?.locked).flatMap((fu) => pick(fu.options, fu.type === 'single'));
@@ -230,6 +237,8 @@ export function isAnswered(q: Question, ids: string[] | undefined, skipped = fal
   if (q.optional && skipped) return true;
   if (!ids?.length) return false;
   if (!ids.some((id) => q.options.some((o) => o.id === id))) return false;
+  // 「ある」を選んだら種類を1つ以上（「種類がわからない」でもよい）
+  if (q.gate && !ids.includes(q.gate.no) && !ids.some((id) => id !== q.gate!.yes && q.options.some((o) => o.id === id))) return false;
   if (q.sub && !ids.some((id) => q.sub!.options.some((o) => o.id === id))) return false;
   // 必須の小見出し（舌の色・形・苔・静脈）：それぞれ1つ以上
   for (const g of q.groups ?? []) if (g.required && !ids.some((id) => q.options.find((o) => o.id === id)?.group === g.id)) return false;

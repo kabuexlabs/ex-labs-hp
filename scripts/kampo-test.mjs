@@ -5,13 +5,18 @@
 // 2026-10-28 修正依頼（6タイプ＋寒熱・選択肢の分割と移動・矛盾する選択肢・妊娠授乳の任意化・アレルギーと副作用歴の統合・
 // 漢方薬の薬剤師入力と重複警告・生活習慣1問・舌4軸・顔色と爪の観察優先）を確認する。
 // 2026-10-31 第4弾（自動チェックだけで次へ・舌の小見出し・食品アレルギー→構成生薬で除外・耳鳴りの音・受診のおすすめは薬剤師画面のみ・注意の種類と根拠・養生の出し方）も確認する。
+// 2026-10-31 第5弾（配点表どおりの判定・寒熱3区分・証名・ある／ない・顔色と爪は薬剤師・甘草2.5g以上・小柴胡湯×肝臓・山梔子・薬の名前の照合・患者画面は6タイプだけ）も確認する。
 // 2026-10-29 第3弾（妊娠中は月経の設問なし・周期と経血の矛盾・不正出血の受診のおすすめ・薬と病気の選択肢ごとの記入欄と飲み合わせ・妊娠授乳は漢方の提案なし・舌の確認方法・爪の色と形・ツムラ番号）も確認する。
 import {
   QUESTIONS, STAFF_QUESTIONS, COMPLAINTS, CATEGORIES, FORMULAS, TYPE_DEFS, THERMAL_DEFS, TYPES, STEPS, TIPS, FOUNDATION, findingById, validateMasters, complaintById, legacyOptionText, QUESTIONNAIRE,
+  SCORE_ROWS, CUTOFF_RATIO,
 } from '../src/lib/kampo/masters.ts';
 import { walk, normalizeAnswer, isAnswered, firstUnansweredStep, personalTips, primaryOf, complaintsOf, applyStaffAnswers, conflictIn, resolveQuestion, tongueMode } from '../src/lib/kampo/flow.ts';
-import { score, classify, resultCards, SELF_TONGUE_FACTOR, advicePlan, adviceOverride, relatedTypeOf } from '../src/lib/kampo/scoring.ts';
-import { safetyFlags, safetyTags, isUrgent, safetyContext, staffChecks, noKampoReason, referrals, foodAllergies, assessFormulaSafety, CAUTION_KIND_LABEL } from '../src/lib/kampo/safety.ts';
+import { score, classify, resultCards, SELF_TONGUE_FACTOR, advicePlan, adviceOverride, relatedTypeOf, patientView, dedupeAdvice, shoName, LEVEL_CUT, DEF_EXC_LABEL, THERMAL_CONDITION_LABEL } from '../src/lib/kampo/scoring.ts';
+import { safetyFlags, safetyTags, isUrgent, safetyContext, staffChecks, noKampoReason, referrals, foodAllergies, assessFormulaSafety, CAUTION_KIND_LABEL, hasHerb, gramsOf, kampoInMedNames, currentKampo } from '../src/lib/kampo/safety.ts';
+import { drugClassesFromNames } from '../src/lib/kampo/drugnames.ts';
+import { FIT_LEVEL_SYMBOL } from '../src/lib/kampo/recommend.ts';
+import { receiptNo } from '../src/lib/kampo/store.ts';
 import { computeSession, selectionOf, isLegacy, kampoHidden } from '../src/lib/kampo/compute.ts';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -48,7 +53,7 @@ eq('マスタ検証 合格', validateMasters(...M), []);
   eq('体質の設問に「わからない」を置くと検証エラー（2-1）', validateMasters(qj, cj, fj, tj, ty, fo).some((e) => e.includes('B4') && e.includes('わからない')), true);
 }
 eq('処方 68 件・タイプ 6 件・寒熱 2 件', [FORMULAS.length, Object.keys(TYPE_DEFS).length, Object.keys(THERMAL_DEFS).length], [68, 6, 2]);
-eq('設問版', QUESTIONNAIRE.version, '2026-10-31-v3.4');
+eq('設問版', QUESTIONNAIRE.version, '2026-10-31-v3.5');
 
 // ---- 主訴カテゴリーと具体的な主訴（改修計画 §4） ----
 eq('大カテゴリー A〜H', CATEGORIES.map((c) => `${c.id}:${c.name}`), ['A:疲れ・体力・全身の不調', 'B:胃腸・便通', 'C:肌', 'D:髪・頭皮', 'E:睡眠・こころ', 'F:女性の健康', 'G:痛み・こり・しびれ', 'H:その他の体の不調']);
@@ -150,12 +155,12 @@ eq('4-3「食事を抜くことが多い」（少食を含めない）', texts('
 const allOpts = QUESTIONS.flatMap((x) => x.options.map((o) => ({ q: x, o })));
 eq('4-4「冷えると体調が悪くなる」はない', allOpts.some(({ o }) => /冷えると体調が悪/.test(o.text)), false);
 eq('4-4「温めると楽になる」は症状の深掘りにだけ置く', allOpts.filter(({ o }) => o.text.includes('温めると') || o.text.includes('温かいものをとると楽')).every(({ q }) => q.section === 'detail'), true);
-eq('4-5 痛みの性質（刺す・張る痛み）を全員向けに聞かない', allOpts.filter(({ o }) => /(刺す|張る)ような痛み|刺すように|張るように/.test(o.text)).every(({ q }) => q.section === 'detail'), true);
+eq('4-5 痛みの性質を全員向けに聞くのは瘀血の「決まった場所が刺すように痛む」だけ（第5弾 1-1b）', allOpts.filter(({ o, q }) => q.section !== 'detail' && /(刺す|張る)ような痛み|刺すように|張るように/.test(o.text)).map(({ o }) => o.id), ['B10-pain_fixed_stabbing']);
 eq('4-6 発症時期・頻度の質問はない', QUESTIONS.some((x) => /いつ頃から|いつごろから|どれくらいの頻度|どれくらい続いて/.test(x.title)), false);
 eq('4-7「日常生活への影響」の質問はない', QUESTIONS.some((x) => x.title.includes('日常生活') || x.options.some((o) => o.text.includes('日常生活'))), false);
-eq('4-8 顔色はイラストの設問 F1 にだけある', allOpts.filter(({ o }) => /顔色/.test(o.text)).map(({ q }) => q.id).filter((id, i, a) => a.indexOf(id) === i), ['F1']);
-eq('F1 はいただいたイラスト（「わからない」は外した。2-1）', qById('F1').options.map((o) => o.image?.split('/').pop()), ['normal.webp', 'pale.webp', 'dark.webp', 'red.webp', undefined, 'bluish.webp']);
-eq('2-1 顔色に「黄色っぽく、つやがない」を追加し、白っぽい・青白いの違いを説明で添える', [texts('F1').includes('顔色が黄色っぽく、つやがない'), texts('F1').includes('血色が悪く、白っぽい（血の気が少ない）'), texts('F1').includes('顔色が青白い（冷えて青みがある）')], [true, true, true]);
+eq('第5弾 1-2 顔色はご本人に聞かない（薬剤師の観察 X_face だけ）', [allOpts.some(({ o }) => /顔色/.test(o.text)), qById('F1')], [false, undefined]);
+eq('第5弾 1-2 顔色の観察はいただいたイラスト（黄色っぽい・つやがないを追加）＋「本人に聞いて選んだ」', sq0('X_face').options.map((o) => o.image?.split('/').pop() ?? (o.meta ? 'meta' : '')), ['normal.webp', 'pale.webp', 'dark.webp', 'red.webp', 'bluish.webp', 'sallow.webp', 'meta']);
+eq('第5弾 1-2 顔色の画像ファイルがある', sq0('X_face').options.filter((o) => o.image).every((o) => fs.existsSync(`public${o.image}`)), true);
 eq('3-5「体力には自信がある」はない', allOpts.some(({ o }) => o.text.includes('体力がある') || o.text.includes('体力には自信')), false);
 eq('11-1 舌はご本人が「自分で鏡を見て」を選んだときだけ聞く', QUESTIONS.filter((x) => x.options.some((o) => o.findings?.some((f) => f.startsWith('tongue_')))).every((x) => x.section === 'tongue' && x.trigger?.chosen?.includes('T1-self')), true);
 eq('2-8 舌は1ページの中に小見出し（色・色の追加・形・苔・苔の色・苔の潤い・舌下静脈）で分ける', STAFF_QUESTIONS.filter((x) => x.id.startsWith('X_tongue')).map((x) => x.groups.map((g) => g.title)), [['舌の色', '色の追加', '舌の形', '舌苔', '苔の色', '苔の潤い', '舌下静脈']]);
@@ -211,7 +216,7 @@ eq('自由記述の設問はない（記入欄は安全確認の任意の短い�
   const f01 = g.candidates.find((x) => x.code === 'F01');
   eq('6-4 体調を崩した漢方薬と同じ漢方薬は除外', [f01.safety.status, f01.safety.exclude[0]], ['excluded', 'この漢方薬で体調を崩したことがあるため除外']);
   eq('5-2 服用中と同じ漢方薬は警告', f01.safety.check.includes('服用中の補中益気湯と同じ漢方薬です'), true);
-  eq('5-2 甘草を含む候補は服用中の漢方との甘草の重複を警告', g.candidates.filter((x) => x.code !== 'F01' && x.formula.cautionHerbs.includes('甘草')).every((x) => x.safety.check.some((t) => t.startsWith('服用中の補中益気湯と') && t.includes('甘草'))), true);
+  eq('5-2・第5弾 3-14 甘草を含む候補は服用中の漢方との甘草の合計量を出す', g.candidates.filter((x) => x.code !== 'F01' && x.formula.cautionHerbs.includes('甘草')).every((x) => x.safety.cautions.some((t) => t.pair.startsWith('甘草 合計') && t.effect.includes('服用中の補中益気湯'))), true);
   eq('6-4 体調を崩した漢方薬と共通の生薬は「◯◯が共通」（一律に外さない）', g.candidates.filter((x) => x.code !== 'F01' && x.formula.cautionHerbs.includes('柴胡')).every((x) => x.safety.status !== 'excluded' && x.safety.check.some((t) => /柴胡.*が共通（体調を崩した補中益気湯と/.test(t))), true);
   eq('候補はすべて主訴の効能に当たる（体質だけで足さない）', g.candidates.every((x) => x.matched.length > 0), true);
   const a2 = { ...a, C1: ['C1-kampo', 'C1KP-notfound'] };
@@ -261,14 +266,14 @@ eq('1-1 体質タイプは6つ', TYPES.map((t) => TYPE_DEFS[t].name), ['気虚',
   const pct = { qi_def: 50, blood_def: 0, qi_stag: 0, blood_stasis: 0, fluid: 40, yin_def: 0, cold: 90, heat: 25 };
   const k = classify(pct);
   eq('1-1 冷え・熱は主体質・副体質にしない', [k.mainTypes, k.subTypes], [['qi_def'], ['fluid']]);
-  eq('1-1 陽虚＝気虚＋冷え、湿熱＝水滞＋熱として表示', k.combos, ['yang_def', 'damp_heat']);
-  eq('1-1 結果には寒熱の傾向を別に出す', resultCards({ ...k, pct }).map((x) => `${x.rank}:${x.t}`), ['main:qi_def', 'sub:fluid', 'thermal:cold', 'thermal:heat']);
+  eq('1-1・第5弾 3-5 陽虚＝気虚＋冷えは寒熱が冷え寄りのときだけ（熱寄りでない湿熱は出さない）', k.combos, ['yang_def']);
+  eq('第5弾 2-1 お客様用の結果は6タイプだけ（寒熱は旧版のときだけ出す）', [resultCards({ ...k, pct }).map((x) => `${x.rank}:${x.t}`), resultCards({ ...k, pct }, true).some((x) => x.rank === 'thermal')], [['main:qi_def', 'sub:fluid'], true]);
 }
 eq('1-1 所見の重み・処方の対象に陽虚・陽盛（独立軸）はない', [M[2].findings, M[5].formulas].flat().some((x) => ['yang_def', 'yang_exc'].some((k) => k in (x.weights ?? x.types ?? {}))), false);
 // 1-3・2-1・2-2
 eq('1-3 尿の色と量は別の選択肢', [texts('B6b').includes('尿の色が薄い'), texts('B6b').includes('尿の量が多い'), allOpts.some(({ o }) => o.text.includes('薄く、量が多い'))], [true, true, false]);
 eq('2-1 体質・深掘りの設問に「わからない」はない（シミが濃くなる条件は残す）', QUESTIONS.filter((x) => (x.section === 'constitution' || x.section === 'detail') && x.options.some((o) => o.exclusive === 'unknown')).map((x) => x.id), ['Sspots3']);
-eq('2-1 アレルギー・飲んでいる薬は「わからない」を残す', [texts('C3').includes('わからない'), texts('C1').includes('わからない')], [true, true]);
+eq('第5弾 1-1f 薬は「ある」の中の最後に「種類がわからない（お薬手帳を見せてください）」', [texts('C1').includes('種類がわからない（お薬手帳を見せてください）'), texts('C1').includes('飲んでいない'), texts('C1').includes('わからない')], [true, false, false]);
 eq('2-2 主訴の性状の設問は「特にない」なし・「その他」あり', [texts('Sspots1').includes('特にない'), texts('Sspots1').includes('その他'), qById('Sspots1').options.find((o) => o.other)?.findings ?? null], [false, true, null]);
 // 2-3
 eq('5-3 汗をかきにくい ⇔ 少し動くと汗・大量の汗（寝汗・緊張・頭や顔だけは同時に選べる）', ['少し動いただけで汗をかく', '暑いときや食事中に大量に汗をかく', '寝汗をかく', '緊張すると手や脇に汗をかく', '頭や顔だけ汗をかく'].map((t) => !!conflictIn(qById('B4'), [opt('B4', '汗をかきにくい').id, opt('B4', t).id])), [true, true, false, false, false]);
@@ -283,7 +288,8 @@ eq('5-3 寒がり ⇔ 暑がり、少量で満腹 ⇔ すぐお腹が空く、�
   eq('5-3 主訴で「軟便・下痢」なら B6 の「便秘がち」「便が硬い」はグレー（押せない）', b6?.options.filter((o) => o.blocked).map((o) => o.text), ['便が硬くコロコロしている', '便秘がち', '便秘と下痢をくり返す']);
   eq('5-3 グレーの選択肢は回答に含めない', normalizeAnswer(b6, ['B6-constipation', 'B6-hemorrhoid']), ['B6-hemorrhoid']);
 }
-eq('2-3 「ない」「わからない」と「ある」は同時に選べない（C3）', normalizeAnswer(qById('C3'), ['C3-none', 'C3-drug']), ['C3-drug']);
+eq('2-3 「ない」と種類は同時に選べない（種類を選べば「ある」。第5弾 1-1f）', [normalizeAnswer(qById('C3'), ['C3-none', 'C3-drug']), normalizeAnswer(qById('C3'), ['C3-yes', 'C3-none'])], [['C3-yes', 'C3-drug'], ['C3-yes']]);
+eq('第5弾 1-1f 「ある」だけでは回答済みにならない（種類が必要）・「ない」だけなら回答済み', [isAnswered(qById('C1'), ['C1-yes']), isAnswered(qById('C1'), ['C1-yes', 'C1-unknown']), isAnswered(qById('C1'), ['C1-none'])], [false, true, true]);
 // 2-4
 eq('2-4 STEP は5段階', STEPS.map((x) => x.label), ['基本情報', 'お悩み', '体質チェック', '安全確認', '生活習慣・舌の確認']);
 // 3-1・3-2
@@ -325,21 +331,22 @@ eq('4-7・第2弾 5-5 睡眠（暑くて眠れないを外す）', texts('B8').f
 eq('4-8 物忘れ・集中力は体力・全身で2つに分ける', [texts('B1').includes('物忘れ'), texts('B1').includes('集中力が続かない'), texts('B9').some((t) => t.includes('物忘れ'))], [true, true, false]);
 eq('4-9 打撲・むち打ち・手術は体のことから外し、手術歴は既往歴で', [allOpts.some(({ o }) => o.text.includes('打撲')), texts('C2').includes('これまでに手術を受けたことがある')], [false, true]);
 {
-  const a = { A1: ['A1-1'], A2: ['A2-3'], A3: ['A3-regular'], A3P: ['A3P-no'], F1: ['F1-face_pale'], B2: ['B2-nail_brittle'] };
-  const w1 = walk(a); applyStaffAnswers(w1.state, { X_face: ['X_face-face_dark'], X_nail_shape: ['X_nail_shape-normal'] });
-  eq('4-10 顔色・爪は観察を採用し、自己申告と両方は足さない', [w1.state.get('face_pale')?.status, w1.state.get('face_dark')?.status, w1.state.get('nail_brittle')?.status], ['absent', 'present', 'present']);
-  eq('3-6 爪の割れやすさは見ただけではわからないので観察欄にない（ご本人の回答を使う）', [sq0('X_nail_shape').options.some((o) => o.text.includes('割れやすい')), w1.state.get('nail_brittle')?.source], [false, 'patient']);
-  const w2 = walk(a); applyStaffAnswers(w2.state, { X_face: ['X_face-defer'], X_nail_shape: ['X_nail_shape-defer'] });
-  eq('4-10 化粧・ネイルで判断できないときは自己申告を採用', [w2.state.get('face_pale')?.status, w2.state.get('face_pale')?.source, w2.state.get('nail_brittle')?.status], ['present', 'patient', 'present']);
+  const a = { A1: ['A1-1'], A2: ['A2-3'], A3: ['A3-regular'], A3P: ['A3P-no'] };
+  eq('第5弾 1-2 爪の割れやすさもご本人の設問（B2）から外す', texts('B2').some((t) => t.includes('爪')), false);
+  const w1 = walk(a); applyStaffAnswers(w1.state, { X_face: ['X_face-face_dark', 'X_face-asked'], X_nail_shape: ['X_nail_shape-nail_brittle'] });
+  eq('第5弾 1-2 顔色・爪は薬剤師の観察（本人に聞いて選んだものを含む）', [w1.state.get('face_pale')?.status, w1.state.get('face_dark')?.status, w1.state.get('nail_brittle')?.status, w1.state.get('nail_brittle')?.source], ['absent', 'present', 'present', 'staff']);
+  const w2 = walk(a); applyStaffAnswers(w2.state, {});
+  eq('第5弾 3-4 観察を選んでいなければ顔色・爪・声は判定に使わない（未選択から始める）', [w2.state.get('face_pale'), w2.state.get('nail_pale'), w2.state.get('voice_weak')], [undefined, undefined, undefined]);
+  eq('第5弾 3-4 観察の選択肢に初期値（default）はない', STAFF_QUESTIONS.some((q) => q.options.some((o) => o.default)), false);
 }
 // 第5章
-eq('5-1 アレルギーと副作用歴は1問', [qById('C3').title, texts('C3')], ['薬や食品で、アレルギーや体調不良が出たことはありますか', ['薬でアレルギーが出たことがある', '食品でアレルギーが出たことがある', '漢方薬で体調を崩したことがある', 'ない', 'わからない']]);
+eq('5-1 アレルギーと副作用歴は1問（第5弾 1-1f：「ある／ない」を先に）', [qById('C3').title, texts('C3'), qById('C3').gate], ['薬や食品で、アレルギーや体調不良が出たことはありますか', ['ある', 'ない', '薬でアレルギーが出たことがある', '食品でアレルギーが出たことがある', '漢方薬で体調を崩したことがある'], { yes: 'C3-yes', no: 'C3-none' }]);
 {
   const fus = qById('C3').followups ?? [];
   const sym = fus.find((f) => f.id === 'C3S');
   eq('5-1 漢方薬で体調を崩したら同じ画面で「どの漢方薬でしたか」（候補）と症状（空咳・息苦しさを含む）', [fus.map((f) => `${f.when}:${f.title}`), sym?.options.map((o) => o.text).includes('空咳・息苦しさ'), sym?.options.map((o) => o.text).includes('むくみ・血圧が上がった')], [['C3-food:アレルギーが出た食品を選んでください', 'C3-kampo:どの漢方薬でしたか', 'C3-kampo:漢方薬で体調を崩したとき、どのような症状が出ましたか'], true, true]);
 }
-eq('5-1 症状・漢方薬は「漢方薬で体調を崩した」を選んだときだけ残す', [normalizeAnswer(qById('C3'), ['C3-drug', 'C3S-rash', 'C3KP-F01']), normalizeAnswer(qById('C3'), ['C3-kampo', 'C3KP-F01', 'C3S-rash', 'C3S-unknown'])], [['C3-drug'], ['C3-kampo', 'C3KP-F01', 'C3S-rash']]);
+eq('5-1 症状・漢方薬は「漢方薬で体調を崩した」を選んだときだけ残す', [normalizeAnswer(qById('C3'), ['C3-drug', 'C3S-rash', 'C3KP-F01']), normalizeAnswer(qById('C3'), ['C3-kampo', 'C3KP-F01', 'C3S-rash', 'C3S-unknown'])], [['C3-yes', 'C3-drug'], ['C3-yes', 'C3-kampo', 'C3KP-F01', 'C3S-rash']]);
 {
   const a = { A1: ['A1-2'], A2: ['A2-3'], C3: ['C3-drug', 'C3-food'] };
   const f = safetyFlags(a, walk(a), { texts: { 'C3-drug': 'ロキソニン' } });
@@ -421,15 +428,18 @@ eq('1-2 患者画面に「おすすめの漢方薬」の見出しはない', (()
   eq('10-1 いずれでもない・男性は提案する', [f({ ...base, A3P: ['A3P-no'] }), f({ A1: ['A1-2'], A2: ['A2-3'] })], [null, null]);
 }
 {
-  eq('4 いま飲んでいる薬は漢方との飲み合わせに関係するものだけ', texts('C1'), ['利尿薬（むくみや血圧の薬）', 'ステロイドの飲み薬', '血圧の薬', '甲状腺の薬', 'ぜんそく・気管支の薬', '抗うつ薬', 'インターフェロン', '便秘薬', '市販のかぜ薬・胃腸薬', '血液をサラサラにする薬', '漢方薬', 'その他の薬・サプリメント', '飲んでいない', 'わからない']);
+  eq('第5弾 1-1d いま飲んでいる薬は添付文書に飲み合わせの記載がある6種類＋その他（例の名前つき）', QUESTIONS.find((x) => x.id === 'C1').options.filter((o) => !o.staffOnly).map((o) => o.text), ['ある', 'ない', '利尿薬（むくみ・血圧の薬。ラシックス・フロセミドなど）', '甲状腺の薬（チラーヂンなど）', 'ぜんそく・気管支の薬（テオドール・メプチンなど）', '肝炎などで注射の治療を受けている（インターフェロン）', '市販のかぜ薬・せき止め・胃腸薬', '漢方薬', 'その他の薬・サプリメント', '種類がわからない（お薬手帳を見せてください）']);
+  eq('第5弾 1-1d ステロイド・血圧の薬・抗うつ薬・便秘薬・血液サラサラは薬剤師の追加でだけ使う（患者画面に出さない）', [QUESTIONS.find((x) => x.id === 'C1').options.filter((o) => o.staffOnly).map((o) => o.id), walk({ A1: ['A1-2'], A2: ['A2-3'] }).steps.find((x) => x.q.id === 'C1')?.q.options.some((o) => o.staffOnly)], [['C1-steroid', 'C1-bp', 'C1-antidep', 'C1-laxative', 'C1-anticoag'], false]);
+  eq('第5弾 1-1e 説明は「飲み薬・注射・市販薬も含みます」、病気は「病名の欄」', [qById('C1').help.startsWith('飲み薬・注射・市販薬も含みます'), qById('C2').help.includes('病名の欄')], [true, true]);
   eq('5 病気は漢方に関係するものだけ（緑内障・糖尿病は「その他」へ）', [texts('C2').some((t) => /緑内障|糖尿病/.test(t)), texts('C2').includes('低カリウム血症と言われたことがある') || texts('C2').some((t) => t.includes('低カリウム')), texts('C2').some((t) => t.includes('前立腺肥大'))], [false, true, true]);
   const a = { A1: ['A1-2'], A2: ['A2-3'], K1: ['K1-B'], K_B: ['KB-constipation'], C1: ['C1-diuretic', 'C1-other'], C2: ['C2-hypok'] };
   const sess = { answers: a, texts: { 'C1-other': 'ビタミン剤' } };
   const c = computeSession(sess);
   const cands = selectionOf(sess, c).groups.flatMap((g) => g.candidates);
   const withKanzo = cands.filter((cd) => (cd.formula.cautionHerbs ?? []).includes('甘草'));
-  eq('4 利尿薬 × 甘草を含む候補 → 併用注意（低カリウム）', withKanzo.length > 0 && withKanzo.every((cd) => cd.safety.check.some((x) => x.includes('利尿薬・ステロイドの飲み薬との併用は低カリウム血症'))), true);
-  eq('5 低カリウム血症 × 甘草を含む候補 → 要確認', withKanzo.every((cd) => cd.safety.status !== 'ok' && cd.safety.check.some((x) => x.includes('低カリウム血症と言われたことがある'))), true);
+  eq('4 利尿薬 × 甘草を含む候補 → 併用注意（低カリウム）', withKanzo.length > 0 && withKanzo.every((cd) => cd.safety.status === 'excluded' || cd.safety.check.some((x) => x.includes('利尿薬・ステロイドの飲み薬との併用は低カリウム血症'))), true);
+  eq('5 低カリウム血症 × 甘草を含む候補 → 2.5g/日以上は除外、未満は要確認', withKanzo.every((cd) => (cd.safety.licorice ?? 0) >= 2.5 ? cd.safety.status === 'excluded' : cd.safety.status !== 'ok' && cd.safety.own.some((x) => x.includes('低カリウム血症・アルドステロン症・ミオパチー'))), true);
+  eq('第5弾 3-14 低カリウム・利尿薬があれば甘草を含まない処方を上に並べる', (() => { const g = selectionOf(sess, c).groups[0]; const ok = g.candidates.filter((cd) => cd.safety.status !== 'excluded' && cd.level !== 'unfit'); const firstLic = ok.findIndex((cd) => cd.safety.licorice !== 0); return [selectionOf(sess, c).preferNoLicorice, firstLic === -1 || ok.slice(firstLic).every((cd) => cd.safety.licorice !== 0)]; })(), [true, true]);
   eq('4 その他の薬あり：確認（記入内容つき）', c.safetyFlags.find((x) => x.code === 'other_meds')?.detail.startsWith('記入：「ビタミン剤」'), true);
   const ai = { A1: ['A1-2'], A2: ['A2-3'], K1: ['K1-B'], K_B: ['KB-constipation'], C1: ['C1-interferon'] };
   const ci = computeSession({ answers: ai, texts: {} });
@@ -449,7 +459,7 @@ eq('1-2 患者画面に「おすすめの漢方薬」の見出しはない', (()
   const self = score(walk({ ...ans, TS: ['TS-color_pale', 'TS-shape_normal', 'TS-coat_normal', 'TS-vein_normal'] }).state);
   const w2 = walk({ ...base, T1: ['T1-staff'] }); applyStaffAnswers(w2.state, { X_tongue: ['X_tongue-color_pale', 'X_tongue-shape_normal', 'X_tongue-coat_normal', 'X_tongue-vein_normal'] }, { ...base, T1: ['T1-staff'] });
   const staff = score(w2.state);
-  eq('11-1 ご本人入力の舌は重みを下げる（暫定 0.5 倍）', [SELF_TONGUE_FACTOR, self.raw.blood_def, staff.raw.blood_def], [0.5, 0.5, 1]);
+  eq('11-1 ご本人入力の舌は重みを下げる（暫定 0.5 倍）', [SELF_TONGUE_FACTOR, staff.raw.blood_def > 0, self.raw.blood_def === staff.raw.blood_def * 0.5], [0.5, true, true]);
   const wn = walk({ ...base, T1: ['T1-none'] }); applyStaffAnswers(wn.state, { X_tongue: ['X_tongue-color_red'] }, { ...base, T1: ['T1-none'] });
   eq('11-1 「舌の確認はしない」なら舌は点数・満点とも入れない（薬剤師の入力も使わない）', [[...wn.state.keys()].some((k) => k.startsWith('tongue_')), score(wn.state).max.heat === score(walk({ ...base, T1: ['T1-none'] }).state).max.heat], [false, true]);
   const ws = walk({ ...ans, TS: ['TS-color_pale'] }); applyStaffAnswers(ws.state, { X_tongue: ['X_tongue-color_red'] }, ans);
@@ -469,7 +479,7 @@ eq('1-2 患者画面に「おすすめの漢方薬」の見出しはない', (()
 }
 {
   const sq = (id) => STAFF_QUESTIONS.find((x) => x.id === id);
-  eq('11-2 爪は色（1つ）と形（複数）', [sq('X_nail_color')?.type, sq('X_nail_color')?.options.map((o) => o.text), sq('X_nail_shape')?.type, sq('X_nail_shape')?.options.map((o) => o.text), sq('X_nail')], ['single', ['ふつう', '白っぽい', '紫っぽい・暗い', '判断できない（ネイルなど）'], 'multi', ['縦すじが目立つ', '反り返っている・スプーン状', '特記なし', '判断できない（ネイルなど）'], undefined]);
+  eq('11-2・第5弾 1-2 爪は色（1つ）と形（複数）。見えないときは本人に聞いて選ぶ', [sq('X_nail_color')?.options.filter((o) => !o.meta).every((o) => o.oneOf === 'nail_color'), sq('X_nail_color')?.options.map((o) => o.text), sq('X_nail_shape')?.type, sq('X_nail_shape')?.options.map((o) => o.text), sq('X_nail')], [true, ['特記なし', '白っぽい', '紫っぽい・暗い', '見えないため、本人に聞いて選んだ（ネイルなど）'], 'multi', ['割れやすい（ご本人に聞く）', '縦すじが目立つ', '反り返っている・スプーン状', '特記なし', '見えないため、本人に聞いて選んだ（ネイルなど）'], undefined]);
   const a = { A1: ['A1-2'], A2: ['A2-3'] };
   const w = walk(a); applyStaffAnswers(w.state, { X_nail_color: ['X_nail_color-nail_dark'], X_nail_shape: ['X_nail_shape-nail_spoon'] }, a);
   eq('11-2 爪の色：紫っぽい＝瘀血、スプーン状 → 受診のおすすめ（鉄不足）', [score(w.state).raw.blood_stasis > 0, referrals(w, { X_nail_shape: ['X_nail_shape-nail_spoon'] }).some((x) => x.message.includes('鉄不足'))], [true, true]);
@@ -512,7 +522,7 @@ eq('1-2 患者画面に「おすすめの漢方薬」の見出しはない', (()
   // 2-1 顔色
   eq('2-1 顔色に「黄色っぽい・つやがない」（血虚・脾）を追加', [!!findingById('face_sallow')?.weights?.blood_def, findingById('face_sallow')?.organs?.spleen], [true, 1]);
   // 2-7 治療中の病気
-  eq('2-7 「ない」と他の病気は同時に選べない・わからないはない', normalizeAnswer(qById('C2'), ['C2-0', 'C2-1']), ['C2-1']);
+  eq('2-7 「ない」と他の病気は同時に選べない・わからないはない', [normalizeAnswer(qById('C2'), ['C2-0', 'C2-1']), texts('C2').includes('わからない')], [['C2-yes', 'C2-1'], false]);
   // 2-10 耳鳴り
   const wt = walk({ ...base, K1: ['K1-H'], K_H: ['KH-tinnitus', 'KTN-low'] });
   eq('2-10 お悩みで耳鳴りの音（低い）を選ぶと所見が入り、体質チェックでは聞き直さない・チェック済み', [wt.state.get('tinnitus_low')?.status, wt.steps.find((x) => x.q.id === 'B12')?.q.followups?.length ?? 0, wt.steps.find((x) => x.q.id === 'B12')?.q.options.find((o) => o.id === 'B12-tinnitus')?.locked], ['present', 0, true]);
@@ -537,9 +547,9 @@ eq('1-2 患者画面に「おすすめの漢方薬」の見出しはない', (()
   eq('2-9 選んだ食品（ショウガ・桃）と、その他の記入あり', [foodAllergies(a).map((x) => x.food), c.safetyFlags.some((f) => f.code === 'allergy_food_other')], [['ショウガ', '桃'], true]);
   const hoch = FORMULAS.find((f) => f.name === '補中益気湯');
   const safe = assessFormulaSafetyFor(hoch, c, a, sess);
-  eq('2-9 生姜を含む処方は候補から除外し、理由を「◯◯アレルギーのため除外（××を含む）」で出す', [safe.status, safe.exclude.some((x) => x.startsWith('ショウガアレルギーのため除外（生姜・乾姜を含む）'))], ['excluded', true]);
+  eq('2-9・第5弾 3-3 生姜を含む処方は除外し、理由は「ショウガ＝生姜を含む／食品アレルギー：ショウガ」', [safe.status, safe.exclude.includes('ショウガ＝生姜を含む／食品アレルギー：ショウガ')], ['excluded', true]);
   const nin = FORMULAS.find((f) => f.name === '桂枝茯苓丸');
-  eq('2-9 桃仁を含む処方は桃アレルギーで除外', assessFormulaSafetyFor(nin, c, a, sess).exclude.some((x) => x.startsWith('桃アレルギーのため除外（桃仁を含む）')), true);
+  eq('2-9 桃仁を含む処方は桃アレルギーで除外', assessFormulaSafetyFor(nin, c, a, sess).exclude.includes('桃＝桃仁を含む／食品アレルギー：桃'), true);
   eq('2-9 その他の食品アレルギーは「その他の食品アレルギーあり：確認」（全候補共通）', selectionOf(sess, c).general.some((x) => x.includes('その他の食品アレルギーあり：確認')), true);
   const noFood = assessFormulaSafetyFor(FORMULAS.find((f) => f.name === '六味丸'), computeSession({ answers: { ...a, C3: ['C3-none'] }, texts: {} }), { ...a, C3: ['C3-none'] }, { texts: {} });
   eq('2-9 食品アレルギーがなければ食品による除外はない', noFood.exclude.some((x) => x.includes('アレルギー')), false);
@@ -567,7 +577,7 @@ function assessFormulaSafetyFor(f, c, answers, sess) {
   eq('3-8 大黄を含む候補：便秘薬 × 大黄 → 成分の重なり／併用注意', dai ? dai.safety.cautions.some((x) => x.kind === 'overlap' && x.pair === '便秘薬 × 大黄' && x.basis === '併用注意') : 'no大黄候補', true);
   eq('3-8 注意は、その生薬を実際に含む候補にだけ付く（甘草を含まない候補に甘草の注意はない）', all.filter((x) => !x.formula.cautionHerbs.includes('甘草')).some((x) => x.safety.cautions.some((y) => y.pair.includes('× 甘草') && y.kind !== 'overlap')), false);
   const ov = all.find((x) => x.formula.cautionHerbs.includes('甘草') && x.code !== 'F01');
-  eq('3-8 服用中の漢方薬 × 候補：甘草が重なる（合計量を表示）', ov?.safety.cautions.some((x) => x.kind === 'overlap' && x.pair.startsWith('服用中の補中益気湯') && x.effect.includes('合計 約')), true);
+  eq('3-8・第5弾 3-14 服用中の漢方薬 × 候補：甘草の合計量（2.5gを超えたら黄色）', ov?.safety.cautions.some((x) => x.kind === 'overlap' && /^甘草 合計[\d.]+g\/日/.test(x.pair) && x.effect.includes('服用中の補中益気湯') && (!x.pair.includes('2.5g超') || x.tone === 'yellow')), true);
   eq('3-8 注意の種類の日本語表示', Object.fromEntries(Object.entries(CAUTION_KIND_LABEL)), { interaction: '飲み合わせ', overlap: '成分の重なり', disease: '持病', allergy: 'アレルギー' });
   eq('3-3 記入漏れの薬の追加（staffMeds）が安全フラグに入る', safetyFlags({ A1: ['A1-2'], A2: ['A2-3'] }, walk({ A1: ['A1-2'], A2: ['A2-3'] }), { staffMeds: [{ id: 'C1-bp', name: 'アムロジピン' }] }).find((f) => f.code === 'med_bp') !== undefined, true);
 }
@@ -578,7 +588,9 @@ function assessFormulaSafetyFor(f, c, answers, sess) {
   const ctx = safetyContext(c.safetyFlags, a, c.w, c.tags, {});
   const shak = assessFormulaSafety(FORMULAS.find((f) => f.name === '芍薬甘草湯'), ctx);
   const hoch = assessFormulaSafety(FORMULAS.find((f) => f.name === '補中益気湯'), ctx);
-  eq('低カリウム血症：甘草が2.5gを超える処方（芍薬甘草湯 6g）は除外、補中益気湯（1.5g）は慎重投与の確認', [shak.status, shak.exclude.some((x) => x.includes('甘草 6g/日')), hoch.exclude.length, hoch.cautions.some((x) => x.pair === '低カリウム血症 × 甘草' && x.basis === '慎重投与')], ['excluded', true, 0, true]);
+  const hange = assessFormulaSafety(FORMULAS.find((f) => f.name === '半夏瀉心湯'), ctx);
+  eq('第5弾 3-8 低カリウム血症など：甘草が2.5g「以上」の処方（芍薬甘草湯 6g・半夏瀉心湯 2.5g）は除外、補中益気湯（1.5g）は慎重投与の確認', [shak.status, shak.exclude.some((x) => x.includes('甘草 6g/日')), hange.status, hange.exclude.some((x) => x.includes('甘草 2.5g/日（2.5g以上は禁忌）')), hoch.exclude.length, hoch.cautions.some((x) => x.pair.startsWith('低カリウム血症など × 甘草') && x.basis === '慎重投与')], ['excluded', true, 'excluded', true, 0, true]);
+  eq('第5弾 3-8 低カリウム血症の選択肢にアルドステロン症・ミオパチーを含める', qById('C2').options.find((o) => o.id === 'C2-hypok')?.text.includes('アルドステロン症'), true);
 }
 // 0-4 月経痛の確認項目は月経がある方だけ
 {
@@ -592,10 +604,12 @@ function assessFormulaSafetyFor(f, c, answers, sess) {
 {
   const mk = (o) => ({ qi_def: 0, blood_def: 0, qi_stag: 0, blood_stasis: 0, fluid: 0, yin_def: 0, cold: 0, heat: 0, ...o });
   const r = (pct) => ({ pct: mk(pct), isBalanced: Math.max(...Object.values(mk(pct)).slice(0, 6)) < 20 });
-  const p1 = advicePlan(r({ qi_def: 70, blood_def: 50, fluid: 30 }), 'fluid');
+  const p1 = advicePlan(r({ qi_def: 70, blood_def: 50, fluid: 45 }), 'fluid');
   eq('3-9 養生は「主タイプ＋主訴に関係するタイプ」の最大2つ（点数の順だけで選ばない）', p1.types, ['qi_def', 'fluid']);
-  const p2 = advicePlan(r({ blood_def: 60, qi_stag: 57, yin_def: 30 }));
-  eq('3-9 1位と2位の差が5点以内なら「同じくらい」と並べ、養生は2つ', [p2.tied, p2.types], [['blood_def', 'qi_stag'], ['blood_def', 'qi_stag']]);
+  eq('第5弾 2-2 主訴に関係するタイプでも、画面に出さない「傾向あり」（40%未満）は養生に使わない', advicePlan(r({ qi_def: 70, blood_def: 50, fluid: 30 }), 'fluid').types, ['qi_def', 'blood_def']);
+  const p2 = advicePlan(r({ blood_def: 58, qi_stag: 55, yin_def: 30 }));
+  eq('3-9 同じ段階で1位と2位の差が5点以内なら「同じくらい」と並べ、養生は2つ', [p2.tied, p2.types], [['blood_def', 'qi_stag'], ['blood_def', 'qi_stag']]);
+  eq('第5弾 2-2 段階が違えば（強い 60 と 注意 57）「同じくらい」にしない', advicePlan(r({ blood_def: 60, qi_stag: 57 })).tied, []);
   const p3 = advicePlan(r({ qi_def: 69, blood_def: 66, qi_stag: 64, blood_stasis: 62, fluid: 61, yin_def: 60 }), 'yin_def');
   eq('3-9 5タイプ以上が「強い」なら薬剤師画面に全体的に高く出ています（養生は最大2つのまま）', [p3.allHigh, p3.strongCount, p3.types.length], [true, 6, 2]);
   eq('3-9 バランスなら養生は土台のみ', advicePlan(r({ qi_def: 10 })).types, []);
@@ -614,6 +628,91 @@ function assessFormulaSafetyFor(f, c, answers, sess) {
   const result = fs.readFileSync('src/pages/kampo/check/[id]/result/index.astro', 'utf8');
   eq('0-2 結果画面に漢方薬・受診のおすすめの表示はない', /referrals|FORMULAS|kp-refer|おすすめの漢方/.test(result), false);
   eq('緑系の配色（--sky 系の変数が緑）', /--sky-strong:#3FA877/.test(fs.readFileSync('src/layouts/KampoLayout.astro', 'utf8')), true);
+}
+
+// ---- 2026-10-31 修正依頼 第5弾 ----
+{
+  eq('第5弾 1-1 気滞・瘀血・水滞の選択肢', [texts('B9').includes('喉に何かつかえる感じがある'), texts('B5b').includes('脇腹やみぞおちが張る・苦しい'), texts('B10').includes('決まった場所が刺すように痛む・夜に強くなる'), texts('B5').includes('胃でチャポチャポ音がする'), texts('B10').includes('静脈瘤がある（足の血管がボコボコと浮き出ている）')], [true, true, true, true, true]);
+  // 配点表
+  const rows = SCORE_ROWS;
+  eq('第5弾 配点表：全行の所見がマスタにあり、1つの所見は1行だけ', [rows.every((r) => r.findings.every((f) => findingById(f))), new Set(rows.flatMap((r) => r.findings)).size === rows.flatMap((r) => r.findings).length], [true, true]);
+  eq('第5弾 配点表：カットオフは満点の40%', [CUTOFF_RATIO, LEVEL_CUT.caution], [0.4, 40]);
+  // 聞いていない項目は分子・分母とも外す
+  const a0 = { A1: ['A1-2'], A2: ['A2-3'] };
+  eq('第5弾 聞いていない項目は満点に入れない', score(walk(a0).state).max.qi_def, 0);
+  // 主な体質＝割合がいちばん高い（同じ割合なら点数）。ほかの体質＝注意以上すべて
+  const pct = { qi_def: 50, blood_def: 50, qi_stag: 45, blood_stasis: 10, fluid: 62, yin_def: 30, cold: 0, heat: 0 };
+  const raw = { qi_def: 6, blood_def: 9, qi_stag: 4, blood_stasis: 1, fluid: 5, yin_def: 3, cold: 0, heat: 0 };
+  const k = classify(pct, { raw });
+  eq('第5弾 2-2 主な体質は割合がいちばん高いタイプ、ほかの体質は「強い」「注意」のすべて（同じ割合なら点数の高い順）', [k.mainTypes, k.subTypes], [['fluid'], ['blood_def', 'qi_def', 'qi_stag']]);
+  const v = patientView({ ...k, pct, raw });
+  eq('第5弾 2-2 お客様用の結果と薬剤師画面で同じ（patientView）', [v.main, v.others, v.tendencyOnly], [['fluid'], ['blood_def', 'qi_def', 'qi_stag']].concat([false]));
+  const k2 = classify({ ...pct, fluid: 30, qi_def: 35, blood_def: 32, qi_stag: 20 }, { raw });
+  eq('第5弾 2-2 カットオフ未満なら主な体質なし（患者画面では「傾向」としていちばん近いタイプ）', [k2.mainTypes, patientView({ ...k2, pct: { ...pct, fluid: 30, qi_def: 35, blood_def: 32, qi_stag: 20 } }).main, patientView({ ...k2, pct: { ...pct, fluid: 30, qi_def: 35, blood_def: 32, qi_stag: 20 } }).tendencyOnly], [[], ['qi_def'], true]);
+  // 寒熱：虚熱・実熱を分ける
+  const th = (ids, staff) => { const a = { A1: ['A1-2'], A2: ['A2-3'], T1: ['T1-staff'], ...ids }; const w = walk(a); applyStaffAnswers(w.state, staff ?? {}, a); return score(w.state).thermal; };
+  const t1 = th({}, { X_tongue: ['X_tongue-color_red', 'X_tongue-coat_little'] });
+  const t2 = th({}, { X_tongue: ['X_tongue-color_red', 'X_tongue-cc_yellow', 'X_tongue-coat_thick'] });
+  eq('第5弾 3-1 舌が赤い：苔が少ない→虚熱、苔が黄色い→実熱（合算しない）', [t1.heatDef > 0 && t1.heatExc === 0, t2.heatExc > 0 && t2.heatDef === 0], [true, true]);
+  eq('第5弾 3-1 寒熱の条件の名前', Object.values(THERMAL_CONDITION_LABEL).map((x) => x.split('（')[0]), ['上熱下寒の可能性', '寒熱錯雑の可能性', '虚熱と冷えが併存']);
+  eq('第5弾 3-1 虚実は 虚／実／中間', [DEF_EXC_LABEL.def, DEF_EXC_LABEL.exc, DEF_EXC_LABEL.mid], ['虚', '実', '中間']);
+  eq('第5弾 3-2 証の名前（脾気虚・肝血虚・腎陰虚・肝の瘀血）', [shoName('qi_def', 'spleen'), shoName('blood_def', 'liver'), shoName('yin_def', 'kidney'), shoName('blood_stasis', 'liver')], ['脾気虚', '肝血虚', '腎陰虚', '肝の瘀血']);
+  // 2-3 アドバイスの重複
+  const txt = (t, it) => TYPE_DEFS[t].advice[it];
+  const rest2 = dedupeAdvice('blood_def', 'rest', txt('blood_def', 'rest'), ['qi_def', 'blood_def'], txt);
+  eq('第5弾 2-3 先に出した体質と同じ養生（夜更かし・早く寝る）はあとの体質で省く', [dedupeAdvice('qi_def', 'rest', txt('qi_def', 'rest'), ['qi_def', 'blood_def'], txt).includes('夜更かし'), /日付が変わる前に就寝/.test(rest2), rest2.includes('寝る前のスマホ')], [true, false, true]);
+  eq('第5弾 2-3 文が全部省かれたら「◯◯のアドバイスと同じです」', dedupeAdvice('yin_def', 'rest', txt('yin_def', 'rest'), ['qi_def', 'yin_def'], txt).includes('気虚のアドバイスと同じです'), true);
+  // 患者画面：寒熱・虚実・五臓・組み合わせを出さない
+  const result = fs.readFileSync('src/pages/kampo/check/[id]/result/index.astro', 'utf8');
+  const advice = fs.readFileSync('src/pages/kampo/check/[id]/advice/[type]/index.astro', 'utf8');
+  eq('第5弾 2-1 お客様用の結果・アドバイスに寒熱・虚実・組み合わせの表示や冷え／熱のアドバイスへの導線がない', [/寒熱の傾向|COMBO_LABEL|thermalLabel|defExc|organ/.test(result), /\['cold', 'heat'\]/.test(result) || /\['cold', 'heat'\]/.test(advice)], [false, false]);
+  eq('第5弾 1-3 6タイプのアイコン画像がある', TYPES.every((t) => fs.existsSync(`public/assets/kampo/types/${t}.webp`)), true);
+}
+{
+  // 3-8・3-14 甘草の合計量
+  const base = { A1: ['A1-2'], A2: ['A2-3'], K1: ['K1-A'], K_A: ['KA-fatigue'] };
+  const ctxOf = (a, input = {}) => { const c = computeSession({ answers: a, texts: {}, ...input }); return safetyContext(c.safetyFlags, a, c.w, c.tags, { texts: {}, ...input }); };
+  const ninjin = FORMULAS.find((f) => f.name === '人参湯');
+  const cur = ctxOf({ ...base, C1: ['C1-yes', 'C1-kampo', 'C1KP-F01'] });
+  const sn = assessFormulaSafety(ninjin, cur);
+  eq('第5弾 3-14 服用中（補中益気湯 1.5g）＋候補（人参湯 3g）＝甘草 合計4.5g/日（2.5g超）を黄色で', sn.cautions.some((x) => x.pair === '甘草 合計4.5g/日（2.5g超）' && x.tone === 'yellow'), true);
+  eq('第5弾 3-17 生薬の判定は構成生薬（herbs）で行う', [hasHerb({ herbs: [{ herb: '甘草', g: 1 }], cautionHerbs: [] }, '甘草'), hasHerb({ cautionHerbs: ['甘草'] }, '甘草'), gramsOf({ herbs: [{ herb: '甘草', g: 2.5 }] }, '甘草')], [true, true, 2.5]);
+  const noHerbs = assessFormulaSafety({ name: '仮の処方', cautionHerbs: [], contraindications: [] }, cur);
+  eq('第5弾 3-17 構成生薬が未登録なら「構成生薬が未登録」', noHerbs.cautions.some((x) => x.pair === '構成生薬が未登録'), true);
+  // 3-15 肝臓の病気 × 小柴胡湯
+  const liver = { ...base, C2: ['C2-yes', 'C2-4'] };
+  const saiko = FORMULAS.find((f) => f.name === '柴胡加竜骨牡蛎湯');
+  const shosaiko = { name: '小柴胡湯', cautionHerbs: ['柴胡', '黄芩', '甘草'], contraindications: [], herbs: ['柴胡', '半夏', '黄芩', '大棗', '人参', '甘草', '生姜'].map((herb) => ({ herb, g: 1 })) };
+  const lc = ctxOf(liver);
+  const lc2 = ctxOf(liver, { tagChecks: { 'row:liver_check': { by: '薬剤師A', at: 'x' } } });
+  eq('第5弾 3-15 肝臓の病気：小柴胡湯は「該当しない」を記録するまで除外、小柴胡湯を含む処方は確認', [assessFormulaSafety(shosaiko, lc).status, assessFormulaSafety(shosaiko, lc2).status !== 'excluded', assessFormulaSafety(saiko, lc).own.some((x) => x.includes('肝硬変・肝癌・血小板数')), assessFormulaSafety(saiko, lc2).own.some((x) => x.includes('肝硬変・肝癌・血小板数'))], ['excluded', true, true, false]);
+  // 3-16 山梔子
+  const kami = FORMULAS.find((f) => f.name === '加味逍遥散');
+  eq('第5弾 3-16 山梔子を含む候補に「長期服用時は腸間膜静脈硬化症に注意」', assessFormulaSafety(kami, cur).cautions.some((x) => x.effect.includes('腸間膜静脈硬化症')), true);
+  const wsan = walk(base);
+  eq('第5弾 3-16 服用中の山梔子：5年以上でお腹の症状を繰り返す → 受診のおすすめ（赤）', referrals(wsan, { X_sanshishi: ['X_sanshishi-long_sym'] }).some((x) => x.message.includes('腸間膜静脈硬化症')), true);
+  // 3-19 薬の名前から種類
+  const a19 = { ...base, C1: ['C1-yes', 'C1-other'] };
+  const f19 = safetyFlags(a19, walk(a19), { texts: { 'C1-other': 'ラシックス錠20mg' } });
+  const f19b = safetyFlags(a19, walk(a19), { texts: { 'C1-other': '血圧の薬', 'C1-other#staff': 'フロセミド' } });
+  eq('第5弾 3-19 ご本人の記入・薬剤師が「直す」で書いた名前から利尿薬を見つけて照合する', [f19.some((f) => f.code === 'med_diuretic'), f19b.some((f) => f.code === 'med_diuretic')], [true, true]);
+  eq('第5弾 3-19 薬の名前の辞書（利尿薬・MAO阻害剤）', drugClassesFromNames(['セレギリン', 'チラーヂンS']).map((x) => x.flag), ['med_mao', 'med_thyroid']);
+  // 3-6 名前の欄の漢方薬は「服用中の漢方薬」にまとめる
+  const a36 = { ...base, C1: ['C1-yes', 'C1-other'] };
+  eq('第5弾 3-6 薬の名前の欄に書かれた漢方薬を服用中の漢方薬として照合する', [kampoInMedNames(a36, { texts: { 'C1-other': '十全大補湯' } }).map((x) => x.name), currentKampo(a36, { texts: { 'C1-other': '十全大補湯' } }).codes.length], [['十全大補湯'], 1]);
+  const g36 = ctxOf(a36, { texts: { 'C1-other': '十全大補湯' } });
+  eq('第5弾 3-6 名前の欄が漢方薬だけの「その他の薬」は共通の確認事項にしない（服用中の漢方薬の行で確認）', [g36.general.some((x) => x.startsWith('その他の薬あり')), g36.pendingKeys.includes('row:C1-other')], [false, false]);
+  // 3-10 確認タブで外れる共通の確認事項
+  const a10 = { ...base, C1: ['C1-yes', 'C1-diuretic'], C2: ['C2-yes', 'C2-1'] };
+  const c10 = ctxOf(a10);
+  const c10b = ctxOf(a10, { tagChecks: { 'row:C1-diuretic': { by: 'A', at: 'x' }, 'row:C2-1': { by: 'A', at: 'x' } } });
+  eq('第5弾 3-10 共通の確認事項は確認タブの行を確認すると外れる', [c10.pendingKeys.sort(), c10.general.length > 0, c10b.pendingKeys, c10b.general.some((x) => x.includes('服用中の薬') || x.includes('治療中の病気'))], [['row:C1-diuretic', 'row:C2-1'], true, [], false]);
+  eq('第5弾 3-10 「要確認」の印はその候補だけの確認事項があるときだけ（own）', assessFormulaSafety(FORMULAS.find((f) => f.name === '六味丸'), c10b).own, []);
+  // 3-11 適合の記号
+  eq('第5弾 3-11 適合は ◎○△（数値は出さない）', [FIT_LEVEL_SYMBOL.good, FIT_LEVEL_SYMBOL.fair, FIT_LEVEL_SYMBOL.weak], ['◎', '○', '△']);
+  const staffPage = fs.readFileSync('src/pages/kampo/staff/session/[id]/index.astro', 'utf8');
+  eq('第5弾 3-3・3-11・3-12 薬剤師画面：食品と生薬の表・適合度の数値・結果の渡し方の選択はない', [/FOOD_HERBS/.test(staffPage), /cd\.fit\.toFixed/.test(staffPage), /name="deliveredVia"/.test(staffPage), /data-deliver="print"/.test(staffPage)], [false, false, false, true]);
+  eq('第5弾 3-7 見出しは受付番号（電話番号は小さく）', [receiptNo('a1b2c3d4e5f60718'), /受付 \{receiptNo\(s\.id\)\}/.test(staffPage)], ['A1B2', true]);
 }
 
 console.log(fail ? `\n${fail} 件 NG` : '\nすべて OK');

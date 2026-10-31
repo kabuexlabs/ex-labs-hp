@@ -57,6 +57,8 @@ export const SELECTION = {
 
 export type FitLevel = 'good' | 'fair' | 'weak' | 'unfit';
 export const FIT_LEVEL_LABEL: Record<FitLevel, string> = { good: '適合', fair: 'やや適合', weak: '一致が弱い', unfit: '不適合' };
+/** 適合の記号（第5弾 3-11：指数の数字は出さず ◎○△ で） */
+export const FIT_LEVEL_SYMBOL: Record<FitLevel, string> = { good: '◎', fair: '○', weak: '△', unfit: '×' };
 export type Axis = '主訴の詳細' | '気血水' | '寒熱' | '虚実' | '五臓' | '随伴症状';
 export interface FitPoint { axis: Axis; text: string }
 
@@ -123,6 +125,11 @@ export interface Selection {
   tags: TagHit[];
   /** 全候補に共通の確認事項（情報不足・未確認のタグ・服用中の薬など。候補の上に1回だけ出す。第4弾 3-8） */
   general: string[];
+  /** 確認タブで確認すると共通の確認事項が外れる行（未確認）と、それ以外で外れる事項の数（第5弾 3-10） */
+  pendingKeys: string[];
+  pendingOther: number;
+  /** 甘草を含まない処方を上に並べたか（第5弾 3-14） */
+  preferNoLicorice: boolean;
   /** 食品アレルギーで選ばれた食品（候補の除外理由の表示用） */
   foods: { id: string; food: string }[];
 }
@@ -286,9 +293,12 @@ export function evaluateFit(f: Formula, result: ScoreResult, chosen: Set<string>
 }
 
 const LEVEL_ORDER: Record<FitLevel, number> = { good: 0, fair: 1, weak: 2, unfit: 3 };
-export function compareCandidates(a: Candidate, b: Candidate): number {
+export function compareCandidates(a: Candidate, b: Candidate, preferNoLicorice = false): number {
   const ex = (c: Candidate) => (c.safety.status === 'excluded' ? 1 : 0);
-  return ex(a) - ex(b) || LEVEL_ORDER[a.level] - LEVEL_ORDER[b.level] || b.fit - a.fit || a.efficacyIndex - b.efficacyIndex || a.formula.priority - b.formula.priority;
+  const unfit = (c: Candidate) => (c.level === 'unfit' ? 1 : 0);
+  // 低カリウム・利尿薬・高血圧・心臓・腎臓 → 甘草を含まない処方を上に（第5弾 3-14。構成生薬で判定、未登録は含むとみなす）
+  const lic = (c: Candidate) => (preferNoLicorice && c.safety.licorice !== 0 ? 1 : 0);
+  return ex(a) - ex(b) || unfit(a) - unfit(b) || lic(a) - lic(b) || LEVEL_ORDER[a.level] - LEVEL_ORDER[b.level] || b.fit - a.fit || a.efficacyIndex - b.efficacyIndex || a.formula.priority - b.formula.priority;
 }
 
 /** 二段階選定の本体（いちばん改善したい主訴を中心に、候補群 → 体質で選ぶ） */
@@ -316,13 +326,16 @@ export function selectFormulas(result: ScoreResult, answers: Answers, w: WalkRes
         safety, ...ev,
       });
     }
-    candidates.sort(compareCandidates); // STEP 3
+    candidates.sort((a, b) => compareCandidates(a, b, sctx.preferNoLicorice)); // STEP 3
     const usable = candidates.filter((c) => c.safety.status !== 'excluded');
     const pick = usable.find((c) => c.level === 'good');
     const outcome: GroupOutcome = !candidates.length ? 'no_pool' : !usable.length ? 'all_excluded' : !pick ? 'no_fit' : pick.safety.status === 'check' ? 'pick_check' : 'pick';
     groups.push({ ...g, candidates, pick, outcome });
   }
-  return { groups, companions: companionComplaints(w), tags, general: sctx.general, foods: sctx.foods.map((x) => ({ id: x.id, food: x.food })) };
+  return {
+    groups, companions: companionComplaints(w), tags, general: sctx.general, pendingKeys: sctx.pendingKeys, pendingOther: sctx.pendingOther,
+    preferNoLicorice: sctx.preferNoLicorice, foods: sctx.foods.map((x) => ({ id: x.id, food: x.food })),
+  };
 }
 
 // --- STEP 5：推薦理由 ----------------------------------------------------------
@@ -380,7 +393,7 @@ export function buildReasons(group: ComplaintGroup, c: Candidate, result: ScoreR
       : `この主訴の候補は${c.name}だけで、${axes.map((a) => `【${a}】`).join('')}が一致しました。`,
     ...others.slice(0, opts.maxCompare ?? 10).map((x) => comparisonLine(x, c, result)),
   ];
-  const cautions = [...c.safety.check, ...c.safety.notes, ...GENERAL_NOTES];
+  const cautions = [...c.safety.own, ...c.safety.notes, ...GENERAL_NOTES]; // 全候補に共通の確認事項は候補の上に1回だけ（第5弾 3-9）
   if (c.formula.note) cautions.unshift(c.formula.note);
   return { complaint, constitution, useTarget: `${c.formula.useTarget}方`, action: c.formula.action, comparison, cautions };
 }

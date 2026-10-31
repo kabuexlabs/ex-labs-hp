@@ -15,10 +15,21 @@
 // 2026-10-31 第4弾：候補ごとの注意は「種類（飲み合わせ・成分の重なり・持病・アレルギー）／何が起きるか／根拠（併用禁忌・併用注意・禁忌・慎重投与）」の形で持つ
 // （Caution。3-8）。食品アレルギー（C3F）は、処方の構成生薬（foodHerbs）に当たるものを候補から除外する（2-9）。
 // 根拠の区分は添付文書のデータ登録前の暫定（一般的な知見）。製品の添付文書で薬剤師が確認する。
+// 2026-10-31 第5弾：
+//  - 薬・病気・アレルギーは「ある／ない」を先に聞く（C1-yes などの「ある」は種類ではないので数えない）。
+//  - 麻黄・甘草・山梔子・大黄などの判定は処方名ではなく構成生薬（formulas.json の herbs）で行う。未登録なら「構成生薬が未登録」（3-17）。
+//  - 甘草が1日 2.5g 以上の処方は、低カリウム血症・アルドステロン症・ミオパチーの方に禁忌（「以上」で判定。3-8）。
+//    服用中の漢方薬と合わせて 2.5g を超えたら「甘草 合計〇g（2.5g超）」（3-14）。
+//  - 情報源が食い違うときは安全側（除外・確認）を採る（3-13）。
+//  - 肝臓の病気：小柴胡湯は肝硬変・肝癌・血小板数を確認するまで除外、小柴胡湯を含む処方は確認（3-15）。
+//  - 山梔子：服用中なら服用期間とお腹の症状を確認、候補には長期服用の注意（3-16）。
+//  - ご本人の記入・薬剤師が「直す」で書いた薬の名前から、飲み合わせに関係する種類を見つける（3-19。drugnames.ts）。
+//  - 全候補に共通の確認事項は、確認タブのどの行を確認すれば外れるか（keys）を持つ（3-10）。
 // ---------------------------------------------------------------------------
-import { optionById, optionText, complaintById, tagById, formulaByCode, type SafetyTagDef } from './masters.ts';
+import { optionById, optionText, complaintById, tagById, formulaByCode, FORMULAS, type SafetyTagDef } from './masters.ts';
 import { isPresent } from './findings.ts';
 import { kampoOf, type Answers, type WalkResult } from './flow.ts';
+import { drugClassesFromNames } from './drugnames.ts';
 
 export type SafetyLevel = 'refer' | 'warn' | 'info';
 export interface SafetyFlag {
@@ -40,7 +51,9 @@ export const FLAG_LABEL: Record<string, string> = {
   disease_note: '治療中の病気（病名・時期）', hypokalemia: '低カリウム血症', other_meds: 'その他の薬あり',
   med_diuretic: '利尿薬', med_steroid: 'ステロイドの飲み薬', med_bp: '血圧の薬', med_thyroid: '甲状腺の薬', med_asthma: 'ぜんそく・気管支の薬',
   med_antidep: '抗うつ薬', med_laxative: '便秘薬', med_otc: '市販のかぜ薬・胃腸薬', med_anticoag: '血液をサラサラにする薬',
+  med_mao: 'MAO阻害剤（パーキンソン病の薬）', meds_unknown: '薬の種類がわからない',
 };
+FLAG_LABEL.hypokalemia = '低カリウム血症・アルドステロン症・ミオパチー';
 FLAG_LABEL.glaucoma_bph = '前立腺肥大など尿が出にくい';
 /** 安全確認の入力（患者の回答のほか、薬剤師の入力・記入欄・タグの確認） */
 export interface SafetyInput {
@@ -63,8 +76,10 @@ const DISEASE_NOTE: Record<string, string> = {
   other_disease: '病名を口頭で確認してください',
 };
 
-const chosenIn = (answers: Answers, qid: string) => answers[qid] ?? [];
-const nonExclusive = (ids: string[]) => ids.filter((id) => !optionById(id)?.exclusive);
+/** 「ある／ない」の「ある」（種類ではないので、薬・病気・アレルギーとしては数えない） */
+export const GATE_YES = new Set(['C1-yes', 'C2-yes', 'C3-yes']);
+const chosenIn = (answers: Answers, qid: string) => (answers[qid] ?? []).filter((id) => !GATE_YES.has(id));
+const nonExclusive = (ids: string[]) => ids.filter((id) => !optionById(id)?.exclusive && !GATE_YES.has(id));
 
 const names = (codes: string[]) => codes.map((c) => formulaByCode(c)?.name ?? c).join('・');
 /** 記入内容：薬剤師が確認・修正した内容があればそれ、なければご本人の記入 */
@@ -117,24 +132,74 @@ export function foodAllergies(answers: Answers): { id: string; food: string; her
   return (answers['C3'] ?? []).filter((id) => id.startsWith('C3F-') && id !== 'C3F-other').map((id) => ({ id, food: optionText(id), herbs: optionById(id)?.herbs ?? [] }));
 }
 
+/** 薬の名前の欄（ご本人の記入・薬剤師が「直す」で書いた名前・記入漏れで追加した名前）。薬剤師の名前を優先 */
+export function medNames(answers: Answers, input: SafetyInput = {}): { id: string; name: string; by: 'staff' | 'patient' }[] {
+  const out: { id: string; name: string; by: 'staff' | 'patient' }[] = [];
+  for (const id of chosenIn(answers, 'C1')) {
+    const n = noteText(input.texts, id);
+    if (n.by !== 'none') out.push({ id, name: n.text, by: n.by });
+  }
+  for (const m of input.staffMeds ?? []) if (m.name) out.push({ id: m.id, name: m.name, by: 'staff' });
+  return out;
+}
+const normName = (s: string) => s.normalize('NFKC').replace(/\s+/g, '');
+/** 薬の名前の欄に漢方薬の名前が書かれていたら、その漢方薬（服用中の漢方薬として扱う。第5弾 3-6） */
+export function kampoInMedNames(answers: Answers, input: SafetyInput = {}): { id: string; code: string; name: string }[] {
+  const out: { id: string; code: string; name: string }[] = [];
+  for (const m of medNames(answers, input)) {
+    const n = normName(m.name);
+    for (const f of FORMULAS) {
+      if ([f.name, ...(f.aliases ?? [])].some((x) => x && n.includes(normName(x))) && !out.some((o) => o.code === f.code)) out.push({ id: m.id, code: f.code, name: f.name });
+    }
+  }
+  // 「加味逍遥散」と「逍遥散」のように短い名前が長い名前に含まれるときは長い方だけ
+  return out.filter((o) => !out.some((x) => x !== o && x.name.length > o.name.length && x.name.includes(o.name)));
+}
+/** 薬の名前の欄が漢方薬の名前だけの選択肢（薬剤師画面では「服用中の漢方薬」の行にまとめる。第5弾 3-6） */
+export function kampoOnlyMedIds(answers: Answers, input: SafetyInput = {}): Set<string> {
+  const out = new Set<string>();
+  const kn = kampoInMedNames(answers, input);
+  const strip = (x: string) => x.normalize('NFKC').replace(/[\s、,・／/。]+/g, '');
+  for (const id of chosenIn(answers, 'C1')) {
+    const n = noteText(input.texts, id);
+    if (n.by === 'none') continue;
+    const mine = kn.filter((k) => k.id === id);
+    if (mine.length && !strip(mine.reduce((t, k) => t.split(k.name).join(''), n.text))) out.add(id);
+  }
+  return out;
+}
+/** 服用中の漢方薬：薬剤師が保存した内容が優先。なければご本人の選択と、薬の名前の欄に書かれた漢方薬 */
+export function currentKampo(answers: Answers, input: SafetyInput = {}): { codes: string[]; source: 'staff' | 'patient' | 'none'; notfound: boolean; fromNames: string[] } {
+  const k = kampoOf(answers, input.staffAnswers, 'X_kampo_current');
+  if (k.source === 'staff') return { ...k, fromNames: [] };
+  const extra = kampoInMedNames(answers, input).map((x) => x.code).filter((c) => !k.codes.includes(c));
+  return { codes: [...k.codes, ...extra], source: k.codes.length || extra.length ? 'patient' : k.source, notfound: k.notfound, fromNames: extra };
+}
+
 /** 安全フラグ（回答・薬剤師の入力から） */
 export function safetyFlags(answers: Answers, w: WalkResult, input: SafetyInput = {}): SafetyFlag[] {
   const flags: SafetyFlag[] = [];
   const push = (f: SafetyFlag) => { if (!flags.some((x) => x.code === f.code)) flags.push(f); };
   const meds = [...new Set([...nonExclusive(chosenIn(answers, 'C1')), ...(input.staffMeds ?? []).map((m) => m.id)])];
-  const otherMeds = meds.filter((id) => id !== 'C1-kampo' && id !== 'C1-other' && !id.startsWith('C1KP-'));
+  const otherMeds = meds.filter((id) => id !== 'C1-kampo' && id !== 'C1-other' && id !== 'C1-unknown' && !id.startsWith('C1KP-'));
   if (otherMeds.length) {
     push({ code: 'meds', level: 'warn', label: '服用中の薬', detail: otherMeds.map((id) => `${optionText(id)}：${noteLine(input, id)}`).join('／'), source: 'C1' });
     if (meds.includes('C1-interferon')) push({ code: 'interferon', level: 'warn', label: 'インターフェロン製剤を使用', detail: '小柴胡湯との併用禁忌。柴胡を含む漢方薬は確認が必要', source: 'C1' });
   }
   for (const id of otherMeds) for (const code of optionById(id)?.flags ?? []) if (code.startsWith('med_') && !flags.some((x) => x.code === code)) flags.push({ code, level: 'info', label: FLAG_LABEL[code] ?? optionText(id), detail: '漢方薬との飲み合わせを候補ごとに確認します', source: 'C1' });
-  if (meds.includes('C1-other')) push({ code: 'other_meds', level: 'warn', label: 'その他の薬あり：確認', detail: `${noteLine(input, 'C1-other')}。自動では飲み合わせを判定できません`, source: 'C1' });
-  const cur = kampoOf(answers, input.staffAnswers, 'X_kampo_current');
+  if (meds.includes('C1-other')) push({ code: 'other_meds', level: 'warn', label: 'その他の薬あり：確認', detail: `${noteLine(input, 'C1-other')}。名前から種類が分かったものは飲み合わせを照合します`, source: 'C1' });
+  if (meds.includes('C1-unknown')) push({ code: 'meds_unknown', level: 'warn', label: '薬の種類がわからない（お薬手帳で確認）', detail: 'お薬手帳で名前を確認し、「記入漏れの薬を追加」で入力してください', source: 'C1' });
+  // 名前から分かる種類（第5弾 3-19）：ご本人の記入・薬剤師が直した名前・追加した名前
+  for (const h of drugClassesFromNames(medNames(answers, input).map((m) => m.name))) {
+    if (h.flag === 'interferon') push({ code: 'interferon', level: 'warn', label: 'インターフェロン製剤を使用', detail: `薬の名前「${h.word}」から判定。小柴胡湯との併用禁忌。柴胡を含む漢方薬は確認が必要`, source: '薬の名前' });
+    else push({ code: h.flag, level: 'info', label: `${FLAG_LABEL[h.flag] ?? h.label}（名前「${h.word}」から）`, detail: '漢方薬との飲み合わせを候補ごとに確認します', source: '薬の名前' });
+  }
+  const cur = currentKampo(answers, input);
   if (meds.includes('C1-kampo') || cur.codes.length) {
     const who = cur.source === 'staff' ? '（薬剤師が確認）' : cur.source === 'patient' ? '（ご本人が選択。薬剤師が確認・修正）' : '';
     push({
       code: 'kampo_current', level: 'warn', label: '服用中の漢方薬',
-      detail: `${cur.codes.length ? `${names(cur.codes)}${who}` : '名前は未確認'}${cur.notfound ? '／ご本人が「見つからない」を選択（口頭で確認）' : ''}`,
+      detail: `${cur.codes.length ? `${names(cur.codes)}${who}` : '名前は未確認'}${cur.fromNames.length ? `（${names(cur.fromNames)}は薬の名前の欄に記入）` : ''}${cur.notfound ? '／ご本人が「見つからない」を選択（口頭で確認）' : ''}`,
       source: cur.source === 'staff' ? '薬剤師の入力' : 'C1',
     });
   }
@@ -265,6 +330,8 @@ export interface FormulaSafetyInput {
   contraindications: string[];
   /** 処方の対象（駆瘀血の判定に使う。瘀血 0.5 以上） */
   types?: Partial<Record<string, number>>;
+  /** 構成生薬と1日量（g）。麻黄・甘草・山梔子・大黄などの判定に使う（第5弾 3-17）。未登録なら undefined */
+  herbs?: { herb: string; g: number }[];
   /** 構成生薬のうち食品アレルギーの対応生薬（foodHerbs）と、甘草などの1日量（amounts）。未登録なら undefined */
   foodHerbs?: string[];
   amounts?: Record<string, number>;
@@ -284,34 +351,79 @@ export interface Caution {
   basis: CautionBasis;
   /** 候補から除外する注意か（併用禁忌・禁忌・アレルギー） */
   exclude?: boolean;
+  /** 色の上書き（甘草の合計量など、根拠の区分によらず黄色で出すもの） */
+  tone?: 'red' | 'yellow' | 'gray';
 }
 export interface FormulaSafety {
   status: 'ok' | 'check' | 'excluded';
   exclude: string[];
   check: string[];
+  /** この候補だけの確認事項（全候補に共通の確認事項を除く。「要確認」の印はこれがあるときだけ。第5弾 3-10） */
+  own: string[];
   notes: string[];
   /** 候補のすぐ下に出す注意（種類・何が起きるか・根拠。第4弾 3-8） */
   cautions: Caution[];
+  /** 甘草の1日量（g）。含まなければ 0、構成生薬が未登録なら null */
+  licorice: number | null;
 }
 export interface FoodHit { id: string; food: string; herbs: string[] }
-export interface SafetyCtx { codes: Set<string>; general: string[]; adverse: Set<string>; current: Set<string>; foods: FoodHit[]; foodOther: boolean }
+/** 全候補に共通の確認事項と、確認タブで確認すれば外れる行（keys。空なら別の入力で外れる） */
+export interface GeneralItem { text: string; keys: string[] }
+export interface SafetyCtx {
+  codes: Set<string>;
+  /** まだ外れていない共通の確認事項の文言 */
+  general: string[];
+  /** 確認タブで確認すると共通の確認事項が外れる行（未確認のもの） */
+  pendingKeys: string[];
+  /** 確認タブの行以外で外れる共通の確認事項（回答の不足・妊娠授乳の未確認など）の数 */
+  pendingOther: number;
+  adverse: Set<string>;
+  current: Set<string>;
+  foods: FoodHit[];
+  foodOther: boolean;
+  /** 低カリウム・利尿薬・高血圧・心臓・腎臓 → 甘草を含まない処方を上に（第5弾 3-14） */
+  preferNoLicorice: boolean;
+  /** 肝臓の病気：肝硬変・肝癌・血小板数を確認して「該当しない」を記録したか（第5弾 3-15） */
+  liverCleared: boolean;
+}
+/** 確認タブの行のキー（薬剤師画面のチェックリストと同じ） */
+export const LIVER_CHECK_KEY = 'row:liver_check';
+export const SANSHISHI_KEY = 'row:sanshishi';
+export const MINOR_KEY = 'row:minor';
+/** 構成生薬の名前（未登録なら undefined） */
+export const herbNamesOf = (f: Pick<FormulaSafetyInput, 'herbs'>): string[] | undefined => f.herbs?.map((h) => h.herb);
+/** 生薬を含むか：構成生薬で判定。未登録なら注意生薬（cautionHerbs）で代用する */
+export const hasHerb = (f: Pick<FormulaSafetyInput, 'herbs' | 'cautionHerbs'>, herb: string): boolean => (f.herbs ? f.herbs.some((h) => h.herb === herb) : f.cautionHerbs.includes(herb));
+/** 生薬の1日量（g）。含まなければ 0、構成生薬が未登録なら undefined */
+export const gramsOf = (f: Pick<FormulaSafetyInput, 'herbs' | 'amounts'>, herb: string): number | undefined => {
+  if (f.herbs) return f.herbs.filter((h) => h.herb === herb).reduce((a, h) => a + h.g, 0);
+  return f.amounts?.[herb];
+};
+/** 注意に関係する生薬（重複・体調を崩した漢方薬との共通の照合に使う） */
+export const KEY_HERBS = ['甘草', '麻黄', '大黄', '芒硝', '附子', '地黄', '石膏', '桃仁', '牡丹皮', '紅花', '牛膝', '山梔子', '黄芩', '柴胡'];
+const keyHerbsOf = (f: Pick<FormulaSafetyInput, 'herbs' | 'cautionHerbs'>) => KEY_HERBS.filter((h) => hasHerb(f, h));
+/** 小柴胡湯（柴胡・黄芩・半夏・人参を含む）か、小柴胡湯を含む処方か */
+export const SHOSAIKOTO_CORE = ['柴胡', '黄芩', '半夏', '人参'];
+const isShosaikoto = (f: Pick<FormulaSafetyInput, 'name'>) => f.name === '小柴胡湯';
+const containsShosaikoto = (f: Pick<FormulaSafetyInput, 'herbs' | 'cautionHerbs' | 'name'>) => !isShosaikoto(f) && !!f.herbs && SHOSAIKOTO_CORE.every((h) => hasHerb(f, h));
+/** 甘草が1日この量以上の処方は、低カリウム血症・アルドステロン症・ミオパチーの方に禁忌（ツムラ添付文書。「以上」で判定） */
+export const LICORICE_CONTRA_G = 2.5;
 
 /** 生薬 × 安全フラグ → 確認が必要な理由（text は確認事項の文言、残りは注意の種類・何が起きるか・根拠） */
 const HERB_CHECKS: { herb: string; flags: string[]; text: string; kind: CautionKind; pair: string; effect: string; basis: CautionBasis }[] = [
   { herb: '甘草', flags: ['hypertension', 'heart', 'kidney'], text: '甘草を含むため、高血圧・心臓・腎臓の病気がある方は服用前に確認が必要です（むくみ・血圧上昇に注意）', kind: 'disease', pair: '高血圧・心臓・腎臓の病気 × 甘草', effect: 'むくみ・血圧上昇・低カリウム（偽アルドステロン症）で悪化するおそれ', basis: '慎重投与' },
-  { herb: '甘草', flags: ['hypokalemia'], text: '甘草を含むため、低カリウム血症と言われたことがある方は服用前に確認が必要です（甘草の量によっては禁忌）', kind: 'disease', pair: '低カリウム血症 × 甘草', effect: '低カリウム血症が悪化するおそれ（甘草の量によっては禁忌）', basis: '禁忌' },
+  { herb: '甘草', flags: ['hypokalemia'], text: '甘草を含むため、低カリウム血症・アルドステロン症・ミオパチーと言われたことがある方は服用前に確認が必要です（甘草 2.5g/日以上は禁忌）', kind: 'disease', pair: '低カリウム血症・アルドステロン症・ミオパチー × 甘草', effect: '低カリウム・筋力低下が悪化するおそれ（甘草 2.5g/日以上は禁忌）', basis: '慎重投与' },
   // 飲み合わせ（2026-10-29 第3弾 4。一般的な併用注意の案。添付文書データの登録後に照合する）
   { herb: '甘草', flags: ['med_diuretic'], text: '甘草を含むため、利尿薬・ステロイドの飲み薬との併用は低カリウム血症に注意が必要です（併用注意）', kind: 'interaction', pair: '利尿薬 × 甘草', effect: '低カリウム・むくみ・血圧上昇（偽アルドステロン症）が起きやすくなる', basis: '併用注意' },
   { herb: '甘草', flags: ['med_steroid'], text: '甘草を含むため、利尿薬・ステロイドの飲み薬との併用は低カリウム血症に注意が必要です（併用注意）', kind: 'interaction', pair: 'ステロイドの飲み薬 × 甘草', effect: '低カリウムが起きやすくなる（偽アルドステロン症）', basis: '併用注意' },
   { herb: '甘草', flags: ['med_bp'], text: '甘草を含むため、血圧の薬との飲み合わせに注意が必要です（むくみ・血圧上昇）', kind: 'interaction', pair: '血圧の薬 × 甘草', effect: 'むくみ・血圧上昇で降圧薬の効きが弱まるおそれ', basis: '併用注意' },
   { herb: '甘草', flags: ['med_otc'], text: '甘草を含むため、市販のかぜ薬・胃腸薬と成分が重なることがあります（甘草の重複）', kind: 'overlap', pair: '市販のかぜ薬・胃腸薬 × 甘草', effect: '市販薬にも甘草が入っていることが多く、量が重なる', basis: '併用注意' },
-  { herb: '麻黄', flags: ['med_bp', 'med_thyroid', 'med_asthma', 'med_antidep'], text: '麻黄を含むため、血圧・甲状腺・ぜんそく／気管支の薬、抗うつ薬との飲み合わせを確認する必要があります（併用注意）', kind: 'interaction', pair: '血圧・甲状腺・ぜんそく／気管支の薬、抗うつ薬 × 麻黄', effect: '動悸・不眠・発汗過多・血圧上昇など、作用が強まるおそれ', basis: '併用注意' },
+  { herb: '麻黄', flags: ['med_bp', 'med_thyroid', 'med_asthma', 'med_antidep', 'med_mao'], text: '麻黄を含むため、血圧・甲状腺・ぜんそく／気管支の薬、抗うつ薬、MAO阻害剤との飲み合わせを確認する必要があります（併用注意）', kind: 'interaction', pair: '血圧・甲状腺・ぜんそく／気管支の薬、抗うつ薬、MAO阻害剤 × 麻黄', effect: '動悸・不眠・発汗過多・血圧上昇など、作用が強まるおそれ', basis: '併用注意' },
   { herb: '麻黄', flags: ['med_otc'], text: '麻黄を含むため、市販のかぜ薬と成分（エフェドリン類）が重なることがあります', kind: 'overlap', pair: '市販のかぜ薬 × 麻黄', effect: 'エフェドリン類が重なり、動悸・不眠・血圧上昇が起きやすくなる', basis: '併用注意' },
   { herb: '大黄', flags: ['med_laxative'], text: '大黄を含むため、便秘薬と作用が重なります（併用注意）', kind: 'overlap', pair: '便秘薬 × 大黄', effect: '下剤の作用が重なり、下痢・腹痛が起きやすくなる', basis: '併用注意' },
   { herb: '芒硝', flags: ['med_laxative'], text: '芒硝を含むため、便秘薬と作用が重なります（併用注意）', kind: 'overlap', pair: '便秘薬 × 芒硝', effect: '下剤の作用が重なり、下痢・腹痛が起きやすくなる', basis: '併用注意' },
   { herb: '麻黄', flags: ['kidney', 'gi_weak'], text: '麻黄を含むため、腎臓の病気がある方・胃腸が弱い方は服用前に確認が必要です', kind: 'disease', pair: '腎臓の病気・胃腸が弱い × 麻黄', effect: '腎機能への負担・食欲不振・胃の不快感が出るおそれ', basis: '慎重投与' },
   { herb: '甘草', flags: ['elderly'], text: '甘草を含むため、高齢の方は服用前に確認が必要です', kind: 'disease', pair: '高齢 × 甘草', effect: '偽アルドステロン症（むくみ・血圧上昇・低カリウム）が出やすい', basis: '慎重投与' },
-  { herb: '甘草', flags: ['kampo_current'], text: '甘草を含むため、服用中の漢方薬との甘草の重複を確認する必要があります', kind: 'overlap', pair: '服用中の漢方薬 × 甘草', effect: '甘草の量が重なる（合計量を確認）', basis: '薬剤師が確認' },
   { herb: '麻黄', flags: ['hypertension', 'heart', 'thyroid', 'glaucoma_bph', 'elderly'], text: '麻黄を含むため、高血圧・心臓や甲状腺の病気・緑内障・排尿困難がある方や高齢の方は服用前に確認が必要です', kind: 'disease', pair: '高血圧・心臓・甲状腺の病気・排尿困難・高齢 × 麻黄', effect: '血圧が上がる・脈が速くなる・排尿しにくくなるおそれ', basis: '慎重投与' },
   { herb: '大黄', flags: ['lactation'], text: '大黄を含むため、授乳中は服用前に確認が必要です（乳児の下痢）', kind: 'disease', pair: '授乳中 × 大黄', effect: '母乳を通じて乳児が下痢をするおそれ', basis: '慎重投与' },
   { herb: '大黄', flags: ['gi_weak'], text: '大黄を含むため、胃腸が弱く下痢しやすい方は服用前に確認が必要です', kind: 'disease', pair: '胃腸が弱い × 大黄', effect: '下痢・腹痛が強く出るおそれ', basis: '慎重投与' },
@@ -351,7 +463,8 @@ export const GENERAL_NOTES = [
 export function safetyContext(flags: SafetyFlag[], answers: Answers, w: WalkResult, tags: TagHit[] = [], input: SafetyInput = {}): SafetyCtx {
   const codes = new Set(flags.map((f) => f.code));
   if (w.ageBand === '70s') codes.add('elderly');
-  const general: string[] = [];
+  const items: GeneralItem[] = [];
+  const add = (text: string, keys: string[] = []) => items.push({ text, keys });
   // 安全確認の回答が足りない・「わからない」→ 推薦を確定しない（情報不足）。妊娠・授乳の未回答は preg_unconfirmed で扱う
   const missing: string[] = [];
   const unknown: string[] = [];
@@ -363,59 +476,72 @@ export function safetyContext(flags: SafetyFlag[], answers: Answers, w: WalkResu
     if (!ids.length) missing.push(LABEL[qid]);
     else if (ids.some((id) => optionById(id)?.exclusive === 'unknown' || optionById(id)?.exclusive === 'declined')) unknown.push(LABEL[qid]);
   }
-  if (missing.length) general.push(`安全確認（${missing.join('・')}）の回答がないため、確認が必要です（情報不足）`);
-  if (unknown.length) general.push(`安全確認（${unknown.join('・')}）が「わからない」「回答しない」のため、確認が必要です（情報不足）`);
-  if (codes.has('meds')) general.push('服用中の薬があるため、薬剤師がお薬手帳などで名前を確認し、飲み合わせ（甘草などの重複を含む）を確認する必要があります');
-  if (codes.has('other_meds')) general.push('その他の薬あり：確認（自動では飲み合わせを判定できません）');
-  const disease = ['kidney', 'hypokalemia', 'liver', 'diabetes', 'cancer', 'other_disease', 'hypertension', 'heart', 'thyroid', 'glaucoma_bph'].filter((c) => codes.has(c));
-  if (disease.length) general.push(`治療中の病気（${disease.map((c) => FLAG_LABEL[c] ?? c).join('・')}）があるため、主治医の指示とあわせて確認が必要です`);
-  if (codes.has('allergy_drug')) general.push('薬のアレルギー歴があるため、何に出たかを口頭で確認し、含まれる成分・添加物との照合が必要です');
-  if (codes.has('allergy_food_other')) general.push('その他の食品アレルギーあり：確認（自動では生薬との照合ができません）');
-  if (codes.has('adverse_kampo')) general.push('漢方薬で体調を崩した経験があるため、その漢方薬の構成生薬と照合し、副作用の内容・原因として疑われる生薬・再投与の危険性を確認する必要があります（原因の生薬は未特定）');
-  const cur = kampoOf(answers, input.staffAnswers, 'X_kampo_current');
+  if (missing.length) add(`安全確認（${missing.join('・')}）の回答がないため、確認が必要です（情報不足）`);
+  if (unknown.length) add(`安全確認（${unknown.join('・')}）が「わからない」「回答しない」のため、確認が必要です（情報不足）`);
+  const c1 = chosenIn(answers, 'C1');
+  const medRows = nonExclusive(c1).filter((id) => id !== 'C1-kampo' && id !== 'C1-other' && id !== 'C1-unknown' && !id.startsWith('C1KP-') && !kampoOnlyMedIds(answers, input).has(id)).map((id) => `row:${id}`);
+  if (codes.has('meds') && medRows.length) add('服用中の薬があるため、薬剤師がお薬手帳などで名前を確認し、飲み合わせ（甘草などの重複を含む）を確認する必要があります', medRows);
+  const merged = kampoOnlyMedIds(answers, input);
+  if (codes.has('other_meds') && !merged.has('C1-other')) add('その他の薬あり：名前を確認（名前から種類が分からないものは自動で飲み合わせを判定できません）', ['row:C1-other']);
+  if (codes.has('meds_unknown')) add('薬の種類がわからないため、お薬手帳で名前を確認する必要があります', ['row:C1-unknown']);
+  const DISEASES = ['kidney', 'hypokalemia', 'liver', 'diabetes', 'cancer', 'other_disease', 'hypertension', 'heart', 'thyroid', 'glaucoma_bph'];
+  const disease = DISEASES.filter((c) => codes.has(c));
+  const diseaseRows = nonExclusive(chosenIn(answers, 'C2')).filter((id) => (optionById(id)?.flags ?? []).some((f) => DISEASES.includes(f))).map((id) => `row:${id}`);
+  if (disease.length) add(`治療中の病気（${disease.map((c) => FLAG_LABEL[c] ?? c).join('・')}）があるため、主治医の指示とあわせて確認が必要です`, diseaseRows);
+  if (codes.has('allergy_drug')) add('薬のアレルギー歴があるため、何に出たかを口頭で確認し、含まれる成分・添加物との照合が必要です', ['row:C3-drug']);
+  if (codes.has('allergy_food_other')) add('その他の食品アレルギーあり：確認（自動では生薬との照合ができません）', ['row:C3-food']);
+  if (codes.has('adverse_kampo')) add('漢方薬で体調を崩した経験があるため、その漢方薬の構成生薬と照合し、副作用の内容・原因として疑われる生薬・再投与の危険性を確認する必要があります（原因の生薬は未特定）', ['row:kampo_adverse']);
+  const cur = currentKampo(answers, input);
   const adv = kampoOf(answers, input.staffAnswers, 'X_kampo_adverse');
-  if (codes.has('kampo_current') && (!cur.codes.length || cur.notfound)) general.push('服用中の漢方薬の名前が確認できていません。確認して入力するまで、重複の照合ができません');
-  if (codes.has('pregnancy')) general.push('妊娠中・妊娠の可能性があるため、服用前に確認が必要です');
-  if (codes.has('preg_unconfirmed')) general.push('妊娠・授乳が未確認です。口頭で確認して入力するまで、提案を確定しません');
-  if (codes.has('minor')) general.push('10代のため、保護者の同意と漢方薬を提案してよいかを確認するまで、提案を確定しません');
+  if (codes.has('kampo_current') && (!cur.codes.length || cur.notfound)) add('服用中の漢方薬の名前が確認できていません。確認して入力するまで、重複の照合ができません', ['row:kampo_current']);
+  if (codes.has('pregnancy')) add('妊娠中・妊娠の可能性があるため、服用前に確認が必要です', ['row:pregnancy']);
+  if (codes.has('preg_unconfirmed')) add('妊娠・授乳が未確認です。口頭で確認して入力するまで、提案を確定しません');
+  if (codes.has('minor')) add('10代のため、保護者の同意と漢方薬を提案してよいかを確認するまで、提案を確定しません', [MINOR_KEY]);
   const open = uncheckedTags(tags);
-  if (open.length) general.push(`安全確認タグ（${open.map((t) => t.label).join('・')}）の確認が済むまで、提案を確定しません`);
-  return { codes, general, adverse: new Set(adv.codes), current: new Set(cur.codes), foods: foodAllergies(answers), foodOther: codes.has('allergy_food_other') };
+  if (open.length) add(`安全確認タグ（${open.map((t) => t.label).join('・')}）の確認が済むまで、提案を確定しません`, open.map((t) => t.id));
+  // 確認タブで確認済みの行だけで外れる事項は外す
+  const checked = (k: string) => !!input.tagChecks?.[k];
+  const pend = items.filter((x) => !x.keys.length || x.keys.some((k) => !checked(k)));
+  const pendingKeys = [...new Set(pend.flatMap((x) => x.keys.filter((k) => !checked(k))))];
+  return {
+    codes, general: pend.map((x) => x.text), pendingKeys, pendingOther: pend.filter((x) => !x.keys.length).length,
+    adverse: new Set(adv.codes), current: new Set(cur.codes), foods: foodAllergies(answers), foodOther: codes.has('allergy_food_other'),
+    preferNoLicorice: ['hypokalemia', 'med_diuretic', 'hypertension', 'heart', 'kidney'].some((c) => codes.has(c)),
+    liverCleared: checked(LIVER_CHECK_KEY),
+  };
 }
 
-/** 甘草の1日量（g）の合計：服用中の漢方薬と候補の合計（構成生薬のデータがあるときだけ） */
-const licoriceTotal = (f: FormulaSafetyInput, currentCodes: Iterable<string>): { total: number; known: boolean } => {
-  let total = f.amounts?.['甘草'] ?? 0;
-  let known = f.amounts !== undefined;
-  for (const code of currentCodes) { const a = formulaByCode(code)?.amounts?.['甘草']; if (a === undefined) known = false; else total += a; }
-  return { total, known };
-};
-/** 服用中・体調を崩した漢方薬と候補の重複（同じ漢方薬・注意生薬の重複）。注意生薬（cautionHerbs）の範囲で照合する */
+const r1 = (n: number) => Math.round(n * 10) / 10;
+/** 服用中・体調を崩した漢方薬と候補の重複（同じ漢方薬・注意に関係する生薬の重複）。構成生薬で照合する */
 export function overlapChecks(f: FormulaSafetyInput, ctx: Pick<SafetyCtx, 'current' | 'adverse'>): string[] {
   return overlapCautions(f, ctx).map((x) => x.text);
 }
 function overlapCautions(f: FormulaSafetyInput, ctx: Pick<SafetyCtx, 'current' | 'adverse'>): (Caution & { text: string })[] {
   const out: (Caution & { text: string })[] = [];
+  const mine = keyHerbsOf(f);
   for (const code of ctx.current) {
     const cf = formulaByCode(code);
     if (!cf) continue;
     if (code === f.code) { out.push({ kind: 'overlap', pair: `服用中の${cf.name} × この処方`, effect: '同じ漢方薬のため、重ねて飲まない', basis: '薬剤師が確認', text: `服用中の${cf.name}と同じ漢方薬です` }); continue; }
-    const shared = f.cautionHerbs.filter((h) => cf.cautionHerbs.includes(h));
-    if (shared.length) {
-      const lic = shared.includes('甘草') ? licoriceTotal(f, [code]) : null;
-      const sum = lic?.known ? `（甘草の1日量の合計 約${Math.round(lic.total * 10) / 10}g）` : '';
-      out.push({
-        kind: 'overlap', pair: `服用中の${cf.name} × ${shared.join('・')}`,
-        effect: shared.includes('甘草') ? `甘草の量が重なる${sum}。多いほど偽アルドステロン症（むくみ・血圧上昇・低カリウム）が起きやすい` : `${shared.join('・')}の量が重なる`,
-        basis: '薬剤師が確認',
-        text: `服用中の${cf.name}と${shared.join('・')}が重複します${shared.includes('甘草') ? '（甘草の合計量に注意：むくみ・血圧上昇・低カリウム血症）' : ''}`,
-      });
-    }
+    const shared = mine.filter((h) => h !== '甘草' && hasHerb(cf, h));
+    if (shared.length) out.push({ kind: 'overlap', pair: `服用中の${cf.name} × ${shared.join('・')}`, effect: `${shared.join('・')}の量が重なる`, basis: '薬剤師が確認', text: `服用中の${cf.name}と${shared.join('・')}が重複します` });
+  }
+  // 甘草の合計量（服用中の漢方薬と候補。第5弾 3-14）：2.5g を超えたら黄色
+  const myG = gramsOf(f, '甘草');
+  const curLic = [...ctx.current].filter((c) => c !== f.code).map((c) => formulaByCode(c)).filter((cf): cf is NonNullable<typeof cf> => !!cf && hasHerb(cf, '甘草'));
+  if (hasHerb(f, '甘草') && curLic.length) {
+    const gs = curLic.map((cf) => gramsOf(cf, '甘草'));
+    const known = myG !== undefined && gs.every((g) => g !== undefined);
+    const total = r1((myG ?? 0) + gs.reduce<number>((a, g) => a + (g ?? 0), 0));
+    const from = curLic.map((cf, i) => `${cf.name}${gs[i] !== undefined ? ` ${gs[i]}g` : '（量は未登録）'}`).join('・');
+    if (!known) out.push({ kind: 'overlap', pair: '服用中の漢方薬 × 甘草', effect: `甘草が重なります（${from}）。量が未登録のものがあるため、合計を添付文書で確認してください`, basis: '薬剤師が確認', tone: 'yellow', text: `服用中の漢方薬（${from}）と甘草が重複します（合計量を確認）` });
+    else if (total > LICORICE_CONTRA_G) out.push({ kind: 'overlap', pair: `甘草 合計${total}g/日（2.5g超）`, effect: `服用中の${from}とこの処方（${myG}g）を合わせた量。偽アルドステロン症（むくみ・血圧上昇・低カリウム）が起きやすくなる`, basis: '併用注意', tone: 'yellow', text: `甘草の合計が${total}g/日（2.5g超）になります（服用中の${from}と）` });
+    else out.push({ kind: 'overlap', pair: `甘草 合計${total}g/日`, effect: `服用中の${from}とこの処方（${myG}g）を合わせた量`, basis: '薬剤師が確認', text: `甘草が重複します（合計${total}g/日）` });
   }
   for (const code of ctx.adverse) {
     const af = formulaByCode(code);
     if (!af || code === f.code) continue;
-    const shared = f.cautionHerbs.filter((h) => af.cautionHerbs.includes(h));
+    const shared = mine.filter((h) => hasHerb(af, h));
     if (shared.length) out.push({ kind: 'overlap', pair: `体調を崩した${af.name} × ${shared.join('・')}`, effect: `${shared.join('・')}が共通（原因の生薬は未特定）`, basis: '薬剤師が確認', text: `${shared.join('・')}が共通（体調を崩した${af.name}と。原因の生薬は未特定）` });
   }
   return out;
@@ -428,6 +554,8 @@ const CONTRA_EFFECT: Record<string, { effect: string; basis: CautionBasis; kind:
 };
 export function assessFormulaSafety(f: FormulaSafetyInput, ctx: SafetyCtx): FormulaSafety {
   const cautions: Caution[] = [];
+  const own: string[] = [];
+  const addOwn = (t: string) => { if (!own.includes(t)) own.push(t); };
   const exclude = f.contraindications.filter((c) => ctx.codes.has(c)).map((c) => `${FLAG_LABEL[c] ?? c}に当たるため除外`);
   for (const c of f.contraindications.filter((c) => ctx.codes.has(c))) {
     const m = CONTRA_EFFECT[c];
@@ -437,71 +565,70 @@ export function assessFormulaSafety(f: FormulaSafetyInput, ctx: SafetyCtx): Form
     exclude.unshift('この漢方薬で体調を崩したことがあるため除外');
     cautions.unshift({ kind: 'overlap', pair: '体調を崩した漢方薬 × この処方', effect: '同じ漢方薬のため除外', basis: '薬剤師が確認', exclude: true });
   }
+  // 構成生薬が未登録：麻黄・甘草・山梔子・大黄などを名前から推定しない（第5弾 3-17）
+  if (!f.herbs) {
+    addOwn('構成生薬が未登録のため、麻黄・甘草・山梔子・大黄などの判定は添付文書で確認してください');
+    cautions.push({ kind: 'disease', pair: '構成生薬が未登録', effect: '麻黄・甘草・山梔子・大黄などを含むかを自動で判定できていません（注意生薬の一覧で代用）', basis: '薬剤師が確認', tone: 'yellow' });
+  }
   // 食品アレルギー：構成生薬に当たる処方は除外（第4弾 2-9）
   if (ctx.foods.length) {
     if (f.foodHerbs === undefined) {
       cautions.push({ kind: 'allergy', pair: `${ctx.foods.map((x) => x.food).join('・')}アレルギー × 構成生薬`, effect: '構成生薬のデータが未登録のため、照合できていません', basis: 'アレルギー' });
+      addOwn('食品アレルギーと構成生薬の照合ができていません');
     } else {
       for (const fd of ctx.foods) {
         const hit = fd.herbs.filter((h) => f.foodHerbs!.includes(h));
         if (hit.length) {
-          const herbs = hit.join('・');
-          exclude.push(`${fd.food}アレルギーのため除外（${herbs}を含む）`);
+          const actual = hit.flatMap((h) => h.split('・')).filter((h) => f.herbs?.some((x) => x.herb === h));
+          const herbs = (actual.length ? actual : hit).join('・');
+          exclude.push(`${fd.food}＝${herbs}を含む／食品アレルギー：${fd.food}`);
           cautions.push({ kind: 'allergy', pair: `${fd.food}アレルギー × ${herbs}`, effect: `${fd.food}と同じ成分（${herbs}）を含むため除外${f.compositionConfidence === 'C' ? '（構成生薬のデータは未確認）' : ''}`, basis: 'アレルギー', exclude: true });
         }
       }
     }
   }
-  const check: string[] = [...ctx.general];
-  for (const o of overlapCautions(f, ctx)) { if (!check.includes(o.text)) check.push(o.text); cautions.push({ kind: o.kind, pair: o.pair, effect: o.effect, basis: o.basis }); }
-  for (const r of HERB_CHECKS) {
-    // 低カリウム血症 × 甘草：ツムラの添付文書は、甘草が1日 2.5g を超える製剤（芍薬甘草湯・人参湯など）の禁忌に「低カリウム血症」を挙げる。
-    // 量のデータがある処方はそれで判定し（超える→除外、以下→慎重投与の確認）、量が不明なら確認にとどめる
-    if (r.herb === '甘草' && r.flags.length === 1 && r.flags[0] === 'hypokalemia' && f.cautionHerbs.includes('甘草') && ctx.codes.has('hypokalemia')) {
-      const amt = f.amounts?.['甘草'];
-      if (amt !== undefined && amt > 2.5) {
-        exclude.push(`低カリウム血症のため除外（甘草 ${amt}g/日。添付文書の禁忌の対象）`);
-        cautions.push({ kind: 'disease', pair: '低カリウム血症 × 甘草', effect: `低カリウム血症が悪化するおそれ（甘草 ${amt}g/日と多い処方）`, basis: '禁忌', exclude: true });
-      } else {
-        check.push(r.text);
-        cautions.push({ kind: r.kind, pair: r.pair, effect: amt !== undefined ? `低カリウム血症が悪化するおそれ（甘草 ${amt}g/日）` : r.effect, basis: '慎重投与' });
-      }
-      continue;
+  for (const o of overlapCautions(f, ctx)) { addOwn(o.text); cautions.push({ kind: o.kind, pair: o.pair, effect: o.effect, basis: o.basis, tone: o.tone }); }
+  // 甘草 2.5g/日以上（第5弾 3-8。「以上」で判定。添付文書の禁忌：アルドステロン症・ミオパチー・低カリウム血症）
+  const lic = gramsOf(f, '甘草');
+  const hasLic = hasHerb(f, '甘草');
+  if (hasLic && ctx.codes.has('hypokalemia')) {
+    if (lic !== undefined && lic >= LICORICE_CONTRA_G) {
+      exclude.push(`低カリウム血症・アルドステロン症・ミオパチー：甘草 ${lic}g/日（2.5g以上は禁忌）`);
+      cautions.push({ kind: 'disease', pair: `低カリウム血症・アルドステロン症・ミオパチー × 甘草 ${lic}g/日`, effect: '甘草が1日2.5g以上の処方は禁忌（低カリウム・筋力低下が悪化するおそれ）', basis: '禁忌', exclude: true });
+    } else {
+      const t = '甘草を含むため、低カリウム血症・アルドステロン症・ミオパチーの方は服用前に確認が必要です（2.5g/日未満のため禁忌ではありません）';
+      addOwn(t);
+      cautions.push({ kind: 'disease', pair: `低カリウム血症など × 甘草${lic !== undefined ? ` ${lic}g/日` : '（量は未登録）'}`, effect: '低カリウム・筋力低下が悪化するおそれ', basis: '慎重投与' });
     }
-    if (f.cautionHerbs.includes(r.herb) && r.flags.some((c) => ctx.codes.has(c))) {
-      if (!check.includes(r.text)) check.push(r.text);
-      const dup = cautions.some((x) => x.pair === r.pair);
-      if (!dup) cautions.push({ kind: r.kind, pair: r.pair, effect: r.effect, basis: r.basis, exclude: r.basis === '併用禁忌' ? true : undefined });
+  } else if (hasLic && lic !== undefined && lic >= LICORICE_CONTRA_G && !cautions.some((x) => x.pair.startsWith('甘草 合計'))) {
+    cautions.push({ kind: 'disease', pair: `甘草 ${lic}g/日（2.5g以上の処方）`, effect: '低カリウム血症・アルドステロン症・ミオパチーの方には使えない量。むくみ・血圧上昇・脱力感に注意', basis: '慎重投与', tone: 'yellow' });
+  }
+  for (const r of HERB_CHECKS) {
+    if (r.flags.length === 1 && r.flags[0] === 'hypokalemia') continue;
+    const hit = r.flags.filter((c) => ctx.codes.has(c));
+    if (!hit.length || !hasHerb(f, r.herb)) continue;
+    addOwn(r.text);
+    const pair = `${hit.map((c) => FLAG_LABEL[c] ?? c).join('・')} × ${r.herb}`;
+    if (!cautions.some((x) => x.pair === pair)) cautions.push({ kind: r.kind, pair, effect: r.effect, basis: r.basis, exclude: r.basis === '併用禁忌' ? true : undefined });
+  }
+  // 肝臓の病気 × 小柴胡湯（第5弾 3-15）：肝硬変・肝癌・血小板数を確認して「該当しない」を記録するまで、
+  // 小柴胡湯は除外、小柴胡湯を含む処方（柴胡・黄芩・半夏・人参を含むもの）は確認
+  if (ctx.codes.has('liver') && !ctx.liverCleared) {
+    if (isShosaikoto(f)) {
+      exclude.push('肝臓の病気：肝硬変・肝癌・血小板数を確認してください（確認タブで「該当しない」を記録すると戻ります）');
+      cautions.push({ kind: 'disease', pair: '肝臓の病気 × 小柴胡湯', effect: '肝硬変・肝癌の方、血小板数が10万/mm³以下の方は禁忌。肝硬変・肝癌・血小板数を確認してください', basis: '禁忌', exclude: true });
+    } else if (containsShosaikoto(f)) {
+      addOwn('小柴胡湯を含む処方のため、肝硬変・肝癌・血小板数を確認してください');
+      cautions.push({ kind: 'disease', pair: '肝臓の病気 × 小柴胡湯を含む処方', effect: '肝硬変・肝癌・血小板数を確認してください（小柴胡湯の禁忌）', basis: '薬剤師が確認', tone: 'yellow' });
     }
   }
+  // 山梔子（第5弾 3-16）：長期服用の注意を小さく
+  if (hasHerb(f, '山梔子')) cautions.push({ kind: 'disease', pair: '山梔子を含む', effect: '長期服用時は腸間膜静脈硬化症に注意', basis: '薬剤師が確認' });
   if (ctx.codes.has('med_anticoag') && (f.types?.blood_stasis ?? 0) >= 0.5) {
-    check.push('瘀血を改善する漢方薬（駆瘀血剤）のため、血液をサラサラにする薬との併用は薬剤師が確認します');
+    addOwn('瘀血を改善する漢方薬（駆瘀血剤）のため、血液をサラサラにする薬との併用は薬剤師が確認します');
     cautions.push({ kind: 'interaction', pair: '血液をサラサラにする薬 × 駆瘀血剤', effect: '出血しやすくなる・薬の効き方が変わるおそれ', basis: '薬剤師が確認' });
   }
-  const notes = [...new Set(f.cautionHerbs.map((h) => HERB_NOTES[h]).filter((x): x is string => !!x))];
-  return { status: exclude.length ? 'excluded' : check.length ? 'check' : 'ok', exclude, check, notes, cautions };
+  const check = [...ctx.general, ...own];
+  const notes = [...new Set(keyHerbsOf(f).map((h) => HERB_NOTES[h]).filter((x): x is string => !!x))];
+  return { status: exclude.length ? 'excluded' : check.length ? 'check' : 'ok', exclude, check, own, notes, cautions, licorice: f.herbs ? (lic ?? 0) : null };
 }
-
-/**
- * 食品アレルギーと重なる生薬（薬剤師画面の参照用。2026-10-28 修正依頼 5-1）。
- * 一般的な対応の参考で、どの漢方薬に含まれるかは製品の添付文書の構成生薬で確認する（構成生薬のマスタは未登録）。
- */
-export const FOOD_HERBS: { food: string; herb: string }[] = [
-  { food: 'シナモン', herb: '桂皮（けいひ）・桂枝（けいし）' },
-  { food: '山芋・長芋', herb: '山薬（さんやく）' },
-  { food: '小麦', herb: '小麦（しょうばく）・浮小麦（ふしょうばく）' },
-  { food: '牡蠣（カキ）', herb: '牡蛎（ぼれい：カキの殻）' },
-  { food: 'ショウガ', herb: '生姜（しょうきょう）・乾姜（かんきょう）' },
-  { food: 'ナツメ', herb: '大棗（たいそう）' },
-  { food: 'ゴマ', herb: '胡麻（ごま）' },
-  { food: '米', herb: '粳米（こうべい）' },
-  { food: 'ハトムギ', herb: '薏苡仁（よくいにん）' },
-  { food: 'みかんの皮', herb: '陳皮（ちんぴ）' },
-  { food: 'シソ', herb: '蘇葉（そよう）' },
-  { food: '桃（種）', herb: '桃仁（とうにん）' },
-  { food: 'アンズ（種）', herb: '杏仁（きょうにん）' },
-  { food: 'ゼラチン', herb: '阿膠（あきょう：動物の皮のにかわ）' },
-  { food: '水あめ（麦芽）', herb: '膠飴（こうい）' },
-  { food: 'ミント', herb: '薄荷（はっか）' },
-  { food: '山椒', herb: '山椒（さんしょう）' },
-];

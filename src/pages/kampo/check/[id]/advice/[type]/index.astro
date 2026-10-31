@@ -1,12 +1,16 @@
 ---
 // 改善アドバイス（薬剤師が開いて来店客に見せる。PIN の後ろ）：特徴／生活養生（心・食・動・休）／おすすめのツボ／あなたへの一言／監修者。
 // 体質の点数は出さない。
+// 2026-10-31 第5弾：「ほかの体質の改善アドバイス」はお客様用の結果に出した体質（主な体質・ほかの体質）だけで、いま見ている体質は除く。
+//   寒熱（冷え・熱）のアドバイスへの導線は出さない（2-1）。前の体質と同じ養生は省く（2-3）。
 export const prerender = false;
 import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
 import AdviceBlock from '../../../../../../components/kampo/AdviceBlock.astro';
 import ResultTabs from '../../../../../../components/kampo/ResultTabs.astro';
 import { isAxisKey, axisDef, axisName } from '../../../../../../lib/kampo/masters';
-import { advicePlanOf } from '../../../../../../lib/kampo/compute';
+import { advicePlanOf, computeSession, isLegacy } from '../../../../../../lib/kampo/compute';
+import { patientView } from '../../../../../../lib/kampo/scoring';
+import type { TypeKey } from '../../../../../../lib/kampo/masters';
 import { getSession } from '../../../../../../lib/kampo/store';
 
 const s = await getSession(Astro.params.id ?? '');
@@ -18,14 +22,15 @@ const d = axisDef(type);
 // 養生を出すのは「主タイプ＋主訴に関係するタイプ」の最大2つ＋寒熱（第4弾 3-9）。逆の内容になる養生は両方に合う表現にそろえる
 const plan = advicePlanOf(s);
 const planTypes = plan?.types ?? [];
-const thermalKeys = (['cold', 'heat'] as const).filter((t) => ((s.scores?.pct ?? {}) as Record<string, number>)[t] >= 20);
-const others = [...planTypes, ...thermalKeys].filter((t) => t !== type);
+const view = isLegacy(s) ? null : patientView(computeSession(s).scores);
+const shown: TypeKey[] = view ? [...view.main, ...view.others] : planTypes;
+const others = shown.filter((t) => t !== type);
 ---
 <KampoLayout title={`${d.name}の改善アドバイス`} width="normal">
   <button slot="actions" class="kp-btn pink small no-print" type="button" onclick="window.print()">印刷する</button>
   <ResultTabs id={s.id} active="advice" adviceType={type} />
   <h1 class="kp-h1">あなたの<span class="sky">改善アドバイス</span></h1>
-  <AdviceBlock type={type} answers={s.answers} types={planTypes} />
+  <AdviceBlock type={type} answers={s.answers} types={planTypes} order={shown} />
   {others.length > 0 && (
     <div class="kp-panel no-print"><h2>ほかの体質の改善アドバイス</h2>
       <div class="kp-panel-b" style="display:flex;gap:12px;flex-wrap:wrap">{others.map((t) => <a class="kp-btn ghost" href={`/kampo/check/${s.id}/advice/${t}/`}>{axisName(t)}のアドバイスを見る</a>)}</div>

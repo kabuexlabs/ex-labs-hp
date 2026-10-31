@@ -124,6 +124,8 @@ export interface KampoSession {
   staffMeds?: { id: string; name: string }[];
   /** 受診のおすすめを「お客様に伝えた」記録（キーは受診のおすすめの文言。薬剤師画面。第4弾 0-2） */
   referralNotified?: Record<string, { by: string; at: string }>;
+  /** お客様用の結果をどう渡したか（「お客様用の結果を開く」「A4で印刷」を押した記録。第5弾 3-12） */
+  deliveries?: { via: 'screen' | 'print'; by: string; at: string }[];
   scores?: ScoreResult;
   safetyFlags?: SafetyFlag[];
   /** 安全確認タグ（保存時点） */
@@ -143,6 +145,8 @@ export interface AuditEntry { at: string; action: string; target: string; staffN
 
 const randHex = (bytes: number) => randomBytes(bytes).toString('hex');
 export const newId = () => randHex(8);
+/** 受付番号（セッションIDの先頭4文字。薬剤師画面の見出しで電話番号の代わりに使う。第5弾 3-7） */
+export const receiptNo = (id: string) => id.slice(0, 4).toUpperCase();
 export const retentionYears = () => Math.max(1, parseInt(readEnv('KAMPO_RETENTION_YEARS') ?? '3', 10) || 3);
 
 /** 日本時間の 'YYYY-MM-DD' */

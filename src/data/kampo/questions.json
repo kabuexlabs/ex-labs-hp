@@ -1,12 +1,12 @@
 {
- "version": "2026-10-31-v3.4",
+ "version": "2026-10-31-v3.5",
  "review": {
   "status": "draft",
   "source": "2026-10-24 版（3段階版）の設問・重みを、2026-10-25 の改修指示と承認済みの改修計画に沿って組み直した草案。重み・五臓は現行の選択肢の値を引き継いだもので、新しい数値は作っていない（専門家未確認）",
   "reviewer": null,
   "reviewedAt": null
  },
- "note": "設問（主訴カテゴリー・具体的主訴・いちばん改善したい主訴の選択肢は complaints.json から作る）。section：basic／category／complaint／primary／detail／constitution／safety／lifestyle／staff。選択肢の findings は選んだときに present になる所見。exclusive（none・unknown・declined）はほかの選択肢と同時に選べない。 2026-10-28：選択肢の other（その他・所見なし）、mensesOnly（閉経・月経なしでは出さない）、note（短い記入欄）、heading（小見出し）、defer（薬剤師の観察で「判断できない」＝本人の回答を使う）、設問の optional（回答せずに次へ）・prefill（前の回答であった所見をチェック済みで出す）・followup（同じ画面で追加の選択肢）を追加。 2026-10-29：followup を followups（配列。picker: formulas は漢方薬の候補から選ぶ）に、設問の note（選択肢を選んだら出す任意の記入欄。except の選択肢は除く）、選択肢の noteLabel／notePlaceholder・staffNote（薬剤師画面の確認メモ）を追加。 2026-10-29（第3弾）：section tongue（舌の確認方法 T1 とご本人の自己確認 TS_*）、選択肢の refer（選ぶと患者画面・薬剤師画面に受診のおすすめ）・oneOf（同じ名前の選択肢はどれか1つ）を追加。記入欄は選んだ選択肢のすぐ下に出す。 2026-10-31（第4弾）：Question.groups（1ページ内の小見出し。舌）、Option の group／groupExclusive／excludes／blockedIf／icon／herbs、Followup.required、主訴の refer・followups（薬剤師画面のみの受診のおすすめ・耳鳴りの音の高さ）を追加。",
+ "note": "設問（主訴カテゴリー・具体的主訴・いちばん改善したい主訴の選択肢は complaints.json から作る）。section：basic／category／complaint／primary／detail／constitution／safety／lifestyle／staff。選択肢の findings は選んだときに present になる所見。exclusive（none・unknown・declined）はほかの選択肢と同時に選べない。 2026-10-28：選択肢の other（その他・所見なし）、mensesOnly（閉経・月経なしでは出さない）、note（短い記入欄）、heading（小見出し）、defer（薬剤師の観察で「判断できない」＝本人の回答を使う）、設問の optional（回答せずに次へ）・prefill（前の回答であった所見をチェック済みで出す）・followup（同じ画面で追加の選択肢）を追加。 2026-10-29：followup を followups（配列。picker: formulas は漢方薬の候補から選ぶ）に、設問の note（選択肢を選んだら出す任意の記入欄。except の選択肢は除く）、選択肢の noteLabel／notePlaceholder・staffNote（薬剤師画面の確認メモ）を追加。 2026-10-29（第3弾）：section tongue（舌の確認方法 T1 とご本人の自己確認 TS_*）、選択肢の refer（選ぶと患者画面・薬剤師画面に受診のおすすめ）・oneOf（同じ名前の選択肢はどれか1つ）を追加。記入欄は選んだ選択肢のすぐ下に出す。 2026-10-31（第4弾）：Question.groups（1ページ内の小見出し。舌）、Option の group／groupExclusive／excludes／blockedIf／icon／herbs、Followup.required、主訴の refer・followups（薬剤師画面のみの受診のおすすめ・耳鳴りの音の高さ）を追加。 2026-10-31（第5弾）：判定は配点表（scoring.json）どおり。Question.gate（「ある／ない」を先に聞き、「ある」のときだけ種類を出す）、Option の staffOnly（薬剤師の追加でだけ使う種類）・sepBefore（区切り線の下に置く）・meta（本人に聞いて選んだ等の記録用）を追加。顔色・爪はご本人の設問から外し薬剤師の観察へ。",
  "questions": [
   {
    "id": "A1",
@@ -6808,16 +6808,9 @@
     },
     {
      "id": "B2-hair_dry",
-     "text": "髪がパサつく",
+     "text": "髪がパサつく・抜けやすい",
      "findings": [
       "hair_dry"
-     ]
-    },
-    {
-     "id": "B2-nail_brittle",
-     "text": "爪が割れやすい",
-     "findings": [
-      "nail_brittle"
      ]
     },
     {
@@ -6845,59 +6838,6 @@
      "id": "B2-none",
      "text": "特にない",
      "exclusive": "none"
-    }
-   ]
-  },
-  {
-   "id": "F1",
-   "section": "constitution",
-   "title": "ふだんの顔色に、いちばん近いものを選んでください",
-   "type": "single",
-   "options": [
-    {
-     "id": "F1-none",
-     "text": "特に気になることはない",
-     "exclusive": "none",
-     "image": "/assets/kampo/face/normal.webp"
-    },
-    {
-     "id": "F1-face_pale",
-     "text": "血色が悪く、白っぽい（血の気が少ない）",
-     "findings": [
-      "face_pale"
-     ],
-     "image": "/assets/kampo/face/pale.webp"
-    },
-    {
-     "id": "F1-face_dark",
-     "text": "顔色が暗く、くすんでいる",
-     "findings": [
-      "face_dark"
-     ],
-     "image": "/assets/kampo/face/dark.webp"
-    },
-    {
-     "id": "F1-face_red",
-     "text": "顔が赤くなりやすい",
-     "findings": [
-      "face_red"
-     ],
-     "image": "/assets/kampo/face/red.webp"
-    },
-    {
-     "id": "F1-face_sallow",
-     "text": "顔色が黄色っぽく、つやがない",
-     "findings": [
-      "face_sallow"
-     ]
-    },
-    {
-     "id": "F1-face_bluish",
-     "text": "顔色が青白い（冷えて青みがある）",
-     "findings": [
-      "face_bluish"
-     ],
-     "image": "/assets/kampo/face/bluish.webp"
     }
    ]
   },
@@ -7117,7 +7057,7 @@
     },
     {
      "id": "B5-stomach_splash",
-     "text": "水分をとると胃がチャポチャポする",
+     "text": "胃でチャポチャポ音がする",
      "findings": [
       "stomach_splash"
      ]
@@ -7151,7 +7091,7 @@
     },
     {
      "id": "B5b-flank_distension",
-     "text": "脇腹が張る",
+     "text": "脇腹やみぞおちが張る・苦しい",
      "findings": [
       "flank_distension"
      ]
@@ -7552,6 +7492,13 @@
      ]
     },
     {
+     "id": "B9-throat_lump",
+     "text": "喉に何かつかえる感じがある",
+     "findings": [
+      "throat_lump"
+     ]
+    },
+    {
      "id": "B9-none",
      "text": "特にない",
      "exclusive": "none"
@@ -7593,9 +7540,23 @@
     },
     {
      "id": "B10-varicose",
-     "text": "静脈瘤がある",
+     "text": "静脈瘤がある（足の血管がボコボコと浮き出ている）",
      "findings": [
       "varicose"
+     ]
+    },
+    {
+     "id": "B10-pain_fixed_stabbing",
+     "text": "決まった場所が刺すように痛む・夜に強くなる",
+     "findings": [
+      "pain_fixed_stabbing"
+     ]
+    },
+    {
+     "id": "B10-lower_abd_tender",
+     "text": "下腹部を押すと痛いところがある",
+     "findings": [
+      "lower_abd_tender"
      ]
     },
     {
@@ -7887,107 +7848,66 @@
    "section": "safety",
    "title": "いま飲んでいる薬・サプリメントはありますか",
    "type": "multi",
-   "help": "あてはまるものを選ぶと、そのすぐ下に薬の名前の欄が出ます（わかれば。書かなくても進めます）。ここにない薬は「その他の薬・サプリメント」に書いてください。",
+   "help": "飲み薬・注射・市販薬も含みます。「ある」を選ぶと種類が出ます。選ぶと、そのすぐ下に名前の欄が出ます（わかれば。書かなくても進めます）。",
    "options": [
     {
+     "id": "C1-yes",
+     "text": "ある"
+    },
+    {
+     "id": "C1-none",
+     "text": "ない",
+     "exclusive": "none"
+    },
+    {
      "id": "C1-diuretic",
-     "text": "利尿薬（むくみや血圧の薬）",
+     "text": "利尿薬（むくみ・血圧の薬。ラシックス・フロセミドなど）",
      "flags": [
       "med_diuretic"
      ],
      "note": true,
      "noteLabel": "薬の名前（わかれば・任意）",
-     "notePlaceholder": "例：お薬手帳に書かれている名前"
-    },
-    {
-     "id": "C1-steroid",
-     "text": "ステロイドの飲み薬",
-     "flags": [
-      "med_steroid"
-     ],
-     "note": true,
-     "noteLabel": "薬の名前（わかれば・任意）",
-     "notePlaceholder": "例：お薬手帳に書かれている名前"
-    },
-    {
-     "id": "C1-bp",
-     "text": "血圧の薬",
-     "flags": [
-      "med_bp"
-     ],
-     "note": true,
-     "noteLabel": "薬の名前（わかれば・任意）",
-     "notePlaceholder": "例：お薬手帳に書かれている名前"
+     "notePlaceholder": "例：お薬手帳に書いてある薬の名前"
     },
     {
      "id": "C1-thyroid",
-     "text": "甲状腺の薬",
+     "text": "甲状腺の薬（チラーヂンなど）",
      "flags": [
       "med_thyroid"
      ],
      "note": true,
      "noteLabel": "薬の名前（わかれば・任意）",
-     "notePlaceholder": "例：お薬手帳に書かれている名前"
+     "notePlaceholder": "例：お薬手帳に書いてある薬の名前"
     },
     {
      "id": "C1-asthma",
-     "text": "ぜんそく・気管支の薬",
+     "text": "ぜんそく・気管支の薬（テオドール・メプチンなど）",
      "flags": [
       "med_asthma"
      ],
      "note": true,
      "noteLabel": "薬の名前（わかれば・任意）",
-     "notePlaceholder": "例：お薬手帳に書かれている名前"
-    },
-    {
-     "id": "C1-antidep",
-     "text": "抗うつ薬",
-     "flags": [
-      "med_antidep"
-     ],
-     "note": true,
-     "noteLabel": "薬の名前（わかれば・任意）",
-     "notePlaceholder": "例：お薬手帳に書かれている名前"
+     "notePlaceholder": "例：お薬手帳に書いてある薬の名前"
     },
     {
      "id": "C1-interferon",
-     "text": "インターフェロン",
+     "text": "肝炎などで注射の治療を受けている（インターフェロン）",
      "flags": [
       "interferon"
      ],
      "note": true,
      "noteLabel": "薬の名前（わかれば・任意）",
-     "notePlaceholder": "例：お薬手帳に書かれている名前"
-    },
-    {
-     "id": "C1-laxative",
-     "text": "便秘薬",
-     "flags": [
-      "med_laxative"
-     ],
-     "note": true,
-     "noteLabel": "薬の名前（わかれば・任意）",
-     "notePlaceholder": "例：お薬手帳に書かれている名前"
+     "notePlaceholder": "例：お薬手帳に書いてある薬の名前"
     },
     {
      "id": "C1-kanzo",
-     "text": "市販のかぜ薬・胃腸薬",
+     "text": "市販のかぜ薬・せき止め・胃腸薬",
      "flags": [
       "med_otc"
      ],
      "note": true,
      "noteLabel": "薬の名前（わかれば・任意）",
-     "notePlaceholder": "例：お薬手帳に書かれている名前"
-    },
-    {
-     "id": "C1-anticoag",
-     "text": "血液をサラサラにする薬",
-     "flags": [
-      "med_anticoag"
-     ],
-     "note": true,
-     "noteLabel": "薬の名前（わかれば・任意）",
-     "notePlaceholder": "例：お薬手帳に書かれている名前"
+     "notePlaceholder": "例：お薬手帳に書いてある薬の名前"
     },
     {
      "id": "C1-kampo",
@@ -8003,18 +7923,71 @@
       "other_meds"
      ],
      "note": true,
-     "noteLabel": "薬・サプリメントの名前（わかれば・任意）",
-     "notePlaceholder": "例：痛み止め（ロキソニン）、ビタミン剤"
-    },
-    {
-     "id": "C1-none",
-     "text": "飲んでいない",
-     "exclusive": "none"
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書いてある薬の名前",
+     "sepBefore": true
     },
     {
      "id": "C1-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
+     "text": "種類がわからない（お薬手帳を見せてください）",
+     "flags": [
+      "meds_unknown"
+     ]
+    },
+    {
+     "id": "C1-steroid",
+     "text": "ステロイドの飲み薬",
+     "flags": [
+      "med_steroid"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書いてある薬の名前",
+     "staffOnly": true
+    },
+    {
+     "id": "C1-bp",
+     "text": "血圧の薬",
+     "flags": [
+      "med_bp"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書いてある薬の名前",
+     "staffOnly": true
+    },
+    {
+     "id": "C1-antidep",
+     "text": "抗うつ薬",
+     "flags": [
+      "med_antidep"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書いてある薬の名前",
+     "staffOnly": true
+    },
+    {
+     "id": "C1-laxative",
+     "text": "便秘薬（センナ・大黄を含むもの など）",
+     "flags": [
+      "med_laxative"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書いてある薬の名前",
+     "staffOnly": true
+    },
+    {
+     "id": "C1-anticoag",
+     "text": "血液をサラサラにする薬",
+     "flags": [
+      "med_anticoag"
+     ],
+     "note": true,
+     "noteLabel": "薬の名前（わかれば・任意）",
+     "notePlaceholder": "例：お薬手帳に書いてある薬の名前",
+     "staffOnly": true
     }
    ],
    "followups": [
@@ -8026,7 +7999,11 @@
      "picker": "formulas",
      "help": "名前の一部（ひらがな・漢字）か、ツムラの番号を入れると候補が出ます。見つからないときは「見つからない（薬剤師に伝える）」を選んでください。"
     }
-   ]
+   ],
+   "gate": {
+    "yes": "C1-yes",
+    "no": "C1-none"
+   }
   },
   {
    "id": "C2",
@@ -8034,6 +8011,15 @@
    "title": "医師の治療を受けている病気や、これまでに受けた手術はありますか",
    "type": "multi",
    "options": [
+    {
+     "id": "C2-yes",
+     "text": "ある"
+    },
+    {
+     "id": "C2-0",
+     "text": "ない",
+     "exclusive": "none"
+    },
     {
      "id": "C2-1",
      "text": "高血圧",
@@ -8061,7 +8047,7 @@
     },
     {
      "id": "C2-hypok",
-     "text": "低カリウムと言われたことがある",
+     "text": "低カリウム血症・アルドステロン症・ミオパチー（筋肉の病気）と言われたことがある",
      "flags": [
       "hypokalemia"
      ]
@@ -8115,7 +8101,8 @@
      ],
      "note": true,
      "noteLabel": "何の手術か（わかれば・任意）",
-     "notePlaceholder": "例：盲腸の手術（10年前）"
+     "notePlaceholder": "例：盲腸の手術（10年前）",
+     "sepBefore": true
     },
     {
      "id": "C2-10",
@@ -8125,22 +8112,30 @@
      ],
      "note": true,
      "noteLabel": "病名（わかれば・任意）"
-    },
-    {
-     "id": "C2-0",
-     "text": "ない",
-     "exclusive": "none"
     }
    ],
-   "help": "あてはまるものを選ぶと、そのすぐ下に病名・時期の欄が出ます（わかれば。書かなくても進めます）。ここにない病気は「その他の病気」に書いてください。"
+   "help": "「ある」を選ぶと種類が出ます。選ぶと、そのすぐ下に病名の欄が出ます（わかれば。書かなくても進めます）。ここにない病気は「その他の病気」に書いてください。",
+   "gate": {
+    "yes": "C2-yes",
+    "no": "C2-0"
+   }
   },
   {
    "id": "C3",
    "section": "safety",
    "title": "薬や食品で、アレルギーや体調不良が出たことはありますか",
    "type": "multi",
-   "help": "「ある」を選んだら、何に出たかを短く書いてください（書かなくても進めます）。",
+   "help": "「ある」を選ぶと種類が出ます。",
    "options": [
+    {
+     "id": "C3-yes",
+     "text": "ある"
+    },
+    {
+     "id": "C3-none",
+     "text": "ない",
+     "exclusive": "none"
+    },
     {
      "id": "C3-drug",
      "text": "薬でアレルギーが出たことがある",
@@ -8149,7 +8144,7 @@
      ],
      "note": true,
      "noteLabel": "何の薬で出ましたか（任意）",
-     "notePlaceholder": "例：薬の名前"
+     "notePlaceholder": "例：お薬手帳に書いてある薬の名前"
     },
     {
      "id": "C3-food",
@@ -8164,16 +8159,6 @@
      "flags": [
       "adverse_kampo"
      ]
-    },
-    {
-     "id": "C3-none",
-     "text": "ない",
-     "exclusive": "none"
-    },
-    {
-     "id": "C3-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ],
    "followups": [
@@ -8374,7 +8359,11 @@
       }
      ]
     }
-   ]
+   ],
+   "gate": {
+    "yes": "C3-yes",
+    "no": "C3-none"
+   }
   },
   {
    "id": "L1",
@@ -9007,14 +8996,14 @@
    "id": "X_face",
    "section": "staff",
    "title": "顔色（観察）",
-   "type": "single",
-   "help": "化粧などで判断できないときは「判断できない」を選ぶと、ご本人の回答を使います。",
+   "type": "multi",
+   "help": "1つ選んでください。マスクなどで見えないときは、その場でご本人に聞いて選び、「本人に聞いて選んだ」も付けてください。",
    "options": [
     {
      "id": "X_face-normal",
-     "text": "特に気になることはない",
-     "exclusive": "none",
-     "image": "/assets/kampo/face/normal.webp"
+     "text": "特記なし",
+     "image": "/assets/kampo/face/normal.webp",
+     "oneOf": "face"
     },
     {
      "id": "X_face-face_pale",
@@ -9022,7 +9011,8 @@
      "findings": [
       "face_pale"
      ],
-     "image": "/assets/kampo/face/pale.webp"
+     "image": "/assets/kampo/face/pale.webp",
+     "oneOf": "face"
     },
     {
      "id": "X_face-face_dark",
@@ -9030,7 +9020,8 @@
      "findings": [
       "face_dark"
      ],
-     "image": "/assets/kampo/face/dark.webp"
+     "image": "/assets/kampo/face/dark.webp",
+     "oneOf": "face"
     },
     {
      "id": "X_face-face_red",
@@ -9038,7 +9029,8 @@
      "findings": [
       "face_red"
      ],
-     "image": "/assets/kampo/face/red.webp"
+     "image": "/assets/kampo/face/red.webp",
+     "oneOf": "face"
     },
     {
      "id": "X_face-face_bluish",
@@ -9046,19 +9038,22 @@
      "findings": [
       "face_bluish"
      ],
-     "image": "/assets/kampo/face/bluish.webp"
+     "image": "/assets/kampo/face/bluish.webp",
+     "oneOf": "face"
     },
     {
      "id": "X_face-face_sallow",
      "text": "顔色が黄色っぽく、つやがない",
      "findings": [
       "face_sallow"
-     ]
+     ],
+     "oneOf": "face",
+     "image": "/assets/kampo/face/sallow.webp"
     },
     {
-     "id": "X_face-defer",
-     "text": "判断できない（化粧など）",
-     "defer": true
+     "id": "X_face-asked",
+     "text": "見えないため、本人に聞いて選んだ（マスクなど）",
+     "meta": true
     }
    ]
   },
@@ -9066,32 +9061,34 @@
    "id": "X_nail_color",
    "section": "staff",
    "title": "爪の色（観察）",
-   "type": "single",
-   "help": "ネイルなどで判断できないときは「判断できない」を選ぶと、ご本人の回答を使います。",
+   "type": "multi",
+   "help": "1つ選んでください。ネイルなどで見えないときは、その場でご本人に聞いて選び、「本人に聞いて選んだ」も付けてください。",
    "options": [
     {
      "id": "X_nail_color-normal",
-     "text": "ふつう",
-     "exclusive": "none"
+     "text": "特記なし",
+     "oneOf": "nail_color"
     },
     {
      "id": "X_nail_color-nail_pale",
      "text": "白っぽい",
      "findings": [
       "nail_pale"
-     ]
+     ],
+     "oneOf": "nail_color"
     },
     {
      "id": "X_nail_color-nail_dark",
      "text": "紫っぽい・暗い",
      "findings": [
       "nail_dark"
-     ]
+     ],
+     "oneOf": "nail_color"
     },
     {
-     "id": "X_nail_color-defer",
-     "text": "判断できない（ネイルなど）",
-     "defer": true
+     "id": "X_nail_color-asked",
+     "text": "見えないため、本人に聞いて選んだ（ネイルなど）",
+     "meta": true
     }
    ]
   },
@@ -9101,6 +9098,13 @@
    "title": "爪の形（観察・複数可）",
    "type": "multi",
    "options": [
+    {
+     "id": "X_nail_shape-nail_brittle",
+     "text": "割れやすい（ご本人に聞く）",
+     "findings": [
+      "nail_brittle"
+     ]
+    },
     {
      "id": "X_nail_shape-nail_ridges",
      "text": "縦すじが目立つ",
@@ -9122,83 +9126,94 @@
      "exclusive": "none"
     },
     {
-     "id": "X_nail_shape-defer",
-     "text": "判断できない（ネイルなど）",
-     "defer": true
+     "id": "X_nail_shape-asked",
+     "text": "見えないため、本人に聞いて選んだ（ネイルなど）",
+     "meta": true
     }
-   ]
+   ],
+   "help": "あてはまるものをすべて。割れやすさは見てもわからないので、ご本人に聞いて選んでください。"
   },
   {
    "id": "X_build",
    "section": "staff",
    "title": "体格",
-   "type": "single",
+   "type": "multi",
    "options": [
     {
      "id": "X_build-build_thin",
      "text": "やせ型",
      "findings": [
       "build_thin"
-     ]
+     ],
+     "oneOf": "build"
     },
     {
      "id": "X_build-build_normal",
      "text": "普通",
      "findings": [
       "build_normal"
-     ]
+     ],
+     "oneOf": "build"
     },
     {
      "id": "X_build-build_solid",
      "text": "がっちり（筋肉質）",
      "findings": [
       "build_solid"
-     ]
+     ],
+     "oneOf": "build"
     },
     {
      "id": "X_build-build_belly_fat",
      "text": "太り気味（お腹周り）",
      "findings": [
       "build_belly_fat"
-     ]
+     ],
+     "oneOf": "build"
     },
     {
      "id": "X_build-build_watery",
      "text": "水太り傾向（色白でぽっちゃり）",
      "findings": [
       "build_watery"
-     ]
+     ],
+     "oneOf": "build"
     }
-   ]
+   ],
+   "help": "1つ選んでください（もう一度押すと取り消し）。"
   },
   {
    "id": "X_voice",
    "section": "staff",
    "title": "声の強さ",
-   "type": "single",
+   "type": "multi",
    "options": [
     {
      "id": "X_voice-voice_weak",
      "text": "小さく弱い",
      "findings": [
       "voice_weak"
-     ]
+     ],
+     "oneOf": "voice"
     },
     {
      "id": "X_voice-voice_normal",
      "text": "普通",
      "findings": [
       "voice_normal"
-     ]
+     ],
+     "oneOf": "voice"
     },
     {
      "id": "X_voice-voice_strong",
      "text": "大きく力強い",
      "findings": [
       "voice_strong"
-     ]
+     ],
+     "oneOf": "voice"
     }
-   ]
+   ],
+   "help": "1つ選んでください（もう一度押すと取り消し）。"
   },
   {
    "id": "X_preg",
@@ -9926,6 +9941,27 @@
      "id": "X_kampo_adverse-F27",
      "text": "六味丸",
      "formula": "F27"
+    }
+   ]
+  },
+  {
+   "id": "X_sanshishi",
+   "section": "staff",
+   "title": "山梔子を含む漢方薬の服用期間（口頭で確認）",
+   "type": "single",
+   "options": [
+    {
+     "id": "X_sanshishi-short",
+     "text": "5年未満"
+    },
+    {
+     "id": "X_sanshishi-long_ok",
+     "text": "5年以上・お腹の症状はない"
+    },
+    {
+     "id": "X_sanshishi-long_sym",
+     "text": "5年以上で、下痢・腹痛・便秘・お腹の張りを繰り返している",
+     "refer": "山梔子を含む漢方薬を長く飲んでいて、お腹の症状を繰り返しています。腸間膜静脈硬化症のことがあるため、消化器内科の受診をおすすめしてください。"
     }
    ]
   }

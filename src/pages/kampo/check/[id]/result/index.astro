@@ -4,14 +4,17 @@
 //   タイプは6つ（気虚・血虚・気滞・瘀血・水滞・水不足（陰虚））のレーダーチャートと解説。寒熱は別の枠。
 //   漢方薬の名前・候補、受診のおすすめ、点数は出さない（漢方・受診のおすすめは薬剤師画面だけ。薬剤師が口頭で伝える）。
 //   養生は「全員共通の土台（胃腸・睡眠・冷やさない）」＋「主タイプ＋主訴に関係するタイプ」の最大2つ分（3-9）。
+// 2026-10-31 第5弾：6タイプだけを出す（寒熱・虚実・五臓・冷え／熱の表示とアドバイス、組み合わせの文は薬剤師画面だけ。2-1）。
+//   主な体質＝いちばん高いタイプ、ほかの体質＝「強い」「注意」のほかのタイプすべて（patientView。薬剤師画面と同じ。2-2）。
+//   同じ養生は2回出さない（2-3）。アイコンはいただいた画像（1-3）。
 export const prerender = false;
 import KampoLayout from '../../../../../layouts/KampoLayout.astro';
 import AdviceBlock from '../../../../../components/kampo/AdviceBlock.astro';
 import RadarChart from '../../../../../components/kampo/RadarChart.astro';
 import ResultTabs from '../../../../../components/kampo/ResultTabs.astro';
 import { axisDef, axisName, TYPES, FOUNDATION, type TypeKey } from '../../../../../lib/kampo/masters';
-import { resultCards, CARD_RANK_LABEL, COMBO_LABEL, LEVEL_LABEL, advicePlan, relatedTypeOf, toAxis } from '../../../../../lib/kampo/scoring';
-import { typeIconSvg } from '../../../../../lib/kampo/icons';
+import { resultCards, CARD_RANK_LABEL, LEVEL_LABEL, advicePlan, relatedTypeOf, toAxis, patientView } from '../../../../../lib/kampo/scoring';
+import { typeIconSvg, typeIconImg } from '../../../../../lib/kampo/icons';
 import { getSession, saveSession, fmtJst } from '../../../../../lib/kampo/store';
 import { finalize, isLegacy, computeSession } from '../../../../../lib/kampo/compute';
 
@@ -29,27 +32,28 @@ const name = (t: string) => axisName(t);
 const pctOf = (k: string) => { if (!r) return 0; const e = Object.entries(r.pct).find(([key]) => toAxis(key) === k); return e ? e[1] : 0; };
 const levelOf = (k: string) => { if (!r) return ''; const e = Object.entries(r.level ?? {}).find(([key]) => toAxis(key) === k); return e ? LEVEL_LABEL[e[1]] : ''; };
 const radarPct = Object.fromEntries(TYPES.map((t) => [t, pctOf(t)])) as Record<TypeKey, number>;
-// 解説カード：新版は養生に使う最大2タイプ、旧版は主・併存
-const cards = legacy ? (r ? resultCards(r).filter((x) => x.rank !== 'thermal') : []) : (plan?.types ?? []).map((t, i) => ({ t, rank: i === 0 ? 'main' : 'sub' as 'main' | 'sub' }));
-const thermal = r ? (['cold', 'heat'] as const).filter((t) => pctOf(t) >= 20).sort((a, b) => pctOf(b) - pctOf(a)) : [];
-const others = (r && !legacy ? TYPES.filter((t) => pctOf(t) >= 20 && !(plan?.types ?? []).includes(t)).sort((a, b) => pctOf(b) - pctOf(a)) : []) as TypeKey[];
-const combos = (r?.combos ?? []).map((x) => COMBO_LABEL[x]);
-const thermalText = thermal.length ? `寒熱では、${thermal.map(name).join('・')}の傾向があります。` : '';
-const comboText = combos.length ? `${combos.join('・')}の組み合わせが見られます。` : '';
+// 解説カード：主な体質 → ほかの体質（「強い」「注意」すべて）。旧版は保存時の主・併存
+const view = r && !legacy ? patientView(r) : null;
+const cards = legacy ? (r ? resultCards(r).filter((x) => x.rank !== 'thermal') : []) : [...(view?.main ?? []).map((t) => ({ t, rank: 'main' as const })), ...(view?.others ?? []).map((t) => ({ t, rank: 'sub' as const }))];
 const mainNames = cards.filter((x) => x.rank === 'main').map((x) => name(x.t)).join('・');
+const subNames = cards.filter((x) => x.rank === 'sub').map((x) => name(x.t)).join('・');
 const summary = !r
   ? '体質の結果がありません。'
   : r.isBalanced
-    ? `大きな偏りは見られません。${thermalText}今の生活を続けながら、季節の変わり目にもう一度チェックしてみましょう。`
-    : plan && plan.tied.length >= 2
-      ? `${plan.tied.map(name).join('・')}の傾向が同じくらい見られます。${thermalText}${comboText}体質の偏りは、毎日の養生で整えていくことができます。`
-      : `あなたの体質は、${mainNames}の傾向がもっとも見られます。${cards.filter((x) => x.rank === 'sub').length ? `${cards.filter((x) => x.rank === 'sub').map((x) => name(x.t)).join('・')}の傾向もあります。` : ''}${thermalText}${comboText}体質の偏りは、毎日の養生で整えていくことができます。`;
-const adviceTypes = cards.map((x) => x.t) as TypeKey[];
+    ? '大きな偏りは見られません。今の生活を続けながら、季節の変わり目にもう一度チェックしてみましょう。'
+    : plan && plan.tied.length >= 2 && view && plan.tied.every((t) => cards.some((x) => x.t === t))
+      ? `${plan.tied.map(name).join('・')}の傾向が同じくらい見られます。体質の偏りは、毎日の養生で整えていくことができます。`
+      : view?.tendencyOnly
+        ? `大きな偏りではありませんが、${mainNames}の傾向が少し見られます。体質の偏りは、毎日の養生で整えていくことができます。`
+        : `あなたの体質は、${mainNames}の傾向がもっとも見られます。${subNames ? `${subNames}の傾向もあります。` : ''}体質の偏りは、毎日の養生で整えていくことができます。`;
+// 改善アドバイス（印刷の2ページ目）：主な体質＋もう1つの最大2つ。同じ養生は2回出さない
+const adviceTypes = (legacy ? cards.map((x) => x.t) : (plan?.types ?? [])) as TypeKey[];
+const shownOrder = cards.map((x) => x.t) as TypeKey[];
 ---
 <KampoLayout title="体質チェックの結果" width="normal">
   <a slot="actions" class="kp-btn ghost small no-print" href={`/kampo/staff/session/${s.id}/`}>担当者画面へ</a>
   <button slot="actions" class="kp-btn pink small no-print" type="button" onclick="window.print()">印刷する</button>
-  <ResultTabs id={s.id} active="result" adviceType={cards[0]?.t ?? thermal[0]} />
+  <ResultTabs id={s.id} active="result" adviceType={cards[0]?.t} />
 
   <section id="result">
     <h1 class="kp-h1">あなたの<span class="sky">体質チェック結果</span></h1>
@@ -75,12 +79,13 @@ const adviceTypes = cards.map((x) => x.t) as TypeKey[];
     )}
     {cards.map(({ t, rank }) => {
       const d = axisDef(t);
+      const img = typeIconImg(t);
       return (
         <article class="kp-panel kp-tcard">
-          <h2>{CARD_RANK_LABEL[rank]}：{d.name}（{d.reading}）</h2>
+          <h2>{CARD_RANK_LABEL[rank]}：{d.name}（{d.reading}）{!legacy && levelOf(t) && <small class="kp-tcard-lv">{levelOf(t)}</small>}</h2>
           <div class="kp-panel-b kp-tcard-b">
             <div class="kp-tcard-side">
-              <span class="kp-tcard-icon" style={`color:${d.color}`}><Fragment set:html={typeIconSvg(t, 56)} /></span>
+              {img ? <img class="kp-tcard-img" src={img} alt="" width="96" height="96"> : <span class="kp-tcard-icon" style={`color:${d.color}`}><Fragment set:html={typeIconSvg(t, 56)} /></span>}
             </div>
             <div>
               <h3 class="kp-tcard-h">{d.headline}</h3>
@@ -92,18 +97,6 @@ const adviceTypes = cards.map((x) => x.t) as TypeKey[];
         </article>
       );
     })}
-    {others.length > 0 && (
-      <div class="kp-panel"><h2>ほかに見られる傾向</h2>
-        <div class="kp-panel-b"><ul class="kp-others">{others.map((t) => <li><b>{name(t)}</b>（{levelOf(t)}）<span>{axisDef(t).headline}</span></li>)}</ul>
-          <p class="kp-note" style="margin-top:8px">ほかの傾向は、まず下の土台と上のタイプの養生を続けながら、薬剤師と相談して整えていきます。</p></div>
-      </div>
-    )}
-    {thermal.length > 0 && (
-      <div class="kp-panel"><h2>寒熱の傾向</h2>
-        <div class="kp-panel-b"><ul class="kp-others">{thermal.map((t) => <li><b>{name(t)}</b>（{levelOf(t)}）<span>{axisDef(t).headline ?? ''}</span></li>)}</ul>
-          <div class="no-print" style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">{thermal.map((t) => <a class="kp-btn ghost small" href={`/kampo/check/${s.id}/advice/${t}/`}>{name(t)}の改善アドバイス</a>)}</div></div>
-      </div>
-    )}
   </section>
 
   {/* 全員共通の土台 */}
@@ -117,17 +110,6 @@ const adviceTypes = cards.map((x) => x.t) as TypeKey[];
     </section>
   )}
 
-  {(adviceTypes.length > 0 || thermal.length > 0) && (
-    <section id="advice" class="kp-panel no-print">
-      <h2>改善アドバイス</h2>
-      <div class="kp-panel-b kp-advice-links">
-        {adviceTypes.map((t, i) => (
-          <a href={`/kampo/check/${s.id}/advice/${t}/`}><small>{i === 0 ? CARD_RANK_LABEL.main : CARD_RANK_LABEL.sub}</small>{name(t)}の生活養生・ツボ</a>
-        ))}
-        {thermal.map((t) => <a href={`/kampo/check/${s.id}/advice/${t}/`}><small>寒熱</small>{name(t)}の生活養生・ツボ</a>)}
-      </div>
-    </section>
-  )}
   <div class="kp-panel" style="background:var(--sky-mist)">
     <h2>ご相談について</h2>
     <div class="kp-panel-b"><p style="font-size:15px">気になる症状については、体調やお薬の内容を確かめたうえで、薬剤師がご相談をお受けします。</p></div>
@@ -137,7 +119,7 @@ const adviceTypes = cards.map((x) => x.t) as TypeKey[];
 
   {/* 印刷時の2ページ目：土台＋体質別の改善アドバイス（最大2つ） */}
   {adviceTypes.map((t) => (
-    <div class="print-only page-break"><AdviceBlock type={t} answers={s.answers} types={adviceTypes} /></div>
+    <div class="print-only page-break"><AdviceBlock type={t} answers={s.answers} types={adviceTypes} order={shownOrder} /></div>
   ))}
   {print && <script is:inline>window.addEventListener('load',function(){setTimeout(function(){window.print()},300)})</script>}
   <style is:global>
@@ -158,6 +140,8 @@ const adviceTypes = cards.map((x) => x.t) as TypeKey[];
   .kp-tcard-b{display:grid;grid-template-columns:200px 1fr;gap:30px;align-items:start}
   .kp-tcard-side{display:flex;flex-direction:column;align-items:center;gap:12px}
   .kp-tcard-icon{display:flex}
+  .kp-tcard-img{width:96px;height:96px;display:block}
+  .kp-tcard-lv{margin-left:10px;font-size:13px;font-weight:400;letter-spacing:.08em;color:var(--sky-text);border:1px solid var(--sky-border);padding:1px 8px;vertical-align:middle}
   .kp-tcard-h{font-size:22px;letter-spacing:.08em;margin-bottom:10px}
   .kp-tcard-p{font-size:15.5px;line-height:2}
   .kp-sym{list-style:none;margin:16px 0 0;padding:16px 20px;background:var(--panel);font-size:15px;line-height:2}

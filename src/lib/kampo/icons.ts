@@ -22,3 +22,10 @@ export const TYPE_ICON: Record<AxisKey, string> = {
 
 export const typeIconSvg = (t: string, size = 28) =>
   `<svg viewBox="0 0 48 48" width="${size}" height="${size}" aria-hidden="true">${TYPE_ICON[t as AxisKey] ?? ''}</svg>`;
+
+/** 6タイプのアイコン画像（2026-10-31 第5弾 1-3。いただいたアイコン一覧の画像から切り出し。寒熱は上の図形のまま） */
+export const TYPE_ICON_IMG: Partial<Record<AxisKey, string>> = {
+  qi_def: '/assets/kampo/types/qi_def.webp', blood_def: '/assets/kampo/types/blood_def.webp', qi_stag: '/assets/kampo/types/qi_stag.webp',
+  blood_stasis: '/assets/kampo/types/blood_stasis.webp', fluid: '/assets/kampo/types/fluid.webp', yin_def: '/assets/kampo/types/yin_def.webp',
+};
+export const typeIconImg = (t: string): string | undefined => TYPE_ICON_IMG[t as AxisKey];

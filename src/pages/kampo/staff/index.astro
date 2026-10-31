@@ -8,7 +8,7 @@ import { SEX_LABEL, AGE_BAND_LABEL, type Sex } from '../../../lib/kampo/flow';
 import { clearStaffCookie, pinConfigured } from '../../../lib/kampo/auth';
 import { supervisorName } from '../../../lib/kampo/compute';
 import {
-  isKvConfigured, listSessionsByDay, listRecentSessions, searchCustomers, countSessions, purgeExpired, jstDate, fmtJst, customerLabel,
+  isKvConfigured, listSessionsByDay, listRecentSessions, searchCustomers, countSessions, purgeExpired, jstDate, fmtJst, customerLabel, receiptNo,
   STATUS_LABEL, INPUT_BY_LABEL, typeNamesOf, getStaffRoster, saveStaffRoster, audit,
 } from '../../../lib/kampo/store';
 
@@ -82,12 +82,12 @@ const urgentCount = sessions.filter((s) => s.urgent).length;
       <p class="kp-note" style="margin-top:12px">この日のチェックはありません。</p>
     ) : (
       <table class="kp-table" style="margin-top:12px">
-        <thead><tr><th>時刻</th><th>お客様</th><th>入力</th><th>主体質（AI）</th><th>副体質（AI）</th><th>安全確認</th><th>状態</th><th></th></tr></thead>
+        <thead><tr><th>時刻</th><th>受付・お客様</th><th>入力</th><th>主な体質（AI）</th><th>ほかの体質（AI）</th><th>安全確認</th><th>状態</th><th></th></tr></thead>
         <tbody>
           {sessions.map((s) => { const f = flagSummary(s); return (
             <tr class:list={[{ 'kp-row-urgent': s.urgent }]}>
               <td>{fmtJst(s.startedAt, false)}</td>
-              <td>{s.customerLabel}</td>
+              <td><b>受付 {receiptNo(s.id)}</b><br><small>{s.customerLabel}</small></td>
               <td>{INPUT_BY_LABEL[s.inputBy]}</td>
               <td>{s.scores ? (s.scores.isBalanced ? 'バランス良好' : typeNamesOf(s.scores.mainTypes)) : '—'}</td>
               <td>{s.scores ? typeNamesOf(s.scores.subTypes) || '—' : '—'}</td>
