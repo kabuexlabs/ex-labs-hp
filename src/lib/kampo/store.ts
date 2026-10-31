@@ -120,6 +120,10 @@ export interface KampoSession {
   judgment?: PharmacistJudgment;
   /** 漢方薬で体調を崩した経験がある方に、薬剤師が確認したうえで漢方候補を表示に切り替えた記録（第2弾 6-4） */
   kampoUnlocked?: { by: string; at: string };
+  /** 薬剤師が追加した記入漏れの薬（C1 の選択肢IDと名前。お薬手帳で確認。第4弾 3-3） */
+  staffMeds?: { id: string; name: string }[];
+  /** 受診のおすすめを「お客様に伝えた」記録（キーは受診のおすすめの文言。薬剤師画面。第4弾 0-2） */
+  referralNotified?: Record<string, { by: string; at: string }>;
   scores?: ScoreResult;
   safetyFlags?: SafetyFlag[];
   /** 安全確認タグ（保存時点） */

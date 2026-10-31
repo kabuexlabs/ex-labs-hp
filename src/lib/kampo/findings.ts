@@ -54,8 +54,11 @@ export function applyAnswer(s: FindingState, q: Question, shown: Option[], ids: 
   }
   for (const o of picked) for (const f of o.findings ?? []) setFinding(s, f, { status: 'present', ...base });
   if (opts.inferAbsent) {
+    // 同じ group の中で「見ていない」（defer）を選んだ項目は、選ばなかった選択肢を「なし」にしない（舌の裏の静脈など）
+    const deferred = new Set(shown.filter((o) => chosen.has(o.id) && o.defer && o.group).map((o) => o.group));
     for (const o of shown) {
       if (chosen.has(o.id) || o.exclusive) continue;
+      if (o.group && deferred.has(o.group)) continue;
       for (const f of o.findings ?? []) setFinding(s, f, { status: 'absent', ...base });
     }
   }

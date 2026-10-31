@@ -2,8 +2,8 @@
 // 漢方体質チェック（/kampo/）専用レイアウト。
 // 非公開ツール（合言葉＋PIN）なので、サイト共通のナビ・フッター・計測・JSON-LD は載せず、
 // noindex と no-store を必ず付ける。
-// デザイン（2026-10-24〜）：白地に淡い水色のアクセント、細身の英字タイトル、枠線の選択肢、
-// 「Q」マーク、丸いボタン、水色帯の見出し。来店客モードとスタッフ画面はヘッダー色で見分ける。
+// デザイン（2026-10-24〜）：白地に淡いアクセント色、細身の英字タイトル、枠線の選択肢、
+// 「Q」マーク、丸いボタン、色帯の見出し。2026-10-31 から緑系（ESSENCE薬局のサイトの雰囲気に合わせる。色は :root の --sky 系の変数だけ）。来店客モードとスタッフ画面はヘッダー色で見分ける。
 export interface Props {
   title: string;
   mode?: 'customer' | 'staff';
@@ -34,10 +34,11 @@ const filled = progress ? Math.round((dots * progress.done) / Math.max(1, progre
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Noto+Sans+JP:wght@300;400;500;700&display=swap">
 <style is:global>
 :root{
-  --sky:#86CDE8;--sky-strong:#5FB8DD;--sky-text:#3E9FD2;--sky-soft:#EAF8FD;--sky-band:#DAEEF8;--sky-mist:#F3FAFD;
+  --sky:#7FCBA3;--sky-strong:#3FA877;--sky-text:#237A55;--sky-soft:#EBF7F0;--sky-band:#D9EFE3;--sky-mist:#F4FAF7;
+  --sky-border:#BFE3CF;--sky-ring:#C9EBD8;--sky-check:#D0EBDD;--sky-disabled:#D3E6DB;--ok-text:#1D6B49;
   --ink:#333333;--ink-2:#555555;--muted:#888888;--line:#D9D9D9;--line-soft:#ECECEC;--radio:#E3E3E3;--paper:#FFFFFF;--panel:#F3F3F3;
-  --pink:#E2457B;--danger:#C62828;--danger-soft:#FDECEC;--danger-deep:#8E1B1B;--warn:#8A5A00;--warn-soft:#FFF5DC;--info:#2F6E95;--info-soft:#EAF4FA;
-  --staff:#3F5566;
+  --pink:#E2457B;--danger:#C62828;--danger-soft:#FDECEC;--danger-deep:#8E1B1B;--warn:#8A5A00;--warn-soft:#FFF5DC;--info:#2F7A5A;--info-soft:#EAF6EF;
+  --staff:#2F5445;
   --en:'Lato','Noto Sans JP',sans-serif;
   --accent:var(--sky-strong);--accent-soft:var(--sky-soft);--accent-dark:var(--sky-text);
 }
@@ -57,7 +58,7 @@ p{margin:0}
 .kp-brand .en b{font-weight:300;color:var(--sky)}
 .kp-brand .ja{display:block;font-size:13px;letter-spacing:.14em;color:var(--ink-2);margin-top:6px}
 .kp-head.staff .kp-brand .en,.kp-head.staff .kp-brand .ja{color:#fff}
-.kp-head.staff .kp-brand .en b{color:#BFE6F5}
+.kp-head.staff .kp-brand .en b{color:#CBEED9}
 .kp-head-actions{margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .kp-progress~.kp-head-actions{margin-left:0}
 .kp-head-actions:empty{display:none}
@@ -89,7 +90,7 @@ p{margin:0}
 /* ボタン（丸いピル型） */
 .kp-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:10px 34px;border-radius:999px;border:1px solid var(--sky);background:var(--sky);color:#fff;font:inherit;font-size:16px;font-weight:500;letter-spacing:.12em;cursor:pointer;text-decoration:none;transition:background .15s,color .15s,border-color .15s;position:relative}
 .kp-btn:hover{background:var(--sky-strong);border-color:var(--sky-strong)}
-.kp-btn:disabled,.kp-btn[aria-disabled=true]{background:#D5E9F1;border-color:#D5E9F1;color:#fff;cursor:not-allowed}
+.kp-btn:disabled,.kp-btn[aria-disabled=true]{background:var(--sky-disabled);border-color:var(--sky-disabled);color:#fff;cursor:not-allowed}
 .kp-btn.ghost{background:var(--paper);color:var(--sky-text);border-color:var(--line)}
 .kp-btn.ghost:hover{background:var(--sky-mist);border-color:var(--sky)}
 .kp-btn.pink{background:var(--paper);color:var(--pink);border-color:var(--pink)}
@@ -124,11 +125,11 @@ textarea.kp-input{min-height:100px;line-height:1.7;resize:vertical}
 .kp-opt input,.kp-radio input{position:absolute;opacity:0;width:1px;height:1px;left:0;top:0}
 .kp-opt::before,.kp-radio::before{content:'';position:absolute;left:24px;top:50%;width:26px;height:26px;margin-top:-13px;border-radius:50%;background:var(--radio)}
 .kp-opt.check::before{border-radius:6px}
-.kp-opt::after,.kp-radio::after{content:'';position:absolute;left:31px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:var(--sky);opacity:0;box-shadow:0 0 0 4px #BFE6F5}
+.kp-opt::after,.kp-radio::after{content:'';position:absolute;left:31px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:var(--sky);opacity:0;box-shadow:0 0 0 4px #CBEED9}
 .kp-opt.check::after{left:31px;width:7px;height:13px;margin-top:-9px;border-radius:0;background:transparent;border:solid var(--sky-strong);border-width:0 3px 3px 0;transform:rotate(45deg);box-shadow:none}
-.kp-opt.is-on,.kp-radio:has(input:checked){background:var(--sky-soft);border-color:#BFE3F2}
+.kp-opt.is-on,.kp-radio:has(input:checked){background:var(--sky-soft);border-color:var(--sky-border)}
 .kp-opt.is-on::after,.kp-radio:has(input:checked)::after{opacity:1}
-.kp-opt.is-on.check::before{background:#CFEAF6}
+.kp-opt.is-on.check::before{background:var(--sky-check)}
 .kp-opt.is-off{opacity:.4}
 .kp-opt.none{color:var(--ink-2)}
 .kp-opt:has(input:focus-visible),.kp-radio:has(input:focus-visible){outline:2px solid var(--sky)}
@@ -143,7 +144,7 @@ textarea.kp-input{min-height:100px;line-height:1.7;resize:vertical}
 .kp-radio{min-height:68px;font-size:17px}
 .kp-check{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border:1px solid var(--line);margin-top:10px;cursor:pointer;background:#fff;font-size:15px}
 .kp-check input{width:22px;height:22px;accent-color:var(--sky-strong);margin:3px 0 0;flex:none}
-.kp-check:has(input:checked){background:var(--sky-soft);border-color:#BFE3F2}
+.kp-check:has(input:checked){background:var(--sky-soft);border-color:var(--sky-border)}
 .kp-check.small{font-size:13.5px;padding:8px 10px}
 /* 設問 */
 .kp-q{display:flex;align-items:center;gap:30px;margin:6px 0 10px}
@@ -177,10 +178,10 @@ textarea.kp-input{min-height:100px;line-height:1.7;resize:vertical}
 .kp-alert{margin:18px 0 0;padding:12px 16px;font-size:14.5px;line-height:1.7;border-left:4px solid}
 .kp-alert.refer{background:var(--danger-soft);border-color:var(--danger);color:var(--danger-deep)}
 .kp-alert.consult{background:var(--warn-soft);border-color:#E3B54A;color:var(--warn)}
-.kp-ok{background:var(--sky-soft);border:1px solid #BFE3F2;color:#1F6E96;padding:12px 16px;font-size:15px;margin-top:14px}
+.kp-ok{background:var(--sky-soft);border:1px solid var(--sky-border);color:var(--ok-text);padding:12px 16px;font-size:15px;margin-top:14px}
 /* 結果のタブ */
 .kp-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin:6px 0 42px}
-.kp-tabs a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;min-height:96px;padding:12px;font-size:19px;letter-spacing:.12em;color:var(--sky);text-decoration:none;background:linear-gradient(180deg,#F4FAFD 0%,#fff 100%);border-bottom:6px solid var(--sky)}
+.kp-tabs a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;min-height:96px;padding:12px;font-size:19px;letter-spacing:.12em;color:var(--sky);text-decoration:none;background:linear-gradient(180deg,#F5FBF8 0%,#fff 100%);border-bottom:6px solid var(--sky)}
 .kp-tabs a::before{content:'';width:14px;height:14px;border:solid var(--sky);border-width:0 1.5px 1.5px 0;transform:rotate(45deg);margin-bottom:8px}
 .kp-tabs a.on{background:var(--sky);color:#fff;justify-content:center;border-bottom-color:var(--sky)}
 .kp-tabs a.on::before{display:none}
@@ -208,7 +209,7 @@ textarea.kp-input{min-height:100px;line-height:1.7;resize:vertical}
 .kp-flag.info{background:var(--info-soft);color:var(--info);border:1px solid #C8E0EE}
 .kp-band{background:var(--danger-deep);color:#fff;padding:12px 18px;font-weight:500;font-size:15px;margin-bottom:14px}
 .kp-chip{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:500;background:#EFEFEF;color:var(--ink);letter-spacing:.04em;white-space:nowrap}
-.kp-chip.ok{background:var(--sky-soft);color:#1F6E96}.kp-chip.warn{background:var(--danger-soft);color:var(--danger)}.kp-chip.refer{background:var(--danger-deep);color:#fff}.kp-chip.check{background:var(--warn-soft);color:var(--warn)}
+.kp-chip.ok{background:var(--sky-soft);color:var(--ok-text)}.kp-chip.warn{background:var(--danger-soft);color:var(--danger)}.kp-chip.refer{background:var(--danger-deep);color:#fff}.kp-chip.check{background:var(--warn-soft);color:var(--warn)}
 .kp-kv{display:grid;grid-template-columns:140px 1fr;gap:6px 14px;font-size:14px}
 .kp-kv dt{color:var(--muted)}.kp-kv dd{margin:0}
 .kp-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}

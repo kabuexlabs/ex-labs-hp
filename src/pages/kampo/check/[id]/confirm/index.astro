@@ -27,7 +27,7 @@ const textOf = (st: (typeof steps)[number]) => {
     return o.text + (s.texts[id] ? `（${s.texts[id]}）` : '');
   })];
   const extra = (st.q.followups ?? []).map((fu) => {
-    const picked = fu.options.filter((o) => st.ids.includes(o.id)).map((o) => o.text);
+    const picked = fu.options.filter((o) => st.ids.includes(o.id)).map((o) => o.text + (s.texts[o.id] ? `（${s.texts[o.id]}）` : ''));
     return picked.length ? `${fu.title}：${picked.join('、')}` : '';
   }).filter(Boolean);
   const note = s.texts[st.q.id] ? [`${st.q.note?.label.replace(/（.*?）$/, '') ?? '記入'}：${s.texts[st.q.id]}`] : [];

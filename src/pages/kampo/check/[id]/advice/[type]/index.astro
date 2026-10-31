@@ -6,7 +6,7 @@ import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
 import AdviceBlock from '../../../../../../components/kampo/AdviceBlock.astro';
 import ResultTabs from '../../../../../../components/kampo/ResultTabs.astro';
 import { isAxisKey, axisDef, axisName } from '../../../../../../lib/kampo/masters';
-import { adviceKeys } from '../../../../../../lib/kampo/scoring';
+import { advicePlanOf } from '../../../../../../lib/kampo/compute';
 import { getSession } from '../../../../../../lib/kampo/store';
 
 const s = await getSession(Astro.params.id ?? '');
@@ -15,13 +15,17 @@ const type = Astro.params.type ?? '';
 if (!isAxisKey(type)) return Astro.redirect(`/kampo/check/${s.id}/result/`, 303);
 if (s.status === 'in_progress') return Astro.redirect(`/kampo/check/${s.id}/`, 303);
 const d = axisDef(type);
-const others = (s.scores ? adviceKeys(s.scores) : []).filter((t) => t !== type);
+// 養生を出すのは「主タイプ＋主訴に関係するタイプ」の最大2つ＋寒熱（第4弾 3-9）。逆の内容になる養生は両方に合う表現にそろえる
+const plan = advicePlanOf(s);
+const planTypes = plan?.types ?? [];
+const thermalKeys = (['cold', 'heat'] as const).filter((t) => ((s.scores?.pct ?? {}) as Record<string, number>)[t] >= 20);
+const others = [...planTypes, ...thermalKeys].filter((t) => t !== type);
 ---
 <KampoLayout title={`${d.name}の改善アドバイス`} width="normal">
   <button slot="actions" class="kp-btn pink small no-print" type="button" onclick="window.print()">印刷する</button>
   <ResultTabs id={s.id} active="advice" adviceType={type} />
   <h1 class="kp-h1">あなたの<span class="sky">改善アドバイス</span></h1>
-  <AdviceBlock type={type} answers={s.answers} />
+  <AdviceBlock type={type} answers={s.answers} types={planTypes} />
   {others.length > 0 && (
     <div class="kp-panel no-print"><h2>ほかの体質の改善アドバイス</h2>
       <div class="kp-panel-b" style="display:flex;gap:12px;flex-wrap:wrap">{others.map((t) => <a class="kp-btn ghost" href={`/kampo/check/${s.id}/advice/${t}/`}>{axisName(t)}のアドバイスを見る</a>)}</div>

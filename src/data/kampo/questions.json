@@ -1,12 +1,12 @@
 {
- "version": "2026-10-29-v3.3",
+ "version": "2026-10-31-v3.4",
  "review": {
   "status": "draft",
   "source": "2026-10-24 版（3段階版）の設問・重みを、2026-10-25 の改修指示と承認済みの改修計画に沿って組み直した草案。重み・五臓は現行の選択肢の値を引き継いだもので、新しい数値は作っていない（専門家未確認）",
   "reviewer": null,
   "reviewedAt": null
  },
- "note": "設問（主訴カテゴリー・具体的主訴・いちばん改善したい主訴の選択肢は complaints.json から作る）。section：basic／category／complaint／primary／detail／constitution／safety／lifestyle／staff。選択肢の findings は選んだときに present になる所見。exclusive（none・unknown・declined）はほかの選択肢と同時に選べない。 2026-10-28：選択肢の other（その他・所見なし）、mensesOnly（閉経・月経なしでは出さない）、note（短い記入欄）、heading（小見出し）、defer（薬剤師の観察で「判断できない」＝本人の回答を使う）、設問の optional（回答せずに次へ）・prefill（前の回答であった所見をチェック済みで出す）・followup（同じ画面で追加の選択肢）を追加。 2026-10-29：followup を followups（配列。picker: formulas は漢方薬の候補から選ぶ）に、設問の note（選択肢を選んだら出す任意の記入欄。except の選択肢は除く）、選択肢の noteLabel／notePlaceholder・staffNote（薬剤師画面の確認メモ）を追加。 2026-10-29（第3弾）：section tongue（舌の確認方法 T1 とご本人の自己確認 TS_*）、選択肢の refer（選ぶと患者画面・薬剤師画面に受診のおすすめ）・oneOf（同じ名前の選択肢はどれか1つ）を追加。記入欄は選んだ選択肢のすぐ下に出す。",
+ "note": "設問（主訴カテゴリー・具体的主訴・いちばん改善したい主訴の選択肢は complaints.json から作る）。section：basic／category／complaint／primary／detail／constitution／safety／lifestyle／staff。選択肢の findings は選んだときに present になる所見。exclusive（none・unknown・declined）はほかの選択肢と同時に選べない。 2026-10-28：選択肢の other（その他・所見なし）、mensesOnly（閉経・月経なしでは出さない）、note（短い記入欄）、heading（小見出し）、defer（薬剤師の観察で「判断できない」＝本人の回答を使う）、設問の optional（回答せずに次へ）・prefill（前の回答であった所見をチェック済みで出す）・followup（同じ画面で追加の選択肢）を追加。 2026-10-29：followup を followups（配列。picker: formulas は漢方薬の候補から選ぶ）に、設問の note（選択肢を選んだら出す任意の記入欄。except の選択肢は除く）、選択肢の noteLabel／notePlaceholder・staffNote（薬剤師画面の確認メモ）を追加。 2026-10-29（第3弾）：section tongue（舌の確認方法 T1 とご本人の自己確認 TS_*）、選択肢の refer（選ぶと患者画面・薬剤師画面に受診のおすすめ）・oneOf（同じ名前の選択肢はどれか1つ）を追加。記入欄は選んだ選択肢のすぐ下に出す。 2026-10-31（第4弾）：Question.groups（1ページ内の小見出し。舌）、Option の group／groupExclusive／excludes／blockedIf／icon／herbs、Followup.required、主訴の refer・followups（薬剤師画面のみの受診のおすすめ・耳鳴りの音の高さ）を追加。",
  "questions": [
   {
    "id": "A1",
@@ -179,183 +179,6 @@
    },
    "options": [],
    "help": "ほかに選んだお悩みも、体質を見るときの参考にします。"
-  },
-  {
-   "id": "Sfatigue1",
-   "section": "detail",
-   "title": "「{main}」に伴って、あてはまるものはありますか",
-   "type": "multi",
-   "trigger": {
-    "primaryDetail": "fatigue"
-   },
-   "template": "fatigue",
-   "options": [
-    {
-     "id": "Sfatigue1-fatigue_unrested",
-     "text": "休んでも疲れが取れない",
-     "findings": [
-      "fatigue_unrested"
-     ]
-    },
-    {
-     "id": "Sfatigue1-poor_appetite",
-     "text": "食欲がない",
-     "findings": [
-      "poor_appetite"
-     ],
-     "also": [
-      "poor_appetite"
-     ]
-    },
-    {
-     "id": "Sfatigue1-sleepy_after_meal",
-     "text": "食後に眠くなる",
-     "findings": [
-      "sleepy_after_meal"
-     ]
-    },
-    {
-     "id": "Sfatigue1-stomach_heavy",
-     "text": "胃がもたれる",
-     "findings": [
-      "stomach_heavy"
-     ],
-     "also": [
-      "stomach_heavy"
-     ]
-    },
-    {
-     "id": "Sfatigue1-sob_exertion",
-     "text": "少し動くと息切れする",
-     "findings": [
-      "sob_exertion"
-     ],
-     "also": [
-      "short_breath"
-     ]
-    },
-    {
-     "id": "Sfatigue1-sweat_exertion",
-     "text": "少し動くと汗をかく",
-     "findings": [
-      "sweat_exertion"
-     ]
-    },
-    {
-     "id": "Sfatigue1-night_sweat",
-     "text": "寝汗をかく",
-     "findings": [
-      "night_sweat"
-     ],
-     "also": [
-      "night_sweat"
-     ]
-    },
-    {
-     "id": "Sfatigue1-cold_hands_feet",
-     "text": "手足が冷える",
-     "findings": [
-      "cold_hands_feet"
-     ],
-     "also": [
-      "cold"
-     ]
-    },
-    {
-     "id": "Sfatigue1-orthostatic",
-     "text": "立ちくらみがする",
-     "findings": [
-      "orthostatic"
-     ],
-     "also": [
-      "dizziness"
-     ]
-    },
-    {
-     "id": "Sfatigue1-catch_cold",
-     "text": "風邪をひきやすい",
-     "findings": [
-      "catch_cold"
-     ],
-     "also": [
-      "weak_constitution"
-     ]
-    },
-    {
-     "id": "Sfatigue1-low_mood",
-     "text": "気分が落ち込む",
-     "findings": [
-      "low_mood"
-     ],
-     "tags": [
-      "mental"
-     ]
-    },
-    {
-     "id": "Sfatigue1-none",
-     "text": "特にない",
-     "exclusive": "none"
-    }
-   ]
-  },
-  {
-   "id": "Sfatigue2",
-   "section": "detail",
-   "title": "疲れやすくなったきっかけで、思い当たるものはありますか",
-   "type": "multi",
-   "trigger": {
-    "primaryDetail": "fatigue"
-   },
-   "template": "fatigue",
-   "options": [
-    {
-     "id": "Sfatigue2-fatigue_after_illness",
-     "text": "病気や手術のあと",
-     "findings": [
-      "fatigue_after_illness"
-     ],
-     "symptoms": [
-      "recovery"
-     ]
-    },
-    {
-     "id": "Sfatigue2-fatigue_after_birth",
-     "text": "出産のあと",
-     "findings": [
-      "fatigue_after_birth"
-     ],
-     "symptoms": [
-      "recovery"
-     ],
-     "femaleOnly": true
-    },
-    {
-     "id": "Sfatigue2-fatigue_after_overwork",
-     "text": "忙しさ・睡眠不足が続いている",
-     "findings": [
-      "fatigue_after_overwork"
-     ]
-    },
-    {
-     "id": "Sfatigue2-fatigue_after_stress",
-     "text": "強いストレス",
-     "findings": [
-      "fatigue_after_stress"
-     ]
-    },
-    {
-     "id": "Sfatigue2-fatigue_after_heat",
-     "text": "暑さ・季節の変わり目",
-     "findings": [
-      "fatigue_after_heat"
-     ]
-    },
-    {
-     "id": "Sfatigue2-none",
-     "text": "特に思い当たらない",
-     "exclusive": "none"
-    }
-   ]
   },
   {
    "id": "Sheavy1",
@@ -7039,7 +6862,7 @@
     },
     {
      "id": "F1-face_pale",
-     "text": "血色が悪く、白っぽい",
+     "text": "血色が悪く、白っぽい（血の気が少ない）",
      "findings": [
       "face_pale"
      ],
@@ -7062,8 +6885,15 @@
      "image": "/assets/kampo/face/red.webp"
     },
     {
+     "id": "F1-face_sallow",
+     "text": "顔色が黄色っぽく、つやがない",
+     "findings": [
+      "face_sallow"
+     ]
+    },
+    {
      "id": "F1-face_bluish",
-     "text": "顔色が青白い",
+     "text": "顔色が青白い（冷えて青みがある）",
      "findings": [
       "face_bluish"
      ],
@@ -7391,7 +7221,11 @@
     {
      "id": "B5T-none",
      "text": "特に渇かない",
-     "exclusive": "none"
+     "exclusive": "none",
+     "blockedIf": [
+      "dry_mouth"
+     ],
+     "blockedText": "お悩みで「口の渇き」を選んだため選べません"
     }
    ]
   },
@@ -7526,6 +7360,13 @@
    "type": "multi",
    "options": [
     {
+     "id": "B7-edema",
+     "text": "むくみやすい",
+     "findings": [
+      "edema"
+     ]
+    },
+    {
      "id": "B7-edema_evening_legs",
      "text": "夕方に足がむくむ",
      "findings": [
@@ -7656,13 +7497,6 @@
      "text": "イライラしやすい",
      "findings": [
       "irritable"
-     ]
-    },
-    {
-     "id": "B9-anger",
-     "text": "怒りっぽい",
-     "findings": [
-      "anger"
      ]
     },
     {
@@ -7965,8 +7799,7 @@
      "text": "耳鳴りがする",
      "findings": [
       "tinnitus"
-     ],
-     "staffNote": "耳鳴りの音の高さ（低い音／高い音・キーン）を口頭で確認してください"
+     ]
     },
     {
      "id": "B12-nasal_discharge",
@@ -7990,6 +7823,13 @@
      ]
     },
     {
+     "id": "B12-cough",
+     "text": "咳が出る",
+     "findings": [
+      "cough"
+     ]
+    },
+    {
      "id": "B12-dry_cough",
      "text": "乾いた咳が出る",
      "findings": [
@@ -8007,6 +7847,38 @@
      "id": "B12-none",
      "text": "特にない",
      "exclusive": "none"
+    }
+   ],
+   "followups": [
+    {
+     "id": "B12TN",
+     "title": "耳鳴りの音の種類（1つ選んでください）",
+     "type": "single",
+     "required": true,
+     "options": [
+      {
+       "id": "B12TN-high",
+       "text": "キーンと高い音",
+       "findings": [
+        "tinnitus_high"
+       ]
+      },
+      {
+       "id": "B12TN-low",
+       "text": "ゴーッ・ボーという低い音",
+       "findings": [
+        "tinnitus_low"
+       ]
+      },
+      {
+       "id": "B12TN-unsure",
+       "text": "どちらとも言えない",
+       "findings": [
+        "tinnitus_unsure"
+       ]
+      }
+     ],
+     "when": "B12-tinnitus"
     }
    ]
   },
@@ -8167,10 +8039,7 @@
      "text": "高血圧",
      "flags": [
       "hypertension"
-     ],
-     "note": true,
-     "noteLabel": "病名・時期（わかれば・任意）",
-     "notePlaceholder": "例：不整脈（5年前から通院）"
+     ]
     },
     {
      "id": "C2-2",
@@ -8179,8 +8048,7 @@
       "heart"
      ],
      "note": true,
-     "noteLabel": "病名・時期（わかれば・任意）",
-     "notePlaceholder": "例：不整脈（5年前から通院）"
+     "noteLabel": "病名（わかれば・任意）"
     },
     {
      "id": "C2-3",
@@ -8189,38 +8057,28 @@
       "kidney"
      ],
      "note": true,
-     "noteLabel": "病名・時期（わかれば・任意）",
-     "notePlaceholder": "例：不整脈（5年前から通院）"
+     "noteLabel": "病名（わかれば・任意）"
     },
     {
      "id": "C2-hypok",
      "text": "低カリウムと言われたことがある",
      "flags": [
       "hypokalemia"
-     ],
-     "note": true,
-     "noteLabel": "病名・時期（わかれば・任意）",
-     "notePlaceholder": "例：不整脈（5年前から通院）"
+     ]
     },
     {
      "id": "C2-5",
      "text": "甲状腺の病気",
      "flags": [
       "thyroid"
-     ],
-     "note": true,
-     "noteLabel": "病名・時期（わかれば・任意）",
-     "notePlaceholder": "例：不整脈（5年前から通院）"
+     ]
     },
     {
      "id": "C2-11",
      "text": "前立腺肥大など、尿が出にくい",
      "flags": [
       "glaucoma_bph"
-     ],
-     "note": true,
-     "noteLabel": "病名・時期（わかれば・任意）",
-     "notePlaceholder": "例：不整脈（5年前から通院）"
+     ]
     },
     {
      "id": "C2-4",
@@ -8229,8 +8087,7 @@
       "liver"
      ],
      "note": true,
-     "noteLabel": "病名・時期（わかれば・任意）",
-     "notePlaceholder": "例：不整脈（5年前から通院）"
+     "noteLabel": "病名（わかれば・任意）"
     },
     {
      "id": "C2-8",
@@ -8239,8 +8096,7 @@
       "gi_weak"
      ],
      "note": true,
-     "noteLabel": "病名・時期（わかれば・任意）",
-     "notePlaceholder": "例：不整脈（5年前から通院）"
+     "noteLabel": "病名（わかれば・任意）"
     },
     {
      "id": "C2-9",
@@ -8249,8 +8105,7 @@
       "cancer"
      ],
      "note": true,
-     "noteLabel": "病名・時期（わかれば・任意）",
-     "notePlaceholder": "例：不整脈（5年前から通院）"
+     "noteLabel": "病名（わかれば・任意）"
     },
     {
      "id": "C2-surgery",
@@ -8259,7 +8114,7 @@
       "surgery"
      ],
      "note": true,
-     "noteLabel": "何の手術か・いつ頃か（任意）",
+     "noteLabel": "何の手術か（わかれば・任意）",
      "notePlaceholder": "例：盲腸の手術（10年前）"
     },
     {
@@ -8269,18 +8124,12 @@
       "other_disease"
      ],
      "note": true,
-     "noteLabel": "病名・時期（わかれば・任意）",
-     "notePlaceholder": "例：不整脈（5年前から通院）"
+     "noteLabel": "病名（わかれば・任意）"
     },
     {
      "id": "C2-0",
      "text": "ない",
      "exclusive": "none"
-    },
-    {
-     "id": "C2-unknown",
-     "text": "わからない",
-     "exclusive": "unknown"
     }
    ],
    "help": "あてはまるものを選ぶと、そのすぐ下に病名・時期の欄が出ます（わかれば。書かなくても進めます）。ここにない病気は「その他の病気」に書いてください。"
@@ -8307,10 +8156,7 @@
      "text": "食品でアレルギーが出たことがある",
      "flags": [
       "allergy_food"
-     ],
-     "note": true,
-     "noteLabel": "何の食品で出ましたか（任意）",
-     "notePlaceholder": "例：食品の名前"
+     ]
     },
     {
      "id": "C3-kampo",
@@ -8331,6 +8177,140 @@
     }
    ],
    "followups": [
+    {
+     "when": "C3-food",
+     "id": "C3F",
+     "title": "アレルギーが出た食品を選んでください",
+     "type": "multi",
+     "help": "あてはまるものをすべて選んでください。",
+     "options": [
+      {
+       "id": "C3F-cinnamon",
+       "text": "シナモン",
+       "herbs": [
+        "桂皮・桂枝"
+       ]
+      },
+      {
+       "id": "C3F-yam",
+       "text": "山芋・長芋",
+       "herbs": [
+        "山薬"
+       ]
+      },
+      {
+       "id": "C3F-wheat",
+       "text": "小麦",
+       "herbs": [
+        "小麦"
+       ]
+      },
+      {
+       "id": "C3F-oyster",
+       "text": "牡蠣",
+       "herbs": [
+        "牡蛎"
+       ]
+      },
+      {
+       "id": "C3F-ginger",
+       "text": "ショウガ",
+       "herbs": [
+        "生姜・乾姜"
+       ]
+      },
+      {
+       "id": "C3F-jujube",
+       "text": "ナツメ",
+       "herbs": [
+        "大棗"
+       ]
+      },
+      {
+       "id": "C3F-sesame",
+       "text": "ゴマ",
+       "herbs": [
+        "胡麻"
+       ]
+      },
+      {
+       "id": "C3F-rice",
+       "text": "米",
+       "herbs": [
+        "粳米"
+       ]
+      },
+      {
+       "id": "C3F-adlay",
+       "text": "ハトムギ",
+       "herbs": [
+        "薏苡仁"
+       ]
+      },
+      {
+       "id": "C3F-mikan",
+       "text": "みかん",
+       "herbs": [
+        "陳皮"
+       ]
+      },
+      {
+       "id": "C3F-shiso",
+       "text": "シソ",
+       "herbs": [
+        "蘇葉"
+       ]
+      },
+      {
+       "id": "C3F-peach",
+       "text": "桃",
+       "herbs": [
+        "桃仁"
+       ]
+      },
+      {
+       "id": "C3F-apricot",
+       "text": "アンズ",
+       "herbs": [
+        "杏仁"
+       ]
+      },
+      {
+       "id": "C3F-gelatin",
+       "text": "ゼラチン",
+       "herbs": [
+        "阿膠"
+       ]
+      },
+      {
+       "id": "C3F-maltose",
+       "text": "水あめ",
+       "herbs": [
+        "膠飴"
+       ]
+      },
+      {
+       "id": "C3F-mint",
+       "text": "ミント",
+       "herbs": [
+        "薄荷"
+       ]
+      },
+      {
+       "id": "C3F-pepper",
+       "text": "山椒",
+       "herbs": [
+        "山椒"
+       ]
+      },
+      {
+       "id": "C3F-other",
+       "text": "その他",
+       "note": true,
+       "noteLabel": "食品の名前（わかれば・任意）"
+      }
+     ]
+    },
     {
      "when": "C3-kampo",
      "id": "C3KP",
@@ -8509,386 +8489,517 @@
    ]
   },
   {
-   "id": "TS_color",
+   "id": "TS",
    "section": "tongue",
-   "title": "鏡で舌を見て、色について近いものを選んでください",
+   "title": "鏡で舌を見て、近いものを選んでください",
    "type": "multi",
-   "options": [
+   "trigger": {
+    "chosen": [
+     "T1-self"
+    ]
+   },
+   "help": "舌は力を抜いて、軽く前に出して見てください。明るい場所で見るとわかりやすくなります。",
+   "groups": [
     {
-     "id": "TS_color-normal",
-     "text": "淡いピンク色（ふつう）",
-     "oneOf": "base"
+     "id": "color",
+     "title": "舌の色",
+     "hint": "1つ選んでください",
+     "required": true
     },
     {
-     "id": "TS_color-tongue_color_pale",
+     "id": "color_add",
+     "title": "色の追加",
+     "hint": "あてはまるものがあれば選んでください（複数可）"
+    },
+    {
+     "id": "shape",
+     "title": "舌の形",
+     "hint": "あてはまるものをすべて選んでください",
+     "required": true
+    },
+    {
+     "id": "coat",
+     "title": "舌の苔（こけ）",
+     "hint": "1つ選んでください",
+     "required": true
+    },
+    {
+     "id": "coat_add",
+     "title": "苔の追加",
+     "hint": "あてはまるものがあれば選んでください（1つ）"
+    },
+    {
+     "id": "vein",
+     "title": "舌の裏の静脈",
+     "hint": "1つ選んでください（舌先を上あごにつけて見ます）",
+     "required": true
+    }
+   ],
+   "options": [
+    {
+     "id": "TS-color_normal",
+     "text": "淡いピンク（ふつう）",
+     "icon": "/assets/kampo/tongue/e-color-normal.svg",
+     "group": "color",
+     "oneOf": "color"
+    },
+    {
+     "id": "TS-color_pale",
      "text": "白っぽい",
+     "icon": "/assets/kampo/tongue/e-color-pale.svg",
      "findings": [
       "tongue_color_pale"
      ],
-     "oneOf": "base"
+     "group": "color",
+     "oneOf": "color"
     },
     {
-     "id": "TS_color-tongue_color_red",
+     "id": "TS-color_red",
      "text": "赤い",
+     "icon": "/assets/kampo/tongue/e-color-red.svg",
      "findings": [
       "tongue_color_red"
      ],
-     "oneOf": "base"
+     "group": "color",
+     "oneOf": "color"
     },
     {
-     "id": "TS_color-tongue_color_purple",
-     "text": "紫っぽい・黒っぽい点がある",
+     "id": "TS-color_purple",
+     "text": "紫っぽい",
+     "icon": "/assets/kampo/tongue/e-color-purple.svg",
      "findings": [
       "tongue_color_purple"
-     ]
+     ],
+     "group": "color",
+     "oneOf": "color"
     },
     {
-     "id": "TS_color-tongue_edge_red",
+     "id": "TS-edge_red",
      "text": "ふちが赤い",
+     "icon": "/assets/kampo/tongue/e-color-edge.svg",
      "findings": [
       "tongue_edge_red"
+     ],
+     "group": "color_add",
+     "excludes": [
+      "TS-color_normal"
      ]
-    }
-   ],
-   "trigger": {
-    "chosen": [
-     "T1-self"
-    ]
-   }
-  },
-  {
-   "id": "TS_shape",
-   "section": "tongue",
-   "title": "舌の形について、近いものを選んでください",
-   "type": "multi",
-   "options": [
+    },
     {
-     "id": "TS_shape-normal",
+     "id": "TS-spots",
+     "text": "黒っぽい点（瘀点）がある",
+     "icon": "/assets/kampo/tongue/e-color-spots.svg",
+     "findings": [
+      "tongue_petechiae"
+     ],
+     "group": "color_add",
+     "excludes": [
+      "TS-color_normal"
+     ]
+    },
+    {
+     "id": "TS-shape_normal",
      "text": "ふつう",
-     "exclusive": "none"
+     "icon": "/assets/kampo/tongue/e-shape-normal.svg",
+     "group": "shape",
+     "groupExclusive": true
     },
     {
-     "id": "TS_shape-tongue_shape_swollen",
-     "text": "大きく、ぼってりしている",
-     "findings": [
-      "tongue_shape_swollen"
-     ]
-    },
-    {
-     "id": "TS_shape-tongue_shape_thin",
-     "text": "小さく、薄い",
-     "findings": [
-      "tongue_shape_thin"
-     ]
-    },
-    {
-     "id": "TS_shape-tongue_teeth_marks",
+     "id": "TS-teeth",
      "text": "ふちに歯の跡がある",
+     "icon": "/assets/kampo/tongue/e-shape-teeth.svg",
      "findings": [
       "tongue_teeth_marks"
+     ],
+     "group": "shape"
+    },
+    {
+     "id": "TS-swollen",
+     "text": "大きくぼってりしている",
+     "icon": "/assets/kampo/tongue/e-shape-swollen.svg",
+     "findings": [
+      "tongue_shape_swollen"
+     ],
+     "group": "shape",
+     "excludes": [
+      "TS-thin"
      ]
     },
     {
-     "id": "TS_shape-tongue_fissured",
-     "text": "表面にひび割れがある",
+     "id": "TS-thin",
+     "text": "薄く小さい",
+     "icon": "/assets/kampo/tongue/e-shape-thin.svg",
+     "findings": [
+      "tongue_shape_thin"
+     ],
+     "group": "shape",
+     "excludes": [
+      "TS-swollen"
+     ]
+    },
+    {
+     "id": "TS-cracked",
+     "text": "ひび割れがある",
+     "icon": "/assets/kampo/tongue/e-shape-cracked.svg",
      "findings": [
       "tongue_fissured"
-     ]
-    },
-    {
-     "id": "TS_shape-tongue_deviation",
-     "text": "まっすぐ出せない・震える",
-     "findings": [
-      "tongue_deviation"
      ],
-     "tags": [
-      "tongue_severe"
-     ]
-    }
-   ],
-   "trigger": {
-    "chosen": [
-     "T1-self"
-    ]
-   }
-  },
-  {
-   "id": "TS_coat",
-   "section": "tongue",
-   "title": "舌の表面の苔（こけ）について、近いものを選んでください",
-   "type": "multi",
-   "options": [
-    {
-     "id": "TS_coat-normal",
-     "text": "薄く白い（ふつう）",
-     "exclusive": "none"
+     "group": "shape"
     },
     {
-     "id": "TS_coat-tongue_coat_thick",
-     "text": "厚い",
+     "id": "TS-coat_normal",
+     "text": "薄く白い（ふつう）",
+     "icon": "/assets/kampo/tongue/e-coat-thin.svg",
+     "group": "coat",
+     "oneOf": "coat"
+    },
+    {
+     "id": "TS-coat_thick",
+     "text": "白く厚い",
+     "icon": "/assets/kampo/tongue/e-coat-thick.svg",
      "findings": [
       "tongue_coat_thick"
-     ]
+     ],
+     "group": "coat",
+     "oneOf": "coat"
     },
     {
-     "id": "TS_coat-tongue_coat_yellow",
+     "id": "TS-coat_yellow",
      "text": "黄色い",
+     "icon": "/assets/kampo/tongue/e-coat-yellow.svg",
      "findings": [
       "tongue_coat_yellow"
-     ]
+     ],
+     "group": "coat",
+     "oneOf": "coat"
     },
     {
-     "id": "TS_coat-tongue_coat_little",
+     "id": "TS-coat_little",
      "text": "少ない・ない",
+     "icon": "/assets/kampo/tongue/e-coat-little.svg",
      "findings": [
       "tongue_coat_little"
-     ]
+     ],
+     "group": "coat",
+     "oneOf": "coat"
     },
     {
-     "id": "TS_coat-tongue_coat_wet",
-     "text": "湿っている",
+     "id": "TS-moist",
+     "text": "べたっと湿っている",
+     "icon": "/assets/kampo/tongue/e-coat-moist.svg",
      "findings": [
       "tongue_coat_wet"
-     ]
+     ],
+     "group": "coat_add",
+     "oneOf": "coat_add"
     },
     {
-     "id": "TS_coat-tongue_coat_dry",
+     "id": "TS-dry",
      "text": "乾いている",
+     "icon": "/assets/kampo/tongue/e-coat-dry.svg",
      "findings": [
       "tongue_coat_dry"
-     ]
-    },
-    {
-     "id": "TS_coat-tongue_coat_grayblack",
-     "text": "灰色・黒っぽい",
-     "findings": [
-      "tongue_coat_grayblack"
      ],
-     "tags": [
-      "tongue_severe"
-     ]
+     "group": "coat_add",
+     "oneOf": "coat_add"
     },
     {
-     "id": "TS_coat-tongue_mirror",
-     "text": "苔がなく、つるつる光る",
-     "findings": [
-      "tongue_mirror"
-     ],
-     "tags": [
-      "tongue_severe"
-     ]
-    }
-   ],
-   "trigger": {
-    "chosen": [
-     "T1-self"
-    ]
-   }
-  },
-  {
-   "id": "TS_vein",
-   "section": "tongue",
-   "title": "舌の裏側の静脈について、近いものを選んでください",
-   "type": "single",
-   "options": [
-    {
-     "id": "TS_vein-normal",
-     "text": "ふつう",
-     "exclusive": "none"
+     "id": "TS-vein_normal",
+     "text": "目立たない（ふつう）",
+     "icon": "/assets/kampo/tongue/e-vein-normal.svg",
+     "group": "vein",
+     "oneOf": "vein"
     },
     {
-     "id": "TS_vein-tongue_sublingual_distended",
-     "text": "太く紫色に浮き出ている",
+     "id": "TS-vein_distended",
+     "text": "太く浮き出ている",
+     "icon": "/assets/kampo/tongue/e-vein-distended.svg",
      "findings": [
       "tongue_sublingual_distended"
-     ]
-    }
-   ],
-   "trigger": {
-    "chosen": [
-     "T1-self"
-    ]
-   }
-  },
-  {
-   "id": "X_tongue_color",
-   "section": "staff",
-   "title": "舌の色",
-   "type": "multi",
-   "options": [
-    {
-     "id": "X_tongue_color-normal",
-     "text": "淡紅色（ふつう）",
-     "oneOf": "base"
+     ],
+     "group": "vein",
+     "oneOf": "vein"
     },
     {
-     "id": "X_tongue_color-tongue_color_pale",
+     "id": "TS-vein_unseen",
+     "text": "見ていない",
+     "group": "vein",
+     "oneOf": "vein",
+     "defer": true
+    }
+   ]
+  },
+  {
+   "id": "X_tongue",
+   "section": "staff",
+   "title": "舌（色・形・苔・舌下静脈）",
+   "type": "multi",
+   "groups": [
+    {
+     "id": "color",
+     "title": "舌の色",
+     "hint": "1つ選ぶ"
+    },
+    {
+     "id": "color_add",
+     "title": "色の追加",
+     "hint": "あれば選ぶ（複数可。「淡紅色（ふつう）」とは同時に選べません）"
+    },
+    {
+     "id": "shape",
+     "title": "舌の形",
+     "hint": "あてはまるものを選ぶ（複数可。「ふつう」と他は同時に選べません）"
+    },
+    {
+     "id": "coat",
+     "title": "舌苔",
+     "hint": "1つ選ぶ"
+    },
+    {
+     "id": "coat_color",
+     "title": "苔の色",
+     "hint": "1つ選ぶ"
+    },
+    {
+     "id": "coat_moist",
+     "title": "苔の潤い",
+     "hint": "1つ選ぶ"
+    },
+    {
+     "id": "vein",
+     "title": "舌下静脈",
+     "hint": "1つ選ぶ"
+    }
+   ],
+   "options": [
+    {
+     "id": "X_tongue-color_normal",
+     "text": "淡紅色（ふつう）",
+     "icon": "/assets/kampo/tongue/e-color-normal.svg",
+     "group": "color",
+     "oneOf": "color"
+    },
+    {
+     "id": "X_tongue-color_pale",
      "text": "淡白（白っぽい）",
+     "icon": "/assets/kampo/tongue/e-color-pale.svg",
      "findings": [
       "tongue_color_pale"
      ],
-     "oneOf": "base"
+     "group": "color",
+     "oneOf": "color"
     },
     {
-     "id": "X_tongue_color-tongue_color_red",
+     "id": "X_tongue-color_red",
      "text": "紅（赤い）",
+     "icon": "/assets/kampo/tongue/e-color-red.svg",
      "findings": [
       "tongue_color_red"
      ],
-     "oneOf": "base"
+     "group": "color",
+     "oneOf": "color"
     },
     {
-     "id": "X_tongue_color-tongue_color_purple",
-     "text": "暗紫・瘀点がある",
+     "id": "X_tongue-color_purple",
+     "text": "暗紫",
+     "icon": "/assets/kampo/tongue/e-color-purple.svg",
      "findings": [
       "tongue_color_purple"
-     ]
+     ],
+     "group": "color",
+     "oneOf": "color"
     },
     {
-     "id": "X_tongue_color-tongue_edge_red",
+     "id": "X_tongue-edge_red",
      "text": "舌の両縁が赤い",
+     "icon": "/assets/kampo/tongue/e-color-edge.svg",
      "findings": [
       "tongue_edge_red"
+     ],
+     "group": "color_add",
+     "excludes": [
+      "X_tongue-color_normal"
      ]
-    }
-   ]
-  },
-  {
-   "id": "X_tongue_shape",
-   "section": "staff",
-   "title": "舌の形",
-   "type": "multi",
-   "options": [
-    {
-     "id": "X_tongue_shape-normal",
-     "text": "ふつう",
-     "exclusive": "none"
     },
     {
-     "id": "X_tongue_shape-tongue_shape_swollen",
+     "id": "X_tongue-spots",
+     "text": "瘀点がある",
+     "icon": "/assets/kampo/tongue/e-color-spots.svg",
+     "findings": [
+      "tongue_petechiae"
+     ],
+     "group": "color_add",
+     "excludes": [
+      "X_tongue-color_normal"
+     ]
+    },
+    {
+     "id": "X_tongue-shape_normal",
+     "text": "ふつう",
+     "icon": "/assets/kampo/tongue/e-shape-normal.svg",
+     "group": "shape",
+     "groupExclusive": true
+    },
+    {
+     "id": "X_tongue-swollen",
      "text": "大きい・腫れぼったい（胖大）",
+     "icon": "/assets/kampo/tongue/e-shape-swollen.svg",
      "findings": [
       "tongue_shape_swollen"
+     ],
+     "group": "shape",
+     "excludes": [
+      "X_tongue-thin"
      ]
     },
     {
-     "id": "X_tongue_shape-tongue_shape_thin",
+     "id": "X_tongue-thin",
      "text": "小さい・薄い（痩薄）",
+     "icon": "/assets/kampo/tongue/e-shape-thin.svg",
      "findings": [
       "tongue_shape_thin"
+     ],
+     "group": "shape",
+     "excludes": [
+      "X_tongue-swollen"
      ]
     },
     {
-     "id": "X_tongue_shape-tongue_teeth_marks",
+     "id": "X_tongue-teeth",
      "text": "歯の跡がある（歯痕）",
+     "icon": "/assets/kampo/tongue/e-shape-teeth.svg",
      "findings": [
       "tongue_teeth_marks"
-     ]
+     ],
+     "group": "shape"
     },
     {
-     "id": "X_tongue_shape-tongue_fissured",
+     "id": "X_tongue-cracked",
      "text": "ひび割れがある（裂紋）",
+     "icon": "/assets/kampo/tongue/e-shape-cracked.svg",
      "findings": [
       "tongue_fissured"
-     ]
+     ],
+     "group": "shape"
     },
     {
-     "id": "X_tongue_shape-tongue_deviation",
+     "id": "X_tongue-deviation",
      "text": "偏位・震え",
+     "icon": "/assets/kampo/tongue/e-shape-deviation.svg",
      "findings": [
       "tongue_deviation"
      ],
+     "group": "shape",
      "tags": [
       "tongue_severe"
      ]
-    }
-   ]
-  },
-  {
-   "id": "X_tongue_coat",
-   "section": "staff",
-   "title": "舌苔",
-   "type": "multi",
-   "options": [
-    {
-     "id": "X_tongue_coat-normal",
-     "text": "薄く白い（ふつう）",
-     "exclusive": "none"
     },
     {
-     "id": "X_tongue_coat-tongue_coat_thick",
+     "id": "X_tongue-coat_normal",
+     "text": "薄く白い（ふつう）",
+     "icon": "/assets/kampo/tongue/e-coat-thin.svg",
+     "group": "coat",
+     "oneOf": "coat"
+    },
+    {
+     "id": "X_tongue-coat_thick",
      "text": "厚い",
+     "icon": "/assets/kampo/tongue/e-coat-thick.svg",
      "findings": [
       "tongue_coat_thick"
-     ]
+     ],
+     "group": "coat",
+     "oneOf": "coat"
     },
     {
-     "id": "X_tongue_coat-tongue_coat_yellow",
-     "text": "黄色い",
-     "findings": [
-      "tongue_coat_yellow"
-     ]
-    },
-    {
-     "id": "X_tongue_coat-tongue_coat_little",
+     "id": "X_tongue-coat_little",
      "text": "少ない・ない",
+     "icon": "/assets/kampo/tongue/e-coat-little.svg",
      "findings": [
       "tongue_coat_little"
-     ]
-    },
-    {
-     "id": "X_tongue_coat-tongue_coat_wet",
-     "text": "湿っている",
-     "findings": [
-      "tongue_coat_wet"
-     ]
-    },
-    {
-     "id": "X_tongue_coat-tongue_coat_dry",
-     "text": "乾いている",
-     "findings": [
-      "tongue_coat_dry"
-     ]
-    },
-    {
-     "id": "X_tongue_coat-tongue_coat_grayblack",
-     "text": "灰黒色",
-     "findings": [
-      "tongue_coat_grayblack"
      ],
-     "tags": [
-      "tongue_severe"
-     ]
+     "group": "coat",
+     "oneOf": "coat"
     },
     {
-     "id": "X_tongue_coat-tongue_mirror",
+     "id": "X_tongue-mirror",
      "text": "苔がなく鏡のように光る",
+     "icon": "/assets/kampo/tongue/e-coat-mirror.svg",
      "findings": [
       "tongue_mirror"
      ],
+     "group": "coat",
+     "oneOf": "coat",
      "tags": [
       "tongue_severe"
      ]
-    }
-   ]
-  },
-  {
-   "id": "X_tongue_vein",
-   "section": "staff",
-   "title": "舌下静脈",
-   "type": "single",
-   "options": [
-    {
-     "id": "X_tongue_vein-normal",
-     "text": "ふつう",
-     "exclusive": "none"
     },
     {
-     "id": "X_tongue_vein-tongue_sublingual_distended",
+     "id": "X_tongue-cc_white",
+     "text": "白",
+     "icon": "/assets/kampo/tongue/e-coat-thick.svg",
+     "group": "coat_color",
+     "oneOf": "coat_color"
+    },
+    {
+     "id": "X_tongue-cc_yellow",
+     "text": "黄色い",
+     "icon": "/assets/kampo/tongue/e-coat-yellow.svg",
+     "findings": [
+      "tongue_coat_yellow"
+     ],
+     "group": "coat_color",
+     "oneOf": "coat_color"
+    },
+    {
+     "id": "X_tongue-cc_gray",
+     "text": "灰黒色",
+     "icon": "/assets/kampo/tongue/e-coat-grayblack.svg",
+     "findings": [
+      "tongue_coat_grayblack"
+     ],
+     "group": "coat_color",
+     "oneOf": "coat_color",
+     "tags": [
+      "tongue_severe"
+     ]
+    },
+    {
+     "id": "X_tongue-moist",
+     "text": "湿っている",
+     "icon": "/assets/kampo/tongue/e-coat-moist.svg",
+     "findings": [
+      "tongue_coat_wet"
+     ],
+     "group": "coat_moist",
+     "oneOf": "coat_moist"
+    },
+    {
+     "id": "X_tongue-dry",
+     "text": "乾いている",
+     "icon": "/assets/kampo/tongue/e-coat-dry.svg",
+     "findings": [
+      "tongue_coat_dry"
+     ],
+     "group": "coat_moist",
+     "oneOf": "coat_moist"
+    },
+    {
+     "id": "X_tongue-vein_normal",
+     "text": "ふつう",
+     "icon": "/assets/kampo/tongue/e-vein-normal.svg",
+     "group": "vein",
+     "oneOf": "vein"
+    },
+    {
+     "id": "X_tongue-vein_distended",
      "text": "太く紫色に浮き出ている（怒張）",
+     "icon": "/assets/kampo/tongue/e-vein-distended.svg",
      "findings": [
       "tongue_sublingual_distended"
-     ]
+     ],
+     "group": "vein",
+     "oneOf": "vein"
     }
    ]
   },
@@ -8907,7 +9018,7 @@
     },
     {
      "id": "X_face-face_pale",
-     "text": "血色が悪く、白っぽい",
+     "text": "血色が悪く、白っぽい（血の気が少ない）",
      "findings": [
       "face_pale"
      ],
@@ -8931,11 +9042,18 @@
     },
     {
      "id": "X_face-face_bluish",
-     "text": "顔色が青白い",
+     "text": "顔色が青白い（冷えて青みがある）",
      "findings": [
       "face_bluish"
      ],
      "image": "/assets/kampo/face/bluish.webp"
+    },
+    {
+     "id": "X_face-face_sallow",
+     "text": "顔色が黄色っぽく、つやがない",
+     "findings": [
+      "face_sallow"
+     ]
     },
     {
      "id": "X_face-defer",
@@ -8983,13 +9101,6 @@
    "title": "爪の形（観察・複数可）",
    "type": "multi",
    "options": [
-    {
-     "id": "X_nail_shape-nail_brittle",
-     "text": "薄い・割れやすい",
-     "findings": [
-      "nail_brittle"
-     ]
-    },
     {
      "id": "X_nail_shape-nail_ridges",
      "text": "縦すじが目立つ",

@@ -1,5 +1,5 @@
 {
- "version": "2026-10-29-v3.3",
+ "version": "2026-10-31-v3.4",
  "review": {
   "status": "draft",
   "source": "2026-10-24 版（3段階版）の設問・重みを、2026-10-25 の改修指示と承認済みの改修計画に沿って組み直した草案。重み・五臓は現行の選択肢の値を引き継いだもので、新しい数値は作っていない（専門家未確認）",
@@ -1449,7 +1449,8 @@
    ],
    "conflicts": [
     "hard_stool",
-    "constipation"
+    "constipation",
+    "alternating"
    ]
   },
   {
@@ -1573,7 +1574,8 @@
     "B6-9"
    ],
    "conflicts": [
-    "loose_stool"
+    "loose_stool",
+    "alternating"
    ]
   },
   {
@@ -1589,6 +1591,10 @@
    "from": [
     "B6-3",
     "Sstress_gi1-alt"
+   ],
+   "conflicts": [
+    "constipation",
+    "loose_stool"
    ]
   },
   {
@@ -4941,6 +4947,10 @@
    "from": [
     "B12-6",
     "B12-7"
+   ],
+   "conflicts": [
+    "tinnitus_high",
+    "tinnitus_unsure"
    ]
   },
   {
@@ -4957,6 +4967,10 @@
    ],
    "from": [
     "B12-8"
+   ],
+   "conflicts": [
+    "tinnitus_low",
+    "tinnitus_unsure"
    ]
   },
   {
@@ -5462,7 +5476,7 @@
   },
   {
    "id": "tongue_color_purple",
-   "label": "舌の色：暗紫・瘀点",
+   "label": "舌の色：暗紫（紫っぽい）",
    "weights": {
     "blood_stasis": 1
    },
@@ -5650,6 +5664,35 @@
   {
    "id": "nail_spoon",
    "label": "爪：反り返っている・スプーン状"
+  },
+  {
+   "id": "face_sallow",
+   "label": "顔色：黄色っぽい・つやがない",
+   "weights": {
+    "blood_def": 1
+   },
+   "organs": {
+    "spleen": 1
+   }
+  },
+  {
+   "id": "tongue_petechiae",
+   "label": "舌の色：黒っぽい点（瘀点）",
+   "weights": {
+    "blood_stasis": 1
+   },
+   "group": "tongue"
+  },
+  {
+   "id": "tinnitus_unsure",
+   "label": "耳鳴り：音の高さはどちらとも言えない",
+   "implies": [
+    "tinnitus"
+   ],
+   "conflicts": [
+    "tinnitus_high",
+    "tinnitus_low"
+   ]
   }
  ]
 }
