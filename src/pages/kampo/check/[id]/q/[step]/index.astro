@@ -11,6 +11,8 @@
 //  - 「どれもあてはまらない」は小見出しの外に区切って置く（6.5-1）。確認画面の「修正する」から来たら、直したあと確認画面に戻る（8-2）。
 // 2026-10-29 第3弾：記入欄・漢方薬の候補・症状の選択肢は、選んだ選択肢のすぐ下に出す（4・5・6）。最後の設問で進み具合 100%（7）。
 //  同じ oneOf の選択肢はどれか1つ（10-4）。受診のおすすめ（refer）の選択肢を選ぶとその場で表示（3-1）。舌のご本人確認ではイラストを出す（11-1）。
+// 2026-10-31 第4弾：お悩みで自動チェックされた項目だけでも「次へ」を押せる（0-1。サーバーは「ほかには特にない」を記録）。受診のおすすめは患者画面に出さない（0-2。薬剤師画面のみ）。
+//  舌は1ページの中に小見出し（色・形・苔・静脈）と項目別イラストで出す（2-8）。食品アレルギーは選択肢（2-9）、耳鳴りの音の高さは選択肢のすぐ下（2-10）。
 export const prerender = false;
 import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
 import QMark from '../../../../../../components/kampo/QMark.astro';
@@ -41,16 +43,24 @@ if (Astro.request.method === 'POST') {
   const form = await Astro.request.formData();
   const skip = q.optional && form.get('skip') === '1';
   const rawIds = [...form.getAll('opt').map(String), ...(form.get('sub') ? [String(form.get('sub'))] : []), ...form.getAll('fu').map(String)];
-  const ids = skip ? [] : normalizeAnswer(q, rawIds);
+  let ids = skip ? [] : normalizeAnswer(q, rawIds);
+  // お悩みで自動チェックされた項目だけで「次へ」を押したら、ほかには特にない（none）を記録する（第4弾 0-1）
+  if (!skip && ids.length === 0 && q.options.some((o) => o.locked)) {
+    const none = q.options.find((o) => o.exclusive === 'none' && selectable(o));
+    if (none) ids = [none.id];
+  }
   const conflict = skip ? null : conflictIn(q, ids);
   if (!skip && !isAnswered(q, ids)) {
-    error = q.sub ? '上下それぞれ1つずつ選んでください。' : '1つ以上選んでください。';
+    const missGroup = (q.groups ?? []).filter((g) => g.required && !ids.some((x) => q.options.find((o) => o.id === x)?.group === g.id)).map((g) => g.title);
+    error = missGroup.length ? `「${missGroup.join('」「')}」を選んでください。`
+      : (q.followups ?? []).some((fu) => fu.required && (ids.includes(fu.when) || q.options.find((o) => o.id === fu.when)?.locked)) && ids.length ? 'すぐ下に出ている追加の項目（音の種類など）も選んでください。'
+      : q.sub ? '上下それぞれ1つずつ選んでください。' : '1つ以上選んでください。';
   } else if (conflict) {
     error = `「${conflict[0]}」と「${conflict[1]}」は同時に選べません。`;
   } else {
     s.answers[q.id] = ids;
     // 短い記入欄（選んだ選択肢のものだけ残す）
-    for (const o of q.options) {
+    for (const o of [...q.options, ...(q.followups ?? []).flatMap((fu) => fu.options)]) {
       if (!o.note) continue;
       const v = clean(form.get(`note-${o.id}`));
       if (ids.includes(o.id) && v) s.texts[o.id] = v;
@@ -87,7 +97,7 @@ if (Astro.request.method === 'POST') {
 
 const selected = new Set(s.answers[q.id] ?? []);
 const multi = q.type === 'multi';
-const hint = multi ? '※あてはまるものをすべて選んでください' : '';
+const hint = multi && !q.groups?.length ? '※あてはまるものをすべて選んでください' : '';
 const withImages = q.options.some((o) => o.image);
 // STEP 表示：段階の中での位置を進み具合に使う（分母が動いても段階は変わらない）
 const stepIdx = stepOfSection(q.section);
@@ -97,26 +107,31 @@ const progressPct = Math.round((100 * (stepIdx + (pos + 1) / Math.max(1, inGroup
 // 同時に選べない選択肢（所見の conflicts）
 const conflictsOf = (o: Option) => q.options.filter((b) => b !== o && selectable(b) && (o.findings ?? []).some((f) => (findingById(f)?.conflicts ?? []).some((x) => (b.findings ?? []).includes(x)))).map((b) => b.id);
 // 小見出しごとに分ける（小見出しのない選択肢は最後のまとまり。小見出しのある設問では区切り線の下に置く）
-const groups: { heading?: string; options: Option[] }[] = [];
-for (const o of q.options) {
-  const last = groups[groups.length - 1];
-  if (last && last.heading === o.heading) last.options.push(o);
-  else groups.push({ heading: o.heading, options: [o] });
+const groups: { heading?: string; hint?: string; required?: boolean; gid?: string; options: Option[] }[] = [];
+if (q.groups?.length) {
+  // 1ページの中の小見出し（舌：色・色の追加・形・苔・苔の追加・静脈。第4弾 2-8）
+  for (const g of q.groups) groups.push({ heading: g.title, hint: g.hint, required: g.required, gid: g.id, options: q.options.filter((o) => o.group === g.id) });
+} else {
+  for (const o of q.options) {
+    const last = groups[groups.length - 1];
+    if (last && last.heading === o.heading) last.options.push(o);
+    else groups.push({ heading: o.heading, options: [o] });
+  }
 }
-const hasHeadings = groups.some((g) => g.heading);
+const hasHeadings = groups.some((g) => g.heading) && !q.groups?.length;
+const hasIcons = q.options.some((o) => o.icon);
 const followups: Followup[] = q.followups ?? [];
 // 記入欄・追加の選択肢を選択肢のすぐ下に出す設問は1列
-const inline = q.options.some((o) => o.note) || followups.length > 0;
+const inline = q.options.some((o) => o.note) || (followups.length > 0 && q.section !== 'complaint');
+// 同時に選べない選択肢（所見の conflicts と、設問の excludes）
+const exclOf = (o: Option) => q.options.filter((b) => b !== o && (o.excludes?.includes(b.id) || b.excludes?.includes(o.id))).map((b) => b.id);
 const colsOf = (opts: Option[]) => {
+  if (hasIcons) return 'icons';
   if (inline) return 'one';
   const maxLen = Math.max(...opts.map((o) => o.text.length), 0);
   return withImages ? 'imgs' : maxLen <= 8 && opts.length >= 3 ? 'cols4' : maxLen <= 14 && opts.length >= 3 ? 'cols3' : '';
 };
 const fuOf = (o: Option) => followups.filter((f) => f.when === o.id);
-const referred = q.options.filter((o) => o.refer && selected.has(o.id));
-// 舌のご本人確認（鏡を見てイラストから選ぶ）：いただいた8種のイラストを見本として出す
-const TONGUE_SAMPLES = [['p1', '白っぽく、歯の跡'], ['p2', '淡白で薄く小さい'], ['p3', '両縁が赤い'], ['p4', '紫色・裏の静脈が太い'], ['p5', '大きく、苔が厚く湿る'], ['p6', '赤く、乾燥し苔が少ない'], ['p7', '白っぽく大きく湿る'], ['p8', '鮮やかな赤で黄色い苔']];
-const showTongue = q.section === 'tongue' && q.id.startsWith('TS_');
 // 漢方薬の候補：名前・読み・商品名・ツムラ番号で探す
 const pickKey = (o: Option) => { const f = o.formula ? formulaByCode(o.formula) : undefined; return f ? [f.name, f.reading, ...(f.aliases ?? [])].join(' ') : o.text; };
 const pickNo = (o: Option) => (o.formula ? formulaByCode(o.formula)?.tsumuraNo ?? '' : '');
@@ -131,24 +146,20 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
     {hint && <p class="kp-qhint">{hint}</p>}
     {q.help && <p class="kp-qhelp">{q.help}</p>}
     {error && <p class="kp-error" style="margin:0 0 16px">{error}</p>}
-    {showTongue && (
-      <div class="kp-tongue-samples" aria-label="舌の見本">
-        {TONGUE_SAMPLES.map(([img, label]) => <figure><img src={`/assets/kampo/tongue/${img}.webp`} alt="" width="72" height="77" loading="lazy"><figcaption>{label}</figcaption></figure>)}
-      </div>
-    )}
     {groups.map((g) => (
       <>
-        {g.heading && <p class="kp-opt-h">{g.heading}</p>}
+        {g.heading && <p class="kp-opt-h" data-group-required={g.required ? g.gid : undefined}>{g.heading}{g.hint && <small class="kp-opt-hint">{g.hint}</small>}</p>}
         <div class:list={['kp-opts', colsOf(g.options), { 'kp-opts-sep': hasHeadings && !g.heading }]}>
           {g.options.map((o) => {
             const on = o.locked || selected.has(o.id);
             return (
               <>
-                <label class:list={['kp-opt', { check: multi, none: !!o.exclusive, 'is-on': on, 'has-img': !!o.image, locked: !!o.locked, 'is-off': !!o.blocked }]}>
+                <label class:list={['kp-opt', { check: multi, none: !!o.exclusive, 'is-on': on, 'has-img': !!o.image, 'has-icon': !!o.icon, locked: !!o.locked, 'is-off': !!o.blocked }]}>
                   <input type={multi ? 'checkbox' : 'radio'} name={selectable(o) ? 'opt' : undefined} value={o.id} checked={on} disabled={!selectable(o)}
-                    data-ex={o.exclusive ? '1' : '0'} data-urgent={o.urgent ? '1' : '0'} data-refer={o.refer ? '1' : '0'} data-locked={o.locked ? '1' : '0'} data-conf={conflictsOf(o).join(' ')} data-one={o.oneOf ?? ''}>
+                    data-ex={o.exclusive || (o.defer && !o.group) ? '1' : '0'} data-urgent={o.urgent ? '1' : '0'} data-locked={o.locked ? '1' : '0'} data-conf={[...conflictsOf(o), ...exclOf(o)].join(' ')} data-one={o.oneOf ?? ''} data-group={o.group ?? ''} data-gex={o.groupExclusive ? '1' : '0'}>
                   {o.image && <img class="kp-opt-img" src={o.image} alt="" width="160" height="236" loading="lazy">}
-                  <span class="kp-opt-text">{o.text}{o.locked && <small class="kp-opt-lock">お悩みで選んだ項目</small>}{o.blocked && <small class="kp-opt-lock off">ほかの回答と同時には選べません</small>}</span>
+                  {o.icon && <img class="kp-opt-icon" src={o.icon} alt="" width="84" height="91" loading="lazy">}
+                  <span class="kp-opt-text">{o.text}{o.locked && <small class="kp-opt-lock">お悩みで選んだ項目</small>}{o.blocked && <small class="kp-opt-lock off">{o.blockedText ?? 'ほかの回答と同時には選べません'}</small>}</span>
                 </label>
                 {o.note && (
                   <label class="kp-notefield" data-for={o.id} hidden={!selected.has(o.id)}>
@@ -157,7 +168,7 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
                   </label>
                 )}
                 {fuOf(o).map((fu) => (
-                  <div class:list={['kp-sub', 'kp-fu', 'inline', { picker: fu.picker === 'formulas' }]} data-when={fu.when} data-type={fu.type} hidden={!selected.has(fu.when)}>
+                  <div class:list={['kp-sub', 'kp-fu', 'inline', { picker: fu.picker === 'formulas' }]} data-when={fu.when} data-type={fu.type} data-required={fu.required ? '1' : '0'} hidden={!(selected.has(fu.when) || o.locked)}>
                     <p class="kp-fu-title">{fu.title}</p>
                     {fu.help && <p class="kp-qhelp" style="margin:0 0 12px">{fu.help}</p>}
                     {fu.picker === 'formulas' ? (
@@ -185,10 +196,18 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
                     ) : (
                       <div class="kp-opts cols3">
                         {fu.options.map((x) => (
-                          <label class:list={['kp-opt', { check: fu.type === 'multi', none: !!x.exclusive, 'is-on': selected.has(x.id) }]}>
-                            <input type={fu.type === 'multi' ? 'checkbox' : 'radio'} name="fu" value={x.id} checked={selected.has(x.id)} data-ex={x.exclusive ? '1' : '0'}>
-                            <span class="kp-opt-text">{x.text}</span>
-                          </label>
+                          <>
+                            <label class:list={['kp-opt', { check: fu.type === 'multi', none: !!x.exclusive, 'is-on': selected.has(x.id) }]}>
+                              <input type={fu.type === 'multi' ? 'checkbox' : 'radio'} name="fu" value={x.id} checked={selected.has(x.id)} data-ex={x.exclusive ? '1' : '0'}>
+                              <span class="kp-opt-text">{x.text}</span>
+                            </label>
+                            {x.note && (
+                              <label class="kp-notefield" data-for={x.id} hidden={!selected.has(x.id)}>
+                                <span>{x.noteLabel ?? `「${x.text}」：内容（任意）`}</span>
+                                <input class="kp-input" type="text" name={`note-${x.id}`} maxlength="60" value={s.texts[x.id] ?? ''} autocomplete="off">
+                              </label>
+                            )}
+                          </>
                         ))}
                       </div>
                     )}
@@ -207,7 +226,6 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
       </label>
     )}
     <p class="kp-alert refer" id="alert-urgent" hidden>すぐに近くのスタッフにお声がけください。回答はこのまま続けられます。</p>
-    <div class="kp-alert refer" id="alert-refer" hidden>{q.options.filter((o) => o.refer).map((o) => <p data-for={o.id} hidden={!referred.includes(o)}>{o.refer}</p>)}</div>
     {q.sub && (
       <div class="kp-sub">
         <div class="kp-q" style="margin-bottom:22px"><QMark /><h2 class="kp-qtitle" style="font-size:26px">{q.sub.title}</h2></div>
@@ -250,13 +268,16 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
   .kp-picker-list{margin-top:10px;gap:10px}
   .kp-picker-list .kp-opt{min-height:64px}
   .kp-picker-none{margin-top:10px;font-size:14px;color:var(--muted)}
-  .kp-fu.inline{margin:6px 0 10px;padding:16px 18px;border:1px solid #BFE3F2;background:var(--sky-mist)}
+  .kp-fu.inline{margin:6px 0 10px;padding:16px 18px;border:1px solid var(--sky-border);background:var(--sky-mist)}
   .kp-fu-title{font-size:17px;font-weight:500;letter-spacing:.06em;margin:0 0 8px}
   .kp-opts.one>.kp-notefield{margin-top:2px;margin-bottom:8px}
-  .kp-tongue-samples{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 22px}
-  .kp-tongue-samples figure{margin:0;text-align:center;font-size:12px;color:var(--ink-2)}
-  .kp-tongue-samples img{width:100%;max-width:90px;height:auto;mix-blend-mode:multiply}
-  #alert-refer p[hidden]{display:none}
+  .kp-opt-hint{display:block;margin-top:4px;font-size:13px;letter-spacing:.04em;color:var(--muted);font-weight:400}
+  .kp-opts.icons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .kp-opts.icons .kp-opt{flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;gap:8px;min-height:0;padding:14px 10px}
+  .kp-opts.icons .kp-opt-icon{width:84px;height:auto}
+  .kp-opts.icons .kp-opt.has-icon:not(.is-on) .kp-opt-icon{opacity:.92}
+  @media(max-width:640px){.kp-opts.icons{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .kp-opts>.kp-fu.inline,.kp-opts>.kp-notefield{grid-column:1/-1}
   </style>
   <script is:inline>
   (function(){
@@ -265,27 +286,37 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
     var next=document.getElementById('nextBtn');
     var A=function(sel,root){return Array.prototype.slice.call((root||form).querySelectorAll(sel))};
     var opts=A('input[name=opt]');
+    var allIn=A('.kp-opt input');
+    var lockedAny=A('input[data-locked="1"]').length>0;
     var subs=A('input[name=sub]');
     var fuBoxes=A('.kp-fu');
     var isEx=function(i){return i.dataset.ex==='1'};
+    var byVal=function(v){return allIn.filter(function(i){return i.value===v})[0]};
     // 同じ画面で選んだ選択肢と矛盾する選択肢はグレーで押せない（第2弾 5-3）
     function blockConflicts(){
       var off={};
       opts.forEach(function(i){if(i.checked&&i.dataset.conf)i.dataset.conf.split(' ').forEach(function(x){off[x]=1})});
-      // oneOf：同じ名前の選択肢は、1つ選んだらほかはグレー
-      opts.forEach(function(i){if(i.checked&&i.dataset.one)opts.forEach(function(o){if(o!==i&&o.dataset.one===i.dataset.one)off[o.value]=1})});
       opts.forEach(function(i){var b=!!off[i.value]&&!i.checked;i.disabled=b;i.closest('.kp-opt').classList.toggle('is-off',b)});
+    }
+    // 次へを押せる条件：何か選んでいる（お悩みで自動チェックされた項目も回答済み）＋必須の小見出し・追加の選択がそろっている
+    function ready(){
+      var checked=opts.filter(function(i){return i.checked});
+      if(!(checked.length>0||lockedAny))return false;
+      if(hasSub&&!subs.some(function(i){return i.checked}))return false;
+      var ok=true;
+      A('[data-group-required]').forEach(function(h){var g=h.dataset.groupRequired;if(!opts.some(function(i){return i.checked&&i.dataset.group===g}))ok=false});
+      fuBoxes.forEach(function(b){if(!b.hidden&&b.dataset.required==='1'&&!A('input[name=fu]',b).some(function(i){return i.checked}))ok=false});
+      return ok;
     }
     function sync(){
       var checked=opts.filter(function(i){return i.checked});
       blockConflicts();
       A('.kp-opt input').forEach(function(i){if(i.dataset.locked!=='1')i.closest('.kp-opt').classList.toggle('is-on',i.checked)});
       var el=document.getElementById('alert-urgent');if(el)el.hidden=!checked.some(function(i){return i.dataset.urgent==='1'});
-      var rf=document.getElementById('alert-refer');if(rf){var any=false;A('p[data-for]',rf).forEach(function(p){var o=opts.filter(function(i){return i.value===p.dataset.for})[0];p.hidden=!(o&&o.checked);any=any||!p.hidden});rf.hidden=!any}
-      A('.kp-notefield[data-for]').forEach(function(n){var o=opts.filter(function(i){return i.value===n.dataset.for})[0];n.hidden=!(o&&o.checked)});
+      A('.kp-notefield[data-for]').forEach(function(n){var o=byVal(n.dataset.for);n.hidden=!(o&&o.checked)});
       A('.kp-notefield[data-qnote]').forEach(function(n){var ex=(n.dataset.except||'').split(' ');n.hidden=!checked.some(function(i){return !isEx(i)&&ex.indexOf(i.value)<0})});
-      fuBoxes.forEach(function(b){var w=opts.filter(function(i){return i.value===b.dataset.when})[0];b.hidden=!(w&&w.checked);if(b.hidden)A('input[name=fu]',b).forEach(function(i){i.checked=false});renderPicker(b)});
-      next.disabled=!(checked.length>0&&(!hasSub||subs.some(function(i){return i.checked})));
+      fuBoxes.forEach(function(b){var w=byVal(b.dataset.when);b.hidden=!(w&&(w.checked||w.dataset.locked==='1'));if(b.hidden)A('input[name=fu]',b).forEach(function(i){i.checked=false});renderPicker(b)});
+      next.disabled=!ready();
     }
     function exclusive(list,i,isMulti){
       if(!isMulti)return;
@@ -315,7 +346,14 @@ const firstConstitution = q.section === 'constitution' && pos === 0;
       var list=A('input[name=fu]',b);
       list.forEach(function(i){i.addEventListener('change',function(){exclusive(list,i,b.dataset.type==='multi');if(q&&i.checked){q.value=''}sync()})});
     });
-    opts.forEach(function(i){i.addEventListener('change',function(){exclusive(opts,i,type==='multi');sync()})});
+    opts.forEach(function(i){i.addEventListener('change',function(){
+      exclusive(opts,i,type==='multi');
+      // oneOf：同じ名前の選択肢は、別のものを選ぶと切り替わる（舌の色など）
+      if(i.checked&&i.dataset.one)opts.forEach(function(o){if(o!==i&&o.dataset.one===i.dataset.one)o.checked=false});
+      // 同じ小見出しの「ふつう」は、同じ小見出しのほかの選択肢と同時に選べない
+      if(i.checked&&i.dataset.group)opts.forEach(function(o){if(o!==i&&o.dataset.group===i.dataset.group&&(i.dataset.gex==='1'||o.dataset.gex==='1'))o.checked=false});
+      sync();
+    })});
     subs.forEach(function(i){i.addEventListener('change',sync)});
     sync();
   })();

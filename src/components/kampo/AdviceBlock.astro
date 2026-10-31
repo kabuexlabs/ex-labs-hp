@@ -1,13 +1,15 @@
 ---
 // 改善アドバイス：特徴（summary）→ 生活養生（心・食・動・休）→ おすすめのツボ → あなたへの一言 → 監修者。
 // 改善アドバイス画面と、結果画面の印刷用2ページ目で共用する。
-import { axisDef, type AxisKey } from '../../lib/kampo/masters';
+import { axisDef, type AxisKey, type TypeKey } from '../../lib/kampo/masters';
+import { adviceOverride } from '../../lib/kampo/scoring';
 import { personalTips } from '../../lib/kampo/flow';
 import { typeIconSvg } from '../../lib/kampo/icons';
 import { supervisorName, supervisorBio } from '../../lib/kampo/compute';
 import type { Answers } from '../../lib/kampo/scoring';
-export interface Props { type: AxisKey; answers: Answers; pct?: number; showSupervisor?: boolean }
-const { type, answers, pct, showSupervisor = true } = Astro.props;
+/** types：いっしょに養生を出すタイプ（逆の内容になる養生は両方に合う表現に置き換える。第4弾 3-9） */
+export interface Props { type: AxisKey; answers: Answers; pct?: number; showSupervisor?: boolean; types?: TypeKey[] }
+const { type, answers, pct, showSupervisor = true, types = [] } = Astro.props;
 const d = axisDef(type);
 const tips = personalTips(answers, type);
 const sup = supervisorName();
@@ -27,7 +29,7 @@ const ADVICE: [keyof typeof d.advice, string][] = [['mind', '心'], ['food', '�
     <h3 class="kp-h2">生活養生</h3>
     <div class="kp-advice-grid">
       {ADVICE.map(([k, label]) => (
-        <div class="kp-advice-item"><span class="kp-advice-badge">{label}</span><p>{d.advice[k]}</p></div>
+        <div class="kp-advice-item"><span class="kp-advice-badge">{label}</span><p>{(types.length > 1 && adviceOverride(types, type as TypeKey, k)) || d.advice[k]}</p></div>
       ))}
     </div>
     <h3 class="kp-h2">おすすめのツボ</h3>

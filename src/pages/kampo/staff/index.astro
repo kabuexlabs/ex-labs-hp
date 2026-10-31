@@ -1,7 +1,7 @@
 ---
 // スタッフ画面トップ：本日のチェック一覧（直ちに対応が必要な回答・安全確認タグの印つき）・顧客検索・新規チェック・CSV書き出し。
 // 「来店客モードへ戻る」でスタッフ Cookie を消す（iPad を渡す前に押す）。
-// 体質（AI の暫定判定）は、薬剤師が判定を記録するまで一覧にも出さない（AI に引きずられないように。2026-10-28 修正依頼 第8章）。
+// 体質（AI の暫定判定）は一覧にも出す（2026-10-31 第4弾 3-2：薬剤師が先に判定する手順は取り下げ。AI の判定は最初から表示）。
 export const prerender = false;
 import KampoLayout from '../../../layouts/KampoLayout.astro';
 import { SEX_LABEL, AGE_BAND_LABEL, type Sex } from '../../../lib/kampo/flow';
@@ -89,9 +89,8 @@ const urgentCount = sessions.filter((s) => s.urgent).length;
               <td>{fmtJst(s.startedAt, false)}</td>
               <td>{s.customerLabel}</td>
               <td>{INPUT_BY_LABEL[s.inputBy]}</td>
-              {s.scores && !s.judgment ? <td colspan="2"><small style="color:var(--muted)">薬剤師の判定前</small></td> : <>
               <td>{s.scores ? (s.scores.isBalanced ? 'バランス良好' : typeNamesOf(s.scores.mainTypes)) : '—'}</td>
-              <td>{s.scores ? typeNamesOf(s.scores.subTypes) || '—' : '—'}</td></>}
+              <td>{s.scores ? typeNamesOf(s.scores.subTypes) || '—' : '—'}</td>
               <td>{s.urgent && <span class="kp-chip refer">直ちに対応</span>} {f.tags > 0 && <span class="kp-chip warn">タグ未確認 {f.tags}</span>} {f.refer > 0 && <span class="kp-chip refer">受診勧奨 {f.refer}</span>} {f.warn > 0 && <span class="kp-chip check">注意 {f.warn}</span>} {!s.urgent && f.tags + f.refer + f.warn === 0 && <span class="kp-chip ok">なし</span>}</td>
               <td><span class:list={['kp-chip', { ok: s.status === 'proposed' }]}>{STATUS_LABEL[s.status]}</span></td>
               <td><a class="kp-btn ghost small" href={`/kampo/staff/session/${s.id}/`}>開く</a></td>

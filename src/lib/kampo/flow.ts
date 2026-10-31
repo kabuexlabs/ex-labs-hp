@@ -99,6 +99,8 @@ export function resolveQuestion(q: Question, c: FlowContext): Question {
   if (q.section === 'constitution') {
     options = options.map((o) => {
       const fs = o.findings ?? [];
+      // 前の回答の所見と矛盾して選べない選択肢（口の渇きを選んだ方の「特に渇かない」など。第4弾 1-4）
+      if (o.blockedIf?.some((f) => isPresent(c.state, f))) return { ...o, blocked: true };
       if (o.exclusive || !fs.length) return o;
       if (fs.every((f) => isPresent(c.state, f))) return { ...o, locked: true };
       if (fs.some((f) => conflictsPresent(c.state, f))) return { ...o, blocked: true };
@@ -114,7 +116,9 @@ export function resolveQuestion(q: Question, c: FlowContext): Question {
   }
   const main = c.primary ? complaintById(c.primary)?.name : undefined;
   const title = q.title.replace(/\{main\}/g, main ?? 'その症状');
-  return { ...q, title, options };
+  // お悩みの段階でもう答えた追加の選択（耳鳴りの音の高さ）は、体質チェックで聞き直さない（第4弾 2-10）
+  const followups = q.followups?.filter((fu) => !(q.section === 'constitution' && fu.options.some((o) => (o.findings ?? []).some((f) => isDetermined(c.state, f)))));
+  return { ...q, title, options, ...(followups ? { followups } : {}) };
 }
 /** 選べる選択肢（チェック済み・グレーを除く） */
 export const selectable = (o: Option) => !o.locked && !o.blocked;
@@ -128,7 +132,7 @@ export interface Step {
   skipped?: boolean;
 }
 export interface WalkResult {
-  steps: Step[]; state: FindingState; sex?: Sex; ageBand?: string; menses?: Menses;
+  steps: Step[]; state: FindingState; sex?: Sex; ageBand?: string; menses?: Menses; pregnant?: boolean;
   categories: string[]; complaints: string[]; primary?: string;
   /** 表示した設問で選ばれている選択肢ID */
   chosen: Set<string>;
@@ -151,12 +155,15 @@ export function walk(answers: Answers): WalkResult {
     steps.push({ q: rq, ids, ...(skipped ? { skipped } : {}) });
     if (!ids.length) continue;
     applyAnswer(ctx.state, rq, rq.options.filter(selectable), ids, { inferAbsent: CARRY.includes(q.section) || q.section === 'tongue' });
+    // 選んだ選択肢のすぐ下の追加の選択（耳鳴りの音の高さなど）の所見
+    const fuOpts = (rq.followups ?? []).filter((fu) => !fu.picker).flatMap((fu) => fu.options).filter((o) => (o.findings ?? []).length);
+    if (fuOpts.length) applyAnswer(ctx.state, rq, fuOpts, ids, { inferAbsent: false });
     for (const id of ids) ctx.chosen.add(id);
     // 月経の状況は A3 を表示したときだけ使う（性別を男性に変えたあとに残った回答を拾わない）
     if (q.id === 'A3') ctx.menses = mensesValue(answers);
     if (q.id === 'A3P') ctx.pregnant = ids.includes('A3P-preg');
   }
-  return { steps, state: ctx.state, sex: ctx.sex, ageBand: ageBandFromAnswers(answers), menses: ctx.menses, categories: ctx.categories, complaints: ctx.complaints, primary: ctx.primary, chosen: ctx.chosen };
+  return { steps, state: ctx.state, sex: ctx.sex, ageBand: ageBandFromAnswers(answers), menses: ctx.menses, pregnant: ctx.pregnant, categories: ctx.categories, complaints: ctx.complaints, primary: ctx.primary, chosen: ctx.chosen };
 }
 
 /**
@@ -171,7 +178,7 @@ export function applyStaffAnswers(state: FindingState, staffAnswers: Answers | u
   for (const q of STAFF_QUESTIONS) {
     const ids = staffAnswers[q.id];
     if (!ids?.length || ids.some((id) => optionById(id)?.defer)) continue;
-    if (q.id.startsWith('X_tongue_') && (tm === 'self' || tm === 'none')) continue;
+    if (q.id === 'X_tongue' && (tm === 'self' || tm === 'none')) continue;
     applyAnswer(state, q, q.options, ids, { source: 'staff', inferAbsent: true });
   }
 }
@@ -185,18 +192,24 @@ export function normalizeAnswer(q: Question, rawIds: string[]): string[] {
   const pick = (opts: Option[], single: boolean) => {
     const by = new Map(opts.filter(selectable).map((o) => [o.id, o]));
     let m = uniq.filter((id) => by.has(id));
-    const nonEx = m.filter((id) => !by.get(id)!.exclusive);
+    // 「特にない」「判断できない」は、ほかの選択肢と両方あればほかを残す
+    // （defer は小見出しの中の「見ていない」のときは、その小見出しの中だけ。oneOf で処理する）
+    const nonEx = m.filter((id) => !by.get(id)!.exclusive && !(by.get(id)!.defer && !by.get(id)!.group));
     m = nonEx.length ? nonEx : m.slice(0, 1);
+    // groupExclusive：同じ group の「ふつう」は、同じ group のほかの選択肢があれば外す
+    m = m.filter((id) => { const o = by.get(id)!; return !o.groupExclusive || !m.some((x) => x !== id && by.get(x)!.group === o.group); });
     // oneOf：同じ名前の選択肢は最初の1つだけ
     const seen = new Set<string>();
     m = m.filter((id) => { const g = by.get(id)!.oneOf; if (!g) return true; if (seen.has(g)) return false; seen.add(g); return true; });
+    // excludes：同時に選べない組み合わせは、先に並んでいる方を残す
+    m = m.filter((id, i) => !m.slice(0, i).some((x) => by.get(x)!.excludes?.includes(id) || by.get(id)!.excludes?.includes(x)));
     return single ? m.slice(0, 1) : m;
   };
   const uniq = [...new Set(rawIds)];
   const m = pick(q.options, q.type === 'single');
   const subIds = new Set(q.sub?.options.map((o) => o.id) ?? []);
   const s = uniq.filter((id) => subIds.has(id)).slice(0, 1);
-  const f = (q.followups ?? []).filter((fu) => m.includes(fu.when)).flatMap((fu) => pick(fu.options, fu.type === 'single'));
+  const f = (q.followups ?? []).filter((fu) => m.includes(fu.when) || q.options.find((o) => o.id === fu.when)?.locked).flatMap((fu) => pick(fu.options, fu.type === 'single'));
   return [...m, ...s, ...f];
 }
 /** 舌の確認の方法（T1）：staff 薬剤師に見てもらう／self ご自分で鏡を見て／none 確認しない／undefined 未回答 */
@@ -218,6 +231,10 @@ export function isAnswered(q: Question, ids: string[] | undefined, skipped = fal
   if (!ids?.length) return false;
   if (!ids.some((id) => q.options.some((o) => o.id === id))) return false;
   if (q.sub && !ids.some((id) => q.sub!.options.some((o) => o.id === id))) return false;
+  // 必須の小見出し（舌の色・形・苔・静脈）：それぞれ1つ以上
+  for (const g of q.groups ?? []) if (g.required && !ids.some((id) => q.options.find((o) => o.id === id)?.group === g.id)) return false;
+  // 選んだ選択肢のすぐ下の必須の追加の選択（耳鳴りの音の高さ）
+  for (const fu of q.followups ?? []) if (fu.required && (ids.includes(fu.when) || q.options.find((o) => o.id === fu.when)?.locked) && !ids.some((id) => fu.options.some((o) => o.id === id))) return false;
   return true;
 }
 /** 最初の未回答設問の step（1始まり）。全問回答済みなら steps.length + 1 */

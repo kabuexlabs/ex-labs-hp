@@ -151,3 +151,50 @@ export function resultCards(r: Pick<ScoreResult, 'mainTypes' | 'subTypes' | 'pct
   return out;
 }
 export const adviceKeys = (r: Pick<ScoreResult, 'mainTypes' | 'subTypes' | 'pct'>): AxisKey[] => resultCards(r).map((x) => x.t);
+
+// --- 患者向けの養生の出し方（2026-10-31 第4弾 3-9）-------------------------------------
+/** 養生を出すタイプ（最大2）：主タイプ＋主訴に関係するタイプ。点数の順だけでは選ばない */
+export interface AdvicePlan {
+  types: TypeKey[];
+  /** 1位との差が5点以内のタイプ（2つ以上なら「主」と決めつけず「同じくらい」と並べる） */
+  tied: TypeKey[];
+  /** 「強い」（60点以上）のタイプの数。5つ以上なら薬剤師画面に「全体的に高く出ています」 */
+  strongCount: number;
+  allHigh: boolean;
+  /** 全体が「バランス」（全タイプ20点未満） */
+  balanced: boolean;
+}
+export function advicePlan(r: Pick<ScoreResult, 'pct' | 'isBalanced'>, related?: TypeKey): AdvicePlan {
+  const pct = r.pct as Record<string, number>;
+  const order = [...TYPES].sort((a, b) => pct[b] - pct[a] || TYPES.indexOf(a) - TYPES.indexOf(b));
+  const top = pct[order[0]] ?? 0;
+  const strongCount = TYPES.filter((t) => pct[t] >= 60).length;
+  if (r.isBalanced || top < 20) return { types: [], tied: [], strongCount, allHigh: strongCount >= 5, balanced: true };
+  const tied = order.filter((t) => pct[t] >= top - 5 && pct[t] >= 20);
+  const types: TypeKey[] = [order[0]];
+  const second = related && related !== order[0] && pct[related] >= 20 ? related : tied.length >= 2 ? tied[1] : undefined;
+  if (second) types.push(second);
+  return { types, tied: tied.length >= 2 ? tied : [], strongCount, allHigh: strongCount >= 5, balanced: false };
+}
+/** 同時に出ると逆の内容になる養生の組み合わせ：両方に合う表現に置き換える */
+export const ADVICE_CONFLICTS: { types: [TypeKey, TypeKey]; item: 'mind' | 'food' | 'move' | 'rest'; text: string }[] = [
+  { types: ['fluid', 'yin_def'], item: 'food', text: '水分は一度にたくさんではなく、少しずつこまめにとります。冷たい飲み物は控えめにして、温かいお茶や白湯を。豆類・ハトムギと、白ごま・豆乳・梨などを無理のない量で組み合わせます。' },
+  { types: ['qi_def', 'qi_stag'], item: 'move', text: '激しい運動は避け、息が上がらない程度の散歩やストレッチから始めます。胸や脇を伸ばして呼吸を深くし、慣れてきたら少しずつ長くします。' },
+  { types: ['blood_def', 'blood_stasis'], item: 'food', text: '赤身の肉・魚、レバー、黒ごま、黒豆などの血を補う食材を中心に、生姜やネギは温かい料理に少量ずつ。辛いものの食べすぎは避けます。' },
+  { types: ['yin_def', 'blood_stasis'], item: 'rest', text: '湯船は38〜40度のぬるめのお湯に10分ほど。熱いお湯や長風呂、サウナは潤いを失うので避けます。喫煙は巡りを妨げるので、減らすだけでも助けになります。' },
+];
+/** その2タイプのうち、逆の内容になる養生を両方に合う表現に置き換えたものを返す（なければ undefined） */
+export function adviceOverride(types: TypeKey[], type: TypeKey, item: 'mind' | 'food' | 'move' | 'rest'): string | undefined {
+  return ADVICE_CONFLICTS.find((c) => c.item === item && c.types.includes(type) && c.types.every((t) => types.includes(t)))?.text;
+}
+/** 主訴の症状（お悩み・深掘りで「あり」にした所見）に関係するタイプ：その所見の重みの合計が最も大きい体質タイプ（主タイプを除く） */
+export function relatedTypeOf(state: FindingState, exclude: string[] = []): TypeKey | undefined {
+  const sum: Record<string, number> = {};
+  for (const [id, e] of state) {
+    if (e.status !== 'present' || (e.section !== 'complaint' && e.section !== 'detail')) continue;
+    const f = findingById(id);
+    for (const [k, w] of Object.entries(f?.weights ?? {})) if ((TYPES as string[]).includes(k)) sum[k] = (sum[k] ?? 0) + (w as number);
+  }
+  const best = (TYPES as TypeKey[]).filter((t) => !exclude.includes(t) && (sum[t] ?? 0) > 0).sort((a, b) => sum[b] - sum[a])[0];
+  return best;
+}

@@ -92,8 +92,22 @@ export interface Option {
   notfound?: boolean;
   /** 選ばれたら患者画面・薬剤師画面に出す受診のおすすめ（2026-10-29 第3弾 3-1・11-2） */
   refer?: string;
-  /** 同じ名前の選択肢はどれか1つ（舌の色の「ふつう・淡白・紅」など。所見の conflicts を持たない選択肢どうし。第3弾 10-4） */
+  /** 同じ名前の選択肢はどれか1つ（舌の色の「ふつう・淡白・紅」など。所見の conflicts を持たない選択肢どうし。第3弾 10-4）。画面では別のものを選ぶと切り替わる */
   oneOf?: string;
+  /** 設問の groups の小見出し（舌：色・色の追加・形・苔…。第4弾 2-8） */
+  group?: string;
+  /** 同じ group の中で「ふつう」など：選んだら同じ group のほかの選択肢は外れる（第4弾 2-8・3-5） */
+  groupExclusive?: boolean;
+  /** 同時に選べない選択肢のID（同じ設問の中。例：「淡紅色（ふつう）」と「舌の両縁が赤い」。所見の conflicts を持たない組み合わせ用） */
+  excludes?: string[];
+  /** これらの所見が present のとき、この選択肢を出さない（グレー。例：口の渇きを選んだ方に「特に渇かない」。第4弾 1-4） */
+  blockedIf?: string[];
+  /** 画面表示用：グレーにした理由（blocked のときの小さな説明。省略すると「ほかの回答と同時には選べません」） */
+  blockedText?: string;
+  /** 食品アレルギーの選択肢：含まれていたら候補から外す生薬（第4弾 2-9。患者画面には出さない） */
+  herbs?: string[];
+  /** 画面で選択肢のイラストを表示する（舌の項目別イラストなど。image と同じ。小さめ） */
+  icon?: string;
   /** 画面内の小見出し（生活習慣。修正依頼 6-1） */
   heading?: string;
   /** 薬剤師の観察で「判断できない」：ご本人の回答を使う（修正依頼 4-10） */
@@ -142,11 +156,21 @@ export interface Question {
   note?: { label: string; placeholder?: string; except?: string[] };
   /** 回答せずに次へ進める（A3P 妊娠・授乳。未回答は薬剤師が口頭で確認） */
   optional?: boolean;
+  /** 1ページの中の小見出し（舌：色・形・苔・舌下静脈。第4弾 2-8）。選択肢の group と対応 */
+  groups?: OptionGroup[];
   help?: string;
   /** 深掘りのテンプレート名 */
   template?: string;
   /** 主訴の設問のカテゴリー */
   category?: string;
+}
+export interface OptionGroup {
+  id: string;
+  title: string;
+  /** 「1つ選んでください」「あてはまるものをすべて」などの小さな説明 */
+  hint: string;
+  /** 答えが必要な項目（なければ「あれば選ぶ」の追加項目） */
+  required?: boolean;
 }
 export interface Followup {
   when: string;
@@ -155,6 +179,8 @@ export interface Followup {
   type: 'single' | 'multi';
   options: Option[];
   help?: string;
+  /** 親の選択肢を選んだら1つ以上の選択が必要（耳鳴りの音の高さ。第4弾 2-10） */
+  required?: boolean;
   /** formulas：漢方薬の候補から選ぶ（名前・読み・ツムラ番号・商品名で検索。選択肢は formulas.json から作る） */
   picker?: 'formulas';
 }
@@ -183,6 +209,10 @@ export interface Complaint {
   tags?: string[];
   femaleOnly?: boolean;
   mensesOnly?: boolean;
+  /** 選ばれたら薬剤師画面に出す受診のおすすめ（息苦しさ・動悸。患者画面には出さない。第4弾 1-2） */
+  refer?: string;
+  /** 選んだらすぐ下に出す追加の選択（耳鳴りの音の高さ。第4弾 2-10） */
+  followups?: Omit<Followup, 'when'>[];
 }
 export interface SafetyTagDef { id: string; label: string; checks: string[]; urgent?: boolean }
 export interface Review { status: string; source?: string; reviewer?: string | null; reviewedAt?: string | null }
@@ -198,7 +228,8 @@ export interface TypeDef {
   tsubo: { name: string; reading: string; position: string; effect: string };
 }
 export interface Tip { when: string; types: AxisKey[]; text: string }
-export interface TypesData { types: Record<TypeKey, TypeDef>; thermal: Record<ThermalKey, TypeDef>; tips: Tip[] }
+export interface Foundation { title: string; lead: string; items: { label: string; text: string }[] }
+export interface TypesData { types: Record<TypeKey, TypeDef>; thermal: Record<ThermalKey, TypeDef>; tips: Tip[]; foundation: Foundation }
 
 export type Strength = 'def' | 'mid' | 'exc';
 export type Thermal = 'warm' | 'neutral' | 'cool';
@@ -237,6 +268,15 @@ export interface Formula {
   /** 市販品の商品名など、検索に使う別名（未登録。いただいたら追加する） */
   aliases?: string[];
   tsumuraNoVerified?: boolean;
+  /** 構成生薬と1日量(g)（ツムラの添付文書などで確認したもの。confidence C は未確認。第4弾 2-9・3-8） */
+  herbs?: { herb: string; g: number }[];
+  /** 食品アレルギーの対応生薬のうち、この処方に含まれるもの */
+  foodHerbs?: string[];
+  /** 甘草・麻黄・附子・大黄・芒硝の1日量(g) */
+  amounts?: Record<string, number>;
+  /** A=ツムラ添付文書(PMDA)で直接確認／B=ほかの信頼できる資料／C=未確認 */
+  compositionConfidence?: 'A' | 'B' | 'C';
+  compositionSource?: string;
 }
 export interface FormulasData { version: string; source?: string; symptoms: Record<string, SymptomDef>; formulas: Formula[] }
 
@@ -270,7 +310,10 @@ export function expandQuestions(rawQuestions: Raw[], cj: { categories: Category[
           options: cj.complaints.filter((x) => x.categories.includes(c.id)).map((x) => ({
             id: `K${c.id}-${x.id}`, text: x.name, complaint: x.id, category: c.id, findings: x.findings, symptoms: x.symptoms,
             ...(x.tags?.length ? { tags: x.tags } : {}), ...(x.femaleOnly ? { femaleOnly: true } : {}), ...(x.mensesOnly ? { mensesOnly: true } : {}),
+            ...(x.refer ? { refer: x.refer } : {}),
           })),
+          followups: cj.complaints.filter((x) => x.categories.includes(c.id) && x.followups?.length)
+            .flatMap((x) => (x.followups ?? []).map((fu) => ({ ...fu, when: `K${c.id}-${x.id}` }))),
         });
       }
     } else out.push(q);
@@ -329,7 +372,7 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
       if (!isObj(c) || !isStr(c.id) || !isStr(c.name) || !isStr(c.detail)) { errs.push('complaints.json: id/name/detail のない主訴'); continue; }
       if (complaintIds.has(c.id)) errs.push(`complaints.json: 主訴ID重複 ${c.id}`);
       complaintIds.add(c.id);
-      templatesUsed.add(c.detail);
+      if (c.detail !== 'none') templatesUsed.add(c.detail);
       if (!strArr(c.categories).length || !strArr(c.categories).every((x) => catIds.has(x))) errs.push(`主訴 ${c.id}: categories が不正`);
       for (const f of strArr(c.findings)) if (!findingIds.has(f)) errs.push(`主訴 ${c.id}: 所見 ${f} がない`);
       for (const s of strArr(c.symptoms)) if (!symptomKeys.has(s)) errs.push(`主訴 ${c.id}: 症状コード ${s} がない`);
@@ -340,6 +383,7 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
   const optionIds = new Set<string>();
   const templates = new Set<string>();
   const chosenRefs: [string, string][] = [];
+  const excludeRefs: [string, string][] = [];
   if (!isObj(qj) || !isStr(qj.version) || !Array.isArray(qj.questions)) errs.push('questions.json: version と questions が必要');
   else {
     const expanded = isObj(cj) && Array.isArray(cj.complaints) ? expandQuestions(qj.questions as Raw[], cj as { categories: Category[]; complaints: Complaint[] }, isObj(fo) && Array.isArray(fo.formulas) ? (fo.formulas as { code: string; name: string }[]) : []) : [];
@@ -381,6 +425,10 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
         if ((o.other || o.defer) && (o.exclusive || strArr(o.findings).length)) errs.push(`${o.id}: other／defer の選択肢に所見・exclusive を付けない`);
         if (o.refer !== undefined && !isStr(o.refer)) errs.push(`${o.id}: refer は受診のおすすめの文言`);
         if (o.oneOf !== undefined && (!isStr(o.oneOf) || o.exclusive)) errs.push(`${o.id}: oneOf は名前（exclusive と併用しない）`);
+        if (o.group !== undefined && !(Array.isArray(q.groups) && (q.groups as unknown[]).some((g) => isObj(g) && g.id === o.group))) errs.push(`${o.id}: group ${String(o.group)} が設問の groups にない`);
+        for (const f of strArr(o.blockedIf)) if (!findingIds.has(f)) errs.push(`${o.id}: blockedIf の ${f} がない`);
+        for (const x of strArr(o.excludes)) excludeRefs.push([String(o.id), x]);
+        if (o.herbs !== undefined && !(Array.isArray(o.herbs) && (o.herbs as unknown[]).every(isStr))) errs.push(`${o.id}: herbs は生薬名の配列`);
       };
       for (const o of opts) checkOpt(o);
       if (isObj(q.sub)) for (const o of (q.sub.options as unknown[]) ?? []) checkOpt(o);
@@ -394,9 +442,11 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
         }
       }
       if (q.note !== undefined && (!isObj(q.note) || !isStr(q.note.label))) errs.push(`${id}: note は label を持つ`);
+      if (q.groups !== undefined && !(Array.isArray(q.groups) && (q.groups as unknown[]).every((g) => isObj(g) && isStr(g.id) && isStr(g.title) && isStr(g.hint)))) errs.push(`${id}: groups は id/title/hint の配列`);
       if (q.prefill !== undefined) errs.push(`${id}: prefill は廃止（体質チェックは全設問でお悩みの所見をチェック済みで出す）`);
     }
     for (const [qid, c] of chosenRefs) if (!optionIds.has(c)) errs.push(`${qid}: trigger.chosen の ${c} は存在しない選択肢ID`);
+    for (const [oid, x] of excludeRefs) if (!optionIds.has(x)) errs.push(`${oid}: excludes の ${x} は存在しない選択肢ID`);
     for (const t of templatesUsed) if (!templates.has(t)) errs.push(`深掘りテンプレート ${t} の設問がない`);
     for (const t of templates) if (!templatesUsed.has(t)) errs.push(`深掘りテンプレート ${t} を使う主訴がない`);
   }
@@ -412,6 +462,7 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
       if (!isObj(d.advice) || !['mind', 'food', 'move', 'rest'].every((k) => isStr((d.advice as Raw)[k]))) errs.push(`types.${key}.advice は mind/food/move/rest`);
       if (!isObj(d.tsubo) || !['name', 'reading', 'position', 'effect'].every((k) => isStr((d.tsubo as Raw)[k]))) errs.push(`types.${key}.tsubo は name/reading/position/effect`);
     }
+    if (!isObj(ty.foundation) || !isStr(ty.foundation.title) || !isStr(ty.foundation.lead) || !Array.isArray(ty.foundation.items) || !(ty.foundation.items as unknown[]).every((x) => isObj(x) && isStr(x.label) && isStr(x.text))) errs.push('types.json: foundation（title/lead/items）が必要');
     for (const [i, tip] of ((Array.isArray(ty.tips) ? ty.tips : []) as unknown[]).entries()) {
       if (!isObj(tip) || !isStr(tip.when) || !Array.isArray(tip.types) || !isStr(tip.text)) { errs.push(`tips[${i}]: when/types/text が必要`); continue; }
       if (!optionIds.has(tip.when)) errs.push(`tips[${i}]: when=${tip.when} は存在しない選択肢ID`);
@@ -461,6 +512,9 @@ export function validateMasters(qj: unknown, cj: unknown, fj: unknown, tj: unkno
       if (typeof raw.active !== 'boolean') errs.push(`${c}: active が真偽値でない`);
       if (raw.tsumuraNo !== undefined && (!Number.isInteger(raw.tsumuraNo) || typeof raw.tsumuraNoVerified !== 'boolean')) errs.push(`${c}: tsumuraNo は整数、tsumuraNoVerified は真偽値`);
       if (raw.aliases !== undefined && (!Array.isArray(raw.aliases) || !(raw.aliases as unknown[]).every(isStr))) errs.push(`${c}: aliases は文字列の配列`);
+      if (raw.herbs !== undefined && !(Array.isArray(raw.herbs) && (raw.herbs as unknown[]).every((h) => isObj(h) && isStr(h.herb) && typeof h.g === 'number'))) errs.push(`${c}: herbs は herb と g の配列`);
+      if (raw.foodHerbs !== undefined && !(Array.isArray(raw.foodHerbs) && (raw.foodHerbs as unknown[]).every(isStr))) errs.push(`${c}: foodHerbs は生薬名の配列`);
+      if (raw.compositionConfidence !== undefined && !['A', 'B', 'C'].includes(String(raw.compositionConfidence))) errs.push(`${c}: compositionConfidence は A/B/C`);
     }
   }
   return errs;
@@ -488,6 +542,8 @@ export const TYPE_DEFS: Record<TypeKey, TypeDef> = (typesJson as unknown as Type
 export const THERMAL_DEFS: Record<ThermalKey, TypeDef> = (typesJson as unknown as TypesData).thermal;
 export const axisDef = (k: AxisKey): TypeDef => (isTypeKey(k) ? TYPE_DEFS[k] : THERMAL_DEFS[k]);
 export const TIPS: Tip[] = (typesJson as unknown as TypesData).tips;
+/** 全員共通の養生の土台（胃腸・睡眠・冷やさない。第4弾 3-9） */
+export const FOUNDATION: Foundation = (typesJson as unknown as TypesData).foundation;
 const formulasData = formulasJson as unknown as FormulasData;
 export const FORMULAS: Formula[] = formulasData.formulas;
 export const SYMPTOMS: Record<string, SymptomDef> = formulasData.symptoms;

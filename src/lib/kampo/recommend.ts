@@ -121,6 +121,10 @@ export interface Selection {
   companions: Companion[];
   /** 安全確認タグ（未確認のあいだは提案を確定しない） */
   tags: TagHit[];
+  /** 全候補に共通の確認事項（情報不足・未確認のタグ・服用中の薬など。候補の上に1回だけ出す。第4弾 3-8） */
+  general: string[];
+  /** 食品アレルギーで選ばれた食品（候補の除外理由の表示用） */
+  foods: { id: string; food: string }[];
 }
 
 export const OUTCOME_LABEL: Record<GroupOutcome, string> = {
@@ -318,7 +322,7 @@ export function selectFormulas(result: ScoreResult, answers: Answers, w: WalkRes
     const outcome: GroupOutcome = !candidates.length ? 'no_pool' : !usable.length ? 'all_excluded' : !pick ? 'no_fit' : pick.safety.status === 'check' ? 'pick_check' : 'pick';
     groups.push({ ...g, candidates, pick, outcome });
   }
-  return { groups, companions: companionComplaints(w), tags };
+  return { groups, companions: companionComplaints(w), tags, general: sctx.general, foods: sctx.foods.map((x) => ({ id: x.id, food: x.food })) };
 }
 
 // --- STEP 5：推薦理由 ----------------------------------------------------------

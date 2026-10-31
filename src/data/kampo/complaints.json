@@ -1,5 +1,5 @@
 {
- "version": "2026-10-29-v3.3",
+ "version": "2026-10-31-v3.4",
  "review": {
   "status": "draft",
   "source": "2026-10-24 版（3段階版）の設問・重みを、2026-10-25 の改修指示と承認済みの改修計画に沿って組み直した草案。重み・五臓は現行の選択肢の値を引き継いだもので、新しい数値は作っていない（専門家未確認）",
@@ -55,7 +55,7 @@
    "symptoms": [
     "fatigue"
    ],
-   "detail": "fatigue"
+   "detail": "none"
   },
   {
    "id": "heavy",
@@ -83,7 +83,7 @@
    "symptoms": [
     "fatigue"
    ],
-   "detail": "fatigue",
+   "detail": "none",
    "tags": [
     "mental"
    ]
@@ -528,12 +528,26 @@
   },
   {
    "id": "light_sleep",
-   "name": "眠りが浅い・夢が多い",
+   "name": "眠りが浅い",
    "categories": [
     "E"
    ],
    "findings": [
     "light_sleep"
+   ],
+   "symptoms": [
+    "insomnia"
+   ],
+   "detail": "insomnia"
+  },
+  {
+   "id": "dreams_many",
+   "name": "夢が多い",
+   "categories": [
+    "E"
+   ],
+   "findings": [
+    "dreams_many"
    ],
    "symptoms": [
     "insomnia"
@@ -559,7 +573,8 @@
     "E"
    ],
    "findings": [
-    "anxious"
+    "anxious",
+    "tension_unwell"
    ],
    "symptoms": [
     "nerves"
@@ -886,6 +901,37 @@
    "detail": "tinnitus",
    "tags": [
     "hearing"
+   ],
+   "followups": [
+    {
+     "id": "KTN",
+     "title": "耳鳴りの音の種類（1つ選んでください）",
+     "type": "single",
+     "required": true,
+     "options": [
+      {
+       "id": "KTN-high",
+       "text": "キーンと高い音",
+       "findings": [
+        "tinnitus_high"
+       ]
+      },
+      {
+       "id": "KTN-low",
+       "text": "ゴーッ・ボーという低い音",
+       "findings": [
+        "tinnitus_low"
+       ]
+      },
+      {
+       "id": "KTN-unsure",
+       "text": "どちらとも言えない",
+       "findings": [
+        "tinnitus_unsure"
+       ]
+      }
+     ]
+    }
    ]
   },
   {
@@ -1013,7 +1059,8 @@
    "detail": "palpitation",
    "tags": [
     "palpitation"
-   ]
+   ],
+   "refer": "動悸は、心臓や肺の病気が隠れていることがあります。受診をおすすめします。"
   },
   {
    "id": "eye_dry",
@@ -1083,7 +1130,8 @@
    "detail": "breath",
    "tags": [
     "breath"
-   ]
+   ],
+   "refer": "息苦しさは、心臓や肺の病気が隠れていることがあります。受診をおすすめします。"
   }
  ]
 }
