@@ -143,6 +143,8 @@ const venueLd = {
   sameAs: ['https://www.yumenoshima.jp/botanicalhall', 'https://ja.wikipedia.org/wiki/%E5%A4%A2%E3%81%AE%E5%B3%B6%E7%86%B1%E5%B8%AF%E6%A4%8D%E7%89%A9%E9%A4%A8', 'https://www.tokyoartbeat.com/venues/-/yumenoshima-tropical-greenhouse-dome'],
   address: { '@type': 'PostalAddress', streetAddress: '夢の島2-1-2', addressLocality: '江東区', addressRegion: '東京都', postalCode: '136-0081', addressCountry: 'JP' },
 };
+const organizerLd = { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' };
+const performerLd = cast.map((c) => ({ '@type': 'Person', name: c.name }));
 const eventLd = {
   '@context': 'https://schema.org',
   '@type': 'EventSeries',
@@ -164,10 +166,15 @@ const eventLd = {
     eventStatus: 'https://schema.org/EventScheduled',
     location: venueLd,
     offers: ticketOffers,
+    // 各回にも主催者・出演者・説明・画像を持たせる（2026-11-03。Event の推奨項目の不足を解消）
+    description,
+    image: ogImage,
+    organizer: organizerLd,
+    performer: performerLd,
   })),
   offers: ticketOffers,
-  organizer: { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' },
-  performer: cast.map((c) => ({ '@type': 'Person', name: c.name })),
+  organizer: organizerLd,
+  performer: performerLd,
 };
 const faqLd = {
   '@context': 'https://schema.org',

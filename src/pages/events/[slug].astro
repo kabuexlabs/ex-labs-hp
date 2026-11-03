@@ -125,7 +125,7 @@ const eventLd = upcoming.concat(cancelled).map((r) => {
 
 <section class="section tinted ev-results" id="dates"><div class="wrap">
 <h2 class="ev-res-h">開催日程と予約先 <small>（{today} 時点・日本時間）</small></h2>
-<p class="ev-meta">開催情報の最終確認：{fmtVerified(work.verified.at)}（{work.verified.by}）。販売・空席の状況は公式ページが正で、ここでは確認できた状態と確認日時だけを表示します。</p>
+<p class="ev-meta">開催情報の最終確認：{fmtVerified(work.verified.at)}（主催者の公式ページの記載を確認）。販売・空席の状況は公式ページが正で、ここでは確認できた状態と確認日時だけを表示します。</p>
 {upcoming.length > 0 ? (
   <ul class="ev-list">{upcoming.map((r) => <li><EventCard r={r} place="detail" compact /></li>)}</ul>
 ) : (

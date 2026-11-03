@@ -60,6 +60,79 @@ const faqs = [
   },
 ];
 
+// 「体験型イベント 事例」向けの事例の詳細（2026-11-03 追加）。記載はすべて各事例ページ・公演ページの公開情報から。
+const cases: { kind: string; title: string; img?: string; alt?: string; rows: [string, string][]; links: { label: string; href: string; show?: string }[] }[] = [
+  {
+    kind: '商業施設｜施設一体型の周遊イマーシブ',
+    title: '渋谷サクラステージ「ウワサバナシ調査委員会」',
+    img: '/assets/events/thumb/uwasabanashi-kv-240.webp', alt: 'ウワサバナシ調査委員会（渋谷サクラステージ）',
+    rows: [
+      ['場所', '渋谷サクラステージの共有区画と館内の複数スポット、協力テナント（404 Not Found・TSUTAYA）の店内。施設の営業中に実施'],
+      ['目的', '目的がないと立ち寄られにくい共有区画・上層フロアに人を回遊させ、協力テナントへの来店のきっかけを作る'],
+      ['内容', '都市伝説×イマーシブ×謎解きの周遊イベント。体験約70分、2026年9月19日〜10月4日の週末6日間'],
+      ['参加者がすること', '新人調査員として館内を歩き、各所のキャストに聞き込みをし、テナントの店内で手がかりを得て真相を推理する'],
+      ['施設側のメリット', '参加者の70％が飲食店に足を運んだ（配布した割引チケットの使用枚数から算出）。施設側の初期費用負担なし。日本経済新聞・電ファミニコゲーマーに掲載'],
+      ['制作のポイント', '手がかりを掲示物ではなくキャストとの会話にして、聞き込みのための移動で回遊を作る。スタート時間の分散と複数ルートで、買い物客の動線と重ねない'],
+    ],
+    links: [{ label: '制作事例の詳細', href: '/guide/case-uwasabanashi/' }],
+  },
+  {
+    kind: '公共の文化施設｜閉館後の周遊型の物語体験',
+    title: '夢の島熱帯植物館「午前零時の幻想集 第一夜『草陰の夢』」',
+    img: '/assets/events/thumb/gensou-kv-240.webp', alt: '午前零時の幻想集 第一夜「草陰の夢」（夢の島熱帯植物館）',
+    rows: [
+      ['場所', '東京都の施設である夢の島熱帯植物館（江東区）。通常の開館時間（9:30〜17:00）のあとの館内'],
+      ['目的', '閉館後の遊休時間を使い、施設に新しい来館の動機をつくる（公共文化施設でのエンターテインメント事業の第一弾）'],
+      ['内容', '最大4人の組がキャストと会話しながら館内を巡る、約50分の物語体験。2026年11月5日〜22日の木〜日曜、17:00〜20:00に12分おきに開始'],
+      ['参加者がすること', '夜の植物館を歩き、キャストとの会話を通して、失われた記憶を集めていく'],
+      ['施設側のメリット', '開始を閉館時刻以降に置くため、日中の見学者と時間が重ならない。チケットは入館料込み。日本経済新聞に掲載（参加者数などの数値は未公開）'],
+      ['制作のポイント', '1組最大4名・12分間隔で出発し、同じ時間に館内で体験している組を最大5組に抑える。受付は正面入口で開始5分前から行う'],
+    ],
+    links: [{ label: '公演ページ', href: '/gensou/', show: 'gensou' }, { label: '公共施設の夜間活用', href: '/guide/bunkashisetsu-yakan-katsuyo/' }],
+  },
+  {
+    kind: '美術館｜定員制の公演（絵画×物語体験）',
+    title: '京都市京セラ美術館「7枚目のコンポジション」',
+    img: '/assets/events/thumb/7th-composition-kv-240.webp', alt: '体験する美術館「7枚目のコンポジション」（京都市京セラ美術館）',
+    rows: [
+      ['場所', '京都市京セラ美術館 本館地下1階の講演室・多目的室（2部屋）'],
+      ['目的', '「『鑑賞するアート』から『体験するアート』へ」をテーマに、絵画の鑑賞を物語体験にする（自社レーベル「体験する美術館」）'],
+      ['内容', '絵画を鑑賞することで物語の中に巻き込まれていく60分の物語体験。2026年11月21日〜23日、各日7回・各回最大18名'],
+      ['参加者がすること', '絵画を鑑賞し、それをきっかけに物語の中へ入っていく'],
+      ['施設側のメリット', '展示室を使わず、決まった部屋で回ごとに実施できる。参加者は公演チケット（1名4,500円・税込）だけで参加でき、別途入館料は不要'],
+      ['制作のポイント', '使う部屋を同じ階の2部屋に絞り、体験中に上下の階へ移動しない。受付は通路の滞留を防ぐため各回開始の10分前から'],
+    ],
+    links: [{ label: '公演ページ', href: '/taikenbizyutu/7th-composition/', show: '7th-composition' }, { label: '日程・行き方の案内', href: '/guide/kyoto-kyocera-museum-7th/' }],
+  },
+  {
+    kind: '街全体｜街歩き周遊型の絵画鑑賞',
+    title: '下北沢「ロスト・フレーム」',
+    img: '/assets/events/thumb/lost-frame-240.webp', alt: 'ロスト・フレーム（下北沢）',
+    rows: [
+      ['場所', '下北沢駅周辺の街の各所（協力店舗を含む）'],
+      ['目的', '街を歩くこと自体を鑑賞の一部にする（自社レーベル「体験する美術館」で初めて街そのものを会場にした公演）'],
+      ['内容', '街を巡る参加型の絵画鑑賞。所要75分、1組1〜4名の予約制、2026年7月7日〜8月31日'],
+      ['参加者がすること', '街の各所で描き下ろしの絵画と出会い、図像を読み解き、登場人物と言葉を交わす。選択によって結末が分かれる'],
+      ['成果', '全公演完売（販売した枠がすべて埋まったことを示すもので、協力店舗の売上や街の回遊量への効果を示すものではありません）'],
+      ['制作のポイント', '謎の答えを掲示物に書かず、絵画の図像そのものを読み解く対象にする。協力店舗にお願いする対応と時間帯を事前に取り決める'],
+    ],
+    links: [{ label: '制作事例の詳細', href: '/guide/case-lostframe/' }],
+  },
+  {
+    kind: '宿泊施設｜宿泊プランと組み合わせたマダミス',
+    title: '宿泊施設向けオリジナルマーダーミステリー',
+    rows: [
+      ['場所', '宿泊施設（Thermal Climb Studio Fuji様）。宿泊者が滞在中に遊ぶ前提で制作'],
+      ['目的', '割引や広告に頼らずに「この施設に泊まる理由」を作り、新規の宿泊予約を増やす'],
+      ['内容', '宿泊者向けのオリジナルマーダーミステリー。宿泊とセットで体験できるプランとして提供（1公演2〜4時間・少人数制）'],
+      ['参加者がすること', '登場人物になりきり、会話と推理で事件の真相を探す'],
+      ['施設側のメリット', '実施後、新規宿泊予約20件以上を獲得（告知はXのみで広告費なし。集計期間・算出方法の詳細は非公開）'],
+      ['制作のポイント', 'その施設に泊まる人だけが遊べる形にして「ここでしか遊べない」理由にする。宿泊のスケジュールに収まる所要時間で設計する'],
+    ],
+    links: [{ label: '宿泊施設での事例の詳細', href: '/guide/hotel-event/#case' }],
+  },
+];
+
 const faqLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -95,7 +168,7 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-08-10',
-  dateModified: '2026-10-29',
+  dateModified: '2026-11-03',
   mainEntityOfPage: new URL('/guide/taikengata-event/', Astro.site).toString(),
 };
 ---
@@ -170,6 +243,24 @@ const articleLd = {
 <li><strong>宿泊施設向けマダミス</strong>：宿泊とセットの物語体験で<strong>新規宿泊予約20件以上</strong>を獲得。</li>
 <li><strong>ヌル・アーデン展</strong>：アート×謎解きの没入型展覧会。本展を含むレーベル「体験する美術館」全体で、<strong>広告費0円（告知はXのみ）のまま累計約2,000人</strong>が参加。</li>
 </ul>
+<h3 class="tk-cases-h" id="case-details">事例の詳細：場所・目的・参加者がすること・施設側のメリット</h3>
+<p class="lede">体験型イベントの事例を、実施した場所の種類ごとに5件まとめました。いずれも株式会社ex Labsが企画・制作または主催した取り組みです。成果は公開できる範囲だけを、集計の条件とあわせて記載しています。</p>
+<div class="tk-cases">
+{cases.map((c) => (
+  <article class:list={['tk-case', { 'no-img': !c.img }]}>
+    {c.img && <img class="tk-case-img" src={c.img} alt={c.alt} width="240" height="340" loading="lazy" decoding="async" />}
+    <div class="tk-case-h">
+      <p class="tk-case-k">{c.kind}</p>
+      <h4 class="tk-case-t">{c.title}</h4>
+    </div>
+    <dl class="tk-case-dl">
+      {c.rows.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+    </dl>
+    <p class="tk-case-a">{c.links.map((l) => <a href={l.href} data-track={l.show ? 'show' : 'cta'} data-show={l.show ?? 'case'} data-place="guide-taikengata-event-cases">{l.label} →</a>)}</p>
+  </article>
+))}
+</div>
+<p class="lede" style="margin-top:18px">ほかの取り組みは<a href="/works/" style="color:var(--accent)">制作事例一覧</a>に、同じ形式を自社の施設で行う場合の条件は<a href="/services/experience-event-production/" style="color:var(--accent)">体験型イベントの企画・制作</a>にまとめています。</p>
 </div></section>
 
 <section class="section tinted" id="flow"><div class="wrap narrow">
@@ -237,6 +328,28 @@ const articleLd = {
 .toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
 .toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
 .toc a:hover{color:var(--accent);border-color:var(--accent)}
-#about,#types,#merit,#examples,#flow,#trend,#faq{scroll-margin-top:88px}
+#about,#types,#merit,#examples,#flow,#trend,#faq,#case-details{scroll-margin-top:88px}
+.tk-cases-h{margin:40px 0 10px;font-size:19px;font-weight:800;line-height:1.5;color:var(--ink);text-wrap:balance}
+.tk-cases{display:grid;gap:16px;margin-top:18px}
+.tk-case{display:grid;grid-template-columns:96px minmax(0,1fr);grid-template-areas:"img head" "img body" "img links";column-gap:18px;align-items:start;background:#fff;border:1px solid rgba(51,48,43,.12);border-radius:16px;padding:18px}
+.tk-case.no-img{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "body" "links"}
+.tk-case-img{grid-area:img;width:96px;height:auto;aspect-ratio:240/340;object-fit:cover;border-radius:10px;display:block}
+.tk-case-h{grid-area:head}
+.tk-case-k{margin:0 0 4px;font-size:12px;font-weight:800;letter-spacing:.04em;color:var(--accent)}
+.tk-case-t{margin:0 0 10px;font-size:16.5px;font-weight:800;line-height:1.5;color:var(--ink)}
+.tk-case-dl{grid-area:body;margin:0;display:grid;gap:6px}
+.tk-case-dl>div{display:grid;grid-template-columns:8.2em minmax(0,1fr);gap:10px;font-size:13.5px;line-height:1.75}
+.tk-case-dl dt{font-weight:800;color:rgba(51,48,43,.7)}
+.tk-case-dl dd{margin:0;color:rgba(51,48,43,.88);overflow-wrap:anywhere}
+.tk-case-a{grid-area:links;margin:12px 0 0;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13.5px;font-weight:800}
+.tk-case-a a{color:var(--accent)}
+@media(max-width:640px){
+  .tk-case{grid-template-columns:60px minmax(0,1fr);grid-template-areas:"img head" "body body" "links links";column-gap:14px;padding:16px}
+  .tk-case.no-img{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "body" "links"}
+  .tk-case-img{width:60px}
+  .tk-case-h{align-self:center}
+  .tk-case-dl{margin-top:12px}
+  .tk-case-dl>div{grid-template-columns:minmax(0,1fr);gap:0}
+}
 @media(max-width:640px){.toc{padding:22px 22px}}
 </style>

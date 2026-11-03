@@ -83,6 +83,7 @@
 
 ## 公演検索サービス /events/（2026-09-13〜）
 - 正本は `src/data/events/`（主催者・作品・会場・公演回・販売先・情報源を分けて管理）。運用手順と公開前の不足は `docs/events-setup.md`。`src/data/shows.ts` は変換層なので手で編集しない。
+- 作品の `verified.by`・公演回の `eventCheckedBy` は内部メモ。画面には出さない（/events/ 詳細は「主催者の公式ページの記載を確認」と表示）。確認日（verified.at）が `verifyTtlDays` を過ぎると各カレンダーに「最新の日程は予約サイトで」の注記が出るので、会期中は公式ページと再照合して更新する（2026-11-03）。
 - 不明な情報は推測で埋めない（開演時刻・上限人数・販売状態・空席は未確認のまま `unknown`／省略）。開催予定があるだけで「予約する」にしない。空席には `checkedAt` と `expiresAt` が必須。
 - テストデータは `fixtures.ts` のみ。公開ページから import しない。`npm run test:events` と `npm run events:validate` は `npm run check` に含まれる。
 - 絞り込み状態のページ・日付別ページは作らない。検索対象は /events/ と作品詳細だけ。

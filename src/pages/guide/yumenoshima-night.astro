@@ -12,6 +12,7 @@ import AuthorBox from '../../components/AuthorBox.astro';
 import StickyReserve from '../../components/StickyReserve.astro';
 import { jsonLd } from '../../lib/microcms';
 import { jstDateString } from '../../lib/thisWeek';
+import { NIGHT_PUBLISHED } from '../../data/seasonalDate'; // 下書き（noindex）の間はリンクしない
 
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const TICKET = 'https://escape.id/gensou-org/e-ichi/';
@@ -51,7 +52,7 @@ const articleLd = {
   author: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString() },
   publisher: { '@type': 'Organization', name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
   datePublished: '2026-10-16',
-  dateModified: '2026-10-25',
+  dateModified: '2026-11-03',
   mainEntityOfPage: new URL('/guide/yumenoshima-night/', site).toString(),
 };
 ---
@@ -143,7 +144,9 @@ const articleLd = {
 <li><strong>撮影・投稿</strong>：体験中の撮影は禁止です。ネタバレを含まない感想はSNSに投稿できます。</li>
 <li><strong>天候</strong>：屋内で行うため、雨の日も開催します。</li>
 </ul>
-<p class="lede" style="margin-top:18px">二人で行く場合や、ほかの夜の予定と組み合わせる場合は、<a href="/guide/tokyo-night-date/" style="color:var(--accent)">東京の夜デート</a>や<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">二人で参加できる東京のイマーシブ</a>も参考になります。</p>
+{NIGHT_PUBLISHED
+  ? <p class="lede" style="margin-top:18px">二人で行く場合や、ほかの夜の予定と組み合わせる場合は、<a href="/guide/tokyo-night-date/" style="color:var(--accent)">東京の夜デート</a>や<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">二人で参加できる東京のイマーシブ</a>も参考になります。</p>
+  : <p class="lede" style="margin-top:18px">二人で行く場合は、<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">二人で参加できる東京のイマーシブ</a>も参考になります。</p>}
 {phase !== 'ended' && (
 <div class="cta-mini" style="margin-top:36px">
 <p class="cta-mini-title serif">夜の夢の島熱帯植物館の物語体験「午前零時の幻想集」</p>

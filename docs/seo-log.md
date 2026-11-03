@@ -1447,3 +1447,14 @@
 - /：イベント欄の下の「終了した公演：…。開催日・空席は公演を探すで確認できます。」の行を削除（終了公演がない場合の案内行も削除）。
 - /：「Outing（東京で、次の休日に行きたい体験を探す）」の枠を削除。ヘッダーの「デート・お出かけ」リンク（/guide/#date）は残す。
 - /：実績の枠を「自社イベント『ヌル・アーデン展』の実績（チケット約1,000枚・4,000円）」から「自社レーベル『体験する美術館』の実績（累計参加者数 約2,000人・チケット価格 4,500円）」に変更。条件の「プレスリリース未実施」は、ロスト・フレームで PR TIMES のリリースを配信しているため外した（「SNSアカウントをゼロから立ち上げ」「広告宣伝費0円」「Xのみで集客」は残す）。
+
+## 2026-11-03 SEO・AIO改善実装指示書（詳細は docs/seo-aio-2026-11-03.md）
+
+- 変更前：サイトマップ全162ページのスナップショット。対象ページの抜粋は docs/seo-baseline/2026-11-03/before-targets.md、前後差分は同 snapshot-diff.txt。title・description・canonical・robots・H1・URL の変更なし。
+- 公演情報：/gensou/・/taikenbizyutu/7th-composition/ と全ページを照合し、料金・時間・年齢・人数・日程・予約先の食い違いなし。公演データの確認日を再照合のうえ 11/3 に更新（期限切れ表示の解消）、キャンセル規定を参加条件に追加、/events/ 詳細の確認者欄の作業メモを来場者向け表記に。7枚目の「主催者都合の中止時の返金」表記はユーザー確認待ち。
+- 予約導線：公演名のみでリンクがなかった shisetsu-katsuyo・eigyo-jikangai・taiken-marketing・施設活用サービスの実績カードに公式ページへのリンク。
+- サービスページ：施設活用の目的別表に「観光地・地域の観光コンテンツ」行、イマーシブ制作・頭脳戦制作の導入文とIPイベントの形式リードに各1文。
+- 体験型イベント 事例：/guide/taikengata-event/ に事例の詳細5件（#case-details）。shuyu-event・popup-event・sankagata-event から同節へリンク。
+- 記事：madamis に企業研修、shinrisen に頭脳戦制作とはへの関連リンク各1本。botsunyukan・saiji の title は比較案のみ（未実施）。
+- 技術：yumenoshima-night から下書き（noindex）記事へのリンクを下書き中は非表示に、sitemap の shinrisen 重複キーを整理、/gensou/ の各回 Event に description・image・organizer・performer。
+- dateModified・lastmod を 11/3 に更新：taikengata-event・shisetsu-katsuyo・eigyo-jikangai・taiken-marketing・shuyu-event・popup-event・sankagata-event・madamis・shinrisen・yumenoshima-night、services（immersive・zunousen・shisetsu-event・ip-event）。

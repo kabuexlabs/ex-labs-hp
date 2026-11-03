@@ -56,7 +56,7 @@ export const IP_SERVICE = {
     {
       id: 'formats', en: 'Formats', ja: ['体験の形式と', '向いている目的'], type: 'table', keyCols: [1, 2],
       rowImgs: ['/assets/events/kaitou-kv.webp', '/assets/events/uwasabanashi-kv.webp', '/assets/work-2.webp', '/assets/zunousen/present-poker.webp', ''],
-      lead: '目的・会場・想定人数に合わせて、4つの形式から組み立てます。形式を組み合わせることもできます。',
+      lead: 'IPを活用したイマーシブイベント（物語参加型）、周遊型、展示連動型、ゲーム・心理戦型から、目的・会場・想定人数に合わせて組み立てます。形式を組み合わせることもできます。',
       cols: ['形式', '来場者がすること', '向いている目的', '参考になる当社の制作'],
       rows: [
         ['物語参加型（1空間公演）', '作中の組織に入る、依頼を受けるなどの役割を持ち、登場人物（キャスト）と会話して選択する', 'ファンの満足度、少人数で深い体験、発売・周年の特別企画', '六本木の会員制バーで行うマジック×イマーシブ「怪盗と秘密の試験」（自社レーベル）'],
