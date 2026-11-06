@@ -50,7 +50,8 @@ export const onRequest = defineMiddleware((context, next) => {
 // キャッシュ指定がないと毎回関数が動き、アクセスの少ない時間帯はコールドスタートで応答が遅れる
 // （外部クローラーで /events/ などがタイムアウトした一因と考えられる）。デプロイ時に CDN キャッシュは破棄される。
 // 管理・予約・API・会員向けなど、人ごとに内容が変わるページは対象外。
-const PRIVATE = /^\/(api|_|contact|yoyaku|bihin|shimokita|kampo|kaitou\/secret|hacktale\/(admin|reservation))(\/|$)/;
+// preview＝関係者確認用の限定URL（合言葉付きのことがあるので CDN に残さない）
+const PRIVATE = /^\/(api|_|contact|yoyaku|bihin|shimokita|kampo|preview|kaitou\/secret|hacktale\/(admin|reservation))(\/|$)/;
 // 日付で表示が変わるページ（開催日・今週の公演）は短めに持つ
 const DATED = /^\/($|events\/|guide\/(immersive-tokyo|tokyo-|shibuya-)|hacktale\/$)/;
 function withEdgeCache(pathname: string, res: Response): Response {

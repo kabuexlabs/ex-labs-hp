@@ -1,0 +1,38 @@
+# 「本当に、家、ついて行ってイイですか？」LP（限定公開・関係者確認用）
+
+- URL（限定公開）：https://kabuexlabs.com/preview/ie-tsuiteitte-ivmnazkmnqfn/
+- 本番URL：未定（決まったらこのメモと CLAUDE.md に書く。候補は作品名のローマ字など）
+- 実装：`src/pages/preview/ie-tsuiteitte-ivmnazkmnqfn/index.astro`（2026-11-06、デザイン書き出し「LP export」（index.html／style.css／main.js／assets/kv.png）の再実装。文言・レイアウト（style 属性）・冒頭演出（メール送信→独白→暗転）は書き出しのまま）
+- 画像：`public/assets/ie-tsuiteitte/kv.webp`（書き出しの kv.png 2246×1588 を WebP 化。EXIF・位置情報なしを確認済み）、`og.jpg`（1200×630。ビジュアルを縦に合わせて縮小し、左右を地の色で埋めたもの）
+- 検索対策：meta robots noindex,nofollow,noarchive＋レスポンスヘッダー `X-Robots-Tag`（ページ側と vercel.json の `/preview/(.*)`）。sitemap・llms.txt・ナビ・他ページからのリンクには載せない。
+- アクセス制限：Vercel の環境変数 `IE_PREVIEW_PASSWORD` を設定すると Basic 認証がかかる（ユーザー名は任意、パスワードだけ照合）。**リポジトリが公開なので URL だけでは秘密にならない**。未設定の間は URL を知っていれば誰でも見られる。共有は URL とパスワードを別経路で。
+- CDN キャッシュ：`Cache-Control: private, no-store`（ページ側）＋ middleware の PRIVATE に `/preview/` を追加（合言葉付きの応答を CDN に残さない）。
+- 冒頭演出（メール入力→送信→独白→暗転、約12秒）：毎回流す（関係者確認中）。SKIP で即終了。OS の「視差効果を減らす」設定では流さない。`<script>` 冒頭の `CONFIG.showIntro` を false にすると演出なし、`typingSpeed` でタイピング速度（ms/字）。
+- 「取材に行く」ボタン3か所（開催概要・最下部・右下の追従）は、販売URL未設定の間ページ内の開催概要（#info）へ移動するだけ。
+- 書き出しの README にあった留意点：開催概要の「公演時間 約60分」に対し、当日の流れの REC 表記は「70:00」なので要確認。
+
+## 差し替え・確定後に入力する項目（index.astro 冒頭の定数）
+
+| 定数 | 現在 | 本番で |
+|---|---|---|
+| `TICKET_URL` | 空 | チケット販売先URL（`https://` から）。入れると3か所のボタンが販売ページへ（別タブ、`data-track="ticket"` `data-show="ie-tsuiteitte"` でクリック計測） |
+| `KV_SRC` | `/assets/ie-tsuiteitte/kv.webp`（仮） | 本番画像（届いたら位置情報を消し、ファイル名を変えて差し替え。縦横比が変われば img の width/height も直す） |
+| `INFO.date` | 空（［開催日程を記載］をグレー表示） | 開催日程 |
+| `INFO.time` | 空（［開催時刻を記載］） | 開催時刻 |
+| `INFO.meet` | 空（［路線名・駅名・出口・集合位置を記載］） | 集合場所 |
+| `INFO.duration` | 約60分 | 確定した公演時間（70:00 との食い違いを解消） |
+| `INFO.price` | 1名 6,000円 | 確定した料金 |
+
+## 本番公開するとき
+- 本番URLを決め、ページを `src/pages/<本番URL>/index.astro` に移動し、旧プレビューURLは vercel.json で本番URLへ 301（言祝ぎの家と同じ手順）。
+- noindex（meta robots・`X-Robots-Tag`・`Cache-Control: private, no-store`）と Basic 認証（`IE_PREVIEW_PASSWORD`）を外し、canonical・OGP（正式ビジュアル）を設定する。
+- title・description を検索向けに（公演名＋「体験型ホラー・ミステリー」＋開催地）、Event 構造化データ（公演回ごと）を入れる。会場の正確な住所・地図は載せない（集合場所は購入者にだけ案内する運用なら言祝ぎの家と同じ）。
+- sitemap・llms.txt に登録し、`npm run llms:full`。関連ページ（/events/ の公演データ、ピラー記事）から内部リンク。
+- 公演データ（src/data/events/）への登録は、販売先・開催日を公式で確認してから。
+
+## 主催者に確認すること（書き出しの README と本文から）
+- チケット販売先URL、販売開始日時、6,000円が税込か税別か
+- 開催日程・開催時刻・集合場所（路線名・駅名・出口・集合位置）
+- 公演時間（約60分か70分か）
+- 本番のメインビジュアル（kv.png は仮）
+- 番組名『家、ついて行ってイイですか？』の使用についての許諾・表記ルール（本文の STORY にそのまま出てくる）

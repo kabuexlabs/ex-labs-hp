@@ -122,3 +122,9 @@
 - Vercel Cron は追加していない（Hobby の上限）。保持期限 3年は Redis TTL ＋ スタッフ画面表示時の掃除。
 - 2026-10-21 ユーザー指示で main に反映（https://kabuexlabs.com/kampo/）。検索に出さない運用（noindex・sitemap/llms.txt 非掲載・合言葉）を崩さない。
 - **2026-10-25 ユーザー指示で v2（PDF「最終実装用マスタープロンプト」、PR #134）を取り消し、2026-10-24 の3段階版に戻した**（revert。v2 の実装は commit e918c0e に残る）。v2 期間に保存されたセッションは texts を持たないため store.ts の normalizeSession で補う。同日受領の「問診・証判定・処方選定・薬剤師画面の改修指示」は**フェーズ1（現状調査と改修計画の提示、コード変更なし）→ ユーザー承認（Q1〜Q12 おすすめで承認済み）→ フェーズ2（患者向け問診。ブランチのプレビューで確認してもらう）→ 以降**の順で進める。
+
+## 「本当に、家、ついて行ってイイですか？」LP（2026-11-06 限定公開）
+- 関係者確認用の限定URL **/preview/ie-tsuiteitte-ivmnazkmnqfn/**（noindex＋`X-Robots-Tag`、sitemap・llms.txt・ナビ非掲載、`Cache-Control: private, no-store`）。正本メモは docs/ie-tsuiteitte-lp.md。本番URLは未定。
+- 環境変数 `IE_PREVIEW_PASSWORD` を設定すると Basic 認証（未設定なら URL を知っていれば見られる）。リポジトリが公開なので URL だけでは秘密にならない。
+- 書き出し（index.html／style.css／main.js）の文言・レイアウト・冒頭演出はそのまま。未確定の項目（販売URL・開催日程・開催時刻・集合場所・公演時間・料金・本番画像）は index.astro 冒頭の定数で入れる。
+- middleware の PRIVATE に `/preview/` を追加済み（限定URLの応答を CDN に残さない）。

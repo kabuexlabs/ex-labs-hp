@@ -1,0 +1,564 @@
+---
+// 「本当に、家、ついて行ってイイですか？」LP（限定公開・関係者確認用）。
+// 2026-11-06 デザイン書き出し（LP export：index.html／style.css／main.js／assets/kv.png）の再実装。
+// 文言・レイアウト（style 属性）・冒頭演出（メール送信→独白→暗転）は書き出しのまま。コーポレートサイトとは
+// デザイン系統が別なので BaseLayout は使わず、このファイルだけで完結させている。経緯・未確定事項は docs/ie-tsuiteitte-lp.md。
+//
+// 限定公開の仕組み：
+//  - URL は推測しにくい /preview/ie-tsuiteitte-ivmnazkmnqfn/。sitemap・llms.txt・ナビ・他ページからのリンクには載せない。
+//  - meta robots noindex,nofollow,noarchive ＋ レスポンスヘッダー X-Robots-Tag（このページと vercel.json の /preview/(.*)）。
+//  - 環境変数 IE_PREVIEW_PASSWORD を設定すると Basic 認証がかかる（ユーザー名は任意、パスワードだけ照合）。
+//    リポジトリが公開なので URL だけでは秘密にならない。未設定の間は URL を知っていれば誰でも見られる。
+//  - CDN にキャッシュさせない（Cache-Control: private, no-store。middleware の PRIVATE にも /preview/ を追加済み）。
+// 本公開するときは docs/ie-tsuiteitte-lp.md の「本番公開するとき」の手順で、本番URLへ移して noindex を外す。
+export const prerender = false;
+import { timingSafeEqual } from 'node:crypto';
+import SiteGuard from '../../../components/SiteGuard.astro';
+
+// ---- 合言葉（Basic 認証）。未設定なら認証なし ----
+const readEnv = (name: string) => ((import.meta.env as Record<string, string | undefined>)[name] ?? process.env[name])?.trim() || undefined;
+const PREVIEW_PASSWORD = readEnv('IE_PREVIEW_PASSWORD');
+const safeEqual = (a: string, b: string) => { const x = Buffer.from(a); const y = Buffer.from(b); return x.length === y.length && timingSafeEqual(x, y); };
+const noIndexHeaders = { 'X-Robots-Tag': 'noindex, nofollow, noarchive', 'Cache-Control': 'private, no-store' };
+if (PREVIEW_PASSWORD) {
+  const m = /^Basic\s+([A-Za-z0-9+/=]+)$/i.exec(Astro.request.headers.get('authorization') ?? '');
+  let ok = false;
+  if (m) {
+    try {
+      const decoded = Buffer.from(m[1], 'base64').toString('utf8');
+      ok = safeEqual(decoded.slice(decoded.indexOf(':') + 1), PREVIEW_PASSWORD);
+    } catch { ok = false; }
+  }
+  if (!ok) {
+    return new Response('認証が必要です（関係者確認用ページ）', {
+      status: 401,
+      headers: { ...noIndexHeaders, 'WWW-Authenticate': 'Basic realm="preview", charset="UTF-8"', 'Content-Type': 'text/plain; charset=utf-8' },
+    });
+  }
+}
+for (const [k, v] of Object.entries(noIndexHeaders)) Astro.response.headers.set(k, v);
+
+// ---- 差し替え・確定後に入力する項目（書き出しの README「差し替え・未確定箇所」） ----
+// チケット販売先URL（https:// から）。未設定の間、「取材に行く」ボタン3か所はページ内の開催概要（#info）へ移動するだけ
+const TICKET_URL = '';
+// メインビジュアル（書き出しの assets/kv.png を WebP にしたもの。本番画像が届いたらファイル名を変えて差し替え）
+const KV_SRC = '/assets/ie-tsuiteitte/kv.webp';
+// 開催概要。date／time／meet は空の間、書き出しの仮表記（［…を記載］）をグレーで表示する。改行は \n
+const INFO = {
+  date: '',       // 開催日程
+  time: '',       // 開催時刻
+  meet: '',       // 集合場所（路線名・駅名・出口・集合位置）
+  duration: '約60分', // 公演時間（書き出しのまま。当日の流れの REC 表記は 70:00 なので要確認）
+  price: '1名 6,000円',
+};
+
+const hasUrl = /^https?:\/\//.test(TICKET_URL);
+const ticketHref = hasUrl ? TICKET_URL : '#info';
+const ticketAttrs = hasUrl ? { target: '_blank', rel: 'noopener', 'data-track': 'ticket', 'data-show': 'ie-tsuiteitte' } : {};
+
+const title = '本当に、家、ついて行ってイイですか？';
+const description = 'あなたが新人ディレクターとなり、住人の家を取材する体験型ホラー・ミステリー公演。';
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL(Astro.url.pathname, site).toString();
+const ogImage = new URL('/assets/ie-tsuiteitte/og.jpg', site).toString();
+---
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:type" content="website">
+<meta property="og:url" content={pageUrl}>
+<meta property="og:image" content={ogImage}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0b0f0f">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-ex.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;500;700;800&family=Zen+Kurenaido&family=DotGothic16&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href={KV_SRC}>
+<SiteGuard />
+<script is:inline>document.documentElement.classList.add('js');</script>
+<style is:global>
+/* ==========================================================
+   本当に、家、ついて行ってイイですか？ LP
+   レイアウト・装飾は HTML の style 属性に記述。
+   ここにはリセット、ホバー、アニメーション定義のみ。
+   ========================================================== */
+html,body{margin:0;background:#0b0f0f;color:#e6e2d8;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#4fd3cc}a:hover{color:#e6e2d8}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes flicker{0%,100%{opacity:1}91%{opacity:1}92%{opacity:.35}93%{opacity:1}95%{opacity:.7}96%{opacity:1}}
+@keyframes glitchA{0%,7%,100%{clip-path:inset(0 0 100% 0);transform:translate(0,0)}1%{clip-path:inset(15% 0 60% 0);transform:translate(-5px,0)}2%{clip-path:inset(60% 0 10% 0);transform:translate(5px,0)}3%{clip-path:inset(35% 0 45% 0);transform:translate(-3px,0)}4%{clip-path:inset(80% 0 5% 0);transform:translate(4px,0)}5%{clip-path:inset(5% 0 85% 0);transform:translate(-4px,0)}6%{clip-path:inset(45% 0 30% 0);transform:translate(2px,0)}}
+@keyframes glitchB{0%,52%,60%,100%{clip-path:inset(0 0 100% 0);transform:translate(0,0)}53%{clip-path:inset(50% 0 30% 0);transform:translate(6px,0)}54%{clip-path:inset(10% 0 70% 0);transform:translate(-6px,0)}55%{clip-path:inset(70% 0 15% 0);transform:translate(3px,0)}56%{clip-path:inset(25% 0 55% 0);transform:translate(-5px,0)}57%{clip-path:inset(0 0 100% 0)}58%{clip-path:inset(40% 0 42% 0);transform:translate(4px,0)}59%{clip-path:inset(85% 0 2% 0);transform:translate(-2px,0)}}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-2%,-3%)}50%{transform:translate(3%,1%)}75%{transform:translate(-1%,3%)}100%{transform:translate(2%,-2%)}}
+@keyframes rec{0%,100%{opacity:1}50%{opacity:.1}}
+@keyframes revealIn{0%{opacity:0;transform:translateY(18px)}100%{opacity:1;transform:none}}
+@keyframes mailIn{0%{opacity:0;transform:translateY(48px)}100%{opacity:1;transform:none}}
+@keyframes flyUp{0%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-110%) scale(.94)}}
+@keyframes toastIn{0%{opacity:0;transform:translate(-50%,16px)}100%{opacity:1;transform:translate(-50%,0)}}
+@keyframes flash{0%{opacity:.9}100%{opacity:0}}
+@keyframes shake{0%,100%{transform:translate(0,0)}20%{transform:translate(-3px,1px)}40%{transform:translate(3px,-1px)}60%{transform:translate(-2px,-2px)}80%{transform:translate(2px,2px)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 14px rgba(79,211,204,.25)}50%{box-shadow:0 0 30px rgba(79,211,204,.5)}}
+
+#grain{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.09}
+
+/* ホバー */
+.cta:hover{background:#4fd3cc!important;color:#0b0f0f!important}
+#intro-skip:hover{border-color:#4fd3cc!important;color:#4fd3cc!important}
+
+/* スクロール表示（JS有効時のみ初期非表示） */
+html.js [data-reveal],html.js #kv-frame{opacity:0}
+
+/* 冒頭演出中はスクロール固定 */
+html.intro-lock,html.intro-lock body{overflow:hidden}
+
+/* 「視差効果を減らす」設定のユーザー */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  html.js [data-reveal],html.js #kv-frame{opacity:1!important}
+  #intro{display:none!important}
+}
+</style>
+</head>
+<body>
+<div id="root" lang="ja" style="background:#0b0f0f;color:#e6e2d8;overflow-x:hidden;font-family:'Shippori Mincho B1',serif;word-break:auto-phrase;line-break:strict">
+
+<div id="grain" style="position:fixed;inset:-50%;z-index:90;pointer-events:none;animation:grain .6s steps(3) infinite;background-size:240px 240px"></div>
+<div style="position:fixed;inset:0;z-index:89;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.2) 0 1px,transparent 1px 3px);opacity:.55"></div>
+
+<section style="position:relative;min-height:100svh;overflow:hidden;background:#050707;display:flex;flex-direction:column;justify-content:center;padding:84px 18px 64px">
+  <div style="position:absolute;top:24px;left:22px;right:22px;display:flex;justify-content:space-between;align-items:center;gap:16px;font-family:'DotGothic16',monospace;font-size:14px;letter-spacing:.12em;color:#e6e2d8;pointer-events:none">
+    <div style="display:flex;align-items:center;gap:10px"><span style="width:11px;height:11px;border-radius:50%;background:#e0312b;animation:rec 1.2s infinite"></span><span>REC</span><span id="timecode" style="color:#c8c3b7">00:00:00:00</span></div>
+    <span style="color:#c8c3b7">SP ▮▮▮▯</span>
+  </div>
+  <div id="kv-frame" style="position:relative;width:100%;max-width:1280px;margin:0 auto;opacity:0">
+    <div style="position:absolute;top:-14px;left:-14px;width:30px;height:30px;border-top:2px solid rgba(230,226,216,.75);border-left:2px solid rgba(230,226,216,.75);pointer-events:none"></div>
+    <div style="position:absolute;top:-14px;right:-14px;width:30px;height:30px;border-top:2px solid rgba(230,226,216,.75);border-right:2px solid rgba(230,226,216,.75);pointer-events:none"></div>
+    <div style="position:absolute;bottom:-14px;left:-14px;width:30px;height:30px;border-bottom:2px solid rgba(230,226,216,.75);border-left:2px solid rgba(230,226,216,.75);pointer-events:none"></div>
+    <div style="position:absolute;bottom:-14px;right:-14px;width:30px;height:30px;border-bottom:2px solid rgba(230,226,216,.75);border-right:2px solid rgba(230,226,216,.75);pointer-events:none"></div>
+    <div style="position:relative;overflow:hidden;animation:flicker 7s infinite">
+      <img src={KV_SRC} width="2246" height="1588" alt="本当に、家、ついて行ってイイですか？ その家、本当について行って大丈夫ですか？ これは、実際にあなたがディレクターとなり『家の中を取材する』イベントです。" style="display:block;width:100%;height:auto">
+      <img aria-hidden="true" src={KV_SRC} alt="" style="position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen;opacity:.85;filter:sepia(1) hue-rotate(130deg) saturate(4);clip-path:inset(0 0 100% 0);animation:glitchA 4.6s infinite linear;pointer-events:none">
+      <img aria-hidden="true" src={KV_SRC} alt="" style="position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen;opacity:.7;filter:sepia(1) hue-rotate(-40deg) saturate(5);clip-path:inset(0 0 100% 0);animation:glitchB 5.9s infinite linear;pointer-events:none">
+    </div>
+  </div>
+  <div style="position:absolute;bottom:22px;left:22px;right:22px;display:flex;justify-content:space-between;align-items:center;gap:16px;font-family:'DotGothic16',monospace;font-size:13px;letter-spacing:.12em;color:#a39f95;pointer-events:none">
+    <span>CAM 01</span><span>AUTO</span>
+  </div>
+</section>
+
+<section style="padding:104px 20px 56px;max-width:760px;margin:0 auto;text-align:center">
+  <div data-reveal="0" style="display:inline-flex;align-items:center;gap:14px;font-family:'Zen Kurenaido',sans-serif;font-size:16px;letter-spacing:.24em;color:#4fd3cc"><span style="width:30px;height:1px;background:#4fd3cc"></span>STORY<span style="width:30px;height:1px;background:#4fd3cc"></span></div>
+  <p data-reveal="80" style="margin:36px 0 0;font-size:clamp(13.5px,3.7vw,18px);line-height:2.35;letter-spacing:.02em;color:#d8d3c7">あなたたちは、<br>『家、ついて行ってイイですか？』の新人ディレクター。<br>今回の仕事は、<br>アポイントを取った住人の家を訪ね、<br>その人の暮らしや人生を取材すること。<br>けれど、目の前の住人は、どこか様子がおかしい。<br>会話の中に混じる違和感。<br>家の中で起こる、説明のつかない出来事。</p>
+  <div data-reveal="140" style="margin:48px auto 0;width:1px;height:48px;background:linear-gradient(#4fd3cc,transparent)"></div>
+  <p data-reveal="160" style="margin:24px 0 0;font-weight:700;font-size:clamp(17px,4.6vw,32px);line-height:1.9;letter-spacing:.06em;color:#f0ece2;animation:flicker 9s infinite;text-wrap:balance">あなたたちは、<br>無事に取材を終えられるだろうか。</p>
+</section>
+
+<section style="padding:96px 20px;max-width:760px;margin:0 auto">
+  <div data-reveal="0" style="display:inline-flex;align-items:center;gap:14px;font-family:'Zen Kurenaido',sans-serif;font-size:16px;letter-spacing:.24em;color:#4fd3cc"><span style="width:30px;height:1px;background:#4fd3cc"></span>ABOUT<span style="width:30px;height:1px;background:#4fd3cc"></span></div>
+  <h2 data-reveal="60" style="margin:10px 0 44px;font-weight:700;font-size:clamp(26px,5vw,38px);letter-spacing:.14em;line-height:1.5;color:#f0ece2">体験について</h2>
+
+  <div data-reveal="80" style="display:flex;align-items:center;gap:12px;margin-bottom:14px;font-size:12px;letter-spacing:.2em;color:#a39f95"><span>◀</span><span style="flex:1;height:1px;background:rgba(230,226,216,.3)"></span><span>取材の流れ</span></div>
+  <div data-reveal="100" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;direction:rtl">
+    <div style="direction:ltr;border:1px solid rgba(230,226,216,.55);padding:18px 8px 22px;display:flex;flex-direction:column;align-items:center;gap:14px;background:rgba(11,15,15,.6)">
+      <span style="font-family:'DotGothic16',monospace;font-size:15px;color:#4fd3cc;letter-spacing:.1em">01</span>
+      <span style="width:16px;height:1px;background:rgba(230,226,216,.6)"></span>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:#e6e2d8;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round"><rect x="3" y="6" width="18" height="12" rx="1"></rect><polyline points="3,7 12,13 21,7"></polyline></svg>
+      <span style="writing-mode:vertical-rl;font-weight:700;font-size:clamp(15px,2.4vw,20px);letter-spacing:.18em;line-height:1;color:#f0ece2;min-height:220px">取材相手からメールが届く</span>
+    </div>
+    <div style="direction:ltr;border:1px solid rgba(230,226,216,.55);padding:18px 8px 22px;display:flex;flex-direction:column;align-items:center;gap:14px;background:rgba(11,15,15,.6)">
+      <span style="font-family:'DotGothic16',monospace;font-size:15px;color:#4fd3cc;letter-spacing:.1em">02</span>
+      <span style="width:16px;height:1px;background:rgba(230,226,216,.6)"></span>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:#e6e2d8;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round"><rect x="5" y="3" width="14" height="14" rx="2"></rect><line x1="5" y1="10" x2="19" y2="10"></line><circle cx="9" cy="14" r="1"></circle><circle cx="15" cy="14" r="1"></circle><line x1="8" y1="21" x2="6" y2="17"></line><line x1="16" y1="21" x2="18" y2="17"></line></svg>
+      <span style="writing-mode:vertical-rl;font-weight:700;font-size:clamp(15px,2.4vw,20px);letter-spacing:.18em;line-height:1;color:#f0ece2;min-height:220px">指定された最寄り駅へ</span>
+    </div>
+    <div style="direction:ltr;border:1px solid rgba(230,226,216,.55);padding:18px 8px 22px;display:flex;flex-direction:column;align-items:center;gap:14px;background:rgba(11,15,15,.6)">
+      <span style="font-family:'DotGothic16',monospace;font-size:15px;color:#4fd3cc;letter-spacing:.1em">03</span>
+      <span style="width:16px;height:1px;background:rgba(230,226,216,.6)"></span>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:#e6e2d8;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round"><polygon points="12,3 21,11 3,11"></polygon><rect x="5" y="11" width="14" height="10"></rect><rect x="10" y="15" width="4" height="6"></rect></svg>
+      <span style="writing-mode:vertical-rl;font-weight:700;font-size:clamp(15px,2.4vw,20px);letter-spacing:.18em;line-height:1;color:#f0ece2;min-height:220px">取材相手の家へ</span>
+    </div>
+    <div style="direction:ltr;border:1px solid rgba(230,226,216,.55);padding:18px 8px 22px;display:flex;flex-direction:column;align-items:center;gap:14px;background:#e6e2d8;color:#0b0f0f">
+      <span style="font-family:'DotGothic16',monospace;font-size:15px;color:#0b0f0f;letter-spacing:.1em">04</span>
+      <span style="width:16px;height:1px;background:rgba(11,15,15,.6)"></span>
+      <span style="font-family:'DotGothic16',monospace;font-size:26px;line-height:28px;color:#0b0f0f">?</span>
+      <span style="writing-mode:vertical-rl;font-weight:700;font-size:clamp(15px,2.4vw,20px);letter-spacing:.18em;line-height:1;color:#0b0f0f;min-height:220px">？？？</span>
+    </div>
+  </div>
+
+  <div style="margin-top:36px;display:grid;gap:0;border-top:1px solid rgba(230,226,216,.2)">
+    <div data-reveal="0" style="display:grid;grid-template-columns:auto 1fr;gap:18px;padding:20px 0;border-bottom:1px solid rgba(230,226,216,.2)"><span style="font-family:'DotGothic16',monospace;font-size:14px;color:#4fd3cc;padding-top:6px">01</span><p style="margin:0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">取材相手から、あなたのもとへメールが届きます。<br>そこに記されているのは、当日の待ち合わせについて。</p></div>
+    <div data-reveal="0" style="display:grid;grid-template-columns:auto 1fr;gap:18px;padding:20px 0;border-bottom:1px solid rgba(230,226,216,.2)"><span style="font-family:'DotGothic16',monospace;font-size:14px;color:#4fd3cc;padding-top:6px">02</span><p style="margin:0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">当日は、指定された駅へ。<br>新人ディレクターとして、取材に向かいます。</p></div>
+    <div data-reveal="0" style="display:grid;grid-template-columns:auto 1fr;gap:18px;padding:20px 0;border-bottom:1px solid rgba(230,226,216,.2)"><span style="font-family:'DotGothic16',monospace;font-size:14px;color:#4fd3cc;padding-top:6px">03</span><p style="margin:0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">気になることを尋ねながら、<br>取材を進めてください。</p></div>
+    <div data-reveal="0" style="display:grid;grid-template-columns:auto 1fr;gap:18px;padding:20px 0;border-bottom:1px solid rgba(230,226,216,.2)"><span style="font-family:'DotGothic16',monospace;font-size:14px;color:#4fd3cc;padding-top:6px">04</span><p style="margin:0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">？？？</p></div>
+  </div>
+</section>
+
+<section style="padding:96px 20px;max-width:760px;margin:0 auto">
+  <div data-reveal="0" style="display:inline-flex;align-items:center;gap:14px;font-family:'Zen Kurenaido',sans-serif;font-size:16px;letter-spacing:.24em;color:#4fd3cc"><span style="width:30px;height:1px;background:#4fd3cc"></span>POINT<span style="width:30px;height:1px;background:#4fd3cc"></span></div>
+  <h2 data-reveal="60" style="margin:10px 0 44px;font-weight:700;font-size:clamp(26px,5vw,38px);letter-spacing:.14em;line-height:1.5;color:#f0ece2">体験のポイント</h2>
+
+  <div data-reveal="0" style="position:relative;border:1px solid rgba(230,226,216,.55);padding:34px 20px 30px;margin-bottom:28px">
+    <div style="position:absolute;top:-1px;left:22px;padding:4px 12px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:12px;letter-spacing:.2em;transform:translateY(-50%)">POINT 01</div>
+    <div style="position:absolute;top:14px;right:14px;width:16px;height:16px;border-top:1px solid #4fd3cc;border-right:1px solid #4fd3cc"></div>
+    <div style="position:absolute;bottom:14px;left:14px;width:16px;height:16px;border-bottom:1px solid #4fd3cc;border-left:1px solid #4fd3cc"></div>
+    <h3 style="margin:0 0 16px;font-weight:700;font-size:clamp(19px,3.2vw,24px);letter-spacing:.08em;line-height:1.6;color:#f0ece2;word-break:keep-all;overflow-wrap:anywhere">あなた自身が、<wbr>新人ディレクターに。</h3>
+    <p style="margin:0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">住人と会話を交わしながら、<br>その人の暮らしや、<br>隠された事情に迫っていく取材体験です。</p>
+  </div>
+
+  <div data-reveal="80" style="position:relative;border:1px solid rgba(230,226,216,.55);padding:34px 20px 30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:28px;align-items:center">
+    <div style="position:absolute;top:-1px;left:22px;padding:4px 12px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:12px;letter-spacing:.2em;transform:translateY(-50%)">POINT 02</div>
+    <div>
+      <h3 style="margin:0 0 16px;font-weight:700;font-size:clamp(19px,3.2vw,24px);letter-spacing:.08em;line-height:1.6;color:#f0ece2;word-break:keep-all;overflow-wrap:anywhere">取材の成果が<wbr>「ディレクター評価」に。</h3>
+      <p style="margin:0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">お渡しする「取材メモ」には、<br>確かめてほしい項目が記されています。<br>会話や家の中で得た情報を整理し、<br>あなたなりの答えを導き出してください。<br>その回答によって、<br>新人ディレクターとしての<br>評価が決まります。</p>
+    </div>
+    <div style="justify-self:center;width:min(260px,100%);background:#ece7d9;color:#1a1c1c;padding:22px 20px 26px;transform:rotate(-2deg);box-shadow:0 14px 30px rgba(0,0,0,.5);position:relative">
+      <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(1deg);width:70px;height:20px;background:rgba(79,211,204,.55)"></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #1a1c1c;padding-bottom:8px;margin-bottom:16px"><span style="font-family:'Zen Kurenaido',sans-serif;font-size:22px;letter-spacing:.1em">取材メモ</span><span style="font-family:'DotGothic16',monospace;font-size:12px;color:#5a5e5e">No.___</span></div>
+      <div style="display:grid;gap:13px">
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:14px;height:14px;border:1.5px solid #1a1c1c;flex:none"></span><span style="height:12px;background:#1a1c1c;width:72%"></span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:14px;height:14px;border:1.5px solid #1a1c1c;flex:none"></span><span style="height:12px;background:#1a1c1c;width:48%"></span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:14px;height:14px;border:1.5px solid #1a1c1c;flex:none"></span><span style="height:12px;background:#1a1c1c;width:84%"></span></div>
+        <div style="display:flex;align-items:center;gap:12px"><span style="width:14px;height:14px;border:1.5px solid #1a1c1c;flex:none"></span><span style="height:12px;background:#1a1c1c;width:60%"></span></div>
+      </div>
+      <div style="margin-top:22px;display:flex;justify-content:flex-end">
+        <div style="width:84px;height:84px;border-radius:50%;border:2px solid #c0392b;color:#c0392b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transform:rotate(8deg);opacity:.85"><span style="font-size:10px;letter-spacing:.1em;font-weight:700">ディレクター</span><span style="font-size:20px;font-weight:800;letter-spacing:.1em">評価</span><span style="width:40px;height:1px;background:#c0392b"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="info" style="padding:96px 20px;max-width:760px;margin:0 auto">
+  <div data-reveal="0" style="display:inline-flex;align-items:center;gap:14px;font-family:'Zen Kurenaido',sans-serif;font-size:16px;letter-spacing:.24em;color:#4fd3cc"><span style="width:30px;height:1px;background:#4fd3cc"></span>INFO<span style="width:30px;height:1px;background:#4fd3cc"></span></div>
+  <h2 data-reveal="60" style="margin:10px 0 44px;font-weight:700;font-size:clamp(26px,5vw,38px);letter-spacing:.14em;line-height:1.5;color:#f0ece2">開催概要</h2>
+  <div data-reveal="80" style="display:grid;grid-template-columns:minmax(96px,auto) 1fr;border:1px solid rgba(230,226,216,.6)">
+    <div style="padding:22px 14px;border-bottom:1px solid rgba(230,226,216,.6);border-right:1px solid rgba(230,226,216,.6);display:flex;flex-direction:column;align-items:center;gap:8px;color:#4fd3cc"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:1.4;stroke-linecap:round"><rect x="3" y="5" width="18" height="16" rx="1"></rect><line x1="3" y1="10" x2="21" y2="10"></line><line x1="8" y1="3" x2="8" y2="7"></line><line x1="16" y1="3" x2="16" y2="7"></line></svg><span style="font-weight:700;font-size:14px;letter-spacing:.12em">開催日程</span></div>
+    <div style={`padding:22px 18px;border-bottom:1px solid rgba(230,226,216,.6);font-size:16px;line-height:1.8;color:${INFO.date ? "#e6e2d8" : "#a39f95"};display:flex;align-items:center;white-space:pre-line`}>{INFO.date || "［開催日程を記載］"}</div>
+    <div style="padding:22px 14px;border-bottom:1px solid rgba(230,226,216,.6);border-right:1px solid rgba(230,226,216,.6);display:flex;flex-direction:column;align-items:center;gap:8px;color:#4fd3cc"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:1.4;stroke-linecap:round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="7" x2="12" y2="12"></line><line x1="12" y1="12" x2="16" y2="14"></line></svg><span style="font-weight:700;font-size:14px;letter-spacing:.12em">開催時刻</span></div>
+    <div style={`padding:22px 18px;border-bottom:1px solid rgba(230,226,216,.6);font-size:16px;line-height:1.8;color:${INFO.time ? "#e6e2d8" : "#a39f95"};display:flex;align-items:center;white-space:pre-line`}>{INFO.time || "［開催時刻を記載］"}</div>
+    <div style="padding:22px 14px;border-bottom:1px solid rgba(230,226,216,.6);border-right:1px solid rgba(230,226,216,.6);display:flex;flex-direction:column;align-items:center;gap:8px;color:#4fd3cc"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:1.4;stroke-linecap:round"><circle cx="12" cy="10" r="6"></circle><circle cx="12" cy="10" r="2"></circle><line x1="12" y1="16" x2="12" y2="22"></line></svg><span style="font-weight:700;font-size:14px;letter-spacing:.12em">集合場所</span></div>
+    <div style={`padding:22px 18px;border-bottom:1px solid rgba(230,226,216,.6);font-size:16px;line-height:1.8;color:${INFO.meet ? "#e6e2d8" : "#a39f95"};display:flex;align-items:center;white-space:pre-line`}>{INFO.meet || "［路線名・駅名・出口・集合位置を記載］"}</div>
+    <div style="padding:22px 14px;border-bottom:1px solid rgba(230,226,216,.6);border-right:1px solid rgba(230,226,216,.6);display:flex;flex-direction:column;align-items:center;gap:8px;color:#4fd3cc"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:1.4;stroke-linecap:round"><circle cx="12" cy="12" r="9"></circle><polygon points="10,8 16,12 10,16"></polygon></svg><span style="font-weight:700;font-size:14px;letter-spacing:.12em">公演時間</span></div>
+    <div style="padding:22px 18px;border-bottom:1px solid rgba(230,226,216,.6);font-size:16px;line-height:1.8;color:#e6e2d8;display:flex;align-items:center">{INFO.duration}</div>
+    <div style="padding:22px 14px;border-right:1px solid rgba(230,226,216,.6);display:flex;flex-direction:column;align-items:center;gap:8px;color:#4fd3cc"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:1.4;stroke-linecap:round"><rect x="3" y="7" width="18" height="10" rx="1"></rect><line x1="15" y1="7" x2="15" y2="17" style="stroke-dasharray:2 2"></line></svg><span style="font-weight:700;font-size:14px;letter-spacing:.12em">チケット料金</span></div>
+    <div style="padding:22px 18px;font-size:16px;line-height:1.8;color:#e6e2d8;display:flex;align-items:center">{INFO.price}</div>
+  </div>
+  <p data-reveal="120" style="margin:28px 0 0;font-size:clamp(13px,3.6vw,14px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">お一人様からお申し込みいただけます。<br>同じ回にお申し込みのお客様と一緒に、<br>新人ディレクターとしてご参加いただきます。</p>
+  <div data-reveal="160" style="margin-top:48px;display:flex;flex-direction:column;align-items:center;gap:14px">
+    <a href={ticketHref} {...ticketAttrs} data-place="info" class="cta" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:16px;min-width:min(300px,100%);padding:20px 40px;border:1px solid #4fd3cc;color:#4fd3cc;font-weight:700;font-size:17px;letter-spacing:.24em;background:rgba(79,211,204,.06);animation:pulseGlow 3s ease-in-out infinite;cursor:pointer;transition:background .2s,color .2s">取材に行く<span style="font-size:12px">▶</span></a>
+  </div>
+</section>
+
+<section style="padding:96px 20px;max-width:760px;margin:0 auto">
+  <div data-reveal="0" style="display:inline-flex;align-items:center;gap:14px;font-family:'Zen Kurenaido',sans-serif;font-size:16px;letter-spacing:.24em;color:#4fd3cc"><span style="width:30px;height:1px;background:#4fd3cc"></span>SCHEDULE<span style="width:30px;height:1px;background:#4fd3cc"></span></div>
+  <h2 data-reveal="60" style="margin:10px 0 48px;font-weight:700;font-size:clamp(26px,5vw,38px);letter-spacing:.14em;line-height:1.5;color:#f0ece2">当日の流れ</h2>
+  <div data-reveal="80" style="position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;text-align:center">
+    <div style="position:absolute;left:16%;right:16%;top:7px;height:1px;background:rgba(230,226,216,.5)"></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px"><span style="width:14px;height:14px;border-radius:50%;border:1px solid #4fd3cc;background:#0b0f0f;position:relative;z-index:1"></span><span style="font-weight:700;font-size:clamp(14px,2.6vw,18px);letter-spacing:.1em;color:#f0ece2">受付開始</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px"><span style="width:14px;height:14px;border-radius:50%;border:1px solid #4fd3cc;background:#4fd3cc;position:relative;z-index:1;box-shadow:0 0 14px rgba(79,211,204,.8)"></span><span style="font-weight:700;font-size:clamp(14px,2.6vw,18px);letter-spacing:.1em;color:#f0ece2">体験スタート</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px"><span style="width:14px;height:14px;border-radius:50%;border:1px solid #4fd3cc;background:#0b0f0f;position:relative;z-index:1"></span><span style="font-weight:700;font-size:clamp(14px,2.6vw,18px);letter-spacing:.1em;color:#f0ece2">解散</span></div>
+  </div>
+  <div data-reveal="100" style="margin:40px 0 0;display:flex;align-items:center;gap:12px;font-family:'DotGothic16',monospace;font-size:13px;color:#a39f95;letter-spacing:.1em"><span style="width:10px;height:10px;border-radius:50%;background:#e0312b;animation:rec 1.2s infinite"></span><span>REC</span><span style="flex:1;height:8px;background:repeating-linear-gradient(90deg,#4fd3cc 0 6px,transparent 6px 9px);opacity:.8"></span><span>70:00</span></div>
+  
+</section>
+
+<section style="padding:96px 20px;max-width:760px;margin:0 auto">
+  <div data-reveal="0" style="display:inline-flex;align-items:center;gap:14px;font-family:'Zen Kurenaido',sans-serif;font-size:16px;letter-spacing:.24em;color:#4fd3cc"><span style="width:30px;height:1px;background:#4fd3cc"></span>HORROR<span style="width:30px;height:1px;background:#4fd3cc"></span></div>
+  <h2 data-reveal="60" style="margin:10px 0 32px;font-weight:700;font-size:clamp(26px,5vw,38px);letter-spacing:.14em;line-height:1.5;color:#f0ece2">怖さ・演出について</h2>
+  <p data-reveal="80" style="margin:0 0 40px;font-size:clamp(13.5px,3.8vw,15px);line-height:2.2;color:#d8d3c7;text-wrap:pretty"><strong style="font-weight:700;color:#f0ece2;font-size:17px">本公演は、怖さを抑えたホラー・ミステリー体験です。</strong><br>暗い場所や物音、不意を突く演出が含まれます。<br>追いかける演出や、キャストがお客様の身体に触れる演出はありません。</p>
+  <div data-reveal="120" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));border:1px solid rgba(230,226,216,.6)">
+    <div style="padding:26px 24px;border-right:1px solid rgba(230,226,216,.6)">
+      <div style="display:inline-block;padding:7px 18px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.15em;margin-bottom:20px">含まれる演出</div>
+      <ul style="list-style:none;margin:0;padding:0;display:grid;gap:14px;font-size:clamp(14px,3.9vw,16px);color:#f0ece2">
+        <li style="display:flex;gap:12px;align-items:center"><span style="width:12px;height:12px;border-radius:50%;background:#e6e2d8;flex:none"></span>暗い場所での体験</li>
+        <li style="display:flex;gap:12px;align-items:center"><span style="width:12px;height:12px;border-radius:50%;background:#e6e2d8;flex:none"></span>物音による演出</li>
+        <li style="display:flex;gap:12px;align-items:center"><span style="width:12px;height:12px;border-radius:50%;background:#e6e2d8;flex:none"></span>不意を突く演出</li>
+      </ul>
+    </div>
+    <div style="padding:26px 24px;background-image:repeating-linear-gradient(-45deg,rgba(230,226,216,.08) 0 1px,transparent 1px 8px)">
+      <div style="display:inline-block;padding:7px 18px;border:1px solid #e6e2d8;color:#e6e2d8;font-weight:700;font-size:14px;letter-spacing:.15em;margin-bottom:20px;background:#0b0f0f">含まれない演出</div>
+      <ul style="list-style:none;margin:0;padding:0;display:grid;gap:14px;font-size:clamp(14px,3.9vw,16px);color:#f0ece2">
+        <li style="display:flex;gap:12px;align-items:center"><span style="font-weight:700;font-size:18px;line-height:1;flex:none;color:#e6e2d8">×</span>お客様を追いかける演出</li>
+        <li style="display:flex;gap:12px;align-items:center"><span style="font-weight:700;font-size:18px;line-height:1;flex:none;color:#e6e2d8">×</span>キャストがお客様の身体に触れる演出</li>
+      </ul>
+    </div>
+  </div>
+  <p data-reveal="160" style="margin:20px 0 0;font-size:13px;line-height:2;color:#a39f95">※怖さの感じ方には個人差があります。</p>
+</section>
+
+<section style="padding:96px 20px;max-width:760px;margin:0 auto">
+  <div data-reveal="0" style="display:inline-flex;align-items:center;gap:14px;font-family:'Zen Kurenaido',sans-serif;font-size:16px;letter-spacing:.24em;color:#4fd3cc"><span style="width:30px;height:1px;background:#4fd3cc"></span>REQUIREMENTS<span style="width:30px;height:1px;background:#4fd3cc"></span></div>
+  <h2 data-reveal="60" style="margin:10px 0 36px;font-weight:700;font-size:clamp(26px,5vw,38px);letter-spacing:.14em;line-height:1.5;color:#f0ece2">参加条件</h2>
+  <div style="display:grid;gap:14px">
+    <div data-reveal="0" style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:20px 18px;border:1px solid rgba(230,226,216,.6)"><div style="padding:9px 14px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;line-height:1.5;text-align:center">対象年齢</div><p style="margin:0;flex:1 1 240px;font-size:clamp(13.5px,3.8vw,15px);line-height:2;color:#f0ece2;text-wrap:pretty">中学生以上の方が対象です。<br>18歳未満の方は、保護者同伴でご参加ください。</p></div>
+    <div data-reveal="0" style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:20px 18px;border:1px solid rgba(230,226,216,.6)"><div style="padding:9px 14px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;line-height:1.5;text-align:center">体調</div><p style="margin:0;flex:1 1 240px;font-size:clamp(13.5px,3.8vw,15px);line-height:2;color:#f0ece2;text-wrap:pretty">心臓疾患のある方、妊娠中の方、<br>体調のすぐれない方は、ご参加をお控えください。</p></div>
+    <div data-reveal="0" style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:20px 18px;border:1px solid rgba(230,226,216,.6)"><div style="padding:9px 14px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;line-height:1.5;text-align:center">会場設備について</div><p style="margin:0;flex:1 1 240px;font-size:clamp(13.5px,3.8vw,15px);line-height:2;color:#f0ece2;text-wrap:pretty">会場は2階建ての家屋です。<br>体験中に階段を使用するため、<br>車椅子でのご参加には対応しておりません。</p></div>
+    <div data-reveal="0" style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:20px 18px;border:1px solid rgba(230,226,216,.6)"><div style="padding:9px 14px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;line-height:1.5;text-align:center">対応言語</div><p style="margin:0;flex:1 1 240px;font-size:clamp(13.5px,3.8vw,15px);line-height:2;color:#f0ece2">本公演は日本語のみで実施します。</p></div>
+  </div>
+</section>
+
+<section style="padding:96px 20px;max-width:760px;margin:0 auto">
+  <div data-reveal="0" style="display:inline-flex;align-items:center;gap:14px;font-family:'Zen Kurenaido',sans-serif;font-size:16px;letter-spacing:.24em;color:#4fd3cc"><span style="width:30px;height:1px;background:#4fd3cc"></span>BELONGINGS<span style="width:30px;height:1px;background:#4fd3cc"></span></div>
+  <h2 data-reveal="60" style="margin:10px 0 36px;font-weight:700;font-size:clamp(26px,5vw,38px);letter-spacing:.14em;line-height:1.5;color:#f0ece2">持ち物・服装・お荷物</h2>
+  <div data-reveal="80" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+    <div style="border:1px solid rgba(230,226,216,.6);padding:26px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:12px;color:#4fd3cc"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:1.4;stroke-linecap:round"><rect x="7" y="2" width="10" height="20" rx="2"></rect><line x1="11" y1="18" x2="13" y2="18"></line></svg><span style="font-weight:700;font-size:15px;letter-spacing:.12em;color:#f0ece2">スマートフォン</span></div>
+      <p style="margin:0;font-size:clamp(13px,3.6vw,14px);line-height:2;color:#d8d3c7;text-wrap:pretty">十分に充電されたスマートフォンをお持ちください。</p>
+    </div>
+    <div style="border:1px solid rgba(230,226,216,.6);padding:26px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:12px;color:#4fd3cc"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:1.4;stroke-linecap:round"><rect x="3" y="13" width="18" height="6" rx="3"></rect><rect x="3" y="8" width="10" height="7" rx="3"></rect></svg><span style="font-weight:700;font-size:15px;letter-spacing:.12em;color:#f0ece2">靴</span></div>
+      <p style="margin:0;font-size:clamp(13px,3.6vw,14px);line-height:2;color:#d8d3c7;text-wrap:pretty">会場では靴を脱いでいただきます。<br>脱ぎ履きしやすい靴でお越しください。</p>
+    </div>
+    <div style="border:1px solid rgba(230,226,216,.6);padding:26px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:12px;color:#4fd3cc"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:1.4;stroke-linecap:round"><rect x="4" y="8" width="16" height="13" rx="2"></rect><rect x="9" y="4" width="6" height="4" rx="2"></rect></svg><span style="font-weight:700;font-size:15px;letter-spacing:.12em;color:#f0ece2">お荷物</span></div>
+      <p style="margin:0;font-size:clamp(13px,3.6vw,14px);line-height:2;color:#d8d3c7;text-wrap:pretty">お荷物は、会場内の指定場所に置いていただきます。</p>
+    </div>
+  </div>
+</section>
+
+<section style="padding:96px 24px 40px;max-width:760px;margin:0 auto">
+  <div data-reveal="0" style="display:inline-flex;align-items:center;gap:14px;font-family:'Zen Kurenaido',sans-serif;font-size:16px;letter-spacing:.24em;color:#4fd3cc"><span style="width:30px;height:1px;background:#4fd3cc"></span>NOTES<span style="width:30px;height:1px;background:#4fd3cc"></span></div>
+  <h2 data-reveal="60" style="margin:10px 0 40px;font-weight:700;font-size:clamp(26px,5vw,38px);letter-spacing:.14em;line-height:1.5;color:#f0ece2">ご参加にあたって</h2>
+  <div style="display:grid;gap:44px;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">
+    <div data-reveal="0" style="display:grid;gap:18px">
+      <h3 style="margin:0;font-weight:700;font-size:clamp(15px,4.2vw,17px);letter-spacing:.08em;color:#f0ece2">【途中退場・お手洗い】</h3>
+      <p style="margin:0;text-wrap:pretty">体験の途中で退場することは可能です。<br>退場をご希望の場合は、スタッフにお知らせください。</p>
+      <p style="margin:0;text-wrap:pretty">お客様のご都合による一時退出後の再入場はできません。</p>
+      <p style="margin:0;text-wrap:pretty">お手洗いは、できるだけ受付前にお済ませください。<br>体験中にお手洗いが必要になった場合や、<br>体調がすぐれない場合は、<br>事前にご案内する専用のサインでスタッフにお知らせください。</p>
+    </div>
+    <div data-reveal="0" style="display:grid;gap:18px">
+      <h3 style="margin:0;font-weight:700;font-size:clamp(15px,4.2vw,17px);letter-spacing:.08em;color:#f0ece2">【参加時のお願い】</h3>
+      <ul style="list-style:none;margin:0;padding:0;display:grid;gap:14px;color:#f0ece2">
+        <li style="display:flex;gap:14px;align-items:baseline"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none;position:relative;top:-2px"></span><span style="text-wrap:pretty">飲酒された状態でのご参加はお断りします。</span></li>
+        <li style="display:flex;gap:14px;align-items:baseline"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none;position:relative;top:-2px"></span><span style="text-wrap:pretty">飲食物の持ち込みはお断りします。</span></li>
+        <li style="display:flex;gap:14px;align-items:baseline"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none;position:relative;top:-2px"></span><span style="text-wrap:pretty">リピート参加も歓迎します。初めて参加される方の体験を損なわないよう、ネタバレにつながる発言や先回りした行動はお控えください。</span></li>
+      </ul>
+    </div>
+    <div data-reveal="0" style="display:grid;gap:18px">
+      <h3 style="margin:0;font-weight:700;font-size:clamp(15px,4.2vw,17px);letter-spacing:.08em;color:#f0ece2">【撮影・録音・SNSについて】</h3>
+      <p style="margin:0;text-wrap:pretty">キャストの撮影・録画、およびキャストの声の録音は、<br>原則として禁止です。</p>
+      <p style="margin:0;text-wrap:pretty">SNSでの参加報告や、<br>ネタバレを含まない感想の投稿は歓迎します。</p>
+      <p style="margin:0;text-wrap:pretty">これから参加する方の楽しみを守るため、<br>家の中の様子、登場人物の秘密、<br>物語の結末に関する投稿はお控えください。</p>
+    </div>
+    <div data-reveal="0" style="display:grid;gap:18px">
+      <h3 style="margin:0;font-weight:700;font-size:clamp(15px,4.2vw,17px);letter-spacing:.08em;color:#f0ece2">【悪天候などによる公演中止について】</h3>
+      <p style="margin:0;text-wrap:pretty">悪天候などにより公演を中止する場合は、<br>原則として開演4時間前までに判断し、<br>チケットをご購入のお客様へメールでご連絡します。</p>
+      <p style="margin:0;text-wrap:pretty">中止の場合は、以下のいずれかをお選びいただけます。</p>
+      <ul style="list-style:none;margin:0;padding:20px 24px;border:1px solid rgba(230,226,216,.6);display:grid;gap:12px;color:#f0ece2">
+        <li style="display:flex;gap:14px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none"></span>チケット代金の全額返金</li>
+        <li style="display:flex;gap:14px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none"></span>後日の空席のある回への振替</li>
+      </ul>
+      <p style="margin:0;text-wrap:pretty">振替可能な回がない場合は、<br>チケット代金を全額返金いたします。</p>
+    </div>
+  </div>
+</section>
+
+<section style="padding:120px 24px 150px;max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center">
+  <p data-reveal="0" style="margin:0 0 40px;font-weight:800;font-size:clamp(17px,5.2vw,36px);line-height:1.8;letter-spacing:.08em;color:#f0ece2;animation:flicker 8s infinite;text-wrap:balance;word-break:keep-all;overflow-wrap:anywhere"><span style="white-space:nowrap">本当に、</span><wbr><span style="white-space:nowrap">家、ついて行ってイイですか？</span></p>
+  <a href={ticketHref} {...ticketAttrs} data-place="final" data-reveal="100" class="cta" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:16px;min-width:min(300px,100%);padding:20px 40px;border:1px solid #4fd3cc;color:#4fd3cc;font-weight:700;font-size:17px;letter-spacing:.24em;background:rgba(79,211,204,.06);cursor:pointer;transition:background .2s,color .2s">取材に行く<span style="font-size:12px">▶</span></a>
+  
+  <div data-reveal="200" style="margin-top:40px;display:flex;align-items:center;gap:10px;font-family:'DotGothic16',monospace;font-size:13px;letter-spacing:.15em;color:#a39f95"><span style="width:9px;height:9px;border-radius:50%;background:#e0312b;animation:rec 1.2s infinite"></span>REC</div>
+</section>
+
+<!-- 追従CTA：冒頭演出の終了後に表示 -->
+<a href={ticketHref} {...ticketAttrs} data-place="float" id="floating-cta" class="cta" style="display:none;position:fixed;right:16px;bottom:16px;z-index:60;align-items:center;gap:12px;padding:14px 26px;border:1px solid #4fd3cc;border-radius:999px;background:rgba(11,15,15,.94);color:#4fd3cc;font-weight:700;font-size:15px;letter-spacing:.18em;white-space:nowrap;text-decoration:none;animation:pulseGlow 3s ease-in-out infinite;transition:background .2s,color .2s">取材に行く<span style="font-size:11px">▶</span></a>
+
+</div>
+
+<!-- 冒頭演出（メール → 独白 → 暗転） -->
+<div id="intro" aria-hidden="true" style="position:fixed;inset:0;z-index:100;background:#000;transition:opacity .9s ease;overflow:hidden;font-family:'Shippori Mincho B1',serif">
+  <button type="button" id="intro-skip" style="position:absolute;top:14px;right:16px;z-index:5;display:flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid rgba(230,226,216,.3);color:#c8c3b7;font-family:'DotGothic16',monospace;font-size:13px;letter-spacing:.2em;cursor:pointer;background:rgba(0,0,0,.4)">SKIP ▶</button>
+
+  <div id="intro-mail" style="position:absolute;inset:0">
+    <div style="position:absolute;inset:0;background:#0b0e10"></div>
+    <div id="mail-panel" style="position:absolute;left:0;right:0;top:60px;bottom:0;width:min(560px,100%);margin:0 auto;display:flex;flex-direction:column;background:#111518;color:#e6ebe9;font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;border-radius:16px 16px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.6);overflow:hidden;animation:mailIn .7s ease both">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #22282b">
+        <span style="font-size:22px;color:#c9d1cf;line-height:1">✕</span>
+        <div id="mail-send" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;color:#4fd3cc;font-size:15px;font-weight:600;transition:transform .15s,background .15s">送信<span style="font-size:12px">▶</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid #22282b;font-size:15px"><span style="color:#8d9794;width:3.5em;flex:none">宛先</span><div style="display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:999px;background:#1d2326"><span style="width:26px;height:26px;border-radius:50%;background:#2a4c49;color:#dff7f4;display:inline-flex;align-items:center;justify-content:center;font-size:13px">住</span><span>住人</span></div></div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #22282b;font-size:15px"><span style="color:#8d9794;width:3.5em;flex:none">Cc/Bcc</span></div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #22282b;font-size:15px"><span style="color:#8d9794;width:3.5em;flex:none">件名</span><span>Re: 取材のお願い</span></div>
+      <div style="flex:1;padding:18px 16px;font-size:clamp(13px,3.9vw,16px);line-height:1.9;white-space:pre-line;color:#e6ebe9;min-height:7.5em;overflow:hidden"><span id="mail-text"></span><span style="display:inline-block;width:2px;height:1.1em;background:#4fd3cc;vertical-align:-0.2em;margin-left:1px;animation:blink 1s steps(1) infinite"></span></div>
+      <div style="padding:8px 6px 22px;background:#1b2023;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;flex:0 1 auto;min-height:0;overflow:hidden">
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">→</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">あ</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">か</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">さ</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">⌫</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">↺</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">た</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">な</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">は</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">空白</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">ABC</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">ま</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">や</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">ら</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">改行</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">あA1</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">^_^</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">わ</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">、。?!</div>
+        <div style="height:46px;border-radius:6px;background:#3b4145;color:#e6ebe9;display:flex;align-items:center;justify-content:center;font-size:18px">　</div>
+      </div>
+    </div>
+    <div id="mail-toast" style="display:none;position:absolute;bottom:44px;left:50%;transform:translateX(-50%);padding:12px 22px;background:#1e2426;color:#e6ebe9;border-radius:8px;font-family:-apple-system,'Hiragino Sans','Noto Sans JP',sans-serif;font-size:14px;letter-spacing:.04em;animation:toastIn .4s ease both;box-shadow:0 8px 24px rgba(0,0,0,.5)">送信しました</div>
+  </div>
+
+  <div id="intro-pc" style="display:none;position:absolute;inset:0;background:#0b0f0f;align-items:center;justify-content:center;padding:20px">
+    <div style="font-family:'DotGothic16',monospace;font-size:clamp(13px,3.9vw,26px);line-height:2.2;letter-spacing:.06em;color:#d8d3c7;white-space:pre-line;max-width:640px"><span id="pc-text"></span><span style="display:inline-block;width:.6em;height:1.05em;background:#d8d3c7;vertical-align:-0.15em;margin-left:3px;animation:blink 1s steps(1) infinite"></span></div>
+  </div>
+
+  <div id="intro-dark" style="display:none;position:absolute;inset:0;background:#000;align-items:center;justify-content:center;padding:20px">
+    <div id="dark-wrap" style="font-weight:700;font-size:clamp(14px,4.4vw,30px);line-height:2;letter-spacing:.08em;color:#fff;text-align:center;max-width:720px;white-space:pre-line"><span id="dark-text"></span><span style="display:inline-block;width:.55em;height:1.05em;background:#fff;vertical-align:-0.15em;margin-left:3px;animation:blink 1s steps(1) infinite"></span></div>
+  </div>
+
+  <div id="intro-flash" style="display:none;position:absolute;inset:0;background:#4fd3cc;mix-blend-mode:screen;animation:flash .5s steps(3) both;pointer-events:none"></div>
+</div>
+
+<script is:inline>
+/* ==========================================================
+   本当に、家、ついて行ってイイですか？ LP
+   - 冒頭演出（メール入力 → 送信 → 独白 → 暗転）
+   - スクロール表示
+   - タイムコード
+   ========================================================== */
+(function () {
+  'use strict';
+
+  var CONFIG = {
+    showIntro: true,   // false で冒頭演出なし
+    typingSpeed: 70    // 1文字あたりのms
+  };
+
+  var MAIL = 'かしこまりました。\nそれでは、××駅前で待ち合わせをお願いします。';
+  var PC   = 'これで、取材の約束はできた。\nあとは当日、待ち合わせ場所へ向かうだけ。';
+  var DARK = '——本当に、この人の家について行って\n大丈夫なのだろうか？';
+
+  var $ = function (id) { return document.getElementById(id); };
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var timers = [];
+  var finished = false;
+
+  function wait(ms) { return new Promise(function (r) { timers.push(setTimeout(r, ms)); }); }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+  function show(id, display) { $(id).style.display = display || 'flex'; }
+  function hide(id) { $(id).style.display = 'none'; }
+
+  function type(el, text, ms) {
+    var i = 0;
+    return new Promise(function (resolve) {
+      (function step() {
+        if (finished) return resolve();
+        i++;
+        el.textContent = text.slice(0, i);
+        if (i >= text.length) return resolve();
+        timers.push(setTimeout(step, /[。、？\n]/.test(text[i - 1]) ? ms * 5 : ms));
+      })();
+    });
+  }
+
+  function revealKv() {
+    var kv = $('kv-frame');
+    if (kv) kv.style.animation = 'revealIn 1.2s cubic-bezier(.2,.7,.2,1) .15s both';
+  }
+
+  function endIntro() {
+    var intro = $('intro');
+    if (intro) intro.remove();
+    document.documentElement.classList.remove('intro-lock');
+    $('floating-cta').style.display = 'inline-flex';
+    revealKv();
+  }
+
+  function finish() {
+    if (finished) return;
+    finished = true;
+    clearTimers();
+    hide('intro-mail'); hide('intro-pc'); show('intro-dark');
+    $('dark-wrap').style.animation = 'shake .22s linear infinite';
+    show('intro-flash', 'block');
+    setTimeout(function () { $('intro').style.opacity = '0'; }, 350);
+    setTimeout(endIntro, 1250);
+  }
+
+  async function runIntro() {
+    var s = CONFIG.typingSpeed;
+    await wait(900);
+    await type($('mail-text'), MAIL, s); if (finished) return;
+    await wait(700);
+    var send = $('mail-send');
+    send.style.transform = 'scale(.88)';
+    send.style.background = 'rgba(79,211,204,.28)';
+    await wait(260);
+    $('mail-panel').style.animation = 'flyUp .7s cubic-bezier(.5,0,.9,.4) forwards';
+    show('mail-toast', 'block');
+    await wait(1400); if (finished) return;
+    hide('intro-mail'); show('intro-pc');
+    await wait(600);
+    await type($('pc-text'), PC, s); if (finished) return;
+    await wait(1700);
+    hide('intro-pc'); show('intro-dark');
+    await wait(900);
+    await type($('dark-text'), DARK, Math.round(s * 1.3)); if (finished) return;
+    await wait(1800);
+    finish();
+  }
+
+  function setupReveal() {
+    var els = document.querySelectorAll('[data-reveal]');
+    if (!('IntersectionObserver' in window) || reduced) {
+      els.forEach(function (el) { el.style.opacity = '1'; });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var d = parseInt(e.target.getAttribute('data-reveal') || '0', 10);
+        e.target.style.opacity = '1';
+        e.target.style.animation = 'revealIn .9s cubic-bezier(.2,.7,.2,1) ' + d + 'ms both';
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    els.forEach(function (el) { io.observe(el); });
+  }
+
+  function setupTimecode() {
+    var el = $('timecode');
+    if (!el) return;
+    var start = performance.now();
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    (function tick(now) {
+      var t = Math.max(0, now - start);
+      el.textContent = [Math.floor(t / 3600000), Math.floor(t / 60000) % 60, Math.floor(t / 1000) % 60, Math.floor(t / 1000 * 30) % 30].map(pad).join(':');
+      requestAnimationFrame(tick);
+    })(start);
+  }
+
+  setupReveal();
+  setupTimecode();
+
+  if (CONFIG.showIntro && !reduced) {
+    document.documentElement.classList.add('intro-lock');
+    $('intro-skip').addEventListener('click', finish);
+    runIntro();
+  } else {
+    finished = true;
+    endIntro();
+  }
+})();
+</script>
+</body>
+</html>
