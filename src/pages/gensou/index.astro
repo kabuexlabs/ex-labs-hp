@@ -84,7 +84,7 @@ const nav = [
 
 // 当日の流れ・注意事項：先頭の短い見出し（label）で何の話かを先に見せる
 const flow = [
-  { label: '集合', text: '開始時刻の5分前までに、夢の島熱帯植物館の正面入口へお越しください。受付が始まるまでは、植物館前（屋外）でお待ちいただきます。' },
+  { label: '集合', text: '会場は新木場駅から徒歩約15分です。開始時刻の5分前までに、夢の島熱帯植物館の正面入口へお越しください。受付が始まるまでは、植物館前（屋外）でお待ちいただきます。' },
   { label: '受付', text: '受付は開始時刻の5分前からです。escape.idの購入済みチケット画面をご提示ください。' },
   { label: '体験', text: '受付後、約50分の体験にご参加いただきます。開始時刻に遅れた場合はご参加いただけません。' },
   { label: '終了', text: '最終回は20:00開始、20:50終了予定です。' },
@@ -98,7 +98,7 @@ const notes = [
     { label: '飲酒', text: '飲酒された状態でのご参加はお断りします。' },
   ] },
   { group: '持ち物・服装', items: [
-    { label: 'スマートフォン', text: '通信可能なスマートフォンをお持ちください。イヤホンは不要です。体験用アプリのダウンロードや事前登録も必要ありません。' },
+    { label: 'スマートフォン', text: '通信可能で、OSなどを最新の状態にアップデートした、ブラウザが使える機種のスマートフォンをお持ちください。イヤホンは不要です。体験用アプリのダウンロードや事前登録も必要ありません。' },
     { label: '服装', text: '歩きやすい服装でお越しください。' },
     { label: '荷物', text: '大きな荷物の持ち込みはご遠慮ください。荷物のお預かりはできません。' },
     { label: '飲食物', text: '飲食物の持ち込みは、蓋つきのお飲み物のみ可能です。' },
@@ -684,7 +684,7 @@ img{max-width:100%}
           </div>
         </div>
         <div class="row"><span>所要時間</span><span>約50分</span></div>
-        <div class="row"><span>持ち物</span><span><strong style="color:#e6d23f;font-weight:600">通信できるスマートフォン（必須）</strong></span></div>
+        <div class="row"><span>持ち物</span><span><strong style="color:#e6d23f;font-weight:600">通信できるスマートフォン（必須）</strong><br><span style="font-size:13px;color:#d0d5e6"><J t="通信可能・OSなどを最新にアップデート済み・ブラウザが使える機種" /></span></span></div>
         <div class="row"><span>開催人数</span><span><J t="参加者1名から開催します。" /></span></div>
         <div class="row"><span>対象年齢</span><span><J t="中学生以上（18歳未満の方は保護者同伴）" /></span></div>
         <div class="row"><span>販売</span><span>{RESERVE_URL ? <a href={RESERVE_URL} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="gensou-row">escape.id</a> : 'escape.id'}{!RESERVE_URL && <><br><span style="font-size:13px;color:#bdb8ab"><J t="販売開始日は決まり次第お知らせします。" /></span></>}</span></div>
@@ -701,7 +701,7 @@ img{max-width:100%}
       <SecHead ja="当日の流れ" side="l" />
       <div class="phone" role="note">
         <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="10" y1="18.5" x2="14" y2="18.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        <div><p class="phone-h">スマートフォンを必ずお持ちください</p><p class="phone-t"><J t="当日は、通信できるスマートフォンが必要です。イヤホン・アプリのダウンロード・事前登録は不要です。" /></p></div>
+        <div><p class="phone-h">スマートフォンを必ずお持ちください</p><p class="phone-t"><J t="当日は、通信可能で、OSなどを最新の状態にアップデートした、ブラウザが使える機種のスマートフォンが必要です。イヤホン・アプリのダウンロード・事前登録は不要です。" /></p></div>
       </div>
       <ol class="flow">
         {flow.map((f) => <li><span class="no">{f.no}</span><span class="tx"><strong class="lb">{f.label}</strong><J t={f.text} /></span></li>)}
@@ -712,7 +712,7 @@ img{max-width:100%}
       <SecHead ja="注意事項" side="r" />
       <div class="phone" role="note">
         <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="10" y1="18.5" x2="14" y2="18.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        <div><p class="phone-h">スマートフォンを必ずお持ちください</p><p class="phone-t"><J t="当日は、通信できるスマートフォンが必要です。イヤホン・アプリのダウンロード・事前登録は不要です。" /></p></div>
+        <div><p class="phone-h">スマートフォンを必ずお持ちください</p><p class="phone-t"><J t="当日は、通信可能で、OSなどを最新の状態にアップデートした、ブラウザが使える機種のスマートフォンが必要です。イヤホン・アプリのダウンロード・事前登録は不要です。" /></p></div>
       </div>
       {notes.map((g) => (
         <div class="ng">
@@ -726,6 +726,10 @@ img{max-width:100%}
 
     <section id="access" class="sec">
       <SecHead ja="会場・アクセス" side="l" />
+      <div class="phone walk" role="note">
+        <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true"><circle cx="13" cy="4" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 21l2-6 3 3v3M9 12l2-4 4 2 2 3M11 8l-3 3-1 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div><p class="phone-h">新木場駅から<span style="white-space:nowrap">徒歩約15分</span></p><p class="phone-t"><J t="会場の夢の島熱帯植物館は、新木場駅から夢の島公園の中を15分ほど歩いた先にあります。開始時刻に遅れるとご参加いただけないため、時間に余裕をもってお越しください。" /></p></div>
+      </div>
       <div class="rows">
         <div class="row"><span>会場</span><span>夢の島熱帯植物館</span></div>
         <div class="row"><span>集合場所</span><span>正面入口</span></div>
