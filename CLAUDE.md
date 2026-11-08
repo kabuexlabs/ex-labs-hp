@@ -132,5 +132,5 @@
 
 ## 「東京メトロ陣取り」LP（2026-11-08 限定公開）
 - 関係者確認用の限定URL **/preview/jintori-k40cbdz8/**（noindex＋`X-Robots-Tag`、sitemap・llms.txt・ナビ・トップ・お知らせ非掲載、`Cache-Control: private, no-store`）。正本メモは docs/jintori-lp.md。
-- ユーザー提供の完成済みLP（1ファイル完結）を `src/lp/jintori/index.html` に**そのまま**置き、index.astro は `?raw` で読んで加工せず返すだけ。**デザイン・文言は変えない**（直すときは HTML ファイルを差し替え）。
+- ユーザー提供の完成済みLP（1ファイル完結）を `src/lp/jintori/index.html` に**そのまま**置き、index.astro は `?raw` で読んで加工せず返すだけ。**文言は変えない**（直すときは HTML ファイルを差し替え）。2026-11-08 ユーザー指示で改行を「、。」単位に（節を `.ph` で包み、入らないときだけ文節で折る。文字サイズの微調整は HTML 内の `.ph` の CSS ブロック）。
 - 環境変数 `JINTORI_PREVIEW_PASSWORD` を設定すると Basic 認証（未設定なら URL を知っていれば見られる）。

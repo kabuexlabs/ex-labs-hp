@@ -327,6 +327,33 @@ body.anim [data-reveal].in .u{background-size:100% 100%}
 body.anim [data-reveal] .acts li{opacity:.25;transform:translateX(-28px)}
 body.anim [data-reveal].in .acts li{opacity:1;transform:none}
 
+/* ===== 改行（2026-11-08 ユーザー指示「、。で改行する」）：「、。」で区切った節（.ph）は途中で折り返さない。
+   節が1行に入らないときだけ、節の中の <wbr>（文節の区切り）で折り返す ===== */
+.ph{display:inline-block;text-wrap:balance}
+/* 元の「.note span」「.reco-tail span」の枠・余白・背景が節（.ph）に重ならないように */
+.note .ph,.reco-tail .ph{padding:0;border:0;background:none;font:inherit;letter-spacing:inherit;max-width:none}
+/* 1行に少しだけ入らない見出し・節は、文字サイズ（と字間・余白）を少し詰めて1行に収める */
+.pl-h h3{font-size:clamp(18px,5.2vw,24px);letter-spacing:.04em}
+@media (min-width:900px){.pl-h h3{font-size:20px}.pl-h{min-height:56px}} /* 3列の時は見出し2行分の高さを揃え、本文の開始位置を揃える */
+.acts li{font-size:clamp(16px,4.6vw,20px)}
+.it h3{font-size:clamp(18px,4.8vw,24px)}
+@media (max-width:419px){.route li{gap:14px}.route p{letter-spacing:.02em}}
+@media (max-width:360px){.pricebox .amt{font-size:17.5vw}}
+@media (max-width:350px){.closing .sk{font-size:30px}}
+/* 374px 以下（小さいスマホ）：表は「項目名の下に内容」の縦並び。479px 以下：持ち物はアイコンの円を小さく、注意書きは余白と文字を少し詰めて、1節が1行に入る幅を確保 */
+@media (max-width:374px){
+  .tbl th,.tbl td{display:block;width:auto}
+  .tbl th{border-bottom:0;padding:14px 4px 0}
+  .tbl td{padding:2px 4px 14px}
+}
+@media (max-width:479px){
+  .it{grid-template-columns:72px 1fr;gap:14px;padding:24px 16px}
+  .it p{letter-spacing:.02em}
+  .caution{padding:24px 14px}
+  .caution ul{font-size:15px;letter-spacing:.02em}
+  .it .mk b{font-size:22px}
+}
+
 @media (prefers-reduced-motion:reduce){
   .flip{animation:none}
   html{scroll-behavior:auto}
@@ -467,11 +494,11 @@ body.anim [data-reveal].in .acts li{opacity:1;transform:none}
     </div>
 
     <div class="about-copy" data-reveal>
-      <p class="q">次は、<wbr>どの駅を<wbr>取りに行く？</p>
-      <p><span class="tm r">赤</span>と<span class="tm b">青</span>のチームに分かれて、<br>東京メトロの駅を取り合う<br><span class="big"><span class="u">2時間の対戦ゲーム</span>。</span></p>
-      <p>駅のホームにある<span class="u" style="--d:.2s">指定のスポット</span>を<br>アプリで読み込むと、<br>その駅が<span class="hl">自分のチームの陣地</span>に。</p>
-      <p>ただし、<wbr>一度取った駅も安心はできません。<wbr>相手がやってくれば、<wbr><span class="flip">奪われる</span>ことも。</p>
-      <p>駅を取り、カードを使い、<span class="em">次の駅へ。</span><br>より多くの駅を、<br><span class="big"><span class="u" style="--d:.4s">自分たちのチームのもの</span>にしよう。</span></p>
+      <p class="q">次は、<wbr><span class="ph">どの駅を<wbr>取りに行く？</span></p>
+      <p><span class="tm r">赤</span>と<span class="tm b">青</span>のチームに分かれて、<br><span class="ph">東京メトロの駅を取り合う<wbr><span class="big"><span class="u">2時間の対戦ゲーム</span>。</span></span></p>
+      <p><span class="ph">駅のホームにある<span class="u" style="--d:.2s">指定のスポット</span>を<wbr>アプリで読み込むと、</span><br><span class="ph">その駅が<wbr><span class="hl">自分のチームの陣地</span>に。</span></p>
+      <p>ただし、<wbr>一度取った駅も安心はできません。<wbr>相手がやってくれば、<wbr><span class="ph"><span class="flip">奪われる</span>ことも。</span></p>
+      <p>駅を取り、カードを使い、<span class="em">次の駅へ。</span><br>より多くの駅を、<br><span class="big"><span class="u" style="--d:.4s">自分たちの<wbr>チームのもの</span>にしよう。</span></p>
     </div>
 
     <a class="cta on-dark" href="#ticket">開催日程・<wbr>チケットを見る<span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span></a>
@@ -486,20 +513,20 @@ body.anim [data-reveal].in .acts li{opacity:1;transform:none}
       <li class="pl">
         <div class="pl-scr" aria-hidden="true"><span class="fr"></span>
           <svg class="ic" viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 56h76"/><circle cx="32" cy="56" r="10" fill="#0B1D4A"/><circle cx="64" cy="56" r="10" fill="#0B1D4A"/><path d="M48 18v18M38 28l10-10 10 10"/></svg></div>
-        <div class="pl-b"><div class="pl-h"><span class="no">01</span><h3>駅に行く</h3></div><p>相棒と<wbr>路線図を<wbr>見ながら、<wbr>狙う駅を<wbr>決めよう。</p></div>
+        <div class="pl-b"><div class="pl-h"><span class="no">01</span><h3>駅に行く</h3></div><p><span class="ph">相棒と<wbr>路線図を<wbr>見ながら、</span><wbr><span class="ph">狙う駅を<wbr>決めよう。</span></p></div>
       </li>
       <li class="pl">
         <div class="pl-scr" aria-hidden="true"><span class="fr"></span>
           <svg class="ic" viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"><path d="M12 32h16l7-11h26l7 11h16v44H12z"/><circle cx="48" cy="53" r="13"/></svg></div>
-        <div class="pl-b"><div class="pl-h"><span class="no">02</span><h3>ホームの<wbr>スポットを撮る</h3></div><p>指定された<wbr>スポットを、<wbr>アプリの<wbr>カメラで撮影。</p></div>
+        <div class="pl-b"><div class="pl-h"><span class="no">02</span><h3>ホームの<wbr>スポットを撮る</h3></div><p><span class="ph">指定された<wbr>スポットを、</span><wbr><span class="ph">アプリの<wbr>カメラで撮影。</span></p></div>
       </li>
       <li class="pl">
         <div class="pl-scr" aria-hidden="true"><span class="fr"></span>
           <svg class="ic" viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="30" width="76" height="36" rx="2"/><path d="M32 48l10 10 22-20"/></svg></div>
-        <div class="pl-b"><div class="pl-h"><span class="no">03</span><h3>「読み込む」を押す</h3></div><p>その駅が、<wbr>あなたの<wbr>チームの陣地に。</p></div>
+        <div class="pl-b"><div class="pl-h"><span class="no">03</span><h3>「読み込む」を押す</h3></div><p>その駅が、<wbr><span class="ph">あなたの<wbr>チームの陣地に。</span></p></div>
       </li>
     </ol>
-    <p class="note"><span>相手に取られた駅も、<wbr><b>同じ方法で<wbr>取り返せます。</b></span></p>
+    <p class="note"><span>相手に取られた駅も、<wbr><b><span class="ph">同じ方法で<wbr>取り返せます。</span></b></span></p>
   </div>
 </section>
 
@@ -509,14 +536,14 @@ body.anim [data-reveal].in .acts li{opacity:1;transform:none}
     <h2 class="sh"><span class="sh-ey">ゲームについて</span><span class="sh-en" aria-hidden="true">Card</span><span class="sh-jp">ゲーム中のカードについて</span></h2>
     <div class="cards-grid">
       <div class="fan" aria-hidden="true">
-        <div class="gc c1"><div class="gc-top"><span>stop</span><i></i></div><div class="gc-ic"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"><path d="M22 6h20l16 16v20L42 58H22L6 42V22z"/><path d="M20 32h24" stroke-linecap="round"/></svg></div><p class="gc-tx">相手の足を<wbr>止める。</p></div>
-        <div class="gc c2"><div class="gc-top"><span>lock</span><i></i></div><div class="gc-ic"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"><rect x="13" y="28" width="38" height="28"/><path d="M21 28v-8a11 11 0 0 1 22 0v8"/><path d="M32 38v8" stroke-linecap="round"/></svg></div><p class="gc-tx">自分たちの駅を<wbr>ロックする。</p></div>
-        <div class="gc c3"><div class="gc-top"><span>peek</span><i></i></div><div class="gc-ic"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"><path d="M4 32s11-16 28-16 28 16 28 16-11 16-28 16S4 32 4 32z"/><circle cx="32" cy="32" r="8"/></svg></div><p class="gc-tx">相手の手札を<wbr>のぞく。</p></div>
+        <div class="gc c1"><div class="gc-top"><span>stop</span><i></i></div><div class="gc-ic"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"><path d="M22 6h20l16 16v20L42 58H22L6 42V22z"/><path d="M20 32h24" stroke-linecap="round"/></svg></div><p class="gc-tx">相手の足を<br>止める。</p></div>
+        <div class="gc c2"><div class="gc-top"><span>lock</span><i></i></div><div class="gc-ic"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"><rect x="13" y="28" width="38" height="28"/><path d="M21 28v-8a11 11 0 0 1 22 0v8"/><path d="M32 38v8" stroke-linecap="round"/></svg></div><p class="gc-tx">自分たちの駅を<br>ロックする。</p></div>
+        <div class="gc c3"><div class="gc-top"><span>peek</span><i></i></div><div class="gc-ic"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"><path d="M4 32s11-16 28-16 28 16 28 16-11 16-28 16S4 32 4 32z"/><circle cx="32" cy="32" r="8"/></svg></div><p class="gc-tx">相手の手札を<br>のぞく。</p></div>
         <span class="fan-tag">全16種類</span>
       </div>
       <div class="cards-copy" data-reveal>
         <p class="q">その1枚で、<br>相手の作戦を崩せ。</p>
-        <p><span class="lead">駅を取ると<wbr>手に入る、<wbr>全16種類のカード。</span></p>
+        <p><span class="lead">駅を取ると手に入る、<wbr>全16種類のカード。</span></p>
         <ul class="acts">
           <li style="--d:0s"><i aria-hidden="true"></i>相手の足を止める。</li>
           <li style="--d:.15s"><i aria-hidden="true"></i>自分たちの駅をロックする。</li>
@@ -537,7 +564,7 @@ body.anim [data-reveal].in .acts li{opacity:1;transform:none}
       <li><p class="sk"><span>謎解きは苦手。</span><span>でも、</span><span class="nw">頭を使う<mark>勝負</mark>は好き。</span></p></li>
       <li><p class="sk"><span>友達や同僚と、</span><span class="nw"><mark>いつもと違う</mark>ことを</span><span>してみたい。</span></p></li>
     </ul>
-    <p class="reco-tail"><span>そんな2人に、<wbr>挑戦してほしい<wbr>ゲームです。</span></p>
+    <p class="reco-tail"><span>そんな2人に、<wbr><span class="ph">挑戦してほしい<wbr>ゲームです。</span></span></p>
   </div>
 </section>
 
@@ -546,11 +573,11 @@ body.anim [data-reveal].in .acts li{opacity:1;transform:none}
   <div class="in">
     <h2 class="sh"><span class="sh-en" aria-hidden="true">Flow</span><span class="sh-jp">参加の流れ</span></h2>
     <ol class="route">
-      <li><span class="stn">1</span><div><span class="en">reserve</span><h3>予約する</h3><p>開催日程から、<wbr>参加する日時を<wbr>選んでください。</p></div></li>
-      <li><span class="stn">2</span><div><span class="en">prepare</span><h3>準備する</h3><p>アプリを<wbr>事前にインストールし、<wbr>東京メトロ24時間券を<wbr>ご用意ください。</p></div></li>
-      <li><span class="stn">3</span><div><span class="en">meet up</span><h3>集合する</h3><p>スタート駅の近くに集合。<br>詳しい集合場所は<wbr>参加案内を<wbr>ご確認ください。</p></div></li>
-      <li><span class="stn">4</span><div><span class="en">in game</span><h3>ゲーム中</h3><p>相棒と相談しながら<wbr>駅を巡り、<wbr>自分たちの陣地を<wbr>広げよう。</p></div></li>
-      <li><span class="stn">5</span><div><span class="en">result</span><h3>結果発表</h3><p>ゲーム終了後、<wbr>その場で<wbr>結果を発表します。</p></div></li>
+      <li><span class="stn">1</span><div><span class="en">reserve</span><h3>予約する</h3><p>開催日程から、<wbr><span class="ph">参加する日時を<wbr>選んでください。</span></p></div></li>
+      <li><span class="stn">2</span><div><span class="en">prepare</span><h3>準備する</h3><p><span class="ph">アプリを<wbr>事前にインストールし、</span><wbr><span class="ph">東京メトロ24時間券を<wbr>ご用意ください。</span></p></div></li>
+      <li><span class="stn">3</span><div><span class="en">meet up</span><h3>集合する</h3><p>スタート駅の近くに集合。<br><span class="ph">詳しい集合場所は<wbr>参加案内を<wbr>ご確認ください。</span></p></div></li>
+      <li><span class="stn">4</span><div><span class="en">in game</span><h3>ゲーム中</h3><p><span class="ph">相棒と相談しながら<wbr>駅を巡り、</span><wbr><span class="ph">自分たちの陣地を<wbr>広げよう。</span></p></div></li>
+      <li><span class="stn">5</span><div><span class="en">result</span><h3>結果発表</h3><p>ゲーム終了後、<wbr><span class="ph">その場で<wbr>結果を発表します。</span></p></div></li>
     </ol>
   </div>
 </section>
@@ -597,11 +624,11 @@ body.anim [data-reveal].in .acts li{opacity:1;transform:none}
     <ul class="items">
       <li class="it">
         <div class="mk" aria-hidden="true"><b>01</b><span><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round"><path d="M6 18a4 4 0 0 1 4-4h36a4 4 0 0 1 4 4v5a5 5 0 0 0 0 10v5a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4v-5a5 5 0 0 0 0-10z"/><path d="M36 14v28" stroke-dasharray="3 3"/></svg></span></div>
-        <div><h3 class="nw">東京メトロ24時間券</h3><p>駅の券売機で<wbr>ご購入ください。</p></div>
+        <div><h3>東京メトロ<wbr>24時間券</h3><p>駅の券売機で<wbr>ご購入ください。</p></div>
       </li>
       <li class="it">
         <div class="mk" aria-hidden="true"><b>02</b><span><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round"><rect x="15" y="4" width="26" height="48" rx="4"/><path d="M24 45h8" stroke-linecap="round"/></svg></span></div>
-        <div><h3>スマートフォン</h3><p>事前にアプリを<wbr>インストールし、<wbr>十分に充電して<wbr>お持ちください。</p></div>
+        <div><h3>スマートフォン</h3><p><span class="ph">事前にアプリを<wbr>インストールし、</span><wbr><span class="ph">十分に充電して<wbr>お持ちください。</span></p></div>
       </li>
       <li class="it">
         <div class="mk" aria-hidden="true"><b>03</b><span><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round"><rect x="5" y="16" width="38" height="24" rx="2"/><path d="M43 23h6v10h-6"/><path d="M26 20l-6 8h8l-6 8" stroke-linecap="round"/></svg></span></div>
@@ -611,13 +638,13 @@ body.anim [data-reveal].in .acts li{opacity:1;transform:none}
 
     <div class="caution">
       <ul>
-        <li>駅構内やホームでは<wbr>走らず、<wbr>歩いて移動してください。</li>
-        <li>ホームの端には<wbr>立たず、<wbr>撮影やアプリの操作は<wbr>周囲の安全を<wbr>確認してから。</li>
-        <li>駅員の方の指示が<wbr>ある場合は、<wbr>必ず従ってください。</li>
+        <li><span class="ph">駅構内やホームでは<wbr>走らず、</span><wbr>歩いて移動してください。</li>
+        <li><span class="ph">ホームの端には<wbr>立たず、</span><wbr><span class="ph">撮影やアプリの操作は<wbr>周囲の安全を<wbr>確認してから。</span></li>
+        <li><span class="ph">駅員の方の指示が<wbr>ある場合は、</span><wbr>必ず従ってください。</li>
       </ul>
       <ul class="sep">
-        <li>ゲームはアプリの中だけで<wbr>進行します。<wbr>駅に物を置いたり、<wbr>通路をふさいだり<wbr>することはありません。</li>
-        <li>ほかのお客様の<wbr>通行や乗り降りを<wbr>妨げないよう、<wbr>ご協力をお願いします。</li>
+        <li><span class="ph">ゲームはアプリの中だけで<wbr>進行します。</span><wbr>駅に物を置いたり、<wbr><span class="ph">通路をふさいだり<wbr>することはありません。</span></li>
+        <li><span class="ph">ほかのお客様の<wbr>通行や乗り降りを<wbr>妨げないよう、</span><wbr>ご協力をお願いします。</li>
       </ul>
     </div>
   </div>
