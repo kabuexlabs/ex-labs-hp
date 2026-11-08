@@ -123,6 +123,16 @@ summary{list-style:none;cursor:pointer}summary::-webkit-details-marker{display:n
 .acc-mark::before{content:'+'}details[open] .acc-mark::before{content:'−'}
 details[open] .acc-title{color:#4fd3cc}
 
+/* 長めの本文（.rt）：画面に入ると1行（.rl）ずつ順に現れ、要点（.em）に水色のマーカー下線が引かれる。
+   JS が無い／「動きを減らす」設定のときは最初から全部表示。 */
+.rl{display:inline-block}
+html.js .rt .rl{opacity:0;transform:translateY(10px)}
+html.js .rt.in .rl{animation:lineIn .7s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0) * 110ms)}
+@keyframes lineIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
+.em{color:#f0ece2;font-weight:700;background-image:linear-gradient(rgba(79,211,204,.42),rgba(79,211,204,.42));background-repeat:no-repeat;background-size:0 .42em;background-position:0 92%;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-size .7s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0) * 110ms + .45s)}
+.rt.in .em,html:not(.js) .em{background-size:100% .42em}
+@media (prefers-reduced-motion: reduce){html.js .rt .rl{opacity:1!important;transform:none!important}.em{background-size:100% .42em!important}}
+
 #grain{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.09}
 
 /* ホバー */
@@ -183,12 +193,12 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
     </div>
   </div>
   <!-- 2026-11-06 ユーザー指示：STORY の改行・段落分けを変更（段落の間は1.5行ぶん空ける） -->
-  <div data-reveal="80" style="margin:0;font-size:clamp(13.5px,3.7vw,18px);line-height:2.35;letter-spacing:.02em;color:#d8d3c7">
-    <p style="margin:0">あなたたちは、<br>『家、ついて行ってイイですか？』の<br>新人ディレクター。</p>
-    <p style="margin:1.5em 0 0">今回の仕事は、<br>アポイントを取った住人の家を訪ね、<br>その人の暮らしや人生を取材すること。</p>
-    <p style="margin:1.5em 0 0">けれど、目の前の住人は、どこか様子がおかしい。</p>
-    <p style="margin:1.5em 0 0">会話の中に混じる違和感。</p>
-    <p style="margin:1.5em 0 0">家の中で起こる、説明のつかない出来事。</p>
+  <div class="rt" data-reveal="80" style="margin:0;font-size:clamp(13.5px,3.7vw,18px);line-height:2.35;letter-spacing:.02em;color:#d8d3c7">
+    <p style="margin:0"><span class="rl">あなたたちは、</span><br><span class="rl">『家、ついて行ってイイですか？』の</span><br><span class="rl"><span class="em">新人ディレクター</span>。</span></p>
+    <p style="margin:1.5em 0 0"><span class="rl">今回の仕事は、</span><br><span class="rl">アポイントを取った住人の家を訪ね、</span><br><span class="rl"><span class="em">その人の暮らしや人生を取材すること</span>。</span></p>
+    <p style="margin:1.5em 0 0"><span class="rl">けれど、目の前の住人は、<span class="em">どこか様子がおかしい</span>。</span></p>
+    <p style="margin:1.5em 0 0"><span class="rl">会話の中に混じる<span class="em">違和感</span>。</span></p>
+    <p style="margin:1.5em 0 0"><span class="rl">家の中で起こる、<span class="em">説明のつかない出来事</span>。</span></p>
   </div>
   <div data-reveal="140" style="margin:48px auto 0;width:1px;height:48px;background:linear-gradient(#4fd3cc,transparent)"></div>
   <p data-reveal="160" style="margin:24px 0 0;font-weight:700;font-size:clamp(17px,4.6vw,32px);line-height:1.9;letter-spacing:.06em;color:#f0ece2;animation:flicker 9s infinite;text-wrap:balance">あなたたちは、<br>無事に取材を終えられるだろうか。</p>
@@ -208,7 +218,7 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
       <span style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DotGothic16',monospace;font-size:17px;letter-spacing:.05em;flex:none;background:#e6e2d8;color:#0b0f0f">01</span>
       <div style="min-width:0">
         <div style="display:flex;align-items:center;gap:12px;min-height:44px"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:#4fd3cc;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round"><rect x="3" y="6" width="18" height="12" rx="1"></rect><polyline points="3,7 12,13 21,7"></polyline></svg><h3 style="margin:0;min-width:0;flex:1;font-weight:700;font-size:clamp(16px,4.2vw,21px);letter-spacing:.06em;line-height:1.5;color:#f0ece2;text-wrap:balance">取材相手からメールが届く</h3></div>
-        <p style="margin:12px 0 0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">取材相手から、あなたのもとへメールが届きます。<br>そこに記されているのは、当日の待ち合わせについて。</p>
+        <p class="rt" style="margin:12px 0 0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty"><span class="rl">取材相手から、あなたのもとへ<span class="em">メールが届きます</span>。</span><br><span class="rl">そこに記されているのは、<span class="em">当日の待ち合わせ</span>について。</span></p>
       </div>
     </div>
     <div aria-hidden="true" style="text-align:center;color:#4fd3cc;font-size:15px;line-height:1">▼</div>
@@ -216,7 +226,7 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
       <span style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DotGothic16',monospace;font-size:17px;letter-spacing:.05em;flex:none;background:#e6e2d8;color:#0b0f0f">02</span>
       <div style="min-width:0">
         <div style="display:flex;align-items:center;gap:12px;min-height:44px"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:#4fd3cc;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round"><rect x="5" y="3" width="14" height="14" rx="2"></rect><line x1="5" y1="10" x2="19" y2="10"></line><circle cx="9" cy="14" r="1"></circle><circle cx="15" cy="14" r="1"></circle><line x1="8" y1="21" x2="6" y2="17"></line><line x1="16" y1="21" x2="18" y2="17"></line></svg><h3 style="margin:0;min-width:0;flex:1;font-weight:700;font-size:clamp(16px,4.2vw,21px);letter-spacing:.06em;line-height:1.5;color:#f0ece2;text-wrap:balance">指定された最寄り駅へ</h3></div>
-        <p style="margin:12px 0 0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">当日は、指定された駅へ。<br>新人ディレクターとして、取材に向かいます。</p>
+        <p class="rt" style="margin:12px 0 0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty"><span class="rl">当日は、<span class="em">指定された駅へ</span>。</span><br><span class="rl">新人ディレクターとして、取材に向かいます。</span></p>
       </div>
     </div>
     <div aria-hidden="true" style="text-align:center;color:#4fd3cc;font-size:15px;line-height:1">▼</div>
@@ -224,7 +234,7 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
       <span style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DotGothic16',monospace;font-size:17px;letter-spacing:.05em;flex:none;background:#e6e2d8;color:#0b0f0f">03</span>
       <div style="min-width:0">
         <div style="display:flex;align-items:center;gap:12px;min-height:44px"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:#4fd3cc;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round"><polygon points="12,3 21,11 3,11"></polygon><rect x="5" y="11" width="14" height="10"></rect><rect x="10" y="15" width="4" height="6"></rect></svg><h3 style="margin:0;min-width:0;flex:1;font-weight:700;font-size:clamp(16px,4.2vw,21px);letter-spacing:.06em;line-height:1.5;color:#f0ece2;text-wrap:balance">取材相手の家へ</h3></div>
-        <p style="margin:12px 0 0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">気になることを尋ねながら、<br>取材を進めてください。</p>
+        <p class="rt" style="margin:12px 0 0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty"><span class="rl"><span class="em">気になることを尋ねながら</span>、</span><br><span class="rl">取材を進めてください。</span></p>
       </div>
     </div>
     <div aria-hidden="true" style="text-align:center;color:#4fd3cc;font-size:15px;line-height:1">▼</div>
@@ -251,14 +261,14 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
     <div style="position:absolute;top:14px;right:14px;width:16px;height:16px;border-top:1px solid #4fd3cc;border-right:1px solid #4fd3cc"></div>
     <div style="position:absolute;bottom:14px;left:14px;width:16px;height:16px;border-bottom:1px solid #4fd3cc;border-left:1px solid #4fd3cc"></div>
     <h3 style="margin:0 0 16px;font-weight:700;font-size:clamp(19px,3.2vw,24px);letter-spacing:.08em;line-height:1.6;color:#f0ece2;word-break:keep-all;overflow-wrap:anywhere">あなた自身が、<wbr>新人ディレクターに。</h3>
-    <p style="margin:0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">住人と会話を交わしながら、<br>その人の暮らしや、<br>隠された事情に迫っていく取材体験です。</p>
+    <p class="rt" style="margin:0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty"><span class="rl">住人と会話を交わしながら、</span><br><span class="rl">その人の暮らしや、</span><br><span class="rl"><span class="em">隠された事情に迫っていく</span>取材体験です。</span></p>
   </div>
 
   <div data-reveal="80" style="position:relative;border:1px solid rgba(230,226,216,.55);padding:34px 20px 30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:28px;align-items:center">
     <div style="position:absolute;top:-1px;left:22px;padding:4px 12px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:12px;letter-spacing:.2em;transform:translateY(-50%)">POINT 02</div>
     <div>
       <h3 style="margin:0 0 16px;font-weight:700;font-size:clamp(19px,3.2vw,24px);letter-spacing:.08em;line-height:1.6;color:#f0ece2;word-break:keep-all;overflow-wrap:anywhere">取材の成果が<wbr>「ディレクター評価」に。</h3>
-      <p style="margin:0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">お渡しする「取材メモ」には、<br>確かめてほしい項目が記されています。<br>会話や家の中で得た情報を整理し、<br>あなたなりの答えを導き出してください。<br>その回答によって、<br>新人ディレクターとしての<br>評価が決まります。</p>
+      <p class="rt" style="margin:0;font-size:clamp(13.5px,3.8vw,15px);line-height:2.1;color:#d8d3c7;text-wrap:pretty"><span class="rl">お渡しする<span class="em">「取材メモ」</span>には、</span><br><span class="rl">確かめてほしい項目が記されています。</span><br><span class="rl">会話や家の中で得た情報を整理し、</span><br><span class="rl"><span class="em">あなたなりの答えを導き出してください</span>。</span><br><span class="rl">その回答によって、</span><br><span class="rl">新人ディレクターとしての</span><br><span class="rl"><span class="em">評価が決まります</span>。</span></p>
     </div>
     <div style="justify-self:center;width:min(260px,100%);background:#ece7d9;color:#1a1c1c;padding:22px 20px 26px;transform:rotate(-2deg);box-shadow:0 14px 30px rgba(0,0,0,.5);position:relative">
       <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(1deg);width:70px;height:20px;background:rgba(79,211,204,.55)"></div>
@@ -301,7 +311,7 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
       ? <><span style="font-size:clamp(15px,4vw,18px);margin-right:.5em">{priceParts[1]}</span><span style="font-size:clamp(38px,10vw,52px)">{priceParts[2]}</span><span style="font-size:clamp(16px,4.4vw,20px);margin-left:.15em">{priceParts[3]}</span></>
       : <span style="font-size:clamp(26px,7vw,36px)">{INFO.price}</span>}</div>
   </div>
-  <p data-reveal="120" style="margin:28px 0 0;font-size:clamp(13px,3.6vw,14px);line-height:2.1;color:#d8d3c7;text-wrap:pretty">お一人様からお申し込みいただけます。<br>同じ回にお申し込みのお客様と一緒に、<br>新人ディレクターとしてご参加いただきます。</p>
+  <p class="rt" data-reveal="120" style="margin:28px 0 0;font-size:clamp(13px,3.6vw,14px);line-height:2.1;color:#d8d3c7;text-wrap:pretty"><span class="rl"><span class="em">お一人様からお申し込みいただけます</span>。</span><br><span class="rl">同じ回にお申し込みのお客様と一緒に、</span><br><span class="rl">新人ディレクターとしてご参加いただきます。</span></p>
   <div data-reveal="160" style="margin-top:48px;display:flex;flex-direction:column;align-items:center;gap:14px">
     <a href={ticketHref} {...ticketAttrs} data-place="info" class="cta" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:16px;min-width:min(300px,100%);padding:20px 40px;border:1px solid #4fd3cc;color:#4fd3cc;font-weight:700;font-size:17px;letter-spacing:.24em;background:rgba(79,211,204,.06);animation:pulseGlow 3s ease-in-out infinite;cursor:pointer;transition:background .2s,color .2s">取材に行く<span style="font-size:12px">▶</span></a>
   </div>
@@ -331,7 +341,7 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
     </div>
     <h2 style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;padding:7px 18px;background:#4fd3cc;color:#0b0f0f;font-weight:700;font-size:clamp(15px,4vw,19px);letter-spacing:.14em;line-height:1.5;white-space:nowrap">怖さ・演出について</h2>
   </div>
-  <p data-reveal="80" style="margin:0 0 40px;font-size:clamp(13.5px,3.8vw,15px);line-height:2.2;color:#d8d3c7;text-wrap:pretty"><strong style="font-weight:700;color:#f0ece2;font-size:17px">本公演は、怖さを抑えたホラー・ミステリー体験です。</strong><br>暗い場所や物音、不意を突く演出が含まれます。<br>追いかける演出や、キャストがお客様の身体に触れる演出はありません。</p>
+  <p class="rt" data-reveal="80" style="margin:0 0 40px;font-size:clamp(13.5px,3.8vw,15px);line-height:2.2;color:#d8d3c7;text-wrap:pretty"><span class="rl"><strong style="font-weight:700;color:#f0ece2;font-size:17px">本公演は、<span class="em">怖さを抑えた</span>ホラー・ミステリー体験です。</strong></span><br><span class="rl"><span class="em">暗い場所や物音、不意を突く演出</span>が含まれます。</span><br><span class="rl">追いかける演出や、キャストがお客様の<span class="em">身体に触れる演出はありません</span>。</span></p>
   <div data-reveal="120" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));border:1px solid rgba(230,226,216,.6)">
     <div style="padding:26px 24px;border-right:1px solid rgba(230,226,216,.6)">
       <div style="display:inline-block;padding:7px 18px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.15em;margin-bottom:20px">含まれる演出</div>
@@ -360,10 +370,10 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
     <h2 style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);margin:0;padding:7px 18px;background:#4fd3cc;color:#0b0f0f;font-weight:700;font-size:clamp(15px,4vw,19px);letter-spacing:.14em;line-height:1.5;white-space:nowrap">参加条件</h2>
   </div>
   <div style="display:grid;gap:14px">
-    <div data-reveal="0" style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:20px 18px;border:1px solid rgba(230,226,216,.6)"><div style="padding:9px 14px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;line-height:1.5;text-align:center">対象年齢</div><p style="margin:0;flex:1 1 240px;font-size:clamp(13.5px,3.8vw,15px);line-height:2;color:#f0ece2;text-wrap:pretty">中学生以上の方が対象です。<br>18歳未満の方は、保護者同伴でご参加ください。</p></div>
-    <div data-reveal="0" style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:20px 18px;border:1px solid rgba(230,226,216,.6)"><div style="padding:9px 14px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;line-height:1.5;text-align:center">体調</div><p style="margin:0;flex:1 1 240px;font-size:clamp(13.5px,3.8vw,15px);line-height:2;color:#f0ece2;text-wrap:pretty">心臓疾患のある方、妊娠中の方、<br>体調のすぐれない方は、ご参加をお控えください。</p></div>
-    <div data-reveal="0" style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:20px 18px;border:1px solid rgba(230,226,216,.6)"><div style="padding:9px 14px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;line-height:1.5;text-align:center">会場設備について</div><p style="margin:0;flex:1 1 240px;font-size:clamp(13.5px,3.8vw,15px);line-height:2;color:#f0ece2;text-wrap:pretty">会場は2階建ての家屋です。<br>体験中に階段を使用するため、<br>車椅子でのご参加には対応しておりません。</p></div>
-    <div data-reveal="0" style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:20px 18px;border:1px solid rgba(230,226,216,.6)"><div style="padding:9px 14px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;line-height:1.5;text-align:center">対応言語</div><p style="margin:0;flex:1 1 240px;font-size:clamp(13.5px,3.8vw,15px);line-height:2;color:#f0ece2">本公演は日本語のみで実施します。</p></div>
+    <div data-reveal="0" style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:20px 18px;border:1px solid rgba(230,226,216,.6)"><div style="padding:9px 14px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;line-height:1.5;text-align:center">対象年齢</div><p class="rt" style="margin:0;flex:1 1 240px;font-size:clamp(13.5px,3.8vw,15px);line-height:2;color:#f0ece2;text-wrap:pretty"><span class="rl"><span class="em">中学生以上</span>の方が対象です。</span><br><span class="rl">18歳未満の方は、<span class="em">保護者同伴</span>でご参加ください。</span></p></div>
+    <div data-reveal="0" style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:20px 18px;border:1px solid rgba(230,226,216,.6)"><div style="padding:9px 14px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;line-height:1.5;text-align:center">体調</div><p class="rt" style="margin:0;flex:1 1 240px;font-size:clamp(13.5px,3.8vw,15px);line-height:2;color:#f0ece2;text-wrap:pretty"><span class="rl">心臓疾患のある方、妊娠中の方、</span><br><span class="rl">体調のすぐれない方は、<span class="em">ご参加をお控えください</span>。</span></p></div>
+    <div data-reveal="0" style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:20px 18px;border:1px solid rgba(230,226,216,.6)"><div style="padding:9px 14px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;line-height:1.5;text-align:center">会場設備について</div><p class="rt" style="margin:0;flex:1 1 240px;font-size:clamp(13.5px,3.8vw,15px);line-height:2;color:#f0ece2;text-wrap:pretty"><span class="rl">会場は2階建ての家屋です。</span><br><span class="rl">体験中に<span class="em">階段を使用</span>するため、</span><br><span class="rl"><span class="em">車椅子でのご参加には対応しておりません</span>。</span></p></div>
+    <div data-reveal="0" style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:20px 18px;border:1px solid rgba(230,226,216,.6)"><div style="padding:9px 14px;background:#e6e2d8;color:#0b0f0f;font-weight:700;font-size:14px;letter-spacing:.1em;white-space:nowrap;line-height:1.5;text-align:center">対応言語</div><p class="rt" style="margin:0;flex:1 1 240px;font-size:clamp(13.5px,3.8vw,15px);line-height:2;color:#f0ece2"><span class="rl">本公演は<span class="em">日本語のみ</span>で実施します。</span></p></div>
   </div>
 </section>
 
@@ -378,17 +388,17 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
     <div style="border:1px solid rgba(230,226,216,.6);background:rgba(11,15,15,.6);padding:28px 20px 26px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px">
       <span style="display:flex;color:#4fd3cc"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:1.4;stroke-linecap:round"><rect x="7" y="2" width="10" height="20" rx="2"></rect><line x1="11" y1="18" x2="13" y2="18"></line></svg></span>
       <span style="font-weight:700;font-size:15px;letter-spacing:.12em;color:#f0ece2">スマートフォン</span>
-      <p style="margin:0;font-size:clamp(13px,3.6vw,14px);line-height:2;color:#d8d3c7;text-wrap:pretty">十分に充電されたスマートフォンをお持ちください。</p>
+      <p class="rt" style="margin:0;font-size:clamp(13px,3.6vw,14px);line-height:2;color:#d8d3c7;text-wrap:pretty"><span class="rl"><span class="em">十分に充電された</span>スマートフォンをお持ちください。</span></p>
     </div>
     <div style="border:1px solid rgba(230,226,216,.6);background:rgba(11,15,15,.6);padding:28px 20px 26px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px">
       <span style="display:flex;color:#4fd3cc"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:1.4;stroke-linecap:round"><rect x="3" y="13" width="18" height="6" rx="3"></rect><rect x="3" y="8" width="10" height="7" rx="3"></rect></svg></span>
       <span style="font-weight:700;font-size:15px;letter-spacing:.12em;color:#f0ece2">靴</span>
-      <p style="margin:0;font-size:clamp(13px,3.6vw,14px);line-height:2;color:#d8d3c7;text-wrap:pretty">会場では靴を脱いでいただきます。<br>脱ぎ履きしやすい靴でお越しください。</p>
+      <p class="rt" style="margin:0;font-size:clamp(13px,3.6vw,14px);line-height:2;color:#d8d3c7;text-wrap:pretty"><span class="rl">会場では靴を脱いでいただきます。</span><br><span class="rl"><span class="em">脱ぎ履きしやすい靴</span>でお越しください。</span></p>
     </div>
     <div style="border:1px solid rgba(230,226,216,.6);background:rgba(11,15,15,.6);padding:28px 20px 26px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px">
       <span style="display:flex;color:#4fd3cc"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="stroke-width:1.4;stroke-linecap:round"><rect x="4" y="8" width="16" height="13" rx="2"></rect><rect x="9" y="4" width="6" height="4" rx="2"></rect></svg></span>
       <span style="font-weight:700;font-size:15px;letter-spacing:.12em;color:#f0ece2">お荷物</span>
-      <p style="margin:0;font-size:clamp(13px,3.6vw,14px);line-height:2;color:#d8d3c7;text-wrap:pretty">お荷物は、会場内の指定場所に置いていただきます。</p>
+      <p class="rt" style="margin:0;font-size:clamp(13px,3.6vw,14px);line-height:2;color:#d8d3c7;text-wrap:pretty"><span class="rl">お荷物は、会場内の<span class="em">指定場所</span>に置いていただきます。</span></p>
     </div>
   </div>
 </section>
@@ -407,10 +417,10 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
         <h3 class="acc-title" style="margin:0;font-weight:700;font-size:clamp(15px,4.2vw,17px);letter-spacing:.08em;line-height:1.6;color:#f0ece2;transition:color .2s">【途中退場・お手洗い】</h3>
         <span class="acc-mark" aria-hidden="true" style="font-family:'DotGothic16',monospace;font-size:24px;line-height:1;color:#e6e2d8;width:24px;text-align:center"></span>
       </summary>
-      <div style="display:grid;gap:18px;padding:2px 4px 28px 60px">
-      <p style="margin:0;text-wrap:pretty">体験の途中で退場することは可能です。<br>退場をご希望の場合は、スタッフにお知らせください。</p>
-      <p style="margin:0;text-wrap:pretty">お客様のご都合による一時退出後の再入場はできません。</p>
-      <p style="margin:0;text-wrap:pretty">お手洗いは、できるだけ受付前にお済ませください。<br>体験中にお手洗いが必要になった場合や、<br>体調がすぐれない場合は、<br>事前にご案内する専用のサインでスタッフにお知らせください。</p>
+      <div class="rt" style="display:grid;gap:18px;padding:2px 4px 28px 60px">
+      <p style="margin:0;text-wrap:pretty"><span class="rl">体験の途中で<span class="em">退場することは可能です</span>。</span><br><span class="rl">退場をご希望の場合は、スタッフにお知らせください。</span></p>
+      <p style="margin:0;text-wrap:pretty"><span class="rl">お客様のご都合による一時退出後の<span class="em">再入場はできません</span>。</span></p>
+      <p style="margin:0;text-wrap:pretty"><span class="rl">お手洗いは、できるだけ<span class="em">受付前にお済ませください</span>。</span><br><span class="rl">体験中にお手洗いが必要になった場合や、</span><br><span class="rl">体調がすぐれない場合は、</span><br><span class="rl">事前にご案内する<span class="em">専用のサイン</span>でスタッフにお知らせください。</span></p>
       </div>
     </details>
     <details data-reveal="0" style="border-bottom:1px solid rgba(230,226,216,.5)">
@@ -419,11 +429,11 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
         <h3 class="acc-title" style="margin:0;font-weight:700;font-size:clamp(15px,4.2vw,17px);letter-spacing:.08em;line-height:1.6;color:#f0ece2;transition:color .2s">【参加時のお願い】</h3>
         <span class="acc-mark" aria-hidden="true" style="font-family:'DotGothic16',monospace;font-size:24px;line-height:1;color:#e6e2d8;width:24px;text-align:center"></span>
       </summary>
-      <div style="display:grid;gap:18px;padding:2px 4px 28px 60px">
+      <div class="rt" style="display:grid;gap:18px;padding:2px 4px 28px 60px">
       <ul style="list-style:none;margin:0;padding:0;display:grid;gap:14px;color:#f0ece2">
-        <li style="display:flex;gap:14px;align-items:baseline"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none;position:relative;top:-2px"></span><span style="text-wrap:pretty">飲酒された状態でのご参加はお断りします。</span></li>
-        <li style="display:flex;gap:14px;align-items:baseline"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none;position:relative;top:-2px"></span><span style="text-wrap:pretty">飲食物の持ち込みはお断りします。</span></li>
-        <li style="display:flex;gap:14px;align-items:baseline"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none;position:relative;top:-2px"></span><span style="text-wrap:pretty">リピート参加も歓迎します。初めて参加される方の体験を損なわないよう、ネタバレにつながる発言や先回りした行動はお控えください。</span></li>
+        <li style="display:flex;gap:14px;align-items:baseline"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none;position:relative;top:-2px"></span><span class="rl" style="text-wrap:pretty"><span class="em">飲酒された状態</span>でのご参加はお断りします。</span></li>
+        <li style="display:flex;gap:14px;align-items:baseline"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none;position:relative;top:-2px"></span><span class="rl" style="text-wrap:pretty"><span class="em">飲食物の持ち込み</span>はお断りします。</span></li>
+        <li style="display:flex;gap:14px;align-items:baseline"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none;position:relative;top:-2px"></span><span class="rl" style="text-wrap:pretty">リピート参加も歓迎します。初めて参加される方の体験を損なわないよう、<span class="em">ネタバレにつながる発言や先回りした行動</span>はお控えください。</span></li>
       </ul>
       </div>
     </details>
@@ -433,10 +443,10 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
         <h3 class="acc-title" style="margin:0;font-weight:700;font-size:clamp(15px,4.2vw,17px);letter-spacing:.08em;line-height:1.6;color:#f0ece2;transition:color .2s">【撮影・録音・SNSについて】</h3>
         <span class="acc-mark" aria-hidden="true" style="font-family:'DotGothic16',monospace;font-size:24px;line-height:1;color:#e6e2d8;width:24px;text-align:center"></span>
       </summary>
-      <div style="display:grid;gap:18px;padding:2px 4px 28px 60px">
-      <p style="margin:0;text-wrap:pretty">キャストの撮影・録画、およびキャストの声の録音は、<br>原則として禁止です。</p>
-      <p style="margin:0;text-wrap:pretty">SNSでの参加報告や、<br>ネタバレを含まない感想の投稿は歓迎します。</p>
-      <p style="margin:0;text-wrap:pretty">これから参加する方の楽しみを守るため、<br>家の中の様子、登場人物の秘密、<br>物語の結末に関する投稿はお控えください。</p>
+      <div class="rt" style="display:grid;gap:18px;padding:2px 4px 28px 60px">
+      <p style="margin:0;text-wrap:pretty"><span class="rl">キャストの撮影・録画、およびキャストの声の録音は、</span><br><span class="rl"><span class="em">原則として禁止</span>です。</span></p>
+      <p style="margin:0;text-wrap:pretty"><span class="rl">SNSでの参加報告や、</span><br><span class="rl"><span class="em">ネタバレを含まない感想の投稿は歓迎</span>します。</span></p>
+      <p style="margin:0;text-wrap:pretty"><span class="rl">これから参加する方の楽しみを守るため、</span><br><span class="rl">家の中の様子、登場人物の秘密、</span><br><span class="rl"><span class="em">物語の結末に関する投稿はお控えください</span>。</span></p>
       </div>
     </details>
     <details data-reveal="0" style="border-bottom:1px solid rgba(230,226,216,.5)">
@@ -445,14 +455,14 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
         <h3 class="acc-title" style="margin:0;font-weight:700;font-size:clamp(15px,4.2vw,17px);letter-spacing:.08em;line-height:1.6;color:#f0ece2;transition:color .2s">【悪天候などによる公演中止について】</h3>
         <span class="acc-mark" aria-hidden="true" style="font-family:'DotGothic16',monospace;font-size:24px;line-height:1;color:#e6e2d8;width:24px;text-align:center"></span>
       </summary>
-      <div style="display:grid;gap:18px;padding:2px 4px 28px 60px">
-      <p style="margin:0;text-wrap:pretty">悪天候などにより公演を中止する場合は、<br>原則として開演4時間前までに判断し、<br>チケットをご購入のお客様へメールでご連絡します。</p>
-      <p style="margin:0;text-wrap:pretty">中止の場合は、以下のいずれかをお選びいただけます。</p>
+      <div class="rt" style="display:grid;gap:18px;padding:2px 4px 28px 60px">
+      <p style="margin:0;text-wrap:pretty"><span class="rl">悪天候などにより公演を中止する場合は、</span><br><span class="rl">原則として<span class="em">開演4時間前までに判断</span>し、</span><br><span class="rl">チケットをご購入のお客様へ<span class="em">メールでご連絡</span>します。</span></p>
+      <p style="margin:0;text-wrap:pretty"><span class="rl">中止の場合は、以下のいずれかをお選びいただけます。</span></p>
       <ul style="list-style:none;margin:0;padding:20px 24px;border:1px solid rgba(230,226,216,.6);display:grid;gap:12px;color:#f0ece2">
-        <li style="display:flex;gap:14px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none"></span>チケット代金の全額返金</li>
-        <li style="display:flex;gap:14px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none"></span>後日の空席のある回への振替</li>
+        <li style="display:flex;gap:14px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none"></span><span class="rl">チケット代金の<span class="em">全額返金</span></span></li>
+        <li style="display:flex;gap:14px;align-items:center"><span style="width:8px;height:8px;border-radius:50%;background:#4fd3cc;flex:none"></span><span class="rl">後日の空席のある回への<span class="em">振替</span></span></li>
       </ul>
-      <p style="margin:0;text-wrap:pretty">振替可能な回がない場合は、<br>チケット代金を全額返金いたします。</p>
+      <p style="margin:0;text-wrap:pretty"><span class="rl">振替可能な回がない場合は、</span><br><span class="rl">チケット代金を<span class="em">全額返金いたします</span>。</span></p>
       </div>
     </details>
   </div>
@@ -643,7 +653,22 @@ html.intro-lock,html.intro-lock body{overflow:hidden}
     })(start);
   }
 
+  // 長めの本文：画面に入ったまとまり（.rt）に in を付け、行（.rl）に順番（--i）を振る
+  function setupLines() {
+    var blocks = document.querySelectorAll('.rt');
+    blocks.forEach(function (b) {
+      var i = 0;
+      b.querySelectorAll('.rl').forEach(function (l) { l.style.setProperty('--i', i++); });
+    });
+    if (!('IntersectionObserver' in window) || reduced) { blocks.forEach(function (b) { b.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (!e.isIntersecting) return; e.target.classList.add('in'); io.unobserve(e.target); });
+    }, { threshold: 0.15, rootMargin: '0px 0px -6% 0px' });
+    blocks.forEach(function (b) { io.observe(b); });
+  }
+
   setupReveal();
+  setupLines();
   setupTimecode();
 
   if (CONFIG.showIntro && !reduced) {
