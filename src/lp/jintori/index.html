@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>東京メトロ陣取り</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..800;1,6..96,400..700&family=Dela+Gothic+One&family=Krona+One&family=Noto+Sans+JP:wght@400;500;700;900&family=Shippori+Mincho+B1:wght@700;800&display=swap">
+<style>
+/* 設計メモ：濃紺の星空（夜の地下）／黒／方眼紙／メトロブルーのバンドを交互に積むイベントLP。
+   見出しは「かすれた大きな英字＋中央に重ねた日本語ラベル」、CTAは黒帯＋丸矢印、画面下に2分割の固定ボタン。
+   改行は文節単位（keep-all＋wbr）。本文はデジタル庁デザインシステム準拠（Noto Sans JP 16–17px／行間1.8以上／タップ44px以上／黄色のフォーカス）。 */
+:root{
+  color-scheme:dark;
+  --ink:#0A0A0A;
+  --navy:#06102A;
+  --navy-2:#0B1D4A;
+  --paper:#F1F1EC;
+  --rule:#DCDCD3;
+  --white:#FFFFFF;
+  --gray:#B9C0CC;
+  --panel:#E4E6EA;
+  --blue:#0BA0DC;      /* 東京メトロ ブライトブルー（近似） */
+  --blue-ink:#006FB0;  /* 紙の上に刷る青 */
+  --red:#F62E36;       /* 丸ノ内線レッド＝赤チーム */
+  --focus:#FFD43D;
+  --f-body:'Noto Sans JP','Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
+  --f-logo:'Dela Gothic One','Noto Sans JP',sans-serif;
+  --f-wide:'Krona One','Arial Black',sans-serif;
+  --f-didone:'Bodoni Moda','Didot','Times New Roman',serif;
+  --f-mincho:'Shippori Mincho B1','Hiragino Mincho ProN','Yu Mincho',serif;
+  --gl:max(20px, env(safe-area-inset-left, 0px));
+  --gr:max(20px, env(safe-area-inset-right, 0px));
+  --bar-h:64px;
+  --grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .12 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  --wear:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -5 0 0 0 3.6'/></filter><rect width='100%' height='100%' filter='url(%23w)'/></svg>");
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ink);color:var(--white);font-family:var(--f-body);font-size:16px;line-height:1.9;letter-spacing:.04em;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  word-break:keep-all;overflow-wrap:anywhere;line-break:strict;
+  padding-bottom:calc(var(--bar-h) + env(safe-area-inset-bottom,0px))}
+@media (min-width:768px){body{font-size:17px}}
+img,svg{max-width:100%}
+a{color:inherit}
+p{margin:0}
+h1,h2,h3{margin:0;font-weight:inherit;line-height:1.4}
+ul,ol{margin:0;padding:0;list-style:none}
+.nw{white-space:nowrap}
+:focus-visible{outline:4px solid var(--focus);outline-offset:2px}
+.skip{position:absolute;left:8px;top:8px;z-index:200;background:var(--white);color:var(--ink);padding:8px 16px;font-weight:700;transform:translateY(-300%)}
+.skip:focus{transform:none}
+.in{max-width:960px;margin-inline:auto;padding-left:var(--gl);padding-right:var(--gr)}
+.sec{position:relative;padding-block:88px;overflow:hidden}
+@media (min-width:768px){.sec{padding-block:120px}}
+.grain::after{content:"";position:absolute;inset:0;background-image:var(--grain);pointer-events:none;z-index:0}
+.sec>.in{position:relative;z-index:1}
+
+/* 背景 */
+.night{background:
+  radial-gradient(1.2px 1.2px at 23px 41px,rgba(255,255,255,.85),transparent) 0 0/173px 173px,
+  radial-gradient(1px 1px at 91px 17px,rgba(255,255,255,.6),transparent) 0 0/211px 211px,
+  radial-gradient(1.4px 1.4px at 140px 120px,rgba(200,235,255,.7),transparent) 0 0/257px 257px,
+  radial-gradient(1px 1px at 50px 160px,rgba(255,255,255,.5),transparent) 0 0/97px 131px,
+  radial-gradient(700px 420px at 92% 8%,rgba(11,160,220,.38),transparent 62%),
+  radial-gradient(520px 380px at 0% 92%,rgba(11,160,220,.26),transparent 62%),
+  linear-gradient(180deg,var(--navy) 0%,var(--navy-2) 100%);
+  color:var(--white)}
+.paper{background-color:var(--paper);background-image:linear-gradient(var(--rule) 1px,transparent 1px),linear-gradient(90deg,var(--rule) 1px,transparent 1px);background-size:56px 56px;background-position:-1px -1px;color:var(--ink)}
+.black{background:var(--ink);color:var(--white)}
+.bblue{background:var(--blue);color:var(--ink)}
+
+/* ===== 固定UI ===== */
+.burger{position:fixed;z-index:120;top:calc(14px + env(safe-area-inset-top,0px));right:calc(14px + env(safe-area-inset-right,0px));width:56px;height:56px;background:var(--ink);border:2px solid var(--blue);cursor:pointer;padding:0;display:grid;place-items:center}
+.burger span{position:relative;display:block;width:28px;height:2px;background:var(--blue);transform:translateY(-5px);transition:transform .25s ease}
+.burger span::after{content:"";position:absolute;left:0;top:10px;width:28px;height:2px;background:var(--blue);transition:transform .25s ease,top .25s ease}
+.burger[aria-expanded="true"] span{transform:translateY(0) rotate(45deg)}
+.burger[aria-expanded="true"] span::after{top:0;transform:rotate(-90deg)}
+.menu{position:fixed;inset:0;z-index:110;background:var(--ink);overflow:auto;padding:calc(96px + env(safe-area-inset-top,0px)) var(--gr) calc(96px + env(safe-area-inset-bottom,0px)) var(--gl)}
+.menu ul{max-width:720px;margin-inline:auto;border-top:1px solid #333}
+.menu li{border-bottom:1px solid #333}
+.menu a{display:flex;align-items:baseline;justify-content:space-between;gap:16px;min-height:72px;padding:14px 4px;text-decoration:none}
+.menu a b{font-family:var(--f-didone);font-weight:700;font-size:clamp(28px,7vw,44px);line-height:1.1;text-transform:uppercase;letter-spacing:.02em}
+.menu a span{font-weight:700;font-size:15px;color:var(--blue)}
+
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:100;display:grid;grid-template-columns:1fr 1fr;background:var(--ink);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.bar a{display:flex;align-items:center;justify-content:center;gap:8px;min-height:var(--bar-h);padding:8px 10px;text-decoration:none;font-weight:900;font-size:15px;line-height:1.3;letter-spacing:.06em;color:var(--ink);text-align:center}
+.bar a svg{flex:none;width:22px;height:22px}
+.bar .b1{background:var(--blue)}
+.bar .b2{background:var(--white)}
+.bar .b1:hover{background:#34B4E8}.bar .b2:hover{background:#EEF1F5}
+@media (max-width:380px){.bar a{font-size:13.5px;gap:5px;letter-spacing:.02em}}
+@media (min-width:768px){.bar a{font-size:18px;gap:12px}}
+
+/* ===== セクション見出し：かすれた英字＋中央の和文ラベル ===== */
+.sh{display:grid;place-items:center;text-align:center;margin-bottom:64px}
+@media (min-width:768px){.sh{margin-bottom:80px}}
+.sh-ey{grid-area:1/1;align-self:start;transform:translateY(-1.6em);font-weight:700;font-size:13px;letter-spacing:.2em;opacity:.8}
+.sh-en{grid-area:1/1;font-family:var(--f-didone);font-weight:800;font-size:clamp(54px,15vw,124px);line-height:1;letter-spacing:.01em;text-transform:uppercase;white-space:nowrap;color:var(--white);
+  -webkit-mask-image:var(--wear);mask-image:var(--wear);-webkit-mask-size:240px;mask-size:240px}
+.sh-jp{grid-area:1/1;align-self:end;transform:translateY(40%);position:relative;z-index:1;background:var(--blue);color:var(--ink);font-weight:900;font-size:clamp(17px,4.6vw,24px);line-height:1.35;letter-spacing:.14em;padding:3px 10px 3px 14px;white-space:nowrap}
+.paper .sh-en{color:var(--ink)}
+.bblue .sh-en{color:var(--ink)}
+.bblue .sh-jp{background:var(--ink);color:var(--blue)}
+
+/* ===== CTA：黒帯＋丸矢印 ===== */
+.cta{position:relative;display:flex;align-items:center;justify-content:center;max-width:640px;margin:56px auto 0;min-height:84px;padding:12px 76px 12px 24px;background:var(--ink);color:var(--blue);text-decoration:none;font-weight:900;font-size:clamp(18px,4.8vw,28px);line-height:1.35;letter-spacing:.06em;text-align:center;border-block:3px solid var(--blue)}
+.cta .arr{position:absolute;right:14px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--blue);color:var(--ink);transition:transform .2s ease}
+.cta .arr svg{width:22px;height:22px}
+.cta:hover .arr{transform:translate(4px,-50%)}
+.cta.on-dark{background:var(--blue);color:var(--ink);border-color:var(--blue)}
+.cta.on-dark .arr{background:var(--ink);color:var(--blue)}
+.cta.on-dark:hover{background:#34B4E8}
+
+/* ===== HERO ===== */
+.hero{position:relative;overflow:hidden;background:var(--navy);min-height:660px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:calc(104px + env(safe-area-inset-top,0px)) var(--gr) 132px var(--gl)}
+@media (min-width:768px){.hero{min-height:800px;padding-top:128px;padding-bottom:160px}}
+.hero-map{position:absolute;inset:0;z-index:0}
+.hero-map svg{position:absolute;left:50%;top:50%;width:1040px;max-width:none;height:auto;transform:translate(-50%,-50%) rotate(-8deg)}
+@media (min-width:768px){.hero-map svg{width:max(1320px,112%)}}
+.hero-map polyline{stroke:var(--blue);opacity:.42;stroke-width:16}
+.hero-map polyline:nth-child(2n){stroke:#5FC3EC;opacity:.22}
+.hero-map::after{content:"";position:absolute;inset:0;background:radial-gradient(circle,transparent 0 1.1px,var(--navy) 1.7px) 0 0/5px 5px;opacity:.6}
+.hero-shade{position:absolute;inset:0;z-index:1;pointer-events:none;background:
+  repeating-linear-gradient(180deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px),
+  radial-gradient(70% 55% at 50% 50%,rgba(6,16,42,.2),rgba(6,16,42,.86) 100%)}
+.hero::after{content:"";position:absolute;inset:0;background-image:var(--grain);z-index:1;pointer-events:none}
+
+@keyframes blink{50%{opacity:.15}}
+
+.title{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center}
+.lock{display:inline-flex;flex-direction:column;align-items:stretch;background:var(--blue);border:3px solid var(--blue);font-family:var(--f-logo);font-weight:400}
+.lock-a{color:var(--ink);font-size:clamp(40px,11.4vw,100px);line-height:1.18;letter-spacing:.06em;padding:.06em .14em 0 .2em;text-align:center}
+.lock-b{background:var(--ink);color:var(--white);font-size:clamp(64px,18.4vw,162px);line-height:1.08;letter-spacing:.06em;padding:.02em .1em .06em .16em;text-align:center;text-shadow:-2px 0 rgba(246,46,54,.6),2px 0 rgba(11,160,220,.75)}
+.hero-en{margin-top:16px;font-family:var(--f-wide);font-size:clamp(12px,3.3vw,22px);letter-spacing:.04em}
+.strip{display:inline-block;margin-top:16px;background:var(--ink);color:var(--white);font-family:var(--f-mincho);font-weight:800;font-size:clamp(17px,4.6vw,32px);line-height:1.35;letter-spacing:.1em;padding:3px 10px 5px 13px;white-space:nowrap}
+
+/* 駅の取り合い */
+.map .st{fill:var(--white);stroke:var(--navy)}
+.map .st.r{fill:var(--red);stroke:var(--white)}
+.map .st.b{fill:var(--blue);stroke:var(--white)}
+@keyframes rb{0%,49%{fill:var(--red)}50%,100%{fill:var(--blue)}}
+@keyframes nr{0%,49%{fill:var(--white);stroke:var(--navy)}50%,100%{fill:var(--red);stroke:var(--white)}}
+@keyframes nb{0%,49%{fill:var(--white);stroke:var(--navy)}50%,100%{fill:var(--blue);stroke:var(--white)}}
+.map .a1,.map .a2,.map .a5{stroke:var(--white)}
+.map .a1{fill:var(--red);animation:rb 6s steps(1,end) infinite alternate}
+.map .a2{fill:var(--blue);animation:rb 7s steps(1,end) infinite alternate-reverse}
+.map .a3{animation:nr 8s steps(1,end) 1s infinite alternate}
+.map .a4{animation:nb 9s steps(1,end) 2.5s infinite alternate}
+.map .a5{fill:var(--red);animation:rb 5s steps(1,end) 1.5s infinite alternate}
+.map .a6{animation:nb 7s steps(1,end) 4s infinite alternate}
+
+/* ===== ティッカー（明朝・二重罫） ===== */
+.ticker{overflow:hidden;background:var(--navy);color:var(--blue);border-top:2px solid var(--blue);border-bottom:2px solid var(--blue);box-shadow:inset 0 3px 0 var(--navy),inset 0 5px 0 rgba(11,160,220,.6),inset 0 -3px 0 var(--navy),inset 0 -5px 0 rgba(11,160,220,.6)}
+.ticker-track{display:flex;width:max-content;animation:tick 44s linear infinite}
+.ticker-g{display:flex;flex:none;align-items:center;padding-block:12px}
+.ticker-g span{white-space:nowrap;padding-right:40px;font-family:var(--f-mincho);font-weight:800;font-size:clamp(20px,5vw,28px);letter-spacing:.06em;line-height:1.3}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+/* ===== 斜体ステートメント ===== */
+.sk{display:inline-block;font-weight:900;font-size:clamp(30px,8.6vw,64px);line-height:1.45;letter-spacing:.01em;transform:skewX(-9deg);text-shadow:0 0 22px rgba(160,220,255,.35)}
+.sk span{display:block}
+.sk mark{background:var(--white);color:var(--navy);padding:0 .08em;text-shadow:none}
+.sk .thin{font-weight:500}
+.lines{margin-top:52px;display:grid;gap:14px;font-weight:700;font-size:clamp(17px,4.5vw,22px);line-height:1.8;text-shadow:0 0 14px rgba(170,215,255,.45)}
+.lines .gap{margin-top:28px}
+
+/* ===== ABOUT ===== */
+.bracket{position:relative;max-width:560px;margin:0 auto 56px;padding:40px 12px;text-align:center}
+.bracket::before,.bracket::after{content:"";position:absolute;width:26px;height:26px;border-color:var(--white);border-style:solid}
+.bracket::before{left:0;top:0;border-width:3px 0 0 3px}
+.bracket::after{right:0;bottom:0;border-width:0 3px 3px 0}
+.bracket .tag{font-weight:900;font-size:clamp(13px,3.5vw,16px);letter-spacing:.2em}
+.bracket .name{margin-top:6px;font-family:var(--f-logo);font-weight:400;font-size:clamp(28px,7.8vw,62px);line-height:1.2;letter-spacing:.12em;padding-left:.12em;white-space:nowrap}
+.about-copy{max-width:600px;margin-inline:auto;text-align:center}
+.about-copy .q{display:inline-block;font-weight:900;font-size:clamp(24px,6.4vw,34px);line-height:1.5;margin-bottom:28px;transform:skewX(-9deg)}
+.about-copy p:not(.q){font-weight:700;font-size:clamp(16px,4.3vw,19px);line-height:2}
+.about-copy p + p{margin-top:18px}
+
+/* ===== PLAY：録画フレーム付きの黒カード ===== */
+.plays{display:grid;gap:24px}
+@media (min-width:900px){.plays{grid-template-columns:repeat(3,1fr);gap:20px}}
+.pl{background:var(--ink);color:var(--white);border:4px solid var(--ink);display:flex;flex-direction:column}
+.pl-scr{position:relative;aspect-ratio:16/9;max-width:100%;background:
+  repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px),
+  radial-gradient(80% 90% at 50% 40%,#16316A,#08142F);
+  display:grid;place-items:center;overflow:hidden}
+.pl-scr .fr{position:absolute;inset:12px;pointer-events:none;
+  background:
+   linear-gradient(var(--white),var(--white)) 0 0/22px 2px no-repeat,
+   linear-gradient(var(--white),var(--white)) 0 0/2px 22px no-repeat,
+   linear-gradient(var(--white),var(--white)) 100% 0/22px 2px no-repeat,
+   linear-gradient(var(--white),var(--white)) 100% 0/2px 22px no-repeat,
+   linear-gradient(var(--white),var(--white)) 0 100%/22px 2px no-repeat,
+   linear-gradient(var(--white),var(--white)) 0 100%/2px 22px no-repeat,
+   linear-gradient(var(--white),var(--white)) 100% 100%/22px 2px no-repeat,
+   linear-gradient(var(--white),var(--white)) 100% 100%/2px 22px no-repeat;opacity:.8}
+.pl-scr .rec i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-right:6px;vertical-align:1px}
+.pl-scr svg.ic{width:30%;max-width:96px;height:auto;color:var(--blue)}
+.pl-b{padding:20px 20px 24px}
+.pl-h{display:flex;align-items:center;gap:12px}
+.pl-h .no{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--white);color:var(--ink);font-family:var(--f-didone);font-weight:700;font-size:20px;line-height:1}
+.pl-h h3{font-weight:900;font-size:clamp(20px,5.4vw,24px);line-height:1.4;letter-spacing:.06em}
+.pl-b p{margin-top:12px;color:var(--gray);font-size:16px;line-height:1.9}
+.note{margin-top:32px;text-align:center}
+.note span{display:inline-block;max-width:100%;background:var(--ink);color:var(--white);font-family:var(--f-mincho);font-weight:800;font-size:clamp(16px,4.4vw,20px);letter-spacing:.08em;padding:8px 18px;line-height:1.6}
+.note b{color:var(--blue)}
+
+/* ===== CARD ===== */
+.cards-grid{display:grid;gap:56px;align-items:center}
+@media (min-width:860px){.cards-grid{grid-template-columns:1fr 1fr}}
+.fan{position:relative;height:320px;max-width:420px;width:100%;margin-inline:auto}
+.gc{position:absolute;left:50%;top:50%;width:136px;height:204px;margin:-102px 0 0 -68px;background:#FAFAF6;color:var(--ink);border:2px solid var(--ink);border-radius:10px;padding:10px;display:flex;flex-direction:column;transform-origin:50% 120%;box-shadow:0 18px 40px rgba(6,16,42,.35)}
+.gc-top{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--ink);padding-bottom:6px;font-family:var(--f-wide);font-size:10px;letter-spacing:0;text-transform:lowercase}
+.gc-top i{width:16px;height:16px;border-radius:50%;background:var(--ink)}
+.gc-ic{flex:1;display:grid;place-items:center}
+.gc-ic svg{width:60px;height:60px}
+.gc-tx{font-family:var(--f-mincho);font-weight:800;font-size:13px;line-height:1.5;letter-spacing:.02em}
+.gc.c1{transform:rotate(-13deg) translateX(-56px)}
+.gc.c1 .gc-top i{background:var(--red)}
+.gc.c2{transform:translateY(-14px);z-index:2}
+.gc.c3{transform:rotate(13deg) translateX(56px)}
+.gc.c3 .gc-top i{background:var(--blue-ink)}
+.fan-tag{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);z-index:3;background:var(--ink);color:var(--white);font-weight:900;font-size:17px;letter-spacing:.12em;padding:4px 16px;white-space:nowrap}
+@media (min-width:860px){.fan{height:380px}.gc{width:172px;height:252px;margin:-126px 0 0 -86px}.gc.c1{transform:rotate(-15deg) translateX(-84px)}.gc.c3{transform:rotate(15deg) translateX(84px)}.gc-tx{font-size:14px}}
+.cards-copy{text-align:center}
+@media (min-width:860px){.cards-copy{text-align:left}}
+.cards-copy .q{display:inline-block;transform:skewX(-9deg);font-weight:900;font-size:clamp(26px,7vw,38px);line-height:1.45;margin-bottom:22px}
+.cards-copy p:not(.q){font-weight:700;font-size:clamp(16px,4.3vw,18px);line-height:2}
+.cards-copy p + p{margin-top:16px}
+.cards-copy .lead{display:inline;background:var(--ink);color:var(--white);padding:3px 8px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* ===== FOR YOU ===== */
+.reco{display:grid;gap:44px;text-align:center}
+.reco .sk{font-size:clamp(25px,7vw,48px)}
+.reco-tail{margin-top:56px;text-align:center}
+.reco-tail span{display:inline-block;font-family:var(--f-mincho);font-weight:800;font-size:clamp(17px,4.6vw,22px);letter-spacing:.1em;border-top:1px solid rgba(255,255,255,.6);border-bottom:1px solid rgba(255,255,255,.6);padding:10px 8px}
+
+/* ===== FLOW ===== */
+.route{position:relative;max-width:640px;margin-inline:auto;display:grid;gap:40px}
+.route::before{content:"";position:absolute;left:25px;top:20px;bottom:20px;width:8px;background:var(--blue)}
+.route li{position:relative;display:grid;grid-template-columns:58px 1fr;gap:20px;align-items:start}
+.stn{position:relative;z-index:1;display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:var(--white);border:7px solid var(--blue);color:var(--ink);font-family:var(--f-didone);font-weight:700;font-size:24px;line-height:1}
+.route li:last-child .stn{border-color:var(--red)}
+.route .en{display:block;font-family:var(--f-wide);font-size:12px;color:var(--blue);letter-spacing:0;text-transform:lowercase;line-height:1.4;padding-top:4px}
+.route h3{font-weight:900;font-size:clamp(21px,5.6vw,26px);letter-spacing:.1em;line-height:1.4;margin-top:4px}
+.route p{margin-top:6px;color:var(--gray);font-size:16px;line-height:1.9}
+
+/* ===== TICKET：PRICEボックス＋情報パネル ===== */
+.pricebox{position:relative;background:var(--ink);color:var(--white);padding:44px 48px 36px;text-align:center;overflow:hidden}
+.pricebox .side{position:absolute;font-family:var(--f-didone);font-weight:800;font-size:44px;line-height:1;letter-spacing:.04em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.45);writing-mode:vertical-rl}
+.pricebox .side.l{left:4px;top:-2px}
+.pricebox .side.r{right:4px;bottom:-2px}
+.pricebox .lab{font-weight:900;font-size:clamp(17px,4.6vw,20px);letter-spacing:.14em}
+.pricebox .amt{margin-top:6px;font-family:var(--f-didone);font-weight:600;font-size:clamp(68px,19vw,112px);line-height:1;letter-spacing:-.01em;font-variant-numeric:lining-nums}
+.pricebox .amt small{font-family:var(--f-body);font-weight:900;font-size:.24em;letter-spacing:.04em;margin-left:4px}
+.pricebox hr{border:0;border-top:1px solid rgba(255,255,255,.35);margin:22px auto 16px;max-width:420px}
+.pricebox .nt{font-size:14px;color:var(--gray);line-height:1.8}
+
+.panel{margin-top:40px;background:var(--panel);color:var(--ink);border:4px solid var(--ink)}
+.panel-h{display:flex;align-items:center;gap:16px;background:var(--ink);color:var(--white);padding:12px 16px 14px}
+.panel-h .tag{flex:none;background:var(--blue);color:var(--ink);font-weight:900;font-size:14px;letter-spacing:.1em;padding:4px 14px;line-height:1.5}
+.panel-h h3{font-weight:900;font-size:clamp(22px,5.8vw,30px);letter-spacing:.08em;line-height:1.3}
+.panel-b{padding:8px 18px 20px}
+@media (min-width:768px){.panel-b{padding:12px 32px 28px}}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th,.tbl td{text-align:left;vertical-align:top;padding:16px 4px;border-bottom:1px solid #B8BCC4;line-height:1.8}
+.tbl th{width:32%;font-weight:900;font-size:15px;letter-spacing:.06em;white-space:nowrap;padding-right:14px}
+.tbl td{font-weight:500;font-size:16px}
+.tbl .team{display:inline-block;padding:0 8px;font-weight:900;line-height:1.7;margin-right:2px}
+.tbl .team.r{background:var(--red);color:var(--white)}
+.tbl .team.b{background:var(--blue);color:var(--ink)}
+.panel .fn{margin-top:14px;font-size:15px;background:#D3D6DC;padding:10px 14px}
+
+/* ===== ITEMS：丸アイコン＋番号の黒ボックス ===== */
+.items{display:grid;gap:20px;max-width:760px;margin-inline:auto}
+.it{background:var(--ink);color:var(--white);display:grid;grid-template-columns:104px 1fr;gap:20px;align-items:start;padding:28px 20px}
+@media (min-width:768px){.it{grid-template-columns:140px 1fr;gap:32px;padding:36px 40px}}
+.it .mk{position:relative;padding-top:12px}
+.it .mk b{position:absolute;left:50%;top:0;transform:translateX(-50%);z-index:1;font-family:var(--f-didone);font-weight:800;font-size:26px;line-height:1;color:var(--white);text-shadow:0 0 0 var(--ink),2px 2px 0 var(--ink)}
+.it .mk span{display:grid;place-items:center;width:100%;aspect-ratio:1;border-radius:50%;background:var(--blue);color:var(--ink)}
+.it .mk svg{width:50%;height:auto}
+.it h3{font-weight:900;font-size:clamp(19px,5vw,24px);line-height:1.45;letter-spacing:.06em}
+.it p{margin-top:10px;color:var(--gray);font-size:16px;line-height:1.9}
+
+.caution{margin-top:48px;border:2px solid var(--ink);background:#FAFAF6;padding:28px 20px;max-width:760px;margin-inline:auto}
+@media (min-width:768px){.caution{padding:36px 44px}}
+.caution ul{display:grid;gap:10px;font-weight:500;font-size:16px;line-height:1.9}
+.caution li{padding-left:1.2em;position:relative}
+.caution li::before{content:"※";position:absolute;left:0;font-weight:900;color:var(--blue-ink)}
+.caution .sep{margin-top:20px;padding-top:20px;border-top:1px dashed #9A9A92}
+
+/* ===== CLOSING ===== */
+.closing{text-align:center}
+.closing .sk{font-size:clamp(34px,9.6vw,76px)}
+
+.ftr{background:var(--ink);color:var(--gray);padding-block:48px 40px;font-size:13px;border-top:2px solid var(--blue)}
+.ftr .name{font-family:var(--f-logo);font-size:22px;letter-spacing:.12em;color:var(--white)}
+.ftr .en{font-family:var(--f-wide);font-size:11px;margin-top:4px}
+.ftr nav{display:flex;flex-wrap:wrap;gap:4px 20px;margin-top:20px}
+.ftr nav a{display:inline-flex;align-items:center;min-height:44px;text-decoration:underline;text-underline-offset:4px}
+
+/* ===== 強調（下線・マーカー・チップ） ===== */
+.u{--uc:rgba(11,160,220,.9);background-image:linear-gradient(transparent 62%,var(--uc) 62%,var(--uc) 92%,transparent 92%);background-repeat:no-repeat;background-size:100% 100%;padding:0 .06em;transition:background-size 1s cubic-bezier(.2,.7,.2,1) var(--d,0s)}
+.u.r{--uc:rgba(246,46,54,.9)}
+.bblue .u{--uc:rgba(255,255,255,.95)}
+body.anim [data-reveal] .u{background-size:0% 100%}
+body.anim [data-reveal].in .u{background-size:100% 100%}
+.em{color:var(--blue);font-size:1.16em;font-weight:900}
+.big{display:inline-block;font-size:1.2em;font-weight:900;line-height:1.55;margin-top:.2em}
+.hl{background:var(--white);color:var(--ink);padding:0 .14em;font-weight:900;text-shadow:none}
+.bblue .hl{background:var(--ink);color:var(--white)}
+.tm{display:inline-block;padding:0 .3em;margin:0 .06em;font-weight:900;line-height:1.5}
+.tm.r{background:var(--red);color:var(--white)}
+.tm.b{background:var(--blue);color:var(--ink)}
+.flip{display:inline-block;padding:0 .3em;font-weight:900;line-height:1.5;background:var(--red);color:var(--white);animation:flip 2.4s steps(1,end) infinite}
+@keyframes flip{0%,49%{background:var(--red);color:var(--white)}50%,100%{background:var(--blue);color:var(--ink)}}
+.acts{display:grid;gap:10px;margin:4px 0 26px;justify-items:center}
+@media (min-width:860px){.acts{justify-items:start}}
+.acts li{display:flex;align-items:center;gap:12px;background:var(--ink);color:var(--white);font-weight:900;font-size:clamp(17px,4.6vw,20px);line-height:1.4;padding:8px 18px 8px 14px;transition:transform .7s cubic-bezier(.2,.7,.2,1) var(--d,0s),opacity .7s ease var(--d,0s)}
+.acts li i{flex:none;width:12px;height:12px;background:var(--blue)}
+.acts li:first-child i{background:var(--red)}
+.acts li:last-child i{background:var(--white)}
+body.anim [data-reveal] .acts li{opacity:.25;transform:translateX(-28px)}
+body.anim [data-reveal].in .acts li{opacity:1;transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  .flip{animation:none}
+  html{scroll-behavior:auto}
+  .ticker-track,.map .st{animation:none!important}
+  .cta .arr,.burger span,.burger span::after{transition:none}
+}
+</style>
+<style>[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+
+
+<a class="skip" href="#main">本文へスキップ</a>
+<button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="メニューを開く"><span></span></button>
+<nav class="menu" id="menu" hidden aria-label="メニュー">
+  <ul>
+    <li><a href="#about"><b>About</b><span>体験概要</span></a></li>
+    <li><a href="#howto"><b>Play</b><span>ゲームの流れ</span></a></li>
+    <li><a href="#card"><b>Card</b><span>ゲーム中のカード</span></a></li>
+    <li><a href="#foryou"><b>For you</b><span>こんな方におすすめ</span></a></li>
+    <li><a href="#flow"><b>Flow</b><span>参加の流れ</span></a></li>
+    <li><a href="#ticket"><b>Ticket</b><span>開催概要</span></a></li>
+    <li><a href="#items"><b>Items</b><span>持ち物</span></a></li>
+  </ul>
+</nav>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<section class="hero" aria-label="メインビジュアル">
+  <div class="hero-map"><svg class="map" viewBox="0 0 800 520" role="img" aria-labelledby="mapT"><title id="mapT">赤と青のチームが駅を取り合っていく路線図のイメージ</title>
+<g fill="none" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">
+<polyline stroke="#FF9500" points="30,380 240,380 360,260 600,260 770,90"/>
+<polyline stroke="#F62E36" points="60,90 240,90 400,250 400,440 560,500"/>
+<polyline stroke="#009BBF" points="20,230 280,230 470,40 780,40"/>
+<polyline stroke="#00BB85" points="180,500 180,320 330,170 330,30"/>
+<polyline stroke="#8F76D6" points="40,470 450,470 620,300 620,160 760,20"/>
+<polyline stroke="#C1A470" points="500,20 500,180 690,370 690,500"/>
+<polyline stroke="#00AC9B" points="100,20 100,170 240,310 240,420"/>
+</g><g class="sts" stroke-width="3.5">
+<circle class="st" cx="30" cy="380" r="10"/>
+<circle class="st r" cx="122" cy="380" r="10"/>
+<circle class="st a1" cx="214" cy="380" r="10"/>
+<circle class="st b" cx="287" cy="333" r="10"/>
+<circle class="st" cx="352" cy="268" r="10"/>
+<circle class="st r" cx="440" cy="260" r="10"/>
+<circle class="st b" cx="532" cy="260" r="10"/>
+<circle class="st" cx="600" cy="260" r="10"/>
+<circle class="st r" cx="682" cy="178" r="10"/>
+<circle class="st a2" cx="747" cy="113" r="10"/>
+<circle class="st b" cx="60" cy="90" r="10"/>
+<circle class="st" cx="152" cy="90" r="10"/>
+<circle class="st a6" cx="240" cy="90" r="10"/>
+<circle class="st b" cx="308" cy="158" r="10"/>
+<circle class="st" cx="373" cy="223" r="10"/>
+<circle class="st r" cx="400" cy="250" r="10"/>
+<circle class="st a3" cx="400" cy="304" r="10"/>
+<circle class="st b" cx="400" cy="396" r="10"/>
+<circle class="st" cx="400" cy="440" r="10"/>
+<circle class="st r" cx="445" cy="457" r="10"/>
+<circle class="st b" cx="531" cy="489" r="10"/>
+<circle class="st" cx="20" cy="230" r="10"/>
+<circle class="st r" cx="112" cy="230" r="10"/>
+<circle class="st a4" cx="204" cy="230" r="10"/>
+<circle class="st b" cx="280" cy="230" r="10"/>
+<circle class="st" cx="356" cy="154" r="10"/>
+<circle class="st r" cx="421" cy="89" r="10"/>
+<circle class="st b" cx="470" cy="40" r="10"/>
+<circle class="st" cx="585" cy="40" r="10"/>
+<circle class="st r" cx="677" cy="40" r="10"/>
+<circle class="st a5" cx="769" cy="40" r="10"/>
+<circle class="st b" cx="180" cy="500" r="10"/>
+<circle class="st" cx="180" cy="408" r="10"/>
+<circle class="st r" cx="180" cy="320" r="10"/>
+<circle class="st b" cx="248" cy="252" r="10"/>
+<circle class="st" cx="330" cy="102" r="10"/>
+<circle class="st r" cx="330" cy="30" r="10"/>
+<circle class="st" cx="40" cy="470" r="10"/>
+<circle class="st b" cx="132" cy="470" r="10"/>
+<circle class="st" cx="224" cy="470" r="10"/>
+<circle class="st r" cx="316" cy="470" r="10"/>
+<circle class="st b" cx="485" cy="435" r="10"/>
+<circle class="st" cx="550" cy="370" r="10"/>
+<circle class="st r" cx="615" cy="305" r="10"/>
+<circle class="st" cx="620" cy="214" r="10"/>
+<circle class="st b" cx="620" cy="160" r="10"/>
+<circle class="st" cx="647" cy="133" r="10"/>
+<circle class="st r" cx="712" cy="68" r="10"/>
+<circle class="st b" cx="500" cy="20" r="10"/>
+<circle class="st" cx="500" cy="112" r="10"/>
+<circle class="st r" cx="500" cy="180" r="10"/>
+<circle class="st" cx="647" cy="327" r="10"/>
+<circle class="st b" cx="690" cy="370" r="10"/>
+<circle class="st" cx="690" cy="493" r="10"/>
+<circle class="st r" cx="100" cy="20" r="10"/>
+<circle class="st b" cx="100" cy="112" r="10"/>
+<circle class="st" cx="100" cy="170" r="10"/>
+<circle class="st r" cx="240" cy="310" r="10"/>
+<circle class="st" cx="240" cy="420" r="10"/>
+</g></svg></div>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="title">
+    <h1 class="lock" aria-label="東京メトロ陣取り"><span class="lock-a" aria-hidden="true">東京メトロ</span><span class="lock-b" aria-hidden="true">陣取り</span></h1>
+    <p class="hero-en">TOKYO METRO JINTORI</p>
+    <p class="strip">いつもの駅を、奪い合え。</p>
+  </div>
+</section>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <div class="ticker-g"><span>いつもの駅を、奪い合え。</span><span>次は、どの駅を取りに行く？</span><span>2時間後、この東京は何色だ。</span></div>
+    <div class="ticker-g"><span>いつもの駅を、奪い合え。</span><span>次は、どの駅を取りに行く？</span><span>2時間後、この東京は何色だ。</span></div>
+  </div>
+</div>
+
+<!-- ================= STATEMENT ================= -->
+<section class="sec night grain">
+  <div class="in" style="text-align:center">
+    <h2 class="sk"><span class="thin">始めましょう。</span><span>東京メトロでの</span><span class="nw">『<mark>陣取り合戦</mark>』を。</span></h2>
+    <div class="lines" data-reveal>
+      <p>路線図を見て、<span class="u">次の一手</span>を決める。</p>
+      <p><span class="u" style="--d:.25s">まだ誰もいない駅</span>を狙うか。</p>
+      <p>相手に奪われた駅を<span class="u r" style="--d:.5s">取り返す</span>か。</p>
+      <p class="gap">頼れるのは、<span class="em">隣にいる相棒</span>と、<br><span class="em">手元のカード</span>。</p>
+      <p>乗り慣れた東京メトロで、<br><span class="big"><span class="hl">陣取りゲーム</span>が始まる。</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="sec black grain" id="about">
+  <div class="in">
+    <h2 class="sh"><span class="sh-en" aria-hidden="true">About</span><span class="sh-jp">体験概要</span></h2>
+
+    <div class="bracket">
+      <p class="tag">2人1組で挑む、<wbr>リアル陣取りゲーム。</p>
+      <p class="name">東京メトロ陣取り</p>
+    </div>
+
+    <div class="about-copy" data-reveal>
+      <p class="q">次は、<wbr>どの駅を<wbr>取りに行く？</p>
+      <p><span class="tm r">赤</span>と<span class="tm b">青</span>のチームに分かれて、<br>東京メトロの駅を取り合う<br><span class="big"><span class="u">2時間の対戦ゲーム</span>。</span></p>
+      <p>駅のホームにある<span class="u" style="--d:.2s">指定のスポット</span>を<br>アプリで読み込むと、<br>その駅が<span class="hl">自分のチームの陣地</span>に。</p>
+      <p>ただし、<wbr>一度取った駅も安心はできません。<wbr>相手がやってくれば、<wbr><span class="flip">奪われる</span>ことも。</p>
+      <p>駅を取り、カードを使い、<span class="em">次の駅へ。</span><br>より多くの駅を、<br><span class="big"><span class="u" style="--d:.4s">自分たちのチームのもの</span>にしよう。</span></p>
+    </div>
+
+    <a class="cta on-dark" href="#ticket">開催日程・<wbr>チケットを見る<span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span></a>
+  </div>
+</section>
+
+<!-- ================= HOW TO PLAY ================= -->
+<section class="sec paper" id="howto">
+  <div class="in">
+    <h2 class="sh"><span class="sh-ey">ゲームについて</span><span class="sh-en" aria-hidden="true">Play</span><span class="sh-jp">ゲームの流れ</span></h2>
+    <ol class="plays">
+      <li class="pl">
+        <div class="pl-scr" aria-hidden="true"><span class="fr"></span>
+          <svg class="ic" viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 56h76"/><circle cx="32" cy="56" r="10" fill="#0B1D4A"/><circle cx="64" cy="56" r="10" fill="#0B1D4A"/><path d="M48 18v18M38 28l10-10 10 10"/></svg></div>
+        <div class="pl-b"><div class="pl-h"><span class="no">01</span><h3>駅に行く</h3></div><p>相棒と<wbr>路線図を<wbr>見ながら、<wbr>狙う駅を<wbr>決めよう。</p></div>
+      </li>
+      <li class="pl">
+        <div class="pl-scr" aria-hidden="true"><span class="fr"></span>
+          <svg class="ic" viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"><path d="M12 32h16l7-11h26l7 11h16v44H12z"/><circle cx="48" cy="53" r="13"/></svg></div>
+        <div class="pl-b"><div class="pl-h"><span class="no">02</span><h3>ホームの<wbr>スポットを撮る</h3></div><p>指定された<wbr>スポットを、<wbr>アプリの<wbr>カメラで撮影。</p></div>
+      </li>
+      <li class="pl">
+        <div class="pl-scr" aria-hidden="true"><span class="fr"></span>
+          <svg class="ic" viewBox="0 0 96 96" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="30" width="76" height="36" rx="2"/><path d="M32 48l10 10 22-20"/></svg></div>
+        <div class="pl-b"><div class="pl-h"><span class="no">03</span><h3>「読み込む」を押す</h3></div><p>その駅が、<wbr>あなたの<wbr>チームの陣地に。</p></div>
+      </li>
+    </ol>
+    <p class="note"><span>相手に取られた駅も、<wbr><b>同じ方法で<wbr>取り返せます。</b></span></p>
+  </div>
+</section>
+
+<!-- ================= CARD ================= -->
+<section class="sec bblue grain" id="card">
+  <div class="in">
+    <h2 class="sh"><span class="sh-ey">ゲームについて</span><span class="sh-en" aria-hidden="true">Card</span><span class="sh-jp">ゲーム中のカードについて</span></h2>
+    <div class="cards-grid">
+      <div class="fan" aria-hidden="true">
+        <div class="gc c1"><div class="gc-top"><span>stop</span><i></i></div><div class="gc-ic"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"><path d="M22 6h20l16 16v20L42 58H22L6 42V22z"/><path d="M20 32h24" stroke-linecap="round"/></svg></div><p class="gc-tx">相手の足を<wbr>止める。</p></div>
+        <div class="gc c2"><div class="gc-top"><span>lock</span><i></i></div><div class="gc-ic"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"><rect x="13" y="28" width="38" height="28"/><path d="M21 28v-8a11 11 0 0 1 22 0v8"/><path d="M32 38v8" stroke-linecap="round"/></svg></div><p class="gc-tx">自分たちの駅を<wbr>ロックする。</p></div>
+        <div class="gc c3"><div class="gc-top"><span>peek</span><i></i></div><div class="gc-ic"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"><path d="M4 32s11-16 28-16 28 16 28 16-11 16-28 16S4 32 4 32z"/><circle cx="32" cy="32" r="8"/></svg></div><p class="gc-tx">相手の手札を<wbr>のぞく。</p></div>
+        <span class="fan-tag">全16種類</span>
+      </div>
+      <div class="cards-copy" data-reveal>
+        <p class="q">その1枚で、<br>相手の作戦を崩せ。</p>
+        <p><span class="lead">駅を取ると<wbr>手に入る、<wbr>全16種類のカード。</span></p>
+        <ul class="acts">
+          <li style="--d:0s"><i aria-hidden="true"></i>相手の足を止める。</li>
+          <li style="--d:.15s"><i aria-hidden="true"></i>自分たちの駅をロックする。</li>
+          <li style="--d:.3s"><i aria-hidden="true"></i>相手の手札をのぞく。</li>
+        </ul>
+        <p><span class="u" style="--d:.4s">今使えば</span>、<wbr>目の前の駅を取れるかもしれない。<br><span class="u" style="--d:.6s">残しておけば</span>、<wbr>最後の切り札になるかもしれない。</p>
+        <p>どこで使うか。誰に使うか。<br>カード1枚の使いどころが、<br><span class="big"><span class="hl">勝負を動かします。</span></span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOR YOU ================= -->
+<section class="sec night grain" id="foryou">
+  <div class="in">
+    <h2 class="sh"><span class="sh-en" aria-hidden="true">For you</span><span class="sh-jp">こんな方におすすめ</span></h2>
+    <ul class="reco">
+      <li><p class="sk"><span>謎解きは苦手。</span><span>でも、</span><span class="nw">頭を使う<mark>勝負</mark>は好き。</span></p></li>
+      <li><p class="sk"><span>友達や同僚と、</span><span class="nw"><mark>いつもと違う</mark>ことを</span><span>してみたい。</span></p></li>
+    </ul>
+    <p class="reco-tail"><span>そんな2人に、<wbr>挑戦してほしい<wbr>ゲームです。</span></p>
+  </div>
+</section>
+
+<!-- ================= FLOW ================= -->
+<section class="sec black grain" id="flow">
+  <div class="in">
+    <h2 class="sh"><span class="sh-en" aria-hidden="true">Flow</span><span class="sh-jp">参加の流れ</span></h2>
+    <ol class="route">
+      <li><span class="stn">1</span><div><span class="en">reserve</span><h3>予約する</h3><p>開催日程から、<wbr>参加する日時を<wbr>選んでください。</p></div></li>
+      <li><span class="stn">2</span><div><span class="en">prepare</span><h3>準備する</h3><p>アプリを<wbr>事前にインストールし、<wbr>東京メトロ24時間券を<wbr>ご用意ください。</p></div></li>
+      <li><span class="stn">3</span><div><span class="en">meet up</span><h3>集合する</h3><p>スタート駅の近くに集合。<br>詳しい集合場所は<wbr>参加案内を<wbr>ご確認ください。</p></div></li>
+      <li><span class="stn">4</span><div><span class="en">in game</span><h3>ゲーム中</h3><p>相棒と相談しながら<wbr>駅を巡り、<wbr>自分たちの陣地を<wbr>広げよう。</p></div></li>
+      <li><span class="stn">5</span><div><span class="en">result</span><h3>結果発表</h3><p>ゲーム終了後、<wbr>その場で<wbr>結果を発表します。</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= TICKET ================= -->
+<section class="sec paper" id="ticket">
+  <div class="in">
+    <h2 class="sh"><span class="sh-en" aria-hidden="true">Ticket</span><span class="sh-jp">開催概要</span></h2>
+
+    <div class="pricebox">
+      <span class="side l" aria-hidden="true">PRICE</span><span class="side r" aria-hidden="true">PRICE</span>
+      <p class="lab">参加費</p>
+      <p class="amt">3,500<small>円（税込）</small></p>
+      <hr>
+      <p class="nt">※交通費は参加費に<wbr>含まれません。</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h"><span class="tag">INFO</span><h3>開催概要</h3></div>
+      <div class="panel-b">
+        <table class="tbl">
+          <tbody>
+            <tr><th scope="row">開催日</th><td>土日</td></tr>
+            <tr><th scope="row">スタート時間</th><td>13:00〜19:00の間、<wbr>30分ごと</td></tr>
+            <tr><th scope="row">ゲーム時間</th><td>1回2時間</td></tr>
+            <tr><th scope="row">参加形式</th><td>2人1組／<wbr><span class="nw"><span class="team r">赤</span><span class="team b">青</span>のチーム対抗戦</span></td></tr>
+            <tr><th scope="row">定員</th><td>各回24人<wbr>(最小遂行人数4人)</td></tr>
+            <tr><th scope="row">参加費</th><td>3,500円（税込）</td></tr>
+            <tr><th scope="row">集合場所</th><td>スタート駅の近く</td></tr>
+          </tbody>
+        </table>
+        <p class="fn">※交通費は参加費に<wbr>含まれません。</p>
+      </div>
+    </div>
+
+    <a class="cta" href="#ticket">開催日程・<wbr>チケットを見る<span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span></a>
+  </div>
+</section>
+
+<!-- ================= ITEMS ================= -->
+<section class="sec paper" id="items" style="padding-top:0">
+  <div class="in">
+    <h2 class="sh"><span class="sh-en" aria-hidden="true">Items</span><span class="sh-jp">持ち物</span></h2>
+    <ul class="items">
+      <li class="it">
+        <div class="mk" aria-hidden="true"><b>01</b><span><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round"><path d="M6 18a4 4 0 0 1 4-4h36a4 4 0 0 1 4 4v5a5 5 0 0 0 0 10v5a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4v-5a5 5 0 0 0 0-10z"/><path d="M36 14v28" stroke-dasharray="3 3"/></svg></span></div>
+        <div><h3 class="nw">東京メトロ24時間券</h3><p>駅の券売機で<wbr>ご購入ください。</p></div>
+      </li>
+      <li class="it">
+        <div class="mk" aria-hidden="true"><b>02</b><span><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round"><rect x="15" y="4" width="26" height="48" rx="4"/><path d="M24 45h8" stroke-linecap="round"/></svg></span></div>
+        <div><h3>スマートフォン</h3><p>事前にアプリを<wbr>インストールし、<wbr>十分に充電して<wbr>お持ちください。</p></div>
+      </li>
+      <li class="it">
+        <div class="mk" aria-hidden="true"><b>03</b><span><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linejoin="round"><rect x="5" y="16" width="38" height="24" rx="2"/><path d="M43 23h6v10h-6"/><path d="M26 20l-6 8h8l-6 8" stroke-linecap="round"/></svg></span></div>
+        <div><h3>モバイル<wbr>バッテリー</h3><p>ゲーム中は<wbr>スマートフォンを<wbr>使用します。</p></div>
+      </li>
+    </ul>
+
+    <div class="caution">
+      <ul>
+        <li>駅構内やホームでは<wbr>走らず、<wbr>歩いて移動してください。</li>
+        <li>ホームの端には<wbr>立たず、<wbr>撮影やアプリの操作は<wbr>周囲の安全を<wbr>確認してから。</li>
+        <li>駅員の方の指示が<wbr>ある場合は、<wbr>必ず従ってください。</li>
+      </ul>
+      <ul class="sep">
+        <li>ゲームはアプリの中だけで<wbr>進行します。<wbr>駅に物を置いたり、<wbr>通路をふさいだり<wbr>することはありません。</li>
+        <li>ほかのお客様の<wbr>通行や乗り降りを<wbr>妨げないよう、<wbr>ご協力をお願いします。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CLOSING ================= -->
+<section class="sec night grain closing">
+  <div class="in">
+    <h2 class="sk"><span>2時間後、</span><span>この東京は<mark>何色</mark>だ。</span></h2>
+    <a class="cta on-dark" href="#ticket">開催日程・<wbr>チケットを見る<span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></span></a>
+  </div>
+</section>
+</main>
+
+<footer class="ftr">
+  <div class="in">
+    <p class="name">東京メトロ陣取り</p>
+    <p class="en">TOKYO METRO JINTORI</p>
+    <nav aria-label="フッター">
+      <a href="#about">体験概要</a><a href="#howto">ゲームの流れ</a><a href="#flow">参加の流れ</a><a href="#ticket">開催概要</a><a href="#items">持ち物</a>
+    </nav>
+  </div>
+</footer>
+
+<nav class="bar" aria-label="主要な操作">
+  <a class="b1" href="#ticket"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z"/></svg><span>開催日程・<wbr>チケットを見る</span></a>
+  <a class="b2" href="#howto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 12h18"/><circle cx="8" cy="12" r="3" fill="#fff"/><circle cx="16" cy="12" r="3" fill="#fff"/></svg>遊び方を見る</a>
+</nav>
+
+<script>
+(function(){
+  'use strict';
+  var b=document.getElementById('burger'), m=document.getElementById('menu');
+  if(!b||!m) return;
+  function set(o){
+    b.setAttribute('aria-expanded',o?'true':'false');
+    b.setAttribute('aria-label',o?'メニューを閉じる':'メニューを開く');
+    m.hidden=!o; document.body.style.overflow=o?'hidden':'';
+  }
+  b.addEventListener('click',function(){ set(m.hidden); });
+  m.addEventListener('click',function(e){ if(e.target.closest('a')) set(false); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!m.hidden){ set(false); b.focus(); } });
+})();
+(function(){
+  'use strict';
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce||!('IntersectionObserver' in window)) return;
+  var els=document.querySelectorAll('[data-reveal]');
+  document.body.classList.add('anim');
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:.2});
+  Array.prototype.forEach.call(els,function(el){ io.observe(el); });
+})();
+</script>
+
+</body>
+</html>

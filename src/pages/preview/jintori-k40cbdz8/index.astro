@@ -1,0 +1,42 @@
+---
+// 「東京メトロ陣取り」LP（限定公開・関係者確認用）。2026-11-08 ユーザー提供の完成済みLP（1ファイル完結）を組み込み。
+// デザイン・文言は一切変えない方針なので、HTML は src/lp/jintori/index.html にそのまま置き、加工せずに返す
+// （Astro のテンプレート処理を通さない。BaseLayout・SiteGuard も入れない）。経緯は docs/jintori-lp.md。
+//
+// 限定公開の仕組み（/preview/ie-tsuiteitte-ivmnazkmnqfn/ と同じ）：
+//  - URL は推測しにくい /preview/jintori-k40cbdz8/。sitemap・llms.txt・ナビ・トップ・お知らせからリンクしない。
+//  - HTML 内の meta robots noindex,nofollow ＋ レスポンスヘッダー X-Robots-Tag（このページと vercel.json の /preview/(.*)）。
+//  - 環境変数 JINTORI_PREVIEW_PASSWORD を設定すると Basic 認証がかかる（ユーザー名は任意、パスワードだけ照合）。
+//    リポジトリが公開なので URL だけでは秘密にならない。未設定の間は URL を知っていれば誰でも見られる。
+//  - CDN にキャッシュさせない（Cache-Control: private, no-store。middleware の PRIVATE に /preview/ あり）。
+export const prerender = false;
+import { timingSafeEqual } from 'node:crypto';
+import html from '../../../lp/jintori/index.html?raw';
+
+const readEnv = (name: string) => ((import.meta.env as Record<string, string | undefined>)[name] ?? process.env[name])?.trim() || undefined;
+const PREVIEW_PASSWORD = readEnv('JINTORI_PREVIEW_PASSWORD');
+const safeEqual = (a: string, b: string) => { const x = Buffer.from(a); const y = Buffer.from(b); return x.length === y.length && timingSafeEqual(x, y); };
+const noIndexHeaders = { 'X-Robots-Tag': 'noindex, nofollow, noarchive', 'Cache-Control': 'private, no-store' };
+
+if (PREVIEW_PASSWORD) {
+  const m = /^Basic\s+([A-Za-z0-9+/=]+)$/i.exec(Astro.request.headers.get('authorization') ?? '');
+  let ok = false;
+  if (m) {
+    try {
+      const decoded = Buffer.from(m[1], 'base64').toString('utf8');
+      ok = safeEqual(decoded.slice(decoded.indexOf(':') + 1), PREVIEW_PASSWORD);
+    } catch { ok = false; }
+  }
+  if (!ok) {
+    return new Response('認証が必要です（関係者確認用ページ）', {
+      status: 401,
+      headers: { ...noIndexHeaders, 'WWW-Authenticate': 'Basic realm="preview", charset="UTF-8"', 'Content-Type': 'text/plain; charset=utf-8' },
+    });
+  }
+}
+
+return new Response(html, {
+  status: 200,
+  headers: { ...noIndexHeaders, 'Content-Type': 'text/html; charset=utf-8', 'Referrer-Policy': 'no-referrer' },
+});
+---

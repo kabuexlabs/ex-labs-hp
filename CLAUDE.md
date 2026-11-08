@@ -129,3 +129,8 @@
 - 書き出し（index.html／style.css／main.js）の文言・レイアウト・冒頭演出はそのまま。未確定の項目（販売URL・開催日程・開催時刻・集合場所・公演時間・料金・本番画像）は index.astro 冒頭の定数で入れる。
 - middleware の PRIVATE に `/preview/` を追加済み（限定URLの応答を CDN に残さない）。
 - 2026-11-08 参考LP（再集電車／東急線沿線の謎解き）のスクリーンショットに倣い、文言はそのままに配置を再調整（流れる英字見出し＋日本語ラベル、番号付きステップカード、縦タイムライン、PRICE 枠、開閉式の注意事項、画面下いっぱいの固定バー、キャッチの流れる帯）。詳細は docs/ie-tsuiteitte-lp.md の変更履歴。
+
+## 「東京メトロ陣取り」LP（2026-11-08 限定公開）
+- 関係者確認用の限定URL **/preview/jintori-k40cbdz8/**（noindex＋`X-Robots-Tag`、sitemap・llms.txt・ナビ・トップ・お知らせ非掲載、`Cache-Control: private, no-store`）。正本メモは docs/jintori-lp.md。
+- ユーザー提供の完成済みLP（1ファイル完結）を `src/lp/jintori/index.html` に**そのまま**置き、index.astro は `?raw` で読んで加工せず返すだけ。**デザイン・文言は変えない**（直すときは HTML ファイルを差し替え）。
+- 環境変数 `JINTORI_PREVIEW_PASSWORD` を設定すると Basic 認証（未設定なら URL を知っていれば見られる）。
