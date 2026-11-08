@@ -311,7 +311,6 @@ body.anim [data-reveal].is-in .acts li{opacity:1;transform:none}
 .note .ph,.reco-tail .ph{padding:0;border:0;background:none;font:inherit;letter-spacing:inherit;max-width:none}
 /* 1行に少しだけ入らない見出し・節は、文字サイズ（と字間・余白）を少し詰めて1行に収める */
 .pl-h h3{font-size:clamp(18px,5.2vw,24px);letter-spacing:.04em}
-@media (min-width:900px){.pl-h h3{font-size:20px}.pl-h{min-height:56px}} /* 3列の時は見出し2行分の高さを揃え、本文の開始位置を揃える */
 .acts li{font-size:clamp(16px,4.6vw,20px)}
 .it h3{font-size:clamp(18px,4.8vw,24px)}
 @media (max-width:419px){.route li{gap:14px}.route p{letter-spacing:.02em}}
@@ -333,6 +332,29 @@ body.anim [data-reveal].is-in .acts li{opacity:1;transform:none}
 
 /* ===== 価格：「（税込）」は金額のすぐ下に中央揃え（2026-11-08 ユーザー指摘「税込がズレている」） ===== */
 .pricebox .amt .tax{display:block;margin:14px 0 0;font-size:17px;line-height:1.4;letter-spacing:.08em;text-indent:.08em}
+
+/* ===== ブロックの配置（2026-11-08 ユーザー指摘「ブロックがほぼ0距離で重なっている」）。
+   デジタル庁デザインシステムの考え方に合わせ、余白は 8px の倍数（8／16／24／32／48）で、
+   関係の近いものは近く（8〜16）、まとまり同士は広く（24〜32）。くっついた黒い帯の積み重ねは1枚のパネルにまとめる ===== */
+/* カード：見出し行＋効果3行を、開催概要の INFO パネルと同じ作りの1枚に */
+.cards-copy .q{margin-bottom:32px}
+.cardbox{max-width:440px;margin:0 auto 32px;background:var(--ink);color:var(--white);text-align:left;border:2px solid var(--ink)}
+@media (min-width:860px){.cardbox{margin-left:0}}
+.cards-copy p.cardbox-h{margin:0;padding:12px 20px;border-bottom:3px solid var(--blue);font-weight:900;font-size:clamp(16px,4.3vw,18px);line-height:1.6;letter-spacing:.06em}
+.cardbox .acts{display:block;justify-items:stretch;margin:0;padding:8px 0}
+.cardbox .acts li{background:none;padding:12px 20px;font-size:clamp(16px,4.4vw,19px);line-height:1.5}
+.cardbox .acts li+li{border-top:1px solid rgba(255,255,255,.16)}
+.cards-copy .cardbox + p{margin-top:0}
+@media (max-width:374px){.cardbox .acts li,.cards-copy p.cardbox-h{padding-left:14px;padding-right:14px}}
+.cards-copy p + p{margin-top:24px}
+/* ゲームの流れ：画像を外したカードは余白を 24px に。3列のときは番号を見出しの上に置き、見出しを1行に揃える */
+.pl-b{padding:24px}
+.pl-b p{margin-top:16px}
+@media (min-width:900px){
+  .pl-h{flex-direction:column;align-items:flex-start;gap:16px}
+  .pl-h h3{font-size:20px}
+}
+.note{margin-top:32px}
 
 /* ===== アニメーション（2026-11-08 ユーザー指示「全体的に増やす」）。
    JS が body に .anim を付けたときだけ動く（JS なし・「視差効果を減らす」設定では最初から全部表示）。
@@ -547,7 +569,7 @@ body.anim .cta .arr svg,body.anim .bar .b1 svg{animation:nudge 2.6s ease-in-out 
         <div class="pl-b"><div class="pl-h"><span class="no">02</span><h3>ホームの<wbr>スポットを撮る</h3></div><p><span class="ph">指定された<wbr>スポットを、</span><wbr><span class="ph">アプリの<wbr>カメラで撮影。</span></p></div>
       </li>
       <li class="pl">
-        <div class="pl-b"><div class="pl-h"><span class="no">03</span><h3>「読み込む」を押す</h3></div><p>その駅が、<wbr><span class="ph">あなたの<wbr>チームの陣地に。</span></p></div>
+        <div class="pl-b"><div class="pl-h"><span class="no">03</span><h3>駅を<wbr>自分たちの陣地に</h3></div><p>その駅が、<wbr><span class="ph">あなたの<wbr>チームの陣地に。</span></p></div>
       </li>
     </ol>
     <p class="note"><span>相手に取られた駅も、<wbr><b><span class="ph">同じ方法で<wbr>取り返せます。</span></b></span></p>
@@ -567,12 +589,14 @@ body.anim .cta .arr svg,body.anim .bar .b1 svg{animation:nudge 2.6s ease-in-out 
       </div>
       <div class="cards-copy" data-reveal>
         <p class="q">その1枚で、<br>相手の作戦を崩せ。</p>
-        <p><span class="lead">駅を取ると手に入る、<wbr>全16種類のカード。</span></p>
+        <div class="cardbox">
+        <p class="cardbox-h">駅を取ると手に入る、<wbr>全16種類のカード。</p>
         <ul class="acts">
           <li style="--d:0s"><i aria-hidden="true"></i>相手の足を止める。</li>
           <li style="--d:.15s"><i aria-hidden="true"></i>自分たちの駅をロックする。</li>
           <li style="--d:.3s"><i aria-hidden="true"></i>相手の手札をのぞく。</li>
         </ul>
+        </div>
         <p><span class="u" style="--d:.4s">今使えば</span>、<wbr>目の前の駅を取れるかもしれない。<br><span class="u" style="--d:.6s">残しておけば</span>、<wbr>最後の切り札になるかもしれない。</p>
         <p>どこで使うか。誰に使うか。<br>カード1枚の使いどころが、<br><span class="big"><span class="hl">勝負を動かします。</span></span></p>
       </div>
@@ -720,7 +744,7 @@ body.anim .cta .arr svg,body.anim .bar .b1 svg{animation:nudge 2.6s ease-in-out 
   document.body.classList.add('anim');
   var $=function(sel){ return Array.prototype.slice.call(document.querySelectorAll(sel)); };
   // 1つずつ下からふわっと現れるもの
-  $('.sec > .in > h2.sk, .bracket, .about-copy .q, .cards-copy .q, .note, .reco-tail, .pricebox, .panel, .caution, .closing .sk, .cta').forEach(function(el){ el.classList.add('rv'); });
+  $('.sec > .in > h2.sk, .cardbox, .bracket, .about-copy .q, .cards-copy .q, .note, .reco-tail, .pricebox, .panel, .caution, .closing .sk, .cta').forEach(function(el){ el.classList.add('rv'); });
   // 同じ並びは少しずつ遅らせて順に現れるもの
   ['.lines > p', '.about-copy > p:not(.q)', '.cards-copy > p:not(.q)', '.plays > li', '.reco > li', '.items > li'].forEach(function(sel){
     $(sel).forEach(function(el, i){ el.classList.add('rv'); el.style.setProperty('--rd', Math.min(i * .12, .6) + 's'); });
