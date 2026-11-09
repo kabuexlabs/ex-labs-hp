@@ -115,8 +115,9 @@ const upcomingEvents = allEvents.filter((e) => e.from && e.from > todayJst).sort
 const liveEvents = allEvents.filter((e) => (!e.until || e.until >= todayJst) && !upcomingEvents.includes(e));
 
 // お取引先、ご協力企業様 — client/partner company logos shown above the 展開団体
-// marquee. 1段構成（7社）。
+// marquee. 1段構成（8社）。
 const partnersRow1: { name: string; logo: string; h?: number }[] = [
+  { name: 'セガサミーホールディングス', logo: '/assets/partners/segasammy.webp', h: 40 },
   { name: 'Skyland Ventures', logo: '/assets/partners/skylandventures.webp', h: 64 },
   { name: 'COEN', logo: '/assets/partners/coen.webp', h: 40 },
   { name: 'MAISON MARC', logo: '/assets/partners/maisonmarc.webp', h: 46 },
@@ -216,6 +217,17 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
       <span class="xt-media-d"><Cls text={`${topMedia.title} →`} emph={false} /></span>
     </a>
     )}
+    <div class="xt-media xt-invest">
+      <span class="xt-media-k">INVESTMENT</span>
+      <div class="xt-invest-body">
+        <div class="xt-invest-logos">
+          <img class="xt-invest-sega" src="/assets/partners/segasammy.webp" alt="セガサミーホールディングス" width="1049" height="181">
+          <span class="xt-invest-sep" aria-hidden="true"></span>
+          <img class="xt-invest-sky" src="/assets/partners/skylandventures-trim.webp" alt="Skyland Ventures" width="988" height="630">
+        </div>
+        <p class="xt-media-t xt-invest-t"><span>セガサミーホールディングス様</span><span>Skyland Ventures様から</span><span>ご出資いただきました</span></p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -523,6 +535,16 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-media-k{font-family:var(--x-en);font-size:14px;letter-spacing:.2em;color:var(--x-lime)}
 .xt-media-t{font-family:var(--x-min);font-weight:600;font-size:16px}
 .xt-media-d{font-size:13px;color:var(--x-pale3)}
+.xt-media.xt-invest{margin-top:14px}
+.xt-invest-body{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:14px 32px}
+.xt-invest-logos{display:flex;align-items:center;gap:20px}
+.xt-invest-sega{height:30px;width:auto;display:block}
+.xt-invest-sky{height:62px;width:auto;display:block}
+.xt-invest-sep{width:1px;height:44px;background:rgba(11,11,20,.18)}
+.xt-invest-t{margin:0;line-height:1.7;display:grid}
+.xt-invest-t span{white-space:nowrap}
+@media(max-width:380px){:root body.x-body .xt-invest-t{font-size:clamp(13px,4.3vw,17px);letter-spacing:.02em}}
+@media(max-width:560px){.xt-invest-body{grid-template-columns:minmax(0,1fr)}.xt-invest-logos{gap:16px}.xt-invest-sega{height:auto;width:min(46%,150px)}.xt-invest-sky{height:auto;width:min(28%,84px)}}
 .xt-card{max-width:960px;margin:0 auto;padding:clamp(48px,7vw,88px) clamp(20px,6vw,88px)}
 .xt-card.is-perf{padding:clamp(48px,7vw,88px) clamp(24px,7vw,88px)}
 .xt-card-h{margin:18px 0 4px;font-family:var(--x-min);font-weight:500;font-size:clamp(38px,6vw,60px);letter-spacing:.06em}
