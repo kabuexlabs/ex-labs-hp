@@ -609,6 +609,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/botsunyukan.webp',
   },
   {
+    href: '/guide/moyooshimono/',
+    title: '催し物とは？意味・読み方と「催し」「催事」「イベント」との違い',
+    desc: '催し物（もよおしもの）の意味、「催し」「催事」「イベント」「行事」との違い、例文、申込書の「催し物名」の書き方、種類と目的を解説。',
+    date: '2026-11-10',
+    category: 'shisetsu',
+    thumb: '/assets/guide/moyooshimono.webp',
+  },
+  {
     href: '/guide/popup-event/',
     title: 'ポップアップイベントとは？体験型で空き区画を集客に変える方法',
     desc: '物販型ポップアップストアとの違い、施設側・出店側のメリット、体験型ポップアップの企画例と開催の流れを解説。',
