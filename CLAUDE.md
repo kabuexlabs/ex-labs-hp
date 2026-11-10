@@ -104,6 +104,7 @@
 - case1 /uwasabanashi/ は終了表示中に case2 へ誘導（固定ボタン・チケット欄）。正確な住所・地図・緯度経度は載せない。
 
 ## 漢方体質チェック 試験サイト /kampo/（2026-10-20 仮実装。2026-10-21〜 main に反映・noindex＋合言葉で非公開運用）
+- **2026-11-10 運用終了（ユーザー指示）**：体質チェックは ESSENCE薬局側の問診票・管理画面に一本化。/kampo/ 以下はすべて 410「終了しました」（auth.ts の `KAMPO_CLOSED`。false で再開）。コードとマスタは残す。**Redis の kampo:* データは消していない**（移す／消すはユーザーの指示待ち）。構成生薬・禁忌ルール・配点表・設問データは先方に書き出して渡し済み。以下は終了時点の記録。
 - ESSENCE薬局 武蔵小杉店の店頭 iPad 用。仕様の正本は docs/kampo-spec.md（実装指示書 v0.1）、仕様との差分は docs/kampo-decisions.md、運用・環境変数は docs/kampo-setup.md。
 - 仕様書は Next.js+Prisma+PostgreSQL の別リポジトリを想定しているが、仮実装は **この Astro サイトに `/kampo/` として組み込み、Upstash Redis（`kampo:` プレフィックス）に保存**。ロジック（`src/lib/kampo/` の findings / flow / scoring / safety / recommend）は純粋関数、マスタは `src/data/kampo/*.json`（薬剤師が直接編集）。
 - 認証は2段：共通パスワード `KAMPO_PASSWORD`（未設定なら YOYAKU_ADMIN_KEY）＋スタッフ画面の `KAMPO_STAFF_PIN`。ルート保護は `src/middleware.ts` → `kampoGuard`。全ページ noindex・no-store。

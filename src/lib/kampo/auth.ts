@@ -81,9 +81,17 @@ export function safeNext(raw: string | null | undefined, fallback: string): stri
 export const isStaffPath = (pathname: string) =>
   (pathname.startsWith('/kampo/staff/') && pathname !== PIN_PATH) || /^\/kampo\/check\/[^/]+\/(result|advice)\//.test(pathname);
 
+/**
+ * 2026-11-10 運用終了：体質チェックは ESSENCE薬局さま側の問診票・管理画面に一本化するため、ex Labs 版は止めた（ユーザー指示）。
+ * /kampo/ 以下はすべて「終了しました」（410）を返す。保存済みのデータ（Redis の kampo:*）は消していない（保持期限まで残る）。
+ * 再開するときは false に戻す。
+ */
+export const KAMPO_CLOSED = true;
+const CLOSED_HTML = `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>終了しました</title><style>body{font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;margin:0;min-height:100vh;display:grid;place-items:center;background:#fafafa;color:#333}main{padding:32px 16px;text-align:center;line-height:2}h1{font-size:20px;font-weight:500}</style></head><body><main><h1>このページは終了しました</h1><p>体質チェックは、ESSENCE薬局の問診票でご案内しています。<br>スタッフにお声がけください。</p></main></body></html>`;
 export function kampoGuard(context: APIContext): Response | undefined {
   const { pathname, search } = context.url;
   if (!pathname.startsWith(KAMPO_BASE)) return undefined;
+  if (KAMPO_CLOSED) return new Response(CLOSED_HTML, { status: 410, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow, noarchive' } });
   const next = encodeURIComponent(pathname + search);
   if (pathname === LOGIN_PATH) return undefined;
   if (!isSiteAuthed(context.cookies)) {
