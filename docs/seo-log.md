@@ -1458,3 +1458,9 @@
 - 記事：madamis に企業研修、shinrisen に頭脳戦制作とはへの関連リンク各1本。botsunyukan・saiji の title は比較案のみ（未実施）。
 - 技術：yumenoshima-night から下書き（noindex）記事へのリンクを下書き中は非表示に、sitemap の shinrisen 重複キーを整理、/gensou/ の各回 Event に description・image・organizer・performer。
 - dateModified・lastmod を 11/3 に更新：taikengata-event・shisetsu-katsuyo・eigyo-jikangai・taiken-marketing・shuyu-event・popup-event・sankagata-event・madamis・shinrisen・yumenoshima-night、services（immersive・zunousen・shisetsu-event・ip-event）。
+
+## 2026-11-10 プレスリリース（2026-11-10「ex Labs、セガサミーホールディングスからの出資を受け、協業に向けた検討を開始」）を反映
+
+- 本文は prtimes.jp に到達できないため検索結果の抜粋で確認（タイトル・配信日・IPと場所をつなぐ協業の検討・資本面の連携の第一弾という位置づけ）。出資の実行日は抜粋で確実に確認できないため、サイトには「2026年11月」とだけ記載。
+- /press/（src/data/press.ts の先頭に追加）、トップの INVESTMENT カードをリリースへのリンクに・会社概要の一文に出資を追記、/company/（資金調達・沿革・お取引先・Organization の funder）、/company/iida-yuki/（経歴）、llms.txt（資金調達・お取引先・プレスリリース）。
+- sitemap lastmod：/、/press/、/company/、/company/iida-yuki/ を 11/10 に。
