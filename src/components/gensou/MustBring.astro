@@ -1,0 +1,17 @@
+---
+// 水底の夢 LP の「必ずお持ちください」（原稿の【必ずお持ちください】）。
+// アイコン（#phone・#earbuds）はページ側の SVG スプライトに置いてある。文言は原稿のまま
+import J from './J.astro';
+const MUST = 'イヤホンと充電されたスマートフォンを、必ずご持参ください。お一人様1つずつないと、体験に参加できません。';
+---
+<div class="need fi" role="note" aria-label="必ずお持ちください">
+  <p class="need-h"><span class="need-ex" aria-hidden="true">!</span>必ずお持ちください</p>
+  <div class="need-b">
+    <ul class="need-g">
+      <li><span class="need-ic"><svg aria-hidden="true"><use href="#phone"/></svg></span><b>充電された<br>スマートフォン</b></li>
+      <li><span class="need-ic"><svg aria-hidden="true"><use href="#earbuds"/></svg></span><b>イヤホン</b><small>有線・Bluetooth<br>どちらでも可</small></li>
+    </ul>
+    <p class="need-one">お一人様<em>1つずつ</em></p>
+    <p class="need-t"><J t={MUST} keep={['スマートフォン']} /></p>
+  </div>
+</div>
