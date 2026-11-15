@@ -20,6 +20,7 @@ import SiteGuard from '../../../components/SiteGuard.astro';
 import J from '../../../components/gensou/J.astro';
 import Tx from '../../../components/gensou/Tx.astro';
 import MustBring from '../../../components/gensou/MustBring.astro';
+import { mediaItems } from '../../../data/media';
 
 const readEnv = (name: string) => ((import.meta.env as Record<string, string | undefined>)[name] ?? process.env[name])?.trim() || undefined;
 const PREVIEW_PASSWORD = readEnv('GENSOU2_PREVIEW_PASSWORD');
@@ -182,6 +183,9 @@ const voices = [
   '夜の植物館、めちゃ雰囲気あった…！\n余韻があってよかったな…',
   '本当に夢の中にいるようでした。\n参加してよかった！！',
 ];
+// 第一夜の日本経済新聞の記事（2026-11-15 ユーザー提供の URL。src/data/media.ts に登録済みのものを使う）
+const NIKKEI = mediaItems.find((m) => m.url === 'https://www.nikkei.com/article/DGXZQOUC266KX0W6A021C2000000/');
+const NIKKEI_HEAD = NIKKEI?.title.match(/^「(.*)」/)?.[1] ?? NIKKEI?.title;
 const HASHTAG = '#午前零時の幻想集';
 const X_SEARCH = 'https://x.com/search?q=' + encodeURIComponent(HASHTAG) + '&f=live';
 
@@ -489,6 +493,12 @@ a{color:inherit}
 .icons a{width:52px;height:52px;border-radius:50%;border:1.5px solid var(--ink);display:flex;align-items:center;justify-content:center;color:var(--ink);text-decoration:none;position:relative}
 .icons a::after{content:"";position:absolute;inset:-1.5px;border-radius:50%;border:3px solid transparent;border-bottom-color:var(--ink);transform:rotate(-30deg);animation:orbit 6s linear infinite}
 @keyframes orbit{to{transform:rotate(330deg)}}
+.nk{display:grid;gap:4px;margin:20px 0 0;padding:16px 18px;border-left:3px solid var(--ink);background:#eef2ff;color:#1b2552;text-decoration:none;transition:background .2s}
+.nk:hover{background:#e2e8ff}
+.nk-k{font:700 11px/1 var(--en2);letter-spacing:.24em;color:var(--ink)}
+.nk-o{font:700 14px/1.5 var(--goth);color:var(--ink)}
+.nk-h{font:700 15px/1.7 var(--mincho);letter-spacing:.02em;text-wrap:pretty}
+.nk-x{display:inline-flex;align-items:center;gap:6px;margin-top:2px;font:700 12.5px/1.6 var(--goth);color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 .card-b{margin:22px 0 0;font:500 15.5px/1.95 var(--goth);letter-spacing:.03em;color:#1b2552}
 
 /* 第1回の感想集（吹き出し） */
@@ -755,7 +765,8 @@ a{color:inherit}
           <div class="icons">
             <a href={SERIES_URL} aria-label="シリーズ公式サイト（第一夜「草陰の夢」）"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></a>
           </div>
-          <p class="card-b"><Tx s="『午前零時の幻想集』は、閉館後の施設を舞台に、物語の登場人物と出会いながら館内を巡る体験型イベントのシリーズです。第一夜「草陰の夢」は2026年11月に夢の島熱帯植物館で開催し、**日本経済新聞にも取り上げられました**。🟥" mark={MARK_TBD} /></p>
+          <p class="card-b"><Tx s="『午前零時の幻想集』は、閉館後の施設を舞台に、物語の登場人物と出会いながら館内を巡る体験型イベントのシリーズです。第一夜「草陰の夢」は2026年11月に夢の島熱帯植物館で開催し、**日本経済新聞にも取り上げられました**。" mark={MARK_TBD} /></p>
+          {NIKKEI && <a class="nk" href={NIKKEI.url} target="_blank" rel="noopener" data-track="show" data-show="media-nikkei" data-place="minasoko-series"><span class="nk-k">MEDIA</span><span class="nk-o">{NIKKEI.outlet}</span><span class="nk-h">「<J t={NIKKEI_HEAD ?? ''} />」</span><span class="nk-x">記事を読む（外部サイト）<svg width="12" height="12" aria-hidden="true"><use href="#arw"/></svg></span></a>}
         </div>
         <svg class="card-tail" viewBox="0 0 560 46" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H560V8C548 8 540 12 540 22H510C496 22 480 46 440 46H120C80 46 64 22 50 22H20C20 12 12 8 0 8Z" fill="#fff"/></svg>
       </div>
