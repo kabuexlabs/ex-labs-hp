@@ -11,6 +11,17 @@
   ],
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "query",
+          "key": "x_astro_path"
+        }
+      ],
+      "destination": "/",
+      "permanent": false
+    },
+    {
       "source": "/preview/kotohogi-xqo8sx5ar3pm/:path*",
       "destination": "/uwasabanashi/kotohogi/",
       "permanent": true

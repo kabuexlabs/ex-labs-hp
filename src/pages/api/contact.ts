@@ -8,7 +8,7 @@ export const prerender = false;
 // インターフェースは formsubmit 互換（_subject / _next / _gotcha）なので、
 // 各サイトのフォームは action を差し替えるだけで移行できる。
 import type { APIRoute } from 'astro';
-import { sendMail, adminEmail, lastMailDiag, readEnv } from '../../lib/yoyaku';
+import { sendMail, adminEmail, lastMailDiag, readEnv, SAFE_EMAIL_RE } from '../../lib/yoyaku';
 import { contactRedis as redis, CONTACT_LOG_KEY, recordMetric } from '../../lib/contact';
 
 // フォームの「ご相談の種類」→ 件名に付ける表示名
@@ -17,20 +17,23 @@ const CATEGORY_LABEL: Record<string, string> = {
   taikengata: '体験型イベント全般', kenshu: '謎解き研修', media: '取材・協業', other: 'その他',
 };
 
-// リダイレクト先はサイト内パスか kabuexlabs.com のみ許可
-// （open redirect 防止）。
-function safeNext(raw: string | undefined): string {
+// リダイレクト先はサイト内パスか kabuexlabs.com のみ許可（open redirect 防止）。
+// 2026-11-15：「/\evil.example/」「/<TAB>/evil.example/」のようにバックスラッシュ・空白・制御文字を挟むと、
+// ブラウザは「//evil.example/」と解釈して外部サイトへ移動してしまう。サイト内パスとして使う文字だけを許可する。
+const SAFE_PATH_RE = /^\/(?![/\\])[A-Za-z0-9\-._~!$&'()*+,;=:@%/?#]*$/;
+export function safeNext(raw: string | undefined): string {
   const fallback = '/contact/thanks/';
   if (!raw) return fallback;
-  if (raw.startsWith('/') && !raw.startsWith('//')) return raw;
+  const pick = (p: string) => (SAFE_PATH_RE.test(p) && !/%5c|%2f%2f|%09|%0a|%0d/i.test(p) ? p : fallback);
+  if (raw.startsWith('/')) return pick(raw);
   try {
     const u = new URL(raw);
-    if (u.origin === 'https://kabuexlabs.com') return u.pathname + u.search;
+    if (u.origin === 'https://kabuexlabs.com') return pick(u.pathname + u.search);
   } catch { /* 不正なURLはfallbackへ */ }
   return fallback;
 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_RE = SAFE_EMAIL_RE;
 
 import { spamCheck } from '../../lib/spam';
 

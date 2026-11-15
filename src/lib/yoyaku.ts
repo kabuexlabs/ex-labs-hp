@@ -370,6 +370,10 @@ export async function sendMail(
   replyTo?: string,
 ): Promise<boolean> {
   lastDiag = { via: 'none', error: 'SMTP・Resend とも未設定' };
+  // 宛先・返信先は送る直前にも形を確かめる（呼び出し側の確認漏れがあっても、すり替え可能な宛先には送らない）
+  // 管理者の通知先（環境変数）は運用側の設定なので対象外（複数指定などの書式でも従来どおり送る）
+  if (to !== adminEmail() && !validEmail(to)) { lastDiag = { via: 'none', error: '宛先の形式が不正のため送信しない' }; return false; }
+  if (replyTo !== undefined && !validEmail(replyTo)) replyTo = undefined;
   // 1) 自社SMTP（最優先）
   if (smtpConfigured()) {
     if (await sendViaSmtp(to, subject, text, replyTo)) return true;
@@ -433,6 +437,12 @@ export function validPhone(phone: string): boolean {
   return /^\+?[0-9()-]{8,15}$/.test(phone);
 }
 
+// メールアドレスとして受け付ける形（2026-11-15 厳格化）。
+// 以前の /^[^\s@]+@[^\s@]+\.[^\s@]+$/ は引用符・括弧・<>・;・, を通していた。
+// 送信ライブラリ（nodemailer）の宛先解析には、これらの記号で宛先を別のアドレスにすり替えられる既知の不具合
+// （GHSA-8c8m-p3m8-cjg8 ほか）があるため、記号を含む宛先はここで弾く。通常のアドレス（英数字と . _ % + - など）は従来どおり通る。
+export const SAFE_EMAIL_RE = /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
+
 export function validEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
+  return email.length <= 254 && SAFE_EMAIL_RE.test(email);
 }

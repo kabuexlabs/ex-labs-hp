@@ -534,3 +534,8 @@
 /* 横送りの枠：高さを表示中のカードに合わせる（BaseLayout のスクリプトが is-fit と高さを付ける）。カードは上揃え、はみ出た分は隠す */
 :root .is-fit{align-items:flex-start;overflow-y:hidden;transition:height .3s ease}
 @media(prefers-reduced-motion:reduce){:root .is-fit{transition:none}}
+
+/* 2026-11-15 レイアウトのずれ（CLS）対策：パンくずの行の高さを固定する。
+   行の高さが「normal」だと、Webフォントが届いた瞬間に 32→37px に伸び、その下の本文全体が下にずれていた
+   （没入感の記事で CLS 0.27）。フォント到着後の高さ（約1.45倍）に合わせて固定し、最終的な見た目は変えない。 */
+:root .breadcrumb ol{line-height:1.45}

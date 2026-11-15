@@ -10,6 +10,7 @@ import SecHead from './SecHead.astro';
 import { SERVICES, SERVICE_LINKS, type ServiceSlug } from '../../data/services';
 import RevShareCallout from '../RevShareCallout.astro';
 import { flat } from '../../lib/jpbreak';
+import { srcsetOf, small600 } from '../../data/imageVariants';
 import { jsonLd } from '../../lib/microcms';
 import { findLinkPreviewTarget } from '../../lib/linkPreview';
 import LinkPreviewScript from '../LinkPreviewScript.astro';
@@ -35,6 +36,9 @@ const faqSec = sections.find((s) => s.type === 'faq');
 // 費用（金額）を載せている節（「ご依頼の条件」優先、なければ最初の節、FAQ だけなら FAQ）に「原価＋実績に対するレベニューシェア」の訴求を置く（FAQ は除く）
 const hasCost = (s: any) => /万円/.test(JSON.stringify(s));
 const costSecId = (sections.find((s) => s.id === 'terms' && hasCost(s)) ?? sections.find((s) => s.type !== 'faq' && hasCost(s)) ?? sections.find(hasCost))?.id;
+// 画像の srcset の sizes（実測の表示幅：ヒーローの小さい写真は最大190px、カード類はスマホで画面の約76%・PCで最大520px）
+const SZ_HERO = '(max-width: 760px) 120px, 190px';
+const SZ_CARD = '(max-width: 760px) 76vw, 520px';
 // ---- 文字の多い並びを図・表にするための整形（文章そのものは変えない） ----
 const plain = (t: string) => t.replace(/\*\*/g, '');
 // 短い項目だけの並び（ご依頼いただける内容・おすすめの業種など）はタグ（チップ）で見せる
@@ -102,7 +106,7 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
     {raw.hero.note && <p class="xs-note"><Cls text={raw.hero.note} emph={false} /></p>}
     {heroImgs.length >= 2 && (
       <div class="xs-hero-ph" aria-hidden="true">
-        {heroImgs.map((src, i) => <span class="xs-hero-ph-i" style={`--i:${i}`}><img src={src} alt="" loading={i < 2 ? 'eager' : 'lazy'} decoding="async"></span>)}
+        {heroImgs.map((src, i) => <span class="xs-hero-ph-i" style={`--i:${i}`}><img src={src} srcset={srcsetOf(src)} sizes={srcsetOf(src) && SZ_HERO} alt="" loading={i < 2 ? 'eager' : 'lazy'} decoding="async"></span>)}
       </div>
     )}
     <nav class="xs-toc" aria-label="このページの内容">
@@ -201,7 +205,7 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
               return (
               <div class="xs-cardc">
                 {c.preview && findLinkPreviewTarget(c.preview) && <a class="xs-cardc-pv" href={c.preview} target="_blank" rel="noopener" data-track="show" data-show="ntv" data-place={`svc-${slug}-works`} aria-label={`${c.title}（公式サイト）`}><span class="xs-cardc-img" data-link-preview={c.preview}><span class="xs-pv-k">TV</span><span class="xs-pv-t">{c.title}</span></span></a>}
-                {c.img && <div class="xs-cover" style={`--bg:url(${c.img})`}><img src={c.img} alt="" loading="lazy" decoding="async"></div>}
+                {c.img && <div class="xs-cover" style={`--bg:url(${small600(c.img) ?? c.img})`}><img src={c.img} srcset={srcsetOf(c.img)} sizes={srcsetOf(c.img) && SZ_CARD} alt="" loading="lazy" decoding="async"></div>}
                 <div class="xs-cardc-h"><span class="xs-cardc-no">{c.no}</span><h3><Cls text={c.title} emph={false} /></h3></div>
                 {badges.length > 0 && <p class="xs-badges">{badges.map((b) => <span>{b}</span>)}</p>}
                 <div class="xs-cardc-sub"><Rich text={c.sub} /></div>
@@ -214,7 +218,7 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
               );
             })}
           </div>
-          {s.photo && <figure class="xs-photo"><img src={s.photo.img} alt={s.photo.cap} loading="lazy" decoding="async"><figcaption><Cls text={s.photo.cap} emph={false} /></figcaption></figure>}
+          {s.photo && <figure class="xs-photo"><img src={s.photo.img} srcset={srcsetOf(s.photo.img)} sizes={srcsetOf(s.photo.img) && SZ_CARD} alt={s.photo.cap} loading="lazy" decoding="async"><figcaption><Cls text={s.photo.cap} emph={false} /></figcaption></figure>}
         </>
       )}
       {s.type === 'table' && s.view === 'matrix' && (
@@ -229,7 +233,7 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
         <div {...railAttrs('table')}>
           {(s.rows as string[][]).map((r, i) => (
             <div class="xs-tr">
-              {s.rowImgs?.[i] && <div class="xs-cover is-wide" style={`--bg:url(${s.rowImgs[i]})`}><img src={s.rowImgs[i]} alt="" loading="lazy" decoding="async"></div>}
+              {s.rowImgs?.[i] && <div class="xs-cover is-wide" style={`--bg:url(${small600(s.rowImgs[i]) ?? s.rowImgs[i]})`}><img src={s.rowImgs[i]} srcset={srcsetOf(s.rowImgs[i])} sizes={srcsetOf(s.rowImgs[i]) && SZ_CARD} alt="" loading="lazy" decoding="async"></div>}
               <div class="xs-tr-h"><span class="xs-tr-no">{pad(i + 1)}</span><p><Cls text={r[0]} emph={false} /></p></div>
               <div class="xs-tr-b">
                 {keyColsOf(s).map((j) => <div><p class="xs-tr-k">{s.cols[j]}</p><div class="xs-tr-v"><Rich text={r[j]} /></div></div>)}
@@ -291,7 +295,7 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
         <div class="x-hscroll" style="margin-top:44px;gap:20px">
           {(s.items as any[]).map((t) => (
             <div class="xs-title">
-              <img src={t.img} alt={t.title} loading="lazy" decoding="async">
+              <img src={t.img} srcset={srcsetOf(t.img)} sizes={srcsetOf(t.img) && SZ_CARD} alt={t.title} loading="lazy" decoding="async">
               <div>
                 <h3>{t.title}</h3>
                 {t.meta && <p class="xs-title-meta">{t.meta}</p>}
@@ -305,7 +309,7 @@ const railAttrs = (type: string, carousel = false) => { const r = RAIL[type]; re
         <div class="x-hscroll" style="margin-top:44px;gap:16px">
           {(s.items as any[]).map((g) => (
             <figure class="xs-gal">
-              <img src={g.img} alt={g.cap ?? ''} loading="lazy" decoding="async" style={`aspect-ratio:${s.square ? '1 / 1' : '4 / 3'}`}>
+              <img src={g.img} srcset={srcsetOf(g.img)} sizes={srcsetOf(g.img) && SZ_CARD} alt={g.cap ?? ''} loading="lazy" decoding="async" style={`aspect-ratio:${s.square ? '1 / 1' : '4 / 3'}`}>
               {g.cap && <figcaption><Cls text={g.cap} emph={false} /></figcaption>}
             </figure>
           ))}
