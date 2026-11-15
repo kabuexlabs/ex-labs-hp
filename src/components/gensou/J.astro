@@ -3,7 +3,7 @@
 // CSS 側は word-break:keep-all なので、<wbr> と句読点の位置だけで改行される（iPhone の Safari でも有効）。
 // t の中の「\n」は <br> になり、「**語句**」は強調（.mk：色付きの下線）になる。
 import { loadDefaultJapaneseParser } from 'budoux';
-interface Props { t: string }
+interface Props { t: string; keep?: string[] }
 const parser = loadDefaultJapaneseParser();
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 // 途中で切りたくない語（固有名詞・慣用句）
@@ -27,7 +27,7 @@ const line = (raw: string) => {
   // KEEP の語と短い強調語句の内側に落ちた区切りを消す
   const keep = new Set<number>();
   const ranges: [number, number][] = [...marks.filter(([a, b]) => b - a <= 16)];
-  for (const w of KEEP) for (let i = s.indexOf(w); i >= 0; i = s.indexOf(w, i + 1)) ranges.push([i, i + w.length]);
+  for (const w of [...KEEP, ...(Astro.props.keep ?? [])]) for (let i = s.indexOf(w); i >= 0; i = s.indexOf(w, i + 1)) ranges.push([i, i + w.length]);
   for (const [a, b] of ranges) for (let k = a + 1; k < b; k++) keep.add(k);
   const breaks = new Set<number>();
   let pos = 0;

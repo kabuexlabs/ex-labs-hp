@@ -135,3 +135,9 @@
 - 関係者確認用の限定URL **/preview/jintori-k40cbdz8/**（noindex＋`X-Robots-Tag`、sitemap・llms.txt・ナビ・トップ・お知らせ非掲載、`Cache-Control: private, no-store`）。正本メモは docs/jintori-lp.md。
 - ユーザー提供の完成済みLP（1ファイル完結）を `src/lp/jintori/index.html` に**そのまま**置き、index.astro は `?raw` で読んで加工せず返すだけ。**文言は変えない**（直すときは HTML ファイルを差し替え）。2026-11-08 ユーザー指示で改行を「、。」単位に（節を `.ph` で包み、入らないときだけ文節で折る。文字サイズの微調整は HTML 内の `.ph` の CSS ブロック）。
 - 環境変数 `JINTORI_PREVIEW_PASSWORD` を設定すると Basic 認証（未設定なら URL を知っていれば見られる）。
+
+## 「午前零時の幻想集 第二夜『水底の夢』× サンシャイン水族館」LP（2026-11-15 限定公開）
+- 関係者確認用の限定URL **/preview/gensou-minasoko-mbyzr3md/**（noindex＋`X-Robots-Tag`、sitemap・llms.txt・ナビ非掲載、`Cache-Control: private, no-store`）。正本メモは docs/gensou-minasoko-lp.md。本番URLは未定。
+- 文言はユーザーの Googleドキュメント原稿のまま。原稿の 🟥（未確定）は `MARK_TBD` が true の間「要確認」「未定」の印で表示（src/components/gensou/Tx.astro）。本公開前に false。
+- デザインは参考サイトのスクリーンショットの雰囲気のみ（青地・白い装飾・ライム色のクレジット欄）。参考サイトの画像・文言・ロゴは使わない。
+- 環境変数 `GENSOU2_PREVIEW_PASSWORD` で Basic 認証。
