@@ -5,12 +5,14 @@
 // todo は原稿で「◯分」「〜の有無」のように穴埋め待ちのメモ。mark が true の間だけ「未定：〜」と出す。
 import J from './J.astro';
 interface Props { s: string; todo?: string; mark?: boolean }
-const KEEP = ['サンシャイン水族館', '午前零時の幻想集', 'スマートフォン', 'イヤホン', 'サンシャインシティ', 'ワールドインポートマートビル', '株式会社ex Labs'];
+// 途中で切りたくない語。強調（**）は6字以下だけ改行禁止にし、長い強調で行末が空くのを防ぐ
+const KEEP = ['サンシャイン水族館', '午前零時の幻想集', 'スマートフォン', 'イヤホン', 'サンシャインシティ', 'ワールドインポートマートビル', '株式会社ex Labs', '東池袋駅', '池袋駅', '6・7番出口', '35番出口', '東京メトロ有楽町線', '有線・Bluetooth', '3時間前', '1日最大210名', '30名様', 'iOS 16以降', 'Android 10以降', '夢の島熱帯植物館', '日本経済新聞', '草陰の夢'];
 const { s, todo, mark = false } = Astro.props;
 const tbd = s.includes('🟥');
-const text = s.replace(/🟥/g, '').trim();
+// 「6・7番出口」のように数字をつなぐ「・」の後ろでは改行しない（語結合子を入れる）
+const text = s.replace(/🟥/g, '').trim().replace(/(\d)・(?=\d)/g, '$1・\u2060');
 ---
-{text && <J t={text} keep={KEEP} />}
+{text && <J t={text} keep={KEEP} markMax={6} />}
 {!text && !todo && mark && <span class="tbd-empty">未定</span>}
 {todo && mark && <span class="tbd-empty">未定：{todo}</span>}
 {tbd && text && mark && <span class="tbd" title="原稿で未確定（🟥）の項目">要確認</span>}
