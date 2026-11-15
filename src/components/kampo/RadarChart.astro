@@ -1,7 +1,8 @@
 ---
 // 8軸レーダーチャート（サーバー側で描く SVG。JS 不要）。
 // 軸は上から時計回りに 気虚・血虚・気滞・瘀血・水滞・水不足（陰虚）（TYPES の順。寒熱は軸にしない）。
-import { TYPES, TYPE_DEFS, type TypeKey } from '../../lib/kampo/masters';
+import { TYPES, TYPE_DEFS } from '../../lib/kampo/masters';
+import type { TypeKey } from '../../lib/kampo/masters';
 export interface Props { pct: Record<TypeKey, number>; size?: number; title?: string; /** false なら点数を出さない（お客様用の結果画面。2026-10-31 第4弾 0-2） */ showScore?: boolean }
 const { pct, size = 360, title = '体質バランス', showScore = true } = Astro.props;
 const cx = size / 2;

@@ -1,6 +1,7 @@
 ---
 // デート・お出かけ記事の冒頭に置く「この記事について」（最終更新日・料金を確認した日・掲載基準）。
-import { checkedRange, ymd, type DateRow } from '../../lib/dateGuide';
+import { checkedRange, ymd } from '../../lib/dateGuide';
+import type { DateRow } from '../../lib/dateGuide';
 interface Props { modified: string; rows: Pick<DateRow, 'checked'>[] }
 const { modified, rows } = Astro.props;
 const checked = checkedRange(rows);

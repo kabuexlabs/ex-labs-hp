@@ -5,11 +5,8 @@
 export const prerender = false;
 import KampoLayout from '../../../../layouts/KampoLayout.astro';
 import consentText from '../../../../data/kampo/consent.md?raw';
-import {
-  isKvConfigured, createSession, saveCustomer, getCustomer, newId, normalizePhone,
-  findCustomerByMember, findCustomerByPhone, findCustomersByLineName, customerLabel, fmtJst,
-  type KampoCustomer, type InputBy,
-} from '../../../../lib/kampo/store';
+import { isKvConfigured, createSession, saveCustomer, getCustomer, newId, normalizePhone, findCustomerByMember, findCustomerByPhone, findCustomersByLineName, customerLabel, fmtJst } from '../../../../lib/kampo/store';
+import type { KampoCustomer, InputBy } from '../../../../lib/kampo/store';
 
 const kv = isKvConfigured();
 let error = '';

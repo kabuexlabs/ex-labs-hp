@@ -17,20 +17,22 @@
 //   「結果の渡し方」の選択はやめ、「お客様用の結果を開く」「A4で印刷」を押した記録を残す。
 export const prerender = false;
 import KampoLayout from '../../../../../layouts/KampoLayout.astro';
-import {
-  TYPES, AXES, STAFF_QUESTIONS, SECTION_LABEL, LEGACY, formulaByCode, findingLabel, legacyOptionText, optionText, optionById, axisName, axisColor,
-  strengthRangeLabel, THERMAL_LABEL, HEAT_LABEL, symptomLabel, questionById, FOUNDATION, type Option, type Question,
-} from '../../../../../lib/kampo/masters';
+import { TYPES, AXES, STAFF_QUESTIONS, SECTION_LABEL, LEGACY, formulaByCode, findingLabel, legacyOptionText, optionText, optionById, axisName, axisColor, strengthRangeLabel, THERMAL_LABEL, HEAT_LABEL, symptomLabel, questionById, FOUNDATION } from '../../../../../lib/kampo/masters';
+import type { Option, Question } from '../../../../../lib/kampo/masters';
 import { LEVEL_LABEL, DEF_EXC_LABEL, COMBO_LABEL, SELF_TONGUE_FACTOR, THERMAL_CONDITION_LABEL, toAxis, advicePlan, relatedTypeOf, patientView, typeOrder } from '../../../../../lib/kampo/scoring';
-import { staffChecks, noKampoReason, referrals, CAUTION_KIND_LABEL, GATE_YES, LIVER_CHECK_KEY, SANSHISHI_KEY, MINOR_KEY, currentKampo, kampoInMedNames, kampoOnlyMedIds, hasHerb, type Caution } from '../../../../../lib/kampo/safety';
+import { staffChecks, noKampoReason, referrals, CAUTION_KIND_LABEL, GATE_YES, LIVER_CHECK_KEY, SANSHISHI_KEY, MINOR_KEY, currentKampo, kampoInMedNames, kampoOnlyMedIds, hasHerb } from '../../../../../lib/kampo/safety';
+import type { Caution } from '../../../../../lib/kampo/safety';
 import { drugClassesFromNames } from '../../../../../lib/kampo/drugnames';
 import { FINDING_STATUS_LABEL } from '../../../../../lib/kampo/findings';
-import { buildReasons, selectionSnapshot, FIT_LEVEL_LABEL, FIT_LEVEL_SYMBOL, OUTCOME_LABEL, type Candidate } from '../../../../../lib/kampo/recommend';
+import { buildReasons, selectionSnapshot, FIT_LEVEL_LABEL, FIT_LEVEL_SYMBOL, OUTCOME_LABEL } from '../../../../../lib/kampo/recommend';
+import type { Candidate } from '../../../../../lib/kampo/recommend';
 import { SEX_LABEL, AGE_BAND_LABEL, MENSES_LABEL, kampoOf, tongueMode, normalizeAnswer } from '../../../../../lib/kampo/flow';
 import { computeSession, selectionOf, finalize, isLegacy, kampoHidden } from '../../../../../lib/kampo/compute';
 import { clearStaffCookie } from '../../../../../lib/kampo/auth';
-import { getSession, saveSession, getCustomer, audit, fmtJst, getStaffRoster, receiptNo, STATUS_LABEL, INPUT_BY_LABEL, type KampoProposal } from '../../../../../lib/kampo/store';
-import { ORGAN_LABEL, CUTOFF_RATIO, type TypeKey, type OrganKey } from '../../../../../lib/kampo/masters';
+import { getSession, saveSession, getCustomer, audit, fmtJst, getStaffRoster, receiptNo, STATUS_LABEL, INPUT_BY_LABEL } from '../../../../../lib/kampo/store';
+import type { KampoProposal } from '../../../../../lib/kampo/store';
+import { ORGAN_LABEL, CUTOFF_RATIO } from '../../../../../lib/kampo/masters';
+import type { TypeKey, OrganKey } from '../../../../../lib/kampo/masters';
 
 const id = Astro.params.id ?? '';
 const s = await getSession(id);

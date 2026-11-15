@@ -11,28 +11,8 @@
 export const prerender = false;
 
 import YoyakuLayout from '../../../layouts/YoyakuLayout.astro';
-import {
-  checkAdminKey,
-  isKvConfigured,
-  migrateLegacy,
-  getEvents,
-  getEvent,
-  createEvent,
-  saveEvent,
-  deleteEvent,
-  getEventStats,
-  getSlots,
-  getBookings,
-  getSlot,
-  addSlot,
-  deleteSlot,
-  saveSlot,
-  cancelBooking,
-  formatSlotJa,
-  jstToday,
-  type Booking,
-  type EventInfo,
-} from '../../../lib/yoyaku';
+import { checkAdminKey, isKvConfigured, migrateLegacy, getEvents, getEvent, createEvent, saveEvent, deleteEvent, getEventStats, getSlots, getBookings, getSlot, addSlot, deleteSlot, saveSlot, cancelBooking, formatSlotJa, jstToday } from '../../../lib/yoyaku';
+import type { Booking, EventInfo } from '../../../lib/yoyaku';
 import { randomBytes } from 'node:crypto';
 import { loginAllowed, recordLoginFailure } from '../../../lib/contact';
 

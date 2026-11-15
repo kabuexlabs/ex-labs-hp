@@ -9,20 +9,8 @@ export const prerender = false;
 
 import YoyakuLayout from '../../../layouts/YoyakuLayout.astro';
 import { checkAdminKey, adminEmail } from '../../../lib/yoyaku';
-import {
-  listInquiries,
-  contactConfigStatus,
-  testMailSend,
-  loginAllowed,
-  recordLoginFailure,
-  type ContactRecord,
-  setInquiryStatus,
-  INQUIRY_STATUS_LABEL,
-  type InquiryStatus,
-  readMetrics,
-  readMailResults,
-  type MailResult,
-} from '../../../lib/contact';
+import { listInquiries, contactConfigStatus, testMailSend, loginAllowed, recordLoginFailure, setInquiryStatus, INQUIRY_STATUS_LABEL, readMetrics, readMailResults } from '../../../lib/contact';
+import type { ContactRecord, InquiryStatus, MailResult } from '../../../lib/contact';
 
 Astro.response.headers.set('Cache-Control', 'no-store');
 Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');

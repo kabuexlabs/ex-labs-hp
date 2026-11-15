@@ -19,7 +19,8 @@
 export const prerender = false;
 import KampoLayout from '../../../../../../layouts/KampoLayout.astro';
 import QMark from '../../../../../../components/kampo/QMark.astro';
-import { STEPS, stepOfSection, findingById, formulaByCode, type Option, type Followup } from '../../../../../../lib/kampo/masters';
+import { STEPS, stepOfSection, findingById, formulaByCode } from '../../../../../../lib/kampo/masters';
+import type { Option, Followup } from '../../../../../../lib/kampo/masters';
 import { getSession, saveSession, getCustomer, saveCustomer } from '../../../../../../lib/kampo/store';
 import { walk, firstUnansweredStep, normalizeAnswer, isAnswered, conflictIn, selectable, sexFromAnswers, ageBandFromAnswers } from '../../../../../../lib/kampo/flow';
 import { isUrgent } from '../../../../../../lib/kampo/safety';

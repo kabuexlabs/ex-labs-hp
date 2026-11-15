@@ -3,7 +3,8 @@
 // 画像は番組公式サイトの og:image を相手のサイトから表示する（LinkPreviewScript）。取れないときは文字のパネル。
 import LinkPreviewScript from './LinkPreviewScript.astro';
 import { findLinkPreviewTarget } from '../lib/linkPreview';
-import { FRIDAY_MYSTERY, type TvWork } from '../data/tvWorks';
+import { FRIDAY_MYSTERY } from '../data/tvWorks';
+import type { TvWork } from '../data/tvWorks';
 interface Props { work?: TvWork; place: string; theme?: 'light' | 'dark' }
 const { work = FRIDAY_MYSTERY, place, theme = 'light' } = Astro.props;
 const preview = findLinkPreviewTarget(work.url) ? work.url : undefined;

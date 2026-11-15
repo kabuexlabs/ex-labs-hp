@@ -3,7 +3,8 @@
 export const prerender = false;
 import KampoLayout from '../../../../../layouts/KampoLayout.astro';
 import { AXES, axisName, axisColor } from '../../../../../lib/kampo/masters';
-import { SEX_LABEL, AGE_BAND_LABEL, type Sex } from '../../../../../lib/kampo/flow';
+import { SEX_LABEL, AGE_BAND_LABEL } from '../../../../../lib/kampo/flow';
+import type { Sex } from '../../../../../lib/kampo/flow';
 import { getCustomer, listCustomerSessions, audit, fmtJst, customerLabel, STATUS_LABEL, typeNamesOf } from '../../../../../lib/kampo/store';
 
 const c = await getCustomer(Astro.params.id ?? '');
