@@ -55,6 +55,7 @@ const reserveAttrs = RESERVE_URL ? { target: '_blank', rel: 'noopener', 'data-tr
 
 const TITLE = '午前零時の幻想集 第二夜「水底の夢」';
 const CATCH = '閉館後の水族館。耳元の声に導かれて、夜の水槽を巡る。🟥';
+const CATCH_BR = '閉館後の水族館。\n耳元の声に導かれて、\n夜の水槽を巡る。🟥';
 const MUST = 'イヤホンと充電されたスマートフォンを、必ずご持参ください。お一人様1つずつないと、体験に参加できません。';
 const title = `${TITLE}｜サンシャイン水族館の夜のイマーシブ体験（関係者確認用）`;
 const description = '閉館後のサンシャイン水族館で、耳元の声に導かれて夜の水槽を巡る体験型イベント「午前零時の幻想集 第二夜『水底の夢』」。2027年2月14日〜3月19日の全10日間、各日18:50〜19:50の10分おきに集合、所要約70分。参加費5,500円（税込）。';
@@ -546,7 +547,7 @@ a{color:inherit}
     <div class="hair" aria-hidden="true" style="width:140%;left:-10%;bottom:12%;transform:rotate(-32deg)"></div>
     <div class="wrap">
       <p class="intro-s fi">{TITLE}</p>
-      <p class="glow fi"><Tx s={"閉館後の水族館。\n耳元の声に導かれて、\n夜の水槽を巡る。🟥"} mark={MARK_TBD} /></p>
+      <p class="glow fi"><Tx s={CATCH_BR} mark={MARK_TBD} /></p>
       <div class="body fi">
         <span class="label">初めての方へ</span>
         <p><Tx s="謎解きの知識や演技の経験は必要ありません。スマートフォンから流れる音声に従って歩き、出会う登場人物の話を聞くだけで物語が進みます。" /></p>
@@ -733,7 +734,7 @@ a{color:inherit}
     <div class="rays" aria-hidden="true" style="opacity:.6"></div>
     <div class="bub" aria-hidden="true">{bubbles.slice(4, 14).map((b) => <i style={`left:${b.x}%;width:${b.s}px;height:${b.s}px;animation-duration:${b.d}s;animation-delay:${b.dl}s`}></i>)}</div>
     <div class="wrap">
-      <p class="glow fi"><Tx s={CATCH} mark={MARK_TBD} /></p>
+      <p class="glow fi"><Tx s={CATCH_BR} mark={MARK_TBD} /></p>
       <p class="fin-i fi"><J t="2027年2月14日（日）〜3月19日（金）の全10日間／サンシャイン水族館／参加費5,500円（税込）" keep={['サンシャイン水族館']} /></p>
       <div class="must fi" role="note">
         <svg aria-hidden="true"><use href="#phone"/></svg>
