@@ -183,6 +183,20 @@ const faqs = [
   { q: '遅れて到着した場合は？', a: '集合時刻を過ぎると、ご参加いただけない場合があります。🟥' },
 ];
 
+// 第1回（第一夜「草陰の夢」）の感想。2026-11-15 ユーザー提供の X のスクリーンショット7件から、本文だけを抜き出したもの
+// （アカウント名・アイコン・画像は載せない。ハッシュタグと URL は外し、文は原文のまま）
+const voices = [
+  'あまりにも良かった！\n正直「夜の植物園ってロケーションってだけで、体験感多少薄くても楽しいってみんな言うんじゃない？」って穿ったことを思っていたんですが(失礼)、物語と場所が素晴らしく噛み合ってて本当に素晴らしかった！！！！\n物語体験が好きな方なら行って後悔ないです、絶対楽しめます。',
+  '今日もとても温かい、優しい素敵な夢をありがとうございました。目の当たりにする物語、そしてこの場で出会えた方々との対話を通して今の自分自身にも少しずつ向き合えてきた…そんな気がします。\n涙はいつも止まりません。',
+  '第一夜 草陰の夢、行ってきたよー！\n夜の植物園楽しすぎたーーー！　綺麗ー！\nサブタイで、もしや？　とも思ってたけれども、第二夜が気になるーー！\nあと、今度はちゃんと昼間にも夢の島熱帯植物園さんに行きたいなって思った！\n\n世にも珍しい滝の裏側見られるの、いいよね……。',
+  '11月14日にソロで草陰の夢に迷い込みました🌴\n\n今年イチバンの素晴らしい体験でした。\n夜の温室，キャスト陣により物語の1人として引き込まれました。最高です。\n\nまた次の幻想で。',
+  '第一夜\n記憶が戻ったら辛かった…\n素に戻ってたくさん泣いた…\nキャストのみなさんのお言葉が胸にしみた…\n\n一緒に記憶を取り戻した\nお二方、ありがとうございました\n\n来週また泣くんだろうなぁ…',
+  'イマーシブ『午前零時の幻想集 第一夜 草陰の夢』体験してきました！夜の植物館めちゃ雰囲気あった…！東京にこんな所があるとは🌴🌺\n徐々に記憶を取り戻していく過程が好きだし余韻があってよかったな…無事に家に帰れたので、これからの人生も大事に生きていきます',
+  '第一夜　草陰の夢に参加してきました🌴\n\nライトアップされた夜の植物たちの美しさで本当に夢の中にいるように感じ、取り戻されていく記憶もドキドキしながら楽しむことができました！本当に素晴らしかったです！\n参加してよかった！！',
+];
+const HASHTAG = '#午前零時の幻想集';
+const X_SEARCH = 'https://x.com/search?q=' + encodeURIComponent(HASHTAG) + '&f=live';
+
 const credits = [
   { k: '出演', s: '🟥' },
   { k: '主催', s: '🟥' },
@@ -363,6 +377,19 @@ a{color:inherit}
 .card-b p{margin:0}
 .card-b p + p{margin-top:18px}
 .card-b .label{border-color:var(--ink);color:var(--ink)}
+
+/* 第1回の感想集（吹き出し） */
+.vc-lead{margin:0 0 40px;text-align:center;font:500 14px/1.9 var(--mincho);letter-spacing:.08em;color:var(--w8)}
+.vc{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:28px}
+.vb{position:relative;max-width:88%;padding:22px 22px 20px;background:#fff;color:var(--ink);border-radius:22px;box-shadow:0 12px 28px rgba(5,15,70,.3)}
+.vb p{margin:0;font:500 15px/1.95 var(--goth);letter-spacing:.04em}
+.vb::after{content:"";position:absolute;bottom:-12px;width:26px;height:20px;background:#fff;clip-path:polygon(0 0,100% 0,30% 100%)}
+.vb.l{align-self:flex-start;border-bottom-left-radius:6px}
+.vb.l::after{left:18px}
+.vb.r{align-self:flex-end;border-bottom-right-radius:6px;background:#eef2ff}
+.vb.r::after{right:18px;background:#eef2ff;clip-path:polygon(0 0,100% 0,70% 100%)}
+.vc-more{margin:48px 0 0;text-align:center;font:600 clamp(16px,4.4vw,19px)/1.9 var(--mincho);letter-spacing:.1em}
+.vc-more a{display:inline-block;margin:0 4px;padding:2px 12px;border-radius:999px;background:var(--lime);color:var(--black);text-decoration:none;font-family:var(--goth);font-weight:700;letter-spacing:.04em}
 
 /* 体験のポイント（番号付き） */
 .pts{display:grid;gap:20px;margin:0;padding:0;list-style:none}
@@ -582,11 +609,21 @@ a{color:inherit}
           </div>
           <div class="card-b">
             <p><Tx s="『午前零時の幻想集』は、閉館後の施設を舞台に、物語の登場人物と出会いながら館内を巡る体験型イベントのシリーズです。第一夜「草陰の夢」は2026年11月に夢の島熱帯植物館で開催し、日本経済新聞にも取り上げられました。🟥" mark={MARK_TBD} /></p>
-            {MARK_TBD && <p><span class="label">第1回の感想集</span><br><span class="tbd-empty">未定：第1回の感想集</span></p>}
           </div>
         </div>
         <svg class="card-tail" viewBox="0 0 560 46" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0H560V8C548 8 540 12 540 22H510C496 22 480 46 440 46H120C80 46 64 22 50 22H20C20 12 12 8 0 8Z" fill="#fff"/></svg>
       </div>
+    </div>
+  </section>
+
+  <section class="sec" id="voice" aria-labelledby="h-voice" style="padding-top:48px">
+    <div class="wrap">
+      <div class="sh fi"><h2 class="sh-en" id="h-voice"><svg aria-hidden="true"><use href="#orn"/></svg>Voice<svg aria-hidden="true" style="transform:scaleX(-1)"><use href="#orn"/></svg></h2><p class="sh-ja">第1回の感想集</p></div>
+      <p class="vc-lead fi">第一夜「草陰の夢」（2026年11月・夢の島熱帯植物館）に<br>ご参加いただいた方の、Xでの感想です。</p>
+      <ul class="vc">
+        {voices.map((v, i) => <li class={`vb fi ${i % 2 ? 'r' : 'l'}`}><p><J t={v} keep={['午前零時の幻想集', '草陰の夢']} /></p></li>)}
+      </ul>
+      <p class="vc-more fi">感想は<a href={X_SEARCH} target="_blank" rel="noopener" data-place="minasoko-voice">{HASHTAG}</a>で<br>Xでご検索ください</p>
     </div>
   </section>
 
