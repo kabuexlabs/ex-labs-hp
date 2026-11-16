@@ -48,8 +48,8 @@ for (const [k, v] of Object.entries(noIndexHeaders)) Astro.response.headers.set(
 // ---- 確定したら埋める項目 ----
 // 原稿の「要記載」「（仮）」に印を付けるか。本公開の前に false にし、未定の項目が残っていないか確認する
 const MARK_TBD = true;
-// 応募フォームの URL（Google フォームの予定。docs/hacktale-award-lp.md）。null の間、応募ボタンはページ下の応募欄へ移動するだけ
-const ENTRY_URL: string | null = null;
+// 応募フォームの URL（Google フォーム。2026-11-16 ユーザー提供）。null にすると、応募ボタンはページ下の応募欄へ移動するだけになる
+const ENTRY_URL: string | null = 'https://forms.gle/qrhMLYvNrD2vSfwcA';
 // 主催（2026-11-16 ユーザー指定：運営法人名は株式会社ex Labs）
 const ORGANIZER = 'ハックテイル';
 const ORGANIZER_CORP: string | null = '株式会社ex Labs';
