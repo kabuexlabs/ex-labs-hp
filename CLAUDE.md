@@ -19,7 +19,8 @@
 - vercel.json・astro.config.mjs・src/middleware.ts（配信の仕方に関わる設定）の変更も同じ手順。
 - 本番で表示がおかしいと言われたら、原因を調べる前に**まず直前の正常な版に戻す**（revert して push）。
 - デプロイのたびに .github/workflows/deploy-smoke.yml が主要ページを確認する。push 後は Actions の結果を見てから「反映しました」と報告する。
-- 版を切り替える・取り消すと `/_astro/` のファイル名が変わり、古いページを持っている端末でデザインが外れる（2026-11-16、/gensou/ などで発生）。**直前に本番へ出ていた版の `/_astro/` のファイルは `public/_astro/` に残す**（現在 14 ファイル。2027年1月以降は削除可）。
+- CSS・JS を変えると `/_astro/` のファイル名が変わり、前の版のページを持っている端末でデザインが外れる（2026-11-16、/gensou/ などで発生）。`npm run check` が `scripts/keep-assets.mjs` で前の版のファイルを `public/_astro/` に残すので、**`public/_astro/` と `scripts/kept-assets.json` の差分を必ず一緒にコミットする**（check を通さずに push しない）。
+- flex／grid の直下に `<wbr>` 入りの文を直接置かない（Firefox で文節ごとに箱が分かれて崩れる。`<span>` で包む）。記事ページは xguide.css 末尾の Firefox 向け代替で対応済み。
 - 現在の版：astro 7.1.3・@astrojs/vercel 11.0.2・vite 8.1.3（2026-11-16 に astro 7.4.12／@astrojs/vercel 11.0.3 などへの更新を取り消した）。
 
 ## 反省から作ったルール（2026-09-06）

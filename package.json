@@ -11,7 +11,7 @@
     "seo:fanout": "node scripts/fanout-audit.mjs",
     "seo:report": "python3 scripts/gsc_report.py",
     "test:spam": "node --experimental-strip-types scripts/spam-test.mjs",
-    "check": "node scripts/deps-guard.mjs && npm run build && node scripts/seo-audit.mjs && npm run test:spam && npm run test:week && npm run test:events && npm run events:validate && npm run test:kampo && npm run test:linkpreview && node scripts/fanout-audit.mjs",
+    "check": "node scripts/deps-guard.mjs && node scripts/keep-assets.mjs --pre && npm run build && node scripts/keep-assets.mjs && node scripts/seo-audit.mjs && npm run test:spam && npm run test:week && npm run test:events && npm run events:validate && npm run test:kampo && npm run test:linkpreview && node scripts/fanout-audit.mjs",
     "llms:full": "node scripts/build-llms-full.mjs",
     "seo:crawl": "node scripts/crawl-audit.mjs --warn",
     "indexnow": "node scripts/indexnow.mjs",

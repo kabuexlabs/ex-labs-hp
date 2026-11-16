@@ -119,6 +119,9 @@ const checkAsset = async (a) => {
 };
 const nested = new Map();
 if (LOCAL) for (const a of [...assetRefs.keys()]) if (a.includes('/_vercel/')) assetRefs.delete(a);
+// 取り消した版のデザイン用ファイル（public/_astro/。古いページを持つ端末が読みに来る）も配信されているか確かめる
+const LEGACY_DIR = new URL('../public/_astro/', import.meta.url);
+if (fs.existsSync(LEGACY_DIR)) for (const f of fs.readdirSync(LEGACY_DIR)) { const a = `${BASE}/_astro/${f}`; if (!assetRefs.has(a)) assetRefs.set(a, new Set(['（以前の版のページ）'])); }
 await pool([...assetRefs.keys()], 10, async (a) => { for (const n of await checkAsset(a)) { if (!nested.has(n)) nested.set(n, a); } });
 await pool([...nested.keys()].filter((n) => !checked.has(n)), 10, async (n) => { await checkAsset(n); assetRefs.set(n, new Set([`（CSS ${nested.get(n).replace(BASE, '')} 経由）`])); });
 for (const [a, bad] of checked) for (const d of bad) problems.push({ page: [...(assetRefs.get(a) ?? [])].slice(0, 4).join(' '), kind: 'asset', asset: a.replace(BASE, ''), detail: d, pages: assetRefs.get(a)?.size ?? 0 });

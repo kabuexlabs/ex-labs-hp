@@ -238,3 +238,13 @@ body.x-guide a.cal-sub,body.x-guide .cal-sub a,body.x-guide a.tw-sub,body.x-guid
   body.x-guide ul.bullets:not(.is-steps) li::before{left:17px;top:25px}
   body.x-guide .lede{font-size:15.5px;line-height:2}
 }
+
+/* ---- Firefox 向けの代替（2026-11-16） ----
+   Firefox は <wbr> を「1つの箱」として扱うため、flex／grid の直下に <wbr> があると文節ごとに別の箱へ分かれ、
+   FAQ の答え・目次・ボタンなどが縦にばらけたり横にはみ出したりする（Chrome・Safari では起きない）。
+   記事の <wbr> は配信時に自動で入る（src/lib/articleHtml.ts）ため、Firefox では <wbr> を無効にし、
+   代わりに通常の日本語の折り返し（文字単位・禁則あり）に戻す。 */
+@supports (-moz-appearance:none){
+  body.x-guide wbr{display:none}
+  body.x-guide main{word-break:normal}
+}

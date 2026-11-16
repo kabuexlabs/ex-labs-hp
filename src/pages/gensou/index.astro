@@ -632,7 +632,7 @@ img{max-width:100%}
         <ul>
           <li>暗い場所</li>
           <li>キャストとの会話</li>
-          <li><J t="キャストが肘から下に触れる場合があります" /></li>
+          <li><span><J t="キャストが肘から下に触れる場合があります" /></span></li>
         </ul>
       </div>
       <p style="margin:32px 0 0;font-size:16px;line-height:2"><J t="物語体験が好きな方におすすめ。" /></p>
@@ -704,7 +704,7 @@ img{max-width:100%}
         <div><p class="phone-h">スマートフォンを必ずお持ちください</p><p class="phone-t"><J t="当日は、通信可能で、OSなどを最新の状態にアップデートした、ブラウザが使える機種のスマートフォンが必要です。イヤホン・アプリのダウンロード・事前登録は不要です。" /></p></div>
       </div>
       <ol class="flow">
-        {flow.map((f) => <li><span class="no">{f.no}</span><span class="tx"><strong class="lb">{f.label}</strong><J t={f.text} /></span></li>)}
+        {flow.map((f) => <li><span class="no">{f.no}</span><span class="tx"><strong class="lb">{f.label}</strong><span><J t={f.text} /></span></span></li>)}
       </ol>
     </section>
 
