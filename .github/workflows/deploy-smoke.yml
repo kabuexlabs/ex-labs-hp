@@ -1,0 +1,42 @@
+# デプロイ直後の表示確認（2026-11-16 新設）。
+# Vercel がデプロイを終えるたびに（本番・プレビューとも）、主要ページが「Webページとして」返るかを確かめる。
+# 「サイトを開くと zip がダウンロードされる」障害を、利用者より先に見つけるため。
+# 失敗するとこのワークフローが赤くなり、本番の場合は GitHub の Issue を自動で作る（リポジトリの通知でメールが届く）。
+name: Deploy smoke test
+on:
+  deployment_status:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  smoke:
+    if: github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 確認するURLを決める
+        id: target
+        env:
+          ENV_NAME: ${{ github.event.deployment.environment }}
+          ENV_URL: ${{ github.event.deployment_status.environment_url }}
+        run: |
+          if [ "$ENV_NAME" = "Production" ]; then echo "base=https://kabuexlabs.com" >> "$GITHUB_OUTPUT"; else echo "base=$ENV_URL" >> "$GITHUB_OUTPUT"; fi
+          echo "env=$ENV_NAME" >> "$GITHUB_OUTPUT"
+      - name: CDN の切り替わりを少し待つ
+        run: sleep 20
+      - name: 主要ページの確認
+        id: smoke
+        env:
+          VERCEL_BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: node scripts/smoke-deploy.mjs "${{ steps.target.outputs.base }}" | tee smoke.log
+      - name: 本番で失敗したら Issue を作る
+        if: failure() && steps.target.outputs.env == 'Production'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --repo "${{ github.repository }}" \
+            --title "【緊急】本番サイトの表示確認に失敗（${{ github.event.deployment.sha }}）" \
+            --body "$(printf 'デプロイ直後の表示確認で問題が見つかりました。直前の正常な版に戻してください（Vercel の Instant Rollback、または該当コミットの revert）。\n\n```\n%s\n```\n\n実行ログ: %s' "$(cat smoke.log)" "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")"

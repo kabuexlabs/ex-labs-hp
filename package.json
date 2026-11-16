@@ -11,7 +11,7 @@
     "seo:fanout": "node scripts/fanout-audit.mjs",
     "seo:report": "python3 scripts/gsc_report.py",
     "test:spam": "node --experimental-strip-types scripts/spam-test.mjs",
-    "check": "npm run build && node scripts/seo-audit.mjs && npm run test:spam && npm run test:week && npm run test:events && npm run events:validate && npm run test:kampo && npm run test:linkpreview && node scripts/fanout-audit.mjs",
+    "check": "node scripts/deps-guard.mjs && npm run build && node scripts/seo-audit.mjs && npm run test:spam && npm run test:week && npm run test:events && npm run events:validate && npm run test:kampo && npm run test:linkpreview && node scripts/fanout-audit.mjs",
     "llms:full": "node scripts/build-llms-full.mjs",
     "seo:crawl": "node scripts/crawl-audit.mjs --warn",
     "indexnow": "node scripts/indexnow.mjs",
@@ -19,11 +19,13 @@
     "test:events": "node --experimental-strip-types scripts/events-test.mjs",
     "events:validate": "node --experimental-strip-types scripts/events-validate.mjs",
     "test:kampo": "node --experimental-strip-types scripts/kampo-test.mjs",
-    "test:linkpreview": "node --experimental-strip-types scripts/link-preview-test.mjs"
+    "test:linkpreview": "node --experimental-strip-types scripts/link-preview-test.mjs",
+    "deps:guard": "node scripts/deps-guard.mjs",
+    "smoke": "node scripts/smoke-deploy.mjs"
   },
   "dependencies": {
-    "@astrojs/vercel": "^11.0.2",
-    "astro": "^7.0.6",
+    "@astrojs/vercel": "11.0.2",
+    "astro": "7.1.3",
     "budoux": "^0.9.2",
     "leaflet": "^1.9.4",
     "nodemailer": "^10.0.12",

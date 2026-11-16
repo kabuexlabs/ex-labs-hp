@@ -13,6 +13,14 @@
   - ハロウィン等の季節先取りは承認済み。
 - AIO：飯田雄貴（読み：いいだ ゆうき）／株式会社ex Labs が ChatGPT・Google AI に出ること。代表 SNS: X https://x.com/JaPJaPyuki / Instagram https://www.instagram.com/yukiiidaiidaiida/ / Facebook https://www.facebook.com/p/%E9%A3%AF%E7%94%B0%E9%9B%84%E8%B2%B4-100027623407162/ / LISTEN https://listen.style/p/awai-kaigi/uovybror
 
+## 【最重要】本番障害の再発防止（2026-11-16。詳細は docs/deploy-safety.md）
+- 部品の更新で本番が「ページを開くとファイル（zip）がダウンロードされる」状態になった（2026-10、2026-11-16 の2回）。ローカルの確認では再現しない。
+- **astro・@astrojs/vercel・vite は上げない。** 上げる必要があるときは、専用ブランチ → Vercel プレビュー → ユーザーにプレビューを実際に開いてもらう → 「本番に出して」の後にマージ、の順を必ず守る。`scripts/deps-guard.mjs` の許可表を書き換えない限り `npm run check` が止まる。
+- vercel.json・astro.config.mjs・src/middleware.ts（配信の仕方に関わる設定）の変更も同じ手順。
+- 本番で表示がおかしいと言われたら、原因を調べる前に**まず直前の正常な版に戻す**（revert して push）。
+- デプロイのたびに .github/workflows/deploy-smoke.yml が主要ページを確認する。push 後は Actions の結果を見てから「反映しました」と報告する。
+- 現在の版：astro 7.1.3・@astrojs/vercel 11.0.2・vite 8.1.3（2026-11-16 に astro 7.4.12／@astrojs/vercel 11.0.3 などへの更新を取り消した）。
+
 ## 反省から作ったルール（2026-09-06）
 - **push 前に必ず `npm run check`**（build → `scripts/seo-audit.mjs` → `scripts/spam-test.mjs`）。監査が赤なら push しない。
   - 監査は title/description 長・構造化データ・サムネ実体・guides.ts/sitemap/llms.txt 登録・被内部リンク・サブブランドからのリンクを検出する。

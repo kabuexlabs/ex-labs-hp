@@ -1,0 +1,22 @@
+# 本番障害の再発防止（2026-11-16 制定）
+
+## 起きたこと
+- 2026-10：astro 7.3 系＋@astrojs/vercel 11.0.11 に上げたところ、本番でページがファイルとしてダウンロードされた。7.1.3 に戻して復旧。
+- 2026-11-16：astro 7.4.12＋@astrojs/vercel 11.0.3 に上げたところ、同じ症状（会社のHPを開くと zip になる）。2つの更新を revert（de40182）して復旧。
+- どちらも、ローカルでのビルド・配信設定の比較・全ページの画面比較では再現しなかった。**ローカルの確認では防げない**ことが2回で分かった。
+
+## 仕組みで止めるもの
+1. **部品の版の見張り**（scripts/deps-guard.mjs、`npm run check` の最初）：astro・@astrojs/vercel・vite が許可した版（astro 7.1.3／@astrojs/vercel 11.0.2／vite 8.1.3）と違うと check が失敗する。package.json も同じ版に固定（`^` を付けない）。
+2. **デプロイ直後の表示確認**（.github/workflows/deploy-smoke.yml → scripts/smoke-deploy.mjs）：Vercel のデプロイが終わるたびに、主要11ページについて「200・Content-Type が HTML／XML・ダウンロード扱いでない・本文が HTML／XML で始まる（gzip のまま届いていない）」を確かめる。本番で失敗すると GitHub に「【緊急】」の Issue を自動で作る（通知メールが届く）。
+   - プレビューが Vercel の認証で保護されている場合は「判定不可」になる。プレビューも確認するには、Vercel の Protection Bypass for Automation を有効にし、そのシークレットを GitHub の `VERCEL_AUTOMATION_BYPASS_SECRET` に登録する。
+
+## 部品（依存パッケージ）を更新するときの手順（必須）
+1. main ではなく専用のブランチで更新する（`deps/…`）。main には直接 push しない。
+2. ローカルで `npm run check`（deps-guard の許可表もこのブランチで書き換える）、画面比較、脆弱性テスト。
+3. ブランチを push して **Vercel のプレビュー** を作る。deploy-smoke の結果（Actions）を確認し、さらに**ユーザーにプレビューURLをスマホとPCで実際に開いてもらい**、ページが表示されることを確認してもらう。
+4. ユーザーの「本番に出して」の後で main にマージする。マージ後も deploy-smoke の結果を確認する。
+5. 本番で問題が出たら、原因を調べる前に**まず直前の正常な版に戻す**（Vercel の Instant Rollback、または revert して push）。
+
+## 部品以外の変更
+- 記事・文言・デザインの変更はこれまでどおり main に反映してよい。deploy-smoke が毎回自動で確認する。
+- vercel.json・astro.config.mjs・src/middleware.ts（配信の仕方に関わる設定）を変えるときも、部品の更新と同じ手順（プレビューで確認）にする。
