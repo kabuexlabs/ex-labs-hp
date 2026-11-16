@@ -12,7 +12,7 @@ permissions:
 jobs:
   check:
     if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # ブラウザ（Playwright）が対応している版に固定
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,7 +27,7 @@ jobs:
         run: set -o pipefail; node scripts/site-check.mjs https://kabuexlabs.com --out out | tee out-files.log
       - name: ブラウザの準備
         run: |
-          mkdir -p /tmp/pw && cd /tmp/pw && npm init -y >/dev/null && npm i --no-audit --no-fund playwright@1.49.1 >/dev/null
+          mkdir -p /tmp/pw && cd /tmp/pw && npm init -y >/dev/null && npm i --no-audit --no-fund playwright@latest >/dev/null
           npx playwright install --with-deps chromium webkit firefox >/dev/null
       - name: 主要ページをブラウザで開いて撮る
         id: shots
