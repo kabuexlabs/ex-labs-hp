@@ -7,7 +7,7 @@ on:
   deployment_status:
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write # 画面の画像を ci-shots ブランチに保存するため
   issues: write
 jobs:
   check:
@@ -28,13 +28,14 @@ jobs:
       - name: ブラウザの準備
         run: |
           mkdir -p /tmp/pw && cd /tmp/pw && npm init -y >/dev/null && npm i --no-audit --no-fund playwright@1.49.1 >/dev/null
-          npx playwright install --with-deps chromium >/dev/null
+          npx playwright install --with-deps chromium webkit firefox >/dev/null
       - name: 主要ページをブラウザで開いて撮る
         id: shots
         shell: bash
         continue-on-error: true
         env:
           NODE_PATH: /tmp/pw/node_modules
+          BROWSERS: chromium,webkit,firefox
         run: |
           set -o pipefail
           cp scripts/site-shots.mjs /tmp/pw/site-shots.mjs
@@ -48,6 +49,18 @@ jobs:
             out-files.log
             out-shots.log
           retention-days: 14
+      - name: 画面の画像を ci-shots ブランチに保存（毎回上書き）
+        if: always()
+        shell: bash
+        run: |
+          rm -rf /tmp/shots-repo && mkdir -p /tmp/shots-repo && cd /tmp/shots-repo
+          cp -r "$GITHUB_WORKSPACE/out" . 2>/dev/null || true
+          cp "$GITHUB_WORKSPACE"/out-*.log . 2>/dev/null || true
+          printf '{\n  "git": { "deploymentEnabled": false }\n}\n' > vercel.json
+          printf '本番サイトの全ページ検査の結果（自動生成・毎回上書き）。%s のコミット %s\n' "$(date -u +%FT%TZ)" "$GITHUB_SHA" > README.md
+          git init -q -b ci-shots && git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "site-check: $GITHUB_SHA"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-shots
       - name: 問題があれば Issue を作る
         if: steps.files.outcome == 'failure' || steps.shots.outcome == 'failure'
         env:
