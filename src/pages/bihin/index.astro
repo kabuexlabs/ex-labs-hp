@@ -9,8 +9,19 @@
 export const prerender = false;
 
 import YoyakuLayout from '../../layouts/YoyakuLayout.astro';
-import { checkBihinKey, isKvConfigured, getItems, getItem, saveItem, deleteItem, newItemId, savePhoto, deletePhoto, formatPrice } from '../../lib/bihin';
-import type { Item } from '../../lib/bihin';
+import {
+  checkBihinKey,
+  isKvConfigured,
+  getItems,
+  getItem,
+  saveItem,
+  deleteItem,
+  newItemId,
+  savePhoto,
+  deletePhoto,
+  formatPrice,
+  type Item,
+} from '../../lib/bihin';
 import { loginAllowed, recordLoginFailure } from '../../lib/contact';
 
 Astro.response.headers.set('Cache-Control', 'no-store');

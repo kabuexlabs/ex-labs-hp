@@ -7,13 +7,24 @@ export const prerender = false;
 
 import HacktaleLayout from '../../../layouts/HacktaleLayout.astro';
 import { htBase, HT_LINE_URL } from '../../../data/hacktale';
-import { isKvConfigured, getWorks, getSessions, bookedSeatsMap, availability, AVAILABILITY_LABEL, formatStartJa, jstNow, sessionFormat, minPlayersOf } from '../../../lib/hacktaleBooking';
-import type { HtSession, HtAvailability, HtWorkRec } from '../../../lib/hacktaleBooking';
-import { FORMAT_LABEL } from '../../../lib/hacktaleTemplates';
-import type { HtFormat } from '../../../lib/hacktaleTemplates';
+import {
+  isKvConfigured,
+  getWorks,
+  getSessions,
+  bookedSeatsMap,
+  availability,
+  AVAILABILITY_LABEL,
+  formatStartJa,
+  jstNow,
+  sessionFormat,
+  minPlayersOf,
+  type HtSession,
+  type HtAvailability,
+  type HtWorkRec,
+} from '../../../lib/hacktaleBooking';
+import { FORMAT_LABEL, type HtFormat } from '../../../lib/hacktaleTemplates';
 import HacktaleCalendar from '../../../components/HacktaleCalendar.astro';
-import { buildCalendarData } from '../../../lib/hacktaleCalendar';
-import type { CalData } from '../../../lib/hacktaleCalendar';
+import { buildCalendarData, type CalData } from '../../../lib/hacktaleCalendar';
 
 Astro.response.headers.set('Cache-Control', 'no-store');
 

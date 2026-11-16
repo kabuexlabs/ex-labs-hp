@@ -14,8 +14,28 @@
 export const prerender = false;
 
 import ShimokitaLayout from '../../../layouts/ShimokitaLayout.astro';
-import { isKvConfigured, checkAdminKey, getContent, saveContent, getAllPlayers, getPlayer, savePlayer, deletePlayer, getStats, jstToday, effectiveStatus, advanceToNextStep, newId, STORE_STATUS_LABEL, WEEKDAY_JA } from '../../../lib/shimokita';
-import type { GameContent, Store, Step, StoreStatus, Player } from '../../../lib/shimokita';
+import {
+  isKvConfigured,
+  checkAdminKey,
+  getContent,
+  saveContent,
+  getAllPlayers,
+  getPlayer,
+  savePlayer,
+  deletePlayer,
+  getStats,
+  jstToday,
+  effectiveStatus,
+  advanceToNextStep,
+  newId,
+  STORE_STATUS_LABEL,
+  WEEKDAY_JA,
+  type GameContent,
+  type Store,
+  type Step,
+  type StoreStatus,
+  type Player,
+} from '../../../lib/shimokita';
 import { loginAllowed, recordLoginFailure } from '../../../lib/contact';
 
 Astro.response.headers.set('Cache-Control', 'no-store');

@@ -15,8 +15,7 @@ import DateInfo from '../../components/guide/DateInfo.astro';
 import DateChecklist from '../../components/guide/DateChecklist.astro';
 import DateCta from '../../components/guide/DateCta.astro';
 import OutingCards from '../../components/guide/OutingCards.astro';
-import { buildOutings, fitsParty, hacktaleSlots, yen } from '../../lib/outingCatalog';
-import type { Outing } from '../../lib/outingCatalog';
+import { buildOutings, fitsParty, hacktaleSlots, yen, type Outing } from '../../lib/outingCatalog';
 import { fmtDateShort, jstDateString } from '../../lib/thisWeek';
 import { jsonLd } from '../../lib/microcms';
 
@@ -44,10 +43,7 @@ const byTime = (lo: number, hi: number) => all.filter((o) => o.minutes !== undef
 const short = byTime(0, 75), mid = byTime(76, 150), long = byTime(151, 999);
 const timeUnknown = all.filter((o) => o.minutes === undefined);
 
-const perPerson = (o: Outing) => {
-  const ns = [1, 2, 3, 4].filter((n) => o.totalFor(n) !== undefined);
-  return ns.length ? `1人あたり${yen(Math.round((o.totalFor(ns[0]) as number) / ns[0]))}〜` : '';
-};
+const perPerson = (o: Outing) => { const ns = [1, 2, 3, 4].filter((n) => o.totalFor(n) !== undefined); return ns.length ? `1人あたり${yen(Math.round(o.totalFor(ns[0])! / ns[0]))}〜` : ''; };
 const fit = (o: Outing) => [
   o.solo === true ? '一人' : '',
   fitsParty(o, 2) ? '二人' : '',
