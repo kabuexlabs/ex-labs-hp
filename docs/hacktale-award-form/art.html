@@ -1,0 +1,141 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0c0c12;--red:#ff2d4a;--blue:#2457ff;--purple:#7b3bff;--grad:linear-gradient(90deg,var(--red),var(--purple) 50%,var(--blue));--en:'Space Grotesk',sans-serif;--go:'Zen Kaku Gothic New',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#888;font-family:var(--go);font-weight:900;color:#fff}
+.ab{position:relative;width:1600px;overflow:hidden;background:var(--ink);margin-bottom:40px}
+.grid{position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.09) 1px,transparent 1px) 0 0/80px 80px,linear-gradient(rgba(255,255,255,.09) 1px,transparent 1px) 0 0/80px 80px}
+.glow{position:absolute;border-radius:50%;opacity:.6}
+.suit{position:absolute;fill:none;stroke-width:1.2}
+.pill{display:inline-block;font:700 22px/1 var(--en);letter-spacing:.16em;padding:.7em 1.1em;border-radius:99px;background:var(--grad)}
+.tile{position:relative;z-index:0;display:inline-block;padding:.1em .22em .14em}
+.tile::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--c);border-radius:.08em;transform:skewX(-7deg) rotate(-1.2deg)}
+.cut{position:relative;color:transparent;display:inline-block}
+.cut::before,.cut::after{content:attr(data-t);position:absolute;left:0;top:0;color:#fff}
+.cut::before{clip-path:inset(0 0 54% 0)}
+.cut::after{clip-path:inset(46% 0 0 0);transform:translateX(.05em)}
+.bar{position:absolute;left:0;right:0;bottom:0;height:10px;background:var(--grad)}
+.logo{filter:invert(1);display:block}
+
+/* ヘッダー 1600x400 */
+#header{height:400px}
+#header .in{position:absolute;left:90px;top:50%;transform:translateY(-50%);z-index:2}
+#header .top{display:flex;align-items:center;gap:22px}
+#header .logo{height:48px;width:auto}
+#header h1{font-size:104px;line-height:1.15;letter-spacing:.02em;margin-top:22px;white-space:nowrap}
+#header h1 small{font-size:.5em;margin-right:.25em;vertical-align:.25em}
+#header .row{display:flex;align-items:center;gap:30px;margin-top:14px}
+#header .tile{font-size:60px;line-height:1.1;--c:var(--blue)}
+#header .date{font:600 30px/1 var(--en);letter-spacing:.08em;opacity:.9}
+#header .dice{position:absolute;right:120px;top:64px;width:250px;height:250px;border-radius:50%;overflow:hidden;filter:grayscale(1) contrast(1.1);box-shadow:0 0 0 9px var(--ink),0 0 0 15px #fff;z-index:2}
+#header .dice img{width:100%;height:100%;object-fit:cover}
+
+/* 見出し帯 1600x360 */
+.sec{height:360px}
+.sec .in{position:absolute;left:90px;top:50%;transform:translateY(-52%);z-index:2}
+.sec .lbl{display:flex;align-items:center;gap:20px;font:700 30px/1 var(--en);letter-spacing:.2em}
+.sec .lbl b{display:grid;place-items:center;width:76px;height:76px;border-radius:16px;background:var(--c);font-size:36px;letter-spacing:.02em;transform:rotate(-6deg)}
+.sec .lbl::after{content:"";width:90px;height:4px;background:var(--c)}
+.sec h2{font-size:124px;line-height:1.2;letter-spacing:.03em;margin-top:26px;white-space:nowrap}
+.sec .big{position:absolute;right:70px;top:50%;width:330px;height:330px;transform:translateY(-50%) rotate(12deg);fill:var(--c);opacity:.95;z-index:1}
+.sec .ring{position:absolute;right:20px;top:50%;width:430px;height:430px;transform:translateY(-50%);border:3px dashed rgba(255,255,255,.35);border-radius:50%}
+
+/* 大義 1600x900 */
+#cause{width:1200px;height:1300px}
+#cause .copy{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);--u:11.4px;line-height:1;z-index:2;width:calc(var(--u)*92)}
+#cause .ln{display:flex;align-items:flex-end;white-space:nowrap}
+#cause .ln>*{flex:none}
+#cause .ln+.ln{margin-top:calc(var(--u)*3)}
+#cause .ln1{padding-left:calc(var(--u)*2)}#cause .ln2{justify-content:flex-end}#cause .ln4{justify-content:center}
+#cause .s{font-weight:700;font-size:calc(var(--u)*6);padding:0 .1em .08em;color:rgba(255,255,255,.86)}
+#cause .tate{writing-mode:vertical-rl;text-orientation:upright;letter-spacing:-.06em;padding:0 .02em .05em}
+#cause .x1{font-size:calc(var(--u)*21)}#cause .x2,#cause .x3{font-size:calc(var(--u)*14.4)}#cause .x4{font-size:calc(var(--u)*9)}
+#cause .x5{font-size:calc(var(--u)*9.6)}#cause .x6{font-size:calc(var(--u)*18)}#cause .x7{font-size:calc(var(--u)*13);color:var(--red);margin-left:-.18em}
+#cause .copy .tile{margin:0 .04em;padding:.1em .16em .12em}
+#cause .ph{display:inline-block;overflow:hidden;filter:grayscale(1) contrast(1.1)}
+#cause .ph img{width:100%;height:100%;object-fit:cover;display:block}
+#cause .hands{width:calc(var(--u)*17);height:calc(var(--u)*11);margin:0 calc(var(--u)*1.6) calc(var(--u)*1.4) 0;border-radius:calc(var(--u)*1.2);box-shadow:0 0 0 4px #fff;transform:rotate(-4deg)}
+#cause .hands img{filter:brightness(1.9)}
+#cause .dice{width:calc(var(--u)*14);height:calc(var(--u)*14);border-radius:50%;margin:0 0 calc(var(--u)*2.4) calc(var(--u)*1);box-shadow:0 0 0 calc(var(--u)*.5) var(--ink),0 0 0 calc(var(--u)*.9) #fff}
+#cause .meta{position:absolute;left:0;right:0;bottom:84px;text-align:center;z-index:2;font-size:50px;letter-spacing:.08em}
+#cause .hd{position:absolute;left:70px;top:56px;display:flex;align-items:center;gap:22px;z-index:2}
+#cause .hd .logo{height:52px;width:auto}
+
+/* 完了 1600x400 */
+#thanks{height:400px}
+#thanks .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;text-align:center}
+#thanks h2{font-size:92px;letter-spacing:.04em;line-height:1.3}
+#thanks p{font-size:36px;font-weight:700;margin-top:10px;opacity:.9}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<path id="spade" d="M12 2C7 8 3 10.5 3 14.5a4.5 4.5 0 0 0 8 2.8V19l-2 3h6l-2-3v-1.7a4.5 4.5 0 0 0 8-2.8C21 10.5 17 8 12 2z"/>
+<path id="heart" d="M12 21C5 15 2 11.5 2 8a5 5 0 0 1 10-1.5A5 5 0 0 1 22 8c0 3.5-3 7-10 13z"/>
+<path id="diamond" d="M12 2 21 12 12 22 3 12z"/>
+<path id="club" d="M12 2a4 4 0 0 0-3.5 6A4 4 0 1 0 11 14.9V19l-2 3h6l-2-3v-4.1A4 4 0 1 0 15.5 8 4 4 0 0 0 12 2z"/>
+</defs></svg>
+
+<div class="ab" id="header">
+  <div class="grid"></div>
+  <div class="glow" style="width:700px;height:700px;left:-220px;top:-300px;background:radial-gradient(circle,rgba(123,59,255,.75),transparent 62%)"></div>
+  <div class="glow" style="width:700px;height:700px;right:-160px;top:-60px;background:radial-gradient(circle,rgba(36,87,255,.75),transparent 62%)"></div>
+  <div class="glow" style="width:520px;height:520px;left:560px;bottom:-380px;background:radial-gradient(circle,rgba(255,45,74,.6),transparent 62%)"></div>
+  <svg class="suit" viewBox="0 0 24 24" style="right:420px;top:44px;width:64px;stroke:var(--red)"><use href="#spade"/></svg>
+  <svg class="suit" viewBox="0 0 24 24" style="right:50px;bottom:40px;width:60px;stroke:#fff"><use href="#heart"/></svg>
+  <svg class="suit" viewBox="0 0 24 24" style="right:400px;bottom:54px;width:52px;fill:var(--purple);stroke:var(--purple)"><use href="#diamond"/></svg>
+  <div class="dice"><img src="../../public/assets/hacktale/award/dice.webp"></div>
+  <div class="in">
+    <div class="top"><img class="logo" src="../../public/assets/hacktale/logo.png"><span class="pill">AWARD #1</span></div>
+    <h1><small>第1回</small>ハックテイル大賞</h1>
+    <div class="row"><span class="tile">応募フォーム</span><span class="date">2026.11.25 WED — 2027.02.28 SUN</span></div>
+  </div>
+  <div class="bar"></div>
+</div>
+
+<div class="ab sec" id="sec1" style="--c:var(--red)"><div class="grid"></div>
+  <div class="glow" style="width:800px;height:800px;right:-200px;top:-220px;background:radial-gradient(circle,rgba(255,45,74,.5),transparent 62%)"></div>
+  <div class="ring"></div><svg class="big" viewBox="0 0 24 24"><use href="#heart"/></svg>
+  <div class="in"><p class="lbl"><b>01</b>APPLICANT</p><h2>応募者について</h2></div><div class="bar"></div></div>
+
+<div class="ab sec" id="sec2" style="--c:var(--purple)"><div class="grid"></div>
+  <div class="glow" style="width:800px;height:800px;right:-200px;top:-220px;background:radial-gradient(circle,rgba(123,59,255,.6),transparent 62%)"></div>
+  <div class="ring"></div><svg class="big" viewBox="0 0 24 24"><use href="#spade"/></svg>
+  <div class="in"><p class="lbl"><b>02</b>GAME</p><h2>作品について</h2></div><div class="bar"></div></div>
+
+<div class="ab sec" id="sec3" style="--c:var(--blue)"><div class="grid"></div>
+  <div class="glow" style="width:800px;height:800px;right:-200px;top:-220px;background:radial-gradient(circle,rgba(36,87,255,.6),transparent 62%)"></div>
+  <div class="ring"></div><svg class="big" viewBox="0 0 24 24"><use href="#diamond"/></svg>
+  <div class="in"><p class="lbl"><b>03</b>SUBMISSION</p><h2>提出物</h2></div><div class="bar"></div></div>
+
+<div class="ab sec" id="sec4" style="--c:var(--red)"><div class="grid"></div>
+  <div class="glow" style="width:800px;height:800px;right:-200px;top:-220px;background:radial-gradient(circle,rgba(255,45,74,.5),transparent 62%)"></div>
+  <div class="ring"></div><svg class="big" viewBox="0 0 24 24"><use href="#club"/></svg>
+  <div class="in"><p class="lbl"><b>04</b>CONFIRM</p><h2>確認事項</h2></div><div class="bar"></div></div>
+
+<div class="ab" id="cause">
+  <div class="grid"></div>
+  <div class="glow" style="width:1000px;height:1000px;left:-340px;top:-320px;background:radial-gradient(circle,rgba(123,59,255,.7),transparent 62%)"></div>
+  <div class="glow" style="width:900px;height:900px;right:-420px;top:360px;background:radial-gradient(circle,rgba(36,87,255,.7),transparent 62%)"></div>
+  <div class="glow" style="width:800px;height:800px;left:200px;bottom:-520px;background:radial-gradient(circle,rgba(255,45,74,.6),transparent 62%)"></div>
+  <svg class="suit" viewBox="0 0 24 24" style="left:60px;top:190px;width:70px;stroke:var(--red)"><use href="#spade"/></svg>
+  <svg class="suit" viewBox="0 0 24 24" style="right:70px;top:70px;width:70px;stroke:#fff"><use href="#heart"/></svg>
+  <svg class="suit" viewBox="0 0 24 24" style="right:70px;bottom:230px;width:64px;fill:var(--blue);stroke:var(--blue)"><use href="#diamond"/></svg>
+  <svg class="suit" viewBox="0 0 24 24" style="left:70px;bottom:200px;width:66px;stroke:var(--purple)"><use href="#club"/></svg>
+  <div class="hd"><img class="logo" src="../../public/assets/hacktale/logo.png"><span class="pill">AWARD #1</span></div>
+  <div class="copy">
+    <span class="ln ln1"><b class="x1 cut" data-t="頭脳戦">頭脳戦</b><span class="s">、</span><span class="ph dice"><img src="../../public/assets/hacktale/award/dice.webp"></span></span>
+    <span class="ln ln2"><b class="x2 tile" style="--c:var(--blue)">コンゲーム</b><span class="s">の</span></span>
+    <span class="ln ln3"><span class="ph hands"><img src="../../public/assets/hacktale/award/hands.webp"></span><b class="x3 tile" style="--c:var(--purple)">作品</b><span class="s">が</span><b class="x4">もっと</b></span>
+    <span class="ln ln4"><b class="x5 tile" style="--c:var(--red)">もっと</b><b class="x6 cut" data-t="増">増</b><span class="s tate">えて</span><b class="x6">欲</b><span class="s tate">しい</span><b class="x7">！</b></span>
+  </div>
+  <p class="meta">第1回 ハックテイル大賞 作品募集</p>
+  <div class="bar"></div>
+</div>
+
+<div class="ab" id="thanks"><div class="grid"></div>
+  <div class="glow" style="width:800px;height:800px;left:-200px;top:-300px;background:radial-gradient(circle,rgba(123,59,255,.7),transparent 62%)"></div>
+  <div class="glow" style="width:800px;height:800px;right:-200px;top:-100px;background:radial-gradient(circle,rgba(36,87,255,.7),transparent 62%)"></div>
+  <svg class="suit" viewBox="0 0 24 24" style="left:120px;top:70px;width:70px;stroke:var(--red)"><use href="#spade"/></svg>
+  <svg class="suit" viewBox="0 0 24 24" style="right:130px;bottom:70px;width:70px;stroke:#fff"><use href="#heart"/></svg>
+  <div class="in"><h2>ここまでで<span class="tile" style="--c:var(--red);margin:0 .12em">最後</span>です</h2><p>内容を確認して「送信」を押してください</p></div><div class="bar"></div></div>
+</body></html>
