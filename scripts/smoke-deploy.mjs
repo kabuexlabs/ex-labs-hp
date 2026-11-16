@@ -42,7 +42,8 @@ for (const [p, kind] of PAGES) {
   const cd = res.headers.get('content-disposition') || '';
   const ce = res.headers.get('content-encoding') || '';
   // プレビューが Vercel の認証で保護されている場合は判定できない（失敗にはしないが、明示する）
-  if ((res.status === 401 || res.status === 403) && /vercel/i.test(res.headers.get('server') || '') && !process.env.VERCEL_BYPASS) {
+  const loc = res.headers.get('location') || '';
+  if (!process.env.VERCEL_BYPASS && (((res.status === 401 || res.status === 403) && /vercel/i.test(res.headers.get('server') || '')) || ((res.status === 302 || res.status === 307) && /^https:\/\/vercel\.com\/(sso-api|login)/.test(loc)))) {
     console.log(`--  ${p}  保護されたプレビューのため判定不可（${res.status}）`); protectedPreview++; continue;
   }
   const problems = [];

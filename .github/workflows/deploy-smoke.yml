@@ -29,9 +29,10 @@ jobs:
         run: sleep 20
       - name: 主要ページの確認
         id: smoke
+        shell: bash
         env:
           VERCEL_BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
-        run: node scripts/smoke-deploy.mjs "${{ steps.target.outputs.base }}" | tee smoke.log
+        run: set -o pipefail; node scripts/smoke-deploy.mjs "${{ steps.target.outputs.base }}" | tee smoke.log
       - name: 本番で失敗したら Issue を作る
         if: failure() && steps.target.outputs.env == 'Production'
         env:
