@@ -54,7 +54,7 @@ const pageLd = {
 const breadcrumbLd = htBreadcrumbLd([{ name: 'HACKTALE', url: new URL('/hacktale/', site).toString() }, { name: '第1回 ハックテイル大賞' }]);
 
 // 改行で途中を切りたくない語（J.astro）
-const KEEP = ['ハックテイル大賞', 'ハックテイル', '頭脳戦ゲーム', '読み合い', '閃き', 'ライセンス料', 'ライセンス契約', '大賞候補', 'テストプレイ', 'ルール説明書', '要相談', '公演化', '商品化', '該当作なし', '応募フォーム', '一次審査', '二次審査', '最終審査', '別途相談', '240分以内', 'A4・1枚以内', '株式会社ex Labs', 'プロ・アマ不問', '年齢・国籍不問', '生成AI', 'SNSアカウント', 'SNS', '未発表作品', '誹謗中傷', '公序良俗', 'ペンネーム', 'オンライン', '源泉徴収', '反社会的勢力', '同居家族', 'ポートフォリオ', '11月25日（水）', '2月28日（日）', 'その手があったか', '対人ゲーム', '個人情報', 'コンテスト', 'キャラクター', '18歳未満', '1作品', '1公演', '2〜10名', '◯週間', 'フォーマット', '受賞作', '協議期間', '大賞確定', 'サイト・SNS', '1作品につき', 'テストプレイすること', '交渉すること', '使うこと', '公演化・商品化', 'お答えできません', '応募できます', 'なりません'];
+const KEEP = ['ハックテイル大賞', 'ハックテイル', '頭脳戦ゲーム', '読み合い', '閃き', 'ライセンス料', 'ライセンス契約', '大賞候補', 'テストプレイ', 'ルール説明書', '要相談', '公演化', '商品化', '該当作なし', '応募フォーム', '一次審査', '二次審査', '最終審査', '別途相談', '240分以内', 'A4・1枚以内', '株式会社ex Labs', 'プロ・アマ不問', '年齢・国籍不問', '生成AI', 'SNSアカウント', 'SNS', '未発表作品', '誹謗中傷', '公序良俗', 'ペンネーム', 'オンライン', '源泉徴収', '反社会的勢力', '同居家族', 'ポートフォリオ', '11月25日（水）', '2月28日（日）', 'その手があったか', '対人ゲーム', '個人情報', 'コンテスト', 'キャラクター', '18歳未満', '1作品', '1公演', '2〜10名', '◯週間', 'フォーマット', '受賞作', '協議期間', '特別賞', '受賞確定', 'マーダーミステリー作家', '大賞確定', 'サイト・SNS', '1作品につき', 'テストプレイすること', '交渉すること', '使うこと', '公演化・商品化', 'お答えできません', '応募できます', 'なりません'];
 // 「・」を含む語は、語の中の「・」の後ろでも折り返さないよう語結合子（U+2060）を入れる。jt() を通した文と KEEP_J を J に渡す
 const WJ = '\u2060';
 const joinDot = (w: string) => w.replace(/・/g, '・' + WJ);
@@ -89,10 +89,11 @@ const SUBMIT = [
   { req: false, s: '世界観・ビジュアルの資料、ポートフォリオ、SNSアカウント', n: '' },
 ];
 const PRIZES = [
-  { name: '優秀賞', count: '', money: '10万円', note: '公演化の優先交渉' },
-  { name: '特別賞', count: '', money: '5万円', note: '' },
-  { name: '参加賞', count: '応募者全員', money: null, note: 'ハックテイルのグッズまたは公演割引' },
+  { name: '特別賞', count: '', money: '5万円', note: 'ハックテイルでの公演化。大賞と同じく、ハックテイルとの公演化契約（ライセンス契約）を結んだ時点で確定します。契約に至らなかった場合は特別賞になりません。', color: 'var(--purple)' },
+  { name: '参加賞', count: '応募者全員', money: null, note: 'ハックテイルのグッズまたは公演割引', color: 'var(--blue)' },
 ];
+// 特別賞も契約が必要（2026-11-17 ユーザー指示：優秀賞は削除、特別賞に公演化を追加し、契約しないと受賞にならない旨を記載）
+const SPECIAL_NOTE = '特別賞も同じです。特別賞の候補となった作品の作者とハックテイルが協議し、公演化契約（ライセンス契約）を結んだ時点で特別賞が確定し、賞金をお支払いします。契約に至らなかった場合は特別賞になりません。';
 const DECIDE = [
   '最終審査では、まず「大賞候補」を1作品選びます。',
   '大賞候補の作者とハックテイルが、「契約の主な条件」をもとに協議し、契約を結びます。',
@@ -120,7 +121,7 @@ const FLOW = [
   { k: '一次審査', d: '3月上旬', s: '書類で選考' },
   { k: '二次審査', d: '3月下旬', s: '実際に遊んで審査' },
   { k: '最終審査', d: '4月上旬', s: '大賞候補を選出' },
-  { k: '契約協議', d: '4月', s: '契約締結で大賞確定' },
+  { k: '契約協議', d: '4月', s: '契約締結で受賞確定' },
   { k: '結果発表', d: '契約締結後', s: 'サイト・SNS' },
 ];
 const OUTLINE: { k: string; v: string; tbd?: boolean }[] = [
@@ -160,7 +161,7 @@ const DISCLAIM = [
 ];
 const RIGHTS = [
   { k: 'すべての応募作品', s: '審査のために閲覧・複製・テストプレイすること' },
-  { k: '大賞候補・優秀賞', s: '協議期間中、公演化・商品化を独占的に交渉すること' },
+  { k: '大賞候補・特別賞候補', s: '協議期間中、公演化・商品化を独占的に交渉すること' },
   { k: '大賞（契約締結後）', s: '契約の範囲で公演化・商品化すること。作品名・作者名・概要・審査風景を広報に使うこと' },
   { k: '落選作品、契約に至らなかった作品', s: '何もできません。応募者が自由に発表・販売できます', free: true },
 ];
@@ -173,6 +174,7 @@ const RIGHTS_NOTE = [
 const JUDGES = [
   { name: 'ねこまみれ。', title: 'ミステリーゲーム作家', img: '/assets/hacktale/award/judge-nekomamire.webp', pos: '42% 50%' },
   { name: 'なつめぅ', title: 'ハックテイル代表', img: '/assets/hacktale/award/judge-natsumeu.webp', pos: '50% 50%' },
+  { name: 'yasu', title: 'マーダーミステリー作家', img: '/assets/hacktale/award/judge-yasu.webp', pos: '50% 40%' },
 ];
 const FAQ = [
   ['1人で複数の作品を出せますか', '出せます。作品ごとにフォームを分けてください'],
@@ -489,7 +491,7 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
 .prizes .m small{font:900 14px/1 var(--go);margin-left:.15em}
 .prizes .m.none{font:700 13px/1 var(--go);color:var(--mute)}
 .prizes .nt{grid-column:1/-1;font-size:13.5px;color:var(--ink2)}
-@media (min-width:760px){.prizes{grid-template-columns:repeat(3,1fr)}}
+@media (min-width:760px){.prizes{grid-template-columns:repeat(2,1fr);align-items:start}}
 
 /* ---------- 閉じておいて開ける欄 ---------- */
 .folds{margin-top:clamp(28px,6vw,44px);display:grid;gap:12px}
@@ -511,6 +513,8 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
 .js .fold[open] .body{animation:open .5s cubic-bezier(.2,.7,.2,1)}
 @keyframes open{from{opacity:0;transform:translateY(-10px)}}
 .fold .callout{margin-top:0}
+.fold .callout.sp{margin-top:22px;background:var(--soft);color:var(--ink)}
+.fold .callout.sp::before{background:var(--purple)}
 .fold .lead{margin-top:0;font-size:15px}
 .steps{margin-top:22px;counter-reset:st}
 .steps li{position:relative;padding:0 0 26px 70px;font:500 14.5px/1.9 var(--go)}
@@ -554,6 +558,7 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
 .judges .nm{font:900 clamp(22px,6.4vw,30px)/1.3 var(--go);letter-spacing:.04em}
 .judges .ti{font:700 13.5px/1.5 var(--go);opacity:.8}
 @media (min-width:760px){.judges{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:960px){.judges{grid-template-columns:repeat(3,1fr)}.judges li{gap:14px;padding:16px}.ph-j{width:88px}.judges .nm{font-size:22px}.judges .ti{font-size:12.5px}}
 
 /* ---------- 審査の流れ ---------- */
 .flow{margin-top:clamp(36px,7vw,56px);position:relative}
@@ -790,7 +795,7 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
     </div>
     <div class="prizes stg">
       {PRIZES.map((p, i) => (
-        <div style={`--c:${['var(--purple)', 'var(--blue)', 'var(--ink)'][i]}`}>
+        <div style={`--c:${p.color}`}>
           <h4>{p.name}</h4>
           {p.money ? <p class="m"><span data-count={p.money.replace('万円', '')}>{p.money.replace('万円', '')}</span><small>万円</small></p> : <p class="m none">賞金なし</p>}
           {p.count && <p class="c">{p.count}</p>}
@@ -802,10 +807,11 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
 
     <div class="folds stg">
       <details class="fold" style="--c:var(--red)">
-        <summary><span class="ic" aria-hidden="true">?</span><span class="t">大賞の決まり方</span><span class="hint" aria-hidden="true"></span><span class="pm" aria-hidden="true"></span></summary>
+        <summary><span class="ic" aria-hidden="true">?</span><span class="t">大賞・特別賞の決まり方</span><span class="hint" aria-hidden="true"></span><span class="pm" aria-hidden="true"></span></summary>
         <div class="body">
           <p class="callout"><J t={jt('大賞は、ハックテイルとの公演化契約（ライセンス契約）を結んだ時点で確定します。契約に至らなかった場合は大賞になりません。')} keep={KEEP_J} /></p>
           <ol class="steps">{DECIDE.map((s, i) => <li style={`--c:${i === 3 ? 'var(--ink)' : COLORS[i % 3]}`}><J t={jt(s)} keep={KEEP_J} /></li>)}</ol>
+          <p class="callout sp"><J t={jt(SPECIAL_NOTE)} keep={KEEP_J} /></p>
         </div>
       </details>
       <details class="fold" style="--c:var(--purple)">
