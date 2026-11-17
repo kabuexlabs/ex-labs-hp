@@ -153,9 +153,9 @@
 - 環境変数 `GENSOU2_PREVIEW_PASSWORD` で Basic 認証。
 - 2026-11-15 ユーザー指示：注意書き以外の重複は削る（目立つ方を残す）。オープニング（水槽の明かりが消え「閉館後の水族館で／1夜きりの物語体験を」）は毎回流す（SKIP あり、視差効果を減らす設定では流さない）。
 
-## 「第1回 ハックテイル大賞」LP（2026-11-16 限定公開）
-- 関係者確認用の限定URL **/preview/hacktale-award-cuqpnq2x/**（noindex＋`X-Robots-Tag`、sitemap・llms.txt・ナビ非掲載、`Cache-Control: private, no-store`）。正本メモは docs/hacktale-award-lp.md。本番URLは未定。
-- 文言はユーザーの Googleドキュメント「01_ハックテイル大賞 応募要項（頭脳戦）」のまま。トップの大義「頭脳戦、コンゲームの作品がもっともっと増えて欲しい！」はユーザー指定。原稿の「要記載」「（仮）」は `MARK_TBD` が true の間、赤い印で表示。運営法人名は株式会社ex Labs（確定）。応募フォーム（`ENTRY_URL`）は Google フォーム https://forms.gle/qrhMLYvNrD2vSfwcA（2026-11-16 接続。フォーム用の画像と質問文は docs/hacktale-award-form/）。
+## 「第1回 ハックテイル大賞」LP（2026-11-17 本公開）
+- 公開URL **/hacktale-award/**（検索インデックス許可、canonical・OGP・構造化データ、sitemap・llms.txt 掲載、/hacktale/ のティッカーと EVENT 欄からリンク）。正本メモは docs/hacktale-award-lp.md。旧プレビュー /preview/hacktale-award-cuqpnq2x/ は同じ場所の index.astro が 301 で転送（vercel.json は触らない）。
+- 文言はユーザーの Googleドキュメント「01_ハックテイル大賞 応募要項（頭脳戦）」のまま。トップの大義「頭脳戦、コンゲームの作品がもっともっと増えて欲しい！」はユーザー指定。運営法人名は株式会社ex Labs。応募フォーム（`ENTRY_URL`）は Google フォーム https://forms.gle/qrhMLYvNrD2vSfwcA（フォーム用の画像と質問文は docs/hacktale-award-form/）。
+- **未確定のまま公開している項目**：賞金（30万・10万・5万円）は原稿どおり「仮」の印付き、契約条件の支払い時期・対象となる公演・独占の範囲と期間・協議期間は「調整中」と表示（`MARK_TBD` が true の間）。確定の連絡が来たら `PRIZES`・`CONTRACT` を直して印を外す。勝手に確定扱いにしない。
 - 2026-11-16 ユーザー指示で作り直し：初版は参考サイト（企業の採用サイト）に似すぎていたため、**黒・白・紫・赤・青の多色**と別の形（黒地に方眼のヒーロー、色付きの札、トランプの記号、流れる帯、浮いた固定バー、下から出るメニュー）に。白×赤だけの配色・赤い三角・赤い全画面メニューには戻さない。WORKS は削除、「若干」は載せない、大賞の決まり方・契約の主な条件・審査の進め方・審査基準と配点は閉じておいて開ける欄。
 - 改行は J.astro（BudouX）＋ `word-break:keep-all`。切りたくない語は index.astro の `KEEP`。flex／grid の直下に J の出力を直接置かない。
-- 環境変数 `HTAWARD_PREVIEW_PASSWORD` で Basic 認証。

@@ -67,6 +67,22 @@ body{background:#888;font-family:var(--go);font-weight:900;color:#fff}
 #thanks .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2;text-align:center}
 #thanks h2{font-size:92px;letter-spacing:.04em;line-height:1.3}
 #thanks p{font-size:36px;font-weight:700;margin-top:10px;opacity:.9}
+
+/* OGP 1200x630 */
+#ogp{width:1200px;height:630px}
+#ogp .hd{position:absolute;left:64px;top:48px;display:flex;align-items:center;gap:20px;z-index:2}
+#ogp .hd .logo{height:44px;width:auto}
+#ogp .cp{position:absolute;left:64px;top:132px;z-index:2;font-size:92px;line-height:1.32;white-space:nowrap}
+#ogp .cp .l{display:flex;align-items:center}
+#ogp .cp .p{font-size:.55em;font-weight:700;padding:0 .12em;opacity:.9;align-self:flex-end;margin-bottom:.22em}
+#ogp .cp .sm{font-size:.72em}
+#ogp .cp .tile{margin:0 .06em;padding:.02em .16em .06em;line-height:1.15}
+#ogp .cp .bang{color:var(--red)}
+#ogp .ft{position:absolute;left:64px;right:64px;bottom:48px;z-index:2;display:flex;align-items:flex-end;justify-content:space-between}
+#ogp .ft b{font-size:40px;letter-spacing:.06em}
+#ogp .ft span{font:600 27px/1 var(--en);letter-spacing:.08em;padding-bottom:6px}
+#ogp .dice{position:absolute;right:56px;top:44px;width:160px;height:160px;border-radius:50%;overflow:hidden;filter:grayscale(1) contrast(1.1);box-shadow:0 0 0 7px var(--ink),0 0 0 12px #fff;z-index:2}
+#ogp .dice img{width:100%;height:100%;object-fit:cover}
 </style></head><body>
 <svg width="0" height="0" style="position:absolute"><defs>
 <path id="spade" d="M12 2C7 8 3 10.5 3 14.5a4.5 4.5 0 0 0 8 2.8V19l-2 3h6l-2-3v-1.7a4.5 4.5 0 0 0 8-2.8C21 10.5 17 8 12 2z"/>
@@ -138,4 +154,23 @@ body{background:#888;font-family:var(--go);font-weight:900;color:#fff}
   <svg class="suit" viewBox="0 0 24 24" style="left:120px;top:70px;width:70px;stroke:var(--red)"><use href="#spade"/></svg>
   <svg class="suit" viewBox="0 0 24 24" style="right:130px;bottom:70px;width:70px;stroke:#fff"><use href="#heart"/></svg>
   <div class="in"><h2>ここまでで<span class="tile" style="--c:var(--red);margin:0 .12em">最後</span>です</h2><p>内容を確認して「送信」を押してください</p></div><div class="bar"></div></div>
+
+<div class="ab" id="ogp">
+  <div class="grid"></div>
+  <div class="glow" style="width:800px;height:800px;left:-280px;top:-340px;background:radial-gradient(circle,rgba(123,59,255,.75),transparent 62%)"></div>
+  <div class="glow" style="width:760px;height:760px;right:-260px;top:40px;background:radial-gradient(circle,rgba(36,87,255,.75),transparent 62%)"></div>
+  <div class="glow" style="width:600px;height:600px;left:300px;bottom:-440px;background:radial-gradient(circle,rgba(255,45,74,.6),transparent 62%)"></div>
+  <svg class="suit" viewBox="0 0 24 24" style="right:300px;top:60px;width:52px;stroke:var(--red)"><use href="#spade"/></svg>
+  <svg class="suit" viewBox="0 0 24 24" style="right:80px;top:300px;width:54px;stroke:#fff"><use href="#heart"/></svg>
+  <svg class="suit" viewBox="0 0 24 24" style="right:210px;top:400px;width:46px;fill:var(--purple);stroke:var(--purple)"><use href="#diamond"/></svg>
+  <div class="dice"><img src="../../public/assets/hacktale/award/dice.webp"></div>
+  <div class="hd"><img class="logo" src="../../public/assets/hacktale/logo.png"><span class="pill">AWARD #1</span></div>
+  <div class="cp">
+    <div class="l"><span class="cut" data-t="頭脳戦">頭脳戦</span><span class="p">、</span><span class="tile" style="--c:var(--blue)">コンゲーム</span><span class="p">の</span></div>
+    <div class="l"><span class="tile" style="--c:var(--purple);margin-left:0">作品</span><span class="p">が</span><span class="sm">もっと</span><span class="tile" style="--c:var(--red)">もっと</span></div>
+    <div class="l"><span class="cut" data-t="増">増</span>えて欲しい<span class="bang">！</span></div>
+  </div>
+  <div class="ft"><b>第1回 ハックテイル大賞 作品募集</b><span>2026.11.25 — 2027.02.28</span></div>
+  <div class="bar"></div>
+</div>
 </body></html>

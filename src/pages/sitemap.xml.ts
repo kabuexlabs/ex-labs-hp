@@ -141,6 +141,7 @@ const STATIC_PATHS = [
   '/kaitou/',
   '/gensou/',
   ...htPaths,
+  '/hacktale-award/',
 ];
 
 export const GET: APIRoute = async ({ site }) => {
@@ -276,6 +277,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/uwasabanashi/kotohogi/': '2026-10-06',
     '/gensou/': '2026-11-06',
     '/uwasabanashi/iinkai/': '2026-10-06',
+    '/hacktale-award/': '2026-11-17',
   };
   // 公演検索サービスの作品詳細（公開作品のみ。テストデータ・非公開は src/data/events/index が除外済み）。
   // 日付別・条件別のページは作らない（一覧 /events/ と作品詳細だけを検索対象にする）。

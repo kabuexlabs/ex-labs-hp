@@ -1,8 +1,9 @@
-# 第1回 ハックテイル大賞 LP（限定公開・関係者確認用）
+# 第1回 ハックテイル大賞 LP（2026-11-17 本公開）
 
-- URL（限定公開）：https://kabuexlabs.com/preview/hacktale-award-cuqpnq2x/
-- 本番URL：未定（候補：/hacktale/award/。決まったらこのメモと CLAUDE.md に書く）
-- 実装：`src/pages/preview/hacktale-award-cuqpnq2x/index.astro`（2026-11-16）
+- URL：https://kabuexlabs.com/hacktale-award/（検索に出す。canonical・OGP・WebPage／パンくずの構造化データ、sitemap・llms.txt 登録、/hacktale/ のティッカーと EVENT 欄からリンク）
+- 旧・関係者確認用 URL /preview/hacktale-award-cuqpnq2x/ は、同じ場所の index.astro が 301 で /hacktale-award/ へ転送（vercel.json は触っていない）。
+- 実装：`src/pages/hacktale-award/index.astro`
+- OGP 画像：`public/assets/hacktale/award/ogp.png`（1200×630。元データは docs/hacktale-award-form/art.html の #ogp）
   - 文言の正本：ユーザー提供の Googleドキュメント「01_ハックテイル大賞 応募要項（頭脳戦）」。原稿の文をそのまま使い、並びと見出しだけ LP 用に整理。
   - トップの大きなコピーはユーザー指定の大義「頭脳戦、コンゲームの作品がもっともっと増えて欲しい！」（赤いメッセージ欄の結びと応募欄にも同じ文）。
   - デザイン（2026-11-16 作り直し後）：黒・白・紫・赤・青の多色。黒地に方眼のヒーロー（HACKTALE のキービジュアルと同じ地）、色付きの札に載せた言葉、トランプの記号、流れる帯（大義の文）、紫→青のメッセージ欄、番号付きの英字ラベル＋太いゴシックの見出し、画面下に浮く丸い固定バー（応募要項｜応募する｜メニュー）、下から出るメニュー、黒いフッター。初版は参考サイト（企業の採用サイト）に似すぎていたためユーザー指示で作り替えた。**参考サイトの画像・文言・ロゴは使っていない**。
@@ -10,15 +11,11 @@
   - 原稿にない見出しは「運ではなく、『読み合い』と『閃き』で。」「応募は無料。何作品でも。」の2つ（原稿の文から作成）。ヒーローの札「応募無料／プロ・アマ不問／何作品でも」は応募概要の記載。
   - 閉じた状態で置き、押すと開く欄：大賞の決まり方／契約の主な条件（PRIZE の下）、審査の進め方／審査基準と配点（JUDGING の下）。注意事項の2・3番目と FAQ も開閉式。
   - 改行：本文は `src/components/gensou/J.astro`（BudouX）で文節に分け、`word-break:keep-all` で文節の切れ目と句読点でだけ折り返す。途中で切りたくない語は index.astro の `KEEP`（「・」を含む語は `jt()` が語結合子を入れる）。flex／grid の直下に J の出力を直接置かない（span で包む）。
-- 検索対策：meta robots noindex＋`X-Robots-Tag`（ページ側と vercel.json の `/preview/(.*)`）。sitemap・llms.txt・ナビ・他ページからリンクしない。
-- アクセス制限：Vercel の環境変数 `HTAWARD_PREVIEW_PASSWORD` を設定すると Basic 認証（ユーザー名は任意）。未設定なら URL を知っていれば見られる（リポジトリが公開なので URL だけでは秘密にならない）。
-- CDN キャッシュ：`Cache-Control: private, no-store`（middleware の PRIVATE に /preview/ あり）。
-
 ## 確定したら入れるもの（index.astro 冒頭の定数・配列）
 | 場所 | 現在 | 本番で |
 |---|---|---|
 | `ENTRY_URL` | https://forms.gle/qrhMLYvNrD2vSfwcA（2026-11-16 設定。固定バー・メニュー・応募欄の「応募する」が別タブでフォームを開く） | 変えるときはここを差し替え |
-| `MARK_TBD` | true | 本公開の前に false（「要記載」「仮」の印が消える。残っていないか確認） |
+| `MARK_TBD` | true（賞金に「仮」、契約条件の未確定4項目に「調整中」と出す） | すべて確定したら false |
 | `PRIZES`・大賞の賞金 | 30万円／10万円／5万円（原稿は「（仮）」） | 確定額 |
 | `CONTRACT` | 支払い時期・対象となる公演・独占の範囲と期間・協議期間（◯週間）が要記載 | 確定した条件 |
 
@@ -26,10 +23,6 @@
 - 賞金（大賞30万円・優秀賞10万円・特別賞5万円はいずれも「仮」）
 - 契約の主な条件：支払い時期、対象となる公演、独占の範囲と期間、協議期間
 - 審査員（ゲスト審査員は後日発表）、3月以降の日程は予定
-
-## 本番公開するとき
-- 本番URLを決めて移動し、旧プレビューURLは vercel.json で 301。noindex・Basic 認証・no-store を外し、canonical・OGP（正式ビジュアル）を設定。
-- sitemap・llms.txt に登録し `npm run llms:full`。/hacktale/ のトップ・ニュースから内部リンク。
 
 ## 変更履歴
 - 2026-11-16 初版（原稿＋参考スクリーンショットから実装）。
@@ -51,3 +44,6 @@
 - 元データは `docs/hacktale-award-form/art.html`（ブラウザで開いて各枠を撮影。文言を変えるときはここを直して撮り直す）。
 - フォームに貼り付ける文・設定手順は `docs/hacktale-award-form/form-text.md`。要項の「指定フォーマット」の配布場所が未定（ユーザー判断待ち）。
 - 2026-11-16 応募フォーム（Google フォーム https://forms.gle/qrhMLYvNrD2vSfwcA）を「応募する」ボタンに接続。応募概要「応募方法」の「要記載」の印も消えた。
+- 2026-11-17 ユーザー指示で本公開（URL は /hacktale-award/）。noindex・Basic 認証・no-store を外し、title・description・canonical・OGP・構造化データを設定。sitemap・llms.txt に登録、/hacktale/ のティッカーと EVENT 欄にリンクを追加。旧 URL は 301。
+  - 未確定の項目は確定していないので、公開ページでは **賞金に「仮」**（原稿どおり）、契約条件のうち支払い時期・対象となる公演・独占の範囲と期間・協議期間は **「調整中」** と表示（原稿の「要記載」「例：」「◯週間」は出さない）。確定したら `CONTRACT`・`PRIZES` を直し、`MARK_TBD` を false に。
+  - 環境変数 `HTAWARD_PREVIEW_PASSWORD` はもう使っていない（Vercel に設定していれば消してよい）。
