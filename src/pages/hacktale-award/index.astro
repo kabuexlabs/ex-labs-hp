@@ -54,7 +54,7 @@ const pageLd = {
 const breadcrumbLd = htBreadcrumbLd([{ name: 'HACKTALE', url: new URL('/hacktale/', site).toString() }, { name: '第1回 ハックテイル大賞' }]);
 
 // 改行で途中を切りたくない語（J.astro）
-const KEEP = ['ハックテイル大賞', 'ハックテイル', '頭脳戦ゲーム', '読み合い', '閃き', 'ライセンス料', 'ライセンス契約', '大賞候補', 'テストプレイ', 'ルール説明書', '要相談', '公演化', '商品化', '該当作なし', '応募フォーム', '一次審査', '二次審査', '最終審査', '別途相談', '240分以内', 'A4・1枚以内', '株式会社ex Labs', 'プロ・アマ不問', '年齢・国籍不問', '生成AI', 'SNSアカウント', 'SNS', '未発表作品', '誹謗中傷', '公序良俗', 'ペンネーム', 'オンライン', '源泉徴収', '反社会的勢力', '同居家族', 'ポートフォリオ', '11月25日（水）', '2月28日（日）', 'その手があったか', '対人ゲーム', '個人情報', 'コンテスト', 'キャラクター', '18歳未満', '1作品', '1公演', '2〜10名', '◯週間', 'フォーマット', '受賞作', '協議期間', '1作品につき', 'テストプレイすること', '交渉すること', '使うこと', '公演化・商品化', 'お答えできません', '応募できます', 'なりません'];
+const KEEP = ['ハックテイル大賞', 'ハックテイル', '頭脳戦ゲーム', '読み合い', '閃き', 'ライセンス料', 'ライセンス契約', '大賞候補', 'テストプレイ', 'ルール説明書', '要相談', '公演化', '商品化', '該当作なし', '応募フォーム', '一次審査', '二次審査', '最終審査', '別途相談', '240分以内', 'A4・1枚以内', '株式会社ex Labs', 'プロ・アマ不問', '年齢・国籍不問', '生成AI', 'SNSアカウント', 'SNS', '未発表作品', '誹謗中傷', '公序良俗', 'ペンネーム', 'オンライン', '源泉徴収', '反社会的勢力', '同居家族', 'ポートフォリオ', '11月25日（水）', '2月28日（日）', 'その手があったか', '対人ゲーム', '個人情報', 'コンテスト', 'キャラクター', '18歳未満', '1作品', '1公演', '2〜10名', '◯週間', 'フォーマット', '受賞作', '協議期間', '大賞確定', 'サイト・SNS', '1作品につき', 'テストプレイすること', '交渉すること', '使うこと', '公演化・商品化', 'お答えできません', '応募できます', 'なりません'];
 // 「・」を含む語は、語の中の「・」の後ろでも折り返さないよう語結合子（U+2060）を入れる。jt() を通した文と KEEP_J を J に渡す
 const WJ = '\u2060';
 const joinDot = (w: string) => w.replace(/・/g, '・' + WJ);
@@ -566,7 +566,7 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
 .flow li:last-child::after{display:none}
 .js .flow li.hot::before{animation:ping 2s ease-in-out infinite}
 @keyframes ping{50%{box-shadow:0 0 0 12px rgba(255,45,74,0)}}
-.flow .d{font:700 15px/1.5 var(--en);letter-spacing:.02em;color:var(--c);grid-row:span 2}
+.flow .d{font:700 15px/1.5 var(--en);letter-spacing:.02em;color:var(--c);grid-row:span 2;white-space:nowrap}
 .flow .k{font:900 18px/1.5 var(--go)}
 .flow .s{font-size:13.5px;color:var(--mute)}
 @media (min-width:900px){
@@ -574,7 +574,10 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
   .flow li{display:block;padding:30px 14px 0 0}
   .flow li::before{left:0;top:-9px}
   .flow li::after{display:none}
-  .flow .d{display:block;margin-bottom:8px}
+  .flow .d,.flow .k,.flow .s{display:block}
+  .flow .d{margin-bottom:8px}
+  .flow .k{font-size:17px}
+  .flow .s{margin-top:4px;font-size:13px;line-height:1.7}
 }
 
 /* ---------- 注意事項・FAQ ---------- */
@@ -825,7 +828,7 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
     <h2 class="h2 io" id="judging-h"><span class="wipe">審査の流れと</span><span class="wipe">日程</span></h2>
     <ol class="flow io">
       {FLOW.map((f, i) => (
-        <li class={i === 0 ? 'hot' : ''} style={`--c:${COLORS[i % 3]}`}><span class="d">{f.d}</span><span class="k">{f.k}</span><span class="s">{f.s}</span></li>
+        <li class={i === 0 ? 'hot' : ''} style={`--c:${COLORS[i % 3]}`}><span class="d">{f.d}</span><span class="k">{f.k}</span><span class="s"><J t={jt(f.s)} keep={KEEP_J} /></span></li>
       ))}
     </ol>
     <p class="note rv"><J t={jt('一次審査はルール説明書を読んで選び、通過作だけを審査員が実際に遊んで点数を付けます。3月以降の日程は予定です。')} keep={KEEP_J} /></p>
