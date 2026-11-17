@@ -12,15 +12,14 @@
 //    flex／grid の直下に <wbr> 入りの文を直接置かない（Firefox で崩れる）。必ず span などで包む。
 // 2026-11-17 ユーザー指示で本公開（/hacktale-award/）。検索に出す（canonical・OGP・sitemap・llms.txt 登録）。
 // 旧・関係者確認用の /preview/hacktale-award-cuqpnq2x/ は同じ場所の index.astro が 301 で転送する。
-// 未確定の項目（賞金の「仮」、契約条件の一部）は、公開ページでは「仮」「調整中」と出す（MARK_TBD）。確定したら原稿の値を入れて印を外す。
+// 2026-11-17 ユーザー指示：賞金の「仮」の印を外す（30万・10万・5万円で確定扱い）／賞状・トロフィーは載せない／
+// 契約条件のうち決まっていない項目は「要相談」（「別途相談」も「要相談」に揃えた）／提出物の「指定フォーマット」は配布物がないので外した。
 export const prerender = false;
 import SiteGuard from '../../components/SiteGuard.astro';
 import J from '../../components/gensou/J.astro';
 import { HT_X_URL, htOrgRef, htBreadcrumbLd } from '../../data/hacktale';
 
 // ---- 確定したら埋める項目 ----
-// 原稿で未確定の項目に印を付けるか（賞金＝「仮」、契約条件＝「調整中」）。すべて確定したら false にする
-const MARK_TBD = true;
 // 応募フォームの URL（Google フォーム。2026-11-16 ユーザー提供）。null にすると、応募ボタンはページ下の応募欄へ移動するだけになる
 const ENTRY_URL: string | null = 'https://forms.gle/qrhMLYvNrD2vSfwcA';
 // 主催（2026-11-16 ユーザー指定：運営法人名は株式会社ex Labs）
@@ -55,7 +54,7 @@ const pageLd = {
 const breadcrumbLd = htBreadcrumbLd([{ name: 'HACKTALE', url: new URL('/hacktale/', site).toString() }, { name: '第1回 ハックテイル大賞' }]);
 
 // 改行で途中を切りたくない語（J.astro）
-const KEEP = ['ハックテイル大賞', 'ハックテイル', '頭脳戦ゲーム', '読み合い', '閃き', 'ライセンス料', 'ライセンス契約', '大賞候補', 'テストプレイ', 'ルール説明書', '公演化', '商品化', '該当作なし', '応募フォーム', '一次審査', '二次審査', '最終審査', '別途相談', '240分以内', 'A4・1枚以内', '株式会社ex Labs', 'プロ・アマ不問', '年齢・国籍不問', '生成AI', 'SNSアカウント', 'SNS', '未発表作品', '誹謗中傷', '公序良俗', 'ペンネーム', 'オンライン', '源泉徴収', '反社会的勢力', '同居家族', 'ポートフォリオ', '11月25日（水）', '2月28日（日）', 'その手があったか', '対人ゲーム', '個人情報', 'コンテスト', 'キャラクター', '18歳未満', '1作品', '1公演', '2〜10名', '◯週間', 'フォーマット', '受賞作', '協議期間', '1作品につき', 'テストプレイすること', '交渉すること', '使うこと', '公演化・商品化', 'お答えできません', '応募できます', 'なりません'];
+const KEEP = ['ハックテイル大賞', 'ハックテイル', '頭脳戦ゲーム', '読み合い', '閃き', 'ライセンス料', 'ライセンス契約', '大賞候補', 'テストプレイ', 'ルール説明書', '要相談', '公演化', '商品化', '該当作なし', '応募フォーム', '一次審査', '二次審査', '最終審査', '別途相談', '240分以内', 'A4・1枚以内', '株式会社ex Labs', 'プロ・アマ不問', '年齢・国籍不問', '生成AI', 'SNSアカウント', 'SNS', '未発表作品', '誹謗中傷', '公序良俗', 'ペンネーム', 'オンライン', '源泉徴収', '反社会的勢力', '同居家族', 'ポートフォリオ', '11月25日（水）', '2月28日（日）', 'その手があったか', '対人ゲーム', '個人情報', 'コンテスト', 'キャラクター', '18歳未満', '1作品', '1公演', '2〜10名', '◯週間', 'フォーマット', '受賞作', '協議期間', '1作品につき', 'テストプレイすること', '交渉すること', '使うこと', '公演化・商品化', 'お答えできません', '応募できます', 'なりません'];
 // 「・」を含む語は、語の中の「・」の後ろでも折り返さないよう語結合子（U+2060）を入れる。jt() を通した文と KEEP_J を J に渡す
 const WJ = '\u2060';
 const joinDot = (w: string) => w.replace(/・/g, '・' + WJ);
@@ -83,15 +82,15 @@ const SPEC = [
   { k: '道具', v: '市販品か印刷で用意できるもの' },
 ];
 const SUBMIT = [
-  { req: true, s: 'ルール説明書（PDF・指定フォーマット）', n: '概要、勝利条件、進行手順、必要な道具' },
+  { req: true, s: 'ルール説明書（PDF）', n: '概要、勝利条件、進行手順、必要な道具' },
   { req: true, s: '「読み合い」と「閃き」が生まれる仕掛けの解説', n: 'A4・1枚以内' },
   { req: true, s: 'テストプレイに使えるデータ一式', n: 'カード・シート等の印刷用データ' },
   { req: false, s: 'テストプレイの記録', n: '回数、参加者の感想、動画' },
   { req: false, s: '世界観・ビジュアルの資料、ポートフォリオ、SNSアカウント', n: '' },
 ];
 const PRIZES = [
-  { name: '優秀賞', count: '', money: '10万円', note: '公演化の優先交渉、賞状' },
-  { name: '特別賞', count: '', money: '5万円', note: '賞状' },
+  { name: '優秀賞', count: '', money: '10万円', note: '公演化の優先交渉' },
+  { name: '特別賞', count: '', money: '5万円', note: '' },
   { name: '参加賞', count: '応募者全員', money: null, note: 'ハックテイルのグッズまたは公演割引' },
 ];
 const DECIDE = [
@@ -100,14 +99,13 @@ const DECIDE = [
   '契約を結んだ時点で大賞が確定し、賞金をお支払いします。ライセンス料は公演の実施に応じてお支払いします。',
   '協議期間内に契約に至らなかった場合、その作品は大賞にはならず、大賞の賞金とライセンス料の支払いもありません。この場合、次点の作品を新たな大賞候補とするか、大賞を「該当作なし」とします。',
 ];
-// tbd：原稿で「要記載」「別途相談」以外の未確定
-const CONTRACT: { k: string; v: string; tbd?: boolean }[] = [
-  { k: 'ライセンス料', v: '1公演あたり、その公演の売上の一定割合。料率は別途相談' },
-  { k: '売上の範囲', v: '別途相談' },
-  { k: '支払い時期', v: '例：月末締め・翌月末払い', tbd: true },
-  { k: '対象となる公演', v: 'ハックテイルが主催する公演、他社へのライセンス提供による公演の扱い', tbd: true },
-  { k: '独占の範囲と期間', v: '', tbd: true },
-  { k: '協議期間', v: '大賞候補の通知から◯週間', tbd: true },
+const CONTRACT: { k: string; v: string }[] = [
+  { k: 'ライセンス料', v: '1公演あたり、その公演の売上の一定割合。料率は要相談' },
+  { k: '売上の範囲', v: '要相談' },
+  { k: '支払い時期', v: '要相談' },
+  { k: '対象となる公演', v: '要相談' },
+  { k: '独占の範囲と期間', v: '要相談' },
+  { k: '協議期間', v: '要相談' },
 ];
 const CRITERIA = [
   { k: '読み合いの深さ', p: 25, s: '相手の考えを読む楽しさがあるか。何度遊んでも展開が変わるか' },
@@ -255,7 +253,6 @@ ul,ol{list-style:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .nb{display:inline-block}
 .tbd{display:inline-block;margin-left:.4em;padding:0 .5em;font:700 11px/1.7 var(--go);letter-spacing:.06em;color:#fff;background:var(--red);vertical-align:.15em;border-radius:99px;white-space:nowrap}
-.tbd.soon{margin-left:0;background:var(--soft);color:var(--mute);box-shadow:inset 0 0 0 1px var(--line)}
 .c-red{--ac:var(--red)}.c-blue{--ac:var(--blue)}.c-purple{--ac:var(--purple)}
 
 /* 画面上の進み具合 */
@@ -764,10 +761,10 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
         <p class="k">GRAND PRIZE</p>
         <h3>ハックテイル大賞</h3>
         <p class="cnt">1作品</p>
-        <div class="money"><span class="lab">賞金</span><span class="v" data-count="30">30</span><span class="u">万円</span>{MARK_TBD && <span class="tbd">仮</span>}</div>
+        <div class="money"><span class="lab">賞金</span><span class="v" data-count="30">30</span><span class="u">万円</span></div>
         <p class="plus"><span>1公演ごとのライセンス料</span></p>
         <ul>
-          {['1公演あたり売上の一定割合をライセンス料として支払い（料率と売上の範囲は別途相談）', 'ハックテイルでの公演化', '制作チームによる監修', '賞状・トロフィー'].map((s, i) => <li style={`--c:${COLORS[i % 3]}`}><span><J t={jt(s)} keep={KEEP_J} /></span></li>)}
+          {['1公演あたり売上の一定割合をライセンス料として支払い（料率と売上の範囲は要相談）', 'ハックテイルでの公演化', '制作チームによる監修'].map((s, i) => <li style={`--c:${COLORS[i % 3]}`}><span><J t={jt(s)} keep={KEEP_J} /></span></li>)}
         </ul>
       </div>
     </div>
@@ -775,9 +772,9 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
       {PRIZES.map((p, i) => (
         <div style={`--c:${['var(--purple)', 'var(--blue)', 'var(--ink)'][i]}`}>
           <h4>{p.name}</h4>
-          {p.money ? <p class="m"><span data-count={p.money.replace('万円', '')}>{p.money.replace('万円', '')}</span><small>万円</small>{MARK_TBD && <span class="tbd">仮</span>}</p> : <p class="m none">賞金なし</p>}
+          {p.money ? <p class="m"><span data-count={p.money.replace('万円', '')}>{p.money.replace('万円', '')}</span><small>万円</small></p> : <p class="m none">賞金なし</p>}
           {p.count && <p class="c">{p.count}</p>}
-          <p class="nt"><J t={jt(p.note)} keep={KEEP_J} /></p>
+          {p.note && <p class="nt"><J t={jt(p.note)} keep={KEEP_J} /></p>}
         </div>
       ))}
     </div>
@@ -796,7 +793,7 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
         <div class="body">
           <dl class="kv">
             {CONTRACT.map((c) => (
-              <div><dt><J t={jt(c.k)} keep={KEEP_J} /></dt><dd>{c.tbd && MARK_TBD ? <span class="tbd soon">調整中</span> : <J t={jt(c.v)} keep={KEEP_J} />}</dd></div>
+              <div><dt><J t={jt(c.k)} keep={KEEP_J} /></dt><dd><J t={jt(c.v)} keep={KEEP_J} /></dd></div>
             ))}
           </dl>
         </div>
@@ -939,7 +936,7 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
     <div class="btns stg">
       {ENTRY_URL
         ? <a class="btn main" href={entryHref} {...entryAttrs}><span>応募フォームへ</span><span class="ar"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 7h11M8 2.5 12.5 7 8 11.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span></a>
-        : <span class="btn main off" aria-disabled="true"><span>応募フォーム（準備中）{MARK_TBD && <span class="tbd" style="background:#fff;color:var(--red)">URL 要記載</span>}</span></span>}
+        : <span class="btn main off" aria-disabled="true"><span>応募フォーム（準備中）</span></span>}
       <a class="btn ln" href="#outline"><span>応募概要を見る</span><span class="ar"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v11M2.5 8 7 12.5 11.5 8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span></a>
       <a class="btn ln" href="/hacktale/"><span>HACKTALE 公式サイト</span><span class="ar"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 7h11M8 2.5 12.5 7 8 11.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span></a>
     </div>
