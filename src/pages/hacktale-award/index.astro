@@ -12,7 +12,7 @@
 //    flex／grid の直下に <wbr> 入りの文を直接置かない（Firefox で崩れる）。必ず span などで包む。
 // 2026-11-17 ユーザー指示で本公開（/hacktale-award/）。検索に出す（canonical・OGP・sitemap・llms.txt 登録）。
 // 旧・関係者確認用の /preview/hacktale-award-cuqpnq2x/ は同じ場所の index.astro が 301 で転送する。
-// 2026-11-17 ユーザー指示：賞金の「仮」の印を外す（30万・10万・5万円で確定扱い）／賞状・トロフィーは載せない／
+// 2026-11-17 ユーザー指示：賞金の「仮」の印を外す（当時は 30万・10万・5万円。その後 優秀賞を削除、特別賞は15万円＋ライセンス料に変更）／賞状・トロフィーは載せない／
 // 契約条件のうち決まっていない項目は「要相談」（「別途相談」も「要相談」に揃えた）／提出物の「指定フォーマット」は配布物がないので外した。
 export const prerender = false;
 import SiteGuard from '../../components/SiteGuard.astro';
@@ -88,12 +88,17 @@ const SUBMIT = [
   { req: false, s: 'テストプレイの記録', n: '回数、参加者の感想、動画' },
   { req: false, s: '世界観・ビジュアルの資料、ポートフォリオ、SNSアカウント', n: '' },
 ];
-const PRIZES = [
-  { name: '特別賞', count: '', money: '5万円', note: 'ハックテイルでの公演化。大賞と同じく、ハックテイルとの公演化契約（ライセンス契約）を結んだ時点で確定します。契約に至らなかった場合は特別賞になりません。', color: 'var(--purple)' },
+// 特別賞：2026-11-18 ユーザー指示で 15万円＋1公演あたりのライセンス料に（公演化つき・契約が必要なのは大賞と同じ）
+const PRIZES: { name: string; count: string; money: string | null; plus?: string; list?: string[]; note: string; color: string }[] = [
+  {
+    name: '特別賞', count: '', money: '15万円', plus: '1公演ごとのライセンス料',
+    list: ['1公演あたり売上の一定割合をライセンス料として支払い（料率と売上の範囲は要相談）', 'ハックテイルでの公演化'],
+    note: '大賞と同じく、ハックテイルとの公演化契約（ライセンス契約）を結んだ時点で確定します。契約に至らなかった場合は特別賞になりません。', color: 'var(--purple)',
+  },
   { name: '参加賞', count: '応募者全員', money: null, note: 'ハックテイルのグッズまたは公演割引', color: 'var(--blue)' },
 ];
 // 特別賞も契約が必要（2026-11-17 ユーザー指示：優秀賞は削除、特別賞に公演化を追加し、契約しないと受賞にならない旨を記載）
-const SPECIAL_NOTE = '特別賞も同じです。特別賞の候補となった作品の作者とハックテイルが協議し、公演化契約（ライセンス契約）を結んだ時点で特別賞が確定し、賞金をお支払いします。契約に至らなかった場合は特別賞になりません。';
+const SPECIAL_NOTE = '特別賞も同じです。特別賞の候補となった作品の作者とハックテイルが協議し、公演化契約（ライセンス契約）を結んだ時点で特別賞が確定し、賞金をお支払いします。ライセンス料は公演の実施に応じてお支払いします。契約に至らなかった場合は特別賞にはならず、特別賞の賞金とライセンス料の支払いもありません。';
 const DECIDE = [
   '最終審査では、まず「大賞候補」を1作品選びます。',
   '大賞候補の作者とハックテイルが、「契約の主な条件」をもとに協議し、契約を結びます。',
@@ -492,6 +497,11 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
 .prizes .m small{font:900 14px/1 var(--go);margin-left:.15em}
 .prizes .m.none{font:700 13px/1 var(--go);color:var(--mute)}
 .prizes .nt{grid-column:1/-1;font-size:13.5px;color:var(--ink2)}
+.prizes .pplus{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin-top:6px;font:900 15px/1.5 var(--go)}
+.prizes .pplus::before{content:"+";flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--c);color:#fff;font:700 19px/1 var(--en)}
+.prizes .pl{grid-column:1/-1;display:grid;gap:6px;margin:4px 0 6px}
+.prizes .pl li{display:flex;gap:10px;padding:10px 12px;border-radius:10px;background:var(--soft);font-size:13.5px;line-height:1.7}
+.prizes .pl li::before{content:"";flex:none;width:7px;height:7px;margin-top:.6em;border-radius:50%;background:var(--c)}
 @media (min-width:760px){.prizes{grid-template-columns:repeat(2,1fr);align-items:start}}
 
 /* ---------- 閉じておいて開ける欄 ---------- */
@@ -799,6 +809,8 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
           <h4>{p.name}</h4>
           {p.money ? <p class="m"><span data-count={p.money.replace('万円', '')}>{p.money.replace('万円', '')}</span><small>万円</small></p> : <p class="m none">賞金なし</p>}
           {p.count && <p class="c">{p.count}</p>}
+          {p.plus && <p class="pplus"><span>{p.plus}</span></p>}
+          {p.list && <ul class="pl">{p.list.map((t) => <li><span><J t={jt(t)} keep={KEEP_J} /></span></li>)}</ul>}
           {p.note && <p class="nt"><J t={jt(p.note)} keep={KEEP_J} /></p>}
         </div>
       ))}
