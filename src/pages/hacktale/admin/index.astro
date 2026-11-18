@@ -80,7 +80,7 @@ import {
   renderTemplate,
   missingPlaceholders,
 } from '../../../lib/hacktaleTemplates';
-import { normalizePhone, validPhone, validEmail, adminEmail } from '../../../lib/yoyaku';
+import { normalizePhone, validPhone, validEmail, notifyEmail } from '../../../lib/yoyaku';
 import { randomBytes } from 'node:crypto';
 import { loginAllowed, recordLoginFailure } from '../../../lib/contact';
 
@@ -417,11 +417,11 @@ if (Astro.request.method === 'POST') {
             const sample = targets[0] ?? all[0];
             const fake: HtReservation = {
               ...(sample ?? { id: 'HT-000000-TEST', sessionId: s.id, name: '（お名前）', phone: '', count: 1, status: 'confirmed', source: 'manual', createdAt: new Date().toISOString() }),
-              email: adminEmail(),
+              email: notifyEmail(),
             } as HtReservation;
             const ok = await sendNoticeMail(work, s, fake, `【テスト送信】${subject}`, body, settings);
             message = ok
-              ? `テストメールを ${adminEmail()} に送信しました（${sample ? `${sample.name}様あての内容` : '見本の内容'}）。内容を確認してから本番の送信をしてください。`
+              ? `テストメールを ${notifyEmail()} に送信しました（${sample ? `${sample.name}様あての内容` : '見本の内容'}）。内容を確認してから本番の送信をしてください。`
               : 'テストメールの送信に失敗しました。メール設定（SMTP/Resend）を確認してください。';
           } else if (targets.length === 0) error = '送信先が選ばれていません（メールアドレスのある予約者にチェックを入れてください）。';
           else if (!(await claimBulkSend(get('bulk')))) {
@@ -942,7 +942,7 @@ const decisionLabel = (s: HtSession, booked: number) =>
           <details class="wide pv"><summary>差し込み後のプレビュー（{confirmedOf(detail.reservations)[0]?.name ?? '見本'}様あて）</summary><pre>{preview}</pre></details>
           {(noticeMode === 'custom' || noticeMode === 'changed' || noticeMode === 'cancelled') ? (
             <div class="wide btnrow">
-              <button class="btn ghost" type="submit" name="action" value="notice-test" formnovalidate>自分にテスト送信（{adminEmail()}）</button>
+              <button class="btn ghost" type="submit" name="action" value="notice-test" formnovalidate>自分にテスト送信（{notifyEmail()}）</button>
               <button class="btn" type="submit" name="action" value="notice" onclick="return confirm('チェックした予約者に一斉送信します。よろしいですか？')">チェックした予約者に送信する</button>
             </div>
           ) : (

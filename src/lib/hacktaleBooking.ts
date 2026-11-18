@@ -1,5 +1,5 @@
 import { randomBytes, timingSafeEqual } from 'node:crypto';
-import { sendMail, adminEmail } from './yoyaku';
+import { sendMail, notifyEmail } from './yoyaku';
 import { HT_CONTACT_EMAIL } from '../data/hacktale';
 import {
   type HtFormat,
@@ -678,8 +678,8 @@ async function sendTemplated(
 
 /** 管理者宛の通知（件名・本文そのまま） */
 export async function notifyAdmin(sessionId: string, subject: string, text: string): Promise<void> {
-  const ok = await sendMail(adminEmail(), subject, text);
-  await logMail({ at: new Date().toISOString(), kind: 'admin', sessionId, to: adminEmail(), subject, ok });
+  const ok = await sendMail(notifyEmail(), subject, text);
+  await logMail({ at: new Date().toISOString(), kind: 'admin', sessionId, to: notifyEmail(), subject, ok });
 }
 
 /** 受付メール（申し込み直後。「開催人数に達したら改めてご案内」） */

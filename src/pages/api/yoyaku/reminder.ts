@@ -17,6 +17,7 @@ import {
   saveBooking,
   sendMail,
   adminEmail,
+  notifyEmail,
   formatSlotJa,
   jstTomorrow,
 } from '../../../lib/yoyaku';
@@ -65,7 +66,7 @@ export const GET: APIRoute = async ({ request }) => {
   // 管理者にも翌日の予定をまとめて知らせる（予約がある日だけ）
   if (dueCount > 0) {
     await sendMail(
-      adminEmail(),
+      notifyEmail(),
       `【予約】明日の予約 ${dueCount}件のリマインド`,
       `明日（${tomorrow}）の予約は以下のとおりです。\n\n${adminLines.join('\n')}\n\nお客様にはリマインドメールを送信済みです。`,
     );

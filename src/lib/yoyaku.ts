@@ -300,10 +300,22 @@ export function adminEmail(): string {
   return readEnv('YOYAKU_ADMIN_EMAIL') ?? 'info@kabuexlabs.com';
 }
 
+// 社内向けの通知（お問い合わせ・予約の通知、テスト送信）の宛先。
+// 送信に使うアカウント（SMTP_USER）自身に送る。Gmail は「自分の別名アドレス宛に自分で送ったメール」を
+// 受信トレイに出さない（送信済みにしか残らない）ため、別名になった info@ 宛では通知に気づけない（2026-11-18）。
+// 自分自身のアドレス宛なら受信トレイに届く。YOYAKU_ADMIN_EMAIL を設定した場合はそちらを優先する。
+// お客様向けの文面・返信先に出す連絡先は、これまで通り adminEmail()（info@）を使う。
+export function notifyEmail(): string {
+  const explicit = readEnv('YOYAKU_ADMIN_EMAIL');
+  if (explicit) return explicit;
+  const user = readEnv('SMTP_USER') ?? '';
+  return validEmail(user) ? user : adminEmail();
+}
+
 // --- 自社メールアカウント直送（SMTP） ------------------------------------------
 // 外部の送信サービスを一切使わず、既存の info@kabuexlabs.com アカウント
 // （Google Workspace）の SMTP でそのまま送る。必要な環境変数：
-//   SMTP_USER = info@kabuexlabs.com
+//   SMTP_USER = 送信に使う Google アカウントのログイン用アドレス（別名アドレスではログインできない）
 //   SMTP_PASS = Googleの「アプリパスワード」（16桁）
 // 任意: SMTP_HOST（既定 smtp.gmail.com）/ SMTP_PORT（既定 465）
 // 自分のアカウントから自分宛てに送るため、認証・到達性の問題が起きない。
@@ -372,7 +384,7 @@ export async function sendMail(
   lastDiag = { via: 'none', error: 'SMTP・Resend とも未設定' };
   // 宛先・返信先は送る直前にも形を確かめる（呼び出し側の確認漏れがあっても、すり替え可能な宛先には送らない）
   // 管理者の通知先（環境変数）は運用側の設定なので対象外（複数指定などの書式でも従来どおり送る）
-  if (to !== adminEmail() && !validEmail(to)) { lastDiag = { via: 'none', error: '宛先の形式が不正のため送信しない' }; return false; }
+  if (to !== adminEmail() && to !== notifyEmail() && !validEmail(to)) { lastDiag = { via: 'none', error: '宛先の形式が不正のため送信しない' }; return false; }
   if (replyTo !== undefined && !validEmail(replyTo)) replyTo = undefined;
   // 1) 自社SMTP（最優先）
   if (smtpConfigured()) {

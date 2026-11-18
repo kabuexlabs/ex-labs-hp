@@ -16,6 +16,7 @@ import {
   reserve,
   sendMail,
   adminEmail,
+  notifyEmail,
   formatSlotJa,
   jstToday,
   normalizePhone,
@@ -77,7 +78,7 @@ if (Astro.request.method === 'POST') {
             `前日にリマインドメールをお送りします。\n変更・キャンセルはこのメールへの返信、または ${adminEmail()} までご連絡ください。\n\n株式会社 ex Labs`,
         ),
         sendMail(
-          adminEmail(),
+          notifyEmail(),
           `【予約】${ev.title}：${when}`,
           `予約ページから新しい予約が入りました。\n\n■ イベント\n${ev.title}\n\n■ 日程\n${when}\n\n` +
             `■ お客様情報\nハンドルネーム：${name}\n電話番号：${phone}\nメールアドレス：${email}\n\n` +

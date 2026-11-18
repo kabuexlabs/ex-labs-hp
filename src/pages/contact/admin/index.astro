@@ -8,7 +8,7 @@
 export const prerender = false;
 
 import YoyakuLayout from '../../../layouts/YoyakuLayout.astro';
-import { checkAdminKey, adminEmail } from '../../../lib/yoyaku';
+import { checkAdminKey, notifyEmail } from '../../../lib/yoyaku';
 import {
   listInquiries,
   contactConfigStatus,
@@ -54,7 +54,7 @@ if (Astro.request.method === 'POST') {
       loginFailed = true;
     }
   } else if (action === 'testmail' && checkAdminKey(key)) {
-    testResult = await testMailSend(adminEmail());
+    testResult = await testMailSend(notifyEmail());
   } else if (action === 'status' && checkAdminKey(key)) {
     const id = String(form.get('id') ?? '');
     const st = String(form.get('status') ?? 'new') as InquiryStatus;
@@ -173,7 +173,7 @@ const stats = (() => {
     </ul>
     <form method="POST" style="margin:16px 0 0">
       <input type="hidden" name="action" value="testmail">
-      <button type="submit" style="padding:10px 20px;border:2px solid var(--ink);background:#fff;font-weight:800;cursor:pointer">テストメールを {adminEmail()} に送信</button>
+      <button type="submit" style="padding:10px 20px;border:2px solid var(--ink);background:#fff;font-weight:800;cursor:pointer">テストメールを {notifyEmail()} に送信</button>
     </form>
     {testResult && (
       <p style={`margin:14px 0 0;font-size:13.5px;padding:12px 14px;border:2px solid ${testResult.ok ? '#1a7f37' : '#c00'};background:${testResult.ok ? '#f0fff4' : '#fff5f5'};overflow-wrap:anywhere`}>{testResult.detail}</p>

@@ -8,7 +8,7 @@ export const prerender = false;
 // インターフェースは formsubmit 互換（_subject / _next / _gotcha）なので、
 // 各サイトのフォームは action を差し替えるだけで移行できる。
 import type { APIRoute } from 'astro';
-import { sendMail, adminEmail, lastMailDiag, readEnv, SAFE_EMAIL_RE } from '../../lib/yoyaku';
+import { sendMail, notifyEmail, lastMailDiag, readEnv, SAFE_EMAIL_RE } from '../../lib/yoyaku';
 import { contactRedis as redis, CONTACT_LOG_KEY, recordMetric } from '../../lib/contact';
 
 // フォームの「ご相談の種類」→ 件名に付ける表示名
@@ -147,13 +147,13 @@ export const POST: APIRoute = async ({ request }) => {
     `——\n送信者メールアドレス: ${email}\n受信日時: ${record.createdAt}\n` +
     (source ? `流入元:\n${source}\n` : '') +
     `このメールに返信すると送信者宛に届きます。`;
-  const mailed = await sendMail(adminEmail(), subject, body, emailOk ? email : undefined);
+  const mailed = await sendMail(notifyEmail(), subject, body, emailOk ? email : undefined);
   const diag = lastMailDiag();
   // 追加の通知先（任意）：CONTACT_NOTIFY_TO にカンマ区切りで設定すると、同じ通知をそちらにも送る
-  const extra = (readEnv('CONTACT_NOTIFY_TO') ?? '').split(',').map((a) => a.trim()).filter((a) => EMAIL_RE.test(a) && a !== adminEmail());
+  const extra = (readEnv('CONTACT_NOTIFY_TO') ?? '').split(',').map((a) => a.trim()).filter((a) => EMAIL_RE.test(a) && a !== notifyEmail());
   const extraOk: string[] = [];
   for (const to of extra) if (await sendMail(to, subject, body, emailOk ? email : undefined)) extraOk.push(to);
-  await saveMailResult({ admin: mailed, via: diag.via, error: mailed ? '' : diag.error, to: adminEmail(), extra: extraOk });
+  await saveMailResult({ admin: mailed, via: diag.via, error: mailed ? '' : diag.error, to: notifyEmail(), extra: extraOk });
 
   // 送信者への自動控えメール。受付が成立した場合のみ送る。
   // 返信先は info@ なので、送信者がこのメールに返信すればそのまま届く。
