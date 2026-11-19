@@ -609,6 +609,22 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/botsunyukan.webp',
   },
   {
+    href: '/guide/nazotoki-seisaku/',
+    title: '謎解き制作の依頼ガイド｜依頼前に決めること・工程・費用の内訳',
+    desc: '依頼前に決める4つのこと、制作の工程と依頼側の確認事項、難易度と所要時間の決め方、費用の内訳を解説。',
+    date: '2026-11-19',
+    category: 'nazotoki',
+    thumb: '/assets/guide/nazotoki-seisaku.webp',
+  },
+  {
+    href: '/guide/madamis-ninzu/',
+    title: 'マダミスは何人で遊ぶ？人数別の選び方｜少人数・大人数の目安',
+    desc: '人数が作品ごとに決まっている理由、少人数・6〜8人・大人数の違い、一人参加や人数が足りないときの方法を解説。',
+    date: '2026-11-19',
+    category: 'murder',
+    thumb: '/assets/guide/madamis-ninzu.webp',
+  },
+  {
     href: '/guide/moyooshimono/',
     title: '催し物とは？意味・読み方と「催し」「催事」「イベント」との違い',
     desc: '催し物（もよおしもの）の意味、「催し」「催事」「イベント」「行事」との違い、例文、申込書の「催し物名」の書き方、種類と目的を解説。',

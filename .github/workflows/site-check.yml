@@ -13,6 +13,7 @@ jobs:
   check:
     if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
     runs-on: ubuntu-24.04 # ブラウザ（Playwright）が対応している版に固定
+    timeout-minutes: 60 # 画面の撮影が終わらないまま何時間も動き続けないようにする
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

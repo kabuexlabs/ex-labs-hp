@@ -22,7 +22,7 @@ TARGETS = [
                     ('イマーシブシアターとは', '/guide/immersive-theater/'), ('イマーシブ公演とは', '/guide/immersive-theater/'), ('没入感', '/guide/botsunyukan/'), ('没入感とは', '/guide/botsunyukan/'), ('没入', '/guide/botsunyukan/')]),
     ('軸2 マダミス', [('マダミス', '/guide/madamis/'), ('マダミスとは', '/guide/madamis/'), ('マーダーミステリー', '/guide/madamis/'), ('マーダーミステリーとは', '/guide/madamis/'),
                   ('マダミス 制作', '/guide/madamis-seisaku/'), ('マダミス制作', '/guide/madamis-seisaku/'), ('マダミス 制作会社', '/guide/madamis-company/'), ('マダミス 費用', '/guide/madamis-cost/'), ('マーダーミステリー 料金', '/guide/madamis-cost/'),
-                  ('マダミス 初心者', '/guide/madamis-shoshinsha/'), ('マダミス 遊び方', '/guide/madamis-asobikata/'), ('マダミス 謎解き 違い', '/guide/madamis-nazotoki-chigai/'), ('東大マダミス', '/toudaimurder/')]),
+                  ('マダミス 初心者', '/guide/madamis-shoshinsha/'), ('マダミス 遊び方', '/guide/madamis-asobikata/'), ('マダミス 人数', '/guide/madamis-ninzu/'), ('マダミス 何人', '/guide/madamis-ninzu/'), ('マーダーミステリー 人数', '/guide/madamis-ninzu/'), ('マダミス 謎解き 違い', '/guide/madamis-nazotoki-chigai/'), ('東大マダミス', '/toudaimurder/')]),
     ('軸3 頭脳戦', [('頭脳戦', '/guide/zunousen/'), ('頭脳戦とは', '/guide/zunousen/'), ('頭脳戦 ゲーム', '/guide/zunousen-game/'), ('頭脳戦ゲーム', '/guide/zunousen-game/'), ('頭脳戦 制作', '/guide/zunousen-seisaku/'), ('頭脳戦 漫画', '/guide/zunousen-sakuhin/'), ('頭脳戦 アニメ', '/guide/zunousen-sakuhin/')]),
     ('軸4 心理戦', [('心理戦', '/guide/shinrisen/'), ('心理戦とは', '/guide/shinrisen/'), ('心理戦 強い人 特徴', '/guide/shinrisen/'), ('心理戦 ゲーム', '/guide/shinrisen-game/'), ('心理戦ゲーム', '/guide/shinrisen-game/')]),
     ('軸5 施設活用', [('施設活用', '/guide/shisetsu-katsuyo/'), ('催事とは', '/guide/saiji/'), ('催事場とは', '/guide/saiji/'), ('ポップアップイベントとは', '/guide/popup-event/'),
@@ -31,6 +31,7 @@ TARGETS = [
     ('軸6 体験型', [('体験型イベント', '/guide/taikengata-event/'), ('体験型イベントとは', '/guide/taikengata-event/'), ('体験型 イベント 企画', '/guide/taikengata-idea/'), ('体験型 イベント アイデア', '/guide/taikengata-idea/'),
                  ('盛り上がる イベント 企画', '/guide/taikengata-idea/'), ('体験型 イベント 会社', '/guide/taikengata-company/'), ('体験型イベント 費用', '/guide/event-hiyou/'),
                  ('参加型イベント', '/guide/sankagata-event/'), ('参加型とは', '/guide/sankagata-event/'), ('社内イベント 企画', '/guide/shanai-event/')]),
+    ('謎解き（維持）', [('謎解き制作', '/guide/nazotoki-seisaku/'), ('謎解き 制作', '/guide/nazotoki-seisaku/'), ('謎解き 制作 依頼 チームビルディング', '/guide/nazotoki-seisaku/'), ('謎解き 制作 費用', '/guide/nazotoki-company/'), ('謎解き 会社 選定基準', '/guide/nazotoki-company/')]),
     ('軸7 周遊', [('周遊イベント', '/guide/shuyu-event/'), ('周遊 イベント アイデア', '/guide/shuyu-event/'), ('周遊型 謎解き', '/guide/shuyu-event/'), ('回遊 施策 アイデア', '/guide/shuyu-event/'), ('回遊 周遊 違い', '/guide/shuyu-event/')]),
 ]
 AXIS_RE = {

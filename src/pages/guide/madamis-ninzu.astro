@@ -1,0 +1,215 @@
+---
+// マダミスは何人で遊ぶ？人数別の選び方（2026-11-19 追加）
+// 「マダミス 人数／何人／何人から／大人数」「マーダーミステリー 人数／何人」の受け皿。
+// 遊び方（/guide/madamis-asobikata/）・初心者ガイド（/guide/madamis-shoshinsha/）は流れと所要時間が主題なので、ここは人数に絞る。
+// 作品ごとの人数・時間は作品データ（src/data/toudaimurderWorks.ts）の値をそのまま使い、手書きしない。
+export const prerender = false;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import LatestPosts from '../../components/LatestPosts.astro';
+import AuthorBox from '../../components/AuthorBox.astro';
+import { jsonLd } from '../../lib/microcms';
+import { tmWorks } from '../../data/toudaimurderWorks';
+
+const site = Astro.site ?? new URL('https://kabuexlabs.com');
+const pageUrl = new URL('/guide/madamis-ninzu/', site).toString();
+const TITLE = 'マダミスは何人で遊ぶ？人数別の選び方｜少人数・大人数の目安';
+const DESC = 'マダミス（マーダーミステリー）は何人で遊ぶゲームか、人数が作品ごとに決まっている理由、少人数・6〜8人・大人数の違い、一人参加や人数が足りないときの方法を解説。東大マーダーミステリーサークルの作品の人数と所要時間も一覧で紹介。';
+
+// 作品データから人数・時間を取り出す（人数の少ない順）
+const detail = (w: (typeof tmWorks)[number], re: RegExp) => w.details?.find((d) => re.test(d.label))?.value;
+const works = tmWorks
+  .map((w) => ({ w, people: detail(w, /^人数$/), time: detail(w, /^時間$/) }))
+  .filter((x): x is { w: (typeof tmWorks)[number]; people: string; time: string } => !!x.people && !!x.time)
+  .map((x) => ({ ...x, n: parseInt(x.people, 10) || 0, min: parseInt(x.time, 10) || 0 }))
+  .sort((a, b) => a.n - b.n || a.min - b.min);
+const total = works.length;
+const upTo8 = works.filter((x) => x.n <= 8);
+const over8 = works.filter((x) => x.n > 8);
+const range = (list: typeof works) => {
+  const m = list.map((x) => x.min).filter(Boolean);
+  const lo = Math.min(...m), hi = Math.max(...m);
+  return lo === hi ? `${lo}分` : `${lo}〜${hi}分`;
+};
+const small = works.filter((x) => x.n <= 5);
+const mid = works.filter((x) => x.n >= 6 && x.n <= 8);
+
+const toc = [
+  { id: 'answer', label: 'マダミスは何人で遊ぶ？' },
+  { id: 'why', label: '人数が作品ごとに決まっている理由' },
+  { id: 'choose', label: '人数別の選び方' },
+  { id: 'solo', label: '一人参加・人数が足りないとき' },
+  { id: 'works', label: '作品ごとの人数と所要時間' },
+  { id: 'group', label: '会社や団体など大人数で遊ぶ場合' },
+  { id: 'faq', label: 'よくある質問' },
+];
+
+const faqs = [
+  {
+    q: 'マダミスは何人から遊べますか？',
+    a: '作品によって決まっています。1卓4〜10人程度の作品が中心で、少人数用に作られた作品もあります。人数は作品の案内に「5人用」「6人用」のように書かれているので、遊ぶ前に確認してください。',
+  },
+  {
+    q: '決まった人数より少ない人数でも遊べますか？',
+    a: '基本的には遊べません。マダミスは登場人物1人につき参加者1人が演じ、全員が物語に必要な情報を持っているため、1人欠けると事件の全体像がそろわなくなります。人数が足りないときは、店舗の募集公演に申し込んでほかの参加者と同卓するか、手元の人数に合う作品を選びます。',
+  },
+  {
+    q: '一人でも参加できますか？',
+    a: '参加できます。店舗の募集公演は、一人または少人数で申し込んだ人同士が同じ卓で遊ぶ形が一般的です。人数が作品ごとに決まっているため、一人のほうが空いている枠に入りやすいこともあります。',
+  },
+  {
+    q: '初めて遊ぶなら何人の作品がよいですか？',
+    a: '4〜6人程度の作品がおすすめです。全員の話を把握しやすく、発言の機会も回ってきやすいためです。進行役（GM）が付く公演を選ぶと、ルールが分からなくても進められます。',
+  },
+  {
+    q: '10人以上の大人数でも遊べますか？',
+    a: '遊べます。大人数用に作られた作品を選ぶ方法と、4〜10人の卓を複数つくって同時に進める方法があります。会社の研修やイベントでは、卓を分けて同じ作品を同時に遊ぶ形がよく使われます。',
+  },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: TITLE,
+  description: DESC,
+  about: 'マダミス（マーダーミステリー）の人数',
+  inLanguage: 'ja',
+  image: [new URL('/assets/guide/madamis-ninzu.webp', site).toString()],
+  author: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString() },
+  publisher: { '@type': 'Organization', '@id': new URL('/#organization', site).toString(), name: '株式会社ex Labs', url: site.toString(), logo: { '@type': 'ImageObject', url: new URL('/assets/logo.png', site).toString() } },
+  datePublished: '2026-11-19',
+  dateModified: '2026-11-19',
+  mainEntityOfPage: pageUrl,
+};
+---
+<BaseLayout
+  title="マダミスは何人で遊ぶ？人数別の選び方｜少人数・大人数の目安 - 株式会社ex Labs"
+  description="マダミス（マーダーミステリー）は何人で遊ぶゲームか、人数が作品ごとに決まっている理由、少人数・6〜8人・大人数の違い、一人参加や人数が足りないときの方法を解説。東大マーダーミステリーサークルの作品の人数と所要時間も一覧で紹介。"
+  ogImage="/assets/guide/madamis-ninzu.webp"
+>
+<script type="application/ld+json" set:html={jsonLd(faqLd)} />
+<script type="application/ld+json" set:html={jsonLd(articleLd)} />
+<Breadcrumb items={[
+  { name: 'ホーム', href: '/' },
+  { name: 'マダミス完全ガイド', href: '/guide/madamis/' },
+  { name: 'マダミスは何人で遊ぶ？' },
+]} />
+
+<section class="section" style="padding-top:40px"><div class="wrap">
+<p class="eyebrow">HOW MANY PLAYERS</p>
+<h1 class="h2 serif"><span class="nobr">マダミスは何人で遊ぶ？</span><br><span class="nobr">人数別の選び方と</span><span class="nobr">少人数・大人数の目安</span></h1>
+<p class="lede"><strong>マダミス（マーダーミステリー）の人数は、作品ごとに決まっています。</strong>1卓4〜10人程度の作品が中心で、「5人用」「6人用」のように、遊べる人数が作品の案内に書かれています。</p>
+<p class="lede">この記事では、人数が決まっている理由、人数ごとの違いと選び方、一人で参加する方法、人数が足りないときの対処をまとめます。</p>
+<p class="pub-date">公開日：2026年11月19日</p>
+<div class="key-points"><p class="key-points-h">この記事の要点</p><ul><li>マダミスの人数とは、その作品を遊ぶのに必要な参加者の数のことで、登場人物の数と同じです。作品ごとに決まっていて、原則として増減できません。</li><li>初めてなら4〜6人程度の作品が、全員の話を把握しやすくおすすめです。</li><li>人数が足りないときは、店舗の募集公演に申し込むと、ほかの参加者と同じ卓で遊べます。</li></ul></div>
+<nav class="toc" aria-label="目次">
+<p class="toc-h">目次</p>
+<ol>
+{toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+</ol>
+</nav>
+</div></section>
+
+<section class="section tinted" id="answer"><div class="wrap narrow">
+<p class="eyebrow">ANSWER</p><h2 class="h2 serif">マダミスは何人で遊ぶ？</h2>
+<p class="lede">マダミスは、<strong>作品に決められた人数ちょうど</strong>で遊びます。1卓4〜10人程度の作品が中心で、少人数用や、10人を超える大人数用に作られた作品もあります。</p>
+<p class="lede">東大マーダーミステリーサークル（UNLIMITED MYSTERY）が人数と所要時間を案内している{total}作品では、8人以下で遊ぶ作品が{upTo8.length}本、それより多い人数で遊ぶ作品が{over8.length}本です（<a href="#works" style="color:var(--accent)">作品ごとの人数と所要時間</a>）。</p>
+</div></section>
+
+<section class="section" id="why"><div class="wrap narrow">
+<p class="eyebrow">WHY</p><h2 class="h2 serif">人数が作品ごとに決まっている理由</h2>
+<p class="lede">マダミスでは、<strong>登場人物1人につき参加者1人</strong>が、その人物になりきって参加します。登場人物はそれぞれ、自分だけが知っている情報と、自分の目的を持っています。</p>
+<p class="lede">そのため、1人欠けると事件の全体像を示す情報がそろわず、1人増えても演じる人物がいません。人数を作品に合わせる必要があるのはこのためです。複数の人数に対応する作品もあり、その場合は対応する人数が案内に書かれています。</p>
+<p class="vc-line"><a href="/guide/madamis-asobikata/" style="color:var(--accent)">当日の流れと所要時間は「マダミスの遊び方」へ →</a></p>
+</div></section>
+
+<section class="section tinted" id="choose"><div class="wrap narrow">
+<p class="eyebrow">HOW TO CHOOSE</p><h2 class="h2 serif">人数別の選び方</h2>
+<div class="cmp-wrap"><table class="cmp-table cmp-stack"><thead><tr><th>人数</th><th>特徴</th><th>向いている場面</th></tr></thead><tbody>
+<tr><th scope="row">少人数<br>（4〜5人）</th><td data-label="特徴">全員の話を把握しやすく、発言の機会が回ってきやすい</td><td data-label="向く場面">初めて遊ぶ人、友人同士</td></tr>
+<tr><th scope="row">中人数<br>（6〜8人）</th><td data-label="特徴">情報と人間関係が増え、議論が広がる</td><td data-label="向く場面">店舗の公演、宿泊施設での公演</td></tr>
+<tr><th scope="row">大人数<br>（9人以上）</th><td data-label="特徴">情報量が一気に増える。同時に複数の会話が進む</td><td data-label="向く場面">経験のある人、イベント</td></tr>
+</tbody></table></div>
+<p class="lede">初めての場合は、<strong>4〜6人程度で、進行役（GM）が付く作品</strong>から始めると、会話についていきやすくなります。作品選びのほかの目安は<a href="/guide/madamis-shoshinsha/" style="color:var(--accent)">マダミス初心者ガイド</a>にまとめています。</p>
+</div></section>
+
+<section class="section" id="solo"><div class="wrap narrow">
+<p class="eyebrow">SOLO &amp; GROUP</p><h2 class="h2 serif">一人参加・人数が足りないとき</h2>
+<ul class="bullets">
+<li><strong>一人で参加する</strong>：店舗の募集公演に申し込みます。一人または少人数で申し込んだ人同士が、同じ卓で遊びます。</li>
+<li><strong>友人と参加するが人数が足りない</strong>：同じく募集公演に申し込むと、足りない人数はほかの参加者で埋まります。</li>
+<li><strong>知り合いだけで遊びたい</strong>：作品の人数ちょうどを集めて、貸切で申し込みます。集まる人数が先に決まっているなら、その人数に合う作品を選びます。</li>
+</ul>
+<p class="lede">人数が作品ごとに決まっているため、公演は定員に達すると申し込めなくなります。日程と空き状況は、各公演の案内で確認してください。</p>
+<p class="vc-line"><a href="/guide/madamis-tokyo/" style="color:var(--accent)">東京でマダミスを遊ぶには（店舗公演の探し方）→</a></p>
+</div></section>
+
+<section class="section tinted" id="works"><div class="wrap narrow">
+<p class="eyebrow">WORKS</p><h2 class="h2 serif">作品ごとの人数と所要時間</h2>
+<p class="lede">東大マーダーミステリーサークル（UNLIMITED MYSTERY）の作品を、人数の少ない順に並べました。作品は、メンバーをそろえて貸切で予約できます。{small.length > 0 && mid.length > 0 && <>5人以下で遊ぶ作品の所要時間は{range(small)}、6〜8人で遊ぶ作品は{range(mid)}です。</>}人数・時間は作品ごとに異なるので、遊ぶ前に各作品のページで確認してください。</p>
+<div class="cmp-wrap"><table class="cmp-table cmp-stack"><thead><tr><th>作品</th><th>人数</th><th>所要時間</th><th>形態</th></tr></thead><tbody>
+{works.map(({ w, people, time }) => (
+  <tr>
+    <th scope="row"><a href={`/toudaimurder/works/${w.slug}/`} style="color:var(--accent)" data-track="show" data-show={`tm-${w.slug}`} data-place="madamis-ninzu">{w.title}</a></th>
+    <td data-label="人数">{people}</td>
+    <td data-label="所要時間">{time}</td>
+    <td data-label="形態">{w.play}</td>
+  </tr>
+))}
+</tbody></table></div>
+<p class="vc-line"><a href="/toudaimurder/works/" style="color:var(--accent)">公演作品の一覧を見る（東大マーダーミステリーサークル）→</a></p>
+</div></section>
+
+<section class="section" id="group"><div class="wrap narrow">
+<p class="eyebrow">FOR GROUPS</p><h2 class="h2 serif">会社や団体など大人数で遊ぶ場合</h2>
+<p class="lede">研修や社内イベントのように参加者が多い場合は、<strong>1卓4〜10名の卓を複数つくり、同時に実施</strong>します。全員が同じ作品を体験できるので、終わったあとに卓をまたいで感想を話し合えます。</p>
+<p class="lede">オリジナルの作品を作る場合は、先に参加人数と目的を決めてからシナリオを書きます。動画企画なら4人、店舗や宿泊施設なら6〜8人というように、使い方に合わせて人数を決められます。</p>
+<p class="vc-line"><a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修とは</a>／<a href="/guide/madamis-seisaku/" style="color:var(--accent)">マダミス制作とは（依頼の流れ・費用）</a></p>
+</div></section>
+
+<section class="section tinted" id="faq"><div class="wrap">
+<p class="eyebrow">FAQ</p><h2 class="h2 serif">よくある質問</h2>
+<div class="faq-list tag-murder">
+{faqs.map((f) => (
+  <div class="faq-item">
+    <p class="faq-q">{f.q}</p>
+    <p class="faq-a">{f.a}</p>
+  </div>
+))}
+</div>
+</div></section>
+
+<section class="section"><div class="wrap">
+<div class="cta-mini">
+<p class="cta-mini-title serif">人数と時間から、遊ぶ作品を選ぶ</p>
+<a class="btn" href="/toudaimurder/works/">公演作品の一覧を見る</a>
+<p class="svc-cta-sub">オリジナルマダミスの制作は<a href="/services/murder-mystery/" style="color:var(--accent)">マダミス制作サービス</a>へ。</p>
+</div>
+<p class="vc-line" style="margin-top:48px">関連ページ：<a href="/guide/madamis/" style="color:var(--accent)">マダミスとは（完全ガイド）</a>／<a href="/guide/madamis-asobikata/" style="color:var(--accent)">マダミスの遊び方</a>／<a href="/guide/madamis-shoshinsha/" style="color:var(--accent)">マダミス初心者ガイド</a>／<a href="/guide/madamis-tokyo/" style="color:var(--accent)">東京でマダミスを遊ぶには</a>／<a href="/guide/madamis-nazotoki-chigai/" style="color:var(--accent)">マダミスと謎解きの違い</a>／<a href="/guide/madamis-kenshu/" style="color:var(--accent)">マダミス研修とは</a></p>
+</div></section>
+
+<AuthorBox />
+
+<LatestPosts category="murder" />
+
+</BaseLayout>
+
+<style>
+.wrap.narrow{max-width:820px}
+.pub-date{margin:18px auto 0;max-width:680px;font-size:12.5px;color:rgba(51,48,43,.55)}
+.wrap.narrow .lede{text-align:left}
+.wrap.narrow .cmp-wrap{margin-top:22px;margin-bottom:22px}
+.wrap.narrow .bullets{margin-top:18px;margin-bottom:22px}
+.toc{max-width:520px;margin:28px auto 0;background:#fff;border:1px solid rgba(51,48,43,.08);border-radius:18px;padding:26px 30px;box-shadow:0 6px 22px rgba(51,48,43,.06)}
+.toc-h{margin:0 0 14px;font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.toc ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:10px}
+.toc a{font-size:14.5px;font-weight:700;color:rgba(51,48,43,.8);border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.toc a:hover{color:var(--accent);border-color:var(--accent)}
+#answer,#why,#choose,#solo,#works,#group,#faq{scroll-margin-top:88px}
+@media(max-width:640px){.toc{padding:22px 22px}}
+</style>
