@@ -37,7 +37,7 @@ const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const canonical = new URL('/hacktale-award/', site).toString();
 const ogImage = new URL('/assets/hacktale/award/ogp.png', site).toString();
 const PUBLISHED = '2026-11-17';
-const MODIFIED = '2026-11-19';
+const MODIFIED = '2026-11-20';
 const pageLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
@@ -178,6 +178,8 @@ const RIGHTS_NOTE = [
 // 審査員（ユーザー提供：名前・肩書き・写真）。増えたらここに足す。並びは50音順（2026-11-18 ユーザー指示。yomi＝読みで自動的に並ぶ）
 const JUDGES: { name: string; aka?: string; yomi: string; title: string; img: string; pos: string }[] = [
   { name: '安藤耀司', aka: '（なの）', yomi: 'あんどうようじ', title: 'コンテンツプロデューサー', img: '/assets/hacktale/award/judge-ando.webp', pos: '50% 45%' },
+  // 肩書きの「/」の後ろでだけ折り返す（title は「/」で区切って表示）
+  { name: 'うみすけ', aka: '（RIDDLER）', yomi: 'うみすけ', title: 'RIDDLER株式会社取締役/謎解きクリエイター', img: '/assets/hacktale/award/judge-umisuke.webp', pos: '50% 50%' },
   { name: 'かるら', yomi: 'かるら', title: 'ハックテイル創設者', img: '/assets/hacktale/award/judge-karura.webp', pos: '50% 50%' },
   { name: '沙竹唯', yomi: 'さたけゆい', title: '企画屋', img: '/assets/hacktale/award/judge-satake.webp', pos: '50% 50%' },
   { name: 'なつめぅ', yomi: 'なつめう', title: 'ハックテイル代表', img: '/assets/hacktale/award/judge-natsumeu.webp', pos: '50% 50%' },
@@ -889,7 +891,7 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
       {JUDGES.map((j, i) => (
         <li style={`--c:${COLORS[(i + 1) % 3]}`}>
           <span class="ph-j"><img src={j.img} alt={`${j.name}${j.aka ?? ''}のプロフィール画像`} width="640" height="640" loading="lazy" decoding="async" style={`object-position:${j.pos}`}></span>
-          <span class="tx"><span class="role en">JUDGE</span><span class="nm">{j.name}{j.aka && <small>{j.aka}</small>}</span><span class="ti">{j.title}</span></span>
+          <span class="tx"><span class="role en">JUDGE</span><span class="nm">{j.name}{j.aka && <small>{j.aka}</small>}</span><span class="ti">{j.title.split('/').map((t, k, a) => <span class="nb">{t}{k < a.length - 1 ? '/' : ''}</span>)}</span></span>
         </li>
       ))}
     </ul>
