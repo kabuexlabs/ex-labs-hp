@@ -1,0 +1,182 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<!-- 第1回 ハックテイル大賞の X（Twitter）ポスト用画像（1600×900）。ブラウザで開いて各 .ab を撮影して PNG にする。 -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0c0c12;--red:#ff2d4a;--blue:#2457ff;--purple:#7b3bff;--grad:linear-gradient(90deg,var(--red),var(--purple) 50%,var(--blue));--en:'Space Grotesk',sans-serif;--go:'Zen Kaku Gothic New',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#888;font-family:var(--go);font-weight:900;color:#fff}
+.ab{position:relative;width:1600px;height:900px;overflow:hidden;background:var(--ink);margin-bottom:40px}
+.grid{position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.09) 1px,transparent 1px) 0 0/80px 80px,linear-gradient(rgba(255,255,255,.09) 1px,transparent 1px) 0 0/80px 80px}
+.glow{position:absolute;border-radius:50%;opacity:.6}
+.g1{width:1000px;height:1000px;left:-360px;top:-440px;background:radial-gradient(circle,rgba(123,59,255,.75),transparent 62%)}
+.g2{width:960px;height:960px;right:-340px;top:120px;background:radial-gradient(circle,rgba(36,87,255,.75),transparent 62%)}
+.g3{width:760px;height:760px;left:420px;bottom:-560px;background:radial-gradient(circle,rgba(255,45,74,.6),transparent 62%)}
+.suit{position:absolute;fill:none;stroke-width:1.2}
+.pill{display:inline-block;font:700 24px/1 var(--en);letter-spacing:.16em;padding:.7em 1.1em;border-radius:99px;background:var(--grad)}
+.tile{position:relative;z-index:0;display:inline-block;padding:.02em .16em .06em;margin:0 .06em;line-height:1.15}
+.tile::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--c);border-radius:.08em;transform:skewX(-7deg) rotate(-1.2deg)}
+.cut{position:relative;color:transparent;display:inline-block}
+.cut::before,.cut::after{content:attr(data-t);position:absolute;left:0;top:0;color:#fff}
+.cut::before{clip-path:inset(0 0 54% 0)}
+.cut::after{clip-path:inset(46% 0 0 0);transform:translateX(.05em)}
+.bar{position:absolute;left:0;right:0;bottom:0;height:12px;background:var(--grad)}
+.logo{filter:invert(1);display:block;height:52px;width:auto}
+.hd{position:absolute;left:80px;top:60px;display:flex;align-items:center;gap:24px;z-index:2}
+.lbl{display:flex;align-items:center;gap:20px;font:700 30px/1 var(--en);letter-spacing:.2em}
+.lbl b{display:grid;place-items:center;min-width:70px;height:70px;padding:0 12px;border-radius:16px;background:var(--c);font-size:32px;letter-spacing:.02em;transform:rotate(-6deg)}
+.lbl::after{content:"";width:90px;height:4px;background:var(--c)}
+.ft{position:absolute;left:80px;right:80px;bottom:58px;z-index:2;display:flex;align-items:flex-end;justify-content:space-between}
+.ft b{font-size:34px;letter-spacing:.06em}
+.ft span{font:600 26px/1 var(--en);letter-spacing:.06em;padding-bottom:5px;opacity:.9}
+
+/* 1 メイン */
+#p1 .cp{position:absolute;left:80px;top:176px;z-index:2;font-size:124px;line-height:1.32;white-space:nowrap}
+#p1 .cp .l{display:flex;align-items:center}
+#p1 .cp .p{font-size:.55em;font-weight:700;padding:0 .12em;opacity:.9;align-self:flex-end;margin-bottom:.22em}
+#p1 .cp .sm{font-size:.72em}
+#p1 .bang{color:var(--red)}
+#p1 .dice{position:absolute;right:76px;top:60px;width:210px;height:210px;border-radius:50%;overflow:hidden;filter:grayscale(1) contrast(1.1);box-shadow:0 0 0 9px var(--ink),0 0 0 15px #fff;z-index:2}
+#p1 .dice img{width:100%;height:100%;object-fit:cover}
+#p1 .bt{position:absolute;left:80px;right:80px;bottom:62px;z-index:2}
+#p1 .bt h2{font-size:54px;letter-spacing:.06em;display:flex;align-items:center;gap:22px}
+#p1 .bt h2 .tile{font-size:.82em;--c:var(--red)}
+#p1 .row{display:flex;align-items:center;gap:16px;margin-top:20px}
+#p1 .date{font:700 36px/1 var(--en);letter-spacing:.06em;margin-right:14px}
+.chip{font:900 24px/1 var(--go);padding:.7em 1em;border-radius:99px;background:var(--c);white-space:nowrap}
+
+/* 2 賞 */
+#p2 .in{position:absolute;left:80px;right:80px;top:150px;z-index:2}
+#p2 h2{font-size:64px;letter-spacing:.04em;margin-top:18px}
+#p2 .cards{display:grid;grid-template-columns:1.12fr 1fr;gap:28px;margin-top:30px}
+#p2 .card{position:relative;border-radius:30px;padding:34px 40px 36px;border:4px solid transparent;background:linear-gradient(var(--ink),var(--ink)) padding-box,linear-gradient(120deg,var(--red),var(--purple),var(--blue)) border-box}
+#p2 .card.sp{background:linear-gradient(#15151e,#15151e) padding-box,linear-gradient(120deg,var(--purple),var(--blue)) border-box}
+#p2 .nm{font-size:44px;letter-spacing:.04em;display:flex;align-items:center;gap:16px}
+#p2 .nm small{font:700 18px/1 var(--en);letter-spacing:.18em;padding:.7em 1em;border-radius:99px;background:var(--grad)}
+#p2 .mny{display:flex;align-items:baseline;gap:8px;margin-top:6px}
+#p2 .mny b{font:700 190px/1 var(--en);letter-spacing:-.04em;background:linear-gradient(100deg,#ff5a70,#b08bff 55%,#6f95ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+#p2 .sp .mny b{font-size:160px;background:linear-gradient(100deg,#b08bff,#6f95ff);-webkit-background-clip:text;background-clip:text}
+#p2 .mny span{font-size:54px}
+#p2 .plus{display:flex;align-items:center;gap:14px;font-size:32px;margin-top:6px;white-space:nowrap}
+#p2 .plus::before{content:"+";flex:none;display:grid;place-items:center;width:50px;height:50px;border-radius:50%;background:var(--red);font:700 34px/1 var(--en)}
+#p2 .sp .plus::before{background:var(--purple)}
+#p2 .sub{font:700 24px/1.5 var(--go);opacity:.85;margin-top:12px}
+#p2 .foot{margin-top:24px;display:flex;align-items:center;gap:18px;font:700 25px/1.5 var(--go)}
+#p2 .foot b{font-weight:900;padding:.35em .9em;border-radius:99px;background:#fff;color:var(--ink);white-space:nowrap}
+#p2 .note{margin-top:14px;font:500 21px/1.6 var(--go);opacity:.8}
+
+/* 3 審査員 */
+#p3 .in{position:absolute;left:70px;right:70px;top:150px;z-index:2}
+#p3 h2{font-size:58px;letter-spacing:.04em;margin-top:16px}
+#p3 .js{display:flex;flex-wrap:wrap;justify-content:center;gap:26px 16px;margin-top:30px}
+#p3 .j{width:350px;display:flex;flex-direction:column;align-items:center;text-align:center}
+#p3 .ph{width:176px;height:176px;border-radius:50%;padding:6px;background:conic-gradient(var(--red),var(--purple),var(--blue),var(--red))}
+#p3 .ph img{width:100%;height:100%;object-fit:cover;border-radius:50%;border:4px solid var(--ink);display:block}
+#p3 .n{font-size:34px;letter-spacing:.03em;margin-top:12px;white-space:nowrap;line-height:1.25}
+#p3 .n small{font-size:.6em}
+#p3 .t{font:700 21px/1.4 var(--go);opacity:.85;margin-top:4px}
+
+/* 4 募集内容 */
+#p4 .in{position:absolute;left:80px;right:80px;top:150px;z-index:2}
+#p4 h2{font-size:92px;line-height:1.3;letter-spacing:.02em;margin-top:22px;white-space:nowrap}
+#p4 h2 .tile{--c:var(--blue)}
+#p4 h2 .tile.r{--c:var(--red)}
+#p4 .lead{font:700 30px/1.7 var(--go);margin-top:18px;opacity:.92}
+#p4 .specs{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px}
+#p4 .sc{border-radius:22px;padding:22px 24px;background:var(--c);min-height:168px;display:flex;flex-direction:column;justify-content:space-between}
+#p4 .sc.o{background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 2px rgba(255,255,255,.5)}
+#p4 .sc dt{font:700 20px/1.3 var(--go);letter-spacing:.1em;opacity:.9}
+#p4 .sc dd{font-size:38px;line-height:1.2;white-space:nowrap}
+#p4 .sc dd.en{font:700 62px/1 var(--en);letter-spacing:-.02em}
+#p4 .sc dd.en small{font:900 26px/1 var(--go);margin-left:.15em}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<path id="spade" d="M12 2C7 8 3 10.5 3 14.5a4.5 4.5 0 0 0 8 2.8V19l-2 3h6l-2-3v-1.7a4.5 4.5 0 0 0 8-2.8C21 10.5 17 8 12 2z"/>
+<path id="heart" d="M12 21C5 15 2 11.5 2 8a5 5 0 0 1 10-1.5A5 5 0 0 1 22 8c0 3.5-3 7-10 13z"/>
+<path id="diamond" d="M12 2 21 12 12 22 3 12z"/>
+<path id="club" d="M12 2a4 4 0 0 0-3.5 6A4 4 0 1 0 11 14.9V19l-2 3h6l-2-3v-4.1A4 4 0 1 0 15.5 8 4 4 0 0 0 12 2z"/>
+</defs></svg>
+
+<!-- 1 メイン（大義＋作品募集） -->
+<div class="ab" id="p1">
+  <div class="grid"></div><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+  <svg class="suit" viewBox="0 0 24 24" style="right:340px;top:76px;width:64px;stroke:var(--red)"><use href="#spade"/></svg>
+  <svg class="suit" viewBox="0 0 24 24" style="right:96px;top:360px;width:66px;stroke:#fff"><use href="#heart"/></svg>
+  <svg class="suit" viewBox="0 0 24 24" style="right:250px;top:500px;width:56px;fill:var(--purple);stroke:var(--purple)"><use href="#diamond"/></svg>
+  <div class="dice"><img src="../../public/assets/hacktale/award/dice.webp"></div>
+  <div class="hd"><img class="logo" src="../../public/assets/hacktale/logo.png"><span class="pill">AWARD #1</span></div>
+  <div class="cp">
+    <div class="l"><span class="cut" data-t="頭脳戦">頭脳戦</span><span class="p">、</span><span class="tile" style="--c:var(--blue)">コンゲーム</span><span class="p">の</span></div>
+    <div class="l"><span class="tile" style="--c:var(--purple);margin-left:0">作品</span><span class="p">が</span><span class="sm">もっと</span><span class="tile" style="--c:var(--red)">もっと</span></div>
+    <div class="l"><span class="cut" data-t="増">増</span>えて欲しい<span class="bang">！</span></div>
+  </div>
+  <div class="bt">
+    <h2>第1回 ハックテイル大賞<span class="tile">作品募集</span></h2>
+    <div class="row"><span class="date">2026.11.25 — 2027.02.28</span><span class="chip" style="--c:var(--red)">応募無料</span><span class="chip" style="--c:var(--purple)">プロ・アマ不問</span><span class="chip" style="--c:var(--blue)">何作品でも</span></div>
+  </div>
+  <div class="bar"></div>
+</div>
+
+<!-- 2 賞 -->
+<div class="ab" id="p2">
+  <div class="grid"></div><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+  <div class="hd"><img class="logo" src="../../public/assets/hacktale/logo.png"><span class="pill">AWARD #1</span></div>
+  <div class="in">
+    <p class="lbl" style="--c:var(--red)"><b>02</b>PRIZE</p>
+    <div class="cards">
+      <div class="card">
+        <p class="nm">ハックテイル大賞<small>GRAND PRIZE</small></p>
+        <p class="mny"><b>30</b><span>万円</span></p>
+        <p class="plus">1公演ごとのライセンス料</p>
+        <p class="sub">ハックテイルでの公演化／制作チームによる監修</p>
+      </div>
+      <div class="card sp">
+        <p class="nm">特別賞</p>
+        <p class="mny"><b>15</b><span>万円</span></p>
+        <p class="plus">1公演ごとのライセンス料</p>
+        <p class="sub">ハックテイルでの公演化</p>
+      </div>
+    </div>
+    <p class="foot"><b>参加賞</b>応募者全員に、ハックテイルのグッズまたは公演割引</p>
+    <p class="note">※大賞・特別賞は、ハックテイルとの公演化契約（ライセンス契約）を結んだ時点で確定します。ライセンス料の料率と売上の範囲は要相談。</p>
+  </div>
+  <div class="bar"></div>
+</div>
+
+<!-- 3 審査員 -->
+<div class="ab" id="p3">
+  <div class="grid"></div><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+  <div class="hd"><img class="logo" src="../../public/assets/hacktale/logo.png"><span class="pill">AWARD #1</span></div>
+  <div class="in">
+    <p class="lbl" style="--c:var(--purple)"><b>03</b>JUDGES<span style="font:900 34px/1 var(--go);letter-spacing:.06em;margin-left:6px">審査員</span></p>
+    <div class="js">
+      <div class="j"><div class="ph"><img src="../../public/assets/hacktale/award/judge-ando.webp" style="object-position:50% 45%"></div><p class="n">安藤耀司<small>（なの）</small></p><p class="t">コンテンツプロデューサー</p></div>
+      <div class="j"><div class="ph"><img src="../../public/assets/hacktale/award/judge-umisuke.webp"></div><p class="n">うみすけ<small>（RIDDLER）</small></p><p class="t">RIDDLER株式会社取締役/<br>謎解きクリエイター</p></div>
+      <div class="j"><div class="ph"><img src="../../public/assets/hacktale/award/judge-karura.webp"></div><p class="n">かるら</p><p class="t">ハックテイル創設者</p></div>
+      <div class="j"><div class="ph"><img src="../../public/assets/hacktale/award/judge-satake.webp"></div><p class="n">沙竹唯</p><p class="t">企画屋</p></div>
+      <div class="j"><div class="ph"><img src="../../public/assets/hacktale/award/judge-natsumeu.webp"></div><p class="n">なつめぅ</p><p class="t">ハックテイル代表</p></div>
+      <div class="j"><div class="ph"><img src="../../public/assets/hacktale/award/judge-nekomamire.webp" style="object-position:42% 50%"></div><p class="n">ねこまみれ。</p><p class="t">ミステリーゲーム作家</p></div>
+      <div class="j"><div class="ph"><img src="../../public/assets/hacktale/award/judge-yasu.webp" style="object-position:50% 40%"></div><p class="n">yasu</p><p class="t">マーダーミステリー作家</p></div>
+    </div>
+  </div>
+  <div class="bar"></div>
+</div>
+
+<!-- 4 募集内容 -->
+<div class="ab" id="p4">
+  <div class="grid"></div><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+  <svg class="suit" viewBox="0 0 24 24" style="right:110px;top:150px;width:150px;stroke:rgba(255,255,255,.35);stroke-width:.8"><use href="#club"/></svg>
+  <div class="hd"><img class="logo" src="../../public/assets/hacktale/logo.png"><span class="pill">AWARD #1</span></div>
+  <div class="in">
+    <p class="lbl" style="--c:var(--blue)"><b>01</b>THEME</p>
+    <h2>運ではなく、<br><span class="tile" style="margin-left:0">「読み合い」</span>と<span class="tile r">「閃き」</span>で。</h2>
+    <p class="lead">勝敗が「読み合い」と「閃き」で決まる、オリジナルの対人ゲームを募集します。</p>
+    <dl class="specs">
+      <div class="sc" style="--c:var(--purple)"><dt>プレイ人数</dt><dd class="en">2–10<small>名</small></dd></div>
+      <div class="sc" style="--c:var(--blue)"><dt>プレイ時間（説明を含む）</dt><dd class="en">240<small>分以内</small></dd></div>
+      <div class="sc o"><dt>形式</dt><dd>対面・<br>オンライン</dd></div>
+      <div class="sc" style="--c:var(--red)"><dt>締切（2027年）</dt><dd class="en">2/28<small>（日）23:59</small></dd></div>
+    </dl>
+  </div>
+  <div class="bar"></div>
+</div>
+</body></html>
