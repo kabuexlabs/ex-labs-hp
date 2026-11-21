@@ -34,7 +34,7 @@ const description =
   '絵画×物語体験。体験する美術館「7枚目のコンポジション」2026年11月21日（土）〜23日（月）京都市京セラ美術館にて開催。絵画を鑑賞することで物語の中に巻き込まれていく60分の物語体験。1名4,500円（税込）、各回最大18名、1名から参加可能。';
 
 const nav = [
-  ['story', 'ストーリー', 'Story'], ['experience', '体験について', 'Experience'], ['team', '制作チーム', 'Creators'],
+  ['story', 'ストーリー', 'Story'], ['experience', '体験について', 'Experience'],
   ['cast', 'キャスト', 'Cast'], ['ticket', 'チケット', 'Ticket'], ['flow', '当日の流れ', 'Flow'],
   ['access', 'アクセス', 'Access'], ['faq', 'よくある質問', 'Q&A'], ['contact', 'お問い合わせ', 'Contact'],
 ]
@@ -90,7 +90,9 @@ const notes: [string, string][] = [
   ['公演内容のネタバレは禁止です。', ''],
   ['動きやすい服装でお越しください。', ''],
 ];
-const ngList = ['途中退出・再入場', '録音', '日時変更', '主催者都合で中止した場合の返金', '最少催行人数に満たない場合の実施判断・連絡・返金'];
+const ngList = ['途中退出・再入場', '録音', '日時変更', '主催者都合で中止した場合の返金'];
+// 最少催行人数に満たない場合は「不可能」の例外（2026-11-21 ユーザー指示）。人数は ticketRows の最少催行人数と揃える
+const ngException = '最少催行人数（各回6名）に満たない場合は、公演の実施可否を主催者が判断し、中止となった場合はご連絡のうえ、チケット代金を返金いたします。';
 // 会場・アクセス（2026-09-27 支給）。main は強調表示、more は補足（小さめ）、list は箇条書き
 const accessRows: { k: string; v?: string; main?: boolean; more?: string[]; list?: string[] }[] = [
   { k: '会場名', v: '京都市京セラ美術館（本館）', main: true },
@@ -124,11 +126,7 @@ const faqs = [
   ['体験中に撮影できますか？', '体験中の撮影はできません。また、公演内容のネタバレは禁止です。'],
   ['購入後にキャンセルできますか？', 'お客様都合によるキャンセルはお受けできません。'],
 ];
-const credits = kv([
-  ['絵画', '伊藤ゆきの'], ['ディレクター・シナリオ・デザイン', '荒巻まりの'], ['ゲームデザイン', '御湯波ライト'],
-  ['プロデューサー', 'かるら'],
-]); // 2026-11-21 ユーザー指示でクレジットから「企画 株式会社ex Labs」を外した
-const [leadCredit, ...restCredits] = credits;
+// クレジット表記は 2026-11-21 ユーザー指示ですべて削除（制作チーム欄・フッター）
 
 const eventLd = {
   '@context': 'https://schema.org',
@@ -296,23 +294,6 @@ const eventLd = {
   </div>
 </section>
 
-<section id="team" class="sec">
-  <div class="w880">
-    <div class="sh" style="--y:58%"><h2>Creators</h2><p>制作チーム</p></div>
-    <div class="team">
-      <div class="team-lead">
-        <span class="role">+・{leadCredit.k}・+</span>
-        <span class="name">{leadCredit.v}</span>
-      </div>
-      <div class="team-grid">
-        {restCredits.map((c) => (
-          <div><span class="role">+・{c.k}・+</span><span class="name">{c.v}</span></div>
-        ))}
-      </div>
-    </div>
-  </div>
-</section>
-
 {SHOW_CAST && (<section id="cast" class="sec">
   <div class="w1160">
     <div class="sh" style="--y:50%"><h2>Cast</h2><p>キャスト</p></div>
@@ -390,6 +371,7 @@ const eventLd = {
     <ul class="att att-main">{notes.map(([em, rest], i) => <li class:list={[{ top: i < 3 }]}><strong>{em}</strong>{rest && <span>{rest}</span>}</li>)}</ul>
     <p class="att-h">以下の扱いは不可能です。</p>
     <ul class="att att-sub">{ngList.map((t) => <li>{t}</li>)}</ul>
+    <p class="att-ex"><strong>例外：</strong>{ngException}</p>
     <div class="deco deco-b" aria-hidden="true"><span class="l"></span><span class="bodoni">+·◇·+</span><span class="r"></span></div>
   </div>
 </section>
@@ -450,11 +432,6 @@ const eventLd = {
       <span class="m">7枚目のコンポジション</span>
       <span class="b">チケットを購入する<span class="bodoni">→</span></span>
     </a>
-    <div class="ft-cr">
-      {credits.map((c) => (
-        <div><span class="k">+・{c.k}・+</span><span class="v">{c.v}</span></div>
-      ))}
-    </div>
     <a href="#contact" class="ft-ct">公演に関するお問い合わせ<span class="bodoni">↗</span></a>
     <a href="/guide/taikengata-event/" class="ft-guide">体験型イベントとは？</a>
     <p class="ft-copy bodoni">© 2026 ex Labs Inc. All Rights Reserved.</p>
@@ -609,15 +586,6 @@ h1,h2,p{margin:0}
 .hl-h{margin-bottom:20px;font-size:22px;font-weight:600;letter-spacing:.14em}
 .hl-b{font-size:17px;line-height:2.2;letter-spacing:.12em;text-wrap:pretty}
 
-/* Creators */
-.team{position:relative;display:flex;flex-direction:column;align-items:center;gap:36px;text-align:center}
-.team-lead{display:flex;flex-direction:column;gap:10px}
-.team-lead .role{font-size:12px;letter-spacing:.24em;color:#F2C9D4}
-.team-lead .name{font-size:clamp(24px,3.2vw,34px);font-weight:600;letter-spacing:.2em}
-.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:28px 32px;width:100%}
-.team-grid>div{display:flex;flex-direction:column;gap:8px}
-.team-grid .role{font-size:11px;letter-spacing:.2em;color:#F2C9D4;opacity:.85}
-.team-grid .name{font-size:19px;font-weight:500;letter-spacing:.2em}
 
 /* Cast */
 .cast{display:grid;grid-template-columns:repeat(3,1fr);gap:40px 32px;max-width:960px;margin:0 auto}
@@ -709,6 +677,8 @@ h1,h2,p{margin:0}
 .att-main li.top::marker{color:#EACF6C}
 .att-main li.top strong{font-size:clamp(18px,2vw,21px);color:#EACF6C}
 .att-sub{font-size:14px;color:rgba(255,247,242,.75);gap:4px}
+.att-ex{margin-top:20px;padding:16px 18px;border:1px solid rgba(234,207,108,.55);background:rgba(234,207,108,.08);font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px;line-height:1.9;letter-spacing:.06em;color:#FFF7F2}
+.att-ex strong{color:#EACF6C;font-weight:500}
 
 /* Access */
 .acc{display:flex;flex-wrap:wrap;gap:40px 56px}
@@ -755,10 +725,6 @@ h1,h2,p{margin:0}
 .ft-btn .s{font-size:13px;letter-spacing:.3em}
 .ft-btn .m{font-size:clamp(24px,3.6vw,34px);font-weight:600;letter-spacing:.12em}
 .ft-btn .b{margin-top:10px;font-size:15px;letter-spacing:.24em;display:flex;align-items:center;gap:10px}
-.ft-cr{display:flex;flex-direction:column;gap:20px}
-.ft-cr>div{display:flex;flex-direction:column;gap:6px}
-.ft-cr .k{font-size:11px;letter-spacing:.2em;opacity:.7}
-.ft-cr .v{font-size:16px;font-weight:500;letter-spacing:.2em}
 .ft-ct{display:inline-flex;align-items:center;gap:14px;color:#1E0A10;font-family:'Zen Kaku Gothic New',sans-serif;font-weight:500;font-size:16px;letter-spacing:.16em}
 .ft-ct:hover{color:#861E3E}
 .ft-ct .bodoni{width:32px;height:32px;border:1px solid #1E0A10;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px}

@@ -249,7 +249,7 @@ export const GET: APIRoute = async ({ site }) => {
     '/guide/case-lostframe/': '2026-10-09',
     '/guide/bonenkai-nazotoki/': '2026-10-14',
     '/guide/yumenoshima-night/': '2026-11-03',
-    '/guide/kyoto-kyocera-museum-7th/': '2026-11-20',
+    '/guide/kyoto-kyocera-museum-7th/': '2026-11-21',
     '/guide/kyoto-okazaki-november/': '2026-11-20',
     '/guide/kyoto-november-experience/': '2026-11-20',
     '/guide/tokyo-night-botanical-garden/': '2026-10-27',
