@@ -32,12 +32,12 @@ const entryHref = ENTRY_URL ?? '#entry';
 const entryAttrs = ENTRY_URL ? { target: '_blank', rel: 'noopener', 'data-track': 'cta', 'data-show': 'hacktale-award' } : {};
 
 const title = '第1回 ハックテイル大賞｜頭脳戦・コンゲームの作品募集【応募無料】';
-const description = '頭脳戦、コンゲームの作品がもっともっと増えて欲しい。読み合いと閃きで勝敗が決まるオリジナルの頭脳戦ゲームを募集する「第1回 ハックテイル大賞」。募集期間は2026年11月25日（水）〜2027年2月28日（日）。応募無料、プロ・アマ不問、個人でもチームでも何作品でも応募できます。主催：ハックテイル。';
+const description = '頭脳戦、コンゲームの作品がもっともっと増えて欲しい。読み合いと閃きで勝敗が決まるオリジナルの頭脳戦ゲームを募集する「第1回 ハックテイル大賞」。募集期間は2026年11月21日（土）〜2027年2月28日（日）。応募無料、プロ・アマ不問、個人でもチームでも何作品でも応募できます。主催：ハックテイル。';
 const site = Astro.site ?? new URL('https://kabuexlabs.com');
 const canonical = new URL('/hacktale-award/', site).toString();
 const ogImage = new URL('/assets/hacktale/award/ogp.png', site).toString();
 const PUBLISHED = '2026-11-17';
-const MODIFIED = '2026-11-20';
+const MODIFIED = '2026-11-21';
 const pageLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
@@ -54,7 +54,7 @@ const pageLd = {
 const breadcrumbLd = htBreadcrumbLd([{ name: 'HACKTALE', url: new URL('/hacktale/', site).toString() }, { name: '第1回 ハックテイル大賞' }]);
 
 // 改行で途中を切りたくない語（J.astro）
-const KEEP = ['ハックテイル大賞', 'ハックテイル', '頭脳戦ゲーム', '読み合い', '閃き', 'ライセンス料', 'ライセンス契約', '大賞候補', 'テストプレイ', 'ルール説明書', '要相談', '公演化', '商品化', '該当作なし', '応募フォーム', '一次審査', '二次審査', '最終審査', '別途相談', '240分以内', 'A4・1枚以内', '株式会社ex Labs', 'プロ・アマ不問', '年齢・国籍不問', '生成AI', 'SNSアカウント', 'SNS', '未発表作品', '誹謗中傷', '公序良俗', 'ペンネーム', 'オンライン', '源泉徴収', '反社会的勢力', '同居家族', 'ポートフォリオ', '11月25日（水）', '2月28日（日）', 'その手があったか', '対人ゲーム', '個人情報', 'コンテスト', 'キャラクター', '18歳未満', '1作品', '1公演', '2〜10名', '◯週間', 'フォーマット', '受賞作', '協議期間', '特別賞', '受賞確定', 'マーダーミステリー作家', '大賞確定', 'サイト・SNS', '1作品につき', 'テストプレイすること', '交渉すること', '使うこと', '公演化・商品化', 'お答えできません', '応募できます', 'なりません'];
+const KEEP = ['ハックテイル大賞', 'ハックテイル', '頭脳戦ゲーム', '読み合い', '閃き', 'ライセンス料', 'ライセンス契約', '大賞候補', 'テストプレイ', 'ルール説明書', '要相談', '公演化', '商品化', '該当作なし', '応募フォーム', '一次審査', '二次審査', '最終審査', '別途相談', '240分以内', 'A4・1枚以内', '株式会社ex Labs', 'プロ・アマ不問', '年齢・国籍不問', '生成AI', 'SNSアカウント', 'SNS', '未発表作品', '誹謗中傷', '公序良俗', 'ペンネーム', 'オンライン', '源泉徴収', '反社会的勢力', '同居家族', 'ポートフォリオ', '11月21日（土）', '2月28日（日）', 'その手があったか', '対人ゲーム', '個人情報', 'コンテスト', 'キャラクター', '18歳未満', '1作品', '1公演', '2〜10名', '◯週間', 'フォーマット', '受賞作', '協議期間', '特別賞', '受賞確定', 'マーダーミステリー作家', '大賞確定', 'サイト・SNS', '1作品につき', 'テストプレイすること', '交渉すること', '使うこと', '公演化・商品化', 'お答えできません', '応募できます', 'なりません'];
 // 「・」を含む語は、語の中の「・」の後ろでも折り返さないよう語結合子（U+2060）を入れる。jt() を通した文と KEEP_J を J に渡す
 const WJ = '\u2060';
 const joinDot = (w: string) => w.replace(/・/g, '・' + WJ);
@@ -122,7 +122,7 @@ const CRITERIA = [
   { k: '観戦・配信映え', p: 10, s: '見ている人にも盛り上がりが伝わるか' },
 ];
 const FLOW = [
-  { k: '作品募集', d: '11/25〜2/28', s: 'フォームで受付' },
+  { k: '作品募集', d: '11/21〜2/28', s: 'フォームで受付' },
   { k: '一次審査', d: '3月上旬', s: '書類で選考' },
   { k: '二次審査', d: '3月下旬', s: '実際に遊んで審査' },
   { k: '最終審査', d: '4月上旬', s: '大賞候補を選出' },
@@ -132,7 +132,7 @@ const FLOW = [
 const OUTLINE: { k: string; v: string; tbd?: boolean }[] = [
   { k: '名称', v: 'ハックテイル大賞（第1回）' },
   { k: '主催', v: ORGANIZER_CORP ? `${ORGANIZER}\n（運営：${ORGANIZER_CORP}）` : `${ORGANIZER}（運営法人名）`, tbd: !ORGANIZER_CORP },
-  { k: '募集期間', v: '2026年11月25日（水）〜\n2027年2月28日（日）23:59' },
+  { k: '募集期間', v: '2026年11月21日（土）〜\n2027年2月28日（日）23:59' },
   { k: '応募資格', v: 'プロ・アマ不問。個人・チームどちらも可。年齢・国籍不問' },
   { k: '未成年の方', v: '18歳未満は保護者の同意が必要' },
   { k: 'チーム応募', v: '代表者1名を決め、連絡・契約・賞金の受け取りは代表者が行う' },
@@ -721,7 +721,7 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
     </h1>
     <div class="hero-meta">
       <p class="t"><span class="nb">第1回</span> <span class="nb">ハックテイル大賞</span> <span class="nb">作品募集</span></p>
-      <p class="d en"><span class="nb">2026.11.25 WED</span><i>—</i><span class="nb">2027.02.28 SUN</span></p>
+      <p class="d en"><span class="nb">2026.11.21 SAT</span><i>—</i><span class="nb">2027.02.28 SUN</span></p>
       <ul class="chips"><li>応募無料</li><li>プロ・アマ不問</li><li>何作品でも</li></ul>
     </div>
   </div>
@@ -983,7 +983,7 @@ html.rm .h2 .wipe{clip-path:none!important;transform:none!important}
     <img class="logo" src="/assets/hacktale/logo.png" alt="HACKTALE" width="1100" height="230" loading="lazy">
     <p><span class="sublogo">AWARD #1 — ENTRY</span></p>
     <p class="catch rv"><span>頭脳戦、</span><span>コンゲームの作品が</span><span>もっともっと</span><span>増えて欲しい！</span></p>
-    <p class="period rv"><b>募集期間</b><span class="nb">2026年11月25日（水）〜</span><span class="nb">2027年2月28日（日）23:59</span></p>
+    <p class="period rv"><b>募集期間</b><span class="nb">2026年11月21日（土）〜</span><span class="nb">2027年2月28日（日）23:59</span></p>
     <div class="btns stg">
       {ENTRY_URL
         ? <a class="btn main" href={entryHref} {...entryAttrs}><span>応募フォームへ</span><span class="ar"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1 7h11M8 2.5 12.5 7 8 11.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span></a>
