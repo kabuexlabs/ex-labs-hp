@@ -41,8 +41,8 @@ const heroChips = [
 
 const faqs = [
   { q: '一人分だけ予約すれば、一人で体験できますか？', a: `公演によります。${soloBook.length ? `${soloShared.length ? `${names(soloShared)}は1名から申し込めますが、他の参加者と同じ回で体験する相席形式です。` : ''}${soloOther.length ? `${names(soloOther)}も1名から申し込めます（相席・貸切は公式ページで確認）。` : ''}` : 'いま紹介している公演には、1名から申し込めるものはありません。'}${soloRun.length ? `${names(soloRun)}は1名だけで回が成立します。` : 'いま紹介している公演には、1名だけで回が成立する（相席なし）ものはありません。'}` },
-  { q: '知らない人と組むのが不安です。会話は必要ですか？', a: rows.map((r) => `${r.w.title}：${r.w.info.participation ?? '体験中の交流は公式ページで確認'}`).join('。') + '。演技は求められませんが、会話や協力が進行の一部になる公演では、その場で反応する場面があります。' },
-  { q: '遅刻や途中退出はできますか？', a: rows.map((r) => `${r.w.title}：${(r.w.info.requirements ?? []).filter((x) => /遅れ|入場/.test(x)).join('、') || '遅刻・途中入場の扱いは公式ページで確認'}`).join('。') + '。途中退出の扱いは各公式ページに記載がないため、予約前に主催者へ確認してください。' },
+  { q: '知らない人と組むのが不安です。会話は必要ですか？', a: (rows.length ? rows.map((r) => `${r.w.title}：${r.w.info.participation ?? '体験中の交流は公式ページで確認'}`).join('。') + '。' : '') + '演技は求められませんが、会話や協力が進行の一部になる公演では、その場で反応する場面があります。' },
+  { q: '遅刻や途中退出はできますか？', a: rows.map((r) => `${r.w.title}：${(r.w.info.requirements ?? []).filter((x) => /遅れ|入場/.test(x)).join('、') || '遅刻・途中入場の扱いは公式ページで確認'}`).join('。') + (rows.length ? '。' : '遅刻・途中入場の扱いは公演ごとに違うため、各公式ページで確認してください。') + '途中退出の扱いは各公式ページに記載がないため、予約前に主催者へ確認してください。' },
   { q: '服装や持ち物はどうすればいいですか？', a: '公演の形式ごとの服装・靴・持ち物は「イマーシブ体験の服装・持ち物」の記事にまとめています。スマートフォンとイヤホンを必須にしている公演があるので、そこだけは先に確認してください。' },
 ];
 const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
@@ -56,6 +56,7 @@ const articleLd = {
   datePublished: '2026-09-18', dateModified: '2026-09-18', mainEntityOfPage: pageUrl,
 };
 import GensouFeature from '../../components/guide/GensouFeature.astro';
+import { gensouEnded } from '../../data/gensouPhase';
 ---
 <BaseLayout
   title="東京のイマーシブ体験に一人で参加するには？申込条件・相席・選び方 - 株式会社ex Labs"
@@ -87,12 +88,15 @@ import GensouFeature from '../../components/guide/GensouFeature.astro';
 )}
 <p class="cards-note">◯は開催日です。空席は予約サイトの表示が最新で、◯があっても満席の場合があります。料金は税込・手数料別。{needsTwo.length ? `${names(needsTwo)}は2名以上での申込のため、ここには載せていません。` : ''}</p>
 </div></section>
+{!gensouEnded() && (
 <section class="section" style="padding-top:28px;padding-bottom:12px"><div class="wrap"><GensouFeature place="immersive-tokyo-solo-pickup" lead="個別チケット（1名3,500円・税込・入館料込み）で1名から参加できます。1名で申し込むと、ほかのお客様と同じ組（最大4名）で夜の植物館を巡ります。各日17:00〜20:00の間に12分おきに開始、所要約50分。暗い場所やキャストとの会話はありますが、怖さは控えめです。" /></div></section>
+)}
 
 
 <section class="section tinted acc-wrap"><div class="wrap">
 <h2 class="cards-h">くわしく知りたい人は<span>タップで開きます</span></h2>
 
+{rows.length > 0 && (
 <details class="acc" id="table">
 <summary><span class="acc-t">条件を表で見比べる</span><span class="acc-s">1申込の人数・相席か貸切か・体験中の交流・所要時間・1人あたり料金</span></summary>
 <div class="acc-b">
@@ -112,6 +116,7 @@ import GensouFeature from '../../components/guide/GensouFeature.astro';
 <p class="cmp-note-p">1組料金の公演は人数で割った1人あたりの金額（税込、手数料は予約サイトで確認）。二人で参加する条件は<a href="/guide/immersive-tokyo-date/" style="color:var(--accent)">二人で楽しむには</a>へ。</p>
 </div>
 </details>
+)}
 
 <details class="acc" id="types">
 <summary><span class="acc-t">一人参加の3つの形式と選び方</span><span class="acc-s">相席で申し込む／一人で巡る／複数名が必要</span></summary>
@@ -128,6 +133,7 @@ import GensouFeature from '../../components/guide/GensouFeature.astro';
 <details class="acc" id="check">
 <summary><span class="acc-t">一人で予約する前に確認すること</span><span class="acc-s">進行役・会話・遅刻・年齢・持ち物（公式案内より）</span></summary>
 <div class="acc-b">
+{rows.length > 0 ? (
 <div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>確認する点</th>{rows.map((r) => <th>{r.w.title}</th>)}</tr></thead><tbody>
 <tr><th scope="row">進行役・サポート</th>{rows.map((r) => <td>{r.w.info.beginner ?? '公式ページで確認'}</td>)}</tr>
 <tr><th scope="row">会話の必要性</th>{rows.map((r) => <td>{r.w.info.actorInteraction === true ? 'キャストとの会話が進行の一部' : r.w.info.participation ?? '公式ページで確認'}</td>)}</tr>
@@ -136,6 +142,9 @@ import GensouFeature from '../../components/guide/GensouFeature.astro';
 <tr><th scope="row">年齢・言語</th>{rows.map((r) => <td>{r.w.info.ageRule ?? '公式で確認'}／{r.w.info.language ?? '公式で確認'}</td>)}</tr>
 <tr><th scope="row">移動・持ち物</th>{rows.map((r) => <td>{r.w.info.walking ?? '—'}{(r.w.info.requirements ?? []).filter((x) => /持参|イヤホン|ロッカー/.test(x)).map((x) => `。${x}`).join('')}</td>)}</tr>
 </tbody></table></div>
+) : (
+<p class="lede">いま紹介できる公演がないため、公演ごとの表は載せていません。予約前は、進行役の有無、会話の必要性、遅刻・途中入場の扱い、年齢・言語、移動と持ち物の5点を、各公演の公式ページで確認してください。</p>
+)}
 <p class="cmp-note-p">「公式ページで確認」とある条件は、各公演の公式ページでご確認ください。服装・持ち物は<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物（公演別チェック表）</a>へ。</p>
 </div>
 </details>

@@ -48,7 +48,7 @@ const heroChips = [
 
 const faqs = [
   { q: '二人で申し込めば、二人だけで体験できますか？', a: `${pairPrivate.length ? `${names(pairPrivate)}は申込単位で貸切なので、2名で申し込めば2名だけで体験できます。` : 'いま紹介している公演には、2名だけで貸切にできるものはありません。'}${pairShared.length ? `${names(pairShared)}は1名ずつのチケットで、同じ回の他の参加者と一緒に体験します。` : ''}` },
-  { q: '二人分の料金はいくらですか？', a: pair.map((r) => r.totalFor(2) !== undefined ? `${r.w.title}は2名で${total2(r)}（1人あたり${fmtYen(r.perPersonFor(2)!)}。${r.w.price.feeNote}）` : `${r.w.title}の料金は公式チケットページでご確認ください`).join('。') + '。' },
+  { q: '二人分の料金はいくらですか？', a: pair.map((r) => r.totalFor(2) !== undefined ? `${r.w.title}は2名で${total2(r)}（1人あたり${fmtYen(r.perPersonFor(2)!)}。${r.w.price.feeNote}）` : `${r.w.title}の料金は公式チケットページでご確認ください`).join('。') + (pair.length ? '。' : '公演によって異なります。1名ずつのチケットなら2名分、1組単位の料金ならその1組分が二人の総額です。各公演の公式チケットページでご確認ください。') },
   { q: '二人が別々の回になることはありますか？', a: `${pairShared.length ? `${names(pairShared)}は1枚ずつのチケットなので、同じ回を選んで代表者がまとめて購入するよう案内されています。` : ''}${pairPrivate.length ? `${names(pairPrivate)}は1組で申し込むため同じ回になります。` : ''}予約時に回（日付・時刻）と枚数を確認してから決済してください。` },
   { q: '服装や待ち合わせ場所はどう決めればいいですか？', a: '集合場所と受付時間は各公式ページに記載があります（「予定の組み方」参照）。服装・靴・持ち物は「イマーシブ体験の服装・持ち物」の記事にまとめています。' },
 ];
@@ -63,6 +63,7 @@ const articleLd = {
   datePublished: '2026-09-18', dateModified: '2026-09-18', mainEntityOfPage: pageUrl,
 };
 import GensouFeature from '../../components/guide/GensouFeature.astro';
+import { gensouEnded } from '../../data/gensouPhase';
 ---
 <BaseLayout
   title="東京のイマーシブ体験を二人で楽しむには？貸切・料金・会話量で選ぶ - 株式会社ex Labs"
@@ -94,12 +95,15 @@ import GensouFeature from '../../components/guide/GensouFeature.astro';
 )}
 <p class="cards-note">◯は開催日です。空席は予約サイトの表示が最新で、◯があっても満席の場合があります。総額は税込・手数料別。</p>
 </div></section>
+{!gensouEnded() && (
 <section class="section" style="padding-top:28px;padding-bottom:12px"><div class="wrap"><GensouFeature place="immersive-tokyo-date-pickup" lead="二人で行くなら、グループチケット（14,000円・最大4名で貸切）で二人だけの組にできます。個別チケットなら1人3,500円で、ほかのお客様と同じ組になる場合があります。開始は各日17:00〜20:00なので、夕方からの予定にも組み込めます。" /></div></section>
+)}
 
 
 <section class="section tinted acc-wrap"><div class="wrap">
 <h2 class="cards-h">くわしく知りたい人は<span>タップで開きます</span></h2>
 
+{rows.length > 0 && (
 <details class="acc" id="table">
 <summary><span class="acc-t">条件を表で見比べる</span><span class="acc-s">二人分の総額・貸切か相席か・同じ組で行動できるか・交流・屋外移動・所要時間</span></summary>
 <div class="acc-b">
@@ -120,6 +124,7 @@ import GensouFeature from '../../components/guide/GensouFeature.astro';
 <p class="cmp-note-p">総額は公式の料金表から計算（1組料金は2名分、1人料金は2倍。手数料は予約サイトで確認）。</p>
 </div>
 </details>
+)}
 
 <details class="acc" id="choose">
 <summary><span class="acc-t">二人の過ごし方で選ぶ</span><span class="acc-s">相談しながら進める／演者と交流／会話を抑える／雨の日</span></summary>
@@ -128,7 +133,7 @@ import GensouFeature from '../../components/guide/GensouFeature.astro';
 <li><strong>二人で相談しながら進めたい</strong>：「同じ組で行動」を確認します。{pairPrivate.length ? `${names(pairPrivate)}は申込単位の貸切で、1組だけで体験します（進行中の動き方は公式ページで確認）。` : ''}{pairShared.length ? `${names(pairShared)}は同じ回に参加できますが、公式に「途中で一時的に離れる場面がある」と案内されています。` : ''}</li>
 <li><strong>演者との交流を楽しみたい</strong>：{actor.length ? `${names(actor)}はキャストとの会話が進行の一部です。` : 'いま紹介している公演には、キャストとの会話が中心のものはありません。'}</li>
 <li><strong>会話の負担を抑えたい</strong>：会話が進行の一部になる公演は避け、証言や手がかりを集めて整理する型を選びます。{rows.filter((r) => r.w.info.actorInteraction !== true).length ? `${names(rows.filter((r) => r.w.info.actorInteraction !== true))}は「${rows.filter((r) => r.w.info.actorInteraction !== true).map((r) => r.w.info.participation).join('」「')}」と案内されています。` : ''}会話量を公式に明記した公演はないため、気になる場合は主催者に確認してください。</li>
-<li><strong>雨の日や歩きやすさが気になる</strong>：{outdoor.length ? `${names(outdoor)}は受付後に屋外の徒歩移動があります。` : ''}{rows.filter((r) => r.venue?.setting === 'indoor').length ? `${names(rows.filter((r) => r.venue?.setting === 'indoor'))}は商業施設内で完結します。` : ''}</li>
+<li><strong>雨の日や歩きやすさが気になる</strong>：{outdoor.length ? `${names(outdoor)}は受付後に屋外の徒歩移動があります。` : ''}{rows.filter((r) => r.venue?.setting === 'indoor').length ? `${names(rows.filter((r) => r.venue?.setting === 'indoor'))}は商業施設内で完結します。` : ''}{rows.length === 0 && '屋内で完結するか、受付後に屋外を歩くかを、各公演の公式ページで確認します。'}</li>
 </ul>
 {EXPERIENCE_DATE_PUBLISHED && <p class="vc-line">イマーシブに決めていない二人が、ものづくり・謎解きも含めて比べるなら<a href="/guide/tokyo-experience-date/" style="color:var(--accent)">東京の非日常デート →</a>／二人だけで解ける謎解き・脱出ゲームを探すなら<a href="/guide/tokyo-nazo-date/" style="color:var(--accent)">東京で二人で楽しめる謎解き・脱出ゲーム →</a></p>}
 </div>
@@ -137,6 +142,7 @@ import GensouFeature from '../../components/guide/GensouFeature.astro';
 <details class="acc" id="plan">
 <summary><span class="acc-t">移動・集合・公演時間を踏まえた予定の組み方</span><span class="acc-s">集合・受付／所要時間／荷物／年齢・言語（公式案内より）</span></summary>
 <div class="acc-b">
+{rows.length > 0 ? (
 <div class="cmp-wrap"><table class="cmp-table"><thead><tr><th>公演</th><th>集合・受付</th><th>所要時間</th><th>移動・荷物</th><th>年齢・言語</th></tr></thead><tbody>
 {rows.map((r) => (
   <tr>
@@ -148,6 +154,9 @@ import GensouFeature from '../../components/guide/GensouFeature.astro';
   </tr>
 ))}
 </tbody></table></div>
+) : (
+<p class="lede">いま紹介できる公演がないため、公演ごとの表は載せていません。予定を組むときは、集合・受付の時刻、所要時間、移動と荷物、年齢・言語の条件を、各公演の公式ページで確認してください。</p>
+)}
 <p class="cmp-note-p">公式ページに記載のある集合・受付の条件だけを載せています。会場が非公開の公演もあるため、周辺の店や前後の過ごし方は提案していません。</p>
 </div>
 </details>
@@ -158,9 +167,9 @@ import GensouFeature from '../../components/guide/GensouFeature.astro';
 <ol class="bullets">
 <li><strong>同じ回・同じ組か</strong>：1名ずつのチケットの公演は、同じ日付・時刻の回を選び、代表者がまとめて購入します。1組単位の公演は人数を2名にして申し込みます。</li>
 <li><strong>途中で離れる場面の有無</strong>：{pairShared.length ? `${names(pairShared)}は公式に「途中で一時的に離れる場合がある」と案内されています。` : '各公式ページの注意事項で確認してください。'}</li>
-<li><strong>集合時刻</strong>：{rows.map((r) => `${r.w.title}は${(r.w.info.requirements ?? []).find((x) => /遅れ|入場/.test(x)) ?? '公式で確認'}`).join('。')}。</li>
+<li><strong>集合時刻</strong>：{rows.length ? rows.map((r) => `${r.w.title}は${(r.w.info.requirements ?? []).find((x) => /遅れ|入場/.test(x)) ?? '公式で確認'}`).join('。') + '。' : '受付開始と開演の時刻、遅れた場合の扱いを、各公演の公式ページで確認します。'}</li>
 <li><strong>キャンセル条件</strong>：日時変更・返金の可否は各予約サイトの規約に従います（決済後の変更・返金不可と案内されている公演があります）。</li>
-<li><strong>年齢・持ち物</strong>：年齢条件（{rows.map((r) => `${r.w.title} ${r.w.info.ageRule ?? '公式で確認'}`).join('、')}）と、スマートフォン・イヤホンなど必須の持ち物を二人とも満たしているか。<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物（公演別チェック表）</a></li>
+<li><strong>年齢・持ち物</strong>：年齢条件{rows.length > 0 && `（${rows.map((r) => `${r.w.title} ${r.w.info.ageRule ?? '公式で確認'}`).join('、')}）`}と、スマートフォン・イヤホンなど必須の持ち物を二人とも満たしているか。<a href="/guide/immersive-preparation/" style="color:var(--accent)">服装・持ち物（公演別チェック表）</a></li>
 </ol>
 </div>
 </details>

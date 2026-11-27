@@ -102,6 +102,7 @@ const dateRows: DateRow[] = [
 const latestStory = story.map((r) => r.w.verified.at).sort().pop();
 const latestStoryText = story.find((r) => r.w.verified.at === latestStory)?.verifiedText ?? '';
 import GensouFeature from '../../components/guide/GensouFeature.astro';
+import { gensouEnded } from '../../data/gensouPhase';
 ---
 <BaseLayout
   title="東京の非日常デート｜二人で楽しむ体験を料金・時間・過ごし方で比較 - 株式会社ex Labs"
@@ -135,7 +136,9 @@ import GensouFeature from '../../components/guide/GensouFeature.astro';
 </ul></div>
 <DateInfo modified={MODIFIED} rows={dateRows} />
 </div></section>
+{!gensouEnded() && (
 <section class="section" style="padding-top:28px;padding-bottom:12px"><div class="wrap"><GensouFeature place="tokyo-experience-date-pickup" lead="夜の夢の島熱帯植物館を二人で歩き、キャストとの会話で進む物語を一緒に見届ける約50分です。各日17:00〜20:00の間に12分おきに始まる回から選べます。二人だけの組で回りたいならグループチケット（1組14,000円・最大4名で貸切）、個別チケット（1名3,500円）は二人で合計7,000円で、ほかのお客様と同じ組になる場合があります。" /></div></section>
+)}
 
 
 <section class="section tinted" id="pick"><div class="wrap">
