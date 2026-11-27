@@ -1,0 +1,97 @@
+---
+// 応募フォーム共通のスタイルと送信処理（ミラノ・学内代表）。
+// form[data-zg-form] を JSON で data-endpoint に送り、成功したら data-next（＋?t=受付トークン）へ移動する。
+// エラー文言は原稿 2.7 のまま（サーバー側 src/lib/zengaku.ts の MSG と同じ）。
+---
+<script is:inline>
+(function(){
+  var M={required:'この項目は入力が必要です。',choose:'1つ選んでください。',kana:'全角カタカナで入力してください。',email:'メールアドレスの形式を確認してください。',emailMatch:'メールアドレスが一致していません。',tel:'数字のみで入力してください。',agree:'応募には、プライバシーポリシーへの同意が必要です。',fail:'送信できませんでした。時間をおいて、もう一度お試しください。'};
+  var EMAIL=/^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
+  var KANA=/^[ァ-ヶー　 ]+$/;
+  var len=function(s){return Array.from(s).length};
+  document.querySelectorAll('form[data-zg-form]').forEach(function(form){
+    var touched={};
+    var setErr=function(name,msg){
+      var box=form.querySelector('[data-field="'+name+'"]');if(!box)return;
+      var e=box.querySelector('.fld-e');box.classList.toggle('has-err',!!msg);
+      if(e){e.textContent=msg||'';e.hidden=!msg}
+      box.querySelectorAll('input,select,textarea').forEach(function(el){if(msg)el.setAttribute('aria-invalid','true');else el.removeAttribute('aria-invalid')});
+    };
+    var check=function(name){
+      var box=form.querySelector('[data-field="'+name+'"]');if(!box)return '';
+      var el=box.querySelector('input:not([type=radio]),select,textarea');
+      var radios=box.querySelectorAll('input[type=radio]');
+      if(radios.length){return box.querySelector('input[type=radio]:checked')?'':M.choose}
+      if(!el)return '';
+      if(el.type==='checkbox'){return el.required&&!el.checked?(el.dataset.msg==='agree'?M.agree:M.required):''}
+      var v=el.value.trim();
+      if(!v){if(el.tagName==='SELECT'&&el.required)return M.choose;return el.required?M.required:''}
+      if(el.dataset.kana!==undefined&&!KANA.test(v))return M.kana;
+      if(el.type==='email'&&!EMAIL.test(v))return M.email;
+      if(el.dataset.match){var o=form.elements[el.dataset.match];if(o&&o.value.trim().toLowerCase()!==v.toLowerCase())return M.emailMatch}
+      if(el.dataset.tel!==undefined&&!/^[0-9]{10,11}$/.test(v))return M.tel;
+      if(el.dataset.max&&len(v)>Number(el.dataset.max))return el.dataset.max+'字以内で入力してください。';
+      return '';
+    };
+    var names=[].slice.call(form.querySelectorAll('[data-field]')).map(function(b){return b.dataset.field});
+    form.addEventListener('focusout',function(e){var b=e.target.closest&&e.target.closest('[data-field]');if(!b)return;touched[b.dataset.field]=1;setErr(b.dataset.field,check(b.dataset.field))});
+    form.addEventListener('input',function(e){
+      var b=e.target.closest&&e.target.closest('[data-field]');if(b&&touched[b.dataset.field])setErr(b.dataset.field,check(b.dataset.field));
+      if(e.target.dataset&&e.target.dataset.max){var c=form.querySelector('[data-count="'+e.target.name+'"]');if(c){var r=Number(e.target.dataset.max)-len(e.target.value.trim());c.textContent=r>=0?'残り'+r+'字':(-r)+'字オーバー';c.classList.toggle('over',r<0)}}
+    });
+    form.addEventListener('change',function(e){var b=e.target.closest&&e.target.closest('[data-field]');if(b&&(e.target.type==='radio'||e.target.type==='checkbox'||e.target.tagName==='SELECT')){touched[b.dataset.field]=1;setErr(b.dataset.field,check(b.dataset.field))}});
+    // 紹介コード（?ref=）。ページを移動しても残るように sessionStorage にも置く
+    var refEl=form.elements.ref;
+    if(refEl){try{var q=new URLSearchParams(location.search).get('ref');if(q&&/^[a-z0-9]{4,12}$/i.test(q)){sessionStorage.setItem('zg_ref',q.toLowerCase())}refEl.value=sessionStorage.getItem('zg_ref')||''}catch(_){}}
+    form.addEventListener('submit',function(e){
+      e.preventDefault();
+      var first=null;
+      names.forEach(function(n){touched[n]=1;var m=check(n);setErr(n,m);if(m&&!first)first=n});
+      var msg=form.querySelector('.form-msg');if(msg){msg.hidden=true;msg.textContent=''}
+      if(first){var b=form.querySelector('[data-field="'+first+'"]');b.scrollIntoView({behavior:'smooth',block:'center'});var f=b.querySelector('input,select,textarea');if(f)setTimeout(function(){f.focus({preventScroll:true})},350);return}
+      var btn=form.querySelector('button[type=submit]');var label=btn.textContent;btn.disabled=true;btn.textContent='送信しています…';
+      var data={};new FormData(form).forEach(function(v,k){data[k]=v});
+      form.querySelectorAll('input[type=checkbox]').forEach(function(c){data[c.name]=c.checked});
+      fetch(form.dataset.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+        .then(function(r){return r.json().catch(function(){return {ok:false}})})
+        .then(function(j){
+          if(j&&j.ok){try{sessionStorage.removeItem('zg_ref')}catch(_){}location.href=form.dataset.next+(j.token?'?t='+encodeURIComponent(j.token):'');return}
+          btn.disabled=false;btn.textContent=label;
+          if(j&&j.errors){var f1=null;Object.keys(j.errors).forEach(function(k){setErr(k,j.errors[k]);if(!f1)f1=k});if(f1){var bx=form.querySelector('[data-field="'+f1+'"]');if(bx)bx.scrollIntoView({behavior:'smooth',block:'center'})}return}
+          if(msg){msg.textContent=(j&&j.closed)?'応募受付は終了しました':M.fail;msg.hidden=false}
+        })
+        .catch(function(){btn.disabled=false;btn.textContent=label;if(msg){msg.textContent=M.fail;msg.hidden=false}});
+    });
+  });
+})();
+</script>
+
+<style is:global>
+.form{max-width:720px;margin:0 auto;background:#fff;border-radius:20px;padding:40px 40px 44px;box-shadow:var(--sh);border:1px solid var(--line)}
+@media (max-width:600px){.form{padding:28px 18px 32px;border-radius:16px}}
+.fld{border:0;margin:0 0 26px;padding:0;min-width:0}
+.fld-l{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15.5px;margin-bottom:8px;padding:0;line-height:1.6}
+.fld-l em{font-style:normal;font-size:11px;font-weight:700;padding:1px 8px;border-radius:4px;letter-spacing:.08em;flex-shrink:0}
+.fld-l .req{background:var(--red);color:#fff}
+.fld-l .opt{background:#eef1f5;color:var(--muted)}
+.form input[type=text],.form input[type=email],.form input[type=tel],.form select,.form textarea{width:100%;font:500 16px/1.6 var(--gothic);color:var(--ink);background:#f7f9fb;border:1.5px solid #d5dbe3;border-radius:10px;padding:13px 14px;transition:border-color .2s,background .2s,box-shadow .2s;-webkit-appearance:none;appearance:none}
+.form select{background-image:linear-gradient(45deg,transparent 50%,var(--ink-2) 50%),linear-gradient(135deg,var(--ink-2) 50%,transparent 50%);background-position:calc(100% - 20px) 55%,calc(100% - 14px) 55%;background-size:6px 6px;background-repeat:no-repeat;padding-right:40px}
+.form textarea{min-height:140px;resize:vertical}
+.form input:focus,.form select:focus,.form textarea:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(37,87,176,.12)}
+.form ::placeholder{color:#a0a7b3}
+.fld-h{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.7}
+.fld-e{font-size:13.5px;color:var(--red);font-weight:700;margin-top:6px}
+.has-err input[type=text],.has-err input[type=email],.has-err input[type=tel],.has-err select,.has-err textarea{border-color:var(--red);background:#fff6f6}
+.cnt{text-align:right;font-size:12.5px;color:var(--muted);margin-top:4px}
+.cnt.over{color:var(--red);font-weight:700}
+.radios{display:grid;gap:8px}
+.radios label,.check{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1.5px solid #d5dbe3;border-radius:10px;cursor:pointer;line-height:1.6;transition:border-color .2s,background .2s;font-size:15px}
+.radios label:has(input:checked),.check:has(input:checked){border-color:var(--blue);background:#f1f6fd}
+.radios input,.check input{flex-shrink:0;width:20px;height:20px;margin:2px 0 0;accent-color:var(--blue)}
+.has-err .radios label,.has-err .check{border-color:#f0b7ba}
+.check a{font-weight:700}
+.form-sub{text-align:center;margin-top:34px}
+.form-sub .btn{width:100%;max-width:420px;min-height:64px;font-size:17px}
+.form-msg{margin-top:16px;text-align:center;color:var(--red);font-weight:700}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>

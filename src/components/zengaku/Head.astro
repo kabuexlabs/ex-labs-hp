@@ -1,0 +1,13 @@
+---
+// 見出し（英字の小見出しは飾り。読み上げない）
+interface Props { en?: string; ja: string; lead?: string; left?: boolean; tag?: 'h1' | 'h2' }
+import J from '../gensou/J.astro';
+const { en, ja, lead, left = false, tag = 'h2' } = Astro.props;
+const H = tag;
+---
+<header class={`sh rv${left ? ' left' : ''}`}>
+  {en && <p class="sh-en" aria-hidden="true">{en}</p>}
+  <H class="sh-ja wb"><J t={ja} /></H>
+  <span class="sh-route" aria-hidden="true"></span>
+  {lead && <p class="sh-lead wb"><J t={lead} /></p>}
+</header>

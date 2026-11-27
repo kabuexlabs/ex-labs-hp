@@ -339,6 +339,7 @@ async function sendViaSmtp(
   subject: string,
   text: string,
   replyTo?: string,
+  fromName?: string,
 ): Promise<boolean> {
   const user = readEnv('SMTP_USER');
   const pass = readEnv('SMTP_PASS');
@@ -354,7 +355,7 @@ async function sendViaSmtp(
       auth: { user, pass: pass.replace(/\s+/g, '') },
     });
     await transporter.sendMail({
-      from: smtpFrom(),
+      from: fromName ? `${fromName} <${user}>` : smtpFrom(),
       to,
       subject,
       text,
@@ -380,15 +381,18 @@ export async function sendMail(
   subject: string,
   text: string,
   replyTo?: string,
+  // 差出人の表示名だけを変える（アドレスは同じ）。2026-11-27 全国学生 未来視察連盟 LP の自動返信用
+  opts?: { fromName?: string },
 ): Promise<boolean> {
   lastDiag = { via: 'none', error: 'SMTP・Resend とも未設定' };
+  const fromName = opts?.fromName?.replace(/[<>"\r\n]/g, '').trim() || undefined;
   // 宛先・返信先は送る直前にも形を確かめる（呼び出し側の確認漏れがあっても、すり替え可能な宛先には送らない）
   // 管理者の通知先（環境変数）は運用側の設定なので対象外（複数指定などの書式でも従来どおり送る）
   if (to !== adminEmail() && to !== notifyEmail() && !validEmail(to)) { lastDiag = { via: 'none', error: '宛先の形式が不正のため送信しない' }; return false; }
   if (replyTo !== undefined && !validEmail(replyTo)) replyTo = undefined;
   // 1) 自社SMTP（最優先）
   if (smtpConfigured()) {
-    if (await sendViaSmtp(to, subject, text, replyTo)) return true;
+    if (await sendViaSmtp(to, subject, text, replyTo, fromName)) return true;
     // SMTP失敗時は下のResendがあればそちらを試す
   }
   const apiKey = readEnv('RESEND_API_KEY');
@@ -397,7 +401,8 @@ export async function sendMail(
     return false;
   }
   const smtpError = lastDiag.error;
-  const from = readEnv('MAIL_FROM') ?? 'ex Labs 予約窓口 <no-reply@kabuexlabs.com>';
+  const baseFrom = readEnv('MAIL_FROM') ?? 'ex Labs 予約窓口 <no-reply@kabuexlabs.com>';
+  const from = fromName ? `${fromName} <${/<([^>]+)>/.exec(baseFrom)?.[1] ?? baseFrom}>` : baseFrom;
   // RESEND_API_BASE はローカルテストでモックサーバーに向けるための逃げ道
   // （microcms.ts の MICROCMS_API_BASE と同じ流儀）。本番では未設定でよい。
   const base = readEnv('RESEND_API_BASE') ?? 'https://api.resend.com';

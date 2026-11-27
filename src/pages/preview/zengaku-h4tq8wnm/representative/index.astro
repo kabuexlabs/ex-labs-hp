@@ -1,0 +1,54 @@
+---
+// 学内代表の応募ページ（原稿 5章）。応募は /api/zengaku/representative（Redis 保存・自動返信）。
+export const prerender = false;
+import ZLayout from '../../../../components/zengaku/ZLayout.astro';
+import Head from '../../../../components/zengaku/Head.astro';
+import Field from '../../../../components/zengaku/Field.astro';
+import FormKit from '../../../../components/zengaku/FormKit.astro';
+import J from '../../../../components/gensou/J.astro';
+import { BASE, GRADES, UNIVERSITIES, previewGuard, NOINDEX_HEADERS } from '../../../../lib/zengaku';
+
+const blocked = previewGuard(Astro.request);
+if (blocked) return blocked;
+for (const [k, v] of Object.entries(NOINDEX_HEADERS)) Astro.response.headers.set(k, v);
+const tasks = ['連盟の企画を、自分の大学の学生に伝える', '大学の仲間からの質問や参加の窓口になる', '視察や勉強会の企画に、運営側として関わる'];
+---
+<ZLayout page="rep" title="学内代表に応募する｜全国学生 未来視察連盟" description="自分の大学で、連盟の活動を広める学内代表を募集しています。学年・学部は問いません。">
+  <section class="sec rp-top">
+    <div class="wrap">
+      <Head en="Campus representative" ja="学内代表に応募する" tag="h1" lead="自分の大学で、連盟の活動を広める学内代表を募集しています。学年・学部は問いません。" />
+      <div class="rp-tasks rv">
+        <p class="rp-h">学内代表がやること</p>
+        <ol>{tasks.map((t, i) => <li><span aria-hidden="true">{i + 1}</span><span class="wb"><J t={t} keep={['学内代表']} /></span></li>)}</ol>
+      </div>
+    </div>
+  </section>
+  <section class="sec rp-form">
+    <div class="wrap">
+      <form class="form" data-zg-form data-endpoint="/api/zengaku/representative" data-next={`${BASE}/representative/thanks/`} novalidate>
+        <Field id="name" label="お名前" req><input id="f-name" name="name" type="text" required autocomplete="name" placeholder="例：山田 太郎" maxlength="60" /></Field>
+        <Field id="kana" label="フリガナ" req hint="全角カタカナ"><input id="f-kana" name="kana" type="text" required data-kana placeholder="例：ヤマダ タロウ" maxlength="60" /></Field>
+        <Field id="univ" label="大学名" req><input id="f-univ" name="univ" type="text" required list="univ-list" autocomplete="organization" placeholder="例：早稲田大学" maxlength="80" />
+          <datalist id="univ-list">{UNIVERSITIES.map((u) => <option value={u} />)}</datalist></Field>
+        <Field id="faculty" label="学部・学科" req><input id="f-faculty" name="faculty" type="text" required placeholder="例：創造理工学部 建築学科" maxlength="80" /></Field>
+        <Field id="grade" label="学年" req><select id="f-grade" name="grade" required><option value="">選んでください</option>{GRADES.map((g) => <option value={g}>{g}</option>)}</select></Field>
+        <Field id="email" label="メールアドレス" req><input id="f-email" name="email" type="email" required autocomplete="email" inputmode="email" maxlength="254" /></Field>
+        <Field id="group" label="所属している団体・サークル"><input id="f-group" name="group" type="text" placeholder="例：建築系の学生団体、サークル名" maxlength="100" /></Field>
+        <Field id="wish" label="学内代表としてやってみたいこと" hint="300字まで"><textarea id="f-wish" name="wish" data-max="300"></textarea><p class="cnt" data-count="wish" aria-live="polite">残り300字</p></Field>
+        <Field id="agree" label="個人情報の取り扱いへの同意" req><label class="check"><input id="f-agree" name="agree" type="checkbox" required data-msg="agree" /><span><a href={`${BASE}/privacy/`} target="_blank" rel="noopener">プライバシーポリシー</a>に同意する</span></label></Field>
+        <div class="hp" aria-hidden="true"><label>空欄のまま<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+        <div class="form-sub"><button class="btn btn-blue" type="submit">学内代表に応募する</button><p class="form-msg" role="alert" hidden></p></div>
+      </form>
+    </div>
+  </section>
+  <FormKit />
+</ZLayout>
+<style>
+.rp-top{background:linear-gradient(180deg,#fff,var(--sky));padding-bottom:56px}
+.rp-tasks{max-width:620px;margin:0 auto;background:#fff;border-radius:18px;padding:28px 24px;box-shadow:var(--sh)}
+.rp-h{text-align:center;font-weight:900;color:var(--blue);letter-spacing:.12em;margin-bottom:14px}
+.rp-tasks ol{display:grid;gap:10px}
+.rp-tasks li{display:flex;gap:14px;align-items:center;font-weight:700;background:var(--sky);border-radius:12px;padding:12px 16px}
+.rp-tasks li>span:first-child{flex-shrink:0;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-family:var(--en);font-size:17px}
+.rp-form{background:#f4f9fd;padding-top:56px}
+</style>

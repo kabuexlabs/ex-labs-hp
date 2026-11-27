@@ -1,0 +1,14 @@
+---
+// フォームの1項目（ラベル・必須/任意・補足・エラー表示の枠）。中身の入力欄は slot。
+interface Props { id: string; label: string; req?: boolean; hint?: string; as?: 'div' | 'fieldset' }
+const { id, label, req = false, hint, as = 'div' } = Astro.props;
+const Tag = as;
+---
+<Tag class="fld" data-field={id}>
+  {as === 'fieldset'
+    ? <legend class="fld-l"><span>{label}</span><em class={req ? 'req' : 'opt'}>{req ? '必須' : '任意'}</em></legend>
+    : <label class="fld-l" for={`f-${id}`}><span>{label}</span><em class={req ? 'req' : 'opt'}>{req ? '必須' : '任意'}</em></label>}
+  <slot />
+  {hint && <p class="fld-h">{hint}</p>}
+  <p class="fld-e" id={`e-${id}`} role="alert" hidden></p>
+</Tag>

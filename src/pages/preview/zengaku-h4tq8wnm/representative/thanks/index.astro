@@ -1,0 +1,27 @@
+---
+// 学内代表の応募完了ページ（原稿 5章）
+export const prerender = false;
+import ZLayout from '../../../../../components/zengaku/ZLayout.astro';
+import { BASE, previewGuard, NOINDEX_HEADERS } from '../../../../../lib/zengaku';
+const blocked = previewGuard(Astro.request);
+if (blocked) return blocked;
+for (const [k, v] of Object.entries(NOINDEX_HEADERS)) Astro.response.headers.set(k, v);
+---
+<ZLayout page="thanks" title="ご応募ありがとうございます｜全国学生 未来視察連盟" description="学内代表への応募を受け付けました。">
+  <section class="sec th">
+    <div class="wrap th-in">
+      <div class="th-ic" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="var(--sky)"/><path d="M19 33l9 9 18-19" fill="none" stroke="var(--blue)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h1 class="th-h">ご応募ありがとうございます。</h1>
+      <p class="th-body">学内代表への応募を受け付けました。内容を確認のうえ、運営メンバーからメールでご連絡します。</p>
+      <p class="back"><a href={`${BASE}/`}>トップページに戻る →</a></p>
+    </div>
+  </section>
+</ZLayout>
+<style>
+.th{background:linear-gradient(180deg,#fff,var(--sky));min-height:60vh}
+.th-in{max-width:640px;text-align:center}
+.th-ic svg{width:72px;height:72px}
+.th-h{font-family:var(--mincho);font-weight:800;font-size:clamp(26px,4.6vw,38px);letter-spacing:.06em;margin:14px 0 22px;line-height:1.5}
+.th-body{line-height:2;text-align:left}
+.back{margin-top:40px}
+</style>

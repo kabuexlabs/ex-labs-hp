@@ -1,0 +1,82 @@
+---
+// 応募の一覧と集計（運営用）。合言葉は環境変数 ZENGAKU_ADMIN_KEY（未設定なら YOYAKU_ADMIN_KEY）。
+// 知った経路（大学／学生団体／施策）と紹介コード別の人数、CSV 書き出し。
+export const prerender = false;
+import { timingSafeEqual } from 'node:crypto';
+import { BASE, SOURCES, listMilano, listRep, jstStamp, isKvConfigured, previewGuard, NOINDEX_HEADERS } from '../../../../lib/zengaku';
+
+const blocked = previewGuard(Astro.request);
+if (blocked) return blocked;
+for (const [k, v] of Object.entries(NOINDEX_HEADERS)) Astro.response.headers.set(k, v);
+const env = (n: string) => ((import.meta.env as Record<string, string | undefined>)[n] ?? process.env[n])?.trim() || undefined;
+const expected = env('ZENGAKU_ADMIN_KEY') ?? env('YOYAKU_ADMIN_KEY');
+let key = '';
+let format = '';
+if (Astro.request.method === 'POST') {
+  const fd = await Astro.request.formData().catch(() => null);
+  key = String(fd?.get('key') ?? '');
+  format = String(fd?.get('format') ?? '');
+}
+const ok = !!expected && !!key && Buffer.byteLength(key) === Buffer.byteLength(expected) && timingSafeEqual(Buffer.from(key), Buffer.from(expected));
+let apps: Awaited<ReturnType<typeof listMilano>> = [];
+let reps: Awaited<ReturnType<typeof listRep>> = [];
+let err = '';
+if (ok) {
+  try { [apps, reps] = await Promise.all([listMilano(), listRep()]); } catch (e) { err = isKvConfigured() ? '読み込みに失敗しました' : 'KV（Redis）が未設定です'; }
+}
+const srcLabel = (k: string) => SOURCES.find((s) => s.key === k)?.label ?? k;
+const srcRoute = (k: string) => SOURCES.find((s) => s.key === k)?.route ?? '施策';
+const csvCell = (v: unknown) => { const s = String(v ?? ''); return /^[=+\-@]/.test(s) ? `"'${s.replace(/"/g, '""')}"` : `"${s.replace(/"/g, '""')}"`; };
+if (ok && !err && (format === 'milano' || format === 'rep')) {
+  const rows = format === 'milano'
+    ? [['受付番号', '応募日時', 'お名前', 'フリガナ', '大学名', '学部・学科', '学年', 'メール', '電話', '知った経路', 'ルート', '紹介者', '紹介コード(来訪)', '本人の紹介コード', '紹介で来た人数', '賛同企業の案内', '応募の理由'],
+       ...apps.map((a) => [a.no, jstStamp(a.createdAt), a.name, a.kana, a.univ, a.faculty, a.grade, a.email, a.tel, srcLabel(a.source), srcRoute(a.source), a.referrer, a.ref, a.myRef, apps.filter((b) => b.ref === a.myRef).length, a.optin ? '受け取る' : '', a.reason])]
+    : [['番号', '応募日時', 'お名前', 'フリガナ', '大学名', '学部・学科', '学年', 'メール', '所属団体', 'やってみたいこと'],
+       ...reps.map((r) => [r.no, jstStamp(r.createdAt), r.name, r.kana, r.univ, r.faculty, r.grade, r.email, r.group, r.wish])];
+  const csv = '﻿' + rows.map((r) => r.map(csvCell).join(',')).join('\r\n');
+  return new Response(csv, { headers: { ...NOINDEX_HEADERS, 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': `attachment; filename="zengaku-${format}.csv"` } });
+}
+const byRoute = ['大学', '学生団体', '施策'].map((r) => ({ r, n: apps.filter((a) => srcRoute(a.source) === r).length }));
+const bySource = SOURCES.map((s) => ({ l: s.label, n: apps.filter((a) => a.source === s.key).length }));
+const byRef = apps.filter((a) => apps.some((b) => b.ref === a.myRef)).map((a) => ({ no: a.no, name: a.name, univ: a.univ, n: apps.filter((b) => b.ref === a.myRef).length })).sort((x, y) => y.n - x.n);
+const unknownRefs = apps.filter((a) => a.ref && !apps.some((b) => b.myRef === a.ref)).length;
+---
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow"><title>応募一覧｜未来視察連盟</title>
+<style>
+body{font-family:system-ui,'Hiragino Sans',sans-serif;margin:0;padding:20px;background:#f5f7fa;color:#1d222b;font-size:14px}
+h1{font-size:20px}h2{font-size:16px;margin-top:28px}
+.card{background:#fff;border-radius:10px;padding:16px;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,.08);overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:640px}th,td{border-bottom:1px solid #e5e8ec;padding:6px 8px;text-align:left;vertical-align:top}th{background:#f0f3f7;white-space:nowrap}
+input,button{font:inherit;padding:8px 12px}button{cursor:pointer}
+.kpi{display:flex;gap:12px;flex-wrap:wrap}.kpi div{background:#fff;border-radius:10px;padding:12px 18px;box-shadow:0 1px 3px rgba(0,0,0,.08)}.kpi b{font-size:22px;display:block}
+.err{color:#c00;font-weight:700}
+</style></head><body>
+<h1>全国学生 未来視察連盟　応募一覧</h1>
+{!ok ? (
+  <form method="post" class="card"><label>合言葉 <input type="password" name="key" autocomplete="current-password" /></label> <button>開く</button>{key && <p class="err">合言葉が違います</p>}{!expected && <p class="err">合言葉（ZENGAKU_ADMIN_KEY または YOYAKU_ADMIN_KEY）が未設定です</p>}</form>
+) : err ? <p class="err">{err}</p> : (
+  <>
+    <div class="kpi">
+      <div>ミラノ応募<b>{apps.length}</b></div>
+      {byRoute.map((r) => <div>{r.r}ルート<b>{r.n}</b></div>)}
+      <div>紹介コード経由<b>{apps.filter((a) => a.ref).length}</b></div>
+      <div>学内代表応募<b>{reps.length}</b></div>
+    </div>
+    <form method="post" style="margin-top:12px"><input type="hidden" name="key" value={key} /><button name="format" value="milano">ミラノ応募を CSV で書き出す</button> <button name="format" value="rep">学内代表を CSV で書き出す</button></form>
+    <h2>知った経路</h2>
+    <div class="card"><table><tr><th>経路</th><th>人数</th></tr>{bySource.map((s) => <tr><td>{s.l}</td><td>{s.n}</td></tr>)}</table></div>
+    <h2>紹介した人（紹介リンクから応募があった人）</h2>
+    <div class="card">{byRef.length ? <table><tr><th>受付番号</th><th>お名前</th><th>大学</th><th>紹介で応募した人数</th></tr>{byRef.map((r) => <tr><td>{r.no}</td><td>{r.name}</td><td>{r.univ}</td><td>{r.n}</td></tr>)}</table> : <p>まだありません</p>}{unknownRefs > 0 && <p>応募者以外のコードからの応募：{unknownRefs}件</p>}</div>
+    <h2>ミラノ応募（応募順）</h2>
+    <div class="card"><table><tr><th>No.</th><th>応募日時</th><th>お名前</th><th>大学・学部・学年</th><th>メール</th><th>経路</th><th>紹介者</th><th>案内</th></tr>
+      {apps.map((a) => <tr><td>{a.no}</td><td>{jstStamp(a.createdAt)}</td><td>{a.name}<br /><small>{a.kana}</small></td><td>{a.univ} {a.faculty} {a.grade}</td><td>{a.email}<br /><small>{a.tel}</small></td><td>{srcLabel(a.source)}</td><td>{a.referrer}{a.ref && <><br /><small>コード {a.ref}</small></>}</td><td>{a.optin ? '○' : ''}</td></tr>)}
+    </table></div>
+    <h2>学内代表</h2>
+    <div class="card"><table><tr><th>No.</th><th>応募日時</th><th>お名前</th><th>大学・学部・学年</th><th>メール</th><th>所属団体</th><th>やってみたいこと</th></tr>
+      {reps.map((r) => <tr><td>{r.no}</td><td>{jstStamp(r.createdAt)}</td><td>{r.name}<br /><small>{r.kana}</small></td><td>{r.univ} {r.faculty} {r.grade}</td><td>{r.email}</td><td>{r.group}</td><td style="white-space:pre-wrap">{r.wish}</td></tr>)}
+    </table></div>
+  </>
+)}
+<p><a href={`${BASE}/`}>サイトへ</a></p>
+</body></html>

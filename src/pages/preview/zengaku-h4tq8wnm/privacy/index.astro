@@ -1,0 +1,51 @@
+---
+// プライバシーポリシー（原稿 6章。原稿のまま）。公開前に事業者名・所在地・連絡先を入れ、責任者が確認する（特に「4. 第三者への提供」）。
+export const prerender = false;
+import ZLayout from '../../../../components/zengaku/ZLayout.astro';
+import Head from '../../../../components/zengaku/Head.astro';
+import { VARS, previewGuard, NOINDEX_HEADERS } from '../../../../lib/zengaku';
+const blocked = previewGuard(Astro.request);
+if (blocked) return blocked;
+for (const [k, v] of Object.entries(NOINDEX_HEADERS)) Astro.response.headers.set(k, v);
+---
+<ZLayout page="privacy" title="プライバシーポリシー｜全国学生 未来視察連盟" description="全国学生 未来視察連盟の個人情報の取り扱いについて。">
+  <section class="sec pv">
+    <div class="wrap pv-in">
+      <Head en="Privacy policy" ja="プライバシーポリシー" tag="h1" />
+      <div class="pv-body">
+        <h2>1. 事業者</h2>
+        <p>{VARS.OPERATOR ?? <><span class="tbd">事業者名・所在地</span><span class="tbd-note">未定</span></>}（全国学生 未来視察連盟　代表 飯田雄貴）<br />お問い合わせ：{VARS.CONTACT_EMAIL ? <a href={`mailto:${VARS.CONTACT_EMAIL}`}>{VARS.CONTACT_EMAIL}</a> : <><span class="tbd">準備中</span><span class="tbd-note">未定</span></>}</p>
+        <h2>2. 取得する情報</h2>
+        <p>応募フォームに入力された、お名前、フリガナ、大学名、学部・学科、学年、メールアドレス、電話番号、その他の入力内容。</p>
+        <h2>3. 利用の目的</h2>
+        <ul>
+          <li>ミラノ建築短期留学ツアーの選考と、結果のご連絡</li>
+          <li>業種セミナーなど、連盟の企画のご案内</li>
+          <li>学内代表の選考とご連絡</li>
+          <li>お問い合わせへの回答</li>
+          <li>応募状況の集計（個人を特定できない形で行います）</li>
+        </ul>
+        <h2>4. 第三者への提供</h2>
+        <p>ご本人の同意がある場合と、法令にもとづく場合を除き、個人情報を第三者に提供しません。</p>
+        <p>応募フォームで「賛同企業のセミナーやイベントの案内を受け取る」にチェックを入れた方には、連盟から賛同企業の案内をお送りします。この場合も、連盟が賛同企業に個人情報を渡すことはありません。</p>
+        <h2>5. 管理</h2>
+        <p>個人情報は、漏えいや紛失が起きないよう適切に管理します。利用の目的を終えた情報は、すみやかに削除します。</p>
+        <h2>6. 開示・訂正・削除</h2>
+        <p>ご本人から、個人情報の開示、訂正、削除、案内の停止の申し出があった場合は、ご本人であることを確認のうえ対応します。上記のお問い合わせ先までご連絡ください。</p>
+        <h2>7. 改定</h2>
+        <p>このポリシーの内容は、必要に応じて見直します。変更した場合は、このページでお知らせします。</p>
+        <p class="pv-date">制定日：2026年12月1日</p>
+      </div>
+    </div>
+  </section>
+</ZLayout>
+<style>
+.pv-in{max-width:800px}
+.pv-body{background:#fff;border:1px solid var(--line);border-radius:18px;padding:40px 36px}
+.pv-body h2{font-family:var(--mincho);font-weight:800;font-size:20px;letter-spacing:.06em;margin:32px 0 10px;padding-left:14px;border-left:4px solid var(--red)}
+.pv-body h2:first-child{margin-top:0}
+.pv-body p+p{margin-top:.8em}
+.pv-body ul{list-style:disc;padding-left:1.4em}
+.pv-date{margin-top:36px!important;text-align:right;color:var(--muted)}
+@media (max-width:600px){.pv-body{padding:28px 18px}}
+</style>

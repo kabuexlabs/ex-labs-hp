@@ -1,0 +1,65 @@
+---
+// ミラノ建築短期留学ツアー 応募完了ページ（原稿 3章）。?t=受付トークン で応募を引き、受付番号と紹介リンクを出す。
+export const prerender = false;
+import ZLayout from '../../../../../components/zengaku/ZLayout.astro';
+import { BASE, findMilanoByToken, refLink, previewGuard, NOINDEX_HEADERS } from '../../../../../lib/zengaku';
+
+const blocked = previewGuard(Astro.request);
+if (blocked) return blocked;
+for (const [k, v] of Object.entries(NOINDEX_HEADERS)) Astro.response.headers.set(k, v);
+const t = Astro.url.searchParams.get('t') ?? '';
+const rec = t ? await findMilanoByToken(t).catch(() => null) : null;
+const link = rec ? refLink(Astro.url.origin, rec.myRef) : '';
+const shareText = `ミラノで建築を学ぶ短期留学ツアーに応募しました。建築に興味があれば、学部は問わないそうです。応募は1月15日まで。\n${link}`;
+const lineHref = `https://line.me/R/share?text=${encodeURIComponent(shareText)}`;
+const xHref = `https://x.com/intent/post?text=${encodeURIComponent(shareText)}`;
+---
+<ZLayout page="thanks" title="ご応募ありがとうございます｜全国学生 未来視察連盟" description="ミラノ建築短期留学ツアーへの応募を受け付けました。">
+  <section class="sec th">
+    <div class="wrap th-in">
+      <div class="th-ic" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="var(--sky)"/><path d="M19 33l9 9 18-19" fill="none" stroke="var(--blue)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h1 class="th-h">ご応募ありがとうございます。</h1>
+      <div class="th-body">
+        <p>ミラノ建築短期留学ツアーへの応募を受け付けました。</p>
+        {rec ? <p>受付番号は <strong class="th-no">{rec.no}</strong> です。</p> : null}
+        <p class="mt">入力されたメールアドレスに、確認のメールをお送りしました。届かない場合は、迷惑メールのフォルダもご確認ください。</p>
+      </div>
+
+      {rec && (
+        <div class="share">
+          <h2 class="share-h">友達にも教えよう</h2>
+          <p>下のリンクから、友達にもこのツアーを紹介できます。</p>
+          <div class="share-link"><input id="ref-url" type="text" readonly value={link} aria-label="紹介リンク" /></div>
+          <button class="btn btn-blue copy-btn" type="button" data-copy="ref-url">リンクをコピーする</button>
+          <div class="share-sns">
+            <a class="sh-line" href={lineHref} target="_blank" rel="noopener">LINEで送る</a>
+            <a class="sh-x" href={xHref} target="_blank" rel="noopener">Xでポストする</a>
+          </div>
+        </div>
+      )}
+      <p class="back"><a href={`${BASE}/`}>トップページに戻る →</a></p>
+    </div>
+  </section>
+  <script is:inline>
+  document.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){var el=document.getElementById(b.dataset.copy);var done=function(){b.textContent='コピーしました';setTimeout(function(){b.textContent='リンクをコピーする'},2400)};if(navigator.clipboard){navigator.clipboard.writeText(el.value).then(done,function(){el.select();document.execCommand('copy');done()})}else{el.select();document.execCommand('copy');done()}})});
+  </script>
+</ZLayout>
+<style>
+.th{background:linear-gradient(180deg,#fff,var(--sky))}
+.th-in{max-width:720px;text-align:center}
+.th-ic svg{width:72px;height:72px}
+.th-h{font-family:var(--mincho);font-weight:800;font-size:clamp(26px,4.6vw,38px);letter-spacing:.06em;margin:14px 0 22px;line-height:1.5}
+.th-body{line-height:2}
+.th-body .mt{margin-top:1em;color:var(--ink-2);font-size:15px}
+.th-no{font-family:var(--en);font-size:34px;color:var(--red);padding:0 4px;vertical-align:-3px}
+.share{margin-top:44px;background:#fff;border-radius:20px;padding:34px 24px;box-shadow:var(--sh)}
+.share-h{font-family:var(--mincho);font-weight:800;font-size:24px;letter-spacing:.08em;margin-bottom:8px}
+.share-link{margin:18px 0 14px}
+.share-link input{width:100%;font:500 15px/1.5 var(--gothic);padding:13px 14px;border:1.5px solid #d5dbe3;border-radius:10px;background:#f7f9fb;color:var(--ink);text-align:center}
+.copy-btn{width:100%;max-width:360px;min-height:54px}
+.share-sns{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.share-sns a{flex:1 1 140px;max-width:200px;display:block;padding:12px;border-radius:999px;color:#fff;text-decoration:none;font-weight:700}
+.sh-line{background:#06c755}
+.sh-x{background:#111}
+.back{margin-top:40px}
+</style>

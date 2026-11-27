@@ -1,0 +1,333 @@
+---
+// 全国学生 未来視察連盟「ミラノ建築短期留学ツアー」イベントページ（仮・限定公開）。原稿 2章。
+// 応募は /api/zengaku/milano（Redis 保存・受付番号・紹介コード・同じメールの2回目は不可・自動返信）。
+// 締切（2027-01-15 23:59 JST）を過ぎると応募ボタンとフォームが自動で「受付終了」に変わる。
+export const prerender = false;
+import ZLayout from '../../../../components/zengaku/ZLayout.astro';
+import Head from '../../../../components/zengaku/Head.astro';
+import Field from '../../../../components/zengaku/Field.astro';
+import FormKit from '../../../../components/zengaku/FormKit.astro';
+import J from '../../../../components/gensou/J.astro';
+import { BASE, VARS, SHOW, GRADES, SOURCES, UNIVERSITIES, CLOSED_TEXT, isClosed, previewGuard, NOINDEX_HEADERS } from '../../../../lib/zengaku';
+
+const blocked = previewGuard(Astro.request);
+if (blocked) return blocked;
+for (const [k, v] of Object.entries(NOINDEX_HEADERS)) Astro.response.headers.set(k, v);
+const closed = isClosed();
+const KEEP = ['未来視察連盟', 'ミラノ建築短期留学ツアー', '業種セミナー', '賛同企業', 'プライバシーポリシー', '迷惑メール'];
+
+const facts = [
+  { k: '時期', v: '2027年3月' },
+  { k: '人数', v: '6名' },
+  { k: '選考', v: '応募順' },
+  { k: '応募締切', v: '2027年1月15日（金）' },
+];
+const overview = [
+  { k: '時期', v: SHOW.TOUR_DATES },
+  { k: '行き先', v: 'イタリア・ミラノ' },
+  { k: '人数', v: '6名' },
+  { k: '内容', v: SHOW.TOUR_PLACES },
+  { k: '費用', v: SHOW.TOUR_COST },
+  { k: '主催', v: '全国学生 未来視察連盟' },
+];
+const forList = ['建築や街づくりを、海外で実際に見てみたい', '建築の仕事にどんな種類があるのか知りたい', '大学の外で、全国の仲間と学びたい', '建築学科ではないけれど、建築に興味がある'];
+const gains = [
+  { t: '現地でしか見られないものを見る', d: '歴史ある建築と最新の街づくりを、写真ではなく実物で体感できます。' },
+  { t: '全国の学生と学ぶ', d: '大学も学部も違う6名が、同じ現場を見て意見を交わします。' },
+  { t: '学んだことを発信する', d: '見てきたことを、連盟の活動報告として自分の言葉で伝えます。' },
+];
+const seminar = [
+  { k: '回数', v: '全2回（うち1回は、ミラノ出発前の会で行います）' },
+  { k: '日程・会場', v: SHOW.SEMINAR_DATES },
+  { k: '内容', v: '学生によるピッチ（賛同企業の業種紹介）、参加した学生による投票' },
+  { k: '参加できる人', v: 'ミラノ建築短期留学ツアーに応募された方' },
+];
+const schedule = [
+  { d: '2026年12月1日（火）', t: '応募受付開始' },
+  { d: `2027年1月15日（金）${VARS.DEADLINE_TIME}`, t: '応募締切' },
+  { d: '2027年1月〜3月', t: '業種セミナー（全2回）' },
+  { d: '2027年3月', t: 'ミラノへ出発' },
+];
+const faq = [
+  { q: '建築学科でなくても応募できますか？', a: 'できます。建築業界に興味があれば、学部・学科は問いません。' },
+  { q: '学年に制限はありますか？', a: 'ありません。学部生も大学院生も応募できます。' },
+  { q: '選考はどのように行われますか？', a: '応募いただいた順に行います。早めのご応募をおすすめします。' },
+  { q: '結果はいつ、どのように届きますか？', a: '応募締切のあと、応募時のメールアドレスにお知らせします。' },
+  { q: '費用はかかりますか？', a: SHOW.TOUR_COST },
+  { q: '日程はいつですか？', a: SHOW.TOUR_DATES },
+  { q: '業種セミナーとは何ですか？', a: '賛同企業の業種を、学生がピッチ形式で紹介する勉強会です。全2回開き、ミラノ出発前の会でも行います。' },
+  { q: 'ツアーに行けなかった場合、応募した意味はありますか？', a: 'あります。応募された方には、業種セミナーのご案内など、ツアー以外の機会もお届けします。' },
+  { q: '友達と一緒に応募できますか？', a: 'できます。応募は1人ずつ行ってください。応募のあとに表示される紹介リンクで、友達に知らせることができます。' },
+  { q: '応募内容を間違えました。', a: 'お問い合わせ先までメールでご連絡ください。' },
+];
+---
+<ZLayout
+  page="milano"
+  sticky
+  title="ミラノ建築短期留学ツアー｜全国学生 未来視察連盟"
+  description="2027年3月、ミラノで建築と街づくりを学ぶ短期留学ツアー。建築業界に興味のある学生なら、大学・学年・学部は問いません。応募締切は2027年1月15日。"
+  ogTitle="ミラノ建築短期留学ツアー｜応募受付中"
+  ogDesc="世界の建築を、自分の目で。応募は1月15日まで。応募いただいた順に選考します。"
+>
+  <!-- 2.1 ファーストビュー -->
+  <section class="mfv" id="top">
+    <svg class="mfv-arch" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <g fill="none" stroke="currentColor" stroke-width="1.3">
+        {Array.from({ length: 13 }, (_, i) => <path d={`M${i * 96} 420 V250 a48 48 0 0 1 96 0 V420`} />)}
+        <path d="M0 236h1200M0 228h1200M0 120h1200"/>
+        {Array.from({ length: 25 }, (_, i) => <path d={`M${i * 48 + 24} 228 V150 a10 10 0 0 1 20 0 V228`} />)}
+        <path d="M420 120 600 22l180 98"/><path d="M600 22V0"/>
+      </g>
+    </svg>
+    <div class="wrap mfv-in">
+      <p class="mfv-lb">{closed ? '応募受付は終了しました' : '応募受付中'}</p>
+      <p class="mfv-sub">全国学生 未来視察連盟　海外研修 第1弾</p>
+      <h1 class="mfv-t"><span>ミラノ建築</span><span>短期留学ツアー</span></h1>
+      <p class="mfv-catch">世界の建築を、自分の目で。</p>
+      <dl class="mfv-facts">
+        {facts.map((f, i) => <div class={`rv d${i + 1}`}><dt>{f.k}</dt><dd>{f.v}</dd></div>)}
+      </dl>
+      <div class="mfv-cta">
+        {closed
+          ? <span class="btn btn-red is-off" aria-disabled="true">応募受付は終了しました</span>
+          : <a class="btn btn-red" href="#apply">応募する（約3分）<span class="ar" aria-hidden="true">↓</span></a>}
+        <p class="mfv-note wb"><J t="建築業界に興味があれば、大学・学年・学部は問いません。" /></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2.2 ツアー概要 -->
+  <section class="sec" id="overview">
+    <div class="wrap">
+      <Head en="Overview" ja="ツアー概要" lead="歴史ある建築と、いま進んでいる街づくり。その両方を、ミラノで見て学ぶ短期留学ツアーです。" />
+      <dl class="tbl rv">
+        {overview.map((o) => <div><dt>{o.k}</dt><dd class="wb"><J t={o.v} keep={KEEP} /></dd></div>)}
+      </dl>
+    </div>
+  </section>
+
+  <!-- 2.3 こんな人へ -->
+  <section class="sec for" id="for">
+    <div class="wrap">
+      <Head en="For you" ja="こんな人に来てほしい" lead="建築業界に少しでも興味があれば、大学・学年・学部は問いません。" />
+      <ul class="for-list">
+        {forList.map((t, i) => <li class={`rv d${i + 1}`}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="var(--blue)"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wb"><J t={t} /></span></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <!-- 2.4 得られること -->
+  <section class="sec" id="gain">
+    <div class="wrap">
+      <Head en="What you gain" ja="このツアーで得られること" />
+      <ol class="gain-list">
+        {gains.map((g, i) => (
+          <li class={`rv d${i + 1}`}>
+            <span class="gain-no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="wb"><J t={g.t} /></h3>
+            <p class="wb"><J t={g.d} keep={KEEP} /></p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- 2.5 業種セミナー -->
+  <section class="sec seminar" id="seminar">
+    <div class="wrap">
+      <Head en="Industry seminar" ja="建築の仕事を知る、全2回の業種セミナー" />
+      <div class="sem-body rv">
+        <p class="wb"><J t="ツアーとあわせて、業種セミナーを全2回開きます。ミラノ出発前の会でも行います。" keep={KEEP} /></p>
+        <p class="wb"><J t="賛同企業の業種を、学生がピッチ形式で紹介する勉強会です。設計、施工、設備、不動産など、建築にかかわる仕事の広さを、一度に知ることができます。" keep={KEEP} /></p>
+        <p class="wb"><J t="参加した学生は、良かったピッチに投票できます。" /></p>
+      </div>
+      <dl class="tbl rv">
+        {seminar.map((o) => <div><dt>{o.k}</dt><dd class="wb"><J t={o.v} keep={KEEP} /></dd></div>)}
+      </dl>
+      <p class="sem-note rv wb"><J t="※ピッチへの投票には、ツアーへの応募が必要です。" /></p>
+    </div>
+  </section>
+
+  <!-- 2.6 スケジュール -->
+  <section class="sec" id="schedule">
+    <div class="wrap">
+      <Head en="Schedule" ja="スケジュール" />
+      <ol class="sch">
+        {schedule.map((s, i) => (
+          <li class={`rv d${i + 1}${i === 1 ? ' is-key' : ''}`}>
+            <span class="sch-no">{i + 1}</span>
+            <p class="sch-d">{s.d}</p>
+            <p class="sch-t">{s.t}</p>
+          </li>
+        ))}
+      </ol>
+      <p class="sch-strong rv wb"><strong><J t="選考は、応募いただいた順に行います。早めのご応募をおすすめします。" /></strong></p>
+      <p class="sch-after rv wb"><J t="応募された方には、業種セミナーのご案内など、ツアー以外の機会もお届けします。" keep={KEEP} /></p>
+    </div>
+  </section>
+
+  <!-- 2.7 応募フォーム -->
+  <section class="sec apply" id="apply">
+    <div class="wrap">
+      <Head en="Entry" ja="応募する" lead={closed ? undefined : `入力は約3分で終わります。応募締切は2027年1月15日（金）${VARS.DEADLINE_TIME}です。`} />
+      {closed ? (
+        <div class="closed rv"><p class="wb"><J t={CLOSED_TEXT} keep={KEEP} /></p></div>
+      ) : (
+        <form class="form" data-zg-form data-endpoint="/api/zengaku/milano" data-next={`${BASE}/milano/thanks/`} novalidate>
+          <Field id="name" label="お名前" req><input id="f-name" name="name" type="text" required autocomplete="name" placeholder="例：山田 太郎" maxlength="60" aria-describedby="e-name" /></Field>
+          <Field id="kana" label="フリガナ" req hint="全角カタカナ"><input id="f-kana" name="kana" type="text" required data-kana placeholder="例：ヤマダ タロウ" maxlength="60" aria-describedby="e-kana" /></Field>
+          <Field id="univ" label="大学名" req hint="正式名称で入力してください。"><input id="f-univ" name="univ" type="text" required list="univ-list" autocomplete="organization" placeholder="例：東京大学" maxlength="80" aria-describedby="e-univ" />
+            <datalist id="univ-list">{UNIVERSITIES.map((u) => <option value={u} />)}</datalist></Field>
+          <Field id="faculty" label="学部・学科" req><input id="f-faculty" name="faculty" type="text" required placeholder="例：工学部 建築学科" maxlength="80" aria-describedby="e-faculty" /></Field>
+          <Field id="grade" label="学年" req><select id="f-grade" name="grade" required aria-describedby="e-grade"><option value="">選んでください</option>{GRADES.map((g) => <option value={g}>{g}</option>)}</select></Field>
+          <Field id="email" label="メールアドレス" req><input id="f-email" name="email" type="email" required autocomplete="email" inputmode="email" placeholder="例：taro@example.com" maxlength="254" aria-describedby="e-email" /></Field>
+          <Field id="email2" label="メールアドレス（確認）" req><input id="f-email2" name="email2" type="email" required data-match="email" autocomplete="off" inputmode="email" maxlength="254" aria-describedby="e-email2" /></Field>
+          <Field id="tel" label="電話番号" hint="ハイフンなし"><input id="f-tel" name="tel" type="tel" data-tel inputmode="numeric" autocomplete="tel-national" placeholder="例：09012345678" maxlength="11" aria-describedby="e-tel" /></Field>
+          <Field id="source" label="このツアーをどこで知りましたか" req as="fieldset">
+            <div class="radios">{SOURCES.map((o) => <label><input type="radio" name="source" value={o.key} required /><span>{o.label}</span></label>)}</div>
+          </Field>
+          <Field id="referrer" label="紹介してくれた人・団体の名前"><input id="f-referrer" name="referrer" type="text" placeholder="例：〇〇大学の田中さん、〇〇サークル" maxlength="100" /></Field>
+          <Field id="reason" label="応募の理由" hint="200字まで"><textarea id="f-reason" name="reason" data-max="200" aria-describedby="e-reason"></textarea><p class="cnt" data-count="reason" aria-live="polite">残り200字</p></Field>
+          <Field id="agree" label="個人情報の取り扱いへの同意" req><label class="check"><input id="f-agree" name="agree" type="checkbox" required data-msg="agree" /><span><a href={`${BASE}/privacy/`} target="_blank" rel="noopener">プライバシーポリシー</a>に同意する</span></label></Field>
+          <Field id="optin" label="賛同企業からのご案内"><label class="check"><input id="f-optin" name="optin" type="checkbox" /><span>賛同企業のセミナーやイベントの案内を受け取る</span></label></Field>
+          <input type="hidden" name="ref" value="" />
+          <div class="hp" aria-hidden="true"><label>空欄のまま<input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+          <div class="form-sub"><button class="btn btn-red" type="submit">この内容で応募する</button><p class="form-msg" role="alert" hidden></p></div>
+        </form>
+      )}
+    </div>
+  </section>
+
+  <!-- 2.8 FAQ -->
+  <section class="sec faq" id="faq">
+    <div class="wrap">
+      <Head en="FAQ" ja="よくある質問" />
+      <div class="faq-list">
+        {faq.map((f) => (
+          <details class="rv">
+            <summary><span class="q" aria-hidden="true">Q</span><span class="wb"><J t={f.q} keep={KEEP} /></span><i aria-hidden="true"></i></summary>
+            <div class="a"><span class="aa" aria-hidden="true">A</span><p class="wb"><J t={f.a} keep={KEEP} /></p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 2.9 主催・協力 -->
+  <section class="sec org" id="organizer">
+    <div class="wrap">
+      <dl class="tbl org-tbl rv">
+        <div><dt>主催</dt><dd>全国学生 未来視察連盟</dd></div>
+        {VARS.SUPPORTERS.length > 0 && <div><dt>協力</dt><dd>{VARS.SUPPORTERS.join('、')}</dd></div>}
+        <div><dt>お問い合わせ</dt><dd>{VARS.CONTACT_EMAIL ? <a href={`mailto:${VARS.CONTACT_EMAIL}`}>{VARS.CONTACT_EMAIL}</a> : <><span class="tbd">準備中</span><span class="tbd-note">未定</span></>}</dd></div>
+      </dl>
+      <p class="org-link rv"><a href={`${BASE}/privacy/`}>プライバシーポリシー →</a></p>
+    </div>
+  </section>
+  <FormKit />
+</ZLayout>
+
+<style>
+/* ---------- FV ---------- */
+.mfv{position:relative;overflow:hidden;background:linear-gradient(180deg,#fff 0%,#f3f8fc 55%,var(--sky) 100%);padding:64px 0 88px;text-align:center}
+.mfv-arch{position:absolute;left:0;right:0;bottom:0;width:100%;height:62%;color:rgba(37,87,176,.13)}
+.mfv-in{position:relative}
+.mfv-lb{display:inline-block;background:var(--red);color:#fff;font-weight:900;font-size:14px;padding:5px 20px;border-radius:999px;letter-spacing:.14em}
+.mfv-sub{margin-top:18px;font-weight:700;font-size:14px;letter-spacing:.14em;color:var(--blue)}
+.mfv-t{font-family:var(--mincho);font-weight:800;font-size:clamp(36px,8vw,80px);line-height:1.3;letter-spacing:.06em;margin-top:10px}
+.mfv-t span{display:inline-block}
+.js .mfv-t span{opacity:0;transform:translateY(16px);animation:mup .9s cubic-bezier(.2,.7,.2,1) forwards}
+.js .mfv-t span+span{animation-delay:.2s}
+@keyframes mup{to{opacity:1;transform:none}}
+.mfv-catch{font-family:var(--mincho);font-size:clamp(18px,2.6vw,24px);font-weight:700;letter-spacing:.14em;margin-top:12px;color:var(--ink-2)}
+.mfv-catch::before,.mfv-catch::after{content:"";display:inline-block;width:28px;height:1px;background:var(--red);vertical-align:middle;margin:0 14px}
+.mfv-facts{display:grid;grid-template-columns:1fr 1fr 1fr 1.6fr;gap:12px;max-width:860px;margin:40px auto 0}
+.mfv-facts div{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:14px;padding:16px 10px;box-shadow:var(--sh)}
+.mfv-facts dt{font-size:12px;font-weight:700;letter-spacing:.16em;color:var(--blue)}
+.mfv-facts dd{font-family:var(--mincho);font-weight:800;font-size:clamp(17px,2.2vw,22px);letter-spacing:.04em;margin-top:2px;line-height:1.45}
+.mfv-facts div:last-child{border-color:#f0b7ba}
+.mfv-facts div:last-child dd{color:var(--red)}
+.mfv-cta{margin-top:36px}
+.mfv-cta .btn{min-width:320px}
+.mfv-note{margin-top:12px;font-size:14px;color:var(--ink-2)}
+@media (max-width:700px){
+  .mfv{padding:40px 0 64px}
+  .mfv-facts{grid-template-columns:repeat(2,1fr);gap:8px}
+  .mfv-facts div:last-child{grid-column:1/-1}
+  .mfv-cta .btn{width:100%;min-width:0}
+  .mfv-catch::before,.mfv-catch::after{width:16px;margin:0 8px}
+}
+
+/* ---------- table ---------- */
+.tbl{max-width:820px;margin:0 auto;border-top:2px solid var(--ink)}
+.tbl>div{display:grid;grid-template-columns:180px 1fr;border-bottom:1px solid var(--line)}
+.tbl dt{padding:20px 18px;font-weight:700;background:#f6f8fb;letter-spacing:.1em}
+.tbl dd{padding:20px 22px;line-height:1.8}
+@media (max-width:600px){.tbl>div{grid-template-columns:1fr}.tbl dt{padding:10px 14px;font-size:14px}.tbl dd{padding:12px 14px 16px}}
+
+/* ---------- for ---------- */
+.for{background:var(--sky)}
+.for-list{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:880px;margin:0 auto}
+.for-list li{display:flex;gap:14px;align-items:center;background:#fff;border-radius:14px;padding:20px 22px;font-weight:700;box-shadow:var(--sh)}
+.for-list svg{width:28px;height:28px;flex-shrink:0}
+@media (max-width:640px){.for-list{grid-template-columns:1fr}}
+
+/* ---------- gain ---------- */
+.gain-list{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.gain-list li{border-top:3px solid var(--ink);padding-top:22px}
+.gain-no{display:block;font-family:var(--en);font-style:italic;font-size:44px;line-height:1;color:var(--red)}
+.gain-list h3{font-family:var(--mincho);font-weight:800;font-size:21px;line-height:1.6;margin:12px 0 10px;letter-spacing:.04em}
+.gain-list p{color:var(--ink-2);font-size:15px}
+@media (max-width:820px){.gain-list{grid-template-columns:1fr}}
+
+/* ---------- seminar ---------- */
+.seminar{background:var(--cream)}
+.sem-body{max-width:760px;margin:0 auto 36px}
+.sem-body p+p{margin-top:1em}
+.seminar .tbl{background:#fff}
+.sem-note{max-width:820px;margin:14px auto 0;font-size:14px;color:var(--ink-2)}
+
+/* ---------- schedule ---------- */
+.sch{display:grid;grid-template-columns:repeat(4,1fr);gap:0;max-width:980px;margin:0 auto;position:relative}
+.sch::before{content:"";position:absolute;left:12.5%;right:12.5%;top:22px;height:2px;background:linear-gradient(90deg,var(--red),var(--blue))}
+.sch li{text-align:center;position:relative;padding:0 8px}
+.sch-no{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;margin:0 auto 14px;background:#fff;border:2px solid var(--blue);color:var(--blue);font-family:var(--en);font-size:22px;font-weight:600;position:relative}
+.sch-d{font-weight:700;font-size:15px;line-height:1.6}
+.sch-t{font-family:var(--mincho);font-weight:800;font-size:19px;margin-top:4px;letter-spacing:.04em}
+.is-key .sch-no{background:var(--red);border-color:var(--red);color:#fff}
+.is-key .sch-d,.is-key .sch-t{color:var(--red)}
+.sch-strong{text-align:center;margin:44px auto 0;max-width:760px;font-size:18px;line-height:2}
+.sch-strong strong{background:linear-gradient(transparent 60%,rgba(244,233,79,.75) 60%);padding:0 2px}
+.sch-after{text-align:center;margin-top:14px;color:var(--ink-2)}
+@media (max-width:700px){
+  .sch{grid-template-columns:1fr;max-width:420px}
+  .sch::before{left:22px;right:auto;top:20px;bottom:20px;width:2px;height:auto;background:linear-gradient(180deg,var(--red),var(--blue))}
+  .sch li{display:grid;grid-template-columns:46px 1fr;column-gap:16px;text-align:left;padding:0 0 22px}
+  .sch-no{grid-row:1/3;margin:0}
+  .sch-strong{font-size:16px;text-align:left}
+  .sch-after{text-align:left}
+}
+
+/* ---------- apply ---------- */
+.apply{background:linear-gradient(180deg,var(--sky),#f4f9fd)}
+.closed{max-width:720px;margin:0 auto;background:#fff;border-radius:20px;padding:40px 32px;text-align:center;border:1px solid var(--line);font-weight:700;line-height:2}
+
+/* ---------- faq ---------- */
+.faq-list{max-width:820px;margin:0 auto;display:grid;gap:12px}
+.faq-list details{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.faq-list summary{display:grid;grid-template-columns:34px 1fr 20px;gap:14px;align-items:center;padding:18px 20px;cursor:pointer;font-weight:700;list-style:none}
+.faq-list summary::-webkit-details-marker{display:none}
+.q,.aa{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;font-family:var(--en);font-size:20px;font-weight:600}
+.q{background:var(--blue);color:#fff}
+.aa{background:#fdecec;color:var(--red);flex-shrink:0}
+.faq-list summary i{width:14px;height:14px;position:relative}
+.faq-list summary i::before,.faq-list summary i::after{content:"";position:absolute;left:0;top:6px;width:14px;height:2px;background:var(--ink-2);transition:transform .25s}
+.faq-list summary i::after{transform:rotate(90deg)}
+.faq-list details[open] summary i::after{transform:rotate(0)}
+.a{display:flex;gap:14px;padding:0 20px 20px;align-items:flex-start}
+.a p{padding-top:3px;color:var(--ink-2)}
+
+/* ---------- organizer ---------- */
+.org{padding-top:40px}
+.org-link{text-align:center;margin-top:20px}
+</style>
