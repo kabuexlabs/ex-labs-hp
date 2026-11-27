@@ -48,13 +48,6 @@ const KEEP = ['未来視察連盟', '最高裁判所', 'ミラノ建築短期留
 >
   <!-- 1.1 ファーストビュー -->
   <section class="fv" id="top">
-    <svg class="fv-map" viewBox="0 0 600 520" aria-hidden="true">
-      <path class="fv-path" d="M70 430 C 140 360, 120 300, 200 270 S 330 250, 360 180 S 470 90, 540 70" fill="none" stroke="#9fb3d6" stroke-width="2" stroke-dasharray="3 7" stroke-linecap="round"/>
-      <g class="pt p1"><circle cx="70" cy="430" r="11" fill="var(--red)"/><text x="92" y="436">国会</text></g>
-      <g class="pt p2"><circle cx="200" cy="270" r="8" fill="#fff" stroke="var(--blue)" stroke-width="3"/><text x="218" y="276">最高裁判所</text></g>
-      <g class="pt p3"><circle cx="360" cy="180" r="8" fill="#fff" stroke="var(--blue)" stroke-width="3"/><text x="378" y="186">スタジアム</text></g>
-      <g class="pt p4"><circle cx="540" cy="70" r="14" fill="var(--blue)"/><text x="470" y="40">MILANO</text></g>
-    </svg>
     <div class="wrap fv-in">
       <p class="fv-org">全国学生 未来視察連盟</p>
       <h1 class="fv-catch"><span class="ln">教室の外に、</span><span class="ln"><span class="hl">未来の教科書</span>がある。</span></h1>
@@ -244,20 +237,12 @@ const KEEP = ['未来視察連盟', '最高裁判所', 'ミラノ建築短期留
 
 <style>
 /* ---------- FV ---------- */
-.fv{position:relative;overflow:hidden;background:linear-gradient(180deg,#fff 0%,var(--sky) 100%);padding:72px 0 96px}
+.fv{position:relative;overflow:hidden;background:linear-gradient(180deg,#fff 0%,var(--sky) 100%);padding:88px 0 104px}
 .fv::before{content:"";position:absolute;right:-18%;top:-30%;width:80vw;max-width:900px;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(37,87,176,.10),rgba(37,87,176,0) 65%)}
 .fv::after{content:"";position:absolute;left:-12%;bottom:-40%;width:60vw;max-width:700px;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(215,52,60,.08),rgba(215,52,60,0) 65%)}
-.fv-map{position:absolute;right:max(0px,calc(50% - 640px));top:56px;width:min(480px,38vw);z-index:0;opacity:.95}
-.fv-map text{font-family:var(--gothic);font-size:15px;font-weight:700;fill:var(--ink-2);letter-spacing:.08em}
-.fv-map .p4 text{font-family:var(--en);font-style:italic;font-size:22px;fill:var(--blue)}
-.js .fv-path{stroke-dashoffset:600;animation:dash 3.2s ease-out forwards}
-@keyframes dash{to{stroke-dashoffset:0}}
-.js .pt{opacity:0;animation:pop .6s ease forwards}
-.js .p1{animation-delay:.2s}.js .p2{animation-delay:.9s}.js .p3{animation-delay:1.6s}.js .p4{animation-delay:2.3s}
-@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .fv-in{position:relative;z-index:1;padding-top:40px}
 .fv-org{display:inline-block;font-weight:700;font-size:14px;letter-spacing:.28em;color:var(--blue);border-bottom:2px solid var(--red);padding-bottom:4px}
-.fv-catch{font-family:var(--mincho);font-weight:800;font-size:clamp(28px,8.2vw,64px);line-height:1.35;letter-spacing:.06em;margin-top:22px}
+.fv-catch{font-family:var(--mincho);font-weight:800;font-size:clamp(28px,8.2vw,76px);line-height:1.35;letter-spacing:.06em;margin-top:22px}
 .fv-catch .ln{display:block;white-space:nowrap}
 .js .fv-catch .ln{opacity:0;transform:translateY(18px);animation:up .9s cubic-bezier(.2,.7,.2,1) forwards}
 .js .fv-catch .ln:nth-child(2){animation-delay:.25s}
@@ -272,8 +257,7 @@ html:not(.js) .hl::after{transform:none}
 .fv-main{display:flex;flex-direction:column;align-items:center}
 .fv-note{margin-top:10px;font-size:13px;font-weight:700;color:var(--red);letter-spacing:.08em}
 @media (max-width:760px){
-  .fv{padding:28px 0 64px}
-  .fv-map{position:relative;display:block;right:auto;top:auto;width:auto;height:170px;margin:0 0 4px auto;opacity:.9}
+  .fv{padding:48px 0 64px}
   .fv-ctas .btn-red{font-size:15px;letter-spacing:.02em;padding:14px 16px;gap:10px}
   .fv-in{padding-top:0}
   .fv-ctas{flex-direction:column;align-items:stretch}
