@@ -36,6 +36,15 @@ export const mediaItems: MediaItem[] = [
     img: '/assets/events/gensou-kv.webp',
     related: [{ label: '公演ページ', href: '/gensou/' }, { label: '公共施設の夜間活用（法人向け）', href: '/guide/bunkashisetsu-yakan-katsuyo/' }],
   },
+  // 2026-11 掲載。見出し・引用はユーザー提供（記事本文より）。正確な掲載日は未確認のため年月まで
+  {
+    outlet: 'ORICON NEWS',
+    date: '2026.11',
+    title: '「東大マーダーミステリーサークル」が取り上げられました',
+    desc: '日本テレビ『金曜ミステリークラブ!!!』を伝えるORICON NEWSの記事で、「新企画『二宮への刺客』では、東大マーダーミステリーサークルが名刑事・二宮に挑戦状をたたきつける。」と取り上げられました。',
+    url: 'https://www.oricon.co.jp/news/2495487/full/',
+    related: [{ label: '東大マーダーミステリーサークル', href: '/toudaimurder/' }],
+  },
   {
     outlet: '日本経済新聞',
     date: '2026.07.31',

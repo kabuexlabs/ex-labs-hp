@@ -250,10 +250,13 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
   </div>
 </section>
 
+{/* 実施中の公演も開催予定の公演も無いときは、この欄ごと出さない（2026-11-27）。実施中が無く開催予定だけあるときは「開催予定のイベント」として出す */}
+{(liveCards.length > 0 || upcomingEvents.length > 0) && (
 <section class="xt-pad16">
   <div style="max-width:1040px;margin:0 auto">
-    <SecHead en="Now Showing" size="top" ja="現在実施中のイベント" />
+    {liveCards.length > 0 ? <SecHead en="Now Showing" size="top" ja="現在実施中のイベント" /> : <SecHead en="Coming Soon" size="top" ja="開催予定のイベント" />}
     <p class="xt-sub"><Cls text="画像をタップすると、各イベントの特設サイトへ移動します。" emph={false} /></p>
+    {liveCards.length > 0 && (
     <div class="x-hscroll" style="margin-top:40px;gap:20px">
       {liveCards.map((e) => (
         <article class="xt-ev">
@@ -272,9 +275,10 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
         </article>
       ))}
     </div>
+    )}
     {upcomingEvents.length > 0 && (
       <div class="xt-soon">
-        <p class="xt-soon-h"><span>Coming Soon</span></p>
+        {liveCards.length > 0 && <p class="xt-soon-h"><span>Coming Soon</span></p>}
         <div class="x-hscroll" style="margin-top:20px;gap:20px">
           {upcomingEvents.map((e) => {
             const id = e.url.split('/').filter(Boolean).pop();
@@ -301,6 +305,7 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
     )}
   </div>
 </section>
+)}
 
 
 <section id="strength" class="xt-pad24">

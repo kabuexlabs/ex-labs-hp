@@ -17,9 +17,22 @@ export interface TmNews {
   body: string;
   /** 関連作品の slug。設定すると記事末尾に作品ページへのボタンが出る */
   workSlug?: string;
+  /** 外部の記事など。設定すると記事末尾にリンクが出る（別タブで開く） */
+  link?: { label: string; url: string };
 }
 
 export const tmNews: TmNews[] = [
+  {
+    slug: 'oricon-friday-mystery',
+    date: '2026.11.27',
+    tag: 'メディア掲載',
+    title: 'ORICON NEWSで取り上げられました',
+    summary: '日本テレビ『金曜ミステリークラブ!!!』の新企画「二宮への刺客」を伝える記事で、東大マーダーミステリーサークルが取り上げられました。',
+    image: '/assets/toudaimurder/news-oricon.webp',
+    body:
+      'ORICON NEWSの記事で、東大マーダーミステリーサークルが取り上げられました。\n\n日本テレビ『金曜ミステリークラブ!!!』の新企画「二宮への刺客」について、記事では次のように紹介されています。\n\n「新企画『二宮への刺客』では、東大マーダーミステリーサークルが名刑事・二宮に挑戦状をたたきつける。」',
+    link: { label: 'ORICON NEWSの記事を読む', url: 'https://www.oricon.co.jp/news/2495487/full/' },
+  },
   {
     slug: 'unreal-release',
     date: '2026.09.29',

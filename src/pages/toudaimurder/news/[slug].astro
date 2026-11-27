@@ -48,6 +48,13 @@ const articleLd = {
       <div class="abody">
         {paragraphs.map((p) => <p>{p}</p>)}
       </div>
+      {article.link && (
+        <a class="wlink" href={article.link.url} target="_blank" rel="noopener">
+          <span class="wlbl en">LINK</span>
+          <span class="wtt">{article.link.label}</span>
+          <span class="wgo en">外部サイト ↗</span>
+        </a>
+      )}
       {work && (
         <a class="wlink" href={`${base}/works/${work.slug}/`}>
           <span class="wlbl en">WORK</span>
