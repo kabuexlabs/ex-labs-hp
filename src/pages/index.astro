@@ -16,6 +16,8 @@ import LinkPreviewScript from '../components/LinkPreviewScript.astro';
 
 // メディア掲載の告知（ヒーロー下）と会社欄の掲載一覧。最優先の掲載は src/data/media.ts の先頭
 const topMedia = mediaItems[0];
+// トップのお知らせに細い行で出す掲載（ORICON NEWS）
+const oriconMedia = mediaItems.find((m) => m.outlet === 'ORICON NEWS');
 // トップの「メディア掲載」欄：記事URLのある掲載（新聞・Webメディアの記事）だけを、掲載の新しい順に
 const pressMedia = mediaItems.filter((m) => m.url).sort((a, b) => b.date.localeCompare(a.date));
 
@@ -195,25 +197,32 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
       <a href="#contact" class="x-btn is-lime xt-cta" data-track="cta" data-show="contact" data-place="home-hero">相談してみる</a>
       <a href="#works" class="x-btn is-line xt-cta">実績を見る</a>
     </div>
-    {topMedia && (
-    <a href="/media/" class="xt-media" data-track="show" data-show="media" data-place="home-hero">
-      <span class="xt-media-k">MEDIA</span>
-      <span class="xt-media-t"><Ph list={[`${topMedia.outlet}様に`, 'ご掲載いただきました。']} /></span>
-      <span class="xt-media-d"><Cls text={`${topMedia.title} →`} emph={false} /></span>
-    </a>
-    )}
-    <a href="https://prtimes.jp/main/html/rd/p/000000009.000185770.html" target="_blank" rel="noopener" class="xt-media xt-invest" data-track="show" data-show="press" data-place="home-hero-invest">
-      <span class="xt-media-k">INVESTMENT</span>
-      <div class="xt-invest-body">
-        <div class="xt-invest-logos">
-          <img class="xt-invest-sega" src="/assets/partners/segasammy.webp" alt="セガサミーホールディングス" width="1049" height="181">
-          <span class="xt-invest-sep" aria-hidden="true"></span>
-          <img class="xt-invest-sky" src="/assets/partners/skylandventures-trim.webp" alt="Skyland Ventures" width="988" height="630">
-        </div>
-        <p class="xt-media-t xt-invest-t"><span>セガサミーホールディングス様</span><span>Skyland Ventures様から</span><span>ご出資いただきました</span></p>
-      </div>
-      <span class="xt-media-d">プレスリリースを読む（PR TIMES）↗</span>
-    </a>
+    {/* トップのお知らせ：日本経済新聞（いちばん大きく）・ORICON NEWS・ご出資を1枚にまとめる（2026-11-27） */}
+    <div class="xt-news">
+      {topMedia && (
+      <a href="/media/" class="xt-news-main" data-track="show" data-show="media" data-place="home-hero">
+        <span class="xt-media-k">MEDIA</span>
+        <span class="xt-media-t"><Ph list={[`${topMedia.outlet}様に`, 'ご掲載いただきました。']} /></span>
+        <span class="xt-media-d"><Cls text={`${topMedia.title} →`} emph={false} /></span>
+      </a>
+      )}
+      {oriconMedia && (
+      <a href="/media/" class="xt-news-row" data-track="show" data-show="media" data-place="home-hero-oricon">
+        <span class="xt-news-k">MEDIA</span>
+        <span class="xt-news-t"><Ph list={['ORICON NEWSで', '取り上げられました']} /><small>東大マーダーミステリーサークル</small></span>
+        <span class="xt-news-a" aria-hidden="true">→</span>
+      </a>
+      )}
+      <a href="https://prtimes.jp/main/html/rd/p/000000009.000185770.html" target="_blank" rel="noopener" class="xt-news-row is-invest" data-track="show" data-show="press" data-place="home-hero-invest">
+        <span class="xt-news-k">INVESTMENT</span>
+        <span class="xt-news-t"><Ph list={['セガサミーホールディングス様・', 'Skyland Ventures様から', 'ご出資いただきました']} /></span>
+        <span class="xt-news-logos">
+          <img class="xt-news-sega" src="/assets/partners/segasammy.webp" alt="セガサミーホールディングス" width="1049" height="181">
+          <img class="xt-news-sky" src="/assets/partners/skylandventures-trim.webp" alt="Skyland Ventures" width="988" height="630">
+        </span>
+        <span class="xt-news-a" aria-hidden="true">↗</span>
+      </a>
+    </div>
   </div>
 </section>
 
@@ -522,20 +531,9 @@ const railStyle = (gtc: string, gap: string, col: string, mt?: string) => `--gtc
 .xt-hero-en{margin:24px 0 0;font-family:var(--x-en);font-size:clamp(15px,1.8vw,18px);letter-spacing:.14em;color:#AFC0FA}
 .xt-hero-ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:40px}
 .xt-cta{font-size:16px;padding:16px 36px}
-.xt-media{margin-top:48px;display:grid;gap:8px;padding:18px 22px;border:1px solid rgba(255,255,255,.35)}
 .xt-media-k{font-family:var(--x-en);font-size:14px;letter-spacing:.2em;color:var(--x-lime)}
 .xt-media-t{font-family:var(--x-min);font-weight:600;font-size:16px}
 .xt-media-d{font-size:13px;color:var(--x-pale3)}
-.xt-media.xt-invest{margin-top:14px}
-.xt-invest-body{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:14px 32px}
-.xt-invest-logos{display:flex;align-items:center;gap:20px}
-.xt-invest-sega{height:30px;width:auto;display:block}
-.xt-invest-sky{height:62px;width:auto;display:block}
-.xt-invest-sep{width:1px;height:44px;background:rgba(11,11,20,.18)}
-.xt-invest-t{margin:0;line-height:1.7;display:grid}
-.xt-invest-t span{white-space:nowrap}
-@media(max-width:380px){:root body.x-body .xt-invest-t{font-size:clamp(13px,4.3vw,17px);letter-spacing:.02em}}
-@media(max-width:560px){.xt-invest-body{grid-template-columns:minmax(0,1fr)}.xt-invest-logos{gap:16px}.xt-invest-sega{height:auto;width:min(46%,150px)}.xt-invest-sky{height:auto;width:min(28%,84px)}}
 .xt-card{max-width:960px;margin:0 auto;padding:clamp(48px,7vw,88px) clamp(20px,6vw,88px)}
 .xt-card.is-perf{padding:clamp(48px,7vw,88px) clamp(24px,7vw,88px)}
 .xt-card-h{margin:18px 0 4px;font-family:var(--x-min);font-weight:500;font-size:clamp(38px,6vw,60px);letter-spacing:.06em}
