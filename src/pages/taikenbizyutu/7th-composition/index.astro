@@ -14,6 +14,9 @@ import SiteGuard from '../../../components/SiteGuard.astro';
 // scripts/seo-audit.mjs が誤表記をエラーにする。
 // 購入先URL。null の間はチケットボタンをすべて #ticket へのアンカーにする
 const TICKET_URL: string | null = 'https://escape.id/kyoukaiart-org/e-7th/'; // 2026-10-03 支給（escape.id）
+// 会期（2026年11月21日〜23日）が終わったら、チケットのボタンを「本公演は終了しました」に切り替える（2026-11-27 指示）。
+// 公演の内容・料金・当日の流れは、開催した記録としてそのまま残す。日付は日本時間で比べる。
+const ENDED = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo' }).format(new Date()) > '2026-11-23';
 // 地図の埋め込みURL（Google マップ。APIキー不要の検索埋め込み）。null にすると枠だけ表示
 const MAP_EMBED_URL: string | null = 'https://maps.google.com/maps?q=' + encodeURIComponent('京都市京セラ美術館') + '&hl=ja&z=16&output=embed';
 const MAP_LINK_URL = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('京都市京セラ美術館');
@@ -75,7 +78,7 @@ const ticketKey = kv([
 const ticketRows = kv([
   ['割引', 'なし'], ['別途入館料', 'なし'], ['最少催行人数', '各回6名'],
   ['服装', '動きやすい服装でお越しください'], ['私物の持ち込み', '不可'],
-  ['購入先URL', TICKET_URL ?? '［未定］'],
+  ...(ENDED ? [] : [['購入先URL', TICKET_URL ?? '［未定］']]),
 ]);
 const schedule = [
   ['第1回', '12:00', '13:00'], ['第2回', '12:45', '13:45'], ['第3回', '13:30', '14:30'], ['第4回', '14:15', '15:15'],
@@ -142,7 +145,7 @@ const eventLd = {
   eventStatus: 'https://schema.org/EventScheduled',
   location: { '@type': 'Place', name: '京都市京セラ美術館', address: { '@type': 'PostalAddress', postalCode: '606-8344', streetAddress: '岡崎円勝寺町124', addressLocality: '京都市左京区', addressRegion: '京都府', addressCountry: 'JP' } },
   organizer: { '@type': 'Organization', name: '株式会社ex Labs', url: 'https://kabuexlabs.com/' },
-  offers: { '@type': 'Offer', name: '参加チケット（1名）', price: 4500, priceCurrency: 'JPY', url: TICKET_URL ?? canonical, validFrom: '2026-10-17T19:00:00+09:00', availability: 'https://schema.org/InStock' },
+  offers: ENDED ? undefined : { '@type': 'Offer', name: '参加チケット（1名）', price: 4500, priceCurrency: 'JPY', url: TICKET_URL ?? canonical, validFrom: '2026-10-17T19:00:00+09:00', availability: 'https://schema.org/InStock' },
 };
 ---
 <!doctype html>
@@ -187,7 +190,7 @@ const eventLd = {
       {nav.map((n) => <a href={n.href}>{n.ja}</a>)}
     </nav>
     <span class="hd-sp"></span>
-    <a href={ticketHref} {...ticketAttrs} data-place="header" class="btn glow hd-buy">チケットを購入する</a>
+    {ENDED ? <span class="btn hd-buy is-ended">公演終了</span> : <a href={ticketHref} {...ticketAttrs} data-place="header" class="btn glow hd-buy">チケットを購入する</a>}
     <button type="button" class="circ hd-menu" aria-label="メニュー" aria-controls="menu" aria-expanded="false" data-menu-open>
       <span></span><span></span>
     </button>
@@ -204,7 +207,7 @@ const eventLd = {
       <a href={n.href} data-menu-close><span class="ja">{n.ja}</span><span class="en">{n.en}</span></a>
     ))}
   </nav>
-  <a href={ticketHref} {...ticketAttrs} data-place="menu" class="btn glow menu-buy" data-menu-close>チケットを購入する</a>
+  {ENDED ? <p class="btn menu-buy is-ended">本公演は終了しました</p> : <a href={ticketHref} {...ticketAttrs} data-place="menu" class="btn glow menu-buy" data-menu-close>チケットを購入する</a>}
 </div>
 
 <main>
@@ -246,8 +249,17 @@ const eventLd = {
       <div><dt>所要</dt><dd>60分（受付・事前説明・退場を含む）</dd></div>
       <div><dt>対象</dt><dd>1名から参加可、各回最大18名。18歳以上</dd></div>
     </dl>
+    {ENDED ? (
+    <>
+    <p class="btn is-ended">本公演は終了しました</p>
+    <p class="qi-n">2026年11月23日に全日程を終了しました。ご来場いただき、ありがとうございました。</p>
+    </>
+    ) : (
+    <>
     <a href={ticketHref} {...ticketAttrs} data-place="top" class="btn glow">11/21〜23の開催回・空席を見る<span class="bodoni">→</span></a>
     <p class="qi-n">チケットは各回の開演1時間前まで販売。空席は予約サイト（escape.id）の表示が最新です。</p>
+    </>
+    )}
   </div>
 </section>
 
@@ -346,7 +358,9 @@ const eventLd = {
       </div>
     </div>
     <div class="ticket-cta">
+      {ENDED ? <p class="btn btn-xl is-ended">本公演は終了しました</p> : (
       <a href={ticketHref} {...ticketAttrs} data-place="ticket" class="btn glow btn-xl">チケットを購入する<span class="bodoni">→</span></a>
+      )}
     </div>
     <p class="qi-n" style="text-align:center"><a href="/guide/kyoto-kyocera-museum-7th/" data-track="show" data-show="guide-kyoto7" data-place="7th-ticket-guide" style="color:inherit;border-bottom:1px solid currentColor">日程・チケット・行き方の案内（京都市京セラ美術館で行われる、絵画の物語体験）→</a></p>
   </div>
@@ -427,18 +441,28 @@ const eventLd = {
   <span aria-hidden="true" class="ft-v ft-vl bodoni">THE 7TH COMPOSITION</span>
   <span aria-hidden="true" class="ft-v ft-vr">体験する美術館</span>
   <div class="ft-in">
+    {ENDED ? (
+    <div class="ft-btn is-ended">
+      <span class="s">体験する美術館</span>
+      <span class="m">7枚目のコンポジション</span>
+      <span class="b">本公演は終了しました</span>
+    </div>
+    ) : (
     <a href={ticketHref} {...ticketAttrs} data-place="footer" class="ft-btn glow">
       <span class="s">体験する美術館</span>
       <span class="m">7枚目のコンポジション</span>
       <span class="b">チケットを購入する<span class="bodoni">→</span></span>
     </a>
+    )}
     <a href="#contact" class="ft-ct">公演に関するお問い合わせ<span class="bodoni">↗</span></a>
     <a href="/guide/taikengata-event/" class="ft-guide">体験型イベントとは？</a>
     <p class="ft-copy bodoni">© 2026 ex Labs Inc. All Rights Reserved.</p>
   </div>
 </footer>
 
+{!ENDED && (
 <a href={ticketHref} {...ticketAttrs} data-place="float" class="btn glow float">チケットを購入する<span class="bodoni">→</span></a>
+)}
 
 </div>
 
@@ -489,6 +513,9 @@ h1,h2,p{margin:0}
 .btn:hover{background:#EACF6C;color:#1E0A10}
 .btn-l{font-size:16px;letter-spacing:.18em;padding:18px 36px;outline-offset:4px}
 .btn-xl{font-size:17px;letter-spacing:.2em;padding:20px 44px;outline-offset:4px}
+/* 会期後：ボタンの代わりに出す「本公演は終了しました」（押せない表示） */
+.btn.is-ended{margin:0;background:transparent;color:#FFF7F2;outline:1px solid rgba(255,247,242,.6);cursor:default}
+p.btn.is-ended:not(.btn-xl):not(.menu-buy){font-size:15px;letter-spacing:.16em;padding:16px 26px}
 .circ{flex-shrink:0;width:46px;height:46px;border:1px solid rgba(255,247,242,.5);border-radius:50%;background:transparent;color:#FFF7F2;cursor:pointer;padding:0}
 
 /* Header */

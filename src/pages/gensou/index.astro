@@ -11,6 +11,11 @@ import SecHead from '../../components/gensou/SecHead.astro';
 import J from '../../components/gensou/J.astro';
 import { mediaItems } from '../../data/media';
 import { pressItems } from '../../data/press';
+import { gensouEnded } from '../../data/gensouPhase';
+
+// 会期（2026年11月5日〜22日）が終わったら、予約のボタンを「本公演は終了しました」に切り替える（2026-11-27 指示）。
+// 公演の内容・料金・当日の流れは、開催した記録としてそのまま残す。
+const ENDED = gensouEnded();
 
 // ---- 未定の項目（決まったらここを埋める。null の間は非表示／仮表示） ----
 // escape.id の販売ページURL。null の間は予約ボタンを「近日販売開始」表示にし、#ticket へ飛ばす
@@ -132,7 +137,7 @@ const faqs = [
 ];
 
 // 販売開始前は予約URLが無いため、LP（チケット欄）を販売情報の URL とする
-const ticketOffers = [
+const ticketOffers = ENDED ? undefined : [
   { '@type': 'Offer', name: '個別チケット', price: '3500', priceCurrency: 'JPY', url: RESERVE_URL ?? `${canonical}#ticket`, availability: 'https://schema.org/InStock' },
   { '@type': 'Offer', name: 'グループチケット（最大4名貸切）', price: '14000', priceCurrency: 'JPY', url: RESERVE_URL ?? `${canonical}#ticket`, availability: 'https://schema.org/InStock' },
 ];
@@ -381,6 +386,9 @@ img{max-width:100%}
 .times span{font-size:14px;text-align:center;padding:6px 0;border:1px solid rgba(217,174,44,.78);white-space:nowrap;overflow-wrap:normal}
 .cta{margin-top:40px;display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 24px;background:#e2c43c;color:#07070e !important;text-decoration:none;font-weight:500;font-size:16px;letter-spacing:.12em}
 .cta.off{background:transparent;color:#f3f2f8 !important;border:1px solid #e2c43c}
+.cta.is-ended{justify-content:center;letter-spacing:.2em}
+.btn-rsv.is-ended{background:transparent;color:#f3f2f8 !important;border:1px solid rgba(243,242,248,.55)}
+.menu .m-rsv.is-ended{background:transparent;color:#f3f2f8;border:1px solid #e2c43c;margin-bottom:0}
 
 /* flow / notice */
 .flow{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
@@ -474,7 +482,7 @@ img{max-width:100%}
 <header class="hd">
   <a href="#top" class="hd-logo"><img src="/assets/gensou/logo-light.webp" alt="午前零時の幻想集 Midnight Tales" width="720" height="711"></a>
   <div class="hd-r">
-    <a href={reserveHref} class="btn-rsv" data-place="gensou-header" {...reserveAttrs}>予約する</a>
+    {ENDED ? <span class="btn-rsv is-ended">公演終了</span> : <a href={reserveHref} class="btn-rsv" data-place="gensou-header" {...reserveAttrs}>予約する</a>}
     <button type="button" class="burger" id="menu-open" aria-label="メニュー" aria-controls="menu" aria-expanded="false"><span></span><span></span></button>
   </div>
 </header>
@@ -485,14 +493,18 @@ img{max-width:100%}
     {nav.map((n) => (
       <a class="mi" href={n.href}><span class="no">{n.no}</span><span class="en">{n.ja}</span><span class="ja">{n.en}</span></a>
     ))}
+    {ENDED ? <p class="m-rsv mi-rsv is-ended">本公演は終了しました</p> : (
     <a href={reserveHref} class="m-rsv mi-rsv" data-place="gensou-menu" {...reserveAttrs}>{RESERVE_URL ? 'escape.id で予約する' : 'チケット情報を見る'}</a>
+    )}
     {X_URL && <a href={X_URL} class="xbtn" target="_blank" rel="noopener" data-place="gensou-menu-x"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L1 2h6.4l4.4 5.8L18.9 2zm-1.1 18h1.7L6.3 3.9H4.5L17.8 20z"/></svg><span>公式X <span class="xid">@Gennsousyuu</span></span><span class="arc" aria-hidden="true">→</span></a>}
   </nav>
 </div>
 
 <aside class="side">
   <div class="vt">午前零時の幻想集<br>夢の島熱帯植物館</div>
+  {!ENDED && (
   <a href={reserveHref} data-place="gensou-side" {...reserveAttrs}>チケットを予約する</a>
+  )}
 </aside>
 
 <main id="top">
@@ -565,14 +577,24 @@ img{max-width:100%}
       {/* 2026-10-22 予約促進：最初の画面で開催日・会場・料金・所要時間・対象と予約ボタンを確認できるようにする（値は公式記載のみ） */}
       <div class="qi" aria-label="公演の基本情報">
         <dl class="qi-l">
+          {ENDED && <div><dt>状況</dt><dd>本公演は、2026年11月22日に全日程を終了しました</dd></div>}
           <div><dt>開催</dt><dd>2026年11月5日（木）〜22日（日）の木〜日曜・全12日間</dd></div>
           <div><dt>会場</dt><dd>夢の島熱帯植物館（東京都江東区・新木場駅から徒歩約15分）</dd></div>
           <div><dt>料金</dt><dd>個別チケット 1名3,500円／グループチケット 1組14,000円（最大4名で貸切）。税込・入館料込み</dd></div>
           <div><dt>所要</dt><dd>約50分。各日17:00〜20:00の間に12分おきに開始</dd></div>
           <div><dt>対象</dt><dd>1名から参加可。中学生以上（18歳未満は保護者同伴）。怖さは控えめ（暗い場所やキャストとの会話あり）</dd></div>
         </dl>
+        {ENDED ? (
+        <>
+        <div class="cta off qi-cta is-ended"><span>本公演は終了しました</span></div>
+        <p class="qi-n">ご来場いただき、ありがとうございました。次回の情報は公式サイトでお知らせします。</p>
+        </>
+        ) : (
+        <>
         <a href={reserveHref} class="cta qi-cta" data-place="gensou-top" {...reserveAttrs}><span>{RESERVE_URL ? '日程・空席を見る（escape.id）' : 'チケット情報を見る'}</span><span class="arc">→</span></a>
         <p class="qi-n">個別チケットはほかのお客様と同じ組になる場合があります。空席は予約サイトの表示が最新です。</p>
+        </>
+        )}
       </div>
       <SecHead ja="会期" side="r" />
       <div class="ov-date">
@@ -595,7 +617,9 @@ img{max-width:100%}
         <SecHead ja="会場" side="l" />
         <p class="venue-t">夢の島熱帯植物館</p>
       </div>
+      {ENDED ? <div class="cta off is-ended"><span>本公演は終了しました</span></div> : (
       <a href={reserveHref} class="cta" data-place="gensou-body" {...reserveAttrs}><span>{RESERVE_URL ? '日程・空席を見る（escape.id）' : 'チケット情報を見る'}</span><span class="arc">→</span></a>
+      )}
       {X_URL && (
         <div class="ov-x">
           <p>最新情報は公式Xでお知らせします。</p>
@@ -687,9 +711,11 @@ img{max-width:100%}
         <div class="row"><span>持ち物</span><span><strong style="color:#e6d23f;font-weight:600">通信できるスマートフォン（必須）</strong><br><span style="font-size:13px;color:#d0d5e6"><J t="通信可能・OSなどを最新にアップデート済み・ブラウザが使える機種" /></span></span></div>
         <div class="row"><span>開催人数</span><span><J t="参加者1名から開催します。" /></span></div>
         <div class="row"><span>対象年齢</span><span><J t="中学生以上（18歳未満の方は保護者同伴）" /></span></div>
-        <div class="row"><span>販売</span><span>{RESERVE_URL ? <a href={RESERVE_URL} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="gensou-row">escape.id</a> : 'escape.id'}{!RESERVE_URL && <><br><span style="font-size:13px;color:#bdb8ab"><J t="販売開始日は決まり次第お知らせします。" /></span></>}</span></div>
+        <div class="row"><span>販売</span><span>{ENDED ? 'escape.id（販売は終了しました）' : RESERVE_URL ? <a href={RESERVE_URL} target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="gensou-row">escape.id</a> : 'escape.id'}{!RESERVE_URL && <><br><span style="font-size:13px;color:#bdb8ab"><J t="販売開始日は決まり次第お知らせします。" /></span></>}</span></div>
       </div>
-      {RESERVE_URL ? (
+      {ENDED ? (
+        <div class="cta off is-ended"><span>本公演は終了しました</span></div>
+      ) : RESERVE_URL ? (
         <a href={RESERVE_URL} class="cta" target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="gensou-ticket"><span>escape.id で予約する</span><span class="arc">→</span></a>
       ) : (
         <div class="cta off"><span>チケット近日販売開始</span><span class="arc">→</span></div>
@@ -767,7 +793,9 @@ img{max-width:100%}
         <li>夢の島熱帯植物館</li>
         <li>個別 3,500円／グループ 14,000円</li>
       </ul>
-      {RESERVE_URL ? (
+      {ENDED ? (
+        <div class="cta off is-ended"><span>本公演は終了しました</span></div>
+      ) : RESERVE_URL ? (
         <a href={RESERVE_URL} class="cta" target="_blank" rel="noopener" data-track="ticket" data-show="gensou" data-place="gensou-final"><span>escape.id で予約する</span><span class="arc">→</span></a>
       ) : (
         <a href="#ticket" class="cta off"><span>チケット情報を見る</span><span class="arc">↑</span></a>
@@ -871,6 +899,6 @@ img{max-width:100%}
   });
 })();
 </script>
-{RESERVE_URL && <StickyReserve href={RESERVE_URL} label="日程・空席を見る" show="gensou" place="gensou-sticky" until={dates[dates.length - 1]} theme="dark" offsetRight={52} />}
+{RESERVE_URL && !ENDED && <StickyReserve href={RESERVE_URL} label="日程・空席を見る" show="gensou" place="gensou-sticky" until={dates[dates.length - 1]} theme="dark" offsetRight={52} />}
 </body>
 </html>

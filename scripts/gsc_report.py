@@ -32,7 +32,7 @@ TARGETS = [
                  ('盛り上がる イベント 企画', '/guide/taikengata-idea/'), ('体験型 イベント 会社', '/guide/taikengata-company/'), ('体験型イベント 費用', '/guide/event-hiyou/'),
                  ('参加型イベント', '/guide/sankagata-event/'), ('参加型とは', '/guide/sankagata-event/'), ('社内イベント 企画', '/guide/shanai-event/')]),
     ('謎解き（維持）', [('謎解き制作', '/guide/nazotoki-seisaku/'), ('謎解き 制作', '/guide/nazotoki-seisaku/'), ('謎解き 制作 依頼 チームビルディング', '/guide/nazotoki-seisaku/'), ('謎解き 制作 費用', '/guide/nazotoki-company/'), ('謎解き 会社 選定基準', '/guide/nazotoki-company/')]),
-    ('軸7 周遊', [('周遊イベント', '/guide/shuyu-event/'), ('周遊 イベント アイデア', '/guide/shuyu-event/'), ('周遊型 謎解き', '/guide/shuyu-event/'), ('回遊 施策 アイデア', '/guide/shuyu-event/'), ('回遊 周遊 違い', '/guide/shuyu-event/')]),
+    ('軸7 周遊', [('周遊イベント', '/guide/shuyu-event/'), ('周遊 イベント アイデア', '/guide/shuyu-event/'), ('周遊型 謎解き', '/guide/shuyu-event/'), ('回遊 施策 アイデア', '/guide/shuyu-event/'), ('回遊 周遊 違い', '/guide/shuyu-event/'), ('回遊とは', '/guide/kaiyu/'), ('回遊型', '/guide/shuyu-event/'), ('回遊企画', '/guide/kaiyu/'), ('回遊性', '/guide/kaiyu/'), ('回遊率', '/guide/kaiyu/')]),
 ]
 AXIS_RE = {
     '軸1 イマーシブ': r'イマーシブ|immersive|没入', '軸2 マダミス': r'マダミス|マーダー', '軸3 頭脳戦': r'頭脳', '軸4 心理戦': r'心理戦',

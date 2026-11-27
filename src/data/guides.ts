@@ -609,6 +609,14 @@ export const guideArticles: GuideArticle[] = [
     thumb: '/assets/guide/botsunyukan.webp',
   },
   {
+    href: '/guide/kaiyu/',
+    title: '回遊とは？意味と、商業施設・商店街で回遊を生む施策',
+    desc: '回遊の意味と読み方、回遊性・回遊率・買い回りの違い、回遊が起きにくい理由、回遊を生む施策の種類と測り方を解説。',
+    date: '2026-11-27',
+    category: 'shisetsu',
+    thumb: '/assets/guide/kaiyu.webp',
+  },
+  {
     href: '/guide/nazotoki-seisaku/',
     title: '謎解き制作の依頼ガイド｜依頼前に決めること・工程・費用の内訳',
     desc: '依頼前に決める4つのこと、制作の工程と依頼側の確認事項、難易度と所要時間の決め方、費用の内訳を解説。',
